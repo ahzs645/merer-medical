@@ -13,7 +13,8 @@
     "resolveJsonModule": true,
     "paths": {
       "@mere/domain": ["../domain/src/index.ts"],
-      "@mere/data": ["../data/src/index.ts"]
+      "@mere/data": ["../data/src/index.ts"],
+      "@mere/local-dexie": ["./src/index.ts"]
     }
   },
   "include": ["src/**/*"]

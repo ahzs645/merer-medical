@@ -4,6 +4,15 @@ import { map } from 'rxjs/operators';
 import { DatabaseCollections } from '../app/providers/DatabaseCollections';
 import { UserDocument } from '../models/user-document/UserDocument.type';
 import uuid4 from '../shared/utils/UUIDUtils';
+import {
+  getDataClient,
+  isDexieReposEnabled,
+  liveRxObservable,
+  userPatchToDomain,
+  userToLegacy,
+  wrapAsRxDocument,
+  type RxDocumentLike,
+} from './dexie-bridge';
 
 const defaultUser: UserDocument = {
   id: uuid4(),
@@ -11,10 +20,36 @@ const defaultUser: UserDocument = {
   is_default_user: true,
 };
 
+function buildUserHandle(user: UserDocument): RxDocumentLike<UserDocument> {
+  const client = getDataClient();
+  return wrapAsRxDocument<UserDocument>(user, {
+    update: async (patch) => {
+      const next = await client.users.update(
+        user.id,
+        userPatchToDomain(patch as Partial<UserDocument>),
+      );
+      return { ...userToLegacy(next), ...patch };
+    },
+    remove: async () => {
+      await client.users.delete(user.id);
+    },
+  });
+}
+
+async function dexieListAllLegacy(): Promise<UserDocument[]> {
+  const client = getDataClient();
+  const users = await client.users.list();
+  return users.map(userToLegacy);
+}
+
 export async function findUserById(
   db: RxDatabase<DatabaseCollections>,
   id: string,
 ): Promise<UserDocument | null> {
+  if (isDexieReposEnabled()) {
+    const u = await getDataClient().users.get(id);
+    return u ? userToLegacy(u) : null;
+  }
   const doc = await db.user_documents.findOne({ selector: { id } }).exec();
   return doc ? doc.toJSON() : null;
 }
@@ -22,6 +57,10 @@ export async function findUserById(
 export async function findSelectedUser(
   db: RxDatabase<DatabaseCollections>,
 ): Promise<UserDocument | null> {
+  if (isDexieReposEnabled()) {
+    const u = await getDataClient().users.getSelected();
+    return u ? userToLegacy(u) : null;
+  }
   const doc = await db.user_documents
     .findOne({ selector: { is_selected_user: true } })
     .exec();
@@ -31,6 +70,9 @@ export async function findSelectedUser(
 export async function findAllUsers(
   db: RxDatabase<DatabaseCollections>,
 ): Promise<UserDocument[]> {
+  if (isDexieReposEnabled()) {
+    return dexieListAllLegacy();
+  }
   const docs = await db.user_documents.find().exec();
   return docs.map((doc) => doc.toJSON());
 }
@@ -38,6 +80,10 @@ export async function findAllUsers(
 export async function userExists(
   db: RxDatabase<DatabaseCollections>,
 ): Promise<boolean> {
+  if (isDexieReposEnabled()) {
+    const list = await getDataClient().users.list();
+    return list.length > 0;
+  }
   const users = await db.user_documents.find().limit(1).exec();
   return users.length > 0;
 }
@@ -48,6 +94,16 @@ export async function findSelectedUserWithDoc(
   user: UserDocument;
   rawUser: RxDocument<UserDocument> | null;
 }> {
+  if (isDexieReposEnabled()) {
+    const u = await getDataClient().users.getSelected();
+    if (!u) return { user: defaultUser, rawUser: null };
+    const legacy = userToLegacy(u);
+    const handle = buildUserHandle(legacy);
+    return {
+      user: { ...defaultUser, ...legacy } as UserDocument,
+      rawUser: handle as unknown as RxDocument<UserDocument>,
+    };
+  }
   const rawUser = await db.user_documents
     .findOne({ selector: { is_selected_user: true } })
     .exec();
@@ -63,6 +119,12 @@ export async function findSelectedUserWithDoc(
 export async function findAllUsersWithDocs(
   db: RxDatabase<DatabaseCollections>,
 ): Promise<RxDocument<UserDocument>[]> {
+  if (isDexieReposEnabled()) {
+    const users = await dexieListAllLegacy();
+    return users.map(
+      (u) => buildUserHandle(u) as unknown as RxDocument<UserDocument>,
+    );
+  }
   return db.user_documents.find().exec();
 }
 
@@ -72,6 +134,17 @@ export function watchSelectedUser(
   user: UserDocument;
   rawUser: RxDocument<UserDocument> | null;
 }> {
+  if (isDexieReposEnabled()) {
+    return liveRxObservable(async () => {
+      const u = await getDataClient().users.getSelected();
+      if (!u) return { user: defaultUser, rawUser: null };
+      const legacy = userToLegacy(u);
+      return {
+        user: { ...defaultUser, ...legacy } as UserDocument,
+        rawUser: buildUserHandle(legacy) as unknown as RxDocument<UserDocument>,
+      };
+    });
+  }
   return db.user_documents
     .findOne({ selector: { is_selected_user: true } })
     .$.pipe(
@@ -88,6 +161,9 @@ export function watchSelectedUser(
 export function watchAllUsers(
   db: RxDatabase<DatabaseCollections>,
 ): Observable<UserDocument[]> {
+  if (isDexieReposEnabled()) {
+    return liveRxObservable(() => dexieListAllLegacy());
+  }
   return db.user_documents
     .find()
     .$.pipe(map((docs) => docs.map((doc) => doc.toJSON())));
@@ -96,6 +172,14 @@ export function watchAllUsers(
 export function watchAllUsersWithDocs(
   db: RxDatabase<DatabaseCollections>,
 ): Observable<RxDocument<UserDocument>[]> {
+  if (isDexieReposEnabled()) {
+    return liveRxObservable(async () => {
+      const users = await dexieListAllLegacy();
+      return users.map(
+        (u) => buildUserHandle(u) as unknown as RxDocument<UserDocument>,
+      );
+    });
+  }
   return db.user_documents
     .find()
     .$.pipe(map((users) => users as RxDocument<UserDocument>[]));
@@ -105,6 +189,36 @@ export async function createUser(
   db: RxDatabase<DatabaseCollections>,
   userData: Partial<UserDocument>,
 ): Promise<RxDocument<UserDocument>> {
+  if (isDexieReposEnabled()) {
+    const client = getDataClient();
+    const created = await client.users.create({
+      firstName: userData.first_name,
+      lastName: userData.last_name,
+      email: userData.email,
+      gender: userData.gender,
+      birthday: userData.birthday,
+    });
+    // honor explicit flags the caller passed in (the createUser API does not
+    // set isDefault/isSelected by default).
+    if (
+      userData.is_selected_user !== undefined ||
+      userData.is_default_user !== undefined
+    ) {
+      await client.users.update(created.id, {
+        ...(userData.is_selected_user !== undefined && {
+          isSelected: userData.is_selected_user,
+        }),
+        ...(userData.is_default_user !== undefined && {
+          isDefault: userData.is_default_user,
+        }),
+      });
+    }
+    const legacy = userToLegacy(
+      (await client.users.get(created.id)) ?? created,
+    );
+    return buildUserHandle(legacy) as unknown as RxDocument<UserDocument>;
+  }
+
   const newUser: UserDocument = {
     id: uuid4(),
     is_selected_user: false,
@@ -117,12 +231,27 @@ export async function createUser(
 export async function createDefaultUserIfNone(
   db: RxDatabase<DatabaseCollections>,
 ): Promise<boolean> {
-  const existingUser = await db.user_documents.findOne({}).exec();
+  if (isDexieReposEnabled()) {
+    const client = getDataClient();
+    const existing = await client.users.list();
+    if (existing.length > 0) return false;
+    await client.users.create({});
+    // mark default + selected — users.create already marks first user as both,
+    // but be defensive.
+    const selected = await client.users.getSelected();
+    if (selected) {
+      await client.users.update(selected.id, {
+        isDefault: true,
+        isSelected: true,
+      });
+    }
+    return true;
+  }
 
+  const existingUser = await db.user_documents.findOne({}).exec();
   if (existingUser) {
     return false;
   }
-
   await db.user_documents.insert(defaultUser);
   return true;
 }
@@ -132,12 +261,17 @@ export async function updateUser(
   id: string,
   updates: Partial<UserDocument>,
 ): Promise<void> {
-  const doc = await db.user_documents.findOne({ selector: { id } }).exec();
+  if (isDexieReposEnabled()) {
+    const existing = await getDataClient().users.get(id);
+    if (!existing) throw new Error(`User not found: ${id}`);
+    await getDataClient().users.update(id, userPatchToDomain(updates));
+    return;
+  }
 
+  const doc = await db.user_documents.findOne({ selector: { id } }).exec();
   if (!doc) {
     throw new Error(`User not found: ${id}`);
   }
-
   await doc.update({ $set: updates });
 }
 
@@ -146,6 +280,15 @@ export async function switchUser(
   toUserId: string,
 ): Promise<void> {
   console.debug(`UserRepository: Switching to user ${toUserId}`);
+
+  if (isDexieReposEnabled()) {
+    const client = getDataClient();
+    const target = await client.users.get(toUserId);
+    if (!target) throw new Error(`User not found: ${toUserId}`);
+    await client.users.select(toUserId);
+    console.debug(`UserRepository: Successfully switched to user ${toUserId}`);
+    return;
+  }
 
   const newUser = await db.user_documents
     .findOne({ selector: { id: toUserId } })
@@ -184,11 +327,16 @@ export async function deleteUser(
   db: RxDatabase<DatabaseCollections>,
   id: string,
 ): Promise<void> {
-  const doc = await db.user_documents.findOne({ selector: { id } }).exec();
+  if (isDexieReposEnabled()) {
+    const existing = await getDataClient().users.get(id);
+    if (!existing) throw new Error(`User not found: ${id}`);
+    await getDataClient().users.delete(id);
+    return;
+  }
 
+  const doc = await db.user_documents.findOne({ selector: { id } }).exec();
   if (!doc) {
     throw new Error(`User not found: ${id}`);
   }
-
   await doc.remove();
 }

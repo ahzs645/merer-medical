@@ -75,16 +75,46 @@ the server; it goes straight into the browser store.
 
 The Dexie store and the `.emrpkg` format don't care which mode you're in.
 
-## Wiring this into the existing app
+## Wiring into the existing app
 
-The existing `apps/web` uses RxDB; this scaffold does not replace it yet.
-Three reasonable next steps:
+The three leaf repositories — `UserRepository`, `ConnectionRepository`, and
+`ClinicalDocumentRepository` (in `apps/web/src/repositories/`) — now branch
+on a runtime flag:
 
-1. Add `@mere/data` as a thin facade over the existing RxDB repositories — the
-   UI can start calling `AppDataClient` methods while storage stays RxDB.
-2. Stand up a new screen/feature on `@mere/local-dexie` directly to validate
-   the format end-to-end.
-3. Replace RxDB import/export in `UserDataSettingsGroup.tsx` with the
-   `.emrpkg` writer/reader from `@mere/local-dexie`.
+```js
+// Enable
+localStorage.setItem('mere.useDexieRepos', 'true');
 
-None of those are done yet — this scaffold is the foundation only.
+// Disable
+localStorage.removeItem('mere.useDexieRepos');
+```
+
+When the flag is on, those three repositories delegate to a Dexie-backed
+`AppDataClient` via `apps/web/src/repositories/dexie-bridge/`. When off,
+they use the existing RxDB code path unchanged. Default is off, so the app
+behaves exactly as before until you opt in.
+
+### ⚠️ Split-brain warning
+
+Most FHIR sync code does NOT go through the repositories — `Epic.ts`,
+`Cerner.ts`, `Veradigm.ts`, `Healow.ts`, `VA.ts`, and `SyncJobProvider`
+all call RxDB collections directly. With the flag on:
+
+- Reads/writes through the three migrated repositories hit **Dexie**.
+- Reads/writes from FHIR sync, vectors, summary, timeline, etc. still hit
+  **RxDB**.
+
+So data created by a portal sync won't be visible to repository readers,
+and vice versa. The flag is intended for development of the new Dexie
+store and the `.emrpkg` flow, not for running the app against live
+portals. If you ingest data only via `.emrpkg` import, the split-brain
+doesn't matter.
+
+### What's still to do
+
+1. Migrate the remaining call sites that bypass the repositories — start
+   with `SyncJobProvider` and the FHIR portal services — so the flag can
+   become the default.
+2. Wire `.emrpkg` import/export into `UserDataSettingsGroup.tsx` alongside
+   (or replacing) the existing JSON dump.
+3. Remove the RxDB path once everything is on Dexie.

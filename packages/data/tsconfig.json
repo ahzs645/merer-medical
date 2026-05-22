@@ -13,7 +13,9 @@
     "isolatedModules": true,
     "resolveJsonModule": true,
     "paths": {
-      "@mere/domain": ["../domain/src/index.ts"]
+      "@mere/domain": ["../domain/src/index.ts"],
+      "@mere/data": ["./src/index.ts"],
+      "@mere/local-dexie": ["../local-dexie/src/index.ts"]
     }
   },
   "include": ["src/**/*"]
