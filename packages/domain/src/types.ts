@@ -29,7 +29,8 @@ export type ConnectionSource =
   | 'cerner'
   | 'veradigm'
   | 'va'
-  | 'healow';
+  | 'healow'
+  | 'manual';
 
 export interface Connection extends BaseRecord {
   userId: AppId;

@@ -1,15 +1,7 @@
 name: build staging
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - ready_for_review
+  workflow_dispatch:
 
 env:
   username: cfu288
@@ -17,7 +9,6 @@ env:
 
 jobs:
   app-multiplatform:
-    if: github.event_name == 'push' || !github.event.pull_request.draft
     strategy:
       matrix:
         include:
@@ -34,7 +25,7 @@ jobs:
 
       - name: Get app version
         id: version
-        run: echo "version=$(git describe --tags)" >> $GITHUB_OUTPUT
+        run: echo "version=$(git describe --tags 2>/dev/null || git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -99,7 +90,6 @@ jobs:
             $(printf 'cfu288/mere-medical@sha256:%s ' *)
 
   app-demo:
-    if: github.event_name == 'push' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -109,7 +99,7 @@ jobs:
 
       - name: Get app version
         id: version
-        run: echo "version=$(git describe --tags)" >> $GITHUB_OUTPUT
+        run: echo "version=$(git describe --tags 2>/dev/null || git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -134,7 +124,6 @@ jobs:
           tags: cfu288/mere-medical:beta-demo
 
   docs:
-    if: github.event_name == 'push' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -183,6 +183,10 @@ function startSyncConnection(
   syncJobEntries: Set<string>,
   handleFetchData: (item: RxDocument<ConnectionDocument>) => void,
 ) {
+  if (item.get('source') === 'manual') {
+    return;
+  }
+
   if (
     !item.get('last_refreshed') ||
     (item.get('last_refreshed') &&
@@ -358,6 +362,9 @@ async function fetchMedicalRecords(
   useProxy = false,
 ) {
   switch (connectionDocument.get('source') as ConnectionSources) {
+    case 'manual': {
+      return [];
+    }
     case 'onpatient': {
       try {
         const syncJob = await OnPatient.syncAllRecords(

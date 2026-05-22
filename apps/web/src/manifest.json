@@ -4,14 +4,16 @@
   "description": "Personal Medical Record Management",
   "icons": [
     {
-      "src": "/assets/icon/icon-1024.png",
+      "src": "assets/icon/icon-1024.png",
       "type": "image/png",
-      "sizes": "1024x1024"
+      "sizes": "1024x1024",
+      "purpose": "any maskable"
     },
     {
-      "src": "/assets/icon/icon-512.png",
+      "src": "assets/icon/icon-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",

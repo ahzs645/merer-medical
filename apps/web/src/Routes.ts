@@ -1,5 +1,6 @@
 export enum Routes {
   Timeline = '/timeline',
+  AddRecord = '/records/new',
   AddConnection = '/connections',
   Summary = '/summary',
   MereAIAssistant = '/assistant',

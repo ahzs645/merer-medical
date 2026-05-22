@@ -7,7 +7,8 @@ export type ConnectionSources =
   | 'cerner'
   | 'veradigm'
   | 'va'
-  | 'healow';
+  | 'healow'
+  | 'manual';
 
 export interface ConnectionDocument extends BaseDocument {
   user_id: string;
