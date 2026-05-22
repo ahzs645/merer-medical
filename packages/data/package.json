@@ -1,0 +1,22 @@
+{
+  "name": "@mere/data",
+  "version": "0.0.0",
+  "private": true,
+  "description": "AppDataClient interface, factory, and reactive hook stubs. UI talks to this — never to Dexie or Convex directly.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./hooks": "./src/hooks/index.ts"
+  },
+  "dependencies": {
+    "@mere/domain": "*"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true }
+  }
+}
