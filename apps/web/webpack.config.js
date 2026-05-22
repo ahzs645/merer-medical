@@ -8,9 +8,17 @@ const path = require('path');
 function getAppVersion() {
   const childProcess = require('child_process');
   try {
-    return childProcess.execSync('git describe --tag').toString().trim();
+    return childProcess
+      .execSync('git describe --tag', { stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim();
   } catch {
-    return childProcess.execSync('git rev-parse --short HEAD').toString().trim();
+    return childProcess
+      .execSync('git rev-parse --short HEAD', {
+        stdio: ['ignore', 'pipe', 'ignore'],
+      })
+      .toString()
+      .trim();
   }
 }
 

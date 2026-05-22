@@ -29,13 +29,28 @@ and there's no server to compromise."
 The web app is a normal static bundle:
 
 ```sh
+nvm use
+npm ci
 npx nx build web
+npm run preview:web:local
 # output: dist/apps/web/
 ```
 
-Serve `dist/apps/web/` from any static host (object storage + CDN,
-GitHub Pages, an Electron shell, `python -m http.server`, etc.). No
-runtime dependencies.
+The repo pins Node in `.nvmrc` (`20.11.0`); use that version for local
+builds and previews.
+
+`npm run preview:web:local` is the recommended local serverless preview.
+It serves `dist/apps/web/`, returns an empty `{}` instance config for
+`/api/v1/instance-config`, and falls back unknown routes like `/settings`
+to `index.html` so browser refreshes work.
+
+For deployed serverless hosting, serve `dist/apps/web/` from any static
+host (object storage + CDN, GitHub Pages, an Electron shell, etc.). Configure
+the host to:
+
+- Rewrite unknown app routes to `/index.html`.
+- Serve `/api/v1/instance-config` as an empty JSON object (`{}`), or skip
+  that route if you are comfortable with a harmless failed config fetch.
 
 You can also load the bundle from `file://` if you don't mind that the
 service worker won't register from that origin.

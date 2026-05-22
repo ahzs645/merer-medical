@@ -69,6 +69,9 @@ the server; it goes straight into the browser store.
 - **If you only ever ingest data via `.emrpkg` import**, you can serve
   `apps/web` as a static bundle from anywhere (file://, a CDN, or Electron)
   and never run the API. This is the "fully serverless" mode.
+  For local preview, run `npm exec nx -- build web` and then
+  `npm run preview:web:local`; that preview server provides SPA route
+  fallback and an empty `/api/v1/instance-config` response.
 - **If you want live portal sync**, you still need `apps/api` running
   somewhere reachable from the browser — the `PUBLIC_URL` env var points the
   web app at it.
