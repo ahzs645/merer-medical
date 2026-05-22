@@ -7,6 +7,8 @@ import { CardBase } from '../../../connections/components/CardBase';
 import { TimelineCardTitle } from '../TimelineCardTitle';
 import { memo } from 'react';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
+import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
+import { getManualRecordNote } from '../../../../shared/utils/manualRecordUtils';
 
 export const AllergyIntoleranceCard = memo(function AllergyIntoleranceCard({
   item,
@@ -14,6 +16,7 @@ export const AllergyIntoleranceCard = memo(function AllergyIntoleranceCard({
   item: ClinicalDocument<BundleEntry<AllergyIntolerance>>;
 }) {
   const conn = useConnectionDoc(item.connection_record_id);
+  const manualNote = getManualRecordNote(item);
   const resource = item.data_record.raw.resource;
   const displayName =
     resource?.substance?.text ||
@@ -36,6 +39,12 @@ export const AllergyIntoleranceCard = memo(function AllergyIntoleranceCard({
         ) : (
           <SkeletonLoadingText />
         )}
+        {manualNote && (
+          <p className="mt-2 whitespace-pre-line rounded-md bg-slate-50 p-2 text-xs font-medium text-gray-700 md:text-sm">
+            {manualNote}
+          </p>
+        )}
+        <ManualRecordActions item={item} />
       </div>
     </CardBase>
   );

@@ -31,7 +31,6 @@ export async function fetchRawRecords(
       $nin: [
         'patient',
         'careplan',
-        'documentreference_attachment',
         'provenance',
       ],
     },

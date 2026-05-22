@@ -9,6 +9,13 @@ import { SkeletonLoadingText } from '../skeletons/SkeletonLoadingText';
 import { ShowDiagnosticReportResultsExpandable } from '../expandables/ShowDiagnosticReportResultsExpandable';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
 import { OpenableCardIcon } from '../OpenableCardIcon';
+import {
+  getManualObservationInterpretation,
+  getManualObservationRange,
+  getManualObservationValue,
+  getManualRecordNote,
+} from '../../../../shared/utils/manualRecordUtils';
+import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
 
 export const ObservationCard = memo(function ObservationCard({
   item,
@@ -17,6 +24,10 @@ export const ObservationCard = memo(function ObservationCard({
 }) {
   const conn = useConnectionDoc(item.connection_record_id);
   const [expanded, setExpanded] = useState(false);
+  const manualNote = getManualRecordNote(item);
+  const manualValue = getManualObservationValue(item);
+  const manualRange = getManualObservationRange(item);
+  const manualInterpretation = getManualObservationInterpretation(item);
 
   return (
     <>
@@ -42,6 +53,27 @@ export const ObservationCard = memo(function ObservationCard({
           ) : (
             <SkeletonLoadingText />
           )}
+          {manualValue && (
+            <p className="mt-2 text-sm font-semibold text-gray-900">
+              {manualValue}
+              {manualInterpretation ? (
+                <span className="ml-2 text-xs font-medium text-primary-700">
+                  {manualInterpretation}
+                </span>
+              ) : null}
+            </p>
+          )}
+          {manualRange && (
+            <p className="text-xs font-medium text-gray-600">
+              Range: {manualRange}
+            </p>
+          )}
+          {manualNote && (
+            <p className="mt-2 whitespace-pre-line rounded-md bg-slate-50 p-2 text-xs font-medium text-gray-700 md:text-sm">
+              {manualNote}
+            </p>
+          )}
+          <ManualRecordActions item={item} />
         </div>
       </CardBase>
       <ShowDiagnosticReportResultsExpandable

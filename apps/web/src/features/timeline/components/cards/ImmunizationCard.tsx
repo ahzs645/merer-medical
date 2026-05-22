@@ -8,6 +8,8 @@ import { TimelineCardTitle } from '../TimelineCardTitle';
 import { memo } from 'react';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
 import { TimelineCardSubtitile } from '../TimelineCardSubtitile';
+import { getManualRecordNote } from '../../../../shared/utils/manualRecordUtils';
+import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
 
 export const ImmunizationCard = memo(function ImmunizationCard({
   item,
@@ -15,6 +17,7 @@ export const ImmunizationCard = memo(function ImmunizationCard({
   item: ClinicalDocument<BundleEntry<Immunization>>;
 }) {
   const conn = useConnectionDoc(item.connection_record_id);
+  const manualNote = getManualRecordNote(item);
 
   return (
     <CardBase>
@@ -35,6 +38,12 @@ export const ImmunizationCard = memo(function ImmunizationCard({
         ) : (
           <SkeletonLoadingText />
         )}
+        {manualNote && (
+          <p className="mt-2 whitespace-pre-line rounded-md bg-slate-50 p-2 text-xs font-medium text-gray-700 md:text-sm">
+            {manualNote}
+          </p>
+        )}
+        <ManualRecordActions item={item} />
       </div>
     </CardBase>
   );

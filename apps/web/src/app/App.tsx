@@ -85,6 +85,10 @@ const routes = [
         element: <ManualRecordTab />,
       },
       {
+        path: AppRoutes.EditRecord,
+        element: <ManualRecordTab />,
+      },
+      {
         path: AppRoutes.MereAIAssistant,
         element: <MereAITab />,
       },

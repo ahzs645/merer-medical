@@ -7,6 +7,8 @@ import { CardBase } from '../../../connections/components/CardBase';
 import { TimelineCardTitle } from '../TimelineCardTitle';
 import { memo } from 'react';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
+import { getManualRecordNote } from '../../../../shared/utils/manualRecordUtils';
+import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
 
 export const ConditionCard = memo(function ConditionCard({
   item,
@@ -14,6 +16,7 @@ export const ConditionCard = memo(function ConditionCard({
   item: ClinicalDocument<BundleEntry<Condition>>;
 }) {
   const conn = useConnectionDoc(item.connection_record_id);
+  const manualNote = getManualRecordNote(item);
 
   return (
     <CardBase>
@@ -31,6 +34,12 @@ export const ConditionCard = memo(function ConditionCard({
         ) : (
           <SkeletonLoadingText />
         )}
+        {manualNote && (
+          <p className="mt-2 whitespace-pre-line rounded-md bg-slate-50 p-2 text-xs font-medium text-gray-700 md:text-sm">
+            {manualNote}
+          </p>
+        )}
+        <ManualRecordActions item={item} />
       </div>
     </CardBase>
   );

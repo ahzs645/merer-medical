@@ -9,6 +9,8 @@ import { memo, useState } from 'react';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
 import { OpenableCardIcon } from '../OpenableCardIcon';
 import { ShowCarePlanDetailsExpandable } from '../expandables/ShowCarePlanDetailsExpandable';
+import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
+import { getManualRecordNote } from '../../../../shared/utils/manualRecordUtils';
 
 export const CarePlanCard = memo(function CarePlanCard({
   item,
@@ -18,6 +20,7 @@ export const CarePlanCard = memo(function CarePlanCard({
   const conn = useConnectionDoc(item.connection_record_id);
   const [expanded, setExpanded] = useState(false);
   const carePlan = item.data_record.raw.resource;
+  const manualNote = getManualRecordNote(item);
 
   return (
     <>
@@ -54,6 +57,12 @@ export const CarePlanCard = memo(function CarePlanCard({
           ) : (
             <SkeletonLoadingText />
           )}
+          {manualNote && (
+            <p className="mt-2 whitespace-pre-line rounded-md bg-slate-50 p-2 text-xs font-medium text-gray-700 md:text-sm">
+              {manualNote}
+            </p>
+          )}
+          <ManualRecordActions item={item} />
         </div>
       </CardBase>
       <ShowCarePlanDetailsExpandable

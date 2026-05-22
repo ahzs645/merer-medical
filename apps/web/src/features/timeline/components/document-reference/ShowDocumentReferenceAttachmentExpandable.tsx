@@ -41,6 +41,7 @@ export function ShowDocumentResultsAttachmentExpandable({
     >(undefined),
     [hasLoadedDocument, setHasLoadedDocument] = useState(false),
     [pdfUrl, setPdfUrl] = useState<string | undefined>(undefined);
+  const [textContent, setTextContent] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (expanded) {
@@ -75,6 +76,12 @@ export function ShowDocumentResultsAttachmentExpandable({
           );
           setHasLoadedDocument(true);
         }
+      } else if (
+        item.data_record.content_type.startsWith('text/') &&
+        typeof item.data_record.raw === 'string'
+      ) {
+        setTextContent(item.data_record.raw);
+        setHasLoadedDocument(true);
       } else {
         setHasLoadedDocument(true);
       }
@@ -126,8 +133,14 @@ export function ShowDocumentResultsAttachmentExpandable({
               </div>
             )}
 
+            {textContent && (
+              <pre className="max-h-[600px] overflow-auto whitespace-pre-wrap p-4 text-sm text-gray-900">
+                {textContent}
+              </pre>
+            )}
+
             {/* Error message when document can't be displayed */}
-            {hasLoadedDocument && !ccda && !pdfUrl && (
+            {hasLoadedDocument && !ccda && !pdfUrl && !textContent && (
               <p className="text-md p-4 text-gray-900">
                 Sorry, looks like we were unable to get the linked document
               </p>

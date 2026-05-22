@@ -18,6 +18,8 @@ import {
 } from '../../../../shared/utils/fhirAccessHelpers';
 import { OpenableCardIcon } from '../OpenableCardIcon';
 import { ShowEncounterDetailsExpandable } from '../expandables/ShowEncounterDetailsExpandable';
+import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
+import { getManualRecordNote } from '../../../../shared/utils/manualRecordUtils';
 
 export const EncounterCard = memo(function EncounterCard({
   item,
@@ -26,6 +28,7 @@ export const EncounterCard = memo(function EncounterCard({
 }) {
   const conn = useConnectionDoc(item.connection_record_id);
   const [expanded, setExpanded] = useState(false);
+  const manualNote = getManualRecordNote(item);
 
   return (
     <>
@@ -58,6 +61,12 @@ export const EncounterCard = memo(function EncounterCard({
           ) : (
             <SkeletonLoadingText />
           )}
+          {manualNote && (
+            <p className="mt-2 whitespace-pre-line rounded-md bg-slate-50 p-2 text-xs font-medium text-gray-700 md:text-sm">
+              {manualNote}
+            </p>
+          )}
+          <ManualRecordActions item={item as ClinicalDocument} />
         </div>
       </CardBase>
       <ShowEncounterDetailsExpandable

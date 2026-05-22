@@ -212,8 +212,13 @@ describe('useRecordQuery helper functions', () => {
 
       const records = await fetchRawRecords(db, userId, 0, 10);
 
-      expect(records).toHaveLength(1);
-      expect(records[0].data_record.resource_type).toBe('observation');
+      expect(records).toHaveLength(2);
+      expect(records.map((record) => record.data_record.resource_type)).toEqual(
+        expect.arrayContaining([
+          'observation',
+          'documentreference_attachment',
+        ]),
+      );
     });
 
     it('excludes records with empty metadata.date', async () => {

@@ -74,6 +74,48 @@ export async function insertClinicalDocument(
   return saved.toJSON() as ClinicalDocument;
 }
 
+export async function getClinicalDocumentById(
+  db: RxDatabase<DatabaseCollections>,
+  userId: string,
+  id: string,
+): Promise<ClinicalDocument | null> {
+  if (isDexieReposEnabled()) {
+    const doc = await getDataClient().clinicalDocuments.get(id);
+    if (!doc) return null;
+    if (doc.userId !== userId) {
+      throw new Error(
+        `Access denied: Clinical document ${id} belongs to a different user`,
+      );
+    }
+    return clinicalDocumentToLegacy(doc);
+  }
+
+  const doc = (await db.clinical_documents.findByIds([id])).get(id);
+  if (doc && doc.get('user_id') !== userId) {
+    throw new Error(
+      `Access denied: Clinical document ${id} belongs to a different user`,
+    );
+  }
+  return doc ? (doc.toMutableJSON() as ClinicalDocument) : null;
+}
+
+export async function deleteClinicalDocument(
+  db: RxDatabase<DatabaseCollections>,
+  userId: string,
+  id: string,
+): Promise<void> {
+  if (isDexieReposEnabled()) {
+    const doc = await getDataClient().clinicalDocuments.get(id);
+    if (!doc || doc.userId !== userId) return;
+    await getDataClient().clinicalDocuments.delete(id);
+    return;
+  }
+
+  const doc = (await db.clinical_documents.findByIds([id])).get(id);
+  if (!doc || doc.get('user_id') !== userId) return;
+  await doc.remove();
+}
+
 export async function findClinicalDocuments(
   db: RxDatabase<DatabaseCollections>,
   query: {

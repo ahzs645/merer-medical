@@ -11,6 +11,7 @@ import { ShowDocumentResultsExpandable } from '../document-reference/ShowDocumen
 import { SkeletonLoadingText } from '../skeletons/SkeletonLoadingText';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
 import { TimelineCardTitle } from '../TimelineCardTitle';
+import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
 
 export const DocumentReferenceCard = memo(function DocumentReferenceCard({
   item,
@@ -55,6 +56,7 @@ export const DocumentReferenceCard = memo(function DocumentReferenceCard({
           ) : (
             <SkeletonLoadingText />
           )}
+          <ManualRecordActions item={item} />
         </div>
       </CardBase>
       <ShowDocumentResultsExpandable
@@ -108,6 +110,7 @@ export const DocumentReferenceAttachmentCard = memo(
             ) : (
               <SkeletonLoadingText />
             )}
+            <ManualRecordActions item={item as ClinicalDocument} />
           </div>
         </CardBase>
         <ShowDocumentResultsAttachmentExpandable

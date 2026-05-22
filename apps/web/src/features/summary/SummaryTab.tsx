@@ -173,19 +173,40 @@ async function fetchPinned(
     })
     .exec();
 
-  if (pinnedIds === null) {
-    return [];
-  }
+  const pinnedIdsList = pinnedIds?.pinned_labs || [];
+  const pinnedDocs = await db.clinical_documents.findByIds(pinnedIdsList);
+  const manualLabs = await db.clinical_documents
+    .find({
+      selector: {
+        user_id,
+        'data_record.resource_type': 'observation',
+        'metadata.date': { $nin: [null, undefined, ''] },
+      },
+      sort: [{ 'metadata.date': 'desc' }],
+    })
+    .exec();
 
-  const pinnedIdsList = pinnedIds.pinned_labs || [];
-
-  return db.clinical_documents.findByIds(pinnedIdsList).then((map) => {
-    const lst = [...map.values()] as RxDocument<
-      ClinicalDocument<BundleEntry<FhirResource>>
-    >[];
-
-    return lst;
+  const byId = new Map<
+    string,
+    RxDocument<ClinicalDocument<BundleEntry<FhirResource>>>
+  >();
+  [...pinnedDocs.values(), ...manualLabs].forEach((doc) => {
+    const raw = doc.get('data_record.raw') as {
+      fullUrl?: string;
+      manual_kind?: string;
+    };
+    if (
+      pinnedIdsList.includes(doc.get('id')) ||
+      raw.fullUrl?.startsWith('manual:')
+    ) {
+      byId.set(
+        doc.get('id'),
+        doc as RxDocument<ClinicalDocument<BundleEntry<FhirResource>>>,
+      );
+    }
   });
+
+  return [...byId.values()];
 }
 
 enum ActionTypes {
