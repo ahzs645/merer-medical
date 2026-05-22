@@ -57,6 +57,11 @@ import {
   createConnection,
   updateConnection,
 } from '../../repositories/ConnectionRepository';
+import {
+  findClinicalDocuments,
+  insertClinicalDocument,
+  upsertClinicalDocuments,
+} from '../../repositories/ClinicalDocumentRepository';
 import uuid4 from '../../shared/utils/UUIDUtils';
 
 export {
@@ -213,7 +218,8 @@ async function syncFHIRResource<T extends FhirResource>(
         fhirResourceUrl.toLowerCase(),
     )
     .map(mapper);
-  const cdsmap = await db.clinical_documents.bulkUpsert(
+  const cdsmap = await upsertClinicalDocuments(
+    db,
     cds as unknown as ClinicalDocument[],
   );
   return cdsmap;
@@ -351,25 +357,16 @@ async function syncDocumentReferences(
     params,
   );
 
-  const docs = await db.clinical_documents
-    .find({
-      selector: {
-        user_id: connectionDocument.user_id,
-        'data_record.resource_type': {
-          $eq: 'documentreference',
-        },
-        connection_record_id: `${connectionDocument.id}`,
-      },
-    })
-    .exec();
+  const docs = await findClinicalDocuments(db, {
+    userId: connectionDocument.user_id,
+    connectionId: connectionDocument.id,
+    resourceType: 'documentreference',
+  });
 
   // format all the document references
-  const docRefItems = docs.map(
-    (doc) =>
-      doc.toMutableJSON() as unknown as ClinicalDocument<
-        BundleEntry<DocumentReference>
-      >,
-  );
+  const docRefItems = docs as unknown as ClinicalDocument<
+    BundleEntry<DocumentReference>
+  >[];
   // for each docref, get attachments and sync them
   const cdsmap = docRefItems.map(async (docRefItem) => {
     const attachmentUrls = (
@@ -378,19 +375,11 @@ async function syncDocumentReferences(
     if (attachmentUrls) {
       for (const attachmentUrl of attachmentUrls) {
         if (attachmentUrl) {
-          const exists = await db.clinical_documents
-            .find({
-              selector: {
-                $and: [
-                  { user_id: connectionDocument.user_id },
-                  { 'metadata.id': `${attachmentUrl}` },
-                  {
-                    connection_record_id: `${docRefItem.connection_record_id}`,
-                  },
-                ],
-              },
-            })
-            .exec();
+          const exists = await findClinicalDocuments(db, {
+            userId: connectionDocument.user_id,
+            connectionId: docRefItem.connection_record_id,
+            metadataId: `${attachmentUrl}`,
+          });
           if (exists.length === 0) {
             console.log('Syncing attachment: ' + attachmentUrl);
             // attachment does not exist, sync it
@@ -420,9 +409,7 @@ async function syncDocumentReferences(
                 },
               };
 
-              await db.clinical_documents.insert(
-                cd as unknown as ClinicalDocument,
-              );
+              await insertClinicalDocument(db, cd as unknown as ClinicalDocument);
             }
           } else {
             console.log('Attachment already synced: ' + attachmentUrl);

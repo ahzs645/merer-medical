@@ -96,19 +96,22 @@ behaves exactly as before until you opt in.
 
 ### ⚠️ Split-brain warning
 
-Most FHIR sync code does NOT go through the repositories — `Epic.ts`,
-`Cerner.ts`, `Veradigm.ts`, `Healow.ts`, `VA.ts`, and `SyncJobProvider`
-all call RxDB collections directly. With the flag on:
+Some app flows still do NOT go through the repositories. With the flag on:
 
-- Reads/writes through the three migrated repositories hit **Dexie**.
-- Reads/writes from FHIR sync, vectors, summary, timeline, etc. still hit
+- Reads/writes through the migrated repositories hit **Dexie**.
+- FHIR sync writes clinical documents through `ClinicalDocumentRepository`,
+  and connection token/timestamp updates through `ConnectionRepository`, so
+  `SyncJobProvider`, `Epic.ts`, `Cerner.ts`, `Veradigm.ts`, `Healow.ts`, and
+  `VA.ts` no longer create a clinical-document split-brain for the flagged
+  path.
+- Vectors, summary, timeline, AI search, and other direct collection users
+  still hit
   **RxDB**.
 
-So data created by a portal sync won't be visible to repository readers,
-and vice versa. The flag is intended for development of the new Dexie
-store and the `.emrpkg` flow, not for running the app against live
-portals. If you ingest data only via `.emrpkg` import, the split-brain
-doesn't matter.
+So the flag is still intended for development of the new Dexie store and
+the `.emrpkg` flow, not for making Dexie the default store yet. The vector
+pipeline is disabled while `mere.useDexieRepos` is enabled because it still
+depends on RxDB collections.
 
 ### .emrpkg in the Settings UI
 
@@ -134,10 +137,10 @@ how a future "smart importer" would tell them apart.
 ### What's still to do
 
 1. Migrate the remaining call sites that bypass the repositories — start
-   with `SyncJobProvider` and the FHIR portal services
-   (`Epic.ts`/`Cerner.ts`/`Veradigm.ts`/`Healow.ts`/`VA.ts`) — so the flag
-   can become the default. These cannot be validated in CI because they
-   require live portal OAuth.
+   with the vector/RAG pipeline and timeline/summary readers — so the flag
+   can become the default. Portal sync still needs manual OAuth validation,
+   but its clinical-document persistence now goes through the flagged
+   repository path.
 2. Extract embedded FHIR attachments (`DocumentReference.content[].attachment.data`,
    etc.) into the `attachments/` folder of the zip on export, and re-embed
    on import. Today they ship as base64 inside the JSON dump — functionally

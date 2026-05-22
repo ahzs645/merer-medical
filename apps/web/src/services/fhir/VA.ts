@@ -25,6 +25,7 @@ import {
   createConnection,
   updateConnection,
 } from '../../repositories/ConnectionRepository';
+import { upsertClinicalDocuments } from '../../repositories/ClinicalDocumentRepository';
 import {
   ClinicalDocument,
   CreateClinicalDocument,
@@ -165,7 +166,8 @@ async function syncFHIRResource<T extends FhirResource>(
         fhirResourceUrl.toLowerCase(),
     )
     .map(mapper);
-  const cdsmap = await db.clinical_documents.bulkUpsert(
+  const cdsmap = await upsertClinicalDocuments(
+    db,
     cds as unknown as ClinicalDocument[],
   );
   return cdsmap;

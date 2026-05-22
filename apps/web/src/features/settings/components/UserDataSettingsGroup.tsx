@@ -372,15 +372,14 @@ export function UserDataSettingsGroup() {
                     checked={emrpkgEncrypt}
                     onChange={(e) => setEmrpkgEncrypt(e.target.checked)}
                   />
-                  Encrypt
+                  Encrypt export
                 </label>
                 <input
                   type="password"
-                  placeholder="Passphrase"
+                  placeholder="Passphrase for encrypted package"
                   className="focus:ring-primary-500 focus:border-primary-500 block w-56 rounded-md border-gray-300 text-sm shadow-sm"
                   value={emrpkgPassphrase}
                   onChange={(e) => setEmrpkgPassphrase(e.target.value)}
-                  disabled={!emrpkgEncrypt}
                   autoComplete="new-password"
                 />
                 <button

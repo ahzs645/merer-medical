@@ -5,10 +5,16 @@ const { merge } = require('webpack-merge');
 const { InjectManifest } = require('workbox-webpack-plugin');
 const path = require('path');
 
-const commitHash = require('child_process')
-  .execSync('git describe --tag')
-  .toString()
-  .trim();
+function getAppVersion() {
+  const childProcess = require('child_process');
+  try {
+    return childProcess.execSync('git describe --tag').toString().trim();
+  } catch {
+    return childProcess.execSync('git rev-parse --short HEAD').toString().trim();
+  }
+}
+
+const commitHash = getAppVersion();
 
 function myCustomPlugin() {
   // `options` and `context` are the target options and

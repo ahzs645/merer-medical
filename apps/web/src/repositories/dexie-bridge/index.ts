@@ -59,6 +59,8 @@ export function isDexieReposEnabled(): boolean {
  * document's own fields (via T) plus the RxDB-style methods we shim.
  */
 export type RxDocumentLike<T extends object> = T & {
+  get<K extends keyof T>(key: K): T[K];
+  get(key: string): unknown;
   toJSON(): T;
   toMutableJSON(): T;
   update(modifier: { $set: Partial<T> }): Promise<void>;
@@ -66,6 +68,8 @@ export type RxDocumentLike<T extends object> = T & {
 };
 
 interface DocMethods<T> {
+  get<K extends keyof T>(key: K): T[K];
+  get(key: string): unknown;
   toJSON(): T;
   toMutableJSON(): T;
   update(modifier: { $set: Partial<T> }): Promise<void>;
@@ -86,6 +90,7 @@ export function wrapAsRxDocument<T extends object>(
 ): RxDocumentLike<T> {
   let current = snapshot;
   const methods: DocMethods<T> = {
+    get: (key: string) => (current as Record<string, any>)[key],
     toJSON: () => ({ ...current }),
     toMutableJSON: () => ({ ...current }),
     async update(mod) {

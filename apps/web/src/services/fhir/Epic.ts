@@ -47,6 +47,11 @@ import { Routes } from '../../Routes';
 import { DSTU2, R4 } from '.';
 import { AppConfig } from '../../app/providers/AppConfigProvider';
 import { createConnection } from '../../repositories/ConnectionRepository';
+import {
+  findClinicalDocuments,
+  insertClinicalDocument,
+  upsertClinicalDocuments,
+} from '../../repositories/ClinicalDocumentRepository';
 import uuid4 from '../../shared/utils/UUIDUtils';
 import { concatPath } from '../../shared/utils/urlUtils';
 import { signJwt } from '@mere/crypto/browser';
@@ -252,7 +257,8 @@ async function syncFHIRResource<T extends FhirResource>(
         fhirResourceUrl.toLowerCase(),
     )
     .map(mapper);
-  const cdsmap = await db.clinical_documents.bulkUpsert(
+  const cdsmap = await upsertClinicalDocuments(
+    db,
     cds as unknown as ClinicalDocument[],
   );
   return cdsmap;
@@ -283,9 +289,7 @@ async function processIncludedResources(
     const mapper = mappers[resourceType];
     if (mapper) {
       const cds = groupedEntries.map(mapper);
-      await db.clinical_documents.bulkUpsert(
-        cds as unknown as ClinicalDocument[],
-      );
+      await upsertClinicalDocuments(db, cds as unknown as ClinicalDocument[]);
     }
   }
 }
@@ -320,7 +324,7 @@ async function syncFHIRResourceWithIncludes<T extends FhirResource>(
         fhirResourceUrl.toLowerCase(),
     )
     .map(mapper);
-  await db.clinical_documents.bulkUpsert(cds as unknown as ClinicalDocument[]);
+  await upsertClinicalDocuments(db, cds as unknown as ClinicalDocument[]);
 
   await processIncludedResources(resc, includeMappers, db, [fhirResourceUrl]);
 }
@@ -723,25 +727,16 @@ async function syncDocumentReferences(
     useProxy,
   );
 
-  const docs = await db.clinical_documents
-    .find({
-      selector: {
-        user_id: connectionDocument.user_id,
-        'data_record.resource_type': {
-          $eq: 'documentreference',
-        },
-        connection_record_id: `${connectionDocument.id}`,
-      },
-    })
-    .exec();
+  const docs = await findClinicalDocuments(db, {
+    userId: connectionDocument.user_id,
+    connectionId: connectionDocument.id,
+    resourceType: 'documentreference',
+  });
 
   // format all the document references
-  const docRefItems = docs.map(
-    (doc) =>
-      doc.toMutableJSON() as unknown as ClinicalDocument<
-        BundleEntry<DocumentReference>
-      >,
-  );
+  const docRefItems = docs as unknown as ClinicalDocument<
+    BundleEntry<DocumentReference>
+  >[];
   // for each docref, get attachments and sync them
   const cdsmap = docRefItems.map(async (docRefItem) => {
     const attachmentUrls = docRefItem.data_record.raw.resource?.content.map(
@@ -750,19 +745,11 @@ async function syncDocumentReferences(
     if (attachmentUrls) {
       for (const attachmentUrl of attachmentUrls) {
         if (attachmentUrl) {
-          const exists = await db.clinical_documents
-            .find({
-              selector: {
-                $and: [
-                  { user_id: connectionDocument.user_id },
-                  { 'metadata.id': `${attachmentUrl}` },
-                  {
-                    connection_record_id: `${docRefItem.connection_record_id}`,
-                  },
-                ],
-              },
-            })
-            .exec();
+          const exists = await findClinicalDocuments(db, {
+            userId: connectionDocument.user_id,
+            connectionId: docRefItem.connection_record_id,
+            metadataId: `${attachmentUrl}`,
+          });
           if (exists.length === 0) {
             const { contentType, raw } = await fetchAttachmentData(
               config,
@@ -794,9 +781,7 @@ async function syncDocumentReferences(
                 },
               };
 
-              await db.clinical_documents.insert(
-                cd as unknown as ClinicalDocument,
-              );
+              await insertClinicalDocument(db, cd as unknown as ClinicalDocument);
             } else {
               console.warn(
                 '[syncDocumentReferences] Skipping attachment save - missing raw or contentType:',

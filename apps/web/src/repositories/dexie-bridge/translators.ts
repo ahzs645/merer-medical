@@ -6,11 +6,13 @@
  */
 
 import type {
+  ClinicalDocument as DomainClinicalDocument,
   Connection,
   ConnectionSource,
   User,
   UserPreferences,
 } from '@mere/domain';
+import type { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import type { UserDocument } from '../../models/user-document/UserDocument.type';
 import type { UserPreferencesDocument } from '../../models/user-preferences/UserPreferences.type';
 import type { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
@@ -206,4 +208,58 @@ export function connectionPatchToDomain(
   if ('patient' in patch) out.patient = patch.patient;
   if ('fhir_version' in patch) out.fhirVersion = patch.fhir_version;
   return out;
+}
+
+// ─── ClinicalDocument ───────────────────────────────────────────────────────
+
+export function clinicalDocumentId(input: {
+  connection_record_id: string;
+  user_id: string;
+  metadata?: { id?: string };
+}): string {
+  return `${input.connection_record_id}|${input.user_id}|${input.metadata?.id ?? ''}`;
+}
+
+export function clinicalDocumentToDomain<T>(
+  input: ClinicalDocument<T>,
+): Omit<DomainClinicalDocument<T>, 'createdAt' | 'updatedAt'> {
+  return {
+    id: input.id || clinicalDocumentId(input),
+    userId: input.user_id,
+    connectionId: input.connection_record_id,
+    format: input.data_record.format,
+    contentType: input.data_record.content_type,
+    resourceType: input.data_record.resource_type,
+    raw: input.data_record.raw,
+    versionHistory: input.data_record.version_history,
+    metadata: {
+      sourceId: input.metadata?.id,
+      date: input.metadata?.date,
+      displayName: input.metadata?.display_name,
+      loincCoding: input.metadata?.loinc_coding,
+    },
+  };
+}
+
+export function clinicalDocumentToLegacy<T>(
+  input: DomainClinicalDocument<T>,
+): ClinicalDocument<T> {
+  return {
+    id: input.id,
+    user_id: input.userId,
+    connection_record_id: input.connectionId,
+    data_record: {
+      raw: input.raw,
+      format: input.format,
+      content_type: input.contentType,
+      resource_type: input.resourceType,
+      version_history: input.versionHistory ?? [],
+    },
+    metadata: {
+      id: input.metadata?.sourceId,
+      date: input.metadata?.date,
+      display_name: input.metadata?.displayName,
+      loinc_coding: input.metadata?.loincCoding,
+    },
+  };
 }

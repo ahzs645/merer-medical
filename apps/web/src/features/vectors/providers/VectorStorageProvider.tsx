@@ -9,6 +9,7 @@ import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { DatabaseCollections } from '../../../app/providers/DatabaseCollections';
 import { createOllamaEmbeddings } from '../../ai-chat/ollama/ollamaEmbeddings';
 import { AI_DEFAULTS } from '../../ai-chat/constants/defaults';
+import { isDexieReposEnabled } from '../../../repositories/dexie-bridge';
 
 export const VectorStorageContext = React.createContext<
   VectorStorage<DatabaseCollections> | undefined
@@ -47,6 +48,13 @@ export function VectorStorageProvider({
 
   useEffect(() => {
     if (!localConfig?.experimental__use_openai_rag || !rxdb) {
+      return;
+    }
+
+    if (isDexieReposEnabled()) {
+      console.warn(
+        'Vector storage is disabled while mere.useDexieRepos is enabled because the vector pipeline still reads and writes RxDB directly.',
+      );
       return;
     }
 
