@@ -33,7 +33,7 @@ export function register(config?: Config) {
     console.log('Installing Service Worker');
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(
-      process.env['PUBLIC_URL'] || '',
+      process.env['PUBLIC_URL'] || document.baseURI,
       window.location.href,
     );
     if (publicUrl.origin !== window.location.origin) {
@@ -45,7 +45,7 @@ export function register(config?: Config) {
     }
 
     window.addEventListener('load', () => {
-      const swUrl = `/service-worker.js`;
+      const swUrl = `${publicUrl.pathname.replace(/\/$/, '')}/service-worker.js`;
 
       if (isLocalhost) {
         // This is running on localhost. Let's check if a service worker still exists or not.

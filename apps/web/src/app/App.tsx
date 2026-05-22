@@ -123,4 +123,9 @@ const routes = [
   },
 ];
 
-const router = createBrowserRouter(routes);
+function getRouterBasename() {
+  const basePath = new URL(document.baseURI).pathname.replace(/\/$/, '');
+  return basePath === '' ? undefined : basePath;
+}
+
+const router = createBrowserRouter(routes, { basename: getRouterBasename() });

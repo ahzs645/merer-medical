@@ -72,7 +72,9 @@ export type ConfigFetcher = () => Promise<AppConfig | null>;
 
 export const defaultConfigFetcher: ConfigFetcher = async () => {
   try {
-    const response = await fetch('/api/v1/instance-config');
+    const response = await fetch(
+      new URL('api/v1/instance-config', document.baseURI),
+    );
     if (!response.ok) {
       console.warn('Failed to fetch config from API:', response.status);
       return null;

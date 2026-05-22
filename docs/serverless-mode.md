@@ -52,6 +52,34 @@ the host to:
 - Serve `/api/v1/instance-config` as an empty JSON object (`{}`), or skip
   that route if you are comfortable with a harmless failed config fetch.
 
+## GitHub Pages
+
+The repo includes `.github/workflows/github-pages.yml`. To deploy:
+
+1. In GitHub, open **Settings → Pages**.
+2. Set **Source** to **GitHub Actions**.
+3. Push to `main`, or run the **Deploy GitHub Pages** workflow manually.
+
+The workflow:
+
+- Uses the pinned Node version from `.node-version`.
+- Builds `apps/web` with the correct Pages base path (`/REPO/` for project
+  Pages, `/` for `OWNER.github.io` repos).
+- Adds `404.html` as an SPA fallback so direct URLs like `/REPO/settings`
+  load correctly.
+- Adds `api/v1/instance-config` containing `{}` so serverless startup does
+  not log a missing API warning.
+- Adds `.nojekyll` so hashed assets and extensionless files are served as-is.
+
+To test the project-Pages shape locally:
+
+```sh
+npm exec nx -- build web --base-href=/mere-medical/
+BASE_PATH=/mere-medical/ npm run preview:web:local
+```
+
+Then open `http://127.0.0.1:4300/mere-medical/settings`.
+
 You can also load the bundle from `file://` if you don't mind that the
 service worker won't register from that origin.
 

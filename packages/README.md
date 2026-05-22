@@ -72,6 +72,8 @@ the server; it goes straight into the browser store.
   For local preview, run `npm exec nx -- build web` and then
   `npm run preview:web:local`; that preview server provides SPA route
   fallback and an empty `/api/v1/instance-config` response.
+  For GitHub Pages, use the `Deploy GitHub Pages` workflow; it builds with
+  the correct Pages base path and uploads the static bundle.
 - **If you want live portal sync**, you still need `apps/api` running
   somewhere reachable from the browser — the `PUBLIC_URL` env var points the
   web app at it.
