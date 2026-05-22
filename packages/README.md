@@ -110,11 +110,38 @@ store and the `.emrpkg` flow, not for running the app against live
 portals. If you ingest data only via `.emrpkg` import, the split-brain
 doesn't matter.
 
+### .emrpkg in the Settings UI
+
+The "Encrypted package (.emrpkg)" row in `UserDataSettingsGroup` exports the
+current RxDB store as a `.emrpkg` and imports one back, with an optional
+passphrase (AES-GCM, PBKDF2-SHA256, 600,000 iterations). The reader/writer
+is split into two layers:
+
+- `@mere/local-dexie` (`packEmrpkg`, `unpackEmrpkg`, `inspectEmrpkg`) — pure
+  envelope + zip + encryption helpers. No Dexie dependency.
+- `apps/web/src/services/emrpkg/` — RxDB-side adapter that reads from / writes
+  to the existing RxDB collections (`user_documents`, `clinical_documents`,
+  `connection_documents`, etc.) using the pure helpers.
+
+The Dexie-native `createPackageCommands(dbName)` continues to read from /
+write to the new Dexie store and uses the same pure helpers. So the same
+`.emrpkg` envelope format is shared between the two source stores, but the
+record shapes inside differ: RxDB-sourced packages contain snake_case
+documents (`user_documents`, etc.), Dexie-sourced packages contain
+camelCase domain rows (`users`, etc.). The manifest's `tables` array is
+how a future "smart importer" would tell them apart.
+
 ### What's still to do
 
 1. Migrate the remaining call sites that bypass the repositories — start
-   with `SyncJobProvider` and the FHIR portal services — so the flag can
-   become the default.
-2. Wire `.emrpkg` import/export into `UserDataSettingsGroup.tsx` alongside
-   (or replacing) the existing JSON dump.
-3. Remove the RxDB path once everything is on Dexie.
+   with `SyncJobProvider` and the FHIR portal services
+   (`Epic.ts`/`Cerner.ts`/`Veradigm.ts`/`Healow.ts`/`VA.ts`) — so the flag
+   can become the default. These cannot be validated in CI because they
+   require live portal OAuth.
+2. Extract embedded FHIR attachments (`DocumentReference.content[].attachment.data`,
+   etc.) into the `attachments/` folder of the zip on export, and re-embed
+   on import. Today they ship as base64 inside the JSON dump — functionally
+   correct but bigger.
+3. Add a "smart import" that can ingest either an RxDB-shaped or
+   Dexie-shaped `.emrpkg` and route into the active store.
+4. Remove the RxDB path once everything is on Dexie.
