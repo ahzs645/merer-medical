@@ -18,6 +18,11 @@
     "baseUrl": ".",
     "paths": {
       "@mere/cerner": ["libs/cerner/src/index.ts"],
+      "@mere/data": ["packages/data/src/index.ts"],
+      "@mere/data/hooks": ["packages/data/src/hooks/index.ts"],
+      "@mere/domain": ["packages/domain/src/index.ts"],
+      "@mere/local-dexie": ["packages/local-dexie/src/index.ts"],
+      "@mere/local-dexie/package-format": ["packages/local-dexie/src/package-format.ts"],
       "@mere/crypto": ["libs/crypto/src/index.ts"],
       "@mere/crypto/browser": ["libs/crypto/src/browser.ts"],
       "@mere/epic": ["libs/epic/src/index.ts"],

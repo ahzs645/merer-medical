@@ -15,6 +15,11 @@ import {
   getStorageQuota,
   requestPersistentStorage,
 } from '../../../shared/utils/storagePermissionUtils';
+import {
+  exportEmrpkgFromRxDb,
+  importEmrpkgToRxDb,
+  inspectEmrpkg,
+} from '../../../services/emrpkg';
 import React from 'react';
 
 export type ImportFields = {
@@ -74,6 +79,20 @@ export const handleImport = (
   });
 };
 
+function readFileAsBytes(file: File): Promise<Uint8Array> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const buf = e.target?.result;
+      if (buf instanceof ArrayBuffer) resolve(new Uint8Array(buf));
+      else reject(new Error('Unable to read file'));
+    };
+    reader.onerror = (e) =>
+      reject(new Error('File read error: ' + e.target?.error));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
 export function UserDataSettingsGroup() {
   const db = useRxDb(),
     [fileDownloadLink, setFileDownloadLink] = useState(''),
@@ -84,6 +103,98 @@ export function UserDataSettingsGroup() {
       useState(false);
 
   const clickDownloadRef = useRef<HTMLAnchorElement | null>(null);
+
+  // ─── .emrpkg state ─────────────────────────────────────────────────────────
+  const [emrpkgPassphrase, setEmrpkgPassphrase] = useState('');
+  const [emrpkgEncrypt, setEmrpkgEncrypt] = useState(false);
+  const [emrpkgDownloadUrl, setEmrpkgDownloadUrl] = useState('');
+  const [emrpkgDownloadName, setEmrpkgDownloadName] = useState('');
+  const [emrpkgBusy, setEmrpkgBusy] = useState(false);
+  const emrpkgDownloadRef = useRef<HTMLAnchorElement | null>(null);
+  const emrpkgImportRef = useRef<HTMLInputElement | null>(null);
+
+  const handleEmrpkgExport = useCallback(async () => {
+    if (emrpkgEncrypt && !emrpkgPassphrase) {
+      notifyDispatch({
+        type: 'set_notification',
+        message: 'Enter a passphrase or uncheck encryption.',
+        variant: 'error',
+      });
+      return;
+    }
+    setEmrpkgBusy(true);
+    try {
+      const bytes = await exportEmrpkgFromRxDb(db, {
+        passphrase: emrpkgEncrypt ? emrpkgPassphrase : undefined,
+      });
+      const blob = new Blob([bytes], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const ts = new Date().toISOString().replace(/[:.]/g, '-');
+      const name = `mere_export_${ts}${emrpkgEncrypt ? '.enc' : ''}.emrpkg`;
+      setEmrpkgDownloadUrl(url);
+      setEmrpkgDownloadName(name);
+      // schedule click after state has flushed
+      setTimeout(() => emrpkgDownloadRef.current?.click(), 0);
+      notifyDispatch({
+        type: 'set_notification',
+        message: `Export ready (${(bytes.byteLength / 1024 / 1024).toFixed(2)} MB)`,
+        variant: 'success',
+      });
+    } catch (e) {
+      notifyDispatch({
+        type: 'set_notification',
+        message: `Export failed: ${(e as Error).message}`,
+        variant: 'error',
+      });
+    } finally {
+      setEmrpkgBusy(false);
+    }
+  }, [db, emrpkgEncrypt, emrpkgPassphrase, notifyDispatch]);
+
+  const handleEmrpkgImport = useCallback(
+    async (file: File) => {
+      setEmrpkgBusy(true);
+      try {
+        const bytes = await readFileAsBytes(file);
+        const info = await inspectEmrpkg(bytes);
+        if (info.encrypted && !emrpkgPassphrase) {
+          notifyDispatch({
+            type: 'set_notification',
+            message: 'This package is encrypted. Enter a passphrase first.',
+            variant: 'error',
+          });
+          setEmrpkgBusy(false);
+          return;
+        }
+        const { counts, unknownTables } = await importEmrpkgToRxDb(bytes, db, {
+          passphrase: info.encrypted ? emrpkgPassphrase : undefined,
+          replace: true,
+        });
+        const total = Object.values(counts).reduce<number>(
+          (a, b) => a + (b ?? 0),
+          0,
+        );
+        const extra = unknownTables.length
+          ? ` (skipped: ${unknownTables.join(', ')})`
+          : '';
+        notifyDispatch({
+          type: 'set_notification',
+          message: `Imported ${total} records${extra}. Reloading…`,
+          variant: 'success',
+        });
+        setTimeout(() => window.location.reload(), 1500);
+      } catch (e) {
+        notifyDispatch({
+          type: 'set_notification',
+          message: `Import failed: ${(e as Error).message}`,
+          variant: 'error',
+        });
+      } finally {
+        setEmrpkgBusy(false);
+      }
+    },
+    [db, emrpkgPassphrase, notifyDispatch],
+  );
 
   const importData: SubmitHandler<ImportFields> = useCallback(
     async (fields) => {
@@ -238,6 +349,83 @@ export function UserDataSettingsGroup() {
                   </button>
                 )}
               </form>
+            </li>
+            {/* ── .emrpkg package import/export ──────────────────────────── */}
+            <li className="flex flex-col py-4">
+              <div className="flex flex-col">
+                <h2 className="text-primary-800 text-lg leading-6">
+                  Encrypted package (.emrpkg)
+                </h2>
+                <p className="pt-2 text-sm text-gray-800">
+                  Export and import your data as a single{' '}
+                  <code className="text-xs">.emrpkg</code> file. Optionally
+                  protect the file with a passphrase (AES-GCM, PBKDF2-SHA256,
+                  600,000 iterations). Use this to move your records between
+                  browsers or devices.
+                </p>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <label className="inline-flex items-center text-sm text-gray-800">
+                  <input
+                    type="checkbox"
+                    className="text-primary-600 focus:ring-primary-500 mr-2 h-4 w-4 rounded border-gray-300"
+                    checked={emrpkgEncrypt}
+                    onChange={(e) => setEmrpkgEncrypt(e.target.checked)}
+                  />
+                  Encrypt
+                </label>
+                <input
+                  type="password"
+                  placeholder="Passphrase"
+                  className="focus:ring-primary-500 focus:border-primary-500 block w-56 rounded-md border-gray-300 text-sm shadow-sm"
+                  value={emrpkgPassphrase}
+                  onChange={(e) => setEmrpkgPassphrase(e.target.value)}
+                  disabled={!emrpkgEncrypt}
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  disabled={emrpkgBusy}
+                  onClick={handleEmrpkgExport}
+                  className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-bold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-500"
+                >
+                  {emrpkgBusy ? (
+                    <>
+                      <span className="pr-2">Working</span>
+                      <ButtonLoadingSpinner />
+                    </>
+                  ) : (
+                    'Export .emrpkg'
+                  )}
+                </button>
+                <button
+                  type="button"
+                  disabled={emrpkgBusy}
+                  onClick={() => emrpkgImportRef.current?.click()}
+                  className="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-500"
+                >
+                  Import .emrpkg
+                </button>
+                <input
+                  ref={emrpkgImportRef}
+                  type="file"
+                  accept=".emrpkg,application/octet-stream,application/zip"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleEmrpkgImport(f);
+                    e.target.value = '';
+                  }}
+                />
+                <a
+                  ref={emrpkgDownloadRef}
+                  href={emrpkgDownloadUrl || undefined}
+                  download={emrpkgDownloadName || undefined}
+                  className="hidden"
+                >
+                  download
+                </a>
+              </div>
             </li>
             {/* Show storage usage  */}
             <li className="flex items-center py-4">
