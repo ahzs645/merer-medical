@@ -7,7 +7,10 @@ import { CardBase } from '../../../connections/components/CardBase';
 import { TimelineCardTitle } from '../TimelineCardTitle';
 import { memo } from 'react';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
-import { getManualRecordNote } from '../../../../shared/utils/manualRecordUtils';
+import {
+  getManualMedicationDetail,
+  getManualRecordNote,
+} from '../../../../shared/utils/manualRecordUtils';
 import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
 
 export const MedicationCard = memo(function MedicationCard({
@@ -17,6 +20,7 @@ export const MedicationCard = memo(function MedicationCard({
 }) {
   const conn = useConnectionDoc(item.connection_record_id);
   const manualNote = getManualRecordNote(item);
+  const manualMedicationDetail = getManualMedicationDetail(item);
 
   return (
     <CardBase>
@@ -36,6 +40,11 @@ export const MedicationCard = memo(function MedicationCard({
           </p>
         ) : (
           <SkeletonLoadingText />
+        )}
+        {manualMedicationDetail && (
+          <p className="mt-2 text-xs font-medium text-gray-700 md:text-sm">
+            {manualMedicationDetail}
+          </p>
         )}
         {manualNote && (
           <p className="mt-2 whitespace-pre-line rounded-md bg-slate-50 p-2 text-xs font-medium text-gray-700 md:text-sm">

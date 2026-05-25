@@ -23,6 +23,7 @@ import {
   upsertClinicalDocuments,
 } from '../../repositories/ClinicalDocumentRepository';
 import {
+  getManualMedicationParts,
   getManualObservationInterpretation,
   getManualObservationRange,
   getManualObservationValue,
@@ -57,6 +58,43 @@ const recordTypes: Array<{ value: ManualRecordKind; label: string }> = [
   { value: 'vital', label: 'Vital sign' },
 ];
 
+type ManualTemplate = {
+  label: string;
+  kind: ManualRecordKind;
+  title: string;
+  unit: string;
+};
+
+// One-tap presets for the most common vitals and labs people log by hand.
+const quickTemplates: ManualTemplate[] = [
+  {
+    label: 'Blood pressure',
+    kind: 'vital',
+    title: 'Blood pressure',
+    unit: 'mmHg',
+  },
+  { label: 'Heart rate', kind: 'vital', title: 'Heart rate', unit: 'bpm' },
+  { label: 'Body weight', kind: 'vital', title: 'Body weight', unit: 'kg' },
+  {
+    label: 'Body temperature',
+    kind: 'vital',
+    title: 'Body temperature',
+    unit: '°C',
+  },
+  {
+    label: 'Oxygen saturation',
+    kind: 'vital',
+    title: 'Oxygen saturation',
+    unit: '%',
+  },
+  {
+    label: 'Blood glucose',
+    kind: 'lab',
+    title: 'Blood glucose',
+    unit: 'mg/dL',
+  },
+];
+
 export function ManualRecordTab() {
   const db = useRxDb();
   const user = useUser();
@@ -73,6 +111,9 @@ export function ManualRecordTab() {
   const [rangeLow, setRangeLow] = useState('');
   const [rangeHigh, setRangeHigh] = useState('');
   const [interpretation, setInterpretation] = useState('');
+  const [dose, setDose] = useState('');
+  const [frequency, setFrequency] = useState('');
+  const [route, setRoute] = useState('');
   const [fileName, setFileName] = useState('');
   const [fileContentType, setFileContentType] = useState('');
   const [fileData, setFileData] = useState<string | undefined>(undefined);
@@ -80,9 +121,39 @@ export function ManualRecordTab() {
     null,
   );
   const [isSaving, setIsSaving] = useState(false);
+  const [keepAdding, setKeepAdding] = useState(false);
+  const [savedCount, setSavedCount] = useState(0);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
   const isEditing = !!recordId;
   const isObservationType = recordType === 'lab' || recordType === 'vital';
   const isDocumentType = recordType === 'document';
+  const isMedicationType = recordType === 'medicationstatement';
+  const titleMissing = !title.trim();
+  const fileMissing = isDocumentType && !fileData;
+
+  function resetFields() {
+    setTitle('');
+    setNotes('');
+    setValue('');
+    setUnit('');
+    setRangeLow('');
+    setRangeHigh('');
+    setInterpretation('');
+    setDose('');
+    setFrequency('');
+    setRoute('');
+    setFileName('');
+    setFileContentType('');
+    setFileData(undefined);
+    setSubmitAttempted(false);
+  }
+
+  function applyTemplate(template: ManualTemplate) {
+    setRecordType(template.kind);
+    setTitle(template.title);
+    setUnit(template.unit);
+    setSubmitAttempted(false);
+  }
 
   useEffect(() => {
     if (!db || !recordId) return;
@@ -119,6 +190,10 @@ export function ManualRecordTab() {
           setRangeHigh(high.trim());
         }
         setInterpretation(getManualObservationInterpretation(doc) || '');
+        const medication = getManualMedicationParts(doc);
+        setDose(medication.dose);
+        setFrequency(medication.frequency);
+        setRoute(medication.route);
         if (doc.data_record.resource_type === 'documentreference_attachment') {
           setFileName(doc.metadata?.display_name || '');
           setFileContentType(doc.data_record.content_type);
@@ -146,15 +221,9 @@ export function ManualRecordTab() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!title.trim() || !db || isSaving) return;
-    if (recordType === 'document' && !fileData) {
-      notifyDispatch({
-        type: 'set_notification',
-        message: 'Select a file before saving this document',
-        variant: 'error',
-      });
-      return;
-    }
+    setSubmitAttempted(true);
+    if (!db || isSaving) return;
+    if (titleMissing || fileMissing) return;
 
     setIsSaving(true);
     try {
@@ -179,6 +248,7 @@ export function ManualRecordTab() {
                   notes,
                   recordDate,
                   { value, unit, rangeLow, rangeHigh, interpretation },
+                  { dose, frequency, route },
                 ),
           format: recordType === 'careplan' ? 'FHIR.R4' : 'FHIR.DSTU2',
           content_type:
@@ -201,6 +271,19 @@ export function ManualRecordTab() {
         await upsertClinicalDocuments(db, [{ ...doc, id: loadedDocument.id }]);
       } else {
         await insertClinicalDocument(db, doc);
+      }
+
+      // Batch mode: stay on the form and clear the inputs so the next
+      // record can be entered without navigating away.
+      if (keepAdding && !loadedDocument) {
+        setSavedCount((count) => count + 1);
+        resetFields();
+        notifyDispatch({
+          type: 'set_notification',
+          message: 'Record added — ready for the next one',
+          variant: 'success',
+        });
+        return;
       }
 
       notifyDispatch({
@@ -253,6 +336,79 @@ export function ManualRecordTab() {
               ))}
             </select>
           </div>
+
+          {!isEditing && (
+            <div>
+              <p className="block text-sm font-semibold text-gray-900">
+                Quick templates
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {quickTemplates.map((template) => (
+                  <button
+                    key={template.label}
+                    type="button"
+                    onClick={() => applyTemplate(template)}
+                    className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100"
+                  >
+                    {template.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {isMedicationType && (
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div>
+                <label
+                  htmlFor="manual-record-dose"
+                  className="block text-sm font-semibold text-gray-900"
+                >
+                  Dose
+                </label>
+                <input
+                  id="manual-record-dose"
+                  type="text"
+                  value={dose}
+                  placeholder="e.g. 10 mg"
+                  onChange={(event) => setDose(event.target.value)}
+                  className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="manual-record-frequency"
+                  className="block text-sm font-semibold text-gray-900"
+                >
+                  Frequency
+                </label>
+                <input
+                  id="manual-record-frequency"
+                  type="text"
+                  value={frequency}
+                  placeholder="e.g. twice daily"
+                  onChange={(event) => setFrequency(event.target.value)}
+                  className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="manual-record-route"
+                  className="block text-sm font-semibold text-gray-900"
+                >
+                  Route
+                </label>
+                <input
+                  id="manual-record-route"
+                  type="text"
+                  value={route}
+                  placeholder="e.g. oral"
+                  onChange={(event) => setRoute(event.target.value)}
+                  className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                />
+              </div>
+            </div>
+          )}
 
           {isObservationType && (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -343,16 +499,25 @@ export function ManualRecordTab() {
               htmlFor="manual-record-title"
               className="block text-sm font-semibold text-gray-900"
             >
-              Name
+              Name <span className="text-red-600">*</span>
             </label>
             <input
               id="manual-record-title"
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              required
-              className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+              aria-invalid={submitAttempted && titleMissing}
+              className={`mt-2 block w-full rounded-md border px-3 py-2 text-base text-gray-900 shadow-sm focus:outline-none focus:ring-1 ${
+                submitAttempted && titleMissing
+                  ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:border-primary-600 focus:ring-primary-600'
+              }`}
             />
+            {submitAttempted && titleMissing && (
+              <p className="mt-1 text-xs font-medium text-red-600">
+                A name is required.
+              </p>
+            )}
           </div>
 
           {isDocumentType && (
@@ -394,6 +559,11 @@ export function ManualRecordTab() {
                   {fileName}
                 </p>
               )}
+              {submitAttempted && fileMissing && (
+                <p className="mt-1 text-xs font-medium text-red-600">
+                  Select a file before saving this document.
+                </p>
+              )}
             </div>
           )}
 
@@ -430,25 +600,45 @@ export function ManualRecordTab() {
             />
           </div>
 
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => navigate(AppRoutes.Timeline)}
-              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSaving || !title.trim()}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-            >
-              {isSaving
-                ? 'Saving'
-                : isEditing
-                  ? 'Update record'
-                  : 'Save record'}
-            </button>
+          {!isEditing && (
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <input
+                type="checkbox"
+                checked={keepAdding}
+                onChange={(event) => setKeepAdding(event.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+              />
+              Keep adding more records after saving
+            </label>
+          )}
+
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-xs font-medium text-gray-500">
+              {savedCount > 0 &&
+                `${savedCount} record${savedCount === 1 ? '' : 's'} added this session`}
+            </span>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => navigate(AppRoutes.Timeline)}
+                className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
+              >
+                {savedCount > 0 && !isEditing ? 'Done' : 'Cancel'}
+              </button>
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+              >
+                {isSaving
+                  ? 'Saving'
+                  : isEditing
+                    ? 'Update record'
+                    : keepAdding
+                      ? 'Save & add another'
+                      : 'Save record'}
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -496,6 +686,11 @@ function buildManualFhirEntry(
     rangeHigh: string;
     interpretation: string;
   },
+  medication?: {
+    dose: string;
+    frequency: string;
+    route: string;
+  },
 ) {
   const resourceType = toFhirResourceType(recordType);
   const observationData = observation ?? {
@@ -505,6 +700,12 @@ function buildManualFhirEntry(
     rangeHigh: '',
     interpretation: '',
   };
+  const medicationData = medication ?? { dose: '', frequency: '', route: '' };
+  const hasMedicationDetail =
+    recordType === 'medicationstatement' &&
+    (medicationData.dose.trim() ||
+      medicationData.frequency.trim() ||
+      medicationData.route.trim());
   const hasObservationValue = observationData.value.trim();
   return {
     fullUrl: `manual:${id}`,
@@ -562,6 +763,19 @@ function buildManualFhirEntry(
           : undefined,
       interpretation: observationData.interpretation.trim()
         ? { text: observationData.interpretation.trim() }
+        : undefined,
+      dosage: hasMedicationDetail
+        ? [
+            {
+              text: medicationData.dose.trim() || undefined,
+              route: medicationData.route.trim()
+                ? { text: medicationData.route.trim() }
+                : undefined,
+              timing: medicationData.frequency.trim()
+                ? { code: { text: medicationData.frequency.trim() } }
+                : undefined,
+            },
+          ]
         : undefined,
     },
   };
