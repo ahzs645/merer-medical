@@ -107,6 +107,7 @@ export function UserDataSettingsGroup() {
   // ─── .emrpkg state ─────────────────────────────────────────────────────────
   const [emrpkgPassphrase, setEmrpkgPassphrase] = useState('');
   const [emrpkgEncrypt, setEmrpkgEncrypt] = useState(false);
+  const [emrpkgUseWebauthn, setEmrpkgUseWebauthn] = useState(false);
   const [emrpkgDownloadUrl, setEmrpkgDownloadUrl] = useState('');
   const [emrpkgDownloadName, setEmrpkgDownloadName] = useState('');
   const [emrpkgBusy, setEmrpkgBusy] = useState(false);
@@ -114,18 +115,21 @@ export function UserDataSettingsGroup() {
   const emrpkgImportRef = useRef<HTMLInputElement | null>(null);
 
   const handleEmrpkgExport = useCallback(async () => {
-    if (emrpkgEncrypt && !emrpkgPassphrase) {
+    if (emrpkgEncrypt && !emrpkgUseWebauthn && !emrpkgPassphrase) {
       notifyDispatch({
         type: 'set_notification',
-        message: 'Enter a passphrase or uncheck encryption.',
+        message: 'Enter a passphrase, use a passkey, or uncheck encryption.',
         variant: 'error',
       });
       return;
     }
     setEmrpkgBusy(true);
     try {
+      const useWebauthn = emrpkgEncrypt && emrpkgUseWebauthn;
       const bytes = await exportEmrpkgFromRxDb(db, {
-        passphrase: emrpkgEncrypt ? emrpkgPassphrase : undefined,
+        passphrase:
+          emrpkgEncrypt && !emrpkgUseWebauthn ? emrpkgPassphrase : undefined,
+        useWebauthn,
       });
       const blob = new Blob([bytes], { type: 'application/octet-stream' });
       const url = URL.createObjectURL(blob);
@@ -149,7 +153,7 @@ export function UserDataSettingsGroup() {
     } finally {
       setEmrpkgBusy(false);
     }
-  }, [db, emrpkgEncrypt, emrpkgPassphrase, notifyDispatch]);
+  }, [db, emrpkgEncrypt, emrpkgPassphrase, emrpkgUseWebauthn, notifyDispatch]);
 
   const handleEmrpkgImport = useCallback(
     async (file: File) => {
@@ -157,7 +161,8 @@ export function UserDataSettingsGroup() {
       try {
         const bytes = await readFileAsBytes(file);
         const info = await inspectEmrpkg(bytes);
-        if (info.encrypted && !emrpkgPassphrase) {
+        const needsPassphrase = info.encrypted && info.kdf !== 'webauthn-prf';
+        if (needsPassphrase && !emrpkgPassphrase) {
           notifyDispatch({
             type: 'set_notification',
             message: 'This package is encrypted. Enter a passphrase first.',
@@ -166,8 +171,16 @@ export function UserDataSettingsGroup() {
           setEmrpkgBusy(false);
           return;
         }
+        if (info.kdf === 'webauthn-prf') {
+          notifyDispatch({
+            type: 'set_notification',
+            message:
+              'This package is passkey-protected. Confirm with your passkey.',
+            variant: 'info',
+          });
+        }
         const { counts, unknownTables } = await importEmrpkgToRxDb(bytes, db, {
-          passphrase: info.encrypted ? emrpkgPassphrase : undefined,
+          passphrase: needsPassphrase ? emrpkgPassphrase : undefined,
           replace: true,
         });
         const total = Object.values(counts).reduce<number>(
@@ -360,8 +373,8 @@ export function UserDataSettingsGroup() {
                   Export and import your data as a single{' '}
                   <code className="text-xs">.emrpkg</code> file. Optionally
                   protect the file with a passphrase (AES-GCM, PBKDF2-SHA256,
-                  600,000 iterations). Use this to move your records between
-                  browsers or devices.
+                  600,000 iterations) or a passkey (WebAuthn PRF). Use this to
+                  move your records between browsers or devices.
                 </p>
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -374,10 +387,22 @@ export function UserDataSettingsGroup() {
                   />
                   Encrypt export
                 </label>
+                {emrpkgEncrypt && (
+                  <label className="inline-flex items-center text-sm text-gray-800">
+                    <input
+                      type="checkbox"
+                      className="text-primary-600 focus:ring-primary-500 mr-2 h-4 w-4 rounded border-gray-300"
+                      checked={emrpkgUseWebauthn}
+                      onChange={(e) => setEmrpkgUseWebauthn(e.target.checked)}
+                    />
+                    Use a passkey instead of a passphrase
+                  </label>
+                )}
                 <input
                   type="password"
                   placeholder="Passphrase for encrypted package"
-                  className="focus:ring-primary-500 focus:border-primary-500 block w-56 rounded-md border-gray-300 text-sm shadow-sm"
+                  disabled={emrpkgUseWebauthn}
+                  className="focus:ring-primary-500 focus:border-primary-500 block w-56 rounded-md border-gray-300 text-sm shadow-sm disabled:bg-gray-100 disabled:text-gray-400"
                   value={emrpkgPassphrase}
                   onChange={(e) => setEmrpkgPassphrase(e.target.value)}
                   autoComplete="new-password"

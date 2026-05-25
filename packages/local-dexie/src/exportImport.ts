@@ -4,7 +4,9 @@ import type { ExportProgress, PackageCommands } from '@mere/data';
 import { getDb, type MereDb } from './db';
 import {
   decryptBytes,
+  decryptBytesWithKey,
   encryptBytes,
+  encryptBytesWithKey,
   fromBase64,
   PBKDF2_ITERATIONS,
   toBase64,
@@ -73,16 +75,42 @@ function readEnvelopeBytes(bytes: Uint8Array): {
     bytes.subarray(12, 12 + headerLen),
   );
   const header = JSON.parse(headerJson) as EnvelopeHeader;
-  if (header.v !== 1 || header.enc !== 'AES-GCM' || header.kdf !== 'PBKDF2-SHA256') {
+  if (
+    header.v !== 1 ||
+    header.enc !== 'AES-GCM' ||
+    (header.kdf !== 'PBKDF2-SHA256' && header.kdf !== 'webauthn-prf')
+  ) {
     throw new Error('Unsupported .emrpkg envelope header.');
   }
   return { header, ciphertext: bytes.subarray(12 + headerLen) };
 }
 
+/** A WebAuthn PRF-derived key plus the metadata needed to re-derive it. */
+export interface WebauthnKeyMaterial {
+  key: CryptoKey;
+  credentialId: string; // base64
+  prfSalt: string; // base64
+}
+
+export interface PackEmrpkgOptions {
+  passphrase?: string;
+  /** Encrypt with a pre-derived key (e.g. WebAuthn PRF) instead of a passphrase. */
+  webauthn?: WebauthnKeyMaterial;
+}
+
+export interface UnpackEmrpkgOptions {
+  passphrase?: string;
+  /**
+   * Called when the package is encrypted with a non-passphrase KDF
+   * (e.g. webauthn-prf) to re-derive the AES-GCM key from the header.
+   */
+  getKey?: (header: EnvelopeHeader) => Promise<CryptoKey>;
+}
+
 /** Pack arbitrary contents into a .emrpkg buffer, optionally encrypted. */
 export async function packEmrpkg(
   input: PackInput,
-  opts: { passphrase?: string } = {},
+  opts: PackEmrpkgOptions = {},
 ): Promise<Uint8Array> {
   const files: Record<string, Uint8Array> = {};
   const tables: string[] = [];
@@ -112,6 +140,23 @@ export async function packEmrpkg(
   files['manifest.json'] = strToU8(JSON.stringify(manifest, null, 2));
 
   const zip = zipSync(files, { level: 6 });
+
+  if (opts.webauthn) {
+    const { ciphertext, iv } = await encryptBytesWithKey(
+      zip,
+      opts.webauthn.key,
+    );
+    const header: EnvelopeHeader = {
+      v: 1,
+      enc: 'AES-GCM',
+      kdf: 'webauthn-prf',
+      iv: toBase64(iv),
+      credentialId: opts.webauthn.credentialId,
+      prfSalt: opts.webauthn.prfSalt,
+    };
+    return writeEnvelope(header, ciphertext);
+  }
+
   if (!opts.passphrase) return zip;
 
   const enc = await encryptBytes(zip, opts.passphrase);
@@ -130,21 +175,35 @@ export async function packEmrpkg(
  * passphrase is provided, or if the manifest is missing/unsupported. */
 export async function unpackEmrpkg(
   bytes: Uint8Array,
-  opts: { passphrase?: string } = {},
+  opts: UnpackEmrpkgOptions = {},
 ): Promise<UnpackedPackage> {
   let zipBytes = bytes;
   if (isEnvelopeBytes(bytes)) {
-    if (!opts.passphrase) {
-      throw new Error('Package is encrypted; passphrase is required.');
-    }
     const { header, ciphertext } = readEnvelopeBytes(bytes);
-    zipBytes = await decryptBytes(
-      ciphertext,
-      opts.passphrase,
-      fromBase64(header.salt),
-      fromBase64(header.iv),
-      header.iter ?? PBKDF2_ITERATIONS,
-    );
+    if (header.kdf === 'webauthn-prf') {
+      if (!opts.getKey) {
+        throw new Error(
+          'Package is encrypted with a passkey; a key resolver is required.',
+        );
+      }
+      const key = await opts.getKey(header);
+      zipBytes = await decryptBytesWithKey(
+        ciphertext,
+        key,
+        fromBase64(header.iv),
+      );
+    } else {
+      if (!opts.passphrase) {
+        throw new Error('Package is encrypted; passphrase is required.');
+      }
+      zipBytes = await decryptBytes(
+        ciphertext,
+        opts.passphrase,
+        fromBase64(header.salt ?? ''),
+        fromBase64(header.iv),
+        header.iter ?? PBKDF2_ITERATIONS,
+      );
+    }
   }
   const files = unzipSync(zipBytes);
   const manifestBytes = files['manifest.json'];
@@ -178,9 +237,19 @@ export async function inspectEmrpkg(bytes: Uint8Array): Promise<{
   formatVersion: number;
   appVersion?: string;
   createdAt?: number;
+  kdf?: EnvelopeHeader['kdf'];
 }> {
   if (isEnvelopeBytes(bytes)) {
-    return { encrypted: true, formatVersion: FORMAT_VERSION };
+    try {
+      const { header } = readEnvelopeBytes(bytes);
+      return {
+        encrypted: true,
+        formatVersion: FORMAT_VERSION,
+        kdf: header.kdf,
+      };
+    } catch {
+      return { encrypted: true, formatVersion: FORMAT_VERSION };
+    }
   }
   try {
     const files = unzipSync(bytes);
