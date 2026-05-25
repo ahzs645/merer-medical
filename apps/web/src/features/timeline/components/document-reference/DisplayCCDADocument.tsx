@@ -3,6 +3,7 @@ import { ErrorBoundary } from '../../../../shared/components/ErrorBoundary';
 import { CCDAStructureDefinitionKeys2_1 } from './CCDAStructureDefinitionKeys2_1';
 import { DisplayCCDAElementSection } from './DisplayCCDAElementSection';
 import { DisplayCCDARawSection } from './DisplayCCDARawSection';
+import { formatCCDASectionTitle } from './ccdaSectionTitle';
 
 interface ChunkWithMetadata {
   id: string;
@@ -10,6 +11,53 @@ interface ChunkWithMetadata {
     sectionName?: string;
   };
 }
+
+// Sections that have a hand-written card above. Everything else falls through
+// to the generic catch-all so every C-CDA 2.1 section is displayed (issue #41).
+const EXPLICITLY_RENDERED_SECTIONS = new Set<CCDAStructureDefinitionKeys2_1>([
+  'REASON_FOR_REFERRAL_SECTION',
+  'ADMISSION_DIAGNOSIS_SECTION',
+  'ADMISSION_MEDICATIONS_SECTION',
+  'CHIEF_COMPLAINT_AND_REASON_FOR_VISIT_SECTION',
+  'CHIEF_COMPLAINT_SECTION',
+  'VITAL_SIGNS_SECTION',
+  'HISTORY_OF_PRESENT_ILLNESS_SECTION',
+  'MEDICATIONS_SECTION',
+  'IMMUNIZATIONS_SECTION',
+  'ALLERGIES_AND_INTOLERANCES_SECTION',
+  'FAMILY_HISTORY_SECTION',
+  'SOCIAL_HISTORY_SECTION',
+  'HEALTH_CONCERNS_SECTION',
+  'REVIEW_OF_SYSTEMS_SECTION',
+  'PROCEDURES_SECTION',
+  'RESULTS_SECTION',
+  'FINDINGS_SECTION',
+  'DICOM_OBJECT_CATALOG_SECTION_DCM_121181',
+  'PREOPERATIVE_DIAGNOSIS_SECTION',
+  'PROCEDURE_DESCRIPTION_SECTION',
+  'PROCEDURE_DISPOSITION_SECTION',
+  'PROCEDURE_NOTE',
+  'SURGERY_DESCRIPTION_SECTION',
+  'POSTOPERATIVE_DIAGNOSIS_SECTION',
+  'POSTPROCEDURE_DIAGNOSIS_SECTION',
+  'PROGRESS_NOTE',
+  'ASSESSMENT_SECTION',
+  'ASSESSMENT_AND_PLAN_SECTION',
+  'PROBLEM_SECTION',
+  'NUTRITION_SECTION',
+  'PLAN_OF_TREATMENT_SECTION',
+  'GOALS_SECTION',
+  'MEDICAL_EQUIPMENT_SECTION',
+  'ADVANCE_DIRECTIVES_SECTION',
+  'INSTRUCTIONS_SECTION',
+  'HOSPITAL_DISCHARGE_INSTRUCTIONS_SECTION',
+  'DISCHARGE_MEDICATIONS_SECTION',
+  'DISCHARGE_SUMMARY',
+  'CARE_TEAMS_SECTION',
+  'PAYERS_SECTION',
+  'ENCOUNTER_DIAGNOSIS',
+  'ENCOUNTERS_SECTION',
+]);
 
 export function DisplayCCDADocument({
   ccda,
@@ -439,6 +487,41 @@ export function DisplayCCDADocument({
           )}
         </>
       )}
+      {/* Generic catch-all: render any other parsed C-CDA 2.1 section so no
+          section is silently dropped (issue #41). */}
+      {ccda &&
+        (Object.keys(ccda) as CCDAStructureDefinitionKeys2_1[])
+          .filter((key) => !EXPLICITLY_RENDERED_SECTIONS.has(key))
+          .filter((key) => {
+            const content = ccda[key];
+            if (!content) return false;
+            if (typeof content === 'string') return content.trim().length > 0;
+            return true;
+          })
+          .sort((a, b) =>
+            formatCCDASectionTitle(a).localeCompare(formatCCDASectionTitle(b)),
+          )
+          .map((key) => {
+            const content = ccda[key];
+            const title = formatCCDASectionTitle(key);
+            return typeof content === 'string' ? (
+              <DisplayCCDARawSection
+                key={key}
+                title={title}
+                content={content}
+                isMatched={matchedSections.has(key)}
+                defaultOpen={matchedSections.has(key)}
+              />
+            ) : (
+              <DisplayCCDAElementSection
+                key={key}
+                title={title}
+                content={content as JSX.Element}
+                isMatched={matchedSections.has(key)}
+                defaultOpen={matchedSections.has(key)}
+              />
+            );
+          })}
     </>
   );
 }
