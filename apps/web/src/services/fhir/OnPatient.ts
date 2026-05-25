@@ -25,6 +25,7 @@ import {
   ClinicalDocument,
   CreateClinicalDocument,
 } from '../../models/clinical-document/ClinicalDocument.type';
+import { incrementalSearchParams } from './incrementalSync';
 
 export const OnPatientBaseUrl = ONPATIENT_CONSTANTS.BASE_URL;
 export const OnPatientDSTU2Url = ONPATIENT_CONSTANTS.FHIR_URL;
@@ -33,9 +34,14 @@ async function getFHIRResource<T extends FhirResource>(
   connectionDocument: ConnectionDocument,
   fhirResourcePathUrl: string,
 ): Promise<BundleEntry<T>[]> {
+  const incrementalQuery = new URLSearchParams(
+    incrementalSearchParams(connectionDocument),
+  ).toString();
   let allEntries: BundleEntry<T>[] = [];
   let nextUrl: string | undefined =
-    `${OnPatientDSTU2Url}/${fhirResourcePathUrl}`;
+    `${OnPatientDSTU2Url}/${fhirResourcePathUrl}${
+      incrementalQuery ? `?${incrementalQuery}` : ''
+    }`;
 
   while (nextUrl) {
     const response = await fetch(nextUrl, {

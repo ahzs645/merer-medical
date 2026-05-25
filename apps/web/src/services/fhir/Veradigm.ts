@@ -53,6 +53,7 @@ import {
   type VeradigmTokenSet,
 } from '@mere/fhir-oauth';
 import { getConnectionCardByUrl } from './getConnectionCardByUrl';
+import { incrementalSearchParams } from './incrementalSync';
 import {
   createConnection,
   updateConnection,
@@ -163,9 +164,14 @@ async function getFHIRResource<T extends FhirResource>(
   fhirResourceUrl: string,
   params?: Record<string, string>,
 ): Promise<BundleEntry<T>[]> {
-  const defaultUrl = params
-    ? `${baseUrl}${fhirResourceUrl}?${new URLSearchParams(params)}`
-    : `${baseUrl}${fhirResourceUrl}`;
+  const mergedParams = {
+    ...params,
+    ...incrementalSearchParams(connectionDocument),
+  };
+  const defaultUrl =
+    Object.keys(mergedParams).length > 0
+      ? `${baseUrl}${fhirResourceUrl}?${new URLSearchParams(mergedParams)}`
+      : `${baseUrl}${fhirResourceUrl}`;
 
   let allEntries: BundleEntry<T>[] = [];
   let nextUrl: string | undefined = defaultUrl;
@@ -409,7 +415,10 @@ async function syncDocumentReferences(
                 },
               };
 
-              await insertClinicalDocument(db, cd as unknown as ClinicalDocument);
+              await insertClinicalDocument(
+                db,
+                cd as unknown as ClinicalDocument,
+              );
             }
           } else {
             console.log('Attachment already synced: ' + attachmentUrl);

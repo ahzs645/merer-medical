@@ -31,13 +31,19 @@ export const ENVELOPE_MAGIC_BYTES = new Uint8Array([
   0x4d, 0x45, 0x52, 0x45, 0x50, 0x4b, 0x47, 0x31,
 ]);
 
+export type EnvelopeKdf = 'PBKDF2-SHA256' | 'webauthn-prf';
+
 export interface EnvelopeHeader {
   v: 1;
   enc: 'AES-GCM';
-  kdf: 'PBKDF2-SHA256';
-  iter: number;
-  salt: string; // base64
+  kdf: EnvelopeKdf;
   iv: string; // base64
+  // PBKDF2-SHA256 fields
+  iter?: number;
+  salt?: string; // base64
+  // webauthn-prf fields: how to re-derive the key on import
+  credentialId?: string; // base64
+  prfSalt?: string; // base64
 }
 
 export interface PackageManifest {

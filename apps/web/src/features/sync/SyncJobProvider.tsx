@@ -33,6 +33,9 @@ import {
   recordSyncSuccess,
   recordSyncError,
 } from '../../services/fhir/ConnectionService';
+import { useUser } from '../../app/providers/UserProvider';
+import { addNotification } from '../../repositories/NotificationRepository';
+import { Routes as AppRoutes } from '../../Routes';
 
 type SyncJobProviderProps = PropsWithChildren<unknown>;
 
@@ -274,9 +277,33 @@ function OnHandleUnsubscribeJobs({ children }: PropsWithChildren) {
   const sync = useSyncJobContext(),
     syncD = useSyncJobDispatchContext(),
     notifyDispatch = useNotificationDispatch(),
+    db = useRxDb(),
+    user = useUser(),
     syncJobs = Object.entries(sync);
 
   useEffect(() => {
+    const logNotification = (
+      message: string,
+      variant: 'info' | 'success' | 'warning' | 'error',
+    ) => {
+      if (db && user?.id) {
+        void addNotification(db, {
+          user_id: user.id,
+          message,
+          variant,
+          source: 'sync',
+          action_route:
+            variant === 'error' || variant === 'warning'
+              ? AppRoutes.AddConnection
+              : AppRoutes.Timeline,
+          action_label:
+            variant === 'error' || variant === 'warning'
+              ? 'Review connections'
+              : undefined,
+        });
+      }
+    };
+
     syncJobs.forEach(([id, j]) => {
       j.subscribe({
         next(res) {
@@ -295,6 +322,7 @@ function OnHandleUnsubscribeJobs({ children }: PropsWithChildren) {
               message: `Successfully synced records`,
               variant: 'success',
             });
+            logNotification('Successfully synced records', 'success');
           } else if (
             // check if partial records were synced successfully
             successRes.length > 0 &&
@@ -305,12 +333,14 @@ function OnHandleUnsubscribeJobs({ children }: PropsWithChildren) {
               message: `Some records were unable to be synced`,
               variant: 'info',
             });
+            logNotification('Some records were unable to be synced', 'warning');
           } else {
             notifyDispatch({
               type: 'set_notification',
               message: `No records were able to be synced`,
               variant: 'error',
             });
+            logNotification('No records were able to be synced', 'error');
           }
         },
         error(e: Error) {
@@ -320,6 +350,7 @@ function OnHandleUnsubscribeJobs({ children }: PropsWithChildren) {
             message: `Error syncing records: ${e.message}`,
             variant: 'error',
           });
+          logNotification(`Error syncing records: ${e.message}`, 'error');
           if (syncD) {
             syncD({ type: 'remove_job', id });
           }
@@ -331,7 +362,7 @@ function OnHandleUnsubscribeJobs({ children }: PropsWithChildren) {
         },
       });
     });
-  }, [notifyDispatch, syncD, syncJobs]);
+  }, [notifyDispatch, syncD, syncJobs, db, user]);
 
   return <>{children}</>;
 }

@@ -14,6 +14,7 @@ import { Routes as AppRoutes } from '../../Routes';
 import { useUser } from '../../app/providers/UserProvider';
 import { TabButton } from './TabButton';
 import { useLocalConfig } from '../../app/providers/LocalConfigProvider';
+import { NotificationCenter } from '../../features/notifications/NotificationCenter';
 
 export function TabWrapper() {
   const user = useUser(),
@@ -65,6 +66,7 @@ export function TabWrapper() {
             title="Settings"
             icon={<Cog6ToothIcon />}
           />
+          <NotificationCenter />
           <div className="hidden md:block md:flex-1"></div>
           <div className="border-primary-700 hidden flex-shrink-0 border-t p-4 md:block">
             <div className="group block flex-shrink-0">

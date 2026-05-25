@@ -78,6 +78,31 @@ export async function decryptBytes(
   return new Uint8Array(pt);
 }
 
+/**
+ * Encrypt with a caller-supplied AES-GCM key. Used when the key comes from a
+ * source other than a passphrase, e.g. a WebAuthn PRF-derived secret.
+ */
+export async function encryptBytesWithKey(
+  plaintext: Uint8Array,
+  key: CryptoKey,
+): Promise<{ ciphertext: Uint8Array; iv: Uint8Array }> {
+  const iv = getRandomBytes(IV_BYTES);
+  const ct = new Uint8Array(
+    await subtle().encrypt({ name: 'AES-GCM', iv }, key, plaintext),
+  );
+  return { ciphertext: ct, iv };
+}
+
+/** Decrypt with a caller-supplied AES-GCM key. */
+export async function decryptBytesWithKey(
+  ciphertext: Uint8Array,
+  key: CryptoKey,
+  iv: Uint8Array,
+): Promise<Uint8Array> {
+  const pt = await subtle().decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+  return new Uint8Array(pt);
+}
+
 export async function sha256Hex(bytes: Uint8Array): Promise<string> {
   const hash = await subtle().digest('SHA-256', bytes);
   const view = new Uint8Array(hash);

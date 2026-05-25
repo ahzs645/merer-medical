@@ -12,7 +12,18 @@ type ManualRawResource = {
       text?: string;
     }>;
     interpretation?: { text?: string; coding?: Array<{ display?: string }> };
+    dosage?: Array<{
+      text?: string;
+      route?: { text?: string };
+      timing?: { code?: { text?: string } };
+    }>;
   };
+};
+
+export type ManualMedicationParts = {
+  dose: string;
+  frequency: string;
+  route: string;
 };
 
 export function isManualRecord(item: ClinicalDocument): boolean {
@@ -80,4 +91,31 @@ export function getManualObservationInterpretation(
     raw.resource?.interpretation?.coding?.find((coding) => coding.display)
       ?.display
   );
+}
+
+export function getManualMedicationParts(
+  item: ClinicalDocument,
+): ManualMedicationParts {
+  const empty = { dose: '', frequency: '', route: '' };
+  if (!isManualRecord(item)) return empty;
+  const raw = item.data_record.raw as ManualRawResource;
+  const dosage = raw.resource?.dosage?.[0];
+  if (!dosage) return empty;
+  return {
+    dose: dosage.text?.trim() || '',
+    frequency: dosage.timing?.code?.text?.trim() || '',
+    route: dosage.route?.text?.trim() || '',
+  };
+}
+
+export function getManualMedicationDetail(
+  item: ClinicalDocument,
+): string | undefined {
+  const { dose, frequency, route } = getManualMedicationParts(item);
+  const parts = [
+    dose && `Dose: ${dose}`,
+    frequency && `Frequency: ${frequency}`,
+    route && `Route: ${route}`,
+  ].filter(Boolean);
+  return parts.length ? parts.join(' • ') : undefined;
 }

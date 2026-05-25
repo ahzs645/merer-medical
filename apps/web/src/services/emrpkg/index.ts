@@ -16,6 +16,7 @@ import { RxDatabase } from 'rxdb';
 import { strToU8, strFromU8 } from 'fflate';
 import { packEmrpkg, unpackEmrpkg, inspectEmrpkg } from '@mere/local-dexie';
 import type { DatabaseCollections } from '../../app/providers/DatabaseCollections';
+import { createExportPrfKey, deriveImportPrfKey } from './webauthnPrf';
 
 export const RXDB_COLLECTIONS_IN_PACKAGE = [
   'user_documents',
@@ -33,6 +34,8 @@ export type RxDbCollectionName = (typeof RXDB_COLLECTIONS_IN_PACKAGE)[number];
 export interface ExportEmrpkgOptions {
   passphrase?: string;
   appVersion?: string;
+  /** Encrypt using a passkey (WebAuthn PRF) instead of a passphrase. */
+  useWebauthn?: boolean;
 }
 
 export interface ImportEmrpkgOptions {
@@ -63,21 +66,25 @@ export async function exportEmrpkgFromRxDb(
     tableFiles[name] = strToU8(JSON.stringify(rows));
   }
 
-  return packEmrpkg(
-    {
-      manifest: {
-        createdAt: Date.now(),
-        app: { name: 'mere-medical', version: opts.appVersion },
-        schema: { version: 1 },
-        tables: Object.keys(tableFiles),
-        counts,
-        attachmentCount: 0,
-      },
-      tableFiles,
-      attachments: {},
+  const packInput = {
+    manifest: {
+      createdAt: Date.now(),
+      app: { name: 'mere-medical', version: opts.appVersion },
+      schema: { version: 1 },
+      tables: Object.keys(tableFiles),
+      counts,
+      attachmentCount: 0,
     },
-    { passphrase: opts.passphrase },
-  );
+    tableFiles,
+    attachments: {},
+  };
+
+  if (opts.useWebauthn) {
+    const { key, credentialId, prfSalt } = await createExportPrfKey();
+    return packEmrpkg(packInput, { webauthn: { key, credentialId, prfSalt } });
+  }
+
+  return packEmrpkg(packInput, { passphrase: opts.passphrase });
 }
 
 /** Restore RxDB contents from a `.emrpkg` buffer. */
@@ -89,6 +96,7 @@ export async function importEmrpkgToRxDb(
   const replace = opts.replace ?? true;
   const { manifest, tableFiles } = await unpackEmrpkg(bytes, {
     passphrase: opts.passphrase,
+    getKey: (header) => deriveImportPrfKey(header),
   });
 
   const counts: Partial<Record<RxDbCollectionName, number>> = {};

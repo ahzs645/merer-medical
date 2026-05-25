@@ -8,10 +8,16 @@ export {
   unpackEmrpkg,
   inspectEmrpkg,
 } from './exportImport';
-export type { PackInput, UnpackedPackage } from './exportImport';
-export {
-  FORMAT_NAME,
-  FORMAT_VERSION,
-  ENVELOPE_MAGIC,
+export type {
+  PackInput,
+  UnpackedPackage,
+  PackEmrpkgOptions,
+  UnpackEmrpkgOptions,
+  WebauthnKeyMaterial,
+} from './exportImport';
+export { FORMAT_NAME, FORMAT_VERSION, ENVELOPE_MAGIC } from './package-format';
+export type {
+  EnvelopeHeader,
+  EnvelopeKdf,
+  PackageManifest,
 } from './package-format';
-export type { EnvelopeHeader, PackageManifest } from './package-format';
