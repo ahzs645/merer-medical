@@ -71,6 +71,7 @@ import {
 } from '../../models/clinical-document/ClinicalDocument.type';
 import { findUserById } from '../../repositories/UserRepository';
 import { getConnectionCardByUrl } from './getConnectionCardByUrl';
+import { incrementalSearchParams } from './incrementalSync';
 
 const epicClient = createEpicClient({ signJwt });
 
@@ -167,6 +168,9 @@ async function getFHIRResource<T extends FhirResource>(
       }
     });
   }
+  Object.entries(incrementalSearchParams(connectionDocument)).forEach(
+    ([key, value]) => searchParams.append(key, value),
+  );
 
   const defaultUrl = `${URLJoin(
     fhirUrl,
@@ -781,7 +785,10 @@ async function syncDocumentReferences(
                 },
               };
 
-              await insertClinicalDocument(db, cd as unknown as ClinicalDocument);
+              await insertClinicalDocument(
+                db,
+                cd as unknown as ClinicalDocument,
+              );
             } else {
               console.warn(
                 '[syncDocumentReferences] Skipping attachment save - missing raw or contentType:',

@@ -68,6 +68,7 @@ import {
   CreateClinicalDocument,
 } from '../../models/clinical-document/ClinicalDocument.type';
 import { getConnectionCardByUrl } from './getConnectionCardByUrl';
+import { incrementalSearchParams } from './incrementalSync';
 import { Routes } from '../../Routes';
 import { AppConfig } from '../../app/providers/AppConfigProvider';
 
@@ -117,8 +118,12 @@ async function getFHIRResource<T extends FhirResource>(
   fhirResourceUrl: string,
   params?: Record<string, string>,
 ): Promise<BundleEntry<T>[]> {
+  const mergedParams = {
+    ...params,
+    ...incrementalSearchParams(connectionDocument),
+  };
   const defaultUrl = `${baseUrl}${fhirResourceUrl}?${new URLSearchParams(
-    params,
+    mergedParams,
   )}`;
 
   let allEntries: BundleEntry<T>[] = [];

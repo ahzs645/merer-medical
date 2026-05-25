@@ -70,6 +70,7 @@ import {
 } from '../../models/clinical-document/ClinicalDocument.type';
 import { concatPath } from '../../shared/utils/urlUtils';
 import { getConnectionCardByUrl } from './getConnectionCardByUrl';
+import { incrementalSearchParams } from './incrementalSync';
 import {
   createHealowClient,
   createHealowClientWithProxy,
@@ -111,6 +112,9 @@ async function getFHIRResource<T extends FhirResource>(
   useProxy = true,
 ): Promise<BundleEntry<T>[]> {
   const searchParams = new URLSearchParams(params);
+  Object.entries(incrementalSearchParams(connectionDocument)).forEach(
+    ([key, value]) => searchParams.append(key, value),
+  );
   const defaultUrl = `${concatPath(baseUrl, fhirResourceUrl)}?${searchParams}`;
   const proxyUrl = concatPath(
     publicUrl || '',

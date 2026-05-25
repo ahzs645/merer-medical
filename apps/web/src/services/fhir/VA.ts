@@ -34,6 +34,7 @@ import { UserDocument } from '../../models/user-document/UserDocument.type';
 import uuid4 from '../../shared/utils/UUIDUtils';
 import { DatabaseCollections } from '../../app/providers/DatabaseCollections';
 import { getConnectionCardByUrl } from './getConnectionCardByUrl';
+import { incrementalSearchParams } from './incrementalSync';
 import {
   createVAClient,
   createSessionManager,
@@ -116,8 +117,13 @@ async function getFHIRResource<T extends FhirResource>(
   fhirResourceUrl: string,
   params?: Record<string, any>,
 ): Promise<BundleEntry<T>[]> {
+  const mergedParams = {
+    ...(params || {}),
+    ...incrementalSearchParams(connectionDocument),
+  };
+  const hasParams = Object.keys(mergedParams).length > 0;
   const defaultUrl = `${baseUrl}${fhirResourceUrl}${
-    !params ? '' : `?${new URLSearchParams(params)}`
+    !hasParams ? '' : `?${new URLSearchParams(mergedParams)}`
   }`;
 
   const res = await fetch(defaultUrl, {
