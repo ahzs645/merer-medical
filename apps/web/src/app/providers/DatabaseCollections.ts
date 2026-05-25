@@ -6,6 +6,7 @@ import { SummaryPagePreferencesCollection } from '../../models/summary-page-pref
 import { VectorStorageDocumentCollection } from '../../models/vector-storage-document/VectorStorageDocument.collection';
 import { USPSTFRecommendationDocumentCollection } from '../../models/uspstf-recommendation-document/USPSTFRecommendationDocument.collection';
 import { InstanceConfigDocumentCollection } from '../../models/instance-config/InstanceConfig.collection';
+import { NotificationCollection } from '../../models/notification/Notification.collection';
 
 export type DatabaseCollections = {
   clinical_documents: ClinicalDocumentCollection;
@@ -16,4 +17,5 @@ export type DatabaseCollections = {
   vector_storage: VectorStorageDocumentCollection;
   uspstf_recommendation_documents: USPSTFRecommendationDocumentCollection;
   instance_config: InstanceConfigDocumentCollection;
+  notifications: NotificationCollection;
 };
