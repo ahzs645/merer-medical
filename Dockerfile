@@ -1,4 +1,4 @@
-FROM node:20.11.0 as build-api-stage
+FROM node:20.19.0 as build-api-stage
 
 WORKDIR /app
 COPY package*.json /app/
@@ -15,7 +15,7 @@ RUN npm prune --production
 RUN node-prune
 
 
-FROM node:20.11.0 as build-web-base
+FROM node:20.19.0 as build-web-base
 
 WORKDIR /app
 COPY package*.json /app/
@@ -24,7 +24,7 @@ COPY ./ /app/
 COPY ./nginx.conf /nginx.conf
 
 
-FROM node:20.11.0 as build-web-stage
+FROM node:20.19.0 as build-web-stage
 
 ARG IS_DEMO=disabled
 ENV IS_DEMO=${IS_DEMO}
