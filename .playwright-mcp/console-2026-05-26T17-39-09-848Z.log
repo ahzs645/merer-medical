@@ -1,0 +1,149 @@
+[     222ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
+[     301ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
+[     308ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[     308ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[     489ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
+[   56002ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:4200/demo/settings:0
+[   59072ms] [ERROR] Warning: Each child in a list should have a unique "key" prop.%s%s See https://reactjs.org/link/warning-keys for more information.%s 
+
+Check the render method of `ForwardRef`.  
+    at li
+    at http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/@headlessui_react.js?v=fcc7e274:1426:22
+    at div
+    at CarePlanListCard (http://127.0.0.1:4200/src/features/summary/components/CarePlanListCard.tsx:7:3)
+    at div
+    at div
+    at div
+    at AppPage (http://127.0.0.1:4200/src/shared/components/AppPage.tsx:4:11)
+    at SummaryTab (http://127.0.0.1:4200/src/features/summary/SummaryTab.tsx:319:7)
+    at RenderedRoute (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3118:5)
+    at Outlet (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3466:26)
+    at div
+    at div
+    at TabWrapper (http://127.0.0.1:4200/src/shared/components/TabWrapper.tsx:21:16)
+    at RenderedRoute (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3118:5)
+    at RenderErrorBoundary (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3078:5)
+    at DataRoutes (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3401:5)
+    at Router (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3473:15)
+    at RouterProvider (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3357:5)
+    at HandleInitalSync (http://127.0.0.1:4200/src/features/sync/SyncJobProvider.tsx:90:29)
+    at OnHandleUnsubscribeJobs (http://127.0.0.1:4200/src/features/sync/SyncJobProvider.tsx:214:36)
+    at SyncJobProvider (http://127.0.0.1:4200/src/features/sync/SyncJobProvider.tsx:66:35)
+    at UserPreferencesProvider (http://127.0.0.1:4200/src/app/providers/UserPreferencesProvider.tsx:62:14)
+    at VectorGeneratorSyncInitializer (http://127.0.0.1:4200/src/features/vectors/providers/VectorGeneratorSyncInitializer.tsx:19:3)
+    at VectorStorageProvider (http://127.0.0.1:4200/src/features/vectors/providers/VectorStorageProvider.tsx:14:3)
+    at VectorProvider (http://127.0.0.1:4200/src/features/vectors/VectorProvider.tsx:4:34)
+    at UserProvider (http://127.0.0.1:4200/src/app/providers/UserProvider.tsx:14:20)
+    at AppConfigProvider (http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:58:3)
+    at RxDbProvider (http://127.0.0.1:4200/src/app/providers/RxDbProvider.tsx:218:23)
+    at NotificationRenderer (http://127.0.0.1:4200/src/app/providers/NotificationProvider.tsx:32:20)
+    at NotificationProvider (http://127.0.0.1:4200/src/app/providers/NotificationProvider.tsx:226:3)
+    at DeveloperLogsProvider (http://127.0.0.1:4200/src/app/providers/DeveloperLogsProvider.tsx:10:27)
+    at LocalConfigProvider (http://127.0.0.1:4200/src/app/providers/LocalConfigProvider.tsx:57:31)
+    at ErrorBoundary (http://127.0.0.1:4200/src/shared/components/ErrorBoundary.tsx:5:5)
+    at App (http://127.0.0.1:4200/src/app/App.tsx?t=1779817131811:42:3) @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react_jsx-dev-runtime.js?v=fcc7e274:63
+[   59714ms] [ERROR] Warning: validateDOMNesting(...): %s cannot appear as a descendant of <%s>.%s <p> p 
+    at p
+    at p
+    at div
+    at div
+    at div
+    at div
+    at div
+    at TimelineMonthDayHeader (http://127.0.0.1:4200/src/features/timeline/components/layout/TimelineMonthDayHeader.tsx:9:3)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at C (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/@headlessui_react.js?v=fcc7e274:521:21)
+    at http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/@headlessui_react.js?v=fcc7e274:2629:22
+    at http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/@headlessui_react.js?v=fcc7e274:2659:15
+    at div
+    at div
+    at AppPage (http://127.0.0.1:4200/src/shared/components/AppPage.tsx:4:11)
+    at TimelineTab (http://127.0.0.1:4200/src/features/timeline/TimelineTab.tsx:33:16)
+    at RenderedRoute (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3118:5)
+    at Outlet (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3466:26)
+    at div
+    at div
+    at TabWrapper (http://127.0.0.1:4200/src/shared/components/TabWrapper.tsx:21:16)
+    at RenderedRoute (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3118:5)
+    at RenderErrorBoundary (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3078:5)
+    at DataRoutes (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3401:5)
+    at Router (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3473:15)
+    at RouterProvider (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3357:5)
+    at HandleInitalSync (http://127.0.0.1:4200/src/features/sync/SyncJobProvider.tsx:90:29)
+    at OnHandleUnsubscribeJobs (http://127.0.0.1:4200/src/features/sync/SyncJobProvider.tsx:214:36)
+    at SyncJobProvider (http://127.0.0.1:4200/src/features/sync/SyncJobProvider.tsx:66:35)
+    at UserPreferencesProvider (http://127.0.0.1:4200/src/app/providers/UserPreferencesProvider.tsx:62:14)
+    at VectorGeneratorSyncInitializer (http://127.0.0.1:4200/src/features/vectors/providers/VectorGeneratorSyncInitializer.tsx:19:3)
+    at VectorStorageProvider (http://127.0.0.1:4200/src/features/vectors/providers/VectorStorageProvider.tsx:14:3)
+    at VectorProvider (http://127.0.0.1:4200/src/features/vectors/VectorProvider.tsx:4:34)
+    at UserProvider (http://127.0.0.1:4200/src/app/providers/UserProvider.tsx:14:20)
+    at AppConfigProvider (http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:58:3)
+    at RxDbProvider (http://127.0.0.1:4200/src/app/providers/RxDbProvider.tsx:218:23)
+    at NotificationRenderer (http://127.0.0.1:4200/src/app/providers/NotificationProvider.tsx:32:20)
+    at NotificationProvider (http://127.0.0.1:4200/src/app/providers/NotificationProvider.tsx:226:3)
+    at DeveloperLogsProvider (http://127.0.0.1:4200/src/app/providers/DeveloperLogsProvider.tsx:10:27)
+    at LocalConfigProvider (http://127.0.0.1:4200/src/app/providers/LocalConfigProvider.tsx:57:31)
+    at ErrorBoundary (http://127.0.0.1:4200/src/shared/components/ErrorBoundary.tsx:5:5)
+    at App (http://127.0.0.1:4200/src/app/App.tsx?t=1779817131811:42:3) @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:520
+[   59717ms] [ERROR] Warning: Each child in a list should have a unique "key" prop.%s%s See https://reactjs.org/link/warning-keys for more information.%s 
+
+Check the render method of `ElementsByDateListCard2`.  
+    at p
+    at ElementsByDateListCard2 (http://127.0.0.1:4200/src/features/timeline/components/layout/ElementsByDateListCard.tsx:153:3)
+    at div
+    at div
+    at TimelineItem2 (http://127.0.0.1:4200/src/features/timeline/components/layout/TimelineItem.tsx:26:3)
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at C (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/@headlessui_react.js?v=fcc7e274:521:21)
+    at http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/@headlessui_react.js?v=fcc7e274:2629:22
+    at http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/@headlessui_react.js?v=fcc7e274:2659:15
+    at div
+    at div
+    at AppPage (http://127.0.0.1:4200/src/shared/components/AppPage.tsx:4:11)
+    at TimelineTab (http://127.0.0.1:4200/src/features/timeline/TimelineTab.tsx:33:16)
+    at RenderedRoute (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3118:5)
+    at Outlet (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3466:26)
+    at div
+    at div
+    at TabWrapper (http://127.0.0.1:4200/src/shared/components/TabWrapper.tsx:21:16)
+    at RenderedRoute (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3118:5)
+    at RenderErrorBoundary (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3078:5)
+    at DataRoutes (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3401:5)
+    at Router (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3473:15)
+    at RouterProvider (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3357:5)
+    at HandleInitalSync (http://127.0.0.1:4200/src/features/sync/SyncJobProvider.tsx:90:29)
+    at OnHandleUnsubscribeJobs (http://127.0.0.1:4200/src/features/sync/SyncJobProvider.tsx:214:36)
+    at SyncJobProvider (http://127.0.0.1:4200/src/features/sync/SyncJobProvider.tsx:66:35)
+    at UserPreferencesProvider (http://127.0.0.1:4200/src/app/providers/UserPreferencesProvider.tsx:62:14)
+    at VectorGeneratorSyncInitializer (http://127.0.0.1:4200/src/features/vectors/providers/VectorGeneratorSyncInitializer.tsx:19:3)
+    at VectorStorageProvider (http://127.0.0.1:4200/src/features/vectors/providers/VectorStorageProvider.tsx:14:3)
+    at VectorProvider (http://127.0.0.1:4200/src/features/vectors/VectorProvider.tsx:4:34)
+    at UserProvider (http://127.0.0.1:4200/src/app/providers/UserProvider.tsx:14:20)
+    at AppConfigProvider (http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:58:3)
+    at RxDbProvider (http://127.0.0.1:4200/src/app/providers/RxDbProvider.tsx:218:23)
+    at NotificationRenderer (http://127.0.0.1:4200/src/app/providers/NotificationProvider.tsx:32:20)
+    at NotificationProvider (http://127.0.0.1:4200/src/app/providers/NotificationProvider.tsx:226:3)
+    at DeveloperLogsProvider (http://127.0.0.1:4200/src/app/providers/DeveloperLogsProvider.tsx:10:27)
+    at LocalConfigProvider (http://127.0.0.1:4200/src/app/providers/LocalConfigProvider.tsx:57:31)
+    at ErrorBoundary (http://127.0.0.1:4200/src/shared/components/ErrorBoundary.tsx:5:5)
+    at App (http://127.0.0.1:4200/src/app/App.tsx?t=1779817131811:42:3) @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react_jsx-dev-runtime.js?v=fcc7e274:63
+[  304695ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
+[  304791ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
+[  304795ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[  304795ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[  305462ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
+[  650369ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
+[  650469ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
+[  650476ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[  650476ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[  650637ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45

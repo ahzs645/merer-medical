@@ -31,7 +31,8 @@ export interface LabCitation {
   url?: string;
   page?: string;
   quote?: string;
-  evidenceGrade: EvidenceGrade;
+  evidenceGrade?: EvidenceGrade;
+  grade?: string;
 }
 
 export interface LabReferenceBand {
@@ -101,4 +102,41 @@ export interface LabEnrichment {
   normalizedValue?: NormalizedLabValue;
   usedByPlanner: boolean;
   audit: LabAuditSummary;
+}
+
+export type ReferenceOverlayMode = ReferenceStandardId | 'original';
+
+export interface LabReferenceOverlay {
+  mode: ReferenceOverlayMode;
+  label: string;
+  display: string;
+  color: string;
+  kind: ReferenceKind;
+  unit?: string;
+  low?: number;
+  high?: number;
+  citation?: LabCitation;
+  citationId?: string;
+  ageBand?: string;
+  note?: string;
+}
+
+export interface LabReferenceEvaluation {
+  mode: ReferenceOverlayMode;
+  label: string;
+  referenceRange?: string;
+  referenceCitation?: LabCitation;
+  referenceAgeBand?: string;
+  referenceNote?: string;
+  flag: LabFlag;
+  normalizedValue?: NormalizedLabValue;
+  isMappedStandard: boolean;
+}
+
+export interface LabStatusSummary {
+  highCount: number;
+  lowCount: number;
+  borderlineCount: number;
+  abnormalCount: number;
+  label: string;
 }

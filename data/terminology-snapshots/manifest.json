@@ -1,0 +1,45 @@
+{
+  "generatedAt": "2026-05-26T17:33:42.764Z",
+  "purpose": "Compressed terminology source snapshots for local-first pack generation.",
+  "snapshots": [
+    {
+      "id": "ccdd-main-20260505",
+      "file": "ccdd-main-20260505.csv.gz",
+      "source": "https://open.canada.ca/data/en/dataset/3e0a7b9e-a5e9-4131-bde4-ac685a1f1a38",
+      "license": "Open Government Licence - Canada",
+      "bytes": 1976547,
+      "rows": 55968
+    },
+    {
+      "id": "cdc-cvx-20260526",
+      "file": "cdc-cvx-20260526.html.gz",
+      "source": "https://www2.cdc.gov/vaccines/iis/iisstandards/vaccines.asp?rpt=cvx",
+      "license": "US government public health code set",
+      "bytes": 66672
+    },
+    {
+      "id": "phac-national-vaccine-catalogue-20260521",
+      "file": "phac-national-vaccine-catalogue-20260521.fhir.json.gz",
+      "source": "https://nvc-cnv.canada.ca/fhir/v2/Bundle/NVC",
+      "license": "Public Health Agency of Canada NVC disclaimers",
+      "bytes": 323312,
+      "entries": 16,
+      "lastUpdated": "2026-05-21T16:22:28Z"
+    },
+    {
+      "id": "health-canada-dpd-marketed-allfiles-20260504",
+      "file": "health-canada-dpd-marketed-allfiles-20260504.zip",
+      "source": "https://www.canada.ca/content/dam/hc-sc/documents/services/drug-product-database/allfiles.zip",
+      "license": "Health Canada DPD terms and conditions",
+      "bytes": 1506014
+    },
+    {
+      "id": "hl7-terminology-r4-7.0.1-encounter-subset",
+      "file": "hl7-terminology-r4-7.0.1-encounter-subset.tgz",
+      "source": "https://packages.simplifier.net/hl7.terminology.r4/7.0.1",
+      "license": "HL7 FHIR license terms",
+      "bytes": 570449,
+      "files": 479
+    }
+  ]
+}

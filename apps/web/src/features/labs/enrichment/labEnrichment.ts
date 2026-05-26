@@ -1,5 +1,7 @@
 import {
   getInterpretationText,
+  getReferenceRangeHigh,
+  getReferenceRangeLow,
   getReferenceRangeString,
   getValueQuantity,
   getValueUnit,
@@ -9,51 +11,27 @@ import { LabDocument, LabGroup, ReportLink } from '../types';
 import {
   getReferenceStandard,
   getSelectedReferenceBand,
-  labCitations,
   loincLabAliases,
   nameLabAliases,
 } from './labEnrichmentCatalog';
+import { labCitations } from './labCitations';
 import {
   LabAuditSummary,
   LabEnrichment,
+  LabReferenceOverlay,
   LabFlag,
+  LabReferenceEvaluation,
+  LabStatusSummary,
   NormalizedLabValue,
   ReferenceKind,
+  ReferenceOverlayMode,
   ReferenceStandardId,
 } from './types';
-
-type UnitConversion = {
-  unit: string;
-  factor: number;
-};
+import { convertLabUnit } from './labUnitConversions';
 
 const DEFAULT_REFERENCE_CONTEXT = {
   ageYears: 40,
   sex: 'unknown' as const,
-};
-
-const labUnitConversions: Record<string, Record<string, UnitConversion>> = {
-  glucose: {
-    'mg/dL': { unit: 'mmol/L', factor: 1 / 18.0182 },
-  },
-  creatinine: {
-    'mg/dL': { unit: 'umol/L', factor: 88.42 },
-  },
-  'total-cholesterol': {
-    'mg/dL': { unit: 'mmol/L', factor: 1 / 38.67 },
-  },
-  hdl: {
-    'mg/dL': { unit: 'mmol/L', factor: 1 / 38.67 },
-  },
-  ldl: {
-    'mg/dL': { unit: 'mmol/L', factor: 1 / 38.67 },
-  },
-  triglycerides: {
-    'mg/dL': { unit: 'mmol/L', factor: 1 / 88.57 },
-  },
-  'vitamin-d-nmol': {
-    'ng/mL': { unit: 'nmol/L', factor: 2.496 },
-  },
 };
 
 const plannerRelevantLabIds = new Set([
@@ -64,6 +42,27 @@ const plannerRelevantLabIds = new Set([
   'vitamin-d-nmol',
   'hemoglobin-a1c',
 ]);
+
+export const referenceOverlayModes: ReferenceOverlayMode[] = [
+  'canadian',
+  'australian',
+  'uk',
+  'original',
+];
+
+export const referenceOverlayColors: Record<ReferenceOverlayMode, string> = {
+  canadian: '#2D4A3E',
+  australian: '#8A5A13',
+  uk: '#565190',
+  original: '#8A7F66',
+};
+
+export const referenceOverlayLabels: Record<ReferenceOverlayMode, string> = {
+  canadian: 'Canadian',
+  australian: 'Australian',
+  uk: 'UK',
+  original: 'Original',
+};
 
 export function buildLabEnrichment({
   group,
@@ -123,32 +122,261 @@ export function getLabEnrichmentId(
   return nameLabAliases.find((alias) => alias.pattern.test(name))?.id;
 }
 
+export function buildLabReferenceOverlays({
+  group,
+  lab,
+}: {
+  group: LabGroup;
+  lab: LabDocument;
+}): LabReferenceOverlay[] {
+  const labId = getLabEnrichmentId(group, lab);
+  const overlays: LabReferenceOverlay[] = [];
+
+  if (labId) {
+    (['canadian', 'australian', 'uk'] as ReferenceStandardId[]).forEach(
+      (standardId) => {
+        const band = getSelectedReferenceBand(
+          standardId,
+          labId,
+          DEFAULT_REFERENCE_CONTEXT,
+        );
+        if (!band) return;
+
+        overlays.push({
+          mode: standardId,
+          label: band.standardLabel,
+          display: band.display,
+          color: referenceOverlayColors[standardId],
+          kind: band.kind,
+          unit: band.unit,
+          low: band.low,
+          high: band.high,
+          citation: labCitations[band.citationId],
+          citationId: band.citationId,
+          ageBand: band.label,
+          note:
+            [band.note, band.defaultNote].filter(Boolean).join(' ') ||
+            undefined,
+        });
+      },
+    );
+  }
+
+  const originalOverlay = buildOriginalReferenceOverlay(lab);
+  if (originalOverlay) overlays.push(originalOverlay);
+
+  return overlays;
+}
+
+export function buildLabReferenceEvaluation({
+  group,
+  lab,
+  mode,
+}: {
+  group: LabGroup;
+  lab: LabDocument;
+  mode: ReferenceOverlayMode;
+}): LabReferenceEvaluation {
+  if (mode === 'original') {
+    return buildOriginalReferenceEvaluation(lab);
+  }
+
+  const labId = getLabEnrichmentId(group, lab),
+    sourceFlag = getSourceFlag(lab);
+
+  if (!labId) {
+    return {
+      ...buildOriginalReferenceEvaluation(lab),
+      mode,
+      label: referenceOverlayLabels[mode],
+      isMappedStandard: false,
+    };
+  }
+
+  const band = getSelectedReferenceBand(mode, labId, DEFAULT_REFERENCE_CONTEXT);
+  if (!band) {
+    return {
+      ...buildOriginalReferenceEvaluation(lab),
+      mode,
+      label: referenceOverlayLabels[mode],
+      isMappedStandard: false,
+    };
+  }
+
+  const value = getValueQuantity(lab),
+    unit = getValueUnit(lab),
+    normalizedValue =
+      value !== undefined
+        ? getNormalizedLabValue(labId, value, unit, band.unit)
+        : undefined,
+    flag =
+      normalizedValue?.value !== undefined
+        ? evaluateFlag(
+            band.kind,
+            normalizedValue.value,
+            band.low,
+            band.high,
+            sourceFlag,
+          )
+        : sourceFlag,
+    referenceNote = [band.note, band.defaultNote].filter(Boolean).join(' ');
+
+  return {
+    mode,
+    label: band.standardLabel,
+    referenceRange: band.display,
+    referenceCitation: labCitations[band.citationId],
+    referenceAgeBand: band.label,
+    referenceNote: referenceNote || undefined,
+    flag,
+    normalizedValue,
+    isMappedStandard: true,
+  };
+}
+
+export function summarizeLabGroupStatus(
+  group: LabGroup,
+  mode: ReferenceOverlayMode,
+): LabStatusSummary {
+  const flags = group.labs.map(
+      (lab) => buildLabReferenceEvaluation({ group, lab, mode }).flag,
+    ),
+    highCount = flags.filter((flag) => flag === 'high').length,
+    lowCount = flags.filter((flag) => flag === 'low').length,
+    borderlineCount = flags.filter((flag) => flag === 'borderline').length,
+    abnormalCount = highCount + lowCount + borderlineCount;
+
+  const parts = [
+    highCount > 0 ? `${highCount} high` : undefined,
+    lowCount > 0 ? `${lowCount} low` : undefined,
+    borderlineCount > 0 ? `${borderlineCount} borderline` : undefined,
+  ].filter(Boolean);
+
+  return {
+    highCount,
+    lowCount,
+    borderlineCount,
+    abnormalCount,
+    label: parts.length > 0 ? parts.join(' / ') : 'In range',
+  };
+}
+
 function getNormalizedLabValue(
   labId: string,
   value: number,
   sourceUnit?: string,
   targetUnit?: string,
 ): NormalizedLabValue {
-  const conversion = sourceUnit
-    ? labUnitConversions[labId]?.[sourceUnit]
-    : undefined;
-  if (!conversion || (targetUnit && conversion.unit !== targetUnit)) {
+  const converted = convertLabUnit(labId, value, sourceUnit, targetUnit);
+  if (!converted.converted) {
     return {
-      value,
-      unit: targetUnit || sourceUnit,
+      value: converted.value,
+      unit: converted.unit,
       sourceValue: value,
       sourceUnit,
     };
   }
 
-  const convertedValue = roundForDisplay(value * conversion.factor);
+  const convertedValue = roundForDisplay(converted.value);
   return {
     value: convertedValue,
-    unit: conversion.unit,
+    unit: converted.unit,
     sourceValue: value,
     sourceUnit,
-    note: `${value} ${sourceUnit} converted to ${convertedValue} ${conversion.unit}.`,
+    note: `${value} ${sourceUnit} converted to ${convertedValue} ${converted.unit}.`,
   };
+}
+
+function buildOriginalReferenceEvaluation(
+  lab: LabDocument,
+): LabReferenceEvaluation {
+  const originalOverlay = buildOriginalReferenceOverlay(lab),
+    sourceFlag = getSourceFlag(lab),
+    value = getValueQuantity(lab),
+    flag =
+      originalOverlay && value !== undefined
+        ? evaluateFlag(
+            originalOverlay.kind,
+            value,
+            originalOverlay.low,
+            originalOverlay.high,
+            sourceFlag,
+          )
+        : sourceFlag;
+
+  return {
+    mode: 'original',
+    label: referenceOverlayLabels.original,
+    referenceRange: originalOverlay?.display || getReferenceRangeString(lab),
+    flag,
+    normalizedValue:
+      value !== undefined
+        ? {
+            value,
+            sourceValue: value,
+            unit: getValueUnit(lab),
+            sourceUnit: getValueUnit(lab),
+          }
+        : undefined,
+    isMappedStandard: true,
+  };
+}
+
+function buildOriginalReferenceOverlay(
+  lab: LabDocument,
+): LabReferenceOverlay | undefined {
+  const display = getReferenceRangeString(lab);
+  const parsed = display ? parseNumericReferenceRange(display) : undefined;
+  const low = getReferenceRangeLow(lab)?.value;
+  const high = getReferenceRangeHigh(lab)?.value;
+
+  if (!display && low === undefined && high === undefined) return undefined;
+
+  return {
+    mode: 'original',
+    label: referenceOverlayLabels.original,
+    display:
+      display ||
+      [low, high].filter((value) => value !== undefined).join(' - ') ||
+      'Source range',
+    color: referenceOverlayColors.original,
+    kind: parsed?.kind || 'range',
+    unit: getValueUnit(lab),
+    low: parsed?.low ?? low,
+    high: parsed?.high ?? high,
+  };
+}
+
+function parseNumericReferenceRange(
+  display: string,
+): Pick<LabReferenceOverlay, 'kind' | 'low' | 'high'> | undefined {
+  const normalized = display
+    .replace(/[≤]/g, '<=')
+    .replace(/[≥]/g, '>=')
+    .replace(/[–—]/g, '-')
+    .replace(/,/g, '');
+  const lteMatch = normalized.match(/^(<=|<)\s*(-?\d+(?:\.\d+)?)/);
+  if (lteMatch?.[1] && lteMatch[2]) {
+    return {
+      kind: lteMatch[1] === '<=' ? 'lte' : 'lt',
+      high: Number(lteMatch[2]),
+    };
+  }
+  const gteMatch = normalized.match(/^(>=|>)\s*(-?\d+(?:\.\d+)?)/);
+  if (gteMatch?.[1] && gteMatch[2]) {
+    return { kind: 'gte', low: Number(gteMatch[2]) };
+  }
+  const rangeMatch = normalized.match(
+    /(-?\d+(?:\.\d+)?)\s*(?:-|to)\s*(-?\d+(?:\.\d+)?)/i,
+  );
+  if (rangeMatch?.[1] && rangeMatch[2]) {
+    return {
+      kind: 'range',
+      low: Number(rangeMatch[1]),
+      high: Number(rangeMatch[2]),
+    };
+  }
+  return undefined;
 }
 
 function evaluateFlag(

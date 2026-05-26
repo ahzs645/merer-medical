@@ -5,6 +5,7 @@ import { createWriteStream, promises as fs } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { spawn } from 'node:child_process';
+import { createReadStream } from 'node:fs';
 
 const repoRoot = resolve(dirname(new URL(import.meta.url).pathname), '..');
 const outDir = join(repoRoot, 'data', 'terminology-snapshots');
@@ -43,6 +44,11 @@ const snapshots = {
       'https://www2.cdc.gov/vaccines/iis/iisstandards/vaccines.asp?rpt=cvx',
     license: 'US government public health code set',
   },
+  nvc: {
+    file: 'phac-national-vaccine-catalogue-20260521.fhir.json.gz',
+    source: 'https://nvc-cnv.canada.ca/fhir/v2/Bundle/NVC',
+    license: 'Public Health Agency of Canada NVC disclaimers',
+  },
   dpd: {
     file: 'health-canada-dpd-marketed-allfiles-20260504.zip',
     source:
@@ -57,19 +63,58 @@ const snapshots = {
 };
 
 async function download(url, path) {
-  const response = await fetch(url);
-  if (!response.ok || !response.body) {
-    throw new Error(`Download failed ${response.status} ${url}`);
-  }
-  await pipeline(response.body, createWriteStream(path));
+  await run('curl', [
+    '--fail',
+    '--location',
+    '--silent',
+    '--show-error',
+    '--max-time',
+    '90',
+    '--output',
+    path,
+    url,
+  ]);
 }
 
 async function gzipUrl(url, path) {
-  const response = await fetch(url);
-  if (!response.ok || !response.body) {
-    throw new Error(`Download failed ${response.status} ${url}`);
-  }
-  await pipeline(response.body, createGzip({ level: 9 }), createWriteStream(path));
+  const tmpPath = `${path}.raw`;
+  await download(url, tmpPath);
+  await pipeline(
+    createReadStream(tmpPath),
+    createGzip({ level: 9 }),
+    createWriteStream(path),
+  );
+  await fs.rm(tmpPath, { force: true });
+}
+
+async function gzipNvcBundle(path) {
+  const tmpPath = `${path}.raw`;
+  await run('curl', [
+    '--fail',
+    '--location',
+    '--silent',
+    '--show-error',
+    '--max-time',
+    '90',
+    '--header',
+    'Accept: application/json+fhir',
+    '--header',
+    'X-App-Desc: Mere terminology snapshot fetcher',
+    '--output',
+    tmpPath,
+    snapshots.nvc.source,
+  ]);
+  await pipeline(
+    createReadStream(tmpPath),
+    createGzip({ level: 9 }),
+    createWriteStream(path),
+  );
+  const parsed = JSON.parse(await fs.readFile(tmpPath, 'utf8'));
+  await fs.rm(tmpPath, { force: true });
+  return {
+    entries: Array.isArray(parsed.entry) ? parsed.entry.length : 0,
+    lastUpdated: parsed.meta?.lastUpdated,
+  };
 }
 
 function run(command, args, options = {}) {
@@ -81,7 +126,8 @@ function run(command, args, options = {}) {
     child.on('error', reject);
     child.on('exit', (code) => {
       if (code === 0) resolveRun();
-      else reject(new Error(`${command} ${args.join(' ')} exited with ${code}`));
+      else
+        reject(new Error(`${command} ${args.join(' ')} exited with ${code}`));
     });
   });
 }
@@ -131,7 +177,9 @@ async function fetchHl7EncounterSubset() {
     `find ${JSON.stringify(extractDir)} -type f \\( -name '*Encounter*' -o -name '*encounter*' -o -name '*v3-Act*' -o -name '*ActCode*' -o -name '*service-type*' \\) -print > ${JSON.stringify(fileList)}`,
   ]);
   await run('tar', ['-czf', output, '-T', fileList]);
-  const files = (await fs.readFile(fileList, 'utf8')).split('\n').filter(Boolean);
+  const files = (await fs.readFile(fileList, 'utf8'))
+    .split('\n')
+    .filter(Boolean);
   return { files: files.length, bytes: await byteSize(output) };
 }
 
@@ -140,10 +188,8 @@ async function main() {
   await fs.mkdir(tmpDir, { recursive: true });
 
   const ccdd = await fetchCcdd();
-  await gzipUrl(
-    snapshots.cdcCvx.source,
-    join(outDir, snapshots.cdcCvx.file),
-  );
+  await gzipUrl(snapshots.cdcCvx.source, join(outDir, snapshots.cdcCvx.file));
+  const nvc = await gzipNvcBundle(join(outDir, snapshots.nvc.file));
   await download(snapshots.dpd.source, join(outDir, snapshots.dpd.file));
   const hl7 = await fetchHl7EncounterSubset();
 
@@ -162,6 +208,13 @@ async function main() {
         id: 'cdc-cvx-20260526',
         ...snapshots.cdcCvx,
         bytes: await byteSize(join(outDir, snapshots.cdcCvx.file)),
+      },
+      {
+        id: 'phac-national-vaccine-catalogue-20260521',
+        ...snapshots.nvc,
+        bytes: await byteSize(join(outDir, snapshots.nvc.file)),
+        entries: nvc.entries,
+        lastUpdated: nvc.lastUpdated,
       },
       {
         id: 'health-canada-dpd-marketed-allfiles-20260504',
@@ -188,4 +241,3 @@ main().catch((error) => {
   console.error(error);
   process.exit(1);
 });
-

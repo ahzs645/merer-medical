@@ -4,9 +4,11 @@ import { AppPage } from '../../shared/components/AppPage';
 import { EmptyRecordsPlaceholder } from '../../shared/components/EmptyRecordsPlaceholder';
 import { LabsEmptySearch } from './components/LabsEmptySearch';
 import { LabsHeader } from './components/LabsHeader';
+import { LabReferenceStandardControl } from './components/LabReferenceStandardControl';
 import { LabsSkeleton } from './components/LabsSkeleton';
 import { LabsTable } from './components/LabsTable';
 import { LibreCgmPanel } from './components/LibreCgmPanel';
+import { ReferenceOverlayMode } from './enrichment/types';
 import { useLabsData } from './hooks/useLabsData';
 import {
   filterLabGroups,
@@ -23,6 +25,8 @@ import { GLUCOSE_LOINC_CODE } from '../diabetes/libreView';
 
 export function LabsTab() {
   const [query, setQuery] = useState(getSavedLabsQuery),
+    [referenceMode, setReferenceMode] =
+      useState<ReferenceOverlayMode>('canadian'),
     scrollContainerRef = useRef<HTMLDivElement | null>(null),
     { labs, reportsByObservationId, connectionsById, status } = useLabsData();
 
@@ -81,6 +85,10 @@ export function LabsTab() {
             ) : filteredGroups.length > 0 ? (
               <>
                 <LibreCgmPanel labs={libreLabs} />
+                <LabReferenceStandardControl
+                  selectedMode={referenceMode}
+                  setSelectedMode={setReferenceMode}
+                />
                 {labSections.map((section) => (
                   <LabsTable
                     key={section.key}
@@ -88,6 +96,7 @@ export function LabsTab() {
                     reportsByObservationId={reportsByObservationId}
                     title={section.title}
                     description={section.description}
+                    referenceMode={referenceMode}
                   />
                 ))}
               </>

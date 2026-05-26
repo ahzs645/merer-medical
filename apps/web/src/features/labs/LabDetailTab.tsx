@@ -9,18 +9,28 @@ import { Routes } from '../../Routes';
 import { LabEnrichmentPanel } from './components/LabEnrichmentPanel';
 import { LabHistoryChart } from './components/LabHistoryChart';
 import { LabHistoryTable } from './components/LabHistoryTable';
+import { LabReferenceOverlayControls } from './components/LabReferenceOverlayControls';
 import { LabsHeader } from './components/LabsHeader';
 import { LabsSkeleton } from './components/LabsSkeleton';
-import { buildLabEnrichment } from './enrichment/labEnrichment';
-import { ReferenceStandardId } from './enrichment/types';
+import {
+  buildLabEnrichment,
+  buildLabReferenceOverlays,
+} from './enrichment/labEnrichment';
+import {
+  getLabGraphUnitOptions,
+  normalizeReferenceOverlaysForGraph,
+} from './enrichment/labGraphNormalization';
+import { ReferenceOverlayMode } from './enrichment/types';
 import { useLabsData } from './hooks/useLabsData';
 import { groupLabs } from './utils/labGrouping';
 
 export function LabDetailTab() {
   const { labKey } = useParams<{ labKey: string }>(),
     { labs, reportsByObservationId, status } = useLabsData();
-  const [referenceStandardId, setReferenceStandardId] =
-    useState<ReferenceStandardId>('canadian');
+  const [enabledOverlayModes, setEnabledOverlayModes] = useState<
+    ReferenceOverlayMode[]
+  >(['canadian', 'original']);
+  const [selectedGraphUnit, setSelectedGraphUnit] = useState<string>();
 
   const groupedLabs = useMemo(() => groupLabs(labs), [labs]);
   const group = useMemo(() => {
@@ -31,6 +41,29 @@ export function LabDetailTab() {
     latestReports = latestLab
       ? reportsByObservationId.get(latestLab.metadata?.id || '') || []
       : [];
+  const referenceOverlays = useMemo(() => {
+    if (!group || !latestLab) return [];
+    return buildLabReferenceOverlays({ group, lab: latestLab });
+  }, [group, latestLab]);
+  const graphUnitOptions = useMemo(
+    () => (group ? getLabGraphUnitOptions(group, referenceOverlays) : []),
+    [group, referenceOverlays],
+  );
+  const activeGraphUnit = graphUnitOptions.some(
+    (option) => option.unit === selectedGraphUnit,
+  )
+    ? selectedGraphUnit
+    : graphUnitOptions[0]?.unit;
+  const enabledReferenceOverlays = useMemo(() => {
+    const overlays = referenceOverlays.filter((overlay) =>
+      enabledOverlayModes.includes(overlay.mode),
+    );
+    return normalizeReferenceOverlaysForGraph({
+      group,
+      overlays,
+      targetUnit: activeGraphUnit,
+    });
+  }, [activeGraphUnit, enabledOverlayModes, group, referenceOverlays]);
   const enrichment = useMemo(() => {
     if (!group || !latestLab) return undefined;
 
@@ -38,9 +71,9 @@ export function LabDetailTab() {
       group,
       lab: latestLab,
       reports: latestReports,
-      standardId: referenceStandardId,
+      standardId: 'canadian',
     });
-  }, [group, latestLab, latestReports, referenceStandardId]);
+  }, [group, latestLab, latestReports]);
 
   return (
     <AppPage
@@ -91,16 +124,45 @@ export function LabDetailTab() {
                 </div>
               </section>
               {enrichment ? (
-                <LabEnrichmentPanel
-                  enrichment={enrichment}
-                  standardId={referenceStandardId}
-                  setStandardId={setReferenceStandardId}
-                />
+                <LabEnrichmentPanel enrichment={enrichment} />
               ) : null}
               <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
-                <h2 className="text-base font-semibold text-gray-900">Graph</h2>
+                <div className="flex flex-col gap-3">
+                  <h2 className="text-base font-semibold text-gray-900">
+                    Graph
+                  </h2>
+                  {graphUnitOptions.length > 1 ? (
+                    <label className="flex w-full max-w-xs flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      Normalize to
+                      <select
+                        value={activeGraphUnit || ''}
+                        onChange={(event) =>
+                          setSelectedGraphUnit(event.target.value)
+                        }
+                        className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium normal-case tracking-normal text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                      >
+                        {graphUnitOptions.map((option) => (
+                          <option key={option.unit} value={option.unit}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  ) : null}
+                  <LabReferenceOverlayControls
+                    overlays={referenceOverlays}
+                    enabledModes={enabledOverlayModes}
+                    setEnabledModes={setEnabledOverlayModes}
+                  />
+                </div>
                 <div className="mt-3">
-                  <LabHistoryChart group={group} heightClassName="h-96" />
+                  <LabHistoryChart
+                    group={group}
+                    heightClassName="h-96"
+                    referenceOverlays={enabledReferenceOverlays}
+                    showReferenceRange={false}
+                    targetUnit={activeGraphUnit}
+                  />
                 </div>
               </section>
               <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">

@@ -1,5 +1,4 @@
 import {
-  LabCitation,
   LabReferenceStandard,
   ReferenceContext,
   ReferenceStandardId,
@@ -7,51 +6,6 @@ import {
 } from './types';
 
 const YEAR_IN_DAYS = 365.2425;
-
-export const labCitations: Record<string, LabCitation> = {
-  'APL-CBC-DIFF': {
-    id: 'APL-CBC-DIFF',
-    source: 'Alberta Precision Laboratories CBC reference intervals',
-    fullCitation:
-      'Alberta Precision Laboratories. CBC and Differential Provincial Reference Intervals and Critical Values - Epic. HE02-100 Rev 3.00, June 2023.',
-    url: 'https://www.albertahealthservices.ca/assets/wf/lab/if-lab-cbc-and-differential-provincial-reference-intervals-and-critical-values-epic.pdf',
-    page: 'p.1-2',
-    evidenceGrade: 'reference-interval',
-  },
-  'DYN-CBC-MCH': {
-    id: 'DYN-CBC-MCH',
-    source: 'Dynacare CBC reference range update',
-    fullCitation:
-      'Dynacare. Partner Update: CBC Reference Ranges, September 28, 2016.',
-    url: 'https://www.dynacare.ca/DYN/media/DYN/eng/Notices-Services/2016/Partner-Update-CBC-Reference-Ranges-EN_V2.pdf',
-    page: 'CBC reference range table',
-    evidenceGrade: 'reference-interval',
-  },
-  'AUS-AUSTIN-REF-RANGES': {
-    id: 'AUS-AUSTIN-REF-RANGES',
-    source: 'Austin Health Pathology reference ranges',
-    fullCitation:
-      'Austin Health Pathology. Pathology Clinical Trials - Trial Specific Reference Ranges 2025. Effective September 30, 2025.',
-    url: 'https://www.austinpathology.org.au/assets/documents/clinical-Trial-Reference-Ranges-Austin-Pathology%28Harmonised%29_Sept2025-Signed.pdf',
-    evidenceGrade: 'reference-interval',
-  },
-  'UK-WORCS-FBC': {
-    id: 'UK-WORCS-FBC',
-    source: 'Worcestershire Acute Hospitals NHS full blood count',
-    fullCitation:
-      'Worcestershire Acute Hospitals NHS Trust. Pathology Tests A to Z: Full Blood Count.',
-    url: 'https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/',
-    evidenceGrade: 'reference-interval',
-  },
-  'DC-LIPID-DIABETES': {
-    id: 'DC-LIPID-DIABETES',
-    source: 'Diabetes Canada dyslipidemia guideline',
-    fullCitation:
-      'Diabetes Canada Clinical Practice Guidelines Expert Committee. Dyslipidemia. Can J Diabetes 2018;42(Suppl 1):S178-S185.',
-    url: 'https://guidelines.diabetes.ca/cpg/chapter25',
-    evidenceGrade: 'clinical-guideline',
-  },
-};
 
 export const labReferenceStandards: LabReferenceStandard[] = [
   {
@@ -343,6 +297,22 @@ export const loincLabAliases: Record<string, string> = {
   '4544-3': 'hematocrit',
   '5905-5': 'monocytes-pct',
   '770-8': 'neutrophils-pct',
+  '14749-6': 'glucose',
+  '2345-7': 'glucose',
+  '2160-0': 'creatinine',
+  '17861-6': 'calcium',
+  '2885-2': 'total-protein',
+  '1751-7': 'albumin',
+  '1975-2': 'bilirubin-total',
+  '2093-3': 'total-cholesterol',
+  '2085-9': 'hdl',
+  '13457-7': 'ldl',
+  '2571-8': 'triglycerides',
+  '3016-3': 'tsh',
+  '14635-7': 'estradiol',
+  '2986-8': 'testosterone-total',
+  '1989-3': 'vitamin-d-nmol',
+  '2857-1': 'psa',
 };
 
 export const nameLabAliases: Array<{ pattern: RegExp; id: string }> = [
@@ -364,6 +334,27 @@ export const nameLabAliases: Array<{ pattern: RegExp; id: string }> = [
   { pattern: /basophil|basos?\b/i, id: 'basophils-pct' },
   { pattern: /\bhdl\b/i, id: 'hdl' },
   { pattern: /\bldl\b/i, id: 'ldl' },
+  { pattern: /triglyceride/i, id: 'triglycerides' },
+  {
+    pattern: /cholesterol.*total|total.*cholesterol/i,
+    id: 'total-cholesterol',
+  },
+  { pattern: /\bglucose\b/i, id: 'glucose' },
+  { pattern: /creatinine/i, id: 'creatinine' },
+  { pattern: /\bcalcium\b/i, id: 'calcium' },
+  { pattern: /total protein/i, id: 'total-protein' },
+  { pattern: /albumin/i, id: 'albumin' },
+  { pattern: /bilirubin/i, id: 'bilirubin-total' },
+  {
+    pattern: /albumin.?creatinine|microalbumin/i,
+    id: 'urine-microalbumin-creatinine-ratio',
+  },
+  { pattern: /vitamin b12|cyanocobal/i, id: 'b12' },
+  { pattern: /\btsh\b|thyroid stimulating/i, id: 'tsh' },
+  { pattern: /estradiol/i, id: 'estradiol' },
+  { pattern: /testosterone/i, id: 'testosterone-total' },
+  { pattern: /vitamin d|25.?hydroxy/i, id: 'vitamin-d-nmol' },
+  { pattern: /\bpsa\b|prostate specific/i, id: 'psa' },
 ];
 
 export function getReferenceStandard(id: ReferenceStandardId) {
@@ -416,7 +407,7 @@ function standardRange(
     name,
     bands: [
       {
-        label: 'Adult',
+        label: '18 years up to 150 years',
         kind,
         display,
         unit,
@@ -424,6 +415,7 @@ function standardRange(
         high,
         citationId,
         ageMinDays: 18 * YEAR_IN_DAYS,
+        ageMaxDays: 150 * YEAR_IN_DAYS,
       },
     ],
   };

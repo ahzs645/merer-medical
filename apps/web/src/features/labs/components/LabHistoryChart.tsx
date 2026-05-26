@@ -1,22 +1,25 @@
-import { format, isValid, parseISO } from 'date-fns';
-import { useMemo } from 'react';
+import { format, isValid } from 'date-fns';
+import {
+  Fragment,
+  type RefObject,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   CartesianGrid,
   ComposedChart,
   Line,
-  ResponsiveContainer,
+  ReferenceLine,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
 
-import {
-  getReferenceRangeHigh,
-  getReferenceRangeLow,
-  getValueQuantity,
-  getValueString,
-  getValueUnit,
-} from '../../timeline/utils/fhirpathParsers';
+import { getValueString } from '../../timeline/utils/fhirpathParsers';
+import { normalizeLabChartData } from '../enrichment/labGraphNormalization';
+import { LabReferenceOverlay } from '../enrichment/types';
 import { LabDocument, LabGroup } from '../types';
 
 type LabHistoryChartProps = {
@@ -25,14 +28,8 @@ type LabHistoryChartProps = {
   className?: string;
   heightClassName?: string;
   showReferenceRange?: boolean;
-};
-
-type LabChartPoint = {
-  date: string;
-  timestamp: number;
-  value: number;
-  referenceLow?: number;
-  referenceHigh?: number;
+  referenceOverlays?: LabReferenceOverlay[];
+  targetUnit?: string;
 };
 
 export function LabHistoryChart({
@@ -41,26 +38,27 @@ export function LabHistoryChart({
   className = '',
   heightClassName = 'h-72',
   showReferenceRange = true,
+  referenceOverlays = [],
+  targetUnit,
 }: LabHistoryChartProps) {
   const labs = useMemo(
     () => [...(history || group?.labs || [])].sort(compareDocumentsByDateAsc),
     [group?.labs, history],
   );
 
-  const { chartData, skippedCount } = useMemo(
-    () => buildLabChartData(labs, showReferenceRange),
-    [labs, showReferenceRange],
+  const {
+    chartData,
+    skippedCount,
+    unit: chartValueUnit,
+  } = useMemo(
+    () => normalizeLabChartData({ group, labs, targetUnit }),
+    [group, labs, targetUnit],
   );
+  const chartRef = useRef<HTMLDivElement>(null);
+  const chartSize = useElementSize(chartRef);
 
-  const latestNumericLab = useMemo(
-    () => labs.find((lab) => isNumber(getValueQuantity(lab))),
-    [labs],
-  );
   const chartDisplayName =
-    group?.name || latestNumericLab?.metadata?.display_name || 'Lab result';
-  const chartValueUnit = latestNumericLab
-    ? getValueUnit(latestNumericLab)
-    : undefined;
+    group?.name || labs[0]?.metadata?.display_name || 'Lab result';
 
   const chartDomain = useMemo(
     () =>
@@ -68,12 +66,14 @@ export function LabHistoryChart({
         chartData
           .flatMap((point) => [
             point.value,
-            point.referenceLow,
-            point.referenceHigh,
+            ...referenceOverlays.flatMap((overlay) => [
+              overlay.low,
+              overlay.high,
+            ]),
           ])
           .filter(isNumber),
       ),
-    [chartData],
+    [chartData, referenceOverlays],
   );
   if (chartData.length === 0) {
     return (
@@ -94,12 +94,15 @@ export function LabHistoryChart({
 
   return (
     <div
-      className={`${heightClassName} w-full [&_.recharts-surface:focus]:outline-none [&_.recharts-wrapper:focus]:outline-none [&_[tabindex]:focus]:outline-none ${className}`}
+      ref={chartRef}
+      className={`${heightClassName} min-h-64 min-w-0 w-full [&_.recharts-surface:focus]:outline-none [&_.recharts-wrapper:focus]:outline-none [&_[tabindex]:focus]:outline-none ${className}`}
     >
-      <ResponsiveContainer width="100%" height="100%">
+      {chartSize.width > 0 && chartSize.height > 0 ? (
         <ComposedChart
           data={chartData}
+          height={chartSize.height}
           margin={{ top: 16, right: 16, bottom: 36, left: 20 }}
+          width={chartSize.width}
         >
           <CartesianGrid stroke="#E5E7EB" strokeDasharray="3 3" />
           <XAxis
@@ -146,6 +149,11 @@ export function LabHistoryChart({
                     {chartDisplayName}: {formatChartTick(Number(value))}
                     {chartValueUnit ? ` ${chartValueUnit}` : ''}
                   </p>
+                  {payload?.[0]?.payload?.conversionNote ? (
+                    <p className="text-gray-500">
+                      {payload[0].payload.conversionNote}
+                    </p>
+                  ) : null}
                   {isNumber(low) && isNumber(high) ? (
                     <p className="text-gray-500">
                       Range: {formatChartTick(low)} - {formatChartTick(high)}
@@ -187,6 +195,28 @@ export function LabHistoryChart({
               />
             </>
           ) : null}
+          {referenceOverlays.map((overlay) => (
+            <Fragment key={overlay.mode}>
+              {isNumber(overlay.low) ? (
+                <ReferenceLine
+                  y={overlay.low}
+                  stroke={overlay.color}
+                  strokeDasharray="5 5"
+                  strokeOpacity={0.85}
+                  strokeWidth={1.5}
+                />
+              ) : null}
+              {isNumber(overlay.high) ? (
+                <ReferenceLine
+                  y={overlay.high}
+                  stroke={overlay.color}
+                  strokeDasharray="5 5"
+                  strokeOpacity={0.85}
+                  strokeWidth={1.5}
+                />
+              ) : null}
+            </Fragment>
+          ))}
           <Line
             dataKey="value"
             dot={{ r: 3, fill: '#00A2D5', strokeWidth: 0 }}
@@ -196,56 +226,37 @@ export function LabHistoryChart({
             type="monotone"
           />
         </ComposedChart>
-      </ResponsiveContainer>
+      ) : null}
     </div>
   );
 }
 
-function buildLabChartData(
-  labs: LabDocument[],
-  showReferenceRange: boolean,
-): { chartData: LabChartPoint[]; skippedCount: number } {
-  const chartData: LabChartPoint[] = [];
-  let skippedCount = 0;
+function useElementSize(ref: RefObject<HTMLElement>) {
+  const [size, setSize] = useState({ width: 0, height: 0 });
 
-  labs.forEach((lab) => {
-    const value = getValueQuantity(lab);
-    const parsedDate = parseLabDate(lab.metadata?.date);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return undefined;
 
-    if (!isNumber(value) || !parsedDate) {
-      skippedCount += 1;
-      return;
-    }
+    const updateSize = () => {
+      setSize({
+        width: Math.max(0, Math.floor(element.clientWidth)),
+        height: Math.max(0, Math.floor(element.clientHeight)),
+      });
+    };
+    updateSize();
 
-    const low = getReferenceRangeLow(lab)?.value;
-    const high = getReferenceRangeHigh(lab)?.value;
-    const hasReferenceRange =
-      showReferenceRange && isNumber(low) && isNumber(high);
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(element);
 
-    chartData.push({
-      date: format(parsedDate, 'yyyy-MM-dd'),
-      timestamp: parsedDate.getTime(),
-      value,
-      referenceLow: hasReferenceRange ? low : undefined,
-      referenceHigh: hasReferenceRange ? high : undefined,
-    });
-  });
+    return () => observer.disconnect();
+  }, [ref]);
 
-  return {
-    chartData: chartData.sort((a, b) => a.timestamp - b.timestamp),
-    skippedCount,
-  };
+  return size;
 }
 
 function compareDocumentsByDateAsc(a: LabDocument, b: LabDocument): number {
   return (a.metadata?.date || '').localeCompare(b.metadata?.date || '');
-}
-
-function parseLabDate(date?: string): Date | undefined {
-  if (!date) return undefined;
-
-  const parsedDate = parseISO(date);
-  return isValid(parsedDate) ? parsedDate : undefined;
 }
 
 function isNumber(value: unknown): value is number {
@@ -279,9 +290,9 @@ function formatAxisDate(value: number | string) {
 }
 
 function formatTooltipDate(value: unknown) {
-  if (typeof value !== 'string') return '';
+  if (typeof value !== 'string' && typeof value !== 'number') return '';
 
-  const parsedDate = parseLabDate(value);
+  const parsedDate = new Date(value);
   return parsedDate ? format(parsedDate, 'MMM d, yyyy') : value;
 }
 

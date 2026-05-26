@@ -1,24 +1,12 @@
 import {
-  BeakerIcon,
   CheckBadgeIcon,
   ClipboardDocumentCheckIcon,
-  DocumentMagnifyingGlassIcon,
   InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import { ReactNode } from 'react';
 
 import { safeFormatDate } from '../../../shared/utils/dateFormatters';
-import {
-  EvidenceGrade,
-  LabEnrichment,
-  ReferenceStandardId,
-} from '../enrichment/types';
-
-const standardOptions: Array<{ id: ReferenceStandardId; label: string }> = [
-  { id: 'canadian', label: 'Canadian' },
-  { id: 'australian', label: 'Australian' },
-  { id: 'uk', label: 'UK' },
-];
+import { LabEnrichment } from '../enrichment/types';
 
 const flagStyles = {
   normal: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
@@ -37,59 +25,26 @@ const auditLabels = {
 
 export function LabEnrichmentPanel({
   enrichment,
-  standardId,
-  setStandardId,
 }: {
   enrichment: LabEnrichment;
-  standardId: ReferenceStandardId;
-  setStandardId: (standardId: ReferenceStandardId) => void;
 }) {
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <BeakerIcon className="h-5 w-5 text-primary-700" />
-            <h2 className="text-base font-semibold text-gray-900">
-              Enrichment & audit
-            </h2>
-          </div>
-          <p className="mt-1 max-w-3xl text-sm text-gray-600">
-            Source values stay intact while this layer computes normalized
-            units, national reference context, citation provenance, and
-            verification status.
-          </p>
-        </div>
-        <label className="flex w-full max-w-xs flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
-          Reference standard
-          <select
-            value={standardId}
-            onChange={(event) =>
-              setStandardId(event.target.value as ReferenceStandardId)
-            }
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium normal-case tracking-normal text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200"
-          >
-            {standardOptions.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-base font-semibold text-gray-900">
+          Enrichment & audit
+        </h2>
+        <span className="rounded-full bg-gray-50 px-2 py-1 text-[11px] font-semibold text-gray-700 ring-1 ring-gray-200">
+          {auditLabels[enrichment.audit.status]}
+        </span>
       </div>
 
-      <div className="mt-4 grid gap-3 lg:grid-cols-3">
+      <div className="grid gap-3 lg:grid-cols-4">
         <InfoTile
           icon={<InformationCircleIcon className="h-4 w-4" />}
-          title={`${enrichment.standardLabel} reference`}
-          value={enrichment.referenceRange || 'No mapped national range'}
-          detail={
-            enrichment.referenceAgeBand
-              ? `Band: ${enrichment.referenceAgeBand}`
-              : enrichment.labId
-                ? `Mapped as ${enrichment.labId}`
-                : 'No lab alias matched this observation yet'
-          }
+          title="Mapped lab"
+          value={enrichment.labId || 'No enrichment alias'}
+          detail={enrichment.referenceNote || enrichment.referenceAgeBand}
         />
         <InfoTile
           icon={<ClipboardDocumentCheckIcon className="h-4 w-4" />}
@@ -109,88 +64,23 @@ export function LabEnrichmentPanel({
             'No unit conversion needed'
           }
         />
+        <InfoTile
+          icon={<InformationCircleIcon className="h-4 w-4" />}
+          title="Audit source"
+          value={enrichment.audit.sourceImage || 'No source image'}
+          detail={`${enrichment.audit.verifiedBy || 'Not verified'} · ${safeFormatDate(
+            enrichment.audit.verifiedAt,
+            'PP',
+            'No date',
+          )}`}
+        />
       </div>
 
-      <div className="mt-4 grid gap-3 lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
-          <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
-            <DocumentMagnifyingGlassIcon className="h-4 w-4 text-primary-700" />
-            Reference citation
-          </div>
-          {enrichment.referenceCitation ? (
-            <div className="mt-2 space-y-1 text-xs text-gray-700">
-              <p className="font-semibold text-gray-900">
-                {enrichment.referenceCitation.source}
-              </p>
-              <p>{enrichment.referenceCitation.fullCitation}</p>
-              <p>
-                Evidence:{' '}
-                <span className="font-semibold">
-                  {formatEvidenceGrade(
-                    enrichment.referenceCitation.evidenceGrade,
-                  )}
-                </span>
-                {enrichment.referenceCitation.page
-                  ? ` · ${enrichment.referenceCitation.page}`
-                  : ''}
-              </p>
-              {enrichment.referenceCitation.url ? (
-                <a
-                  href={enrichment.referenceCitation.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex font-semibold text-primary-700 hover:text-primary-900"
-                >
-                  Open citation
-                </a>
-              ) : null}
-            </div>
-          ) : (
-            <p className="mt-2 text-xs text-gray-600">
-              No citation is attached until this lab is mapped to a supported
-              reference.
-            </p>
-          )}
-          {enrichment.referenceNote ? (
-            <p className="mt-2 text-xs text-gray-600">
-              {enrichment.referenceNote}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
-          <div className="flex items-center justify-between gap-2">
-            <div className="text-sm font-semibold text-gray-900">
-              Verification audit
-            </div>
-            <span className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-gray-700 ring-1 ring-gray-200">
-              {auditLabels[enrichment.audit.status]}
-            </span>
-          </div>
-          <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs text-gray-700">
-            <dt className="font-semibold text-gray-500">Verified by</dt>
-            <dd>{enrichment.audit.verifiedBy || 'Not recorded'}</dd>
-            <dt className="font-semibold text-gray-500">Verified at</dt>
-            <dd>
-              {safeFormatDate(
-                enrichment.audit.verifiedAt,
-                'PP',
-                'Not recorded',
-              )}
-            </dd>
-            <dt className="font-semibold text-gray-500">Source</dt>
-            <dd>
-              {enrichment.audit.sourceImage ||
-                'No source image/report recorded'}
-            </dd>
-          </dl>
-          <ul className="mt-2 space-y-1 text-xs text-gray-600">
-            {enrichment.audit.notes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      <ul className="mt-3 space-y-1 text-xs text-gray-600">
+        {enrichment.audit.notes.map((note) => (
+          <li key={note}>{note}</li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -258,10 +148,4 @@ function normalizedValueLabel(enrichment: LabEnrichment) {
   if (!normalized) return undefined;
 
   return `${normalized.value}${normalized.unit ? ` ${normalized.unit}` : ''}`;
-}
-
-function formatEvidenceGrade(grade: EvidenceGrade) {
-  if (grade === 'clinical-guideline') return 'clinical guideline';
-  if (grade === 'source-reported') return 'source reported';
-  return 'reference interval';
 }

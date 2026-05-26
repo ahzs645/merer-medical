@@ -11,6 +11,7 @@ Included now:
 
 - Health Canada CCDD main CSV files, concatenated and gzipped.
 - CDC CVX vaccine code table, gzipped from the current HTML table payload.
+- PHAC National Vaccine Catalogue FHIR Bundle, gzipped from the public API.
 - Health Canada DPD marketed `allfiles.zip`, kept in its original compressed
   zip format because the source is already compressed.
 - A reduced HL7 Terminology R4 encounter/ActCode-focused subset.
@@ -21,7 +22,8 @@ Not included:
   review.
 - RxNorm/RxTerms source files, because UMLS download access is gated.
 - SNOMED CT CA and ICD-10-CA/CCI, because they are licensed/import-only sources.
-- Canadian Vaccine Catalogue, until redistribution/API terms are confirmed.
+- Legacy Canadian Vaccine Catalogue exports, because the PHAC National Vaccine
+  Catalogue is now the preferred public Canada-first vaccine source.
 
 Refresh snapshots with:
 
@@ -31,4 +33,3 @@ node tools/fetch-terminology-snapshots.mjs
 
 After refresh, inspect `manifest.json` and update docs if source versions or
 sizes changed materially.
-

@@ -53,7 +53,11 @@ type ManualRecordKind =
   | 'careplan'
   | 'document'
   | 'lab'
-  | 'vital';
+  | 'vital'
+  | 'device';
+
+type ClinicalManualRecordKind = Exclude<ManualRecordKind, 'device'>;
+type DeviceImportKind = 'freestyle_libre';
 
 const recordTypes: Array<{ value: ManualRecordKind; label: string }> = [
   { value: 'condition', label: 'Condition' },
@@ -66,11 +70,16 @@ const recordTypes: Array<{ value: ManualRecordKind; label: string }> = [
   { value: 'document', label: 'Document / file' },
   { value: 'lab', label: 'Lab / result' },
   { value: 'vital', label: 'Vital sign' },
+  { value: 'device', label: 'Device' },
+];
+
+const deviceImportTypes: Array<{ value: DeviceImportKind; label: string }> = [
+  { value: 'freestyle_libre', label: 'FreeStyle Libre' },
 ];
 
 type ManualTemplate = {
   label: string;
-  kind: ManualRecordKind;
+  kind: ClinicalManualRecordKind;
   title: string;
   unit: string;
   terminology?: TerminologyEntry;
@@ -127,6 +136,8 @@ export function ManualRecordTab() {
   const notifyDispatch = useNotificationDispatch();
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
   const [recordType, setRecordType] = useState<ManualRecordKind>('condition');
+  const [deviceImportType, setDeviceImportType] =
+    useState<DeviceImportKind>('freestyle_libre');
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(today);
   const [notes, setNotes] = useState('');
@@ -153,11 +164,15 @@ export function ManualRecordTab() {
   const [savedCount, setSavedCount] = useState(0);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const isEditing = !!recordId;
+  const isDeviceImportType = recordType === 'device';
+  const isLibreImportType =
+    isDeviceImportType && deviceImportType === 'freestyle_libre';
   const isObservationType = recordType === 'lab' || recordType === 'vital';
   const isDocumentType = recordType === 'document';
   const isMedicationType = recordType === 'medicationstatement';
   const completedLabRows = labRows.filter((row) => row.title.trim());
-  const titleMissing = recordType === 'lab' ? false : !title.trim();
+  const titleMissing =
+    recordType === 'lab' || isDeviceImportType ? false : !title.trim();
   const fileMissing = isDocumentType && !fileData;
   const terminologyProfile = localConfig.terminology_profile || 'canada';
   const terminologyLanguage = localConfig.terminology_language || 'en';
@@ -293,6 +308,7 @@ export function ManualRecordTab() {
     event.preventDefault();
     setSubmitAttempted(true);
     if (!db || isSaving) return;
+    if (recordType === 'device') return;
     if (titleMissing || fileMissing) return;
     if (recordType === 'lab' && completedLabRows.length === 0) return;
 
@@ -441,32 +457,6 @@ export function ManualRecordTab() {
     >
       <div className="h-full overflow-y-auto bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-2xl flex-col gap-5">
-          {!isEditing && (
-            <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-base font-semibold text-gray-900">
-                    Import FreeStyle Libre
-                  </h2>
-                  <p className="mt-1 text-sm text-gray-600">
-                    Add LibreView JSON or CSV exports as glucose observations in
-                    Labs.
-                  </p>
-                </div>
-                <label className="inline-flex cursor-pointer items-center justify-center rounded-md bg-primary-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-800">
-                  {isImportingLibre ? 'Importing...' : 'Import LibreView file'}
-                  <input
-                    type="file"
-                    accept=".json,.csv,application/json,text/csv"
-                    className="sr-only"
-                    disabled={isImportingLibre}
-                    onChange={onLibreFileSelected}
-                  />
-                </label>
-              </div>
-            </section>
-          )}
-
           <form
             onSubmit={onSubmit}
             className="flex flex-col gap-5 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6"
@@ -497,7 +487,58 @@ export function ManualRecordTab() {
               </div>
             )}
 
-            {!isEditing && (
+            {isDeviceImportType && !isEditing && (
+              <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
+                <label
+                  htmlFor="manual-device-type"
+                  className="block text-sm font-semibold text-gray-900"
+                >
+                  Device
+                </label>
+                <select
+                  id="manual-device-type"
+                  value={deviceImportType}
+                  onChange={(event) =>
+                    setDeviceImportType(event.target.value as DeviceImportKind)
+                  }
+                  className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                >
+                  {deviceImportTypes.map((device) => (
+                    <option key={device.value} value={device.value}>
+                      {device.label}
+                    </option>
+                  ))}
+                </select>
+
+                {isLibreImportType && (
+                  <div className="mt-4">
+                    <label
+                      htmlFor="libre-import-file"
+                      className="block text-sm font-semibold text-gray-900"
+                    >
+                      LibreView file
+                    </label>
+                    <p className="mt-1 text-sm text-gray-600">
+                      Import a LibreView JSON or CSV export. Readings will
+                      appear as glucose observations in Labs.
+                    </p>
+                    <label className="mt-3 inline-flex cursor-pointer items-center justify-center rounded-md bg-primary-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-800">
+                      {isImportingLibre ? 'Importing...' : 'Choose file'}
+                      <input
+                        id="libre-import-file"
+                        type="file"
+                        accept=".json,.csv,application/json,text/csv"
+                        className="sr-only"
+                        disabled={isImportingLibre}
+                        onChange={onLibreFileSelected}
+                      />
+                    </label>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!isEditing && !isDeviceImportType && (
               <div>
                 <p className="block text-sm font-semibold text-gray-900">
                   Quick templates
@@ -517,7 +558,7 @@ export function ManualRecordTab() {
               </div>
             )}
 
-            {isMedicationType && (
+            {isMedicationType && !isDeviceImportType && (
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
                   <label
@@ -570,7 +611,7 @@ export function ManualRecordTab() {
               </div>
             )}
 
-            {isObservationType && (
+            {isObservationType && !isDeviceImportType && (
               <div className="grid gap-4 sm:grid-cols-2">
                 {recordType === 'lab' && !isEditing && (
                   <LabResultsTable
@@ -682,48 +723,50 @@ export function ManualRecordTab() {
               </div>
             )}
 
-            <div>
-              <label
-                htmlFor="manual-record-title"
-                className="block text-sm font-semibold text-gray-900"
-              >
-                Name <span className="text-red-600">*</span>
-              </label>
-              <input
-                id="manual-record-title"
-                type="text"
-                value={title}
-                onChange={(event) => {
-                  setTitle(event.target.value);
-                  setSelectedTerminology(undefined);
-                }}
-                aria-invalid={submitAttempted && titleMissing}
-                className={`mt-2 block w-full rounded-md border px-3 py-2 text-base text-gray-900 shadow-sm focus:outline-none focus:ring-1 ${
-                  submitAttempted && titleMissing
-                    ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-primary-600 focus:ring-primary-600'
-                }`}
-              />
-              {!isDocumentType &&
-                recordType !== 'lab' &&
-                recordType !== 'careplan' && (
-                  <TerminologySuggestions
-                    kind={recordType}
-                    query={title}
-                    selected={selectedTerminology}
-                    onSelect={applyTerminology}
-                    profile={terminologyProfile}
-                    language={terminologyLanguage}
-                    lookupMode={terminologyLookupMode}
-                    remoteEnabled={terminologyRemoteEnabled}
-                  />
+            {!isDeviceImportType && (
+              <div>
+                <label
+                  htmlFor="manual-record-title"
+                  className="block text-sm font-semibold text-gray-900"
+                >
+                  Name <span className="text-red-600">*</span>
+                </label>
+                <input
+                  id="manual-record-title"
+                  type="text"
+                  value={title}
+                  onChange={(event) => {
+                    setTitle(event.target.value);
+                    setSelectedTerminology(undefined);
+                  }}
+                  aria-invalid={submitAttempted && titleMissing}
+                  className={`mt-2 block w-full rounded-md border px-3 py-2 text-base text-gray-900 shadow-sm focus:outline-none focus:ring-1 ${
+                    submitAttempted && titleMissing
+                      ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
+                      : 'border-gray-300 focus:border-primary-600 focus:ring-primary-600'
+                  }`}
+                />
+                {!isDocumentType &&
+                  recordType !== 'lab' &&
+                  recordType !== 'careplan' && (
+                    <TerminologySuggestions
+                      kind={recordType}
+                      query={title}
+                      selected={selectedTerminology}
+                      onSelect={applyTerminology}
+                      profile={terminologyProfile}
+                      language={terminologyLanguage}
+                      lookupMode={terminologyLookupMode}
+                      remoteEnabled={terminologyRemoteEnabled}
+                    />
+                  )}
+                {submitAttempted && titleMissing && (
+                  <p className="mt-1 text-xs font-medium text-red-600">
+                    A name is required.
+                  </p>
                 )}
-              {submitAttempted && titleMissing && (
-                <p className="mt-1 text-xs font-medium text-red-600">
-                  A name is required.
-                </p>
-              )}
-            </div>
+              </div>
+            )}
 
             {isDocumentType && (
               <div>
@@ -772,6 +815,7 @@ export function ManualRecordTab() {
               </div>
             )}
 
+            {!isDeviceImportType && (
             <div>
               <label
                 htmlFor="manual-record-date"
@@ -788,7 +832,9 @@ export function ManualRecordTab() {
                 className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
               />
             </div>
+            )}
 
+            {!isDeviceImportType && (
             <div>
               <label
                 htmlFor="manual-record-notes"
@@ -804,8 +850,9 @@ export function ManualRecordTab() {
                 className="mt-2 block w-full resize-y rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
               />
             </div>
+            )}
 
-            {!isEditing && (
+            {!isEditing && !isDeviceImportType && (
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                 <input
                   type="checkbox"
@@ -817,6 +864,7 @@ export function ManualRecordTab() {
               </label>
             )}
 
+            {!isDeviceImportType && (
             <div className="flex items-center justify-between gap-3">
               <span className="text-xs font-medium text-gray-500">
                 {savedCount > 0 &&
@@ -845,6 +893,7 @@ export function ManualRecordTab() {
                 </button>
               </div>
             </div>
+            )}
           </form>
         </div>
       </div>
@@ -896,7 +945,7 @@ function buildClinicalDocument({
 }: {
   connectionId: string;
   userId: string;
-  recordType: ManualRecordKind;
+  recordType: ClinicalManualRecordKind;
   recordDate: string;
   title: string;
   notes: string;
@@ -965,7 +1014,7 @@ function buildClinicalDocument({
 
 function buildManualFhirEntry(
   id: string,
-  recordType: ManualRecordKind,
+  recordType: ClinicalManualRecordKind,
   title: string,
   notes: string,
   date: string,
@@ -1090,7 +1139,7 @@ function buildManualFhirEntry(
 }
 
 function getClinicalResourceType(
-  recordType: ManualRecordKind,
+  recordType: ClinicalManualRecordKind,
 ): ClinicalDocumentResourceType {
   if (recordType === 'lab' || recordType === 'vital') return 'observation';
   if (recordType === 'document') return 'documentreference_attachment';
@@ -1107,7 +1156,7 @@ function getManualRecordKind(doc: ClinicalDocument): ManualRecordKind {
   return doc.data_record.resource_type as ManualRecordKind;
 }
 
-function toFhirResourceType(recordType: ManualRecordKind) {
+function toFhirResourceType(recordType: ClinicalManualRecordKind) {
   switch (recordType) {
     case 'medicationstatement':
       return 'MedicationStatement';

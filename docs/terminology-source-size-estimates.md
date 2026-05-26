@@ -13,9 +13,9 @@ not for patient data.
 | Canada medications                       | Health Canada CCDD                  |                                                       11.6 MiB CSV across main files checked; 55,968 rows |   1.9 MiB gzip for the main CSV files; estimate 2-5 MB as normalized app JSON/index | Best Canada-first medication autocomplete source.                                            |
 | Canada medication product/DIN enrichment | Health Canada DPD marketed allfiles | 1.4 MiB zip for `allfiles.zip`; Canada.ca states about 117 MB uncompressed for the broader extract family | 1.4 MiB if storing the marketed zip; estimate 1-3 MB for reduced DIN/product lookup | Use as enrichment, not the primary medication search surface.                                |
 | US/global medications                    | RxNorm / RxTerms                    |                                   Login-gated UMLS downloads; size not exposed by unauthenticated headers |             Unknown until downloaded with UMLS credentials; likely larger than CCDD | Optional US/global pack or remote connector. Prefer RxTerms for autocomplete when available. |
+| Immunizations, Canada                    | PHAC National Vaccine Catalogue     |                                            8.1 MB FHIR JSON bundle; 16 bundle entries; updated 2026-05-21 |                                         316 KB gzip for the full public FHIR bundle | Preferred Canada-first vaccine terminology and product source.                               |
 | Immunizations, US/global                 | CDC CVX                             |                                                                         282 KB current HTML table payload |          66 KB gzip before normalization; likely less than 100 KB as app JSON/index | Easy to bundle for US/global profile.                                                        |
 | Encounters/FHIR value sets               | HL7 Terminology R4 package 7.0.1    |                                                                        4.6 MB `.tgz`; 4,111 package files |                                 554 KB for a rough encounter/ActCode-focused subset | Bundle or import a reduced encounter value-set subset.                                       |
-| Canada immunizations                     | Canadian Vaccine Catalogue          |                                                                Redistribution/API terms need confirmation |                                                                             Unknown | Support as import/API connector until redistribution terms are confirmed.                    |
 | Canada conditions/procedures/allergies   | SNOMED CT CA                        |                                                                                      Licensed/login-gated |                                                                             Unknown | Do not bundle. Support licensed import or terminology server.                                |
 | Canada ICD/procedure classifications     | ICD-10-CA / CCI                     |                                                                                                  Licensed |                                                                             Unknown | Do not bundle. Support licensed import or terminology server.                                |
 
@@ -50,6 +50,7 @@ Dexie stores structured records and search indexes. Practical targets:
 | CCDD medication pack           |                         2-5 MB |          5-15 MB |
 | LOINC labs/vitals reduced pack |                        5-15 MB |         10-30 MB |
 | UCUM units                     |               less than 100 KB | less than 500 KB |
+| PHAC NVC immunization pack     |                     250-750 KB |           1-3 MB |
 | CDC CVX                        |               less than 100 KB | less than 500 KB |
 | HL7 encounter subset           |                     250-750 KB |           1-2 MB |
 | DPD DIN/product reduced pack   |                         1-3 MB |           2-8 MB |
@@ -65,6 +66,8 @@ imported as reduced packs or queried through configured terminology servers.
 - UCUM license: https://ucum.org/license
 - Health Canada CCDD: https://open.canada.ca/data/en/dataset/3e0a7b9e-a5e9-4131-bde4-ac685a1f1a38
 - Health Canada DPD extract: https://www.canada.ca/en/health-canada/services/drugs-health-products/drug-products/drug-product-database/what-data-extract-drug-product-database.html
+- PHAC National Vaccine Catalogue: https://nvc-cnv.canada.ca/en/vaccine-catalogue
+- PHAC NVC FHIR API guide: https://nvc-cnv.canada.ca/downloads/NVC-API-Implementation-Guide.pdf
 - RxNorm files: https://www.nlm.nih.gov/research/umls/rxnorm/docs/rxnormfiles.html
 - RxTerms: https://catalog.data.gov/dataset/rxterms
 - CDC CVX: https://www2.cdc.gov/vaccines/iis/iisstandards/vaccines.asp?rpt=cvx

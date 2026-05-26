@@ -5,9 +5,10 @@ import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 import { safeFormatDate } from '../../../shared/utils/dateFormatters';
 import {
-  getReferenceRangeString,
-  isOutOfRangeResult,
-} from '../../timeline/utils/fhirpathParsers';
+  buildLabReferenceEvaluation,
+  summarizeLabGroupStatus,
+} from '../enrichment/labEnrichment';
+import { LabFlag, ReferenceOverlayMode } from '../enrichment/types';
 import { LabGroup, ReportLink } from '../types';
 import { formatLabValue, getLabDetailLink } from '../utils/labFormatters';
 import { saveLabsScrollPosition } from '../utils/labsPageState';
@@ -20,11 +21,13 @@ export function LabsTable({
   reportsByObservationId,
   title,
   description,
+  referenceMode,
 }: {
   groups: LabGroup[];
   reportsByObservationId: Map<string, ReportLink[]>;
   title?: string;
   description?: string;
+  referenceMode: ReferenceOverlayMode;
 }) {
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
 
@@ -75,6 +78,7 @@ export function LabsTable({
                 expanded={expandedKeys.has(group.key)}
                 onToggle={() => toggleExpanded(group.key)}
                 reportsByObservationId={reportsByObservationId}
+                referenceMode={referenceMode}
               />
             ))}
           </div>
@@ -89,16 +93,23 @@ function LabTableRow({
   expanded,
   onToggle,
   reportsByObservationId,
+  referenceMode,
 }: {
   group: LabGroup;
   expanded: boolean;
   onToggle: () => void;
   reportsByObservationId: Map<string, ReportLink[]>;
+  referenceMode: ReferenceOverlayMode;
 }) {
   const navigate = useNavigate();
   const latest = group.labs[0],
     latestReports = reportsByObservationId.get(latest.metadata?.id || '') || [],
-    abnormalCount = group.labs.filter((lab) => isOutOfRangeResult(lab)).length;
+    latestReference = buildLabReferenceEvaluation({
+      group,
+      lab: latest,
+      mode: referenceMode,
+    }),
+    statusSummary = summarizeLabGroupStatus(group, referenceMode);
 
   function openLabDetail() {
     saveLabsScrollPosition();
@@ -146,13 +157,24 @@ function LabTableRow({
           </div>
         </div>
         <div
-          className={`text-sm font-semibold ${
-            isOutOfRangeResult(latest) ? 'text-red-700' : 'text-gray-900'
-          }`}
+          className={`text-sm font-semibold ${getFlagTextClass(
+            latestReference.flag,
+          )}`}
         >
           {formatLabValue(latest) || 'No value'}
+          {latestReference.normalizedValue?.note ? (
+            <div className="mt-1 text-[11px] font-medium leading-4 text-gray-500">
+              {latestReference.normalizedValue.note}
+            </div>
+          ) : null}
         </div>
-        <LabReferenceRange range={getReferenceRangeString(latest)} />
+        <LabReferenceRange
+          range={latestReference.referenceRange}
+          ageBand={latestReference.referenceAgeBand}
+          citation={latestReference.referenceCitation}
+          note={latestReference.referenceNote}
+          isMappedStandard={latestReference.isMappedStandard}
+        />
         <div className="text-sm text-gray-700">
           {safeFormatDate(latest.metadata?.date, 'PP', 'Unknown')}
         </div>
@@ -160,9 +182,15 @@ function LabTableRow({
           <LinkedReportList reports={latestReports} />
         </div>
         <div className="text-sm">
-          {abnormalCount > 0 ? (
-            <span className="font-semibold text-red-700">
-              {abnormalCount} high/low
+          {statusSummary.abnormalCount > 0 ? (
+            <span
+              className={`font-semibold ${
+                statusSummary.highCount > 0 || statusSummary.lowCount > 0
+                  ? 'text-red-700'
+                  : 'text-amber-700'
+              }`}
+            >
+              {statusSummary.label}
             </span>
           ) : (
             <span className="text-gray-600">In range</span>
@@ -177,4 +205,10 @@ function LabTableRow({
       ) : null}
     </section>
   );
+}
+
+function getFlagTextClass(flag: LabFlag): string {
+  if (flag === 'high' || flag === 'low') return 'text-red-700';
+  if (flag === 'borderline') return 'text-amber-700';
+  return 'text-gray-900';
 }
