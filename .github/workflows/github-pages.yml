@@ -36,13 +36,22 @@ jobs:
       - name: Compute Pages base href
         id: pages
         shell: bash
+        env:
+          # Custom domain configured in repo Settings → Pages. When set, the
+          # site is served from the domain root, so the base href is always "/".
+          CUSTOM_DOMAIN: emr.ahmadjalil.com
         run: |
-          repo_name="${GITHUB_REPOSITORY#*/}"
-          if [[ "$repo_name" == "${GITHUB_REPOSITORY_OWNER}.github.io" ]]; then
+          if [[ -n "$CUSTOM_DOMAIN" ]]; then
             echo "base_href=/" >> "$GITHUB_OUTPUT"
           else
-            echo "base_href=/$repo_name/" >> "$GITHUB_OUTPUT"
+            repo_name="${GITHUB_REPOSITORY#*/}"
+            if [[ "$repo_name" == "${GITHUB_REPOSITORY_OWNER}.github.io" ]]; then
+              echo "base_href=/" >> "$GITHUB_OUTPUT"
+            else
+              echo "base_href=/$repo_name/" >> "$GITHUB_OUTPUT"
+            fi
           fi
+          echo "custom_domain=$CUSTOM_DOMAIN" >> "$GITHUB_OUTPUT"
 
       - name: Build web app
         run: npm exec nx -- build web --base-href="${{ steps.pages.outputs.base_href }}"
@@ -54,6 +63,9 @@ jobs:
           mkdir -p dist/apps/web/api/v1
           printf '{}' > dist/apps/web/api/v1/instance-config
           touch dist/apps/web/.nojekyll
+          if [[ -n "${{ steps.pages.outputs.custom_domain }}" ]]; then
+            echo "${{ steps.pages.outputs.custom_domain }}" > dist/apps/web/CNAME
+          fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
