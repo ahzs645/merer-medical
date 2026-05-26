@@ -112,7 +112,11 @@ export function TimelineTab() {
           )}
           {status !== QueryStatus.COMPLETE_HIDE_LOAD_MORE &&
             status !== QueryStatus.LOADING && (
-              <LoadMoreButton status={status} loadNextPage={loadNextPage} />
+              <LoadMoreButton
+                status={status}
+                loadNextPage={loadNextPage}
+                scrollRootRef={scrollContainer}
+              />
             )}
         </>
       ) : (
@@ -214,32 +218,37 @@ export function TimelineTab() {
 function LoadMoreButton({
   status,
   loadNextPage,
+  scrollRootRef,
 }: {
   status: QueryStatus;
   loadNextPage: () => void;
+  scrollRootRef: React.RefObject<HTMLDivElement>;
 }) {
   const ref = useRef<HTMLButtonElement | null>(null),
-    entry = useIntersectionObserver(ref, {}),
+    entry = useIntersectionObserver(ref, {
+      root: scrollRootRef.current,
+      rootMargin: '900px 0px',
+    }),
     isVisible = !!entry?.isIntersecting;
 
   useEffect(() => {
-    if (isVisible) {
+    if (isVisible && status === QueryStatus.SUCCESS) {
       loadNextPage();
     }
-  }, [isVisible, loadNextPage]);
+  }, [isVisible, loadNextPage, status]);
+
+  const isLoadingMore = status === QueryStatus.LOADING_MORE;
 
   return (
     <button
       ref={ref}
-      disabled={status === QueryStatus.LOADING_MORE}
-      className="border-1 hover:bg-primary-700 mt-6 w-full rounded border border-gray-300 px-4 py-2 font-bold hover:text-white disabled:bg-gray-100 disabled:text-gray-600"
+      disabled={isLoadingMore}
+      className="border-1 hover:bg-primary-700 mt-6 w-full rounded border border-gray-300 px-4 py-2 font-bold hover:text-white disabled:cursor-wait disabled:bg-gray-100 disabled:text-gray-600"
       onClick={loadNextPage}
     >
-      {status === QueryStatus.LOADING_MORE
-        ? 'Loading more records'
-        : 'Load more records'}
+      {isLoadingMore ? 'Loading more records' : 'Load more records'}
       <span className="ml-2 inline-flex justify-center align-middle">
-        {status === QueryStatus.LOADING_MORE ? <ButtonLoadingSpinner /> : null}
+        {isLoadingMore ? <ButtonLoadingSpinner /> : null}
       </span>
     </button>
   );

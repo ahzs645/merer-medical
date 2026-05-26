@@ -1,7 +1,4 @@
 /* eslint-disable react/jsx-no-useless-fragment */
-import 'billboard.js/dist/billboard.css';
-
-import bb, { areaLineRange, ChartOptions } from 'billboard.js';
 import { format } from 'date-fns';
 import { BundleEntry, Observation } from 'fhir/r2';
 import React, {
@@ -9,12 +6,20 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
+import {
+  Area,
+  CartesianGrid,
+  ComposedChart,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { RxDatabase, RxDocument } from 'rxdb';
 
-import BillboardJS, { IChart } from '@billboard.js/react';
 import { Disclosure } from '@headlessui/react';
 import { ChartBarIcon, TableCellsIcon } from '@heroicons/react/24/outline';
 
@@ -310,92 +315,118 @@ function HistoricalRelatedLabsChart({
   relatedLabs: RxDocument<ClinicalDocument<BundleEntry<Observation>>>[];
   item: ClinicalDocument<BundleEntry<Observation>>;
 }) {
-  const chartComponent = useRef<IChart>(),
-    chartDisplayName = `${item.metadata?.display_name}`,
-    chartValueUnit = `(${getValueUnit(item)})`;
+  const chartDisplayName = `${item.metadata?.display_name}`,
+    chartValueUnit = getValueUnit(item);
   const chartData = useMemo(
-    () => [
-      [
-        chartDisplayName,
-        ...relatedLabs.map((rl) => {
-          return {
-            high: getReferenceRangeHigh(rl)?.value,
-            mid: getValueQuantity(rl),
-            low: getReferenceRangeLow(rl)?.value,
-          } as { high: number; mid: number; low: number };
-        }),
-      ],
-      [
-        'x',
-        ...relatedLabs.map((rl) =>
-          safeFormatDate(rl.metadata?.date, 'yyyy-MM-dd'),
-        ),
-      ],
-    ],
-    [chartDisplayName, relatedLabs],
+    () =>
+      relatedLabs.map((rl) => {
+        const low = getReferenceRangeLow(rl)?.value,
+          high = getReferenceRangeHigh(rl)?.value;
+
+        return {
+          date: safeFormatDate(rl.metadata?.date, 'yyyy-MM-dd'),
+          value: getValueQuantity(rl),
+          referenceRange:
+            low !== undefined && high !== undefined ? [low, high] : undefined,
+        };
+      }),
+    [relatedLabs],
   );
   const chartMin = useMemo(
     () =>
       Math.min(
-        ...(relatedLabs.map((rl) =>
-          (getReferenceRangeLow(rl)?.value || Number.MAX_SAFE_INTEGER) >
-          (getValueQuantity(rl) || Number.MAX_SAFE_INTEGER)
-            ? getValueQuantity(rl)
-            : getReferenceRangeLow(rl)?.value,
-        ) as number[]),
+        ...chartData
+          .flatMap((d) => [d.value, d.referenceRange?.[0]])
+          .filter(isNumber),
       ),
-    [relatedLabs],
+    [chartData],
   );
-  const chartOptions: ChartOptions = useMemo(() => {
-    return {
-      data: {
-        x: 'x',
-        columns: chartData,
-        types: { [chartDisplayName]: areaLineRange() },
-        colors: {
-          [chartDisplayName]: '#00A2D5',
-        },
-      },
-      axis: {
-        y: {
-          min: chartMin,
-          label: {
-            text: chartValueUnit,
-            position: 'outer-middle',
-          },
-        },
-        x: {
-          padding: {
-            right: 10,
-            unit: 'px',
-          },
-          type: 'timeseries',
-          tick: {
-            count: 4,
-            rotate: 125,
-            centered: true,
-            fit: true,
-            format: '%Y-%m',
-          },
-        },
-      },
-      tooltip: {
-        format: {
-          title: (x) => {
-            return format(x, 'MMM Mo, yyyy');
-          },
-        },
-      },
-      legend: { hide: true },
-    };
-  }, [chartMin, chartData, chartDisplayName, chartValueUnit]);
 
-  // Chart resizing
-  useEffect(() => {
-    chartComponent.current?.instance.resize();
-  }, [chartData]);
+  return (
+    <div className="h-72 w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart
+          data={chartData}
+          margin={{ top: 16, right: 16, bottom: 36, left: 8 }}
+        >
+          <CartesianGrid stroke="#E5E7EB" strokeDasharray="3 3" />
+          <XAxis
+            dataKey="date"
+            interval="preserveStartEnd"
+            tickFormatter={(value) => format(new Date(value), 'yyyy-MM')}
+            tick={{ fill: '#4B5563', fontSize: 12 }}
+            angle={-55}
+            textAnchor="end"
+          />
+          <YAxis
+            domain={[
+              Number.isFinite(chartMin) ? chartMin : 'dataMin',
+              'dataMax',
+            ]}
+            label={{
+              value: chartValueUnit ? `(${chartValueUnit})` : '',
+              angle: -90,
+              position: 'insideLeft',
+              fill: '#4B5563',
+            }}
+            tick={{ fill: '#4B5563', fontSize: 12 }}
+          />
+          <Tooltip
+            content={({ active, label, payload }) => {
+              if (!active) {
+                return null;
+              }
 
-  return <BillboardJS bb={bb} options={chartOptions} ref={chartComponent} />;
+              const value = payload?.find((p) => p.dataKey === 'value')?.value,
+                range = payload?.find((p) => p.dataKey === 'referenceRange')
+                  ?.value as number[] | undefined;
+
+              const formattedLabel =
+                label !== undefined
+                  ? format(new Date(label), 'MMM Mo, yyyy')
+                  : '';
+
+              return (
+                <div className="rounded-md border border-gray-200 bg-white px-3 py-2 text-xs shadow-md">
+                  <p className="font-semibold text-gray-900">
+                    {formattedLabel}
+                  </p>
+                  <p className="text-gray-700">
+                    {chartDisplayName}: {value}
+                    {chartValueUnit ? ` ${chartValueUnit}` : ''}
+                  </p>
+                  {range ? (
+                    <p className="text-gray-500">
+                      Range: {range[0]} - {range[1]}
+                    </p>
+                  ) : null}
+                </div>
+              );
+            }}
+          />
+          <Area
+            dataKey="referenceRange"
+            fill="#D8F1F8"
+            fillOpacity={0.8}
+            stroke="none"
+            type="monotone"
+          />
+          <Line
+            dataKey="value"
+            dot={{ r: 3, fill: '#00A2D5', strokeWidth: 0 }}
+            name={chartDisplayName}
+            stroke="#00A2D5"
+            strokeWidth={2}
+            type="monotone"
+          />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function isNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
 }
 
 /**

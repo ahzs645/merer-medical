@@ -28,11 +28,7 @@ export async function fetchRawRecords(
   const selector: MangoQuerySelector<ClinicalDocument<unknown>> = {
     user_id: user_id,
     'data_record.resource_type': {
-      $nin: [
-        'patient',
-        'careplan',
-        'provenance',
-      ],
+      $nin: ['patient', 'careplan', 'provenance'],
     },
     'metadata.date': { $nin: [null, undefined, ''] },
   };
@@ -87,9 +83,16 @@ export function mergeRecordsByDate(
   if (!existing) return incoming;
   const merged = { ...existing };
   for (const [dateKey, records] of Object.entries(incoming)) {
-    merged[dateKey] = merged[dateKey]
-      ? [...merged[dateKey], ...records]
-      : records;
+    if (!merged[dateKey]) {
+      merged[dateKey] = records;
+      continue;
+    }
+
+    const existingIds = new Set(merged[dateKey].map((record) => record.id));
+    merged[dateKey] = [
+      ...merged[dateKey],
+      ...records.filter((record) => !existingIds.has(record.id)),
+    ];
   }
   return merged;
 }
@@ -119,6 +122,7 @@ export async function fetchRecordsUntilCompleteDays(
   existingOffset: number = 0,
   timeoutMs: number = 3000,
   onPartialResults?: PartialResultsCallback,
+  emitPartialBatches = false,
 ): Promise<{
   records: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]>;
   hasMore: boolean;
@@ -174,6 +178,14 @@ export async function fetchRecordsUntilCompleteDays(
 
     allRecords.push(...batch);
     offset += batch.length;
+
+    if (emitPartialBatches && onPartialResults) {
+      onPartialResults({
+        records: groupRecordsByDate(allRecords),
+        hasMore: true,
+        lastOffset: offset,
+      });
+    }
 
     if (batch.length < GROUPED_VIEW_BATCH_SIZE) {
       console.debug('[fetchRecordsUntilCompleteDays] exiting: partial batch', {
@@ -477,6 +489,7 @@ async function executeGroupedQuery(
         merge: loadMore,
       });
     },
+    loadMore,
   );
 
   console.debug('useRecordQuery: grouped result', {
@@ -610,6 +623,10 @@ export function useRecordQuery(
 
   const execQuery = useCallback(
     async (loadMore: boolean) => {
+      if (loadMore && state.status !== QueryStatus.SUCCESS) {
+        return;
+      }
+
       const thisRequestId = ++requestIdRef.current;
 
       const guardedDispatch: typeof dispatch = (action) => {
@@ -663,6 +680,7 @@ export function useRecordQuery(
       isGroupedView,
       state.groupedOffset,
       state.searchPage,
+      state.status,
       minCompleteDays,
       vectorStorage,
       experimental__use_openai_rag,
