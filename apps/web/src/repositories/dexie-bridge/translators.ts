@@ -237,6 +237,10 @@ export function clinicalDocumentToDomain<T>(
       date: input.metadata?.date,
       displayName: input.metadata?.display_name,
       loincCoding: input.metadata?.loinc_coding,
+      terminologyProfile: input.metadata?.terminology_profile as any,
+      terminologySource: input.metadata?.terminology_source,
+      terminologySourceVersion: input.metadata?.terminology_source_version,
+      manualUncoded: input.metadata?.manual_uncoded,
     },
   };
 }
@@ -260,6 +264,10 @@ export function clinicalDocumentToLegacy<T>(
       date: input.metadata?.date,
       display_name: input.metadata?.displayName,
       loinc_coding: input.metadata?.loincCoding,
+      terminology_profile: input.metadata?.terminologyProfile,
+      terminology_source: input.metadata?.terminologySource,
+      terminology_source_version: input.metadata?.terminologySourceVersion,
+      manual_uncoded: input.metadata?.manualUncoded,
     },
   };
 }

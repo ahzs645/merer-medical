@@ -17,7 +17,6 @@ import { SEARCH_CONFIG } from '../ai-chat/constants/config';
 import { useDebounceCallback } from '@react-hook/debounce';
 
 import { AppPage } from '../../shared/components/AppPage';
-import { ButtonLoadingSpinner } from '../connections/components/ButtonLoadingSpinner';
 import { EmptyRecordsPlaceholder } from '../../shared/components/EmptyRecordsPlaceholder';
 import useIntersectionObserver from '../../shared/hooks/useIntersectionObserver';
 import { useScrollToHash } from '../../shared/hooks/useScrollToHash';
@@ -52,11 +51,12 @@ export function TimelineTab() {
     scrollToTop = useScrollToTop(scrollContainer),
     onScroll: UIEventHandler<HTMLDivElement> = useDebounceCallback((e) => {
       if (e) {
-        setScrollY(
-          onScrollGetYPosition(e.target ? e.target : (e as any).srcElement),
-        );
+        const target = e.target ? e.target : (e as any).srcElement;
+        setScrollY(onScrollGetYPosition(target));
+        setActiveDateKey(getActiveDateKey(target, Object.keys(data || {})));
       }
     }, 100),
+    [activeDateKey, setActiveDateKey] = useState<string | undefined>(),
     [scrollY, setScrollY] = useState(0);
 
   const yearMap = useMemo(() => {
@@ -112,7 +112,7 @@ export function TimelineTab() {
           )}
           {status !== QueryStatus.COMPLETE_HIDE_LOAD_MORE &&
             status !== QueryStatus.LOADING && (
-              <LoadMoreButton
+              <LoadMoreSentinel
                 status={status}
                 loadNextPage={loadNextPage}
                 scrollRootRef={scrollContainer}
@@ -172,15 +172,14 @@ export function TimelineTab() {
             <JumpToPanel
               items={data}
               isLoading={false}
-              status={status}
-              loadMore={loadNextPage}
+              activeDateKey={activeDateKey ?? Object.keys(data || {})[0]}
             />
             <div
               className="px-auto flex h-full max-h-full w-full justify-center overflow-y-scroll relative"
               ref={scrollContainer}
               onScroll={onScroll}
             >
-              <div className="h-max w-full max-w-4xl flex-col px-4 pb-20 sm:px-6 sm:pb-6 lg:px-8">
+              <div className="h-max w-full max-w-4xl flex-col px-4 pb-[50vh] sm:px-6 lg:px-8">
                 <SearchBar query={query} setQuery={setQuery} status={status} />
                 {listItems}
                 {(Object.keys(data || {}) || []).length === 0 ? (
@@ -215,7 +214,7 @@ export function TimelineTab() {
   );
 }
 
-function LoadMoreButton({
+function LoadMoreSentinel({
   status,
   loadNextPage,
   scrollRootRef,
@@ -224,7 +223,7 @@ function LoadMoreButton({
   loadNextPage: () => void;
   scrollRootRef: React.RefObject<HTMLDivElement>;
 }) {
-  const ref = useRef<HTMLButtonElement | null>(null),
+  const ref = useRef<HTMLDivElement | null>(null),
     entry = useIntersectionObserver(ref, {
       root: scrollRootRef.current,
       rootMargin: '900px 0px',
@@ -237,21 +236,7 @@ function LoadMoreButton({
     }
   }, [isVisible, loadNextPage, status]);
 
-  const isLoadingMore = status === QueryStatus.LOADING_MORE;
-
-  return (
-    <button
-      ref={ref}
-      disabled={isLoadingMore}
-      className="border-1 hover:bg-primary-700 mt-6 w-full rounded border border-gray-300 px-4 py-2 font-bold hover:text-white disabled:cursor-wait disabled:bg-gray-100 disabled:text-gray-600"
-      onClick={loadNextPage}
-    >
-      {isLoadingMore ? 'Loading more records' : 'Load more records'}
-      <span className="ml-2 inline-flex justify-center align-middle">
-        {isLoadingMore ? <ButtonLoadingSpinner /> : null}
-      </span>
-    </button>
-  );
+  return <div ref={ref} className="h-1 w-full" aria-hidden="true" />;
 }
 
 function useScrollToTop(ref?: React.RefObject<HTMLDivElement | undefined>) {
@@ -262,6 +247,36 @@ function useScrollToTop(ref?: React.RefObject<HTMLDivElement | undefined>) {
 
 const onScrollGetYPosition = (element: HTMLElement) => {
   return element.scrollTop;
+};
+
+const getActiveDateKey = (container: HTMLElement, dateKeys: string[]) => {
+  if (container.scrollTop <= 1) {
+    return dateKeys[0];
+  }
+
+  const containerRect = container.getBoundingClientRect(),
+    containerCenter = containerRect.top + containerRect.height / 2;
+
+  let activeDateKey = dateKeys[0],
+    closestDistance = Number.POSITIVE_INFINITY;
+
+  for (const dateKey of dateKeys) {
+    const element = document.getElementById(
+      format(parseISO(dateKey), 'MMM-dd-yyyy'),
+    );
+    if (!element) continue;
+
+    const distance = Math.abs(
+      element.getBoundingClientRect().top - containerCenter,
+    );
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      activeDateKey = dateKey;
+    }
+  }
+
+  return activeDateKey;
 };
 
 export const checkIfDefaultDate = (date: string) =>

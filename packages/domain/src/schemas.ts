@@ -32,6 +32,8 @@ export const connectionSourceSchema = z.enum([
   'veradigm',
   'va',
   'healow',
+  'freestyle_libre',
+  'manual',
 ]);
 
 export const connectionSchema = z.object({
@@ -72,6 +74,10 @@ export const clinicalDocumentSchema = z.object({
       date: z.string().optional(),
       displayName: z.string().optional(),
       loincCoding: z.array(z.string()).optional(),
+      terminologyProfile: z.enum(['canada', 'us', 'global']).optional(),
+      terminologySource: z.string().optional(),
+      terminologySourceVersion: z.string().optional(),
+      manualUncoded: z.boolean().optional(),
     })
     .optional(),
 });
@@ -91,6 +97,12 @@ export const instanceConfigSchema = z.object({
   experimental: z.record(z.boolean()).optional(),
   tutorialCompletedAt: z.number().int().optional(),
   setupCompletedAt: z.number().int().optional(),
+  terminologyProfile: z.enum(['canada', 'us', 'global']).optional(),
+  terminologyLookupMode: z
+    .enum(['local-only', 'hybrid', 'server-first'])
+    .optional(),
+  terminologyLanguage: z.enum(['en', 'fr']).optional(),
+  terminologyRemoteEnabled: z.boolean().optional(),
 });
 
 export const summaryPagePreferencesSchema = z.object({

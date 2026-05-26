@@ -158,7 +158,7 @@ export function ObservationResultRow({
                 <div className="flex-rows col-span-1 flex items-end justify-end align-middle">
                   {relatedLabs.length > 0 &&
                     getValueQuantity(item) !== undefined && (
-                      <Disclosure.Button className="text-primary-900 rounded bg-[#E2F5FA] p-1 duration-150 active:scale-90  active:bg-slate-50">
+                      <Disclosure.Button className="text-primary-900 rounded bg-[#E2F5FA] p-1 duration-150 active:scale-90 active:bg-slate-50 focus:outline-none focus:ring-0">
                         {open ? (
                           <>{closeXSvg}</>
                         ) : (
@@ -215,7 +215,7 @@ export function ObservationResultRow({
                   {/* Toggle select between graph view and list view */}
 
                   <button
-                    className="text-primary-900 absolute top-0 right-0 m-2 mr-4 rounded bg-[#E2F5FA] p-1 duration-150 active:scale-90 active:bg-gray-100"
+                    className="text-primary-900 absolute top-0 right-0 m-2 mr-4 rounded bg-[#E2F5FA] p-1 duration-150 active:scale-90 active:bg-gray-100 focus:outline-none focus:ring-0"
                     onClick={() =>
                       setView((v) => {
                         return v === 'GRAPH' ? 'LIST' : 'GRAPH';
@@ -332,22 +332,26 @@ function HistoricalRelatedLabsChart({
       }),
     [relatedLabs],
   );
-  const chartMin = useMemo(
+  const chartDomain = useMemo(
     () =>
-      Math.min(
-        ...chartData
-          .flatMap((d) => [d.value, d.referenceRange?.[0]])
+      getPaddedChartDomain(
+        chartData
+          .flatMap((d) => [
+            d.value,
+            d.referenceRange?.[0],
+            d.referenceRange?.[1],
+          ])
           .filter(isNumber),
       ),
     [chartData],
   );
 
   return (
-    <div className="h-72 w-full">
+    <div className="h-72 w-full [&_.recharts-surface:focus]:outline-none [&_.recharts-wrapper:focus]:outline-none [&_[tabindex]:focus]:outline-none">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={chartData}
-          margin={{ top: 16, right: 16, bottom: 36, left: 8 }}
+          margin={{ top: 16, right: 16, bottom: 36, left: 20 }}
         >
           <CartesianGrid stroke="#E5E7EB" strokeDasharray="3 3" />
           <XAxis
@@ -359,10 +363,7 @@ function HistoricalRelatedLabsChart({
             textAnchor="end"
           />
           <YAxis
-            domain={[
-              Number.isFinite(chartMin) ? chartMin : 'dataMin',
-              'dataMax',
-            ]}
+            domain={chartDomain}
             label={{
               value: chartValueUnit ? `(${chartValueUnit})` : '',
               angle: -90,
@@ -370,6 +371,8 @@ function HistoricalRelatedLabsChart({
               fill: '#4B5563',
             }}
             tick={{ fill: '#4B5563', fontSize: 12 }}
+            tickFormatter={formatChartTick}
+            width={64}
           />
           <Tooltip
             content={({ active, label, payload }) => {
@@ -408,7 +411,8 @@ function HistoricalRelatedLabsChart({
             dataKey="referenceRange"
             fill="#D8F1F8"
             fillOpacity={0.8}
-            stroke="none"
+            stroke="transparent"
+            strokeWidth={0}
             type="monotone"
           />
           <Line
@@ -427,6 +431,27 @@ function HistoricalRelatedLabsChart({
 
 function isNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
+}
+
+function getPaddedChartDomain(
+  values: number[],
+): [number | 'dataMin', number | 'dataMax'] {
+  if (values.length === 0) {
+    return ['dataMin', 'dataMax'];
+  }
+
+  const min = Math.min(...values),
+    max = Math.max(...values),
+    range = max - min,
+    padding = range > 0 ? range * 0.12 : Math.max(Math.abs(max) * 0.12, 1);
+
+  return [Math.max(0, min - padding), max + padding];
+}
+
+function formatChartTick(value: number) {
+  return Number.isInteger(value)
+    ? `${value}`
+    : value.toLocaleString(undefined, { maximumFractionDigits: 3 });
 }
 
 /**

@@ -2,6 +2,17 @@
 @tailwind base;
 @tailwind utilities;
 
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* You can add global styles to this file, and also import other style files */
 
 @font-face {

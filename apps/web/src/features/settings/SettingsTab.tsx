@@ -11,6 +11,7 @@ import { DeveloperSettingsGroup } from './components/DeveloperSettingsGroup';
 import { PrivacyAndSecuritySettingsGroup } from './components/PrivacyAndSecuritySettingsGroup';
 import { UserCard } from './components/UserCard';
 import { UserDataSettingsGroup } from './components/UserDataSettingsGroup';
+import { TerminologySettingsGroup } from './components/TerminologySettingsGroup';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { ExperimentalSettingsGroup } from './components/ExperimentalSettingsGroup';
 import { UserSwitchModal } from './components/UserSwitchModal';
@@ -119,6 +120,7 @@ const SettingsTab: React.FC = () => {
       <UserCard />
       <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pb-20 pt-2 sm:px-6 sm:pb-6 lg:px-8">
         <PrivacyAndSecuritySettingsGroup />
+        <TerminologySettingsGroup />
         <UserDataSettingsGroup />
         <AboutMereSettingsGroup />
         <ExperimentalSettingsGroup />

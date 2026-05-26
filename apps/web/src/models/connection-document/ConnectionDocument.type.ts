@@ -8,6 +8,7 @@ export type ConnectionSources =
   | 'veradigm'
   | 'va'
   | 'healow'
+  | 'freestyle_libre'
   | 'manual';
 
 export interface ConnectionDocument extends BaseDocument {

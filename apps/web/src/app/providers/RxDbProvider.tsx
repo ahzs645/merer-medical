@@ -242,8 +242,23 @@ export async function getStorageAdapter(db: RxDatabase<DatabaseCollections>) {
 async function loadDemoData(db: RxDatabase<DatabaseCollections>) {
   const data = await fetch('/assets/demo.json');
   const json = await data.json();
+  normalizeDumpSchemaHashes(json as RxDumpDatabaseAny<DatabaseCollections>, db);
   const message = await handleJSONDataImport(JSON.stringify(json), db);
   return message;
+}
+
+function normalizeDumpSchemaHashes(
+  data: RxDumpDatabaseAny<DatabaseCollections>,
+  db: RxDatabase<DatabaseCollections>,
+) {
+  data.collections?.forEach((collection) => {
+    const currentCollection = db.collections[
+      collection.name as keyof DatabaseCollections
+    ] as unknown as { schema?: { hash?: string } };
+    if (currentCollection?.schema?.hash) {
+      collection.schemaHash = currentCollection.schema.hash;
+    }
+  });
 }
 
 export function RxDbProvider(props: RxDbProviderProps) {

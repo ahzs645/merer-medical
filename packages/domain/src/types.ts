@@ -23,6 +23,58 @@ export interface UserPreferences extends BaseRecord {
   useProxy: boolean;
 }
 
+export type TerminologyProfile = 'canada' | 'us' | 'global';
+export type TerminologyLookupMode = 'local-only' | 'hybrid' | 'server-first';
+export type TerminologyLanguage = 'en' | 'fr';
+export type TerminologyDomain =
+  | 'condition'
+  | 'medication'
+  | 'immunization'
+  | 'procedure'
+  | 'allergy'
+  | 'encounter'
+  | 'lab'
+  | 'vital';
+
+export interface TerminologyPack extends BaseRecord {
+  profile: TerminologyProfile;
+  name: string;
+  source: string;
+  sourceUrl: string;
+  sourceVersion: string;
+  license: string;
+  languageCoverage: TerminologyLanguage[];
+  importedAt: number;
+  checksum?: string;
+  bundled?: boolean;
+}
+
+export interface TerminologyEntry extends BaseRecord {
+  packId: AppId;
+  profile: TerminologyProfile;
+  domain: TerminologyDomain;
+  system: string;
+  code: string;
+  displayEn: string;
+  displayFr?: string;
+  aliasesEn?: string[];
+  aliasesFr?: string[];
+  units?: string[];
+  defaultUnit?: string;
+  source: string;
+  sourceVersion: string;
+  license: string;
+  active: boolean;
+}
+
+export interface TerminologySearchIndex extends BaseRecord {
+  packId: AppId;
+  profile: TerminologyProfile;
+  domain: TerminologyDomain;
+  language: TerminologyLanguage;
+  serializedIndex: unknown;
+}
+
 export type ConnectionSource =
   | 'epic'
   | 'onpatient'
@@ -30,6 +82,7 @@ export type ConnectionSource =
   | 'veradigm'
   | 'va'
   | 'healow'
+  | 'freestyle_libre'
   | 'manual';
 
 export interface Connection extends BaseRecord {
@@ -112,6 +165,10 @@ export interface ClinicalDocument<T = unknown> extends BaseRecord {
     date?: string;
     displayName?: string;
     loincCoding?: string[];
+    terminologyProfile?: TerminologyProfile;
+    terminologySource?: string;
+    terminologySourceVersion?: string;
+    manualUncoded?: boolean;
   };
 }
 
@@ -134,6 +191,10 @@ export interface InstanceConfig extends BaseRecord {
   experimental?: Record<string, boolean>;
   tutorialCompletedAt?: number;
   setupCompletedAt?: number;
+  terminologyProfile?: TerminologyProfile;
+  terminologyLookupMode?: TerminologyLookupMode;
+  terminologyLanguage?: TerminologyLanguage;
+  terminologyRemoteEnabled?: boolean;
 }
 
 export interface SummaryPagePreferences extends BaseRecord {

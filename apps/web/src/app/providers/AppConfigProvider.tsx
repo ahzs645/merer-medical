@@ -79,6 +79,13 @@ export const defaultConfigFetcher: ConfigFetcher = async () => {
       console.warn('Failed to fetch config from API:', response.status);
       return null;
     }
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      console.warn(
+        'Config API did not return JSON. Is the API server running?',
+      );
+      return null;
+    }
     return await response.json();
   } catch (error) {
     console.warn('Error fetching config from API:', error);

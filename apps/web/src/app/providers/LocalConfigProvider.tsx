@@ -10,6 +10,17 @@ import {
   AI_DEFAULTS,
   DEFAULT_AI_PROVIDER,
 } from '../../features/ai-chat/constants/defaults';
+import {
+  DEFAULT_TERMINOLOGY_LANGUAGE,
+  DEFAULT_TERMINOLOGY_LOOKUP_MODE,
+  DEFAULT_TERMINOLOGY_PROFILE,
+  DEFAULT_TERMINOLOGY_REMOTE_ENABLED,
+} from '../../features/terminology/terminologySettings';
+import {
+  TerminologyLanguage,
+  TerminologyLookupMode,
+  TerminologyProfile,
+} from '@mere/domain';
 
 interface LocalConfig {
   use_encrypted_database: boolean;
@@ -22,6 +33,10 @@ interface LocalConfig {
   experimental__ollama_model?: string;
   experimental__ollama_embedding_model?: string;
   experimental__ollama_rerank_model?: string;
+  terminology_profile?: TerminologyProfile;
+  terminology_lookup_mode?: TerminologyLookupMode;
+  terminology_language?: TerminologyLanguage;
+  terminology_remote_enabled?: boolean;
 }
 
 const defaultLocalConfig: LocalConfig = {
@@ -35,6 +50,10 @@ const defaultLocalConfig: LocalConfig = {
   experimental__ollama_model: AI_DEFAULTS.OLLAMA.MODEL,
   experimental__ollama_embedding_model: AI_DEFAULTS.OLLAMA.EMBEDDING_MODEL,
   experimental__ollama_rerank_model: AI_DEFAULTS.OLLAMA.RERANK_MODEL,
+  terminology_profile: DEFAULT_TERMINOLOGY_PROFILE,
+  terminology_lookup_mode: DEFAULT_TERMINOLOGY_LOOKUP_MODE,
+  terminology_language: DEFAULT_TERMINOLOGY_LANGUAGE,
+  terminology_remote_enabled: DEFAULT_TERMINOLOGY_REMOTE_ENABLED,
 };
 
 function getLocalConfig(): LocalConfig {

@@ -2,6 +2,7 @@ import { Link, Outlet } from 'react-router-dom';
 
 import {
   Cog6ToothIcon,
+  BeakerIcon,
   DocumentPlusIcon,
   NewspaperIcon,
   PlusCircleIcon,
@@ -41,6 +42,11 @@ export function TabWrapper() {
             route={AppRoutes.Summary}
             title="Summary"
             icon={<QueueListIcon />}
+          />
+          <TabButton
+            route={AppRoutes.Labs}
+            title="Labs"
+            icon={<BeakerIcon />}
           />
           <TabButton
             route={AppRoutes.AddRecord}

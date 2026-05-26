@@ -10,6 +10,13 @@ import type {
   InstanceConfig,
   SummaryPagePreferences,
   TableName,
+  TerminologyDomain,
+  TerminologyEntry,
+  TerminologyLanguage,
+  TerminologyLookupMode,
+  TerminologyPack,
+  TerminologyProfile,
+  TerminologySearchIndex,
   User,
   UserPreferences,
 } from '@mere/domain';
@@ -57,7 +64,9 @@ export interface ConnectionCommands {
   list(userId: AppId): Promise<Connection[]>;
   get(id: AppId): Promise<Connection | null>;
   bySource(userId: AppId, source: ConnectionSource): Promise<Connection[]>;
-  create(input: Omit<Connection, 'id' | 'createdAt' | 'updatedAt'>): Promise<Connection>;
+  create(
+    input: Omit<Connection, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Connection>;
   update(
     id: AppId,
     patch: Partial<Omit<Connection, 'id' | 'createdAt' | 'userId'>>,
@@ -79,7 +88,11 @@ export interface ClinicalDocumentQuery {
 export interface ClinicalDocumentCommands {
   query(q: ClinicalDocumentQuery): Promise<ClinicalDocument[]>;
   get(id: AppId): Promise<ClinicalDocument | null>;
-  upsertBatch(docs: Array<Omit<ClinicalDocument, 'createdAt' | 'updatedAt'> & { id?: AppId }>): Promise<ClinicalDocument[]>;
+  upsertBatch(
+    docs: Array<
+      Omit<ClinicalDocument, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<ClinicalDocument[]>;
   delete(id: AppId): Promise<void>;
   countByResource(userId: AppId): Promise<Record<ClinicalResourceType, number>>;
   observe(q: ClinicalDocumentQuery): Observable<ClinicalDocument[]>;
@@ -101,7 +114,9 @@ export interface AttachmentCommands {
 
 export interface InstanceConfigCommands {
   get(): Promise<InstanceConfig | null>;
-  update(patch: Partial<Omit<InstanceConfig, 'id' | 'createdAt'>>): Promise<InstanceConfig>;
+  update(
+    patch: Partial<Omit<InstanceConfig, 'id' | 'createdAt'>>,
+  ): Promise<InstanceConfig>;
 }
 
 export interface SummaryPagePreferencesCommands {
@@ -110,6 +125,28 @@ export interface SummaryPagePreferencesCommands {
     userId: AppId,
     cards: SummaryPagePreferences['cards'],
   ): Promise<SummaryPagePreferences>;
+}
+
+export interface TerminologySearchQuery {
+  profile: TerminologyProfile;
+  domain: TerminologyDomain;
+  query: string;
+  language: TerminologyLanguage;
+  lookupMode?: TerminologyLookupMode;
+  remoteEnabled?: boolean;
+  limit?: number;
+}
+
+export interface TerminologyCommands {
+  listPacks(profile?: TerminologyProfile): Promise<TerminologyPack[]>;
+  upsertPack(input: {
+    pack: Omit<TerminologyPack, 'createdAt' | 'updatedAt'>;
+    entries: Array<Omit<TerminologyEntry, 'createdAt' | 'updatedAt'>>;
+    searchIndexes?: Array<
+      Omit<TerminologySearchIndex, 'createdAt' | 'updatedAt'>
+    >;
+  }): Promise<TerminologyPack>;
+  search(q: TerminologySearchQuery): Promise<TerminologyEntry[]>;
 }
 
 export type ExportProgress = {
@@ -160,6 +197,7 @@ export interface AppDataClient {
   attachments: AttachmentCommands;
   instanceConfig: InstanceConfigCommands;
   summaryPagePreferences: SummaryPagePreferencesCommands;
+  terminology: TerminologyCommands;
   package: PackageCommands;
   /** Close any underlying connections (Dexie open handles, websockets, etc.). */
   close(): Promise<void>;

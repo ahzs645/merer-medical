@@ -59,6 +59,10 @@ export interface ClinicalDocument<T = unknown> {
     date?: TDateISO | string;
     display_name?: string;
     loinc_coding?: string[];
+    terminology_profile?: string;
+    terminology_source?: string;
+    terminology_source_version?: string;
+    manual_uncoded?: boolean;
   };
 }
 

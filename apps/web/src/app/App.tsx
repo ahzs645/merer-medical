@@ -26,6 +26,8 @@ import CernerRedirect from '../features/connections/oauth-callbacks/CernerRedire
 import ConnectionTab from '../features/connections/ConnectionTab';
 import EpicRedirect from '../features/connections/oauth-callbacks/EpicRedirect';
 import HealowRedirect from '../features/connections/oauth-callbacks/HealowRedirect';
+import { LabDetailTab } from '../features/labs/LabDetailTab';
+import { LabsTab } from '../features/labs/LabsTab';
 import MereAITab from '../features/ai-chat/MereAITab';
 import { ManualRecordTab } from '../features/manual-entry/ManualRecordTab';
 import OnPatientRedirect from '../features/connections/oauth-callbacks/OnPatientRedirect';
@@ -76,6 +78,14 @@ const routes = [
       {
         path: AppRoutes.Timeline,
         element: <TimelineTab />,
+      },
+      {
+        path: AppRoutes.Labs,
+        element: <LabsTab />,
+      },
+      {
+        path: AppRoutes.LabDetail,
+        element: <LabDetailTab />,
       },
       {
         path: AppRoutes.AddConnection,

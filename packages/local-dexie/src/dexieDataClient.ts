@@ -10,8 +10,12 @@ import type {
   ConnectionSource,
   InstanceConfig,
   SummaryPagePreferences,
+  TerminologyEntry,
+  TerminologyProfile,
   User,
   UserPreferences,
+  TerminologyPack,
+  TerminologySearchIndex,
 } from '@mere/domain';
 import type { AppDataClient } from '@mere/data';
 import { getDb, closeDb, type MereDb } from './db';
@@ -49,7 +53,12 @@ export function createDexieDataClient(
     getSelected: async () => {
       const all = await db.users.toArray();
       const live = all.filter((u) => !u.deletedAt);
-      return live.find((u) => u.isSelected) ?? live.find((u) => u.isDefault) ?? live[0] ?? null;
+      return (
+        live.find((u) => u.isSelected) ??
+        live.find((u) => u.isDefault) ??
+        live[0] ??
+        null
+      );
     },
     async create(input) {
       const t = now();
@@ -124,9 +133,13 @@ export function createDexieDataClient(
 
   const userPreferences: AppDataClient['userPreferences'] = {
     getForUser: async (userId) =>
-      (await db.user_preferences.where('userId').equals(userId).first()) ?? null,
+      (await db.user_preferences.where('userId').equals(userId).first()) ??
+      null,
     async upsert(userId, patch) {
-      const existing = await db.user_preferences.where('userId').equals(userId).first();
+      const existing = await db.user_preferences
+        .where('userId')
+        .equals(userId)
+        .first();
       const t = now();
       const next: UserPreferences = existing
         ? { ...existing, ...patch, userId, updatedAt: t }
@@ -146,7 +159,10 @@ export function createDexieDataClient(
     list: (userId) => db.connections.where('userId').equals(userId).toArray(),
     get: async (id) => (await db.connections.get(id)) ?? null,
     bySource: async (userId, source: ConnectionSource) => {
-      const rows = await db.connections.where('userId').equals(userId).toArray();
+      const rows = await db.connections
+        .where('userId')
+        .equals(userId)
+        .toArray();
       return rows.filter((r) => r.source === source);
     },
     async create(input) {
@@ -173,7 +189,9 @@ export function createDexieDataClient(
     observe: (userId) =>
       makeObservable<Connection[]>(
         () => [],
-        dexieLive(() => db.connections.where('userId').equals(userId).toArray()),
+        dexieLive(() =>
+          db.connections.where('userId').equals(userId).toArray(),
+        ),
       ),
   };
 
@@ -181,13 +199,15 @@ export function createDexieDataClient(
     async query(q) {
       let coll = db.clinical_documents.where('userId').equals(q.userId);
       let rows = await coll.toArray();
-      if (q.connectionId) rows = rows.filter((r) => r.connectionId === q.connectionId);
+      if (q.connectionId)
+        rows = rows.filter((r) => r.connectionId === q.connectionId);
       if (q.resourceTypes?.length) {
         const set = new Set(q.resourceTypes);
         rows = rows.filter((r) => set.has(r.resourceType));
       }
       if (q.format) rows = rows.filter((r) => r.format === q.format);
-      if (q.sinceUpdatedAt) rows = rows.filter((r) => r.updatedAt >= q.sinceUpdatedAt!);
+      if (q.sinceUpdatedAt)
+        rows = rows.filter((r) => r.updatedAt >= q.sinceUpdatedAt!);
       rows = rows.filter((r) => !r.deletedAt);
       const offset = q.offset ?? 0;
       const limit = q.limit ?? rows.length;
@@ -209,7 +229,10 @@ export function createDexieDataClient(
       await db.clinical_documents.delete(id);
     },
     async countByResource(userId) {
-      const rows = await db.clinical_documents.where('userId').equals(userId).toArray();
+      const rows = await db.clinical_documents
+        .where('userId')
+        .equals(userId)
+        .toArray();
       const out: Partial<Record<ClinicalResourceType, number>> = {};
       for (const r of rows) {
         if (r.deletedAt) continue;
@@ -226,10 +249,17 @@ export function createDexieDataClient(
 
   const attachments: AppDataClient['attachments'] = {
     list: (ownerType: AttachmentOwnerType, ownerId) =>
-      db.attachments.where('[ownerType+ownerId]' as never).equals([ownerType, ownerId] as never).toArray().catch(async () => {
-        const rows = await db.attachments.where('ownerId').equals(ownerId).toArray();
-        return rows.filter((r) => r.ownerType === ownerType);
-      }),
+      db.attachments
+        .where('[ownerType+ownerId]' as never)
+        .equals([ownerType, ownerId] as never)
+        .toArray()
+        .catch(async () => {
+          const rows = await db.attachments
+            .where('ownerId')
+            .equals(ownerId)
+            .toArray();
+          return rows.filter((r) => r.ownerType === ownerType);
+        }),
     get: async (id) => (await db.attachments.get(id)) ?? null,
     async read(id) {
       const meta = await db.attachments.get(id);
@@ -253,17 +283,27 @@ export function createDexieDataClient(
         size: input.bytes.byteLength,
         sha256,
       };
-      await db.transaction('rw', db.attachments, db.attachment_blobs, async () => {
-        await db.attachments.put(att);
-        await db.attachment_blobs.put({ id, bytes: input.bytes });
-      });
+      await db.transaction(
+        'rw',
+        db.attachments,
+        db.attachment_blobs,
+        async () => {
+          await db.attachments.put(att);
+          await db.attachment_blobs.put({ id, bytes: input.bytes });
+        },
+      );
       return att;
     },
     async delete(id) {
-      await db.transaction('rw', db.attachments, db.attachment_blobs, async () => {
-        await db.attachments.delete(id);
-        await db.attachment_blobs.delete(id);
-      });
+      await db.transaction(
+        'rw',
+        db.attachments,
+        db.attachment_blobs,
+        async () => {
+          await db.attachments.delete(id);
+          await db.attachment_blobs.delete(id);
+        },
+      );
     },
   };
 
@@ -291,11 +331,17 @@ export function createDexieDataClient(
   const summaryPagePreferences: AppDataClient['summaryPagePreferences'] = {
     async getForUser(userId) {
       return (
-        (await db.summary_page_preferences.where('userId').equals(userId).first()) ?? null
+        (await db.summary_page_preferences
+          .where('userId')
+          .equals(userId)
+          .first()) ?? null
       );
     },
     async upsert(userId, cards) {
-      const existing = await db.summary_page_preferences.where('userId').equals(userId).first();
+      const existing = await db.summary_page_preferences
+        .where('userId')
+        .equals(userId)
+        .first();
       const t = now();
       const next: SummaryPagePreferences = existing
         ? { ...existing, cards, updatedAt: t }
@@ -311,6 +357,115 @@ export function createDexieDataClient(
     },
   };
 
+  const terminology: AppDataClient['terminology'] = {
+    async listPacks(profile?: TerminologyProfile) {
+      const packs = profile
+        ? await db.terminology_packs.where('profile').equals(profile).toArray()
+        : await db.terminology_packs.toArray();
+      return packs.filter((pack) => !pack.deletedAt);
+    },
+    async upsertPack(input) {
+      const t = now();
+      const incomingPack = input.pack as Partial<TerminologyPack> &
+        typeof input.pack;
+      const pack: TerminologyPack = {
+        ...input.pack,
+        createdAt: incomingPack.createdAt ?? t,
+        updatedAt: t,
+      };
+      const entries: TerminologyEntry[] = input.entries.map((entryInput) => {
+        const entry = entryInput as Partial<TerminologyEntry> &
+          typeof entryInput;
+        return {
+          ...entryInput,
+          packId: pack.id,
+          createdAt: entry.createdAt ?? t,
+          updatedAt: t,
+        };
+      });
+      const searchIndexes: TerminologySearchIndex[] = (
+        input.searchIndexes ?? []
+      ).map((indexInput) => {
+        const index = indexInput as Partial<TerminologySearchIndex> &
+          typeof indexInput;
+        return {
+          ...indexInput,
+          packId: pack.id,
+          createdAt: index.createdAt ?? t,
+          updatedAt: t,
+        };
+      });
+      await db.transaction(
+        'rw',
+        db.terminology_packs,
+        db.terminology_entries,
+        db.terminology_search_index,
+        async () => {
+          await db.terminology_packs.put(pack);
+          await db.terminology_entries.where('packId').equals(pack.id).delete();
+          if (entries.length) await db.terminology_entries.bulkPut(entries);
+          await db.terminology_search_index
+            .where('packId')
+            .equals(pack.id)
+            .delete();
+          if (searchIndexes.length) {
+            await db.terminology_search_index.bulkPut(searchIndexes);
+          }
+        },
+      );
+      return pack;
+    },
+    async search(q) {
+      const limit = q.limit ?? 8;
+      const normalizedQuery = q.query.trim().toLocaleLowerCase();
+      let rows = await db.terminology_entries
+        .where('[profile+domain]' as never)
+        .equals([q.profile, q.domain] as never)
+        .toArray()
+        .catch(async () => {
+          const all = await db.terminology_entries
+            .where('profile')
+            .equals(q.profile)
+            .toArray();
+          return all.filter((entry) => entry.domain === q.domain);
+        });
+
+      rows = rows.filter((entry) => entry.active && !entry.deletedAt);
+      if (!normalizedQuery) return rows.slice(0, limit);
+
+      const scored = rows
+        .map((entry) => {
+          const display =
+            q.language === 'fr' && entry.displayFr
+              ? entry.displayFr
+              : entry.displayEn;
+          const haystack = [
+            display,
+            entry.displayEn,
+            entry.displayFr,
+            entry.code,
+            entry.source,
+            ...(entry.aliasesEn ?? []),
+            ...(entry.aliasesFr ?? []),
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLocaleLowerCase();
+          const starts = haystack.startsWith(normalizedQuery);
+          const includes = haystack.includes(normalizedQuery);
+          return {
+            entry,
+            score: starts ? 0 : includes ? 1 : 2,
+            includes,
+          };
+        })
+        .filter((item) => item.includes)
+        .sort((a, b) => a.score - b.score);
+
+      return scored.map((item) => item.entry).slice(0, limit);
+    },
+  };
+
   return {
     mode: 'local',
     users,
@@ -320,6 +475,7 @@ export function createDexieDataClient(
     attachments,
     instanceConfig,
     summaryPagePreferences,
+    terminology,
     package: createPackageCommands(dbName),
     async close() {
       await closeDb();

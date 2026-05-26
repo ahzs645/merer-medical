@@ -96,8 +96,10 @@ export function ConnectionCard({
     sync = useSyncJobContext(),
     syncD = useSyncJobDispatchContext(),
     syncJobEntries = new Set(Object.keys(sync)),
+    isLocalImport = item.get('source') === 'freestyle_libre',
     syncing = syncJobEntries.has(item.get('id')),
     handleFetchData = useCallback(() => {
+      if (isLocalImport) return;
       if (!isConfigValid(config)) {
         notifyDispatch({
           type: 'set_notification',
@@ -117,7 +119,16 @@ export function ConnectionCard({
           db,
         });
       }
-    }, [baseUrl, config, db, item, notifyDispatch, syncD, userPreferences]);
+    }, [
+      baseUrl,
+      config,
+      db,
+      isLocalImport,
+      item,
+      notifyDispatch,
+      syncD,
+      userPreferences,
+    ]);
 
   const [showModal, setShowModal] = useState(false);
   const [showPeriodText, setShowPeriodText] = useState('...');
@@ -144,11 +155,17 @@ export function ConnectionCard({
       className="col-span-1 mb-8 divide-y divide-gray-200 rounded-lg bg-white shadow"
     >
       <div className="flex w-full items-center justify-between space-x-6 p-6">
-        <img
-          className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
-          src={getImage(item.get('source'))}
-          alt={`${item.get('source')} logo`}
-        />
+        {getImage(item.get('source')) ? (
+          <img
+            className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
+            src={getImage(item.get('source'))}
+            alt={`${item.get('source')} logo`}
+          />
+        ) : (
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-sky-100 text-sm font-semibold text-sky-800">
+            CGM
+          </div>
+        )}
         <div className="flex-1 truncate">
           <div className="flex items-center space-x-3">
             <h3 className="truncate text-sm font-semibold  text-gray-900">
@@ -158,7 +175,9 @@ export function ConnectionCard({
                   ? `Cerner - ${item.get('name')}`
                   : item.get('source') === 'veradigm'
                     ? `Veradigm - ${item.get('name')}`
-                    : item.get('name')}
+                    : item.get('source') === 'freestyle_libre'
+                      ? `FreeStyle Libre - ${item.get('name')}`
+                      : item.get('name')}
             </h3>
           </div>
           {item.get('last_sync_was_error') ? (
@@ -202,12 +221,12 @@ export function ConnectionCard({
             </div>
           </button>
           <button
-            disabled={syncing}
+            disabled={syncing || isLocalImport}
             className="-ml-px flex w-0 flex-1 divide-x divide-gray-800 disabled:bg-slate-50"
             onClick={handleFetchData}
           >
             <div className="relative inline-flex h-full w-0 flex-1 items-center justify-center rounded-br-lg border border-transparent py-4 text-sm font-medium text-gray-800 hover:text-gray-800">
-              Sync
+              {isLocalImport ? 'Imported' : 'Sync'}
               <span className="ml-3">
                 {syncing ? <ButtonLoadingSpinner /> : null}
               </span>
