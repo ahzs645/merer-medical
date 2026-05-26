@@ -14,6 +14,7 @@
     "dev": "nx serve-all",
     "preview:web:local": "node scripts/serve-web-local.mjs",
     "labs:references": "node tools/lab-reference-pipeline.mjs --all",
+    "labs:nonclinical": "node tools/lab-nonclinical-pipeline.mjs --all",
     "prepare": "[ -d .git ] && husky && git config blame.ignoreRevsFile .git-blame-ignore-revs || true"
   },
   "engines": {

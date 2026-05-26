@@ -1,0 +1,1367 @@
+{
+  "files": [
+    {
+      "id": 35121203,
+      "name": "12874_2022_1611_MOESM8_ESM.zip",
+      "size": 44107,
+      "is_link_only": false,
+      "download_url": "https://ndownloader.figshare.com/files/35121203",
+      "supplied_md5": "056778a897a3a781ff5323928c59e06b",
+      "computed_md5": "056778a897a3a781ff5323928c59e06b",
+      "mimetype": "application/zip"
+    }
+  ],
+  "folder_structure": {},
+  "authors": [
+    {
+      "id": 12545441,
+      "full_name": "Ahmed Rafee",
+      "first_name": "Ahmed",
+      "last_name": "Rafee",
+      "is_active": false,
+      "url_name": "_",
+      "orcid_id": ""
+    },
+    {
+      "id": 8587758,
+      "full_name": "Sarah Riepenhausen",
+      "first_name": "Sarah",
+      "last_name": "Riepenhausen",
+      "is_active": false,
+      "url_name": "_",
+      "orcid_id": ""
+    },
+    {
+      "id": 5439716,
+      "full_name": "Philipp Neuhaus",
+      "first_name": "Philipp",
+      "last_name": "Neuhaus",
+      "is_active": false,
+      "url_name": "_",
+      "orcid_id": ""
+    },
+    {
+      "id": 8587764,
+      "full_name": "Alexandra Meidt",
+      "first_name": "Alexandra",
+      "last_name": "Meidt",
+      "is_active": false,
+      "url_name": "_",
+      "orcid_id": ""
+    },
+    {
+      "id": 793,
+      "full_name": "Martin Dugas",
+      "first_name": "Martin",
+      "last_name": "Dugas",
+      "is_active": false,
+      "url_name": "Martin_Dugas",
+      "orcid_id": ""
+    },
+    {
+      "id": 6275471,
+      "full_name": "Julian Varghese",
+      "first_name": "Julian",
+      "last_name": "Varghese",
+      "is_active": false,
+      "url_name": "_",
+      "orcid_id": ""
+    }
+  ],
+  "custom_fields": [
+    {
+      "name": "Research Data Support",
+      "value": "",
+      "settings": {
+        "validations": {
+          "min_length": 1,
+          "max_length": 250
+        },
+        "placeholder": "Complete where RDS data are part of RDS submission"
+      },
+      "field_type": "text",
+      "order": null,
+      "is_mandatory": false
+    }
+  ],
+  "figshare_url": "https://springernature.figshare.com/articles/dataset/Additional_file_8_of_ELaPro_a_LOINC-mapped_core_dataset_for_top_laboratory_procedures_of_eligibility_screening_for_clinical_trials/19767803",
+  "download_disabled": false,
+  "description": "Additional file 8. Appendix 8A: The final dataset, ELaPro, in CSV format after complete mapping to LOINC. B: The final dataset, ELaPro, reported as ODM file (CDASH standard). 8C. The final dataset, ELaPro, in in FHIR format (HL7 standard).",
+  "funding": "Westfälische Wilhelms-Universität Münster (1056)",
+  "funding_list": [
+    {
+      "id": 20059231,
+      "title": "Westfälische Wilhelms-Universität Münster (1056)",
+      "grant_code": "",
+      "funder_name": null,
+      "is_user_defined": 1
+    }
+  ],
+  "version": 1,
+  "status": "public",
+  "size": 44107,
+  "created_date": "2022-05-15T04:24:53Z",
+  "modified_date": "2023-06-03T12:57:43Z",
+  "is_public": true,
+  "is_confidential": false,
+  "is_metadata_record": false,
+  "confidential_reason": "",
+  "metadata_reason": "",
+  "license": {
+    "value": 47,
+    "name": "CC BY + CC0",
+    "url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "tags": [
+    "Eligibility screening",
+    "UMLS",
+    "LOINC",
+    "Data models",
+    "Medical informatics"
+  ],
+  "keywords": [
+    "Eligibility screening",
+    "UMLS",
+    "LOINC",
+    "Data models",
+    "Medical informatics"
+  ],
+  "categories": [
+    {
+      "id": 7,
+      "title": "Medicine",
+      "parent_id": 48,
+      "path": "",
+      "source_id": "",
+      "taxonomy_id": 10
+    },
+    {
+      "id": 734,
+      "title": "Biological Sciences not elsewhere classified",
+      "parent_id": 48,
+      "path": "",
+      "source_id": "",
+      "taxonomy_id": 10
+    },
+    {
+      "id": 931,
+      "title": "Information Systems not elsewhere classified",
+      "parent_id": 52,
+      "path": "",
+      "source_id": "",
+      "taxonomy_id": 10
+    },
+    {
+      "id": 106,
+      "title": "Science Policy",
+      "parent_id": 40,
+      "path": "",
+      "source_id": "",
+      "taxonomy_id": 10
+    }
+  ],
+  "references": [
+    "https://doi.org/10.1093/jamiaopen/ooaa041",
+    "https://doi.org/10.1093/jamiaopen/ooaa041",
+    "https://doi.org/10.1200/EDBK_179807",
+    "https://doi.org/10.1200/EDBK_179807",
+    "https://doi.org/10.1186/1745-6215-15-399",
+    "https://doi.org/10.1186/1745-6215-15-399",
+    "https://doi.org/10.12688/f1000research.22182.1",
+    "https://doi.org/10.12688/f1000research.22182.1",
+    "https://doi.org/10.1177/17407745211015924",
+    "https://doi.org/10.1177/17407745211015924",
+    "https://doi.org/10.1016/s0895-4356%252801%252900353-5",
+    "https://doi.org/10.1016/s0895-4356%252801%252900353-5",
+    "https://doi.org/10.1186/1745-6215-7-9",
+    "https://doi.org/10.1186/1745-6215-7-9",
+    "https://doi.org/10.1111/j.1365-2702.2009.03041.x",
+    "https://doi.org/10.1111/j.1365-2702.2009.03041.x",
+    "https://doi.org/10.1186/s12874-016-0151-1",
+    "https://doi.org/10.1186/s12874-016-0151-1",
+    "https://doi.org/10.1111/iwj.12950",
+    "https://doi.org/10.1111/iwj.12950",
+    "https://doi.org/10.4103/picr.PICR_206_19",
+    "https://doi.org/10.4103/picr.PICR_206_19",
+    "https://doi.org/10.1002/14651858.MR000045.pub2",
+    "https://doi.org/10.1002/14651858.MR000045.pub2",
+    "https://doi.org/10.1001/jama.2014.1361",
+    "https://doi.org/10.1001/jama.2014.1361",
+    "https://doi.org/10.1016/j.jclinepi.2016.07.016",
+    "https://doi.org/10.1016/j.jclinepi.2016.07.016",
+    "https://doi.org/10.1136/bmjopen-2016-015276",
+    "https://doi.org/10.1136/bmjopen-2016-015276",
+    "https://doi.org/10.1186/s13063-018-2460-7",
+    "https://doi.org/10.1186/s13063-018-2460-7",
+    "https://doi.org/10.1186/s13063-018-2467-0",
+    "https://doi.org/10.1186/s13063-018-2467-0",
+    "https://doi.org/10.1186/s13063-019-3957-4",
+    "https://doi.org/10.1186/s13063-019-3957-4",
+    "https://doi.org/10.1016/j.conctc.2018.08.001",
+    "https://doi.org/10.1016/j.conctc.2018.08.001",
+    "https://doi.org/10.1001/jama.297.11.1233",
+    "https://doi.org/10.1001/jama.297.11.1233",
+    "https://doi.org/10.1016/j.jbi.2009.12.004",
+    "https://doi.org/10.1016/j.jbi.2009.12.004",
+    "https://doi.org/10.1200/JCO.2015.62.1854",
+    "https://doi.org/10.1200/JCO.2015.62.1854",
+    "https://doi.org/10.1177/1740774510363013",
+    "https://doi.org/10.1177/1740774510363013",
+    "https://doi.org/10.1016/j.tips.2015.08.007",
+    "https://doi.org/10.1016/j.tips.2015.08.007",
+    "https://doi.org/10.1186/s13063-021-05397-0",
+    "https://doi.org/10.1186/s13063-021-05397-0",
+    "https://doi.org/10.1016/j.jbi.2010.09.007",
+    "https://doi.org/10.1016/j.jbi.2010.09.007",
+    "https://doi.org/10.1186/1472-6947-12-47",
+    "https://doi.org/10.1186/1472-6947-12-47",
+    "https://doi.org/10.1007/978-3-319-78503-5_5",
+    "https://doi.org/10.1055/s-0038-1634945",
+    "https://doi.org/10.1055/s-0038-1634945",
+    "https://doi.org/10.1093/jamia/ocaa176",
+    "https://doi.org/10.1093/jamia/ocaa176",
+    "https://doi.org/10.1093/jamia/ocaa180",
+    "https://doi.org/10.1093/jamia/ocaa180",
+    "https://doi.org/10.1197/jamia.M3119",
+    "https://doi.org/10.1197/jamia.M3119",
+    "https://doi.org/10.1016/j.cct.2010.03.005",
+    "https://doi.org/10.1016/j.cct.2010.03.005",
+    "https://doi.org/10.2196/jmir.3446",
+    "https://doi.org/10.2196/jmir.3446",
+    "https://doi.org/10.1136/amiajnl-2014-002887",
+    "https://doi.org/10.1136/amiajnl-2014-002887",
+    "https://doi.org/10.1186/s12911-015-0149-3",
+    "https://doi.org/10.1186/s12911-015-0149-3",
+    "https://doi.org/10.1093/jamia/ocw176",
+    "https://doi.org/10.1093/jamia/ocw176",
+    "https://doi.org/10.1186/s13063-017-2413-6",
+    "https://doi.org/10.1186/s13063-017-2413-6",
+    "https://doi.org/10.2196/10020",
+    "https://doi.org/10.2196/10020",
+    "https://doi.org/10.2196/10020",
+    "https://doi.org/10.1016/j.ijmedinf.2019.05.018",
+    "https://doi.org/10.1016/j.ijmedinf.2019.05.018",
+    "https://doi.org/10.1186/s13063-020-04234-0",
+    "https://doi.org/10.1186/s13063-020-04234-0",
+    "https://doi.org/10.1002/acr2.11289",
+    "https://doi.org/10.1002/acr2.11289",
+    "https://doi.org/10.1158/1078-0432.CCR-20-3853",
+    "https://doi.org/10.1158/1078-0432.CCR-20-3853",
+    "https://doi.org/10.1136/jamia.1998.0050276",
+    "https://doi.org/10.1055/s-0038-1667077",
+    "https://doi.org/10.1055/s-0038-1667077",
+    "https://doi.org/10.1016/j.jbi.2013.06.001",
+    "https://doi.org/10.1016/j.jbi.2013.06.001",
+    "https://doi.org/10.1093/database/bav121",
+    "https://doi.org/10.1186/s12911-021-01524-8",
+    "https://doi.org/10.1186/s12911-021-01524-8",
+    "https://doi.org/10.3414/ME14-01-0046",
+    "https://doi.org/10.3414/ME14-01-0046",
+    "https://doi.org/10.2196/13554",
+    "https://doi.org/10.2196/13554",
+    "https://doi.org/10.2196/14107",
+    "https://doi.org/10.2196/14107",
+    "https://doi.org/10.1515/labmed-2019-0193",
+    "https://doi.org/10.1515/labmed-2019-0193",
+    "https://doi.org/10.1016/j.jbi.2013.08.012",
+    "https://doi.org/10.1016/j.jbi.2013.08.012",
+    "https://doi.org/10.1186/1745-6215-15-18",
+    "https://doi.org/10.1186/1745-6215-15-18",
+    "https://doi.org/10.1038/s41597-020-00620-0",
+    "https://doi.org/10.1038/s41597-020-00620-0",
+    "https://doi.org/10.1093/jamia/ocy178",
+    "https://doi.org/10.1093/jamia/ocy178",
+    "https://doi.org/10.1093/jamia/ocx019",
+    "https://doi.org/10.1093/jamia/ocx019",
+    "https://doi.org/10.3414/ME15-01-0112",
+    "https://doi.org/10.3414/ME15-01-0112",
+    "https://doi.org/10.2196/21929",
+    "https://doi.org/10.2196/21929",
+    "https://doi.org/10.1186/s12874-022-01611-y"
+  ],
+  "has_linked_file": false,
+  "citation": "Rafee, Ahmed; Riepenhausen, Sarah; Neuhaus, Philipp; Meidt, Alexandra; Dugas, Martin; Varghese, Julian (2022). Additional file 8 of ELaPro, a LOINC-mapped core dataset for top laboratory procedures of eligibility screening for clinical trials. figshare. Dataset. https://doi.org/10.6084/m9.figshare.19767803.v1",
+  "related_materials": [
+    {
+      "id": 36441893,
+      "identifier": "10.1093/jamiaopen/ooaa041",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/jamiaopen/ooaa041"
+    },
+    {
+      "id": 36441899,
+      "identifier": "10.1093/jamiaopen/ooaa041",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/jamiaopen/ooaa041"
+    },
+    {
+      "id": 36441905,
+      "identifier": "10.1200/EDBK_179807",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1200/EDBK_179807"
+    },
+    {
+      "id": 36441911,
+      "identifier": "10.1200/EDBK_179807",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1200/EDBK_179807"
+    },
+    {
+      "id": 36441917,
+      "identifier": "10.1186/1745-6215-15-399",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/1745-6215-15-399"
+    },
+    {
+      "id": 36441926,
+      "identifier": "10.1186/1745-6215-15-399",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/1745-6215-15-399"
+    },
+    {
+      "id": 36441932,
+      "identifier": "10.12688/f1000research.22182.1",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.12688/f1000research.22182.1"
+    },
+    {
+      "id": 36441938,
+      "identifier": "10.12688/f1000research.22182.1",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.12688/f1000research.22182.1"
+    },
+    {
+      "id": 36441947,
+      "identifier": "10.1177/17407745211015924",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1177/17407745211015924"
+    },
+    {
+      "id": 36441953,
+      "identifier": "10.1177/17407745211015924",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1177/17407745211015924"
+    },
+    {
+      "id": 36441959,
+      "identifier": "10.1016/s0895-4356%2801%2900353-5",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/s0895-4356%2801%2900353-5"
+    },
+    {
+      "id": 36441971,
+      "identifier": "10.1016/s0895-4356%2801%2900353-5",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/s0895-4356%2801%2900353-5"
+    },
+    {
+      "id": 36441980,
+      "identifier": "10.1186/1745-6215-7-9",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/1745-6215-7-9"
+    },
+    {
+      "id": 36441986,
+      "identifier": "10.1186/1745-6215-7-9",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/1745-6215-7-9"
+    },
+    {
+      "id": 36441992,
+      "identifier": "10.1111/j.1365-2702.2009.03041.x",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1111/j.1365-2702.2009.03041.x"
+    },
+    {
+      "id": 36442001,
+      "identifier": "10.1111/j.1365-2702.2009.03041.x",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1111/j.1365-2702.2009.03041.x"
+    },
+    {
+      "id": 36442007,
+      "identifier": "10.1186/s12874-016-0151-1",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s12874-016-0151-1"
+    },
+    {
+      "id": 36442013,
+      "identifier": "10.1186/s12874-016-0151-1",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s12874-016-0151-1"
+    },
+    {
+      "id": 36442019,
+      "identifier": "10.1111/iwj.12950",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1111/iwj.12950"
+    },
+    {
+      "id": 36442025,
+      "identifier": "10.1111/iwj.12950",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1111/iwj.12950"
+    },
+    {
+      "id": 36442031,
+      "identifier": "10.4103/picr.PICR_206_19",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.4103/picr.PICR_206_19"
+    },
+    {
+      "id": 36442037,
+      "identifier": "10.4103/picr.PICR_206_19",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.4103/picr.PICR_206_19"
+    },
+    {
+      "id": 36442043,
+      "identifier": "10.1002/14651858.MR000045.pub2",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1002/14651858.MR000045.pub2"
+    },
+    {
+      "id": 36442049,
+      "identifier": "10.1002/14651858.MR000045.pub2",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1002/14651858.MR000045.pub2"
+    },
+    {
+      "id": 36442055,
+      "identifier": "10.1001/jama.2014.1361",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1001/jama.2014.1361"
+    },
+    {
+      "id": 36442061,
+      "identifier": "10.1001/jama.2014.1361",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1001/jama.2014.1361"
+    },
+    {
+      "id": 36442067,
+      "identifier": "10.1016/j.jclinepi.2016.07.016",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.jclinepi.2016.07.016"
+    },
+    {
+      "id": 36442073,
+      "identifier": "10.1016/j.jclinepi.2016.07.016",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.jclinepi.2016.07.016"
+    },
+    {
+      "id": 36442079,
+      "identifier": "10.1136/bmjopen-2016-015276",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1136/bmjopen-2016-015276"
+    },
+    {
+      "id": 36442088,
+      "identifier": "10.1136/bmjopen-2016-015276",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1136/bmjopen-2016-015276"
+    },
+    {
+      "id": 36442094,
+      "identifier": "10.1186/s13063-018-2460-7",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s13063-018-2460-7"
+    },
+    {
+      "id": 36442100,
+      "identifier": "10.1186/s13063-018-2460-7",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s13063-018-2460-7"
+    },
+    {
+      "id": 36442103,
+      "identifier": "10.1186/s13063-018-2467-0",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s13063-018-2467-0"
+    },
+    {
+      "id": 36442109,
+      "identifier": "10.1186/s13063-018-2467-0",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s13063-018-2467-0"
+    },
+    {
+      "id": 36442112,
+      "identifier": "10.1186/s13063-019-3957-4",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s13063-019-3957-4"
+    },
+    {
+      "id": 36442115,
+      "identifier": "10.1186/s13063-019-3957-4",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s13063-019-3957-4"
+    },
+    {
+      "id": 36442118,
+      "identifier": "10.1016/j.conctc.2018.08.001",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.conctc.2018.08.001"
+    },
+    {
+      "id": 36442121,
+      "identifier": "10.1016/j.conctc.2018.08.001",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.conctc.2018.08.001"
+    },
+    {
+      "id": 36442124,
+      "identifier": "10.1001/jama.297.11.1233",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1001/jama.297.11.1233"
+    },
+    {
+      "id": 36442127,
+      "identifier": "10.1001/jama.297.11.1233",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1001/jama.297.11.1233"
+    },
+    {
+      "id": 36442130,
+      "identifier": "10.1016/j.jbi.2009.12.004",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.jbi.2009.12.004"
+    },
+    {
+      "id": 36442133,
+      "identifier": "10.1016/j.jbi.2009.12.004",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.jbi.2009.12.004"
+    },
+    {
+      "id": 36442136,
+      "identifier": "10.1200/JCO.2015.62.1854",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1200/JCO.2015.62.1854"
+    },
+    {
+      "id": 36442139,
+      "identifier": "10.1200/JCO.2015.62.1854",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1200/JCO.2015.62.1854"
+    },
+    {
+      "id": 36442142,
+      "identifier": "10.1177/1740774510363013",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1177/1740774510363013"
+    },
+    {
+      "id": 36442145,
+      "identifier": "10.1177/1740774510363013",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1177/1740774510363013"
+    },
+    {
+      "id": 36442148,
+      "identifier": "10.1016/j.tips.2015.08.007",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.tips.2015.08.007"
+    },
+    {
+      "id": 36442151,
+      "identifier": "10.1016/j.tips.2015.08.007",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.tips.2015.08.007"
+    },
+    {
+      "id": 36442154,
+      "identifier": "10.1186/s13063-021-05397-0",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s13063-021-05397-0"
+    },
+    {
+      "id": 36442157,
+      "identifier": "10.1186/s13063-021-05397-0",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s13063-021-05397-0"
+    },
+    {
+      "id": 36442160,
+      "identifier": "10.1016/j.jbi.2010.09.007",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.jbi.2010.09.007"
+    },
+    {
+      "id": 36442163,
+      "identifier": "10.1016/j.jbi.2010.09.007",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.jbi.2010.09.007"
+    },
+    {
+      "id": 36442166,
+      "identifier": "10.1186/1472-6947-12-47",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/1472-6947-12-47"
+    },
+    {
+      "id": 36442169,
+      "identifier": "10.1186/1472-6947-12-47",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/1472-6947-12-47"
+    },
+    {
+      "id": 36442172,
+      "identifier": "10.1007/978-3-319-78503-5_5",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1007/978-3-319-78503-5_5"
+    },
+    {
+      "id": 36442175,
+      "identifier": "10.1055/s-0038-1634945",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1055/s-0038-1634945"
+    },
+    {
+      "id": 36442178,
+      "identifier": "10.1055/s-0038-1634945",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1055/s-0038-1634945"
+    },
+    {
+      "id": 36442181,
+      "identifier": "10.1093/jamia/ocaa176",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/jamia/ocaa176"
+    },
+    {
+      "id": 36442184,
+      "identifier": "10.1093/jamia/ocaa176",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/jamia/ocaa176"
+    },
+    {
+      "id": 36442187,
+      "identifier": "10.1093/jamia/ocaa180",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/jamia/ocaa180"
+    },
+    {
+      "id": 36442190,
+      "identifier": "10.1093/jamia/ocaa180",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/jamia/ocaa180"
+    },
+    {
+      "id": 36442193,
+      "identifier": "10.1197/jamia.M3119",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1197/jamia.M3119"
+    },
+    {
+      "id": 36442196,
+      "identifier": "10.1197/jamia.M3119",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1197/jamia.M3119"
+    },
+    {
+      "id": 36442199,
+      "identifier": "10.1016/j.cct.2010.03.005",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.cct.2010.03.005"
+    },
+    {
+      "id": 36442202,
+      "identifier": "10.1016/j.cct.2010.03.005",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.cct.2010.03.005"
+    },
+    {
+      "id": 36442205,
+      "identifier": "10.2196/jmir.3446",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.2196/jmir.3446"
+    },
+    {
+      "id": 36442208,
+      "identifier": "10.2196/jmir.3446",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.2196/jmir.3446"
+    },
+    {
+      "id": 36442211,
+      "identifier": "10.1136/amiajnl-2014-002887",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1136/amiajnl-2014-002887"
+    },
+    {
+      "id": 36442214,
+      "identifier": "10.1136/amiajnl-2014-002887",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1136/amiajnl-2014-002887"
+    },
+    {
+      "id": 36442217,
+      "identifier": "10.1186/s12911-015-0149-3",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s12911-015-0149-3"
+    },
+    {
+      "id": 36442220,
+      "identifier": "10.1186/s12911-015-0149-3",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s12911-015-0149-3"
+    },
+    {
+      "id": 36442223,
+      "identifier": "10.1093/jamia/ocw176",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/jamia/ocw176"
+    },
+    {
+      "id": 36442226,
+      "identifier": "10.1093/jamia/ocw176",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/jamia/ocw176"
+    },
+    {
+      "id": 36442229,
+      "identifier": "10.1186/s13063-017-2413-6",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s13063-017-2413-6"
+    },
+    {
+      "id": 36442232,
+      "identifier": "10.1186/s13063-017-2413-6",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s13063-017-2413-6"
+    },
+    {
+      "id": 36442235,
+      "identifier": "10.2196/10020",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.2196/10020"
+    },
+    {
+      "id": 36442238,
+      "identifier": "10.2196/10020",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.2196/10020"
+    },
+    {
+      "id": 36442241,
+      "identifier": "10.2196/10020",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.2196/10020"
+    },
+    {
+      "id": 36442244,
+      "identifier": "10.1016/j.ijmedinf.2019.05.018",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.ijmedinf.2019.05.018"
+    },
+    {
+      "id": 36442247,
+      "identifier": "10.1016/j.ijmedinf.2019.05.018",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.ijmedinf.2019.05.018"
+    },
+    {
+      "id": 36442250,
+      "identifier": "10.1186/s13063-020-04234-0",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s13063-020-04234-0"
+    },
+    {
+      "id": 36442253,
+      "identifier": "10.1186/s13063-020-04234-0",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s13063-020-04234-0"
+    },
+    {
+      "id": 36442256,
+      "identifier": "10.1002/acr2.11289",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1002/acr2.11289"
+    },
+    {
+      "id": 36442259,
+      "identifier": "10.1002/acr2.11289",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1002/acr2.11289"
+    },
+    {
+      "id": 36442262,
+      "identifier": "10.1158/1078-0432.CCR-20-3853",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1158/1078-0432.CCR-20-3853"
+    },
+    {
+      "id": 36442265,
+      "identifier": "10.1158/1078-0432.CCR-20-3853",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1158/1078-0432.CCR-20-3853"
+    },
+    {
+      "id": 36442268,
+      "identifier": "10.1136/jamia.1998.0050276",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1136/jamia.1998.0050276"
+    },
+    {
+      "id": 36442271,
+      "identifier": "10.1055/s-0038-1667077",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1055/s-0038-1667077"
+    },
+    {
+      "id": 36442274,
+      "identifier": "10.1055/s-0038-1667077",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1055/s-0038-1667077"
+    },
+    {
+      "id": 36442277,
+      "identifier": "10.1016/j.jbi.2013.06.001",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.jbi.2013.06.001"
+    },
+    {
+      "id": 36442280,
+      "identifier": "10.1016/j.jbi.2013.06.001",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.jbi.2013.06.001"
+    },
+    {
+      "id": 36442283,
+      "identifier": "10.1093/database/bav121",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/database/bav121"
+    },
+    {
+      "id": 36442286,
+      "identifier": "10.1186/s12911-021-01524-8",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s12911-021-01524-8"
+    },
+    {
+      "id": 36442289,
+      "identifier": "10.1186/s12911-021-01524-8",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/s12911-021-01524-8"
+    },
+    {
+      "id": 36442292,
+      "identifier": "10.3414/ME14-01-0046",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.3414/ME14-01-0046"
+    },
+    {
+      "id": 36442295,
+      "identifier": "10.3414/ME14-01-0046",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.3414/ME14-01-0046"
+    },
+    {
+      "id": 36442298,
+      "identifier": "10.2196/13554",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.2196/13554"
+    },
+    {
+      "id": 36442301,
+      "identifier": "10.2196/13554",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.2196/13554"
+    },
+    {
+      "id": 36442304,
+      "identifier": "10.2196/14107",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.2196/14107"
+    },
+    {
+      "id": 36442307,
+      "identifier": "10.2196/14107",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.2196/14107"
+    },
+    {
+      "id": 36442310,
+      "identifier": "10.1515/labmed-2019-0193",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1515/labmed-2019-0193"
+    },
+    {
+      "id": 36442313,
+      "identifier": "10.1515/labmed-2019-0193",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1515/labmed-2019-0193"
+    },
+    {
+      "id": 36442316,
+      "identifier": "10.1016/j.jbi.2013.08.012",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.jbi.2013.08.012"
+    },
+    {
+      "id": 36442319,
+      "identifier": "10.1016/j.jbi.2013.08.012",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1016/j.jbi.2013.08.012"
+    },
+    {
+      "id": 36442322,
+      "identifier": "10.1186/1745-6215-15-18",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/1745-6215-15-18"
+    },
+    {
+      "id": 36442325,
+      "identifier": "10.1186/1745-6215-15-18",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1186/1745-6215-15-18"
+    },
+    {
+      "id": 36442328,
+      "identifier": "10.1038/s41597-020-00620-0",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1038/s41597-020-00620-0"
+    },
+    {
+      "id": 36442331,
+      "identifier": "10.1038/s41597-020-00620-0",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1038/s41597-020-00620-0"
+    },
+    {
+      "id": 36442334,
+      "identifier": "10.1093/jamia/ocy178",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/jamia/ocy178"
+    },
+    {
+      "id": 36442337,
+      "identifier": "10.1093/jamia/ocy178",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/jamia/ocy178"
+    },
+    {
+      "id": 36442340,
+      "identifier": "10.1093/jamia/ocx019",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/jamia/ocx019"
+    },
+    {
+      "id": 36442343,
+      "identifier": "10.1093/jamia/ocx019",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.1093/jamia/ocx019"
+    },
+    {
+      "id": 36442346,
+      "identifier": "10.3414/ME15-01-0112",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.3414/ME15-01-0112"
+    },
+    {
+      "id": 36442349,
+      "identifier": "10.3414/ME15-01-0112",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.3414/ME15-01-0112"
+    },
+    {
+      "id": 36442352,
+      "identifier": "10.2196/21929",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.2196/21929"
+    },
+    {
+      "id": 36442355,
+      "identifier": "10.2196/21929",
+      "title": "",
+      "relation": "References",
+      "identifier_type": "DOI",
+      "is_linkout": false,
+      "link": "https://doi.org/10.2196/21929"
+    },
+    {
+      "id": 36442358,
+      "identifier": "10.1186/s12874-022-01611-y",
+      "title": "ELaPro, a LOINC-mapped core dataset for top laboratory procedures of eligibility screening for clinical trials",
+      "relation": "IsSupplementTo",
+      "identifier_type": "DOI",
+      "is_linkout": true,
+      "link": "https://doi.org/10.1186/s12874-022-01611-y"
+    }
+  ],
+  "is_embargoed": false,
+  "embargo_date": null,
+  "embargo_type": null,
+  "embargo_title": "",
+  "embargo_reason": "",
+  "embargo_options": [],
+  "id": 19767803,
+  "title": "Additional file 8 of ELaPro, a LOINC-mapped core dataset for top laboratory procedures of eligibility screening for clinical trials",
+  "doi": "10.6084/m9.figshare.19767803.v1",
+  "handle": "",
+  "url": "https://api.figshare.com/v2/articles/19767803",
+  "published_date": "2022-05-15T04:24:53Z",
+  "thumb": "",
+  "defined_type": 3,
+  "defined_type_name": "dataset",
+  "group_id": 7327,
+  "url_private_api": "https://api.figshare.com/v2/account/articles/19767803",
+  "url_public_api": "https://api.figshare.com/v2/articles/19767803",
+  "url_private_html": "https://figshare.com/account/articles/19767803",
+  "url_public_html": "https://springernature.figshare.com/articles/dataset/Additional_file_8_of_ELaPro_a_LOINC-mapped_core_dataset_for_top_laboratory_procedures_of_eligibility_screening_for_clinical_trials/19767803",
+  "timeline": {
+    "posted": "2022-05-15T04:24:53",
+    "publisherAcceptance": "2022-04-20T05:00:00",
+    "publisherPublication": "2022-05-14T05:00:00",
+    "firstOnline": "2022-05-15"
+  },
+  "resource_title": "ELaPro, a LOINC-mapped core dataset for top laboratory procedures of eligibility screening for clinical trials",
+  "resource_doi": "10.1186/s12874-022-01611-y"
+}

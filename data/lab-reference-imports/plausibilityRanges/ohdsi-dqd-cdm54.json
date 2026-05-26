@@ -1,0 +1,3207 @@
+{
+  "generatedAt": "2026-05-26T19:37:28.492Z",
+  "kind": "plausibilityRanges",
+  "source": {
+    "id": "ohdsi-dqd-cdm54-concept-level",
+    "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+    "lane": "plausibilityRanges",
+    "license": "Apache-2.0"
+  },
+  "caveat": "Plausibility and data-quality thresholds only. Do not use as clinical reference intervals.",
+  "thresholds": [
+    {
+      "conceptId": 3006315,
+      "conceptName": "Basophils [#/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        8784,
+        8848,
+        8961,
+        9444,
+        8785
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3004410,
+      "conceptName": "Hemoglobin A1c/Hemoglobin.total in Blood",
+      "plausibleUnitConceptIds": [
+        8554,
+        8737,
+        9225,
+        9579
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 40487382,
+      "conceptName": "Total lymphocyte count",
+      "plausibleUnitConceptIds": [
+        8784,
+        8848,
+        8961,
+        9444,
+        8785
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3013721,
+      "conceptName": "Aspartate aminotransferase [Enzymatic activity/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8645,
+        8923
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3019198,
+      "conceptName": "Lymphocytes [#/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        8784,
+        8848,
+        8961,
+        9444,
+        8785
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3034426,
+      "conceptName": "Prothrombin time (PT)",
+      "plausibleUnitConceptIds": [
+        8555
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3043688,
+      "conceptName": "Hemoglobin [Mass/volume] in Body fluid",
+      "plausibleUnitConceptIds": [
+        8713,
+        8859
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3046485,
+      "conceptName": "Urea nitrogen/Creatinine [Mass Ratio] in Blood",
+      "plausibleUnitConceptIds": [
+        8523,
+        8554,
+        8596,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4216098,
+      "conceptName": "Eosinophil count",
+      "plausibleUnitConceptIds": [
+        8784,
+        8848,
+        8961,
+        9444
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4245152,
+      "conceptName": "Potassium measurement",
+      "plausibleUnitConceptIds": [
+        8736,
+        8753,
+        9557
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 43055141,
+      "conceptName": "Pain severity - 0-10 verbal numeric rating [Score] - Reported",
+      "plausibleUnitConceptIds": [
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3006923,
+      "conceptName": "Alanine aminotransferase [Enzymatic activity/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8645,
+        8923
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3021044,
+      "conceptName": "Iron binding capacity [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8837
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3024171,
+      "conceptName": "Respiratory rate",
+      "plausibleUnitConceptIds": [
+        8483,
+        8541
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3027114,
+      "conceptName": "Cholesterol [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 40762499,
+      "conceptName": "Oxygen saturation in Arterial blood by Pulse oximetry",
+      "plausibleUnitConceptIds": [
+        8554,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3000963,
+      "conceptName": "Hemoglobin [Mass/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        8636,
+        8713
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3001604,
+      "conceptName": "Monocytes [#/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        8848,
+        8961,
+        9444
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3019069,
+      "conceptName": "Monocytes/100 leukocytes in Blood",
+      "plausibleUnitConceptIds": [
+        8554
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3022509,
+      "conceptName": "Hyaline casts [#/area] in Urine sediment by Microscopy low power field",
+      "plausibleUnitConceptIds": [
+        8765
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3028288,
+      "conceptName": "Cholesterol in LDL [Mass/volume] in Serum or Plasma by calculation",
+      "plausibleUnitConceptIds": [
+        8840,
+        9028
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4148615,
+      "conceptName": "Neutrophil count",
+      "plausibleUnitConceptIds": [
+        8784,
+        8848,
+        8961,
+        8848,
+        9444
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 44806420,
+      "conceptName": "Estimation of glomerular filtration rate",
+      "plausibleUnitConceptIds": [
+        720870,
+        8795
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3028437,
+      "conceptName": "Cholesterol in LDL [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8840,
+        9028
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3016991,
+      "conceptName": "Thyroxine (T4) [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8837
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3026925,
+      "conceptName": "Triiodothyronine (T3) Free [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8820,
+        8845
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3028615,
+      "conceptName": "Eosinophils [#/volume] in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8784,
+        8816,
+        8848,
+        8961,
+        9436,
+        9444,
+        8647
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3051205,
+      "conceptName": "Crystals [#/area] in Urine sediment by Microscopy high power field",
+      "plausibleUnitConceptIds": [
+        8786
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4098046,
+      "conceptName": "Pulse oximetry",
+      "plausibleUnitConceptIds": [
+        8554
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3005131,
+      "conceptName": "Glucose mean value [Mass/volume] in Blood Estimated from glycated hemoglobin",
+      "plausibleUnitConceptIds": [
+        8840,
+        9028
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3011163,
+      "conceptName": "Cholesterol.total/Cholesterol in HDL [Mass Ratio] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8523,
+        8529,
+        8554,
+        8596,
+        8606,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3044491,
+      "conceptName": "Cholesterol non HDL [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8576,
+        8840,
+        9028
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4017361,
+      "conceptName": "Blood urea nitrogen measurement",
+      "plausibleUnitConceptIds": [
+        8753,
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3006504,
+      "conceptName": "Eosinophils/100 leukocytes in Blood",
+      "plausibleUnitConceptIds": [
+        8554
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3000483,
+      "conceptName": "Glucose [Mass/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3033543,
+      "conceptName": "Specific gravity of Urine",
+      "plausibleUnitConceptIds": [
+        8523,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3045716,
+      "conceptName": "Anion gap in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8753,
+        9557
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4101713,
+      "conceptName": "High density lipoprotein cholesterol measurement",
+      "plausibleUnitConceptIds": [
+        8636,
+        8736,
+        8753,
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4103762,
+      "conceptName": "Anion gap measurement",
+      "plausibleUnitConceptIds": [
+        8753,
+        9557
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3001008,
+      "conceptName": "Epithelial cells.squamous [#/area] in Urine sediment by Microscopy high power field",
+      "plausibleUnitConceptIds": [
+        8765,
+        8786,
+        8889
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3009744,
+      "conceptName": "MCHC [Mass/volume] by Automated count",
+      "plausibleUnitConceptIds": [
+        8564,
+        8636,
+        8713
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3013115,
+      "conceptName": "Eosinophils [#/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        8848,
+        8961,
+        9444,
+        8784,
+        8785
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3019550,
+      "conceptName": "Sodium [Moles/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8753,
+        9557
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3020416,
+      "conceptName": "Erythrocytes [#/volume] in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        44777575,
+        8734,
+        8815,
+        8647,
+        8931,
+        8785
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3035583,
+      "conceptName": "Leukocytes [#/area] in Urine sediment by Microscopy high power field",
+      "plausibleUnitConceptIds": [
+        8786,
+        8889
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3035995,
+      "conceptName": "Alkaline phosphatase [Enzymatic activity/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8645,
+        8923
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3038553,
+      "conceptName": "Body mass index (BMI) [Ratio]",
+      "plausibleUnitConceptIds": [
+        9531
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 35610320,
+      "conceptName": "Diastolic arterial pressure",
+      "plausibleUnitConceptIds": [
+        8876
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3001490,
+      "conceptName": "Nucleated erythrocytes [#/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        8784,
+        8848,
+        8961,
+        9444
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4195214,
+      "conceptName": "Cholesterol/HDL ratio measurement",
+      "plausibleUnitConceptIds": [
+        8523,
+        8554,
+        8596,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 36306178,
+      "conceptName": "Glomerular filtration rate/1.73 sq M.predicted among blacks [Volume Rate/Area] in Serum, Plasma or Blood by Creatinine-based formula (CKD-EPI)",
+      "plausibleUnitConceptIds": [
+        720870,
+        8795
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 37393850,
+      "conceptName": "MCHC - Mean corpuscular haemoglobin concentration",
+      "plausibleUnitConceptIds": [
+        8636,
+        8713,
+        8554,
+        8753
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3004501,
+      "conceptName": "Glucose [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8840,
+        8753
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3008598,
+      "conceptName": "Thyroxine (T4) free [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8817,
+        8845,
+        8725
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3018010,
+      "conceptName": "Neutrophils/100 leukocytes in Blood",
+      "plausibleUnitConceptIds": [
+        8554,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3022192,
+      "conceptName": "Triglyceride [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8840,
+        8753
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4151768,
+      "conceptName": "Pack years",
+      "plausibleUnitConceptIds": [
+        9448,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4197602,
+      "conceptName": "Serum TSH measurement",
+      "plausibleUnitConceptIds": [
+        8719,
+        9040,
+        9093,
+        44777578,
+        8750,
+        8923,
+        44777583
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 46236952,
+      "conceptName": "Glomerular filtration rate/1.73 sq M.predicted [Volume Rate/Area] in Serum, Plasma or Blood by Creatinine-based formula (MDRD)",
+      "plausibleUnitConceptIds": [
+        720870,
+        8795
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3006906,
+      "conceptName": "Calcium [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3007070,
+      "conceptName": "Cholesterol in HDL [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3020460,
+      "conceptName": "C reactive protein [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8751,
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3023314,
+      "conceptName": "Hematocrit [Volume Fraction] of Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        44777604,
+        8554
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3035941,
+      "conceptName": "MCH [Entitic mass]",
+      "plausibleUnitConceptIds": [
+        8564,
+        9655
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3037072,
+      "conceptName": "Urobilinogen [Mass/volume] in Urine by Test strip",
+      "plausibleUnitConceptIds": [
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4151358,
+      "conceptName": "Hematocrit determination",
+      "plausibleUnitConceptIds": [
+        44777604,
+        8554,
+        8523
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4194332,
+      "conceptName": "Monocyte count",
+      "plausibleUnitConceptIds": [
+        8784,
+        8848,
+        8961,
+        9444
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3001123,
+      "conceptName": "Platelet mean volume [Entitic volume] in Blood",
+      "plausibleUnitConceptIds": [
+        8583
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3012888,
+      "conceptName": "Diastolic blood pressure",
+      "plausibleUnitConceptIds": [
+        8876
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3013707,
+      "conceptName": "Erythrocyte sedimentation rate by Westergren method",
+      "plausibleUnitConceptIds": [
+        8752
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3037511,
+      "conceptName": "Lymphocytes/100 leukocytes in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8554
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3040168,
+      "conceptName": "Immature granulocytes [#/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        8848,
+        8961,
+        9444
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4097430,
+      "conceptName": "Sodium measurement",
+      "plausibleUnitConceptIds": [
+        8753,
+        9557
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3005424,
+      "conceptName": "Body surface area",
+      "plausibleUnitConceptIds": [
+        8617
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3013603,
+      "conceptName": "Prostate specific Ag [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8748,
+        8842
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3020509,
+      "conceptName": "Albumin/Globulin [Mass Ratio] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8523,
+        8554,
+        8596,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3036277,
+      "conceptName": "Body height",
+      "plausibleUnitConceptIds": [
+        8582,
+        9327,
+        9330,
+        9546
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4301868,
+      "conceptName": "Pulse rate",
+      "plausibleUnitConceptIds": [
+        8483,
+        8541,
+        8581
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 40762636,
+      "conceptName": "Body mass index (BMI) [Percentile]",
+      "plausibleUnitConceptIds": [
+        8554
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 40765040,
+      "conceptName": "25-Hydroxyvitamin D3+25-Hydroxyvitamin D2 [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8842,
+        8845
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3024386,
+      "conceptName": "Platelet mean volume [Entitic volume] in Blood by Rees-Ecker",
+      "plausibleUnitConceptIds": [
+        8583
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3009201,
+      "conceptName": "Thyrotropin [Units/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        44777578,
+        8719,
+        9040,
+        9093,
+        8860
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3024731,
+      "conceptName": "MCV [Entitic volume]",
+      "plausibleUnitConceptIds": [
+        8583
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3050479,
+      "conceptName": "Immature granulocytes/100 leukocytes in Blood",
+      "plausibleUnitConceptIds": [
+        8554,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4012479,
+      "conceptName": "Low density lipoprotein cholesterol measurement",
+      "plausibleUnitConceptIds": [
+        8636,
+        8753,
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4152194,
+      "conceptName": "Systolic blood pressure",
+      "plausibleUnitConceptIds": [
+        8876
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 37393840,
+      "conceptName": "Haematocrit",
+      "plausibleUnitConceptIds": [
+        44777604,
+        8523,
+        8554,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3000593,
+      "conceptName": "Cobalamin (Vitamin B12) [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8845,
+        8725
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3002888,
+      "conceptName": "Erythrocyte distribution width [Entitic volume]",
+      "plausibleUnitConceptIds": [
+        8583
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3010910,
+      "conceptName": "Erythrocytes [#/volume] in Body fluid",
+      "plausibleUnitConceptIds": [
+        8647,
+        8785,
+        8815,
+        8931,
+        8784,
+        8848,
+        9257,
+        8888,
+        9428
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3013290,
+      "conceptName": "Carbon dioxide [Partial pressure] in Blood",
+      "plausibleUnitConceptIds": [
+        8876
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3027970,
+      "conceptName": "Globulin [Mass/volume] in Serum by calculation",
+      "plausibleUnitConceptIds": [
+        8636,
+        8713,
+        8950
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4239408,
+      "conceptName": "Heart rate",
+      "plausibleUnitConceptIds": [
+        8483,
+        8541,
+        8581
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3010813,
+      "conceptName": "Leukocytes [#/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        44777588,
+        8848,
+        8961,
+        9444,
+        8647
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3023103,
+      "conceptName": "Potassium [Moles/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8753,
+        9557
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4030871,
+      "conceptName": "Red blood cell count",
+      "plausibleUnitConceptIds": [
+        8734,
+        8815,
+        8931,
+        9444,
+        9445
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4154790,
+      "conceptName": "Diastolic blood pressure",
+      "plausibleUnitConceptIds": [
+        8876
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4217013,
+      "conceptName": "Systolic arterial pressure",
+      "plausibleUnitConceptIds": [
+        8876
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3001318,
+      "conceptName": "Cholesterol.total/Cholesterol in HDL [Percentile]",
+      "plausibleUnitConceptIds": [
+        8554,
+        8596,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3004249,
+      "conceptName": "Systolic blood pressure",
+      "plausibleUnitConceptIds": [
+        8876
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3009596,
+      "conceptName": "Cholesterol in VLDL [Mass/volume] in Serum or Plasma by calculation",
+      "plausibleUnitConceptIds": [
+        8576,
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3025315,
+      "conceptName": "Body weight",
+      "plausibleUnitConceptIds": [
+        8739,
+        9346,
+        9373,
+        9529
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3053283,
+      "conceptName": "Glomerular filtration rate/1.73 sq M.predicted among blacks [Volume Rate/Area] in Serum, Plasma or Blood by Creatinine-based formula (MDRD)",
+      "plausibleUnitConceptIds": [
+        720870,
+        8795
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4008265,
+      "conceptName": "Total cholesterol measurement",
+      "plausibleUnitConceptIds": [
+        8736,
+        8753,
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 36303797,
+      "conceptName": "Glomerular filtration rate/1.73 sq M.predicted among non-blacks [Volume Rate/Area] in Serum, Plasma or Blood by Creatinine-based formula (CKD-EPI)",
+      "plausibleUnitConceptIds": [
+        720870,
+        8795
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 37398460,
+      "conceptName": "Serum alkaline phosphatase level",
+      "plausibleUnitConceptIds": [
+        32995,
+        8645,
+        8923
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3013682,
+      "conceptName": "Urea nitrogen [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3026361,
+      "conceptName": "Erythrocytes [#/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        32706,
+        8785,
+        8815,
+        8931,
+        8784,
+        8848,
+        8961,
+        9444
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3027018,
+      "conceptName": "Heart rate",
+      "plausibleUnitConceptIds": [
+        8483,
+        8541,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4013965,
+      "conceptName": "Oxygen saturation measurement, arterial",
+      "plausibleUnitConceptIds": [
+        8554
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3013429,
+      "conceptName": "Basophils [#/volume] in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8784,
+        8816,
+        8848,
+        8961,
+        9436,
+        9444,
+        8785
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3023599,
+      "conceptName": "MCV [Entitic volume] by Automated count",
+      "plausibleUnitConceptIds": [
+        8583
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3036588,
+      "conceptName": "Neutrophil cytoplasmic Ab.perinuclear [Presence] in Serum",
+      "plausibleUnitConceptIds": [
+        8525,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4298431,
+      "conceptName": "White blood cell count",
+      "plausibleUnitConceptIds": [
+        8848,
+        8961,
+        9444,
+        8784,
+        8785
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3017732,
+      "conceptName": "Neutrophils [#/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        8848,
+        8961,
+        9444
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3024561,
+      "conceptName": "Albumin [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8636,
+        8713
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3034639,
+      "conceptName": "Hemoglobin A1c [Mass/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        8713,
+        8840,
+        9579,
+        8923
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3013650,
+      "conceptName": "Neutrophils [#/volume] in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8784,
+        8848,
+        8961,
+        9444,
+        8647,
+        8785
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3021886,
+      "conceptName": "Globulin [Mass/volume] in Serum",
+      "plausibleUnitConceptIds": [
+        8636,
+        8713,
+        8950
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4254663,
+      "conceptName": "Lymphocyte count",
+      "plausibleUnitConceptIds": [
+        8848,
+        9444,
+        8961
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3001420,
+      "conceptName": "Magnesium [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3007461,
+      "conceptName": "Platelets [#/volume] in Blood",
+      "plausibleUnitConceptIds": [
+        8848,
+        8961,
+        9444,
+        32706
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3012030,
+      "conceptName": "MCH [Entitic mass] by Automated count",
+      "plausibleUnitConceptIds": [
+        8564,
+        8704,
+        9655,
+        8504,
+        8576
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 40764999,
+      "conceptName": "Glomerular filtration rate/1.73 sq M.predicted [Volume Rate/Area] in Serum, Plasma or Blood by Creatinine-based formula (CKD-EPI)",
+      "plausibleUnitConceptIds": [
+        720870,
+        8795
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3008893,
+      "conceptName": "Testosterone [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8817,
+        8842
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3016723,
+      "conceptName": "Creatinine [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8840,
+        8749
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3026910,
+      "conceptName": "Gamma glutamyl transferase [Enzymatic activity/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8645,
+        8923
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3033575,
+      "conceptName": "Monocytes [#/volume] in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8784,
+        8816,
+        8848,
+        8961,
+        9436,
+        9444,
+        8785,
+        8647
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3041084,
+      "conceptName": "Immature granulocytes [#/volume] in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8848,
+        8961,
+        9444
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4184637,
+      "conceptName": "Hemoglobin A1c measurement",
+      "plausibleUnitConceptIds": [
+        8554,
+        8632,
+        8737,
+        9579
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4313591,
+      "conceptName": "Respiratory rate",
+      "plausibleUnitConceptIds": [
+        8483,
+        8541
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 37393851,
+      "conceptName": "MCV - Mean corpuscular volume",
+      "plausibleUnitConceptIds": [
+        8583
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 1619025,
+      "conceptName": "Glomerular filtration rate/1.73 sq M.predicted [Volume Rate/Area] in Serum, Plasma or Blood by Creatinine-based formula (CKD-EPI 2021)",
+      "plausibleUnitConceptIds": [
+        720870,
+        8795
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3013869,
+      "conceptName": "Basophils/100 leukocytes in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8554
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3035472,
+      "conceptName": "Albumin/Protein.total in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8554,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3039000,
+      "conceptName": "Anion gap in Blood",
+      "plausibleUnitConceptIds": [
+        8753,
+        9557
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3000905,
+      "conceptName": "Leukocytes [#/volume] in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8816,
+        8848,
+        8961,
+        9436,
+        9444
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3015632,
+      "conceptName": "Carbon dioxide, total [Moles/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8753,
+        9557
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3032710,
+      "conceptName": "Calcium.ionized/Calcium.total corrected for albumin in Blood",
+      "plausibleUnitConceptIds": [
+        8554,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4197971,
+      "conceptName": "HbA1c measurement (DCCT aligned)",
+      "plausibleUnitConceptIds": [
+        8554,
+        8632,
+        8737
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 42869452,
+      "conceptName": "Immature granulocytes/100 leukocytes in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8554,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3002109,
+      "conceptName": "Cholesterol in LDL/Cholesterol in HDL [Mass Ratio] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8523,
+        8596,
+        8606,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3004327,
+      "conceptName": "Lymphocytes [#/volume] in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8784,
+        8816,
+        8848,
+        8961,
+        9436,
+        9444,
+        8785
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3006322,
+      "conceptName": "Oral temperature",
+      "plausibleUnitConceptIds": [
+        586323,
+        9289
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3008342,
+      "conceptName": "Neutrophils/100 leukocytes in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8554
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3020630,
+      "conceptName": "Protein [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8636,
+        8713
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3001122,
+      "conceptName": "Ferritin [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8748,
+        8842
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3009542,
+      "conceptName": "Hematocrit [Volume Fraction] of Blood",
+      "plausibleUnitConceptIds": [
+        8554
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3010189,
+      "conceptName": "Epithelial cells [#/area] in Urine sediment by Microscopy high power field",
+      "plausibleUnitConceptIds": [
+        8765,
+        8786
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3010457,
+      "conceptName": "Eosinophils/100 leukocytes in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8554
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4192368,
+      "conceptName": "Platelet mean volume determination",
+      "plausibleUnitConceptIds": [
+        8583
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3014576,
+      "conceptName": "Chloride [Moles/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8753,
+        9557
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3024128,
+      "conceptName": "Bilirubin.total [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8840,
+        8749
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3018311,
+      "conceptName": "Urea nitrogen/Creatinine [Mass Ratio] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8523,
+        8554,
+        8596,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3020891,
+      "conceptName": "Body temperature",
+      "plausibleUnitConceptIds": [
+        586323,
+        9289
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3037556,
+      "conceptName": "Urate [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8840,
+        8923
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 37399332,
+      "conceptName": "Serum TSH (thyroid stimulating hormone) level",
+      "plausibleUnitConceptIds": [
+        44777578,
+        9040
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3011904,
+      "conceptName": "Phosphate [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3019897,
+      "conceptName": "Erythrocyte distribution width [Ratio] by Automated count",
+      "plausibleUnitConceptIds": [
+        8554,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3025255,
+      "conceptName": "Bacteria [#/area] in Urine sediment by Microscopy high power field",
+      "plausibleUnitConceptIds": [
+        8786
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4076704,
+      "conceptName": "High density lipoprotein measurement",
+      "plausibleUnitConceptIds": [
+        8753,
+        8840
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4172647,
+      "conceptName": "Basophil count",
+      "plausibleUnitConceptIds": [
+        8848,
+        8961,
+        9444,
+        8785
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 37393531,
+      "conceptName": "Serum alanine aminotransferase level",
+      "plausibleUnitConceptIds": [
+        32995,
+        8645,
+        8923
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 40771529,
+      "conceptName": "Immature granulocytes/100 leukocytes in Body fluid",
+      "plausibleUnitConceptIds": [
+        8554,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3000034,
+      "conceptName": "Microalbumin [Mass/volume] in Urine",
+      "plausibleUnitConceptIds": [
+        8576,
+        8723,
+        8751,
+        8840,
+        8859,
+        8636
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3035124,
+      "conceptName": "Erythrocytes [#/area] in Urine sediment by Microscopy high power field",
+      "plausibleUnitConceptIds": [
+        8786,
+        8889
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3002030,
+      "conceptName": "Lymphocytes/100 leukocytes in Blood",
+      "plausibleUnitConceptIds": [
+        8554,
+        8848
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3019170,
+      "conceptName": "Thyrotropin [Units/volume] in Serum or Plasma by Detection limit <= 0.005 mIU/L",
+      "plausibleUnitConceptIds": [
+        44777578,
+        8719,
+        8860,
+        9040,
+        9093,
+        9550
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3020149,
+      "conceptName": "25-hydroxyvitamin D3 [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8842
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3022174,
+      "conceptName": "Leukocytes [#/volume] in Body fluid",
+      "plausibleUnitConceptIds": [
+        8647,
+        8784,
+        8785,
+        8848,
+        8961,
+        9257,
+        8888
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3024929,
+      "conceptName": "Platelets [#/volume] in Blood by Automated count",
+      "plausibleUnitConceptIds": [
+        8816,
+        8848,
+        8961,
+        9436,
+        9444
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3049187,
+      "conceptName": "Glomerular filtration rate/1.73 sq M.predicted among non-blacks [Volume Rate/Area] in Serum, Plasma or Blood by Creatinine-based formula (MDRD)",
+      "plausibleUnitConceptIds": [
+        720870,
+        8795
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 37398676,
+      "conceptName": "Basophil count",
+      "plausibleUnitConceptIds": [
+        8848
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4112223,
+      "conceptName": "BUN/Creatinine ratio",
+      "plausibleUnitConceptIds": [
+        8523,
+        8596,
+        -1
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3017250,
+      "conceptName": "Creatinine [Mass/volume] in Urine",
+      "plausibleUnitConceptIds": [
+        8840,
+        8636
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 4191837,
+      "conceptName": "Calculated LDL cholesterol level",
+      "plausibleUnitConceptIds": [
+        8840,
+        8753
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3022096,
+      "conceptName": "Basophils/100 leukocytes in Blood",
+      "plausibleUnitConceptIds": [
+        8554
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3034485,
+      "conceptName": "Albumin/Creatinine [Mass Ratio] in Urine",
+      "plausibleUnitConceptIds": [
+        8523,
+        8723,
+        8838,
+        9017,
+        9072
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 44790183,
+      "conceptName": "Glomerular filtration rate testing",
+      "plausibleUnitConceptIds": [
+        720870,
+        8795
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3002400,
+      "conceptName": "Iron [Mass/volume] in Serum or Plasma",
+      "plausibleUnitConceptIds": [
+        8749,
+        8837
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "conceptId": 3003338,
+      "conceptName": "MCHC [Mass/volume]",
+      "plausibleUnitConceptIds": [
+        8713,
+        8753
+      ],
+      "plausibleUnitConceptIdsThreshold": [
+        5
+      ],
+      "source": {
+        "id": "ohdsi-dqd-cdm54-concept-level",
+        "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+        "lane": "plausibilityRanges",
+        "license": "Apache-2.0"
+      }
+    }
+  ]
+}

@@ -9,7 +9,7 @@ export function OcularRecordsPanel({
     (record) =>
       !['prescription', 'refraction', 'visualAcuity', 'iop'].includes(
         record.kind,
-      ),
+      ) && record.kind !== 'checkup',
   );
 
   return (

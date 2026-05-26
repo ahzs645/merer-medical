@@ -131,6 +131,7 @@ function inferKind(
   }
   if (resourceType === 'condition') return 'diagnosis';
   if (resourceType === 'procedure') return 'procedure';
+  if (resourceType === 'encounter') return 'checkup';
   if (resourceType === 'diagnosticreport') return 'report';
   if (
     normalized.includes('frame') ||

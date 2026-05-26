@@ -1,0 +1,46 @@
+{
+  "generatedAt": "2026-05-26T19:37:28.487Z",
+  "purpose": "Non-clinical lab support data. Plausibility checks and terminology metadata must stay separate from clinical reference intervals.",
+  "sources": [
+    {
+      "id": "ohdsi-dqd-cdm54-concept-level",
+      "lane": "plausibilityRanges",
+      "parser": "ohdsiDqdConceptLevel",
+      "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
+      "license": "Apache-2.0",
+      "caveat": "Plausibility and data-quality thresholds only. Do not use as clinical reference intervals.",
+      "status": "parsed",
+      "counts": {
+        "rows": 527,
+        "measurementThresholds": 181,
+        "withValueLow": 0,
+        "withValueHigh": 0,
+        "withUnitConstraints": 181
+      },
+      "notes": [
+        "Filtered to OMOP MEASUREMENT rows with plausibility constraints."
+      ]
+    },
+    {
+      "id": "ahrq-appendix-o-lab-ranges",
+      "lane": "plausibilityRanges",
+      "parser": "ahrqAppendixO",
+      "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+      "license": "US government source; confirm downstream reuse terms before runtime packaging.",
+      "caveat": "Administrative database range checks and LOINC mappings, not patient-specific normal ranges.",
+      "status": "parsed",
+      "counts": {
+        "loincMappings": 58,
+        "rangeChecks": 27
+      },
+      "notes": [
+        "PDF text was extracted with pdftotext -layout.",
+        "Range checks are administrative absolute/relative bounds, not clinical normals."
+      ]
+    }
+  ],
+  "outputs": [
+    "data/lab-reference-imports/plausibilityRanges/ohdsi-dqd-cdm54.json",
+    "data/lab-reference-imports/plausibilityRanges/ahrq-appendix-o-range-checks.json"
+  ]
+}

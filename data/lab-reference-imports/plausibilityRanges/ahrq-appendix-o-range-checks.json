@@ -1,0 +1,392 @@
+{
+  "generatedAt": "2026-05-26T19:37:28.494Z",
+  "kind": "plausibilityRanges",
+  "source": {
+    "id": "ahrq-appendix-o-lab-ranges",
+    "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+    "lane": "plausibilityRanges",
+    "license": "US government source; confirm downstream reuse terms before runtime packaging."
+  },
+  "caveat": "Administrative database range checks and LOINC mappings, not patient-specific normal ranges.",
+  "rangeChecks": [
+    {
+      "testName": "AST",
+      "unit": "U/L",
+      "absoluteHigh": 20000,
+      "relativeHigh": 2000,
+      "rawLabel": "AST (U/L)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Albumin",
+      "unit": "gm/dl",
+      "absoluteLow": 0.5,
+      "absoluteHigh": 12,
+      "relativeLow": 1,
+      "relativeHigh": 6,
+      "rawLabel": "Albumin (gm/dl)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Alk Phosphatase",
+      "unit": "U/L",
+      "absoluteHigh": 5000,
+      "relativeHigh": 2000,
+      "rawLabel": "Alk Phosphatase (U/L)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Amylase",
+      "unit": "U/L",
+      "absoluteHigh": 20000,
+      "relativeHigh": 2000,
+      "rawLabel": "Amylase (U/L)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Bilirubin",
+      "unit": "total",
+      "absoluteHigh": 80,
+      "relativeHigh": 40,
+      "rawLabel": "Bilirubin (total) [mg/dl]",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "BUN (mg/dl",
+      "absoluteHigh": 500,
+      "relativeHigh": 250,
+      "rawLabel": "BUN (mg/dl",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Calcium",
+      "unit": "mg/dl",
+      "absoluteLow": 5,
+      "absoluteHigh": 20,
+      "relativeLow": 7,
+      "relativeHigh": 14,
+      "rawLabel": "Calcium (mg/dl)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "CPK",
+      "unit": "U/L",
+      "absoluteHigh": 50000,
+      "relativeHigh": 5000,
+      "rawLabel": "CPK (U/L)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "CPK-MB",
+      "unit": "ng/ml",
+      "absoluteHigh": 5000,
+      "relativeHigh": 500,
+      "rawLabel": "CPK-MB (ng/ml)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Creatinine",
+      "unit": "mg/dl",
+      "absoluteHigh": 50,
+      "relativeLow": 0.5,
+      "relativeHigh": 25,
+      "rawLabel": "Creatinine (mg/dl)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Glucose",
+      "unit": "mg/dl",
+      "absoluteLow": 10,
+      "absoluteHigh": 2500,
+      "relativeLow": 30,
+      "relativeHigh": 1000,
+      "rawLabel": "Glucose (mg/dl)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "LDH",
+      "unit": "U/L",
+      "absoluteHigh": 10000,
+      "relativeHigh": 2000,
+      "rawLabel": "LDH (U/L)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Potassium",
+      "unit": "meq/L",
+      "absoluteLow": 1,
+      "absoluteHigh": 9,
+      "relativeLow": 2,
+      "relativeHigh": 7,
+      "rawLabel": "Potassium (meq/L)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Sodium",
+      "unit": "meq/L",
+      "absoluteLow": 100,
+      "absoluteHigh": 200,
+      "relativeLow": 110,
+      "relativeHigh": 175,
+      "rawLabel": "Sodium (meq/L)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Troponin I",
+      "unit": "ng/ml",
+      "absoluteHigh": 50,
+      "relativeHigh": 20,
+      "rawLabel": "Troponin I (ng/ml)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "O2 Saturation",
+      "unit": "%",
+      "absoluteLow": 30,
+      "absoluteHigh": 100,
+      "relativeLow": 50,
+      "relativeHigh": 100,
+      "rawLabel": "O2 Saturation (%)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "pCO2",
+      "unit": "mm Hg",
+      "absoluteLow": 10,
+      "absoluteHigh": 100,
+      "relativeLow": 20,
+      "relativeHigh": 70,
+      "rawLabel": "pCO2 (mm Hg)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "pH",
+      "absoluteLow": 6.7,
+      "absoluteHigh": 7.9,
+      "relativeLow": 7.1,
+      "relativeHigh": 7.7,
+      "rawLabel": "pH",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "pO2",
+      "unit": "mmHg",
+      "absoluteLow": 20,
+      "absoluteHigh": 1000,
+      "relativeLow": 30,
+      "relativeHigh": 600,
+      "rawLabel": "pO2 (mmHg)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Base Excess",
+      "absoluteLow": -50,
+      "absoluteHigh": 50,
+      "relativeLow": -30,
+      "relativeHigh": 30,
+      "rawLabel": "Base Excess",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "FIO2",
+      "absoluteLow": 20,
+      "absoluteHigh": 100,
+      "relativeLow": 20,
+      "relativeHigh": 100,
+      "rawLabel": "FIO2",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Hemoglobin",
+      "unit": "gm/dl",
+      "absoluteLow": 1,
+      "absoluteHigh": 25,
+      "relativeLow": 5,
+      "relativeHigh": 20,
+      "rawLabel": "Hemoglobin (gm/dl)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "INR",
+      "absoluteLow": 0.5,
+      "absoluteHigh": 20,
+      "relativeLow": 0.8,
+      "relativeHigh": 10,
+      "rawLabel": "INR",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "PTT",
+      "unit": "sec",
+      "absoluteLow": 10,
+      "absoluteHigh": 150,
+      "relativeLow": 20,
+      "relativeHigh": 100,
+      "rawLabel": "PTT (sec)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Platelet Count",
+      "unit": "cells/ul",
+      "absoluteHigh": 2000000,
+      "relativeLow": 10000,
+      "relativeHigh": 1000000,
+      "rawLabel": "Platelet Count (cells/ul)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "Prothrombin Time",
+      "unit": "sec",
+      "absoluteLow": 5,
+      "absoluteHigh": 200,
+      "relativeLow": 8,
+      "relativeHigh": 100,
+      "rawLabel": "Prothrombin Time (sec)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testName": "WBC",
+      "unit": "cells/ul",
+      "absoluteHigh": 500000,
+      "relativeLow": 1000,
+      "relativeHigh": 100000,
+      "rawLabel": "WBC (cells/ul)",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    }
+  ]
+}

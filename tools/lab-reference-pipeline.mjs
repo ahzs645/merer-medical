@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 
 import { createHash } from 'node:crypto';
+import { execFile } from 'node:child_process';
 import { promises as fs } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
+import { promisify } from 'node:util';
+
+const execFileAsync = promisify(execFile);
 
 const repoRoot = resolve(dirname(new URL(import.meta.url).pathname), '..');
 const sourceDir = join(repoRoot, 'data', 'lab-reference-sources');
@@ -29,6 +34,76 @@ const sources = [
     url: 'https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem',
   },
   {
+    id: 'aacb-tate-2014-common-reference-intervals',
+    kind: 'clinical-reference',
+    parser: 'aacbTate2014Chemistry',
+    country: 'australian',
+    category: 'chemistry',
+    licenseRisk: 'open-repository-review-before-runtime',
+    fileType: 'pdf',
+    url: 'https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download',
+  },
+  {
+    id: 'nz-chl-general-chemistry',
+    kind: 'clinical-reference',
+    parser: 'nzChlGeneralChemistry',
+    country: 'australian',
+    category: 'chemistry',
+    licenseRisk: 'curated-citation',
+    fileType: 'pdf',
+    url: 'https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf',
+  },
+  {
+    id: 'nz-awanui-auckland-biochemistry',
+    kind: 'clinical-reference',
+    parser: 'nzAwanuiAucklandBiochemistry',
+    country: 'australian',
+    category: 'chemistry',
+    licenseRisk: 'curated-citation',
+    fileType: 'pdf',
+    url: 'https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf',
+  },
+  {
+    id: 'nz-awanui-auckland-haematology',
+    kind: 'clinical-reference',
+    parser: 'nzAwanuiAucklandHaematology',
+    country: 'australian',
+    category: 'hematology',
+    licenseRisk: 'curated-citation',
+    fileType: 'pdf',
+    url: 'https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/03/Haem-Ref-Int-HAE-F012.pdf',
+  },
+  {
+    id: 'aus-monash-reference-master-list',
+    kind: 'clinical-reference',
+    parser: 'ausMonashReferenceMasterList',
+    country: 'australian',
+    category: 'chemistry',
+    licenseRisk: 'curated-citation',
+    fileType: 'pdf',
+    url: 'https://monashpathology.org/wp-content/uploads/2024/08/WIN-QS-19.pdf',
+  },
+  {
+    id: 'aus-pathwest-blood-gas',
+    kind: 'clinical-reference',
+    parser: 'ausPathwestBloodGas',
+    country: 'australian',
+    category: 'chemistry',
+    licenseRisk: 'curated-citation',
+    fileType: 'pdf',
+    url: 'https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf',
+  },
+  {
+    id: 'aus-pathwest-istat-poct',
+    kind: 'clinical-reference',
+    parser: 'profileOnly',
+    country: 'australian',
+    category: 'chemistry',
+    licenseRisk: 'curated-citation-source-text-not-extractable',
+    fileType: 'pdf',
+    url: 'https://www.pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/i-STAT-Point-of-Care-Testing-Reference-Intervals.pdf',
+  },
+  {
     id: 'uk-worcs-full-blood-count',
     kind: 'clinical-reference',
     parser: 'ukWorcsFbc',
@@ -36,6 +111,37 @@ const sources = [
     category: 'hematology',
     licenseRisk: 'curated-citation',
     url: 'https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/',
+  },
+  {
+    id: 'uk-synnovis-chemistry-reference-intervals',
+    kind: 'clinical-reference',
+    parser: 'ukSynnovisChemistry',
+    country: 'uk',
+    category: 'chemistry',
+    licenseRisk: 'curated-citation',
+    fileType: 'pdf',
+    title: 'Synnovis Chemistry Reference Intervals',
+    url: 'https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf',
+  },
+  {
+    id: 'uk-mft-blood-counts-reference-ranges',
+    kind: 'clinical-reference',
+    parser: 'ukMftBloodCounts',
+    country: 'uk',
+    category: 'hematology',
+    licenseRisk: 'curated-citation',
+    fileType: 'pdf',
+    title: 'Manchester University NHS Foundation Trust Blood Counts Reference Ranges',
+    url: 'https://mft.nhs.uk/app/uploads/2024/07/Blood-counts-reference-ranges.pdf',
+  },
+  {
+    id: 'uk-uhd-haematology-reference-ranges',
+    kind: 'clinical-reference',
+    parser: 'ukUhdHaematology',
+    country: 'uk',
+    category: 'hematology',
+    licenseRisk: 'curated-citation',
+    url: 'https://www.uhd.nhs.uk/directory/name/187-services/joint-service/pathology/haematology-medical-pathology/2389-test-repertoire-and-reference-ranges',
   },
   {
     id: 'uk-glos-sodium',
@@ -81,6 +187,53 @@ const sources = [
     category: 'chemistry',
     licenseRisk: 'curated-citation',
     url: 'https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/thyroid-function-tests-tsh-ft4-ft3/',
+  },
+  {
+    id: 'ca-shared-health-manitoba-hba1c',
+    kind: 'clinical-reference',
+    parser: 'caSharedHealthHba1c',
+    country: 'canadian',
+    category: 'chemistry',
+    licenseRisk: 'copyrighted-review-only',
+    url: 'https://apps.sbgh.mb.ca/labmanual/test/view?seedId=122',
+  },
+  {
+    id: 'ca-shared-health-manitoba-hdl',
+    kind: 'clinical-reference',
+    parser: 'caSharedHealthHdl',
+    country: 'canadian',
+    category: 'lipids',
+    licenseRisk: 'copyrighted-review-only',
+    url: 'https://apps.sbgh.mb.ca/labmanual/test/view?seedId=1401',
+  },
+  {
+    id: 'ca-lhsc-reference-ranges',
+    kind: 'clinical-reference',
+    parser: 'caLhscReferenceRanges',
+    country: 'canadian',
+    category: 'chemistry',
+    licenseRisk: 'copyrighted-review-only',
+    url: 'https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges',
+  },
+  {
+    id: 'ca-northern-health-test-directory',
+    kind: 'clinical-reference',
+    parser: 'caNorthernHealthDirectory',
+    country: 'canadian',
+    category: 'chemistry',
+    licenseRisk: 'copyrighted-review-only',
+    fileType: 'pdf',
+    url: 'https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf',
+  },
+  {
+    id: 'ca-northern-health-test-directory-hematology',
+    kind: 'clinical-reference',
+    parser: 'caNorthernHealthHematology',
+    country: 'canadian',
+    category: 'hematology',
+    licenseRisk: 'copyrighted-review-only',
+    fileType: 'pdf',
+    url: 'https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf',
   },
   {
     id: 'caliper-database',
@@ -185,18 +338,18 @@ async function fetchSource(source) {
     throw new Error(`${source.id} fetch failed: ${response.status}`);
   }
 
-  const text = await response.text();
+  const buffer = Buffer.from(await response.arrayBuffer());
   const path = sourcePath(source);
   const metadataPath = sourceMetadataPath(source);
-  await fs.writeFile(path, text);
+  await fs.writeFile(path, buffer);
   await fs.writeFile(
     metadataPath,
     `${JSON.stringify(
       {
         ...source,
         fetchedAt: new Date().toISOString(),
-        bytes: Buffer.byteLength(text),
-        sha256: sha256(text),
+        bytes: buffer.byteLength,
+        sha256: sha256(buffer),
         contentType: response.headers.get('content-type'),
       },
       null,
@@ -216,13 +369,17 @@ async function analyzeSources(picked) {
   };
 
   for (const source of picked) {
-    const html = await ensureSourceHtml(source);
-    const text = htmlToText(html);
+    const sourceText = await ensureSourceText(source);
+    const text =
+      source.fileType === 'pdf' ? sourceText : htmlToText(sourceText);
     const profile = {
       ...source,
-      bytes: Buffer.byteLength(html),
-      sha256: sha256(html),
-      title: extractTitle(html),
+      bytes: Buffer.byteLength(sourceText),
+      sha256: sha256(sourceText),
+      title:
+        source.fileType === 'pdf'
+          ? source.title || source.id
+          : extractTitle(sourceText),
       textBytes: Buffer.byteLength(text),
     };
 
@@ -247,12 +404,14 @@ async function analyzeSources(picked) {
   return analysis;
 }
 
-async function ensureSourceHtml(source) {
+async function ensureSourceText(source) {
   const path = sourcePath(source);
   try {
+    if (source.fileType === 'pdf') return extractPdfText(path);
     return await fs.readFile(path, 'utf8');
   } catch {
     await fetchSource(source);
+    if (source.fileType === 'pdf') return extractPdfText(path);
     return fs.readFile(path, 'utf8');
   }
 }
@@ -260,8 +419,50 @@ async function ensureSourceHtml(source) {
 function parseSource(source, text) {
   if (source.parser === 'rcpaChemistry') return parseRcpaChemistry(text);
   if (source.parser === 'ukWorcsFbc') return parseUkWorcsFbc(text);
+  if (source.parser === 'ukSynnovisChemistry') {
+    return parseCuratedSource({
+      text,
+      definitions: ukSynnovisChemistryDefinitions,
+      expectedTerms: ['Albumin', 'Creatinine', 'Sodium', 'T4, Free'],
+      parser: source.parser,
+      sourceName: 'Synnovis chemistry',
+    });
+  }
+  if (source.parser === 'ukMftBloodCounts') {
+    return parseCuratedSource({
+      text,
+      definitions: ukMftBloodCountsDefinitions,
+      expectedTerms: ['Blood Counts', 'RBC', 'Plats', 'Erythrocyte Sedimentation Rate'],
+      parser: source.parser,
+      sourceName: 'MFT blood counts',
+    });
+  }
+  if (source.parser === 'ukUhdHaematology') {
+    return parseCuratedSource({
+      text,
+      definitions: ukUhdHaematologyDefinitions,
+      expectedTerms: ['Adult FBC Reference Ranges', 'Paediatric Reference Ranges', 'ESR Reference ranges'],
+      parser: source.parser,
+      sourceName: 'UHD haematology',
+    });
+  }
   if (source.parser === 'ukGlosChemistry') {
     return parseUkGlosChemistry(source.id, text);
+  }
+  if (source.parser === 'caSharedHealthHba1c') {
+    return parseCaSharedHealthHba1c(text);
+  }
+  if (source.parser === 'caSharedHealthHdl') {
+    return parseCaSharedHealthHdl(text);
+  }
+  if (source.parser === 'caLhscReferenceRanges') {
+    return parseCaLhscReferenceRanges(text);
+  }
+  if (source.parser === 'caNorthernHealthDirectory') {
+    return parseCaNorthernHealthDirectory(text);
+  }
+  if (source.parser === 'caNorthernHealthHematology') {
+    return parseCaNorthernHealthHematology(text);
   }
   return {
     status: 'profile-only',
@@ -562,6 +763,30 @@ function parseUkGlosChemistry(sourceId, text) {
   };
 }
 
+function parseCuratedSource({
+  text,
+  definitions,
+  expectedTerms,
+  parser,
+  sourceName,
+}) {
+  const normalizedText = text.toLowerCase();
+  const found = expectedTerms.filter((term) =>
+    normalizedText.includes(term.toLowerCase()),
+  );
+  return {
+    status:
+      definitions.length > 0 && found.length >= Math.min(2, expectedTerms.length)
+        ? 'curated-candidate-json'
+        : 'source-shape-changed',
+    definitions,
+    notes: [
+      `Found ${found.length}/${expectedTerms.length} expected ${sourceName} terms.`,
+      `${sourceName} definitions are curated from the source document and must be reviewed before promotion.`,
+    ],
+  };
+}
+
 function extractAnalyteSegment(
   text,
   header,
@@ -613,15 +838,28 @@ function labelForAgeBand(ageMin, ageMax, sex) {
 }
 
 function sourcePath(source) {
-  return join(sourceDir, `${source.id}.html`);
+  return join(sourceDir, `${source.id}.${source.fileType || 'html'}`);
 }
 
 function sourceMetadataPath(source) {
   return join(sourceDir, `${source.id}.metadata.json`);
 }
 
-function sha256(text) {
-  return createHash('sha256').update(text).digest('hex');
+function sha256(value) {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+async function extractPdfText(path) {
+  const dir = await fs.mkdtemp(join(tmpdir(), 'mere-lab-pdf-'));
+  const output = join(dir, 'source.txt');
+  try {
+    await execFileAsync('pdftotext', [path, output], {
+      maxBuffer: 25 * 1024 * 1024,
+    });
+    return await fs.readFile(output, 'utf8');
+  } finally {
+    await fs.rm(dir, { force: true, recursive: true });
+  }
 }
 
 function htmlToText(html) {

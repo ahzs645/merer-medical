@@ -3,6 +3,7 @@ import { EyeImagingPanel } from './components/EyeImagingPanel';
 import { EyeMetricsPanel } from './components/EyeMetricsPanel';
 import { EyePrescriptionPanel } from './components/EyePrescriptionPanel';
 import { OcularRecordsPanel } from './components/OcularRecordsPanel';
+import { OptometryCheckupHistoryPanel } from './components/OptometryCheckupHistoryPanel';
 import { OptometryFieldModelPanel } from './components/OptometryFieldModelPanel';
 import { OptometryHeader } from './components/OptometryHeader';
 import { OptometrySummaryPanel } from './components/OptometrySummaryPanel';
@@ -28,6 +29,7 @@ export function OptometryTab() {
             <EyePrescriptionPanel records={records} />
             <EyeMetricsPanel records={records} />
           </div>
+          <OptometryCheckupHistoryPanel records={records} />
           <div className="grid gap-4 xl:grid-cols-2">
             <OcularRecordsPanel records={records} />
             <EyeImagingPanel items={imaging} />

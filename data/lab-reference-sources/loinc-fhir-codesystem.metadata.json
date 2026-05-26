@@ -1,0 +1,14 @@
+{
+  "id": "loinc-fhir-codesystem",
+  "lane": "loincMetadata",
+  "parser": "loincFhirCodeSystem",
+  "url": "https://raw.githubusercontent.com/loinc/loinc-fhir-codesystem/master/loinc.xml",
+  "extension": "xml",
+  "license": "LOINC license",
+  "caveat": "Lightweight CodeSystem metadata only. It does not include the full LOINC term release.",
+  "contentType": "text/plain; charset=utf-8",
+  "fetchedUrl": "https://raw.githubusercontent.com/loinc/loinc-fhir-codesystem/master/loinc.xml",
+  "fetchedAt": "2026-05-26T19:37:26.581Z",
+  "bytes": 34254,
+  "sha256": "7365fba162ec1f1bc78a3f5abd758a9fb3d5efba496c762d252be775d6bc6e52"
+}

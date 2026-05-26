@@ -1,0 +1,709 @@
+{
+  "generatedAt": "2026-05-26T19:37:28.494Z",
+  "kind": "loincMetadata",
+  "source": {
+    "id": "ahrq-appendix-o-lab-ranges",
+    "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+    "lane": "plausibilityRanges",
+    "license": "US government source; confirm downstream reuse terms before runtime packaging."
+  },
+  "caveat": "Administrative database range checks and LOINC mappings, not patient-specific normal ranges.",
+  "loincMappings": [
+    {
+      "testNumber": "1",
+      "loinc": "1751-7",
+      "rawLabel": "Albumin Serum / Plasma g/dL",
+      "loincName": "Albumin SerPl-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "2",
+      "loinc": "6768-6",
+      "rawLabel": "Serum / Plasma U/L",
+      "loincName": "ALP SerPl-cCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "2A",
+      "loinc": "1783-0",
+      "rawLabel": "Whole Blood U/L",
+      "loincName": "ALP Bld-cCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "3",
+      "loinc": "1798-8",
+      "rawLabel": "Amylase Serum / Plasma U/L",
+      "loincName": "Amylase SerPl-cCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "4",
+      "loinc": "1920-8",
+      "rawLabel": "AST (SGOT) Serum / Plasma U/L",
+      "loincName": "AST SerPl-cCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "5",
+      "loinc": "1922-4",
+      "rawLabel": "Base Units Deficit Whole Blood mEq/L",
+      "loincName": "Base Deficit BldA-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "5A",
+      "loinc": "1925-7",
+      "rawLabel": "Base Units Excess Whole Blood mEq/L",
+      "loincName": "Base Excess BldA-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "6",
+      "loinc": "1963-8",
+      "rawLabel": "Bicarbonate Serum mEq/L = mmol/L",
+      "loincName": "HCO3 Ser-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "6A",
+      "loinc": "1962-0",
+      "rawLabel": "Bicarbonate Plasma mEq/L = mmol/L",
+      "loincName": "HCO3 Plas-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "6B",
+      "loinc": "1960-4",
+      "rawLabel": "Bicarbonate mEq/L = mmol/L",
+      "loincName": "HCO3 BldA-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "6C",
+      "loinc": "1959-6",
+      "rawLabel": "Bicarbonate Whole Blood mEq/L = mmol/L",
+      "loincName": "HCO3 Bld-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "7",
+      "loinc": "1975-2",
+      "rawLabel": "Bilirubin Total Serum / Plasma mg/dL",
+      "loincName": "Bilirub SerPl-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "7A",
+      "loinc": "14631-6",
+      "rawLabel": "Bilirubin Total Serum / Plasma umol/L",
+      "loincName": "Bilirub SerPl-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "8",
+      "loinc": "17861-6",
+      "rawLabel": "Calcium Serum / Plasma mg/dL",
+      "loincName": "Calcium SerPl-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "8A",
+      "loinc": "2000-8",
+      "rawLabel": "Calcium Serum / Plasma mEq/L, mmol/L",
+      "loincName": "Calcium SerPl-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "8B",
+      "loinc": "49765-1",
+      "rawLabel": "Calcium Whole Blood mg/dL",
+      "loincName": "Calcium Bld-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "8C",
+      "loinc": "1996-8",
+      "rawLabel": "Calcium Whole Blood mEq/L, mmol/L",
+      "loincName": "Calcium Bld-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "9",
+      "loinc": "2157-6",
+      "rawLabel": "Serum / Plasma U/L",
+      "loincName": "CK SerPl-cCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "10",
+      "loinc": "13969-1",
+      "rawLabel": "Creatine Kinase MB Serum / Plasma ng/mL",
+      "loincName": "CK MB SerPl-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "10A",
+      "loinc": "32673-6",
+      "rawLabel": "Creatine Kinase MB Serum / Plasma U/L",
+      "loincName": "CK MB SerPl-cCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "10B",
+      "loinc": "49551-5",
+      "rawLabel": "Creatine Kinase MB Whole Blood ng/mL",
+      "loincName": "CK MB Bld-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "10C",
+      "loinc": "50757-4",
+      "rawLabel": "Creatine Kinase MB Whole Blood ratio",
+      "loincName": "CK MB Bld-cCrto",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "11",
+      "loinc": "2160-0",
+      "rawLabel": "Creatinine Serum Serum / Plasma mg/dL",
+      "loincName": "Creat SerPl-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "11A",
+      "loinc": "14682-9",
+      "rawLabel": "Creatinine Serum Serum / Plasma umol/L",
+      "loincName": "Creat SerPl-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "12",
+      "loinc": "2345-7",
+      "rawLabel": "Glucose Serum / Plasma mg/dL",
+      "loincName": "Glucose SerPl-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "12A",
+      "loinc": "14749-6",
+      "rawLabel": "Glucose Serum / Plasma mmol/L",
+      "loincName": "Glucose SerPl-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "12B",
+      "loinc": "1558-6",
+      "rawLabel": "Glucose Serum / Plasma mg/dL",
+      "loincName": "Glucose p fast SerPl-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "12C",
+      "loinc": "14771-0",
+      "rawLabel": "Glucose Serum / Plasma mmol/L",
+      "loincName": "Glucose p fast SerPl-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "12D",
+      "loinc": "2339-0",
+      "rawLabel": "Glucose Whole Blood mg/dL",
+      "loincName": "Glucose Bld-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "12E",
+      "loinc": "15074-8",
+      "rawLabel": "Glucose Whole Blood mmol/L",
+      "loincName": "Glucose Bld-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "12F",
+      "loinc": "32016-8",
+      "rawLabel": "Glucose Capillary Blood mg/dL",
+      "loincName": "Glucose BldC-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "12G",
+      "loinc": "1556-0",
+      "rawLabel": "Glucose Capillary Blood mg/dL",
+      "loincName": "Glucose p fast BldC-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "13",
+      "loinc": "718-7",
+      "rawLabel": "Hemoglobin Whole Blood g/dL",
+      "loincName": "Hgb Bld-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "13A",
+      "loinc": "30352-9",
+      "rawLabel": "Hemoglobin Capillary Blood g/dL",
+      "loincName": "Hgb BldC-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "14",
+      "loinc": "3150-0",
+      "rawLabel": "Inhaled oxygen n/a %",
+      "loincName": "Inhaled O2 % Qn with pO2 & with",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "14A",
+      "loinc": "3151-8",
+      "rawLabel": "Inhaled oxygen n/a L/min",
+      "loincName": "Inhaled O2 rate",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "15",
+      "loinc": "6301-6",
+      "rawLabel": "INR ratio",
+      "loincName": "INR PPP Qn",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "15A",
+      "loinc": "5902-2",
+      "rawLabel": "Prothrombin Time sec",
+      "loincName": "PT PPP Qn",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "16",
+      "loinc": "2532-0",
+      "rawLabel": "Dehydrogenase Serum / Plasma U/L",
+      "loincName": "LDH SerPl-cCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "17",
+      "loinc": "14979-9",
+      "rawLabel": "Thromboplastin sec",
+      "loincName": "aPTT PPP Qn",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "18",
+      "loinc": "2019-8",
+      "rawLabel": "pCO2 Arterial Arterial Blood mmHg",
+      "loincName": "pCO2 BldA Qn",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "19",
+      "loinc": "2744-1",
+      "rawLabel": "pH Arterial Arterial Blood none",
+      "loincName": "pH BldA-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "20",
+      "loinc": "26515-7",
+      "rawLabel": "Platelet Count Whole Blood 10^9 cells/uL",
+      "loincName": "Platelet # Bld",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "20A",
+      "loinc": "778-1",
+      "rawLabel": "Platelet Count Whole Blood 10^9 cells/uL",
+      "loincName": "Platelet # Bld Manual",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "20B",
+      "loinc": "777-3",
+      "rawLabel": "Platelet Count Whole Blood 10^9 cells/uL",
+      "loincName": "Platelet # Bld Auto",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "21",
+      "loinc": "2703-7",
+      "rawLabel": "pO2 Arterial Arterial Blood mmHg",
+      "loincName": "pO2 BldA Qn FIO2",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "21A",
+      "loinc": "2708-6",
+      "rawLabel": "Arterial Blood %",
+      "loincName": "O2 % BldA FIO2",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "22",
+      "loinc": "2823-3",
+      "rawLabel": "Potassium Serum / Plasma mEq/L = mmol/L",
+      "loincName": "Potassium SerPl-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "22A",
+      "loinc": "6298-4",
+      "rawLabel": "Potassium Whole Blood mEq/L = mmol/L",
+      "loincName": "Potassium Bld-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "23",
+      "loinc": "2951-2",
+      "rawLabel": "Sodium Serum / Plasma mEq/L = mmol/L",
+      "loincName": "Sodium SerPl-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "23A",
+      "loinc": "2947-0",
+      "rawLabel": "Sodium Whole Blood mEq/L = mmol/L",
+      "loincName": "Sodium Bld-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "24",
+      "loinc": "10839-9",
+      "rawLabel": "Troponin I Serum / Plasma ng/ml = ug/L",
+      "loincName": "Troponin I SerPl-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "25A",
+      "loinc": "42757-5",
+      "rawLabel": "Troponin I Whole Blood ng/ml = ug/L",
+      "loincName": "Troponin I Bld-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "25",
+      "loinc": "3094-0",
+      "rawLabel": "Serum / Plasma mg/dL",
+      "loincName": "BUN SerPl-mCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "25A",
+      "loinc": "14937-7",
+      "rawLabel": "Serum / Plasma mmol/L",
+      "loincName": "BUN SerPl-sCnc",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "26",
+      "loinc": "26464-8",
+      "rawLabel": "White Blood Count Whole Blood 10^9 cells/uL",
+      "loincName": "WBC # Bld",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "26A",
+      "loinc": "804-5",
+      "rawLabel": "White Blood Count Whole Blood 10^9 cells/uL",
+      "loincName": "WBC # Bld Manual",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    },
+    {
+      "testNumber": "26B",
+      "loinc": "6690-2",
+      "rawLabel": "White Blood Count Whole Blood 10^9 cells/uL",
+      "loincName": "WBC # Bld Auto",
+      "source": {
+        "id": "ahrq-appendix-o-lab-ranges",
+        "url": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
+        "lane": "plausibilityRanges",
+        "license": "US government source; confirm downstream reuse terms before runtime packaging."
+      }
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "generatedAt": "2026-05-26T19:37:28.487Z",
+  "purpose": "Non-clinical lab support data. Plausibility checks and terminology metadata must stay separate from clinical reference intervals.",
+  "sources": [
+    {
+      "id": "loinc-fhir-codesystem",
+      "lane": "loincMetadata",
+      "parser": "loincFhirCodeSystem",
+      "url": "https://raw.githubusercontent.com/loinc/loinc-fhir-codesystem/master/loinc.xml",
+      "license": "LOINC license",
+      "caveat": "Lightweight CodeSystem metadata only. It does not include the full LOINC term release.",
+      "status": "profiled",
+      "counts": {
+        "filters": 3,
+        "properties": 85,
+        "concepts": 0
+      },
+      "notes": [
+        "This CodeSystem file describes LOINC metadata fields and filters; it does not contain full LOINC terms."
+      ]
+    },
+    {
+      "id": "elapro-core-labs",
+      "lane": "loincMetadata",
+      "parser": "elaproCoreLabs",
+      "url": "https://api.figshare.com/v2/articles/19767803",
+      "license": "CC BY 4.0 / CC0 per source metadata; verify before app redistribution.",
+      "caveat": "LOINC-mapped eligibility-screening lab procedure metadata, not clinical normal ranges.",
+      "status": "parsed",
+      "counts": {
+        "terms": 295,
+        "primaryLoincGroups": 58,
+        "distinctSecondaryLoinc": 289
+      },
+      "notes": [
+        "Reduced to fields useful for search, aliases, units, and LOINC mapping.",
+        "No reference intervals are imported from ELaPro."
+      ]
+    }
+  ],
+  "outputs": [
+    "data/lab-reference-imports/loincMetadata/ahrq-appendix-o-loinc-mappings.json",
+    "data/lab-reference-imports/loincMetadata/loinc-fhir-codesystem.json",
+    "data/lab-reference-imports/loincMetadata/elapro-core-labs.json"
+  ]
+}

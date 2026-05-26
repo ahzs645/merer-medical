@@ -1,0 +1,203 @@
+                                                                                                  Appendix O-1
+
+     LOINC CODES FOR LABORATORY DATA IN ENHANCED ADMINISTRATIVE
+                             DATABASE
+Test    Laboratory Test                                       LOINC
+                            Specimen Type        Units                        LOINC Name              Comments
+ #          Name                                               Code
+ 1     Albumin              Serum / Plasma        g/dL        1751-7      Albumin SerPl-mCnc
+       Alkaline
+ 2                          Serum / Plasma        U/L         6768-6         ALP SerPl-cCnc
+       Phosphatase
+       Alkaline
+2A                           Whole Blood          U/L         1783-0          ALP Bld-cCnc
+       Phosphatase
+ 3     Amylase              Serum / Plasma        U/L         1798-8      Amylase SerPl-cCnc
+
+ 4     AST (SGOT)           Serum / Plasma        U/L         1920-8        AST SerPl-cCnc
+
+ 5     Base Units Deficit    Whole Blood         mEq/L        1922-4     Base Deficit BldA-sCnc
+
+5A     Base Units Excess     Whole Blood         mEq/L        1925-7     Base Excess BldA-sCnc
+
+ 6     Bicarbonate              Serum        mEq/L = mmol/L   1963-8         HCO3 Ser-sCnc
+
+6A     Bicarbonate             Plasma        mEq/L = mmol/L   1962-0        HCO3 Plas-sCnc
+                            Arterial Whole
+6B     Bicarbonate                           mEq/L = mmol/L   1960-4        HCO3 BldA-sCnc
+                                Blood
+                                                                                                      If Venous or
+6C     Bicarbonate           Whole Blood     mEq/L = mmol/L   1959-6         HCO3 Bld-sCnc
+                                                                                                      Unspecified
+ 7     Bilirubin Total      Serum / Plasma       mg/dL        1975-2       Bilirub SerPl-mCnc
+
+7A     Bilirubin Total      Serum / Plasma       umol/L       14631-6       Bilirub SerPl-sCnc
+
+ 8     Calcium              Serum / Plasma       mg/dL        17861-6     Calcium SerPl-mCnc
+
+8A     Calcium              Serum / Plasma   mEq/L, mmol/L    2000-8       Calcium SerPl-sCnc
+
+8B           Calcium         Whole Blood         mg/dL        49765-1      Calcium Bld-mCnc
+
+8C     Calcium               Whole Blood     mEq/L, mmol/L    1996-8        Calcium Bld-sCnc
+       Creatine Kinase
+ 9                          Serum / Plasma        U/L         2157-6         CK SerPl-cCnc
+       (CPK)
+10     Creatine Kinase MB   Serum / Plasma       ng/mL        13969-1      CK MB SerPl-mCnc
+
+10A    Creatine Kinase MB   Serum / Plasma        U/L         32673-6      CK MB SerPl-cCnc
+
+10B    Creatine Kinase MB    Whole Blood         ng/mL        49551-5       CK MB Bld-mCnc
+
+10C    Creatine Kinase MB    Whole Blood          ratio       50757-4       CK MB Bld-cCrto
+
+11     Creatinine Serum     Serum / Plasma       mg/dL        2160-0        Creat SerPl-mCnc
+
+11A    Creatinine Serum     Serum / Plasma       umol/L       14682-9       Creat SerPl-sCnc
+                                                                                                       Random
+12     Glucose              Serum / Plasma       mg/dL        2345-7      Glucose SerPl-mCnc
+                                                                                                       Sample
+                                                                                                       Random
+12A    Glucose              Serum / Plasma      mmol/L        14749-6      Glucose SerPl-sCnc
+                                                                                                       Sample
+                                                                                                       Fasting
+12B    Glucose              Serum / Plasma       mg/dL        1558-6    Glucose p fast SerPl-mCnc
+                                                                                                        Value
+
+          HANDOUT #5: LOINC Codes for Laboratory Data in Enhanced Administrative Database - 1
+                                                                                                 Appendix O-2
+Test   Laboratory Test                                       LOINC
+                          Specimen Type         Units                       LOINC Name                Comments
+ #     Name                                                   Code
+                                                                                                       Fasting
+12C    Glucose            Serum / Plasma       mmol/L        14771-0   Glucose p fast SerPl-sCnc
+                                                                                                        Value
+                                                                                                       Random
+12D    Glucose             Whole Blood          mg/dL        2339-0       Glucose Bld-mCnc
+                                                                                                       Sample
+                                                                                                       Random
+12E    Glucose             Whole Blood         mmol/L        15074-8      Glucose Bld-sCnc
+                                                                                                       Sample
+                                                                                                       Random
+12F    Glucose            Capillary Blood       mg/dL        32016-8     Glucose BldC-mCnc
+                                                                                                       Sample
+                                                                                                       Fasting
+12G    Glucose            Capillary Blood       mg/dL        1556-0    Glucose p fast BldC-mCnc
+                                                                                                        Value
+13     Hemoglobin          Whole Blood           g/dL         718-7         Hgb Bld-mCnc
+
+13A    Hemoglobin         Capillary Blood        g/dL        30352-9       Hgb BldC-mCnc
+                                                                                                   FIO2 Concurrent
+14     Inhaled oxygen           n/a               %          3150-0        Inhaled O2 % Qn         with pO2 & with
+                                                                                                       O2 Sat
+                                                                                                       O2 Rate
+                                                                                                   Concurrent with
+14A    Inhaled oxygen           n/a             L/min        3151-8         Inhaled O2 rate
+                                                                                                    pO2 & with O2
+                                                                                                         Sat
+                           Platelet Poor
+15     INR                                       ratio       6301-6          INR PPP Qn
+                              Plasma
+                           Platelet Poor
+15A    Prothrombin Time                          sec         5902-2           PT PPP Qn
+                              Plasma
+       Lactate
+16     Dehydrogenase      Serum / Plasma         U/L         2532-0        LDH SerPl-cCnc
+       (LDH)
+       Partial
+                           Platelet Poor
+17     Thromboplastin                            sec         14979-9        aPTT PPP Qn
+                              Plasma
+       Time (PTT)
+18     pCO2 Arterial       Arterial Blood       mmHg         2019-8         pCO2 BldA Qn
+
+19     pH Arterial         Arterial Blood        none        2744-1         pH BldA-sCnc
+                                                                                                    Specify Method
+20     Platelet Count      Whole Blood       10^9 cells/uL   26515-7         Platelet # Bld
+                                                                                                    When Available
+20A    Platelet Count      Whole Blood       10^9 cells/uL    778-1      Platelet # Bld Manual
+
+20B    Platelet Count      Whole Blood       10^9 cells/uL    777-3       Platelet # Bld Auto
+                                                                                                    With Concurrent
+21     pO2 Arterial        Arterial Blood       mmHg         2703-7          pO2 BldA Qn                 FIO2
+                                                                                                    When Available
+                                                                                                    With Concurrent
+       O2 Saturation
+21A                        Arterial Blood         %          2708-6           O2 % BldA                  FIO2
+       Arterial
+                                                                                                    When Available
+22     Potassium          Serum / Plasma    mEq/L = mmol/L   2823-3     Potassium SerPl-sCnc
+
+22A    Potassium           Whole Blood      mEq/L = mmol/L   6298-4      Potassium Bld-sCnc
+
+23     Sodium             Serum / Plasma    mEq/L = mmol/L   2951-2       Sodium SerPl-sCnc
+
+23A    Sodium              Whole Blood      mEq/L = mmol/L   2947-0        Sodium Bld-sCnc
+
+24     Troponin I         Serum / Plasma     ng/ml = ug/L    10839-9    Troponin I SerPl-mCnc
+
+
+
+
+          HANDOUT #5: LOINC Codes for Laboratory Data in Enhanced Administrative Database - 2
+                                                                                              Appendix O-3
+Test   Laboratory Test                                        LOINC
+                             Specimen Type       Units                     LOINC Name             Comments
+ #     Name                                                    Code
+25A    Troponin I             Whole Blood     ng/ml = ug/L    42757-5   Troponin I Bld-mCnc
+       Urea Nitrogen Blood
+25                           Serum / Plasma      mg/dL        3094-0     BUN SerPl-mCnc
+       (BUN)
+       Urea Nitrogen Blood
+25A                          Serum / Plasma     mmol/L        14937-7    BUN SerPl-sCnc
+       (BUN)
+                                                                                                 Specify Method
+26     White Blood Count      Whole Blood     10^9 cells/uL   26464-8       WBC # Bld
+                                                                                                 When Available
+26A    White Blood Count      Whole Blood     10^9 cells/uL    804-5    WBC # Bld Manual
+
+26B    White Blood Count      Whole Blood     10^9 cells/uL   6690-2      WBC # Bld Auto
+
+
+
+
+          HANDOUT #5: LOINC Codes for Laboratory Data in Enhanced Administrative Database - 3
+                                                                        Appendix O-4
+
+                    RANGE CHECKS FOR LABORATORY DATA
+                                     Absolute                      Relative
+      Test Name
+                            Lower Bound Upper Bound      Lower Bound Upper Bound
+AST (U/L)                       n/a           20,000           n/a           2,000
+Albumin (gm/dl)                 0.5              12             1               6
+Alk Phosphatase (U/L)           n/a            5,000          n/a            2,000
+Amylase (U/L)                   n/a           20,000          n/a            2,000
+Bilirubin (total) [mg/dl]       n/a              80           n/a              40
+BUN (mg/dl                      n/a             500           n/a             250
+Calcium (mg/dl)                  5               20             7              14
+CPK (U/L)                       n/a           50,000          n/a            5,000
+CPK-MB (ng/ml)                  n/a            5,000           n/a            500
+Creatinine (mg/dl)              n/a              50           0.5              25
+Glucose (mg/dl)                  10            2,500           30            1,000
+LDH (U/L)                       n/a           10,000           n/a           2,000
+Potassium (meq/L)                 1               9             2               7
+Sodium (meq/L)                  100             200           110             175
+Troponin I (ng/ml)              n/a              50           n/a              20
+O2 Saturation (%)              30%            100%           50%             100%
+pCO2 (mm Hg)                     10             100            20              70
+pH                             6.70             7.90          7.10            7.70
+pO2 (mmHg)                       20            1,000           30             600
+Base Excess                     -50              50           -30              30
+FIO2                           20%            100%           20%             100%
+Hemoglobin (gm/dl)                1              25             5              20
+INR                             0.5              20           0.8              10
+PTT (sec)                        10             150            20             100
+Platelet Count (cells/ul)       n/a         2,000,000       10,000         1,000,000
+Prothrombin Time (sec)            5             200             8             100
+WBC (cells/ul)                  n/a          500,000         1,000          100,000
+
+
+
+
+                     HANDOUT #9: Range Checks for Laboratory Data - 4
+

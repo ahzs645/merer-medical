@@ -10,6 +10,7 @@ export type OptometryRecordKind =
   | 'iop'
   | 'diagnosis'
   | 'procedure'
+  | 'checkup'
   | 'report'
   | 'retail'
   | 'admin';
