@@ -1,19 +1,14 @@
-[     483ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
-[     602ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
-[     612ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
-[     612ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
-[     823ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
-[   17825ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
-[   17890ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
-[   17895ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
-[   17895ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
-[   18087ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
-[  555955ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
-[  556067ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
-[  556080ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
-[  556081ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
-[  556297ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
-[  592491ms] Error: useUser must be used within a UserProvider
+[     238ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
+[     319ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
+[     326ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[     326ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[     489ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
+[   86277ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
+[   86342ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
+[   86347ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[   86347ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[   86844ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
+[  122819ms] Error: useUser must be used within a UserProvider
     at useUser (http://127.0.0.1:4200/src/app/providers/UserProvider.tsx:85:11)
     at TabWrapper (http://127.0.0.1:4200/src/shared/components/TabWrapper.tsx?t=1779820519261:22:16)
     at renderWithHooks (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:11596:26)
@@ -24,7 +19,7 @@
     at invokeGuardedCallback (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:3739:39)
     at beginWork$1 (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:19818:15)
     at performUnitOfWork (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:19251:20)
-[  592492ms] [ERROR] Error handled by React Router default ErrorBoundary: Error: useUser must be used within a UserProvider
+[  122820ms] [ERROR] Error handled by React Router default ErrorBoundary: Error: useUser must be used within a UserProvider
     at useUser (http://127.0.0.1:4200/src/app/providers/UserProvider.tsx:85:11)
     at TabWrapper (http://127.0.0.1:4200/src/shared/components/TabWrapper.tsx?t=1779820519261:22:16)
     at renderWithHooks (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:11596:26)
@@ -35,7 +30,7 @@
     at workLoopSync (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:19190:13)
     at renderRootSync (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:19169:15)
     at performSyncWorkOnRoot (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:18927:28) @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3059
-[  592494ms] Error: useUser must be used within a UserProvider
+[  122821ms] Error: useUser must be used within a UserProvider
     at useUser (http://127.0.0.1:4200/src/app/providers/UserProvider.tsx:85:11)
     at TabWrapper (http://127.0.0.1:4200/src/shared/components/TabWrapper.tsx?t=1779820519261:22:16)
     at renderWithHooks (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:11596:26)
@@ -46,7 +41,7 @@
     at invokeGuardedCallback (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:3739:39)
     at beginWork$1 (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:19818:15)
     at performUnitOfWork (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:19251:20)
-[  592494ms] [ERROR] Error handled by React Router default ErrorBoundary: Error: useUser must be used within a UserProvider
+[  122821ms] [ERROR] Error handled by React Router default ErrorBoundary: Error: useUser must be used within a UserProvider
     at useUser (http://127.0.0.1:4200/src/app/providers/UserProvider.tsx:85:11)
     at TabWrapper (http://127.0.0.1:4200/src/shared/components/TabWrapper.tsx?t=1779820519261:22:16)
     at renderWithHooks (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:11596:26)
@@ -57,7 +52,7 @@
     at workLoopSync (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:19190:13)
     at renderRootSync (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:19169:15)
     at recoverFromConcurrentError (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:18786:28) @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3059
-[  592495ms] [ERROR] The above error occurred in the <TabWrapper> component:
+[  122823ms] [ERROR] The above error occurred in the <TabWrapper> component:
 
     at TabWrapper (http://127.0.0.1:4200/src/shared/components/TabWrapper.tsx?t=1779820519261:22:16)
     at RenderedRoute (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3118:5)
@@ -83,7 +78,7 @@
     at App (http://127.0.0.1:4200/src/app/App.tsx?t=1779820519261:43:3)
 
 React will try to recreate this component tree from scratch using the error boundary you provided, RenderErrorBoundary. @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:14079
-[  592495ms] [ERROR] React Router caught the following error during render Error: useUser must be used within a UserProvider
+[  122823ms] [ERROR] React Router caught the following error during render Error: useUser must be used within a UserProvider
     at useUser (http://127.0.0.1:4200/src/app/providers/UserProvider.tsx:85:11)
     at TabWrapper (http://127.0.0.1:4200/src/shared/components/TabWrapper.tsx?t=1779820519261:22:16)
     at renderWithHooks (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:11596:26)
@@ -95,25 +90,25 @@ React will try to recreate this component tree from scratch using the error boun
     at renderRootSync (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:19169:15)
     at recoverFromConcurrentError (http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:18786:28) {componentStack: 
     at TabWrapper (http://127.0.0.1:4200/src/shar….0.0.1:4200/src/app/App.tsx?t=1779820519261:43:3)} @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/react-router-dom.js?v=fcc7e274:3104
-[  593808ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
-[  593808ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
-[  595160ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
-[  595220ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
-[  595228ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
-[  595228ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
-[  595414ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
-[  693578ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
-[  693624ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
-[  693631ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
-[  693631ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
-[  694021ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
-[  697751ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
-[  697794ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
-[  697802ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
-[  697802ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
-[  698584ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
-[  702356ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
-[  702394ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
-[  702400ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
-[  702400ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
-[  702835ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
+[  123850ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[  123850ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[  124969ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
+[  125021ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
+[  125025ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[  125025ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[  125563ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
+[  223924ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
+[  223964ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
+[  223967ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[  223968ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[  224111ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
+[  228099ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
+[  228133ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
+[  228136ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[  228136ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[  228495ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
+[  232691ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=fcc7e274:21608
+[  232725ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
+[  232728ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[  232729ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[  232877ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45

@@ -5,6 +5,7 @@ import {
   BeakerIcon,
   DocumentPlusIcon,
   NewspaperIcon,
+  PhotoIcon,
   PlusCircleIcon,
   QueueListIcon,
   SparklesIcon,
@@ -47,6 +48,11 @@ export function TabWrapper() {
             route={AppRoutes.Labs}
             title="Labs"
             icon={<BeakerIcon />}
+          />
+          <TabButton
+            route={AppRoutes.Imaging}
+            title="Imaging"
+            icon={<PhotoIcon />}
           />
           <TabButton
             route={AppRoutes.AddRecord}

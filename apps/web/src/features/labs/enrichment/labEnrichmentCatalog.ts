@@ -1,267 +1,79 @@
 import {
+  LabReferenceBand,
+  LabReferenceDefinition,
   LabReferenceStandard,
   ReferenceContext,
+  ReferenceKind,
+  ReferenceSex,
   ReferenceStandardId,
   SelectedReferenceBand,
 } from './types';
+import australianHematologyDefinitions from './referenceStandards/australian/hematology.json';
+import australianMetadata from './referenceStandards/australian/index.json';
+import canadianHematologyDefinitions from './referenceStandards/canadian/hematology.json';
+import canadianMetadata from './referenceStandards/canadian/index.json';
+import canadianLipidDefinitions from './referenceStandards/canadian/lipids.json';
+import ukMetadata from './referenceStandards/uk/index.json';
+import ukHematologyDefinitions from './referenceStandards/uk/hematology.json';
 
 const YEAR_IN_DAYS = 365.2425;
 
-export const labReferenceStandards: LabReferenceStandard[] = [
+type RawLabReferenceBand = Omit<
+  LabReferenceBand,
+  'kind' | 'sex' | 'ageMinDays' | 'ageMaxDays'
+> & {
+  kind: ReferenceKind;
+  sex?: ReferenceSex;
+  ageMinYears?: number;
+  ageMaxYears?: number;
+};
+
+type RawLabReferenceDefinition = Omit<LabReferenceDefinition, 'bands'> & {
+  bands: RawLabReferenceBand[];
+};
+
+type RawLabReferenceStandard = Omit<LabReferenceStandard, 'definitions'> & {
+  definitions: RawLabReferenceDefinition[];
+};
+
+const rawReferenceStandards = [
   {
-    id: 'canadian',
-    label: 'Canadian',
-    country: 'Canada',
+    ...canadianMetadata,
     definitions: [
-      standardRange(
-        ['hemoglobin'],
-        'Hemoglobin',
-        '135-175',
-        'g/L',
-        135,
-        175,
-        'APL-CBC-DIFF',
-      ),
-      standardRange(
-        ['hematocrit'],
-        'Hematocrit',
-        '40-52%',
-        '%',
-        40,
-        52,
-        'APL-CBC-DIFF',
-      ),
-      standardRange(
-        ['rbc'],
-        'Red blood cells',
-        '4.30-6.00',
-        '10^12/L',
-        4.3,
-        6,
-        'APL-CBC-DIFF',
-      ),
-      standardRange(
-        ['platelets'],
-        'Platelets',
-        '140-400',
-        '10^9/L',
-        140,
-        400,
-        'APL-CBC-DIFF',
-      ),
-      standardRange(['mch'], 'MCH', '27-32', 'pg', 27, 32, 'DYN-CBC-MCH'),
-      standardRange(
-        ['mchc'],
-        'MCHC',
-        '310-360',
-        'g/L',
-        310,
-        360,
-        'APL-CBC-DIFF',
-      ),
-      {
-        testIds: [
-          'neutrophils-pct',
-          'eosinophils-pct',
-          'basophils-pct',
-          'lymphocytes-pct',
-          'monocytes-pct',
-        ],
-        name: 'Differential percentage',
-        bands: [
-          {
-            label: 'All ages',
-            kind: 'note',
-            display: 'Use absolute count',
-            citationId: 'APL-CBC-DIFF',
-            note: 'Canadian CBC differential intervals are published for absolute counts, not percentages.',
-          },
-        ],
-      },
-      standardRange(
-        ['lymphocytes-abs'],
-        'Lymphocytes absolute',
-        '1.0-4.0',
-        '10^9/L',
-        1,
-        4,
-        'APL-CBC-DIFF',
-      ),
-      standardRange(
-        ['monocytes-abs'],
-        'Monocytes absolute',
-        '0.2-0.8',
-        '10^9/L',
-        0.2,
-        0.8,
-        'APL-CBC-DIFF',
-      ),
-      standardRange(
-        ['eosinophils-abs'],
-        'Eosinophils absolute',
-        '0.0-0.7',
-        '10^9/L',
-        0,
-        0.7,
-        'APL-CBC-DIFF',
-      ),
-      standardRange(
-        ['basophils-abs'],
-        'Basophils absolute',
-        '0.0-0.3',
-        '10^9/L',
-        0,
-        0.3,
-        'APL-CBC-DIFF',
-      ),
-      standardRange(
-        ['neutrophils-abs'],
-        'Neutrophils absolute',
-        '1.8-7.5',
-        '10^9/L',
-        1.8,
-        7.5,
-        'APL-CBC-DIFF',
-      ),
-      standardRange(
-        ['hdl'],
-        'HDL cholesterol',
-        '>=1.00 male',
-        'mmol/L',
-        1,
-        undefined,
-        'DC-LIPID-DIABETES',
-        'gte',
-      ),
-      standardRange(
-        ['ldl'],
-        'LDL cholesterol',
-        '<2.0 with diabetes-risk context',
-        'mmol/L',
-        undefined,
-        2,
-        'DC-LIPID-DIABETES',
-        'lt',
-      ),
+      ...canadianHematologyDefinitions,
+      ...canadianLipidDefinitions,
     ],
   },
   {
-    id: 'australian',
-    label: 'Australian',
-    country: 'Australia',
-    definitions: [
-      standardRange(
-        ['hemoglobin'],
-        'Hemoglobin',
-        '135-180',
-        'g/L',
-        135,
-        180,
-        'AUS-AUSTIN-REF-RANGES',
-      ),
-      standardRange(
-        ['hematocrit'],
-        'Hematocrit',
-        '40-54%',
-        '%',
-        40,
-        54,
-        'AUS-AUSTIN-REF-RANGES',
-      ),
-      standardRange(
-        ['rbc'],
-        'Red blood cells',
-        '4.5-6.5',
-        '10^12/L',
-        4.5,
-        6.5,
-        'AUS-AUSTIN-REF-RANGES',
-      ),
-      standardRange(
-        ['platelets'],
-        'Platelets',
-        '150-400',
-        '10^9/L',
-        150,
-        400,
-        'AUS-AUSTIN-REF-RANGES',
-      ),
-      standardRange(
-        ['mch'],
-        'MCH',
-        '27-33',
-        'pg',
-        27,
-        33,
-        'AUS-AUSTIN-REF-RANGES',
-      ),
-      standardRange(
-        ['mchc'],
-        'MCHC',
-        '320-360',
-        'g/L',
-        320,
-        360,
-        'AUS-AUSTIN-REF-RANGES',
-      ),
-      differentialPercentNote('AUS-AUSTIN-REF-RANGES'),
-    ],
+    ...australianMetadata,
+    definitions: [...australianHematologyDefinitions],
   },
   {
-    id: 'uk',
-    label: 'UK',
-    country: 'United Kingdom',
-    definitions: [
-      standardRange(
-        ['hemoglobin'],
-        'Haemoglobin',
-        '130-180',
-        'g/L',
-        130,
-        180,
-        'UK-WORCS-FBC',
-      ),
-      standardRange(
-        ['hematocrit'],
-        'Haematocrit',
-        '40-52%',
-        '%',
-        40,
-        52,
-        'UK-WORCS-FBC',
-      ),
-      standardRange(
-        ['rbc'],
-        'Red blood cells',
-        '4.5-6.5',
-        '10^12/L',
-        4.5,
-        6.5,
-        'UK-WORCS-FBC',
-      ),
-      standardRange(
-        ['platelets'],
-        'Platelets',
-        '150-400',
-        '10^9/L',
-        150,
-        400,
-        'UK-WORCS-FBC',
-      ),
-      standardRange(['mch'], 'MCH', '27-32', 'pg', 27, 32, 'UK-WORCS-FBC'),
-      standardRange(
-        ['mchc'],
-        'MCHC',
-        '300-350',
-        'g/L',
-        300,
-        350,
-        'UK-WORCS-FBC',
-      ),
-      differentialPercentNote('UK-WORCS-FBC'),
-    ],
+    ...ukMetadata,
+    definitions: [...ukHematologyDefinitions],
   },
-];
+] as unknown as RawLabReferenceStandard[];
+
+export const labReferenceStandards: LabReferenceStandard[] =
+  rawReferenceStandards.map(normalizeReferenceStandard);
+
+function normalizeReferenceStandard(
+  standard: RawLabReferenceStandard,
+): LabReferenceStandard {
+  return {
+    ...standard,
+    definitions: standard.definitions.map((definition) => ({
+      ...definition,
+      bands: definition.bands.map(({ ageMinYears, ageMaxYears, ...band }) => ({
+        ...band,
+        ageMinDays:
+          ageMinYears === undefined ? undefined : ageMinYears * YEAR_IN_DAYS,
+        ageMaxDays:
+          ageMaxYears === undefined ? undefined : ageMaxYears * YEAR_IN_DAYS,
+      })),
+    })),
+  };
+}
 
 const standardById = new Map(
   labReferenceStandards.map((standard) => [standard.id, standard]),
@@ -389,56 +201,5 @@ export function getSelectedReferenceBand(
     standardLabel: standard.label,
     definitionName: definition.name,
     defaultNote: definition.defaultNote,
-  };
-}
-
-function standardRange(
-  testIds: string[],
-  name: string,
-  display: string,
-  unit: string,
-  low: number | undefined,
-  high: number | undefined,
-  citationId: string,
-  kind: 'range' | 'lt' | 'gte' = 'range',
-) {
-  return {
-    testIds,
-    name,
-    bands: [
-      {
-        label: '18 years up to 150 years',
-        kind,
-        display,
-        unit,
-        low,
-        high,
-        citationId,
-        ageMinDays: 18 * YEAR_IN_DAYS,
-        ageMaxDays: 150 * YEAR_IN_DAYS,
-      },
-    ],
-  };
-}
-
-function differentialPercentNote(citationId: string) {
-  return {
-    testIds: [
-      'neutrophils-pct',
-      'eosinophils-pct',
-      'basophils-pct',
-      'lymphocytes-pct',
-      'monocytes-pct',
-    ],
-    name: 'Differential percentage',
-    bands: [
-      {
-        label: 'All ages',
-        kind: 'note' as const,
-        display: 'Use absolute count',
-        citationId,
-        note: 'This standard treats absolute differential counts as the preferred reference interval.',
-      },
-    ],
   };
 }

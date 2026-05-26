@@ -1,0 +1,123 @@
+[
+  {
+    "testIds": ["hemoglobin"],
+    "name": "Hemoglobin",
+    "bands": [
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "135-180",
+        "unit": "g/L",
+        "low": 135,
+        "high": 180,
+        "citationId": "AUS-AUSTIN-REF-RANGES",
+        "ageMinYears": 18,
+        "ageMaxYears": 150
+      }
+    ]
+  },
+  {
+    "testIds": ["hematocrit"],
+    "name": "Hematocrit",
+    "bands": [
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "40-54%",
+        "unit": "%",
+        "low": 40,
+        "high": 54,
+        "citationId": "AUS-AUSTIN-REF-RANGES",
+        "ageMinYears": 18,
+        "ageMaxYears": 150
+      }
+    ]
+  },
+  {
+    "testIds": ["rbc"],
+    "name": "Red blood cells",
+    "bands": [
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "4.5-6.5",
+        "unit": "10^12/L",
+        "low": 4.5,
+        "high": 6.5,
+        "citationId": "AUS-AUSTIN-REF-RANGES",
+        "ageMinYears": 18,
+        "ageMaxYears": 150
+      }
+    ]
+  },
+  {
+    "testIds": ["platelets"],
+    "name": "Platelets",
+    "bands": [
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "150-400",
+        "unit": "10^9/L",
+        "low": 150,
+        "high": 400,
+        "citationId": "AUS-AUSTIN-REF-RANGES",
+        "ageMinYears": 18,
+        "ageMaxYears": 150
+      }
+    ]
+  },
+  {
+    "testIds": ["mch"],
+    "name": "MCH",
+    "bands": [
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "27-33",
+        "unit": "pg",
+        "low": 27,
+        "high": 33,
+        "citationId": "AUS-AUSTIN-REF-RANGES",
+        "ageMinYears": 18,
+        "ageMaxYears": 150
+      }
+    ]
+  },
+  {
+    "testIds": ["mchc"],
+    "name": "MCHC",
+    "bands": [
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "320-360",
+        "unit": "g/L",
+        "low": 320,
+        "high": 360,
+        "citationId": "AUS-AUSTIN-REF-RANGES",
+        "ageMinYears": 18,
+        "ageMaxYears": 150
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "neutrophils-pct",
+      "eosinophils-pct",
+      "basophils-pct",
+      "lymphocytes-pct",
+      "monocytes-pct"
+    ],
+    "name": "Differential percentage",
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "note",
+        "display": "Use absolute count",
+        "citationId": "AUS-AUSTIN-REF-RANGES",
+        "note": "This standard treats absolute differential counts as the preferred reference interval."
+      }
+    ]
+  }
+]

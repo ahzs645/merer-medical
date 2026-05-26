@@ -28,6 +28,7 @@ import EpicRedirect from '../features/connections/oauth-callbacks/EpicRedirect';
 import HealowRedirect from '../features/connections/oauth-callbacks/HealowRedirect';
 import { LabDetailTab } from '../features/labs/LabDetailTab';
 import { LabsTab } from '../features/labs/LabsTab';
+import { ImagingTab } from '../features/imaging/ImagingTab';
 import MereAITab from '../features/ai-chat/MereAITab';
 import { ManualRecordTab } from '../features/manual-entry/ManualRecordTab';
 import OnPatientRedirect from '../features/connections/oauth-callbacks/OnPatientRedirect';
@@ -86,6 +87,10 @@ const routes = [
       {
         path: AppRoutes.LabDetail,
         element: <LabDetailTab />,
+      },
+      {
+        path: AppRoutes.Imaging,
+        element: <ImagingTab />,
       },
       {
         path: AppRoutes.AddConnection,

@@ -1,0 +1,34 @@
+[
+  {
+    "testIds": ["hdl"],
+    "name": "HDL cholesterol",
+    "bands": [
+      {
+        "label": "18 years up to 150 years",
+        "kind": "gte",
+        "display": ">=1.00 male",
+        "unit": "mmol/L",
+        "low": 1,
+        "citationId": "DC-LIPID-DIABETES",
+        "ageMinYears": 18,
+        "ageMaxYears": 150
+      }
+    ]
+  },
+  {
+    "testIds": ["ldl"],
+    "name": "LDL cholesterol",
+    "bands": [
+      {
+        "label": "18 years up to 150 years",
+        "kind": "lt",
+        "display": "<2.0 with diabetes-risk context",
+        "unit": "mmol/L",
+        "high": 2,
+        "citationId": "DC-LIPID-DIABETES",
+        "ageMinYears": 18,
+        "ageMaxYears": 150
+      }
+    ]
+  }
+]

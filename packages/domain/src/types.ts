@@ -126,6 +126,7 @@ export type ClinicalResourceType =
   | 'goal'
   | 'immunization'
   | 'insuranceplan'
+  | 'imagingstudy'
   | 'location'
   | 'media'
   | 'medication'

@@ -18,6 +18,7 @@ export type ClinicalDocumentResourceType =
   | 'goal'
   | 'immunization'
   | 'insuranceplan'
+  | 'imagingstudy'
   | 'location'
   | 'media'
   | 'medication'
