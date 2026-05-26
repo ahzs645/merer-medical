@@ -1,0 +1,1306 @@
+[
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|VisionPrescription/demo-glasses-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "VisionPrescription",
+          "id": "demo-glasses-2026",
+          "status": "active",
+          "created": "2026-04-08",
+          "patient": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "dateWritten": "2026-04-08",
+          "prescriber": {
+            "display": "Dr. Priya Shah, OD"
+          },
+          "lensSpecification": [
+            {
+              "product": {
+                "text": "Progressive spectacle lens"
+              },
+              "eye": "right",
+              "sphere": -2.25,
+              "cylinder": -0.75,
+              "axis": 92,
+              "add": 1.75,
+              "prism": [
+                {
+                  "amount": 0.5,
+                  "base": "in"
+                }
+              ],
+              "note": ["OD progressive lens"]
+            },
+            {
+              "product": {
+                "text": "Progressive spectacle lens"
+              },
+              "eye": "left",
+              "sphere": -1.75,
+              "cylinder": -1,
+              "axis": 88,
+              "add": 1.75,
+              "prism": [
+                {
+                  "amount": 0.5,
+                  "base": "in"
+                }
+              ],
+              "note": ["OS progressive lens"]
+            }
+          ],
+          "note": [
+            {
+              "text": "PD 62 mm OU. Recommend anti-reflective coating and high-index lenses."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "visionprescription",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "VisionPrescription/demo-glasses-2026",
+      "date": "2026-04-08T17:10:00.000Z",
+      "display_name": "Final progressive glasses prescription"
+    },
+    "_meta": {
+      "lwt": 1779823879174
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Observation/demo-refraction-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Observation",
+          "id": "demo-refraction-2026",
+          "status": "final",
+          "category": [
+            {
+              "text": "Optometry exam measurement"
+            }
+          ],
+          "code": {
+            "text": "Manifest refraction"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2026-04-08T16:40:00.000Z",
+          "component": [
+            {
+              "code": {
+                "text": "OD sphere"
+              },
+              "valueQuantity": {
+                "value": -2.25,
+                "unit": "D"
+              }
+            },
+            {
+              "code": {
+                "text": "OD cylinder"
+              },
+              "valueQuantity": {
+                "value": -0.75,
+                "unit": "D"
+              }
+            },
+            {
+              "code": {
+                "text": "OD axis"
+              },
+              "valueQuantity": {
+                "value": 92,
+                "unit": "degrees"
+              }
+            },
+            {
+              "code": {
+                "text": "OS sphere"
+              },
+              "valueQuantity": {
+                "value": -1.75,
+                "unit": "D"
+              }
+            },
+            {
+              "code": {
+                "text": "OS cylinder"
+              },
+              "valueQuantity": {
+                "value": -1,
+                "unit": "D"
+              }
+            },
+            {
+              "code": {
+                "text": "OS axis"
+              },
+              "valueQuantity": {
+                "value": 88,
+                "unit": "degrees"
+              }
+            }
+          ],
+          "note": [
+            {
+              "text": "Manifest refraction performed with phoropter. OD and OS stable from prior year."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Observation/demo-refraction-2026",
+      "date": "2026-04-08T16:40:00.000Z",
+      "display_name": "Manifest refraction OD/OS"
+    },
+    "_meta": {
+      "lwt": 1779823879174
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Observation/demo-visual-acuity-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Observation",
+          "id": "demo-visual-acuity-2026",
+          "status": "final",
+          "category": [
+            {
+              "text": "Visual acuity"
+            }
+          ],
+          "code": {
+            "text": "Visual acuity Snellen corrected"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2026-04-08T16:20:00.000Z",
+          "component": [
+            {
+              "code": {
+                "text": "OD visual acuity corrected"
+              },
+              "valueString": "20/20"
+            },
+            {
+              "code": {
+                "text": "OS visual acuity corrected"
+              },
+              "valueString": "20/25"
+            },
+            {
+              "code": {
+                "text": "OU visual acuity corrected"
+              },
+              "valueString": "20/20"
+            }
+          ],
+          "method": {
+            "text": "Snellen distance chart"
+          }
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Observation/demo-visual-acuity-2026",
+      "date": "2026-04-08T16:20:00.000Z",
+      "display_name": "Visual acuity corrected OD/OS/OU"
+    },
+    "_meta": {
+      "lwt": 1779823879174
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Observation/demo-iop-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Observation",
+          "id": "demo-iop-2026",
+          "status": "final",
+          "category": [
+            {
+              "text": "IOP tonometry"
+            }
+          ],
+          "code": {
+            "text": "IOP tonometry"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2026-04-08T16:25:00.000Z",
+          "method": {
+            "text": "iCare tonometer"
+          },
+          "component": [
+            {
+              "code": {
+                "text": "OD IOP"
+              },
+              "valueQuantity": {
+                "value": 17,
+                "unit": "mmHg"
+              }
+            },
+            {
+              "code": {
+                "text": "OS IOP"
+              },
+              "valueQuantity": {
+                "value": 18,
+                "unit": "mmHg"
+              }
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Observation/demo-iop-2026",
+      "date": "2026-04-08T16:25:00.000Z",
+      "display_name": "Intraocular pressure OD/OS"
+    },
+    "_meta": {
+      "lwt": 1779823879174
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Condition/demo-dry-eye",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Condition",
+          "id": "demo-dry-eye",
+          "clinicalStatus": {
+            "coding": [
+              {
+                "code": "active",
+                "display": "Active"
+              }
+            ]
+          },
+          "category": [
+            {
+              "text": "Ocular diagnosis"
+            }
+          ],
+          "code": {
+            "text": "Dry eye syndrome OU",
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "246938006",
+                "display": "Dry eyes"
+              }
+            ]
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "bodySite": [
+            {
+              "text": "OU eyes"
+            }
+          ],
+          "note": [
+            {
+              "text": "Mild evaporative dry eye. Recommend preservative-free artificial tears and lid hygiene."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Condition/demo-dry-eye",
+      "date": "2026-04-08T17:20:00.000Z",
+      "display_name": "Mild dry eye syndrome OU"
+    },
+    "_meta": {
+      "lwt": 1779823879174
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Procedure/demo-oct-procedure",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Procedure",
+          "id": "demo-oct-procedure",
+          "status": "completed",
+          "code": {
+            "text": "OCT retina and optic nerve imaging",
+            "coding": [
+              {
+                "system": "http://www.ama-assn.org/go/cpt",
+                "code": "92133",
+                "display": "Scanning computerized ophthalmic diagnostic imaging"
+              }
+            ]
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "performedDateTime": "2026-04-08T16:50:00.000Z",
+          "note": [
+            {
+              "text": "OCT macula and RNFL captured for glaucoma screening baseline."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Procedure/demo-oct-procedure",
+      "date": "2026-04-08T16:50:00.000Z",
+      "display_name": "OCT macula and RNFL performed"
+    },
+    "_meta": {
+      "lwt": 1779823879174
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DiagnosticReport/demo-oct-report",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "DiagnosticReport",
+          "id": "demo-oct-report",
+          "status": "final",
+          "category": [
+            {
+              "text": "Ophthalmic imaging"
+            }
+          ],
+          "code": {
+            "text": "OCT RNFL report"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2026-04-08T17:00:00.000Z",
+          "conclusion": "OCT RNFL within normal limits OU. Average RNFL OD 92 microns, OS 89 microns.",
+          "result": [
+            {
+              "reference": "Observation/demo-oct-rnfl-2026"
+            }
+          ],
+          "imagingStudy": [
+            {
+              "reference": "ImagingStudy/demo-oct-2026"
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "diagnosticreport",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DiagnosticReport/demo-oct-report",
+      "date": "2026-04-08T17:00:00.000Z",
+      "display_name": "OCT RNFL diagnostic report"
+    },
+    "_meta": {
+      "lwt": 1779823879174
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Observation/demo-oct-rnfl-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Observation",
+          "id": "demo-oct-rnfl-2026",
+          "status": "final",
+          "category": [
+            {
+              "text": "OCT metric"
+            }
+          ],
+          "code": {
+            "text": "OCT RNFL average thickness"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2026-04-08T17:00:00.000Z",
+          "component": [
+            {
+              "code": {
+                "text": "OD OCT RNFL average"
+              },
+              "valueQuantity": {
+                "value": 92,
+                "unit": "microns"
+              }
+            },
+            {
+              "code": {
+                "text": "OS OCT RNFL average"
+              },
+              "valueQuantity": {
+                "value": 89,
+                "unit": "microns"
+              }
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Observation/demo-oct-rnfl-2026",
+      "date": "2026-04-08T17:00:00.000Z",
+      "display_name": "OCT RNFL metrics OD/OS"
+    },
+    "_meta": {
+      "lwt": 1779823879174
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|ImagingStudy/demo-oct-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "ImagingStudy",
+          "id": "demo-oct-2026",
+          "status": "available",
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "started": "2026-04-08T16:55:00.000Z",
+          "description": "Ophthalmic OCT macula and RNFL DICOM export",
+          "modality": [
+            {
+              "system": "http://dicom.nema.org/resources/ontology/DCM",
+              "code": "OPT",
+              "display": "Ophthalmic Tomography"
+            }
+          ],
+          "series": [
+            {
+              "uid": "1.2.826.0.1.3680043.10.543.demo.oct.1",
+              "modality": {
+                "code": "OPT",
+                "display": "OCT"
+              },
+              "description": "OCT RNFL cube",
+              "bodySite": {
+                "display": "OU eyes"
+              },
+              "numberOfInstances": 128
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "imagingstudy",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "ImagingStudy/demo-oct-2026",
+      "date": "2026-04-08T16:55:00.000Z",
+      "display_name": "Ophthalmic OCT DICOM study"
+    },
+    "_meta": {
+      "lwt": 1779823879174
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DocumentReference/demo-visual-field-pdf",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "DocumentReference",
+          "id": "demo-visual-field-pdf",
+          "status": "current",
+          "type": {
+            "text": "Visual field device report"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "date": "2026-04-08T17:05:00.000Z",
+          "description": "Humphrey visual field 24-2 OU. Reliability acceptable; no glaucomatous defects.",
+          "content": [
+            {
+              "attachment": {
+                "contentType": "application/pdf",
+                "title": "visual-field-24-2-ou.pdf",
+                "url": "demo://optometry/visual-field-24-2-ou.pdf",
+                "size": 485100
+              }
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "documentreference",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DocumentReference/demo-visual-field-pdf",
+      "date": "2026-04-08T17:05:00.000Z",
+      "display_name": "Humphrey visual field PDF"
+    },
+    "_meta": {
+      "lwt": 1779823879174
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DocumentReference/demo-optical-order",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "DocumentReference",
+          "id": "demo-optical-order",
+          "status": "current",
+          "type": {
+            "text": "Optical retail lens order"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "date": "2026-04-08T17:30:00.000Z",
+          "description": "Frame: Avery 52-17. Progressive high-index lenses with anti-reflective coating. Dispense planned in 10 business days.",
+          "content": [
+            {
+              "attachment": {
+                "contentType": "application/pdf",
+                "title": "optical-order-demo.pdf",
+                "url": "demo://optometry/optical-order-demo.pdf",
+                "size": 160220
+              }
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "documentreference",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DocumentReference/demo-optical-order",
+      "date": "2026-04-08T17:30:00.000Z",
+      "display_name": "Optical lens and frame order"
+    },
+    "_meta": {
+      "lwt": 1779823879174
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Encounter/demo-eye-exam-2025",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Encounter",
+          "id": "demo-eye-exam-2025",
+          "status": "finished",
+          "class": {
+            "code": "AMB",
+            "display": "ambulatory"
+          },
+          "type": [
+            {
+              "text": "Comprehensive eye exam"
+            }
+          ],
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "period": {
+            "start": "2025-04-11T16:00:00.000Z",
+            "end": "2025-04-11T17:00:00.000Z"
+          },
+          "reasonCode": [
+            {
+              "text": "Annual optometry checkup and contact lens review"
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "encounter",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Encounter/demo-eye-exam-2025",
+      "date": "2025-04-11T16:00:00.000Z",
+      "display_name": "Annual optometry checkup 2025"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Observation/demo-refraction-2025",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Observation",
+          "id": "demo-refraction-2025",
+          "status": "final",
+          "category": [
+            {
+              "text": "Optometry exam measurement"
+            }
+          ],
+          "code": {
+            "text": "Manifest refraction"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2025-04-11T16:20:00.000Z",
+          "component": [
+            {
+              "code": {
+                "text": "OD sphere"
+              },
+              "valueQuantity": {
+                "value": -2,
+                "unit": "D"
+              }
+            },
+            {
+              "code": {
+                "text": "OD cylinder"
+              },
+              "valueQuantity": {
+                "value": -0.5,
+                "unit": "D"
+              }
+            },
+            {
+              "code": {
+                "text": "OD axis"
+              },
+              "valueQuantity": {
+                "value": 90,
+                "unit": "degrees"
+              }
+            },
+            {
+              "code": {
+                "text": "OS sphere"
+              },
+              "valueQuantity": {
+                "value": -1.5,
+                "unit": "D"
+              }
+            },
+            {
+              "code": {
+                "text": "OS cylinder"
+              },
+              "valueQuantity": {
+                "value": -0.75,
+                "unit": "D"
+              }
+            },
+            {
+              "code": {
+                "text": "OS axis"
+              },
+              "valueQuantity": {
+                "value": 86,
+                "unit": "degrees"
+              }
+            }
+          ],
+          "note": [
+            {
+              "text": "Minor myopic shift compared with 2024."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Observation/demo-refraction-2025",
+      "date": "2025-04-11T16:20:00.000Z",
+      "display_name": "Manifest refraction OD/OS 2025"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Observation/demo-va-2025",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Observation",
+          "id": "demo-va-2025",
+          "status": "final",
+          "category": [
+            {
+              "text": "Visual acuity"
+            }
+          ],
+          "code": {
+            "text": "Visual acuity Snellen corrected"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2025-04-11T16:10:00.000Z",
+          "method": {
+            "text": "Snellen distance chart"
+          },
+          "component": [
+            {
+              "code": {
+                "text": "OD visual acuity corrected"
+              },
+              "valueString": "20/20"
+            },
+            {
+              "code": {
+                "text": "OS visual acuity corrected"
+              },
+              "valueString": "20/20"
+            },
+            {
+              "code": {
+                "text": "OU visual acuity corrected"
+              },
+              "valueString": "20/20"
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Observation/demo-va-2025",
+      "date": "2025-04-11T16:10:00.000Z",
+      "display_name": "Visual acuity corrected 2025"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Observation/demo-iop-2025",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Observation",
+          "id": "demo-iop-2025",
+          "status": "final",
+          "category": [
+            {
+              "text": "IOP tonometry"
+            }
+          ],
+          "code": {
+            "text": "IOP tonometry"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2025-04-11T16:12:00.000Z",
+          "method": {
+            "text": "Goldmann applanation"
+          },
+          "component": [
+            {
+              "code": {
+                "text": "OD IOP"
+              },
+              "valueQuantity": {
+                "value": 16,
+                "unit": "mmHg"
+              }
+            },
+            {
+              "code": {
+                "text": "OS IOP"
+              },
+              "valueQuantity": {
+                "value": 17,
+                "unit": "mmHg"
+              }
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Observation/demo-iop-2025",
+      "date": "2025-04-11T16:12:00.000Z",
+      "display_name": "Intraocular pressure 2025"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|VisionPrescription/demo-glasses-2025",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "VisionPrescription",
+          "id": "demo-glasses-2025",
+          "status": "active",
+          "created": "2025-04-11",
+          "patient": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "dateWritten": "2025-04-11",
+          "prescriber": {
+            "display": "Dr. Priya Shah, OD"
+          },
+          "lensSpecification": [
+            {
+              "product": {
+                "text": "Single vision spectacle lens"
+              },
+              "eye": "right",
+              "sphere": -2,
+              "cylinder": -0.5,
+              "axis": 90
+            },
+            {
+              "product": {
+                "text": "Single vision spectacle lens"
+              },
+              "eye": "left",
+              "sphere": -1.5,
+              "cylinder": -0.75,
+              "axis": 86
+            }
+          ],
+          "note": [
+            {
+              "text": "PD 62 mm OU. Single vision distance lenses."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "visionprescription",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "VisionPrescription/demo-glasses-2025",
+      "date": "2025-04-11T16:45:00.000Z",
+      "display_name": "Single vision glasses prescription 2025"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Encounter/demo-eye-exam-2024",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Encounter",
+          "id": "demo-eye-exam-2024",
+          "status": "finished",
+          "class": {
+            "code": "AMB",
+            "display": "ambulatory"
+          },
+          "type": [
+            {
+              "text": "Comprehensive eye exam"
+            }
+          ],
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "period": {
+            "start": "2024-04-19T16:00:00.000Z",
+            "end": "2024-04-19T16:55:00.000Z"
+          },
+          "reasonCode": [
+            {
+              "text": "Annual optometry checkup"
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "encounter",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Encounter/demo-eye-exam-2024",
+      "date": "2024-04-19T16:00:00.000Z",
+      "display_name": "Annual optometry checkup 2024"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Observation/demo-refraction-2024",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Observation",
+          "id": "demo-refraction-2024",
+          "status": "final",
+          "category": [
+            {
+              "text": "Optometry exam measurement"
+            }
+          ],
+          "code": {
+            "text": "Manifest refraction"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2024-04-19T16:22:00.000Z",
+          "component": [
+            {
+              "code": {
+                "text": "OD sphere"
+              },
+              "valueQuantity": {
+                "value": -1.75,
+                "unit": "D"
+              }
+            },
+            {
+              "code": {
+                "text": "OD cylinder"
+              },
+              "valueQuantity": {
+                "value": -0.5,
+                "unit": "D"
+              }
+            },
+            {
+              "code": {
+                "text": "OD axis"
+              },
+              "valueQuantity": {
+                "value": 88,
+                "unit": "degrees"
+              }
+            },
+            {
+              "code": {
+                "text": "OS sphere"
+              },
+              "valueQuantity": {
+                "value": -1.25,
+                "unit": "D"
+              }
+            },
+            {
+              "code": {
+                "text": "OS cylinder"
+              },
+              "valueQuantity": {
+                "value": -0.5,
+                "unit": "D"
+              }
+            },
+            {
+              "code": {
+                "text": "OS axis"
+              },
+              "valueQuantity": {
+                "value": 84,
+                "unit": "degrees"
+              }
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Observation/demo-refraction-2024",
+      "date": "2024-04-19T16:22:00.000Z",
+      "display_name": "Manifest refraction OD/OS 2024"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Observation/demo-va-2024",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Observation",
+          "id": "demo-va-2024",
+          "status": "final",
+          "category": [
+            {
+              "text": "Visual acuity"
+            }
+          ],
+          "code": {
+            "text": "Visual acuity Snellen corrected"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2024-04-19T16:12:00.000Z",
+          "method": {
+            "text": "Snellen distance chart"
+          },
+          "component": [
+            {
+              "code": {
+                "text": "OD visual acuity corrected"
+              },
+              "valueString": "20/20"
+            },
+            {
+              "code": {
+                "text": "OS visual acuity corrected"
+              },
+              "valueString": "20/25"
+            },
+            {
+              "code": {
+                "text": "OU visual acuity corrected"
+              },
+              "valueString": "20/20"
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Observation/demo-va-2024",
+      "date": "2024-04-19T16:12:00.000Z",
+      "display_name": "Visual acuity corrected 2024"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Observation/demo-iop-2024",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Observation",
+          "id": "demo-iop-2024",
+          "status": "final",
+          "category": [
+            {
+              "text": "IOP tonometry"
+            }
+          ],
+          "code": {
+            "text": "IOP tonometry"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2024-04-19T16:15:00.000Z",
+          "method": {
+            "text": "iCare tonometer"
+          },
+          "component": [
+            {
+              "code": {
+                "text": "OD IOP"
+              },
+              "valueQuantity": {
+                "value": 15,
+                "unit": "mmHg"
+              }
+            },
+            {
+              "code": {
+                "text": "OS IOP"
+              },
+              "valueQuantity": {
+                "value": 16,
+                "unit": "mmHg"
+              }
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Observation/demo-iop-2024",
+      "date": "2024-04-19T16:15:00.000Z",
+      "display_name": "Intraocular pressure 2024"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DocumentReference/demo-retinal-photo-2024",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "DocumentReference",
+          "id": "demo-retinal-photo-2024",
+          "status": "current",
+          "type": {
+            "text": "Fundus retinal photo report"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "date": "2024-04-19T16:40:00.000Z",
+          "description": "Color fundus photos OU. Optic nerves healthy, no diabetic retinopathy.",
+          "content": [
+            {
+              "attachment": {
+                "contentType": "image/jpeg",
+                "title": "fundus-photos-ou-2024.jpg",
+                "url": "demo://optometry/fundus-photos-ou-2024.jpg",
+                "size": 720100
+              }
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "documentreference",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DocumentReference/demo-retinal-photo-2024",
+      "date": "2024-04-19T16:40:00.000Z",
+      "display_name": "Retinal fundus photos 2024"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  }
+]

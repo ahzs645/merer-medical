@@ -5,7 +5,7 @@
  *     the demo, served from the deployment root).
  *  2. Runtime — visiting the `/demo` route on a normal build (e.g.
  *     https://emr.ahmadjalil.com/demo). The app boots a read-only, in-memory
- *     database seeded from `/assets/demo.json` and namespaces every inner page
+ *     database seeded from the bundled demo fixture and namespaces every inner page
  *     under `/demo/*` so the demo session stays isolated from the real app.
  */
 
@@ -47,7 +47,7 @@ export function isBuildTimeDemo(): boolean {
 
 /**
  * True when the app should run as a read-only demo populated from
- * `/assets/demo.json` — either a build-time demo or the `/demo` runtime route.
+ * the bundled demo fixture — either a build-time demo or the `/demo` runtime route.
  */
 export function isDemoMode(): boolean {
   if (isBuildTimeDemo()) {

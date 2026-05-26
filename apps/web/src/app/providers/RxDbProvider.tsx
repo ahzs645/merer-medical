@@ -240,8 +240,7 @@ export async function getStorageAdapter(db: RxDatabase<DatabaseCollections>) {
 }
 
 async function loadDemoData(db: RxDatabase<DatabaseCollections>) {
-  const data = await fetch('/assets/demo.json');
-  const json = await data.json();
+  const { default: json } = await import('../../assets/demo');
   normalizeDumpSchemaHashes(json as RxDumpDatabaseAny<DatabaseCollections>, db);
   const message = await handleJSONDataImport(JSON.stringify(json), db);
   return message;

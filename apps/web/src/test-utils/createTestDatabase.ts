@@ -36,7 +36,7 @@ export async function createTestDatabase(): Promise<
 }
 
 /**
- * Seeds the test database with demo data from the demo.json file.
+ * Seeds the test database with the bundled demo fixture.
  * Useful for tests that need realistic data.
  */
 export async function seedTestDatabase(
@@ -47,8 +47,16 @@ export async function seedTestDatabase(
     await db.importJSON(data);
   } else {
     // Import default demo data
-    const demoData = await import('../assets/demo.json');
-    await db.importJSON(demoData as any);
+    const { default: demoData } = await import('../assets/demo');
+    const dump = JSON.parse(JSON.stringify(demoData));
+    dump.collections?.forEach(
+      (collection: { name: string; schemaHash?: string }) => {
+        collection.schemaHash = (
+          db.collections as Record<string, { schema: { hash: string } }>
+        )[collection.name].schema.hash;
+      },
+    );
+    await db.importJSON(dump);
   }
 }
 

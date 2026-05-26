@@ -61,16 +61,7 @@ export function LabsTab() {
   }, [status, labSections.length]);
 
   return (
-    <AppPage
-      banner={
-        <LabsHeader
-          labCount={labs.length}
-          groupCount={groupedLabs.length}
-          query={query}
-          setQuery={setQuery}
-        />
-      }
-    >
+    <AppPage banner={<LabsHeader query={query} setQuery={setQuery} />}>
       {status === 'success' && labs.length === 0 ? (
         <EmptyRecordsPlaceholder />
       ) : (
@@ -79,7 +70,7 @@ export function LabsTab() {
           ref={scrollContainerRef}
           className="h-full overflow-y-auto bg-gray-50"
         >
-          <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
+          <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-3 py-3 pb-24 sm:gap-4 sm:px-6 sm:py-4 lg:px-8">
             {status === 'loading' ? (
               <LabsSkeleton />
             ) : filteredGroups.length > 0 ? (

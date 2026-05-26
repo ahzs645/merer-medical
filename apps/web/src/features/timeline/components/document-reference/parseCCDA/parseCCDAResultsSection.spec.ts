@@ -245,8 +245,8 @@ describe('parseCCDAResultsSection', () => {
   //   }
   // });
 
-  // it('minify demo.json', () => {
-  //   const jsonFile = fs.readFileSync('demo.json').toString();
+  // it('minify demo fixture', () => {
+  //   const jsonFile = fs.readFileSync('demo-dump.json').toString();
   //   // write back
   //   try {
   //     fs.writeFileSync('demo.new.json', JSON.stringify(JSON.parse(jsonFile)));

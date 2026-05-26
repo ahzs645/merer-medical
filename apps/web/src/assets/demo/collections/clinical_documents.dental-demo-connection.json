@@ -1,0 +1,1412 @@
+[
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalCondition/demo-caries-30",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Condition",
+          "id": "demo-caries-30",
+          "clinicalStatus": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                "code": "active",
+                "display": "Active"
+              }
+            ]
+          },
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/dental-data-exchange/CodeSystem/dental-category",
+                  "code": "dental",
+                  "display": "Dental"
+                }
+              ],
+              "text": "Dental condition"
+            }
+          ],
+          "code": {
+            "text": "Dental caries on tooth 30 occlusal surface",
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "80967001",
+                "display": "Dental caries"
+              }
+            ]
+          },
+          "bodySite": [
+            {
+              "text": "Tooth 30 O surface"
+            }
+          ],
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "onsetDateTime": "2026-02-12T18:00:00.000Z",
+          "note": [
+            {
+              "text": "Small occlusal lesion detected on tooth 30. Monitor sensitivity and restore if progression is noted."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalCondition/demo-caries-30",
+      "date": "2026-02-12T18:00:00.000Z",
+      "display_name": "Occlusal caries on tooth 30"
+    },
+    "_meta": {
+      "lwt": 1779823045896
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalFinding/demo-perio-14",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Observation",
+          "id": "demo-perio-14",
+          "status": "final",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                  "code": "exam",
+                  "display": "Exam"
+                }
+              ],
+              "text": "Dental finding"
+            }
+          ],
+          "code": {
+            "text": "Periodontal probing depth tooth 14",
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "252398008",
+                "display": "Periodontal pocket depth"
+              }
+            ]
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2026-02-12T18:05:00.000Z",
+          "bodySite": {
+            "text": "Tooth 14 mesial buccal site"
+          },
+          "component": [
+            {
+              "code": {
+                "text": "Pocket depth MB"
+              },
+              "valueQuantity": {
+                "value": 5,
+                "unit": "mm",
+                "system": "http://unitsofmeasure.org",
+                "code": "mm"
+              }
+            },
+            {
+              "code": {
+                "text": "Bleeding on probing"
+              },
+              "valueBoolean": true
+            },
+            {
+              "code": {
+                "text": "Mobility"
+              },
+              "valueString": "Class I"
+            }
+          ],
+          "note": [
+            {
+              "text": "Localized 5 mm pocketing with bleeding on probing around tooth 14."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalFinding/demo-perio-14",
+      "date": "2026-02-12T18:05:00.000Z",
+      "display_name": "Periodontal pocketing tooth 14"
+    },
+    "_meta": {
+      "lwt": 1779823045896
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalProcedure/demo-crown-14",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Procedure",
+          "id": "demo-crown-14",
+          "status": "completed",
+          "code": {
+            "text": "Crown preparation tooth 14",
+            "coding": [
+              {
+                "system": "http://www.ada.org/cdt",
+                "code": "D2740",
+                "display": "Crown - porcelain/ceramic"
+              }
+            ]
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "performedDateTime": "2026-01-20T17:30:00.000Z",
+          "bodySite": [
+            {
+              "text": "Tooth 14 MOD surfaces"
+            }
+          ],
+          "note": [
+            {
+              "text": "Crown preparation and provisional crown placed on tooth 14. Final crown delivery planned."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalProcedure/demo-crown-14",
+      "date": "2026-01-20T17:30:00.000Z",
+      "display_name": "Crown preparation tooth 14"
+    },
+    "_meta": {
+      "lwt": 1779823045896
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalServiceRequest/demo-implant-19",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "ServiceRequest",
+          "id": "demo-implant-19",
+          "status": "active",
+          "intent": "plan",
+          "code": {
+            "text": "Implant consultation for tooth 19",
+            "coding": [
+              {
+                "system": "http://www.ada.org/cdt",
+                "code": "D6010",
+                "display": "Surgical placement of implant body"
+              }
+            ]
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "authoredOn": "2026-02-13T16:00:00.000Z",
+          "bodySite": [
+            {
+              "text": "Tooth 19 edentulous site"
+            }
+          ],
+          "reasonCode": [
+            {
+              "text": "Treatment plan phase 2: evaluate implant at tooth 19 site."
+            }
+          ],
+          "note": [
+            {
+              "text": "Discuss implant versus bridge. Needs CBCT review and oral surgery referral."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "servicerequest",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalServiceRequest/demo-implant-19",
+      "date": "2026-02-13T16:00:00.000Z",
+      "display_name": "Implant consultation for tooth 19"
+    },
+    "_meta": {
+      "lwt": 1779823045896
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalNote/demo-treatment-plan",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "DocumentReference",
+          "id": "demo-treatment-plan",
+          "status": "current",
+          "type": {
+            "text": "Dental treatment plan"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "date": "2026-02-13T16:15:00.000Z",
+          "description": "Treatment plan: restore tooth 30 O, deliver crown tooth 14, consult for implant tooth 19, periodontal maintenance in 3 months.",
+          "content": [
+            {
+              "attachment": {
+                "contentType": "application/pdf",
+                "title": "Dental treatment plan estimate.pdf",
+                "url": "demo://dental/treatment-plan-estimate.pdf",
+                "size": 182340
+              }
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "documentreference",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalNote/demo-treatment-plan",
+      "date": "2026-02-13T16:15:00.000Z",
+      "display_name": "Dental treatment plan summary"
+    },
+    "_meta": {
+      "lwt": 1779823045896
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalReferral/demo-endo-30",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "ServiceRequest",
+          "id": "demo-endo-30",
+          "status": "active",
+          "intent": "order",
+          "code": {
+            "text": "Endodontic consultation tooth 30"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "authoredOn": "2026-02-15T17:00:00.000Z",
+          "bodySite": [
+            {
+              "text": "Tooth 30"
+            }
+          ],
+          "reasonCode": [
+            {
+              "text": "Intermittent cold sensitivity after caries diagnosis."
+            }
+          ],
+          "note": [
+            {
+              "text": "Refer to endodontist if symptoms persist after restoration."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "servicerequest",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalReferral/demo-endo-30",
+      "date": "2026-02-15T17:00:00.000Z",
+      "display_name": "Endodontic referral tooth 30"
+    },
+    "_meta": {
+      "lwt": 1779823045896
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalDiagnosticReport/demo-pano",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "DiagnosticReport",
+          "id": "demo-pano",
+          "status": "final",
+          "category": [
+            {
+              "text": "Dental imaging"
+            }
+          ],
+          "code": {
+            "text": "Panoramic dental X-ray",
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "30745-4",
+                "display": "XR Panorex mandible"
+              }
+            ]
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "effectiveDateTime": "2026-02-12T18:20:00.000Z",
+          "issued": "2026-02-12T18:35:00.000Z",
+          "conclusion": "Panoramic radiograph shows restored tooth 14, missing tooth 19, and occlusal radiolucency consistent with caries on tooth 30.",
+          "imagingStudy": [
+            {
+              "reference": "ImagingStudy/demo-cbct-2026"
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "diagnosticreport",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalDiagnosticReport/demo-pano",
+      "date": "2026-02-12T18:20:00.000Z",
+      "display_name": "Panoramic dental radiograph report",
+      "loinc_coding": ["30745-4"]
+    },
+    "_meta": {
+      "lwt": 1779823045896
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|ImagingStudy/demo-cbct-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "ImagingStudy",
+          "id": "demo-cbct-2026",
+          "status": "available",
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "started": "2026-02-12T18:25:00.000Z",
+          "description": "Dental CBCT for implant planning and endodontic assessment",
+          "modality": [
+            {
+              "system": "http://dicom.nema.org/resources/ontology/DCM",
+              "code": "CT",
+              "display": "Computed Tomography"
+            }
+          ],
+          "series": [
+            {
+              "uid": "1.2.826.0.1.3680043.10.543.demo.cbct.1",
+              "modality": {
+                "code": "CT",
+                "display": "CBCT"
+              },
+              "description": "CBCT maxillofacial volume",
+              "bodySite": {
+                "display": "Mandible and maxilla"
+              },
+              "numberOfInstances": 1
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "imagingstudy",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "ImagingStudy/demo-cbct-2026",
+      "date": "2026-02-12T18:25:00.000Z",
+      "display_name": "Dental CBCT mandible/maxilla"
+    },
+    "_meta": {
+      "lwt": 1779823045896
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalScan/demo-intraoral-stl",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "DocumentReference",
+          "id": "demo-intraoral-stl",
+          "status": "current",
+          "type": {
+            "text": "Intraoral dental scan STL"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "date": "2026-02-12T18:40:00.000Z",
+          "description": "STL intraoral scan files for upper and lower arches captured for crown and implant planning.",
+          "content": [
+            {
+              "attachment": {
+                "contentType": "model/stl",
+                "title": "upper-arch-demo.stl",
+                "url": "demo://dental/scans/upper-arch-demo.stl",
+                "size": 3821440,
+                "hash": "demo-upper-stl"
+              }
+            },
+            {
+              "attachment": {
+                "contentType": "model/stl",
+                "title": "lower-arch-demo.stl",
+                "url": "demo://dental/scans/lower-arch-demo.stl",
+                "size": 3569100,
+                "hash": "demo-lower-stl"
+              }
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "documentreference",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalScan/demo-intraoral-stl",
+      "date": "2026-02-12T18:40:00.000Z",
+      "display_name": "Intraoral scan upper/lower arches"
+    },
+    "_meta": {
+      "lwt": 1779823045896
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalPhoto/demo-intraoral-photo-30",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "DocumentReference",
+          "id": "demo-intraoral-photo-30",
+          "status": "current",
+          "type": {
+            "text": "Intraoral dental photo"
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "date": "2026-02-12T18:45:00.000Z",
+          "description": "Intraoral photo documenting tooth 30 occlusal caries.",
+          "content": [
+            {
+              "attachment": {
+                "contentType": "image/jpeg",
+                "title": "tooth-30-occlusal-photo.jpg",
+                "url": "demo://dental/photos/tooth-30-occlusal-photo.jpg",
+                "size": 642112
+              }
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "documentreference",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalPhoto/demo-intraoral-photo-30",
+      "date": "2026-02-12T18:45:00.000Z",
+      "display_name": "Intraoral photo tooth 30"
+    },
+    "_meta": {
+      "lwt": 1779823045896
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalCleaning/demo-prophy-2025-08",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Procedure",
+          "id": "demo-prophy-2025-08",
+          "status": "completed",
+          "code": {
+            "text": "Adult prophylaxis cleaning",
+            "coding": [
+              {
+                "system": "http://www.ada.org/cdt",
+                "code": "D1110",
+                "display": "Prophylaxis - adult"
+              }
+            ]
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "performedDateTime": "2025-08-14T16:00:00.000Z",
+          "note": [
+            {
+              "text": "Routine hygiene cleaning. Light plaque, no calculus. Fluoride varnish applied. Six-month recall recommended."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalCleaning/demo-prophy-2025-08",
+      "date": "2025-08-14T16:00:00.000Z",
+      "display_name": "Routine dental cleaning and exam"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalCleaning/demo-perio-maint-2025-02",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Procedure",
+          "id": "demo-perio-maint-2025-02",
+          "status": "completed",
+          "code": {
+            "text": "Periodontal maintenance cleaning",
+            "coding": [
+              {
+                "system": "http://www.ada.org/cdt",
+                "code": "D4910",
+                "display": "Periodontal maintenance"
+              }
+            ]
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "performedDateTime": "2025-02-06T17:15:00.000Z",
+          "note": [
+            {
+              "text": "Periodontal maintenance with localized scaling around molars. Bleeding improved compared with prior visit."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalCleaning/demo-perio-maint-2025-02",
+      "date": "2025-02-06T17:15:00.000Z",
+      "display_name": "Periodontal maintenance cleaning"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalCleaning/demo-srp-2024-09",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Procedure",
+          "id": "demo-srp-2024-09",
+          "status": "completed",
+          "code": {
+            "text": "Scaling and root planing UR/LR",
+            "coding": [
+              {
+                "system": "http://www.ada.org/cdt",
+                "code": "D4341",
+                "display": "Periodontal scaling and root planing"
+              }
+            ]
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "performedDateTime": "2024-09-18T18:30:00.000Z",
+          "bodySite": [
+            {
+              "text": "Upper right and lower right quadrants"
+            }
+          ],
+          "note": [
+            {
+              "text": "Scaling and root planing completed for UR and LR quadrants. Local anesthesia used. Re-evaluate pockets at next hygiene visit."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalCleaning/demo-srp-2024-09",
+      "date": "2024-09-18T18:30:00.000Z",
+      "display_name": "Scaling and root planing UR/LR"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalCleaning/demo-prophy-2024-03",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Procedure",
+          "id": "demo-prophy-2024-03",
+          "status": "completed",
+          "code": {
+            "text": "Adult prophylaxis cleaning",
+            "coding": [
+              {
+                "system": "http://www.ada.org/cdt",
+                "code": "D1110",
+                "display": "Prophylaxis - adult"
+              }
+            ]
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "performedDateTime": "2024-03-21T15:30:00.000Z",
+          "note": [
+            {
+              "text": "Routine cleaning and oral hygiene instruction. Moderate plaque on lingual lower anterior teeth."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "DentalCleaning/demo-prophy-2024-03",
+      "date": "2024-03-21T15:30:00.000Z",
+      "display_name": "Routine dental cleaning"
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|demo:demo-ortho-assessment-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "fullUrl": "demo:demo-ortho-assessment-2026",
+        "manual_specialty": "dental",
+        "manual_subtype": "orthodonticAssessment",
+        "manual_specialty_details": {
+          "specialty": "dental",
+          "subtype": "orthodonticAssessment",
+          "orthoPhase": "Diagnostic",
+          "orthoStatus": "Active assessment",
+          "overjet": "5",
+          "overbite": "4",
+          "molarClass": "Class II division 1"
+        },
+        "resource": {
+          "resourceType": "Condition",
+          "id": "demo-ortho-assessment-2026",
+          "code": {
+            "text": "Orthodontic assessment - Class II malocclusion"
+          },
+          "category": [
+            {
+              "text": "dental orthodontic"
+            }
+          ],
+          "date": "2026-03-12T12:00:00.000Z",
+          "effectiveDateTime": "2026-03-12T12:00:00.000Z",
+          "recordedDate": "2026-03-12T12:00:00.000Z",
+          "issued": "2026-03-12T12:00:00.000Z",
+          "status": "final",
+          "note": [
+            {
+              "text": "Angle Class II division 1 tendency. Overjet 5 mm, overbite 4 mm. Mild upper crowding, lower midline 1 mm left. No TMJ symptoms. Oral hygiene fair; reviewed braces and aligner options."
+            }
+          ],
+          "text": {
+            "status": "generated",
+            "div": "Angle Class II division 1 tendency. Overjet 5 mm, overbite 4 mm. Mild upper crowding, lower midline 1 mm left. No TMJ symptoms. Oral hygiene fair; reviewed braces and aligner options."
+          },
+          "description": "Orthodontic assessment - Class II malocclusion",
+          "conclusion": "Angle Class II division 1 tendency. Overjet 5 mm, overbite 4 mm. Mild upper crowding, lower midline 1 mm left. No TMJ symptoms. Oral hygiene fair; reviewed braces and aligner options."
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "demo:demo-ortho-assessment-2026",
+      "date": "2026-03-12T12:00:00.000Z",
+      "display_name": "Orthodontic assessment - Class II malocclusion",
+      "manual_specialty": "dental",
+      "manual_subtype": "orthodonticAssessment",
+      "manual_specialty_details": {
+        "specialty": "dental",
+        "subtype": "orthodonticAssessment",
+        "orthoPhase": "Diagnostic",
+        "orthoStatus": "Active assessment",
+        "overjet": "5",
+        "overbite": "4",
+        "molarClass": "Class II division 1"
+      }
+    },
+    "_meta": {
+      "lwt": 1779825105308
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|demo:demo-ortho-plan-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "fullUrl": "demo:demo-ortho-plan-2026",
+        "manual_specialty": "dental",
+        "manual_subtype": "orthodonticTreatmentPlan",
+        "manual_specialty_details": {
+          "specialty": "dental",
+          "subtype": "orthodonticTreatmentPlan",
+          "orthoPhase": "Phase II",
+          "orthoAppliance": "Clear aligners",
+          "orthoStatus": "Accepted",
+          "nextVisit": "Scan review in 4 weeks"
+        },
+        "resource": {
+          "resourceType": "CarePlan",
+          "id": "demo-ortho-plan-2026",
+          "code": {
+            "text": "Orthodontic treatment plan - aligner therapy"
+          },
+          "category": [
+            {
+              "text": "dental orthodontic"
+            }
+          ],
+          "date": "2026-03-20T12:00:00.000Z",
+          "effectiveDateTime": "2026-03-20T12:00:00.000Z",
+          "recordedDate": "2026-03-20T12:00:00.000Z",
+          "issued": "2026-03-20T12:00:00.000Z",
+          "status": "active",
+          "note": [
+            {
+              "text": "Accepted clear aligner plan. Estimated 18 months. Objectives: reduce overjet, align arches, correct midline, improve anterior guidance. Planned attachments, staged IPR up to 0.4 mm, elastics as needed. Consent reviewed and signed."
+            }
+          ],
+          "text": {
+            "status": "generated",
+            "div": "Accepted clear aligner plan. Estimated 18 months. Objectives: reduce overjet, align arches, correct midline, improve anterior guidance. Planned attachments, staged IPR up to 0.4 mm, elastics as needed. Consent reviewed and signed."
+          },
+          "description": "Orthodontic treatment plan - aligner therapy",
+          "conclusion": "Accepted clear aligner plan. Estimated 18 months. Objectives: reduce overjet, align arches, correct midline, improve anterior guidance. Planned attachments, staged IPR up to 0.4 mm, elastics as needed. Consent reviewed and signed."
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "careplan",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "demo:demo-ortho-plan-2026",
+      "date": "2026-03-20T12:00:00.000Z",
+      "display_name": "Orthodontic treatment plan - aligner therapy",
+      "manual_specialty": "dental",
+      "manual_subtype": "orthodonticTreatmentPlan",
+      "manual_specialty_details": {
+        "specialty": "dental",
+        "subtype": "orthodonticTreatmentPlan",
+        "orthoPhase": "Phase II",
+        "orthoAppliance": "Clear aligners",
+        "orthoStatus": "Accepted",
+        "nextVisit": "Scan review in 4 weeks"
+      }
+    },
+    "_meta": {
+      "lwt": 1779825105308
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|demo:demo-ortho-aligner-case",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "fullUrl": "demo:demo-ortho-aligner-case",
+        "manual_specialty": "dental",
+        "manual_subtype": "alignerCase",
+        "manual_specialty_details": {
+          "specialty": "dental",
+          "subtype": "alignerCase",
+          "orthoPhase": "Active treatment",
+          "orthoArch": "Both arches",
+          "orthoAppliance": "Clear aligners",
+          "orthoStatus": "Active",
+          "alignerCurrent": "1",
+          "alignerTotal": "24",
+          "nextVisit": "Tray 5 check"
+        },
+        "resource": {
+          "resourceType": "Procedure",
+          "id": "demo-ortho-aligner-case",
+          "code": {
+            "text": "Aligner case start - trays 1 to 24"
+          },
+          "category": [
+            {
+              "text": "dental orthodontic"
+            }
+          ],
+          "date": "2026-04-18T12:00:00.000Z",
+          "effectiveDateTime": "2026-04-18T12:00:00.000Z",
+          "recordedDate": "2026-04-18T12:00:00.000Z",
+          "issued": "2026-04-18T12:00:00.000Z",
+          "status": "final",
+          "note": [
+            {
+              "text": "Issued trays 1-4 of 24. Attachments placed on upper 6, 7, 10, 11 and lower 22, 27. Wear 22 hours/day, change every 10 days. Tracking fit good at delivery."
+            }
+          ],
+          "text": {
+            "status": "generated",
+            "div": "Issued trays 1-4 of 24. Attachments placed on upper 6, 7, 10, 11 and lower 22, 27. Wear 22 hours/day, change every 10 days. Tracking fit good at delivery."
+          },
+          "description": "Aligner case start - trays 1 to 24",
+          "conclusion": "Issued trays 1-4 of 24. Attachments placed on upper 6, 7, 10, 11 and lower 22, 27. Wear 22 hours/day, change every 10 days. Tracking fit good at delivery."
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "demo:demo-ortho-aligner-case",
+      "date": "2026-04-18T12:00:00.000Z",
+      "display_name": "Aligner case start - trays 1 to 24",
+      "manual_specialty": "dental",
+      "manual_subtype": "alignerCase",
+      "manual_specialty_details": {
+        "specialty": "dental",
+        "subtype": "alignerCase",
+        "orthoPhase": "Active treatment",
+        "orthoArch": "Both arches",
+        "orthoAppliance": "Clear aligners",
+        "orthoStatus": "Active",
+        "alignerCurrent": "1",
+        "alignerTotal": "24",
+        "nextVisit": "Tray 5 check"
+      }
+    },
+    "_meta": {
+      "lwt": 1779825105308
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|demo:demo-ortho-adjustment-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "fullUrl": "demo:demo-ortho-adjustment-2026",
+        "manual_specialty": "dental",
+        "manual_subtype": "orthodonticAdjustment",
+        "manual_specialty_details": {
+          "specialty": "dental",
+          "subtype": "orthodonticAdjustment",
+          "orthoPhase": "Active treatment",
+          "orthoAppliance": "Clear aligners",
+          "orthoStatus": "Tracking with minor lag",
+          "alignerCurrent": "8",
+          "alignerTotal": "24",
+          "nextVisit": "8 weeks"
+        },
+        "resource": {
+          "resourceType": "Encounter",
+          "id": "demo-ortho-adjustment-2026",
+          "code": {
+            "text": "Orthodontic adjustment visit - tray 8 check"
+          },
+          "category": [
+            {
+              "text": "dental orthodontic"
+            }
+          ],
+          "date": "2026-06-16T12:00:00.000Z",
+          "effectiveDateTime": "2026-06-16T12:00:00.000Z",
+          "recordedDate": "2026-06-16T12:00:00.000Z",
+          "issued": "2026-06-16T12:00:00.000Z",
+          "status": "final",
+          "note": [
+            {
+              "text": "Patient on aligner 8 of 24. Tracking acceptable except mild lag upper right lateral. Chewie use reinforced. No broken attachments. Hygiene good. Issued trays 9-12."
+            }
+          ],
+          "text": {
+            "status": "generated",
+            "div": "Patient on aligner 8 of 24. Tracking acceptable except mild lag upper right lateral. Chewie use reinforced. No broken attachments. Hygiene good. Issued trays 9-12."
+          },
+          "description": "Orthodontic adjustment visit - tray 8 check",
+          "conclusion": "Patient on aligner 8 of 24. Tracking acceptable except mild lag upper right lateral. Chewie use reinforced. No broken attachments. Hygiene good. Issued trays 9-12."
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "encounter",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "demo:demo-ortho-adjustment-2026",
+      "date": "2026-06-16T12:00:00.000Z",
+      "display_name": "Orthodontic adjustment visit - tray 8 check",
+      "manual_specialty": "dental",
+      "manual_subtype": "orthodonticAdjustment",
+      "manual_specialty_details": {
+        "specialty": "dental",
+        "subtype": "orthodonticAdjustment",
+        "orthoPhase": "Active treatment",
+        "orthoAppliance": "Clear aligners",
+        "orthoStatus": "Tracking with minor lag",
+        "alignerCurrent": "8",
+        "alignerTotal": "24",
+        "nextVisit": "8 weeks"
+      }
+    },
+    "_meta": {
+      "lwt": 1779825105308
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|demo:demo-ortho-ceph-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "fullUrl": "demo:demo-ortho-ceph-2026",
+        "manual_specialty": "dental",
+        "manual_subtype": "cephalometricAnalysis",
+        "manual_specialty_details": {
+          "specialty": "dental",
+          "subtype": "cephalometricAnalysis",
+          "orthoPhase": "Diagnostic",
+          "orthoStatus": "Baseline",
+          "overjet": "5",
+          "overbite": "4",
+          "molarClass": "Skeletal Class II"
+        },
+        "resource": {
+          "resourceType": "Observation",
+          "id": "demo-ortho-ceph-2026",
+          "code": {
+            "text": "Cephalometric analysis baseline"
+          },
+          "category": [
+            {
+              "text": "dental orthodontic"
+            }
+          ],
+          "date": "2026-03-12T12:00:00.000Z",
+          "effectiveDateTime": "2026-03-12T12:00:00.000Z",
+          "recordedDate": "2026-03-12T12:00:00.000Z",
+          "issued": "2026-03-12T12:00:00.000Z",
+          "status": "final",
+          "note": [
+            {
+              "text": "Baseline lateral ceph. SNA 82, SNB 78, ANB 4, Wits +2 mm, mandibular plane angle 31 degrees. Incisor angulation increased. Findings support mild skeletal Class II pattern."
+            }
+          ],
+          "text": {
+            "status": "generated",
+            "div": "Baseline lateral ceph. SNA 82, SNB 78, ANB 4, Wits +2 mm, mandibular plane angle 31 degrees. Incisor angulation increased. Findings support mild skeletal Class II pattern."
+          },
+          "description": "Cephalometric analysis baseline",
+          "conclusion": "Baseline lateral ceph. SNA 82, SNB 78, ANB 4, Wits +2 mm, mandibular plane angle 31 degrees. Incisor angulation increased. Findings support mild skeletal Class II pattern."
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "demo:demo-ortho-ceph-2026",
+      "date": "2026-03-12T12:00:00.000Z",
+      "display_name": "Cephalometric analysis baseline",
+      "manual_specialty": "dental",
+      "manual_subtype": "cephalometricAnalysis",
+      "manual_specialty_details": {
+        "specialty": "dental",
+        "subtype": "cephalometricAnalysis",
+        "orthoPhase": "Diagnostic",
+        "orthoStatus": "Baseline",
+        "overjet": "5",
+        "overbite": "4",
+        "molarClass": "Skeletal Class II"
+      }
+    },
+    "_meta": {
+      "lwt": 1779825105308
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|demo:demo-ortho-retention-2025",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "fullUrl": "demo:demo-ortho-retention-2025",
+        "manual_specialty": "dental",
+        "manual_subtype": "retention",
+        "manual_specialty_details": {
+          "specialty": "dental",
+          "subtype": "retention",
+          "orthoPhase": "Retention",
+          "orthoArch": "Upper removable, lower fixed",
+          "orthoAppliance": "Clear retainer and bonded 3-3 retainer",
+          "orthoStatus": "Delivered",
+          "dentalRecall": "6-month retention check"
+        },
+        "resource": {
+          "resourceType": "Procedure",
+          "id": "demo-ortho-retention-2025",
+          "code": {
+            "text": "Retainer delivery and retention instructions"
+          },
+          "category": [
+            {
+              "text": "dental orthodontic"
+            }
+          ],
+          "date": "2025-11-21T12:00:00.000Z",
+          "effectiveDateTime": "2025-11-21T12:00:00.000Z",
+          "recordedDate": "2025-11-21T12:00:00.000Z",
+          "issued": "2025-11-21T12:00:00.000Z",
+          "status": "final",
+          "note": [
+            {
+              "text": "Upper clear retainer and lower bonded 3-3 retainer delivered after prior limited ortho. Nightly wear reviewed. Lower bonded retainer intact; recall in 6 months."
+            }
+          ],
+          "text": {
+            "status": "generated",
+            "div": "Upper clear retainer and lower bonded 3-3 retainer delivered after prior limited ortho. Nightly wear reviewed. Lower bonded retainer intact; recall in 6 months."
+          },
+          "description": "Retainer delivery and retention instructions",
+          "conclusion": "Upper clear retainer and lower bonded 3-3 retainer delivered after prior limited ortho. Nightly wear reviewed. Lower bonded retainer intact; recall in 6 months."
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "demo:demo-ortho-retention-2025",
+      "date": "2025-11-21T12:00:00.000Z",
+      "display_name": "Retainer delivery and retention instructions",
+      "manual_specialty": "dental",
+      "manual_subtype": "retention",
+      "manual_specialty_details": {
+        "specialty": "dental",
+        "subtype": "retention",
+        "orthoPhase": "Retention",
+        "orthoArch": "Upper removable, lower fixed",
+        "orthoAppliance": "Clear retainer and bonded 3-3 retainer",
+        "orthoStatus": "Delivered",
+        "dentalRecall": "6-month retention check"
+      }
+    },
+    "_meta": {
+      "lwt": 1779825105308
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|demo:demo-ortho-consent-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "fullUrl": "demo:demo-ortho-consent-2026",
+        "manual_specialty": "dental",
+        "manual_subtype": "orthodonticConsent",
+        "manual_specialty_details": {
+          "specialty": "dental",
+          "subtype": "orthodonticConsent",
+          "orthoPhase": "Phase II",
+          "orthoStatus": "Signed"
+        },
+        "resource": {
+          "resourceType": "DocumentReference",
+          "id": "demo-ortho-consent-2026",
+          "code": {
+            "text": "Orthodontic informed consent and financial agreement"
+          },
+          "category": [
+            {
+              "text": "dental orthodontic"
+            }
+          ],
+          "date": "2026-03-20T12:00:00.000Z",
+          "effectiveDateTime": "2026-03-20T12:00:00.000Z",
+          "recordedDate": "2026-03-20T12:00:00.000Z",
+          "issued": "2026-03-20T12:00:00.000Z",
+          "status": "final",
+          "note": [
+            {
+              "text": "Consent covers risks, alternatives, no-treatment option, retention responsibility, aligner compliance, possible refinements, and insurance/payment estimate. Guardian signed electronically."
+            }
+          ],
+          "text": {
+            "status": "generated",
+            "div": "Consent covers risks, alternatives, no-treatment option, retention responsibility, aligner compliance, possible refinements, and insurance/payment estimate. Guardian signed electronically."
+          },
+          "description": "Orthodontic informed consent and financial agreement",
+          "conclusion": "Consent covers risks, alternatives, no-treatment option, retention responsibility, aligner compliance, possible refinements, and insurance/payment estimate. Guardian signed electronically."
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "documentreference",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "demo:demo-ortho-consent-2026",
+      "date": "2026-03-20T12:00:00.000Z",
+      "display_name": "Orthodontic informed consent and financial agreement",
+      "manual_specialty": "dental",
+      "manual_subtype": "orthodonticConsent",
+      "manual_specialty_details": {
+        "specialty": "dental",
+        "subtype": "orthodonticConsent",
+        "orthoPhase": "Phase II",
+        "orthoStatus": "Signed"
+      }
+    },
+    "_meta": {
+      "lwt": 1779825105308
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|demo:demo-ortho-scan-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "fullUrl": "demo:demo-ortho-scan-2026",
+        "manual_specialty": "dental",
+        "manual_subtype": "imaging",
+        "manual_specialty_details": {
+          "specialty": "dental",
+          "subtype": "imaging",
+          "orthoPhase": "Diagnostic",
+          "orthoArch": "Both arches",
+          "orthoStatus": "Exported"
+        },
+        "resource": {
+          "resourceType": "DocumentReference",
+          "id": "demo-ortho-scan-2026",
+          "code": {
+            "text": "Orthodontic intraoral STL scan and bite registration"
+          },
+          "category": [
+            {
+              "text": "dental orthodontic"
+            }
+          ],
+          "date": "2026-03-14T12:00:00.000Z",
+          "effectiveDateTime": "2026-03-14T12:00:00.000Z",
+          "recordedDate": "2026-03-14T12:00:00.000Z",
+          "issued": "2026-03-14T12:00:00.000Z",
+          "status": "final",
+          "note": [
+            {
+              "text": "Upper/lower STL intraoral scans with bite registration exported for aligner planning. Segmentation pending; source files retained as local document references."
+            }
+          ],
+          "text": {
+            "status": "generated",
+            "div": "Upper/lower STL intraoral scans with bite registration exported for aligner planning. Segmentation pending; source files retained as local document references."
+          },
+          "description": "Orthodontic intraoral STL scan and bite registration",
+          "conclusion": "Upper/lower STL intraoral scans with bite registration exported for aligner planning. Segmentation pending; source files retained as local document references."
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "documentreference",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "demo:demo-ortho-scan-2026",
+      "date": "2026-03-14T12:00:00.000Z",
+      "display_name": "Orthodontic intraoral STL scan and bite registration",
+      "manual_specialty": "dental",
+      "manual_subtype": "imaging",
+      "manual_specialty_details": {
+        "specialty": "dental",
+        "subtype": "imaging",
+        "orthoPhase": "Diagnostic",
+        "orthoArch": "Both arches",
+        "orthoStatus": "Exported"
+      }
+    },
+    "_meta": {
+      "lwt": 1779825105308
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|demo:demo-ortho-pano-ceph-2026",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "dental-demo-connection",
+    "data_record": {
+      "raw": {
+        "fullUrl": "demo:demo-ortho-pano-ceph-2026",
+        "manual_specialty": "dental",
+        "manual_subtype": "imaging",
+        "manual_specialty_details": {
+          "specialty": "dental",
+          "subtype": "imaging",
+          "orthoPhase": "Diagnostic",
+          "orthoStatus": "Reviewed"
+        },
+        "resource": {
+          "resourceType": "DiagnosticReport",
+          "id": "demo-ortho-pano-ceph-2026",
+          "code": {
+            "text": "Panoramic and cephalometric orthodontic imaging report"
+          },
+          "category": [
+            {
+              "text": "dental orthodontic"
+            }
+          ],
+          "date": "2026-03-12T12:00:00.000Z",
+          "effectiveDateTime": "2026-03-12T12:00:00.000Z",
+          "recordedDate": "2026-03-12T12:00:00.000Z",
+          "issued": "2026-03-12T12:00:00.000Z",
+          "status": "final",
+          "note": [
+            {
+              "text": "Panoramic and lateral cephalometric radiographs reviewed. No pathology. Third molars developing. Ceph landmarks adequate for analysis. Imaging used for orthodontic diagnosis and treatment plan."
+            }
+          ],
+          "text": {
+            "status": "generated",
+            "div": "Panoramic and lateral cephalometric radiographs reviewed. No pathology. Third molars developing. Ceph landmarks adequate for analysis. Imaging used for orthodontic diagnosis and treatment plan."
+          },
+          "description": "Panoramic and cephalometric orthodontic imaging report",
+          "conclusion": "Panoramic and lateral cephalometric radiographs reviewed. No pathology. Third molars developing. Ceph landmarks adequate for analysis. Imaging used for orthodontic diagnosis and treatment plan."
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "diagnosticreport",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "demo:demo-ortho-pano-ceph-2026",
+      "date": "2026-03-12T12:00:00.000Z",
+      "display_name": "Panoramic and cephalometric orthodontic imaging report",
+      "manual_specialty": "dental",
+      "manual_subtype": "imaging",
+      "manual_specialty_details": {
+        "specialty": "dental",
+        "subtype": "imaging",
+        "orthoPhase": "Diagnostic",
+        "orthoStatus": "Reviewed"
+      }
+    },
+    "_meta": {
+      "lwt": 1779825105308
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  }
+]

@@ -1,0 +1,144 @@
+{
+  "name": "connection_documents",
+  "schemaHash": "sza9oh",
+  "docs": [
+    {
+      "id": "0f38582a-1773-4e2b-80e3-90fda727cdbd",
+      "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+      "source": "onpatient",
+      "location": "https://fhir.epic.com/interconnect-fhir-oauth",
+      "name": "Blessings Clinic",
+      "access_token": "*****",
+      "refresh_token": "*****",
+      "last_refreshed": "2023-11-14T03:39:13.292Z",
+      "tenant_id": "*****",
+      "last_sync_was_error": false,
+      "last_sync_attempt": "2025-10-29T23:38:44.965Z",
+      "expires_at": 1674876347,
+      "_meta": {
+        "lwt": 1761781124967.02
+      },
+      "_deleted": false
+    },
+    {
+      "id": "3993ce6f-d2d6-4526-840d-4753b7207c88",
+      "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+      "source": "epic",
+      "location": "https://fhir.epic.com/interconnect-fhir-oauth",
+      "name": "Highlands Hospital Center",
+      "access_token": "*****",
+      "scope": "patient/AllergyIntolerance.Read patient/Binary.Read patient/CarePlan.Read patient/Condition.Read patient/Device.Read patient/DiagnosticReport.Read patient/DocumentReference.Read patient/Goal.Read patient/Immunization.Read patient/Medication.Read patient/MedicationOrder.Read patient/MedicationStatement.Read patient/Observation.Read patient/Patient.Read patient/Practitioner.Read patient/Procedure.Read launch/patient",
+      "patient": "TU7Ww-u45MuFg3rfCUJulShScNajzRO7B74I-03agGsIB",
+      "client_id": "GFC22A3B4-A1CF-11ED-8EEC-005056A8FA4A",
+      "tenant_id": "*****",
+      "last_refreshed": "2016-09-27T05:52:44.098Z",
+      "refresh_token": "*****",
+      "last_sync_was_error": false,
+      "last_sync_attempt": "2025-10-29T23:38:42.501Z",
+      "expires_at": 1675218618,
+      "_meta": {
+        "lwt": 1761781122503.02
+      },
+      "_deleted": false
+    },
+    {
+      "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+      "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+      "source": "cerner",
+      "location": "https://fhir-myrecord.cerner.com/dstu2/ec2458f2-1e24-41c8-b71b-0e701af7583d/",
+      "auth_uri": "https://authorization.cerner.com/tenants/ec2458f2-1e24-41c8-b71b-0e701af7583d/protocols/oauth2/profiles/smart-v1/personas/patient/authorize",
+      "token_uri": "https://authorization.cerner.com/tenants/ec2458f2-1e24-41c8-b71b-0e701af7583d/protocols/oauth2/profiles/smart-v1/token",
+      "name": "Oak Valley Community Hospital",
+      "access_token": "*****",
+      "scope": "patient/AllergyIntolerance.Read patient/Binary.Read patient/CarePlan.Read patient/Condition.Read patient/Device.Read patient/DiagnosticReport.Read patient/DocumentReference.Read patient/Goal.Read patient/Immunization.Read patient/Medication.Read patient/MedicationOrder.Read patient/MedicationStatement.Read patient/Observation.Read patient/Patient.Read patient/Practitioner.Read patient/Procedure.Read launch/patient",
+      "patient": "TGsj9rYGI8SV-LYYkdH1JqbxYuFGfrODXSPC6iLLYkJcB",
+      "client_id": "G7022A34A-A24D-11ED-9C46-0050568BD7C0",
+      "tenant_id": "*****",
+      "last_refreshed": "2009-06-17T01:39:34.493Z",
+      "refresh_token": "*****",
+      "last_sync_was_error": false,
+      "last_sync_attempt": "2025-10-29T23:38:42.605Z",
+      "expires_at": 1675272499,
+      "_meta": {
+        "lwt": 1761781122606.02
+      },
+      "_deleted": false
+    },
+    {
+      "id": "a25cd905-d981-496b-ab08-ff1fd78b3ca8",
+      "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+      "source": "epic",
+      "location": "https://fhir.epic.com/interconnect-fhir-oauth",
+      "name": "Lowland Community Hospital",
+      "access_token": "*****",
+      "scope": "patient/AllergyIntolerance.Read patient/Binary.Read patient/CarePlan.Read patient/Condition.Read patient/Device.Read patient/DiagnosticReport.Read patient/DocumentReference.Read patient/Goal.Read patient/Immunization.Read patient/Medication.Read patient/MedicationOrder.Read patient/MedicationStatement.Read patient/Observation.Read patient/Patient.Read patient/Practitioner.Read patient/Procedure.Read launch/patient",
+      "patient": "TEA538R9Oalv4iCf581QobYR3Le1v8.Gk.AJpfnwryEMB",
+      "client_id": "G841EDF08-A1D0-11ED-8306-005056A4FD84",
+      "tenant_id": "*****",
+      "last_refreshed": "2022-12-04T21:40:58.870Z",
+      "refresh_token": "*****",
+      "last_sync_was_error": false,
+      "last_sync_attempt": "2025-10-29T23:38:42.488Z",
+      "expires_at": 1675218846,
+      "_meta": {
+        "lwt": 1761781122491.01
+      },
+      "_deleted": false
+    },
+    {
+      "id": "e3936774-a661-4be0-8172-912ef5f758b7",
+      "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+      "source": "epic",
+      "location": "https://fhir.epic.com/interconnect-fhir-oauth",
+      "name": "Hopedale Medical Clinic",
+      "access_token": "*****",
+      "scope": "patient/AllergyIntolerance.Read patient/Binary.Read patient/CarePlan.Read patient/Condition.Read patient/Device.Read patient/DiagnosticReport.Read patient/DocumentReference.Read patient/Goal.Read patient/Immunization.Read patient/Medication.Read patient/MedicationOrder.Read patient/MedicationStatement.Read patient/Observation.Read patient/Patient.Read patient/Practitioner.Read patient/Procedure.Read launch/patient",
+      "patient": "TZDZshrvQARLXydivaO7TvciSUEZ2mnfenEOwMPqGRSsB",
+      "client_id": "G6745ED04-A1D0-11ED-AAC6-3403A5D01EBA",
+      "tenant_id": "*****",
+      "last_refreshed": "2016-08-08T13:59:15.176Z",
+      "refresh_token": "*****",
+      "last_sync_was_error": false,
+      "last_sync_attempt": "2025-10-29T23:38:42.512Z",
+      "expires_at": 1675218797,
+      "_meta": {
+        "lwt": 1761781122516.02
+      },
+      "_deleted": false
+    },
+    {
+      "id": "dental-demo-connection",
+      "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+      "source": "manual",
+      "location": "demo://dental-smiles-family-dentistry",
+      "name": "Smiles Family Dentistry",
+      "access_token": "*****",
+      "refresh_token": "*****",
+      "last_refreshed": "2026-03-03T16:30:00.000Z",
+      "last_sync_was_error": false,
+      "last_sync_attempt": "2026-03-03T16:30:00.000Z",
+      "expires_at": 1772555400,
+      "_meta": {
+        "lwt": 1779823045896
+      },
+      "_deleted": false
+    },
+    {
+      "id": "optometry-demo-connection",
+      "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+      "source": "manual",
+      "location": "demo://clearview-optometry",
+      "name": "ClearView Optometry",
+      "access_token": "*****",
+      "refresh_token": "*****",
+      "last_refreshed": "2026-04-08T17:00:00.000Z",
+      "last_sync_was_error": false,
+      "last_sync_attempt": "2026-04-08T17:00:00.000Z",
+      "expires_at": 1775667600,
+      "_meta": {
+        "lwt": 1779823879174
+      },
+      "_deleted": false
+    }
+  ]
+}

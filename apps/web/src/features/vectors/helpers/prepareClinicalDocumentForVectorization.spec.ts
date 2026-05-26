@@ -32,7 +32,7 @@ beforeEach(() => {
   });
 });
 
-// Real test fixtures extracted from production demo.json
+// Real test fixtures extracted from the demo fixture.
 const realObservationFixture: ClinicalDocument<any> = {
   id: '3993ce6f-d2d6-4526-840d-4753b7207c88|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/Observation/T2tq0t9mgFFfQ8JWmyGaw7g8g1W3Yj3Zg.bSZtsIVGzoB',
   user_id: '91a8d8cb-6480-4db4-a628-18a5e44536cd',

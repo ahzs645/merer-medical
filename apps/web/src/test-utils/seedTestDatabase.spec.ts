@@ -17,7 +17,7 @@ describe('seedTestDatabase', () => {
     await cleanupTestDatabase(db);
   });
 
-  it('ensures demo.json schema matches current expected schema on import', async () => {
+  it('ensures the demo fixture schema matches current expected schema on import', async () => {
     await seedTestDatabase(db);
   });
 

@@ -1,0 +1,18 @@
+{
+  "name": "summary_page_preferences",
+  "schemaHash": "z0zi96",
+  "docs": [
+    {
+      "id": "e4353690-4af0-42c5-94a3-08823bb6c6da",
+      "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+      "pinned_labs": [
+        "a25cd905-d981-496b-ab08-ff1fd78b3ca8|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/Observation/T5MzUBOkQfDhPSYQjl4aTItTrwHfMHfGu0h6a1aaIHYgB",
+        "a25cd905-d981-496b-ab08-ff1fd78b3ca8|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/Observation/T5MzUBOkQfDhPSYQjl4aTIgzY3yeUIoNBNIeQUR452aEB"
+      ],
+      "_meta": {
+        "lwt": 1761781117798.02
+      },
+      "_deleted": false
+    }
+  ]
+}

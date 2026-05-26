@@ -13,7 +13,7 @@ export function LabReferenceStandardControl({
   setSelectedMode: (mode: ReferenceOverlayMode) => void;
 }) {
   return (
-    <section className="rounded-md border border-gray-200 bg-white px-4 py-3 shadow-sm">
+    <section className="rounded-md border border-gray-200 bg-white px-3 py-3 shadow-sm sm:px-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-sm font-semibold text-gray-900">
@@ -27,7 +27,7 @@ export function LabReferenceStandardControl({
         <div
           role="radiogroup"
           aria-label="Reference standard"
-          className="flex flex-wrap gap-2"
+          className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap"
         >
           {referenceOverlayModes.map((mode) => {
             const selected = selectedMode === mode;
@@ -39,7 +39,7 @@ export function LabReferenceStandardControl({
                 role="radio"
                 aria-checked={selected}
                 onClick={() => setSelectedMode(mode)}
-                className={`inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold ${
+                className={`inline-flex min-h-9 items-center justify-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold sm:justify-start ${
                   selected
                     ? 'border-primary-700 bg-primary-50 text-primary-900'
                     : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'

@@ -1,0 +1,15 @@
+{
+  "name": "user_preferences",
+  "schemaHash": "o01fwr",
+  "docs": [
+    {
+      "use_proxy": true,
+      "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+      "id": "9bca0f4e-b023-4d2b-9f9d-59af9b3b3234",
+      "_meta": {
+        "lwt": 1761781117812.01
+      },
+      "_deleted": false
+    }
+  ]
+}

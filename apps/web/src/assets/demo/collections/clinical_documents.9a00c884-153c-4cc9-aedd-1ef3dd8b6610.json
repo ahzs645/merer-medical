@@ -1,0 +1,3884 @@
+[
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TCL8gvLArh3J9-ouPez48SwB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TCL8gvLArh3J9-ouPez48SwB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TCL8gvLArh3J9-ouPez48SwB",
+        "resource": {
+          "resourceType": "AllergyIntolerance",
+          "id": "TCL8gvLArh3J9-ouPez48SwB",
+          "onset": "2007-04-27",
+          "recordedDate": "2009-05-26T00:55:38.829Z",
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "substance": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "892484",
+                "display": "STRAWBERRY EXTRACT"
+              },
+              {
+                "system": "http://fdasis.nlm.nih.gov",
+                "code": "4J2TY8Y81V",
+                "display": "STRAWBERRY EXTRACT"
+              }
+            ],
+            "text": "STRAWBERRY EXTRACT"
+          },
+          "status": "confirmed",
+          "criticality": "CRITH",
+          "reaction": [
+            {
+              "certainty": "confirmed",
+              "onset": "2007-04-27",
+              "manifestation": [
+                {
+                  "text": "Anaphylaxis"
+                }
+              ]
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "allergyintolerance",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TCL8gvLArh3J9-ouPez48SwB",
+      "date": "2009-05-26T00:55:38.829Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.1
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TD.wMo3U.roSLonCSKC978gB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TD.wMo3U.roSLonCSKC978gB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TD.wMo3U.roSLonCSKC978gB",
+        "resource": {
+          "resourceType": "AllergyIntolerance",
+          "id": "TD.wMo3U.roSLonCSKC978gB",
+          "onset": "2010",
+          "recordedDate": "2017-02-26T02:48:17.681Z",
+          "recorder": {
+            "display": "Family Medicine Physician, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/Thh97FZ9lU9.p-Rgpozo6vwB"
+          },
+          "patient": {
+            "display": "Davis, Elijah John",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TZP1AvJlIR4IZDc3myX64DDxFHjn24zSDxI1BPYXIAk4B"
+          },
+          "substance": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "6211",
+                "display": "LACTOSE"
+              },
+              {
+                "system": "http://fdasis.nlm.nih.gov",
+                "code": "3SY5LH9PMK",
+                "display": "LACTOSE"
+              }
+            ],
+            "text": "LACTOSE"
+          },
+          "status": "confirmed",
+          "criticality": "CRITL",
+          "reaction": [
+            {
+              "certainty": "confirmed",
+              "onset": "2010",
+              "manifestation": [
+                {
+                  "text": "GI intolerance"
+                }
+              ]
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "allergyintolerance",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TD.wMo3U.roSLonCSKC978gB",
+      "date": "2017-02-26T02:48:17.681Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.11
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TE0ew53gcSnA-so7H0RQuQwB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TE0ew53gcSnA-so7H0RQuQwB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TE0ew53gcSnA-so7H0RQuQwB",
+        "resource": {
+          "resourceType": "AllergyIntolerance",
+          "id": "TE0ew53gcSnA-so7H0RQuQwB",
+          "onset": "2012-05-28",
+          "recordedDate": "2019-05-30T15:42:40.202Z",
+          "recorder": {
+            "display": "Family Medicine Physician, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/Thh97FZ9lU9.p-Rgpozo6vwB"
+          },
+          "patient": {
+            "display": "Davis, Elijah John",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TZP1AvJlIR4IZDc3myX64DDxFHjn24zSDxI1BPYXIAk4B"
+          },
+          "substance": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "1314891",
+                "display": "LATEX"
+              },
+              {
+                "system": "http://fdasis.nlm.nih.gov",
+                "code": "2LQ0UUW8IN",
+                "display": "LATEX"
+              }
+            ],
+            "text": "LATEX"
+          },
+          "status": "confirmed",
+          "criticality": "CRITL",
+          "reaction": [
+            {
+              "certainty": "confirmed",
+              "onset": "2012-05-28",
+              "manifestation": [
+                {
+                  "text": "Hives"
+                },
+                {
+                  "text": "Itching"
+                }
+              ]
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "allergyintolerance",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TE0ew53gcSnA-so7H0RQuQwB",
+      "date": "2019-05-30T15:42:40.202Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.12
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB",
+        "resource": {
+          "resourceType": "AllergyIntolerance",
+          "id": "TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB",
+          "patient": {
+            "display": "Powell, Desiree Caroline",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB"
+          },
+          "substance": {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "1631000175102",
+                "display": "Patient not asked"
+              }
+            ],
+            "text": "Not on File"
+          },
+          "status": "unconfirmed"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "allergyintolerance",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB",
+      "date": "2006-04-01T08:53:40.204Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.13
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TSrFbSNLZt8fsKYpHZHSrOwB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TSrFbSNLZt8fsKYpHZHSrOwB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TSrFbSNLZt8fsKYpHZHSrOwB",
+        "resource": {
+          "resourceType": "AllergyIntolerance",
+          "id": "TSrFbSNLZt8fsKYpHZHSrOwB",
+          "onset": "2007-04-27",
+          "recordedDate": "2011-02-21T19:02:47.330Z",
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "substance": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "7980",
+                "display": "PENICILLIN G"
+              },
+              {
+                "system": "http://fdasis.nlm.nih.gov",
+                "code": "Q42T66VG0C",
+                "display": "PENICILLIN G"
+              }
+            ],
+            "text": "PENICILLIN G"
+          },
+          "status": "confirmed",
+          "criticality": "CRITL",
+          "reaction": [
+            {
+              "certainty": "confirmed",
+              "onset": "2007-04-27",
+              "manifestation": [
+                {
+                  "text": "Hives"
+                }
+              ]
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "allergyintolerance",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TSrFbSNLZt8fsKYpHZHSrOwB",
+      "date": "2011-02-21T19:02:47.330Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.14
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B",
+        "resource": {
+          "resourceType": "AllergyIntolerance",
+          "id": "TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B",
+          "patient": {
+            "display": "Lopez, Camila Maria",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B"
+          },
+          "substance": {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "1631000175102",
+                "display": "Patient not asked"
+              }
+            ],
+            "text": "Not on File"
+          },
+          "status": "unconfirmed"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "allergyintolerance",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B",
+      "date": "2006-04-01T08:53:40.204Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.15
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TpVSZffvhgK94550JQbWXBgB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TpVSZffvhgK94550JQbWXBgB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TpVSZffvhgK94550JQbWXBgB",
+        "resource": {
+          "resourceType": "AllergyIntolerance",
+          "id": "TpVSZffvhgK94550JQbWXBgB",
+          "onset": "2007-04-27",
+          "recordedDate": "2014-08-20T13:32:18.828Z",
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "substance": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/ndfrt",
+                "code": "N0000007624",
+                "display": "SHELLFISH-DERIVED PRODUCTS"
+              }
+            ],
+            "text": "SHELLFISH-DERIVED PRODUCTS"
+          },
+          "status": "confirmed",
+          "criticality": "CRITH",
+          "reaction": [
+            {
+              "certainty": "confirmed",
+              "onset": "2007-04-27",
+              "manifestation": [
+                {
+                  "text": "Itching"
+                }
+              ]
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "allergyintolerance",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/TpVSZffvhgK94550JQbWXBgB",
+      "date": "2014-08-20T13:32:18.828Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.16
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0",
+        "resource": {
+          "resourceType": "AllergyIntolerance",
+          "id": "e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0",
+          "patient": {
+            "display": "Lin, Derrick",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0"
+          },
+          "substance": {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "1631000175102",
+                "display": "Patient not asked"
+              }
+            ],
+            "text": "Not on File"
+          },
+          "status": "unconfirmed"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "allergyintolerance",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/AllergyIntolerance/e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0",
+      "date": "2006-04-01T08:53:40.204Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.17
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB",
+        "resource": {
+          "resourceType": "CarePlan",
+          "id": "TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB",
+          "subject": {
+            "display": "Powell, Desiree Caroline",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB"
+          },
+          "status": "active",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "38717003",
+                  "display": "Longitudinal"
+                }
+              ],
+              "text": "Longitudinal"
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "careplan",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB",
+      "date": "2006-04-01T08:53:40.204Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.18
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/TZP1AvJlIR4IZDc3myX64DDxFHjn24zSDxI1BPYXIAk4B",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/TZP1AvJlIR4IZDc3myX64DDxFHjn24zSDxI1BPYXIAk4B"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/TZP1AvJlIR4IZDc3myX64DDxFHjn24zSDxI1BPYXIAk4B",
+        "resource": {
+          "resourceType": "CarePlan",
+          "id": "TZP1AvJlIR4IZDc3myX64DDxFHjn24zSDxI1BPYXIAk4B",
+          "subject": {
+            "display": "Davis, Elijah John",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TZP1AvJlIR4IZDc3myX64DDxFHjn24zSDxI1BPYXIAk4B"
+          },
+          "status": "active",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "38717003",
+                  "display": "Longitudinal"
+                }
+              ],
+              "text": "Longitudinal"
+            }
+          ],
+          "addresses": [
+            {
+              "display": "Right upper lobe pneumonia",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T0w9tuQmTLTBhjOEI0bpBpAB"
+            },
+            {
+              "display": "Broken arm",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/Tq5Ws51pnFqUA17r4wKRvUAB"
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "careplan",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/TZP1AvJlIR4IZDc3myX64DDxFHjn24zSDxI1BPYXIAk4B",
+      "date": "2006-04-01T08:53:40.204Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.19
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B",
+        "resource": {
+          "resourceType": "CarePlan",
+          "id": "TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B",
+          "subject": {
+            "display": "Lopez, Camila Maria",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B"
+          },
+          "status": "active",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "38717003",
+                  "display": "Longitudinal"
+                }
+              ],
+              "text": "Longitudinal"
+            }
+          ],
+          "addresses": [
+            {
+              "display": "Polycystic ovaries",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TN6waPEPXdmZfcLWL6Lxr3wB"
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "careplan",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B",
+      "date": "2006-04-01T08:53:40.204Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.2
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB",
+        "resource": {
+          "resourceType": "CarePlan",
+          "id": "Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB",
+          "subject": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "status": "active",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "38717003",
+                  "display": "Longitudinal"
+                }
+              ],
+              "text": "Longitudinal"
+            }
+          ],
+          "addresses": [
+            {
+              "display": "Chronic cough",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TxgN-LNHqNXDbPenMZURj3gB"
+            },
+            {
+              "display": "Asthma",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TNBVegGo63EqEs9x0ugqJZwB"
+            },
+            {
+              "display": "TB (pulmonary tuberculosis)",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TpQ3y0axeAgBy6ee7oUTTLgB"
+            },
+            {
+              "display": "Zika virus disease",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TJ8aFaqXRcO7oNxvSHFQ1MgB"
+            },
+            {
+              "display": "Fear of open places",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T.dUwSVhAMiuA7rzdhV.wSAB"
+            },
+            {
+              "display": "Elevated hemoglobin A1c",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TkWzuybaxs2csXqHVo53vdwB"
+            },
+            {
+              "display": "Bad breath",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T0ScCElKTIITpT72zaEiGEAB"
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "careplan",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB",
+      "date": "2006-04-01T08:53:40.204Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.21
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0",
+        "resource": {
+          "resourceType": "CarePlan",
+          "id": "e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0",
+          "subject": {
+            "display": "Lin, Derrick",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0"
+          },
+          "status": "active",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "38717003",
+                  "display": "Longitudinal"
+                }
+              ],
+              "text": "Longitudinal"
+            }
+          ],
+          "addresses": [
+            {
+              "display": "Risk for coronary artery disease between 10% and 20% in next 10 years",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TH12jkQYrabXcEh-2vXMxLAB"
+            }
+          ],
+          "goal": [
+            {
+              "display": "Increase physical activity ",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Goal/Th1eUSLOTovYJXv3ZSZ0gEQB"
+            },
+            {
+              "display": "Get 7-8 hours of restful sleep each night",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Goal/Tyf3iG2vHsf9V2xinvdHbrwB"
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "careplan",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/CarePlan/e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0",
+      "date": "2006-04-01T08:53:40.204Z"
+    },
+    "_meta": {
+      "lwt": 1761781117805.22
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T.dUwSVhAMiuA7rzdhV.wSAB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T.dUwSVhAMiuA7rzdhV.wSAB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T.dUwSVhAMiuA7rzdhV.wSAB",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "T.dUwSVhAMiuA7rzdhV.wSAB",
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "dateRecorded": "2007-04-27",
+          "code": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-9-cm/diagnosis",
+                "code": "300.22",
+                "display": "Agoraphobia"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.6.90",
+                "code": "F40.00",
+                "display": "Agoraphobia"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "70691001",
+                "display": "Agoraphobia (disorder)"
+              }
+            ],
+            "text": "Fear of open places"
+          },
+          "category": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "29308-4",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "439401001",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "diagnosis",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://argonautwiki.hl7.org/extension-codes",
+                "code": "problem",
+                "display": "Problem"
+              }
+            ],
+            "text": "Diagnosis"
+          },
+          "clinicalStatus": "active",
+          "verificationStatus": "confirmed",
+          "onsetDateTime": "2007-04-27"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T.dUwSVhAMiuA7rzdhV.wSAB",
+      "date": "2007-04-27",
+      "display_name": "Fear of open places"
+    },
+    "_meta": {
+      "lwt": 1761781117805.23
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T0ScCElKTIITpT72zaEiGEAB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T0ScCElKTIITpT72zaEiGEAB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T0ScCElKTIITpT72zaEiGEAB",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "T0ScCElKTIITpT72zaEiGEAB",
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "dateRecorded": "2007-04-27",
+          "code": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-9-cm/diagnosis",
+                "code": "784.99",
+                "display": "Halitosis"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.6.90",
+                "code": "R19.6",
+                "display": "Halitosis"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "79879001",
+                "display": "Breath smells unpleasant (finding)"
+              }
+            ],
+            "text": "Bad breath"
+          },
+          "category": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "29308-4",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "439401001",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "diagnosis",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://argonautwiki.hl7.org/extension-codes",
+                "code": "problem",
+                "display": "Problem"
+              }
+            ],
+            "text": "Diagnosis"
+          },
+          "clinicalStatus": "active",
+          "verificationStatus": "confirmed",
+          "onsetDateTime": "2007-04-27"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T0ScCElKTIITpT72zaEiGEAB",
+      "date": "2007-04-27",
+      "display_name": "Bad breath"
+    },
+    "_meta": {
+      "lwt": 1761781117805.24
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T0w9tuQmTLTBhjOEI0bpBpAB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T0w9tuQmTLTBhjOEI0bpBpAB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T0w9tuQmTLTBhjOEI0bpBpAB",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "T0w9tuQmTLTBhjOEI0bpBpAB",
+          "patient": {
+            "display": "Davis, Elijah John",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TZP1AvJlIR4IZDc3myX64DDxFHjn24zSDxI1BPYXIAk4B"
+          },
+          "asserter": {
+            "display": "Family Medicine Physician, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/Thh97FZ9lU9.p-Rgpozo6vwB"
+          },
+          "dateRecorded": "2012-11-28",
+          "code": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-9-cm/diagnosis",
+                "code": "486",
+                "display": "Right upper lobe pneumonia"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.6.90",
+                "code": "J18.1",
+                "display": "Right upper lobe pneumonia"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "301004001",
+                "display": "Right upper zone pneumonia (disorder)"
+              }
+            ],
+            "text": "Right upper lobe pneumonia"
+          },
+          "category": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "29308-4",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "439401001",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "diagnosis",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://argonautwiki.hl7.org/extension-codes",
+                "code": "problem",
+                "display": "Problem"
+              }
+            ],
+            "text": "Diagnosis"
+          },
+          "clinicalStatus": "active",
+          "verificationStatus": "confirmed",
+          "severity": {
+            "text": "High"
+          },
+          "onsetDateTime": "2012-11-28"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/T0w9tuQmTLTBhjOEI0bpBpAB",
+      "date": "2012-11-28",
+      "display_name": "Right upper lobe pneumonia"
+    },
+    "_meta": {
+      "lwt": 1761781117805.25
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TH12jkQYrabXcEh-2vXMxLAB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TH12jkQYrabXcEh-2vXMxLAB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TH12jkQYrabXcEh-2vXMxLAB",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "TH12jkQYrabXcEh-2vXMxLAB",
+          "patient": {
+            "display": "Lin, Derrick",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/e7fdb1f6-ab03-411f-b18d-5a35cd0b71c0"
+          },
+          "asserter": {
+            "display": "Family Medicine Physician, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/Thh97FZ9lU9.p-Rgpozo6vwB"
+          },
+          "dateRecorded": "2020-12-31",
+          "code": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-9-cm/diagnosis",
+                "code": "V49.89",
+                "display": "Risk for coronary artery disease between 10% and 20% in next 10 years"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.6.90",
+                "code": "Z91.89",
+                "display": "Risk for coronary artery disease between 10% and 20% in next 10 years"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "315016007",
+                "display": "At risk of coronary heart disease (finding)"
+              }
+            ],
+            "text": "Risk for coronary artery disease between 10% and 20% in next 10 years"
+          },
+          "category": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "29308-4",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "439401001",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "diagnosis",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://argonautwiki.hl7.org/extension-codes",
+                "code": "problem",
+                "display": "Problem"
+              }
+            ],
+            "text": "Diagnosis"
+          },
+          "clinicalStatus": "active",
+          "verificationStatus": "confirmed",
+          "onsetDateTime": "2020-12-31"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TH12jkQYrabXcEh-2vXMxLAB",
+      "date": "2020-12-31",
+      "display_name": "Risk for coronary artery disease between 10% and 20% in next 10 years"
+    },
+    "_meta": {
+      "lwt": 1761781117805.26
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TJ8aFaqXRcO7oNxvSHFQ1MgB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TJ8aFaqXRcO7oNxvSHFQ1MgB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TJ8aFaqXRcO7oNxvSHFQ1MgB",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "TJ8aFaqXRcO7oNxvSHFQ1MgB",
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "dateRecorded": "2007-04-27",
+          "code": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-9-cm/diagnosis",
+                "code": "066.3",
+                "display": "Zika virus disease"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.6.90",
+                "code": "A92.5",
+                "display": "Zika virus disease"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "3928002",
+                "display": "Zika virus disease (disorder)"
+              }
+            ],
+            "text": "Zika virus disease"
+          },
+          "category": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "29308-4",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "439401001",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "diagnosis",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://argonautwiki.hl7.org/extension-codes",
+                "code": "problem",
+                "display": "Problem"
+              }
+            ],
+            "text": "Diagnosis"
+          },
+          "clinicalStatus": "active",
+          "verificationStatus": "confirmed",
+          "onsetDateTime": "2007-04-27"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TJ8aFaqXRcO7oNxvSHFQ1MgB",
+      "date": "2007-04-27",
+      "display_name": "Zika virus disease"
+    },
+    "_meta": {
+      "lwt": 1761781117805.27
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TN6waPEPXdmZfcLWL6Lxr3wB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TN6waPEPXdmZfcLWL6Lxr3wB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TN6waPEPXdmZfcLWL6Lxr3wB",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "TN6waPEPXdmZfcLWL6Lxr3wB",
+          "patient": {
+            "display": "Lopez, Camila Maria",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B"
+          },
+          "asserter": {
+            "display": "Family Medicine Physician, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/Thh97FZ9lU9.p-Rgpozo6vwB"
+          },
+          "dateRecorded": "2020-12-31",
+          "code": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-9-cm/diagnosis",
+                "code": "256.4",
+                "display": "PCOS (polycystic ovarian syndrome)"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.6.90",
+                "code": "E28.2",
+                "display": "PCOS (polycystic ovarian syndrome)"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "69878008",
+                "display": "Polycystic ovaries (disorder)"
+              }
+            ],
+            "text": "Polycystic ovaries"
+          },
+          "category": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "29308-4",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "439401001",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "diagnosis",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://argonautwiki.hl7.org/extension-codes",
+                "code": "problem",
+                "display": "Problem"
+              }
+            ],
+            "text": "Diagnosis"
+          },
+          "clinicalStatus": "active",
+          "verificationStatus": "confirmed",
+          "severity": {
+            "text": "Medium"
+          },
+          "onsetDateTime": "2017-08-16"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TN6waPEPXdmZfcLWL6Lxr3wB",
+      "date": "2020-12-31",
+      "display_name": "Polycystic ovaries"
+    },
+    "_meta": {
+      "lwt": 1761781117805.28
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TNBVegGo63EqEs9x0ugqJZwB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TNBVegGo63EqEs9x0ugqJZwB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TNBVegGo63EqEs9x0ugqJZwB",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "TNBVegGo63EqEs9x0ugqJZwB",
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "dateRecorded": "2007-04-27",
+          "code": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-9-cm/diagnosis",
+                "code": "493.90",
+                "display": "Asthma"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.6.90",
+                "code": "J45.909",
+                "display": "Asthma"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "195967001",
+                "display": "Asthma (disorder)"
+              }
+            ],
+            "text": "Asthma"
+          },
+          "category": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "29308-4",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "439401001",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "diagnosis",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://argonautwiki.hl7.org/extension-codes",
+                "code": "problem",
+                "display": "Problem"
+              }
+            ],
+            "text": "Diagnosis"
+          },
+          "clinicalStatus": "active",
+          "verificationStatus": "confirmed",
+          "onsetDateTime": "2007-04-27"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TNBVegGo63EqEs9x0ugqJZwB",
+      "date": "2007-04-27",
+      "display_name": "Asthma"
+    },
+    "_meta": {
+      "lwt": 1761781117805.29
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TkWzuybaxs2csXqHVo53vdwB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TkWzuybaxs2csXqHVo53vdwB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TkWzuybaxs2csXqHVo53vdwB",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "TkWzuybaxs2csXqHVo53vdwB",
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "dateRecorded": "2007-04-27",
+          "code": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-9-cm/diagnosis",
+                "code": "790.29",
+                "display": "Hemoglobin A1c above reference range"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.6.90",
+                "code": "R73.09",
+                "display": "Hemoglobin A1c above reference range"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "444751005",
+                "display": "Hemoglobin A1c above reference range (finding)"
+              }
+            ],
+            "text": "Elevated hemoglobin A1c"
+          },
+          "category": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "29308-4",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "439401001",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "diagnosis",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://argonautwiki.hl7.org/extension-codes",
+                "code": "problem",
+                "display": "Problem"
+              }
+            ],
+            "text": "Diagnosis"
+          },
+          "clinicalStatus": "active",
+          "verificationStatus": "confirmed",
+          "onsetDateTime": "2007-04-27"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TkWzuybaxs2csXqHVo53vdwB",
+      "date": "2007-04-27",
+      "display_name": "Elevated hemoglobin A1c"
+    },
+    "_meta": {
+      "lwt": 1761781117805.3
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TpQ3y0axeAgBy6ee7oUTTLgB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TpQ3y0axeAgBy6ee7oUTTLgB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TpQ3y0axeAgBy6ee7oUTTLgB",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "TpQ3y0axeAgBy6ee7oUTTLgB",
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "dateRecorded": "2007-04-27",
+          "code": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-9-cm/diagnosis",
+                "code": "011.90",
+                "display": "TB (pulmonary tuberculosis)"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.6.90",
+                "code": "A15.0",
+                "display": "TB (pulmonary tuberculosis)"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "154283005",
+                "display": "Pulmonary tuberculosis (disorder)"
+              }
+            ],
+            "text": "TB (pulmonary tuberculosis)"
+          },
+          "category": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "29308-4",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "439401001",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "diagnosis",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://argonautwiki.hl7.org/extension-codes",
+                "code": "problem",
+                "display": "Problem"
+              }
+            ],
+            "text": "Diagnosis"
+          },
+          "clinicalStatus": "active",
+          "verificationStatus": "confirmed",
+          "onsetDateTime": "2007-04-27"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TpQ3y0axeAgBy6ee7oUTTLgB",
+      "date": "2007-04-27",
+      "display_name": "TB (pulmonary tuberculosis)"
+    },
+    "_meta": {
+      "lwt": 1761781117805.31
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/Tq5Ws51pnFqUA17r4wKRvUAB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/Tq5Ws51pnFqUA17r4wKRvUAB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/Tq5Ws51pnFqUA17r4wKRvUAB",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "Tq5Ws51pnFqUA17r4wKRvUAB",
+          "patient": {
+            "display": "Davis, Elijah John",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TZP1AvJlIR4IZDc3myX64DDxFHjn24zSDxI1BPYXIAk4B"
+          },
+          "asserter": {
+            "display": "Family Medicine Physician, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/Thh97FZ9lU9.p-Rgpozo6vwB"
+          },
+          "dateRecorded": "2012-11-28",
+          "code": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-9-cm/diagnosis",
+                "code": "818.0",
+                "display": "Broken arm"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.6.90",
+                "code": "S42.309A",
+                "display": "Broken arm"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "23406007",
+                "display": "Fracture of upper limb (disorder)"
+              }
+            ],
+            "text": "Broken arm"
+          },
+          "category": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "29308-4",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "439401001",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "diagnosis",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://argonautwiki.hl7.org/extension-codes",
+                "code": "problem",
+                "display": "Problem"
+              }
+            ],
+            "text": "Diagnosis"
+          },
+          "clinicalStatus": "active",
+          "verificationStatus": "confirmed",
+          "severity": {
+            "text": "Medium"
+          },
+          "onsetDateTime": "2012-11-28"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/Tq5Ws51pnFqUA17r4wKRvUAB",
+      "date": "2012-11-28",
+      "display_name": "Broken arm"
+    },
+    "_meta": {
+      "lwt": 1761781117805.32
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TxgN-LNHqNXDbPenMZURj3gB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TxgN-LNHqNXDbPenMZURj3gB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TxgN-LNHqNXDbPenMZURj3gB",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "TxgN-LNHqNXDbPenMZURj3gB",
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "dateRecorded": "2007-04-27",
+          "code": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-9-cm/diagnosis",
+                "code": "786.2",
+                "display": "Chronic cough"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.6.90",
+                "code": "R05",
+                "display": "Chronic cough"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "68154008",
+                "display": "Chronic cough (finding)"
+              }
+            ],
+            "text": "Chronic cough"
+          },
+          "category": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "29308-4",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://snomed.info/sct",
+                "code": "439401001",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "diagnosis",
+                "display": "Diagnosis"
+              },
+              {
+                "system": "http://argonautwiki.hl7.org/extension-codes",
+                "code": "problem",
+                "display": "Problem"
+              }
+            ],
+            "text": "Diagnosis"
+          },
+          "clinicalStatus": "active",
+          "verificationStatus": "confirmed",
+          "onsetDateTime": "2007-04-27"
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TxgN-LNHqNXDbPenMZURj3gB",
+      "date": "2007-04-27",
+      "display_name": "Chronic cough"
+    },
+    "_meta": {
+      "lwt": 1761781117805.33
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/DiagnosticReport/T8A7CSOhucBPc2wJxlHlS4gB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/DiagnosticReport/T8A7CSOhucBPc2wJxlHlS4gB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/DiagnosticReport/T8A7CSOhucBPc2wJxlHlS4gB",
+        "resource": {
+          "resourceType": "DiagnosticReport",
+          "id": "T8A7CSOhucBPc2wJxlHlS4gB",
+          "identifier": [
+            {
+              "use": "official",
+              "type": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/ValueSet/identifier-type",
+                    "code": "PLAC",
+                    "display": "Placer Identifier"
+                  }
+                ],
+                "text": "Placer Identifier"
+              },
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.2.798268",
+              "value": "1066905"
+            }
+          ],
+          "status": "final",
+          "category": {
+            "coding": [
+              {
+                "system": "urn:oid:1.2.840.114350.1.13.0.1.7.10.798268.30",
+                "code": "Lab",
+                "display": "Lab"
+              }
+            ],
+            "text": "Lab"
+          },
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "4548-4",
+                "display": "Hemoglobin A1c/Hemoglobin.total in Blood"
+              }
+            ],
+            "text": "HEMOGLOBIN A1C - Final result"
+          },
+          "subject": {
+            "display": "Lopez, Camila Maria",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B"
+          },
+          "effectiveDateTime": "2006-12-05T14:04:46.960Z",
+          "issued": "2006-12-05T14:04:46.960Z",
+          "performer": {
+            "display": "Family Medicine Physician, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/Thh97FZ9lU9.p-Rgpozo6vwB"
+          },
+          "result": [
+            {
+              "display": "Component: HEMOGLOBIN A1C, POC",
+              "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Observation/TgnIbHY714d5JDcg.iIiVQKhJHnxeIO4rrV03bq1W5VQB"
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "diagnosticreport",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/DiagnosticReport/T8A7CSOhucBPc2wJxlHlS4gB",
+      "date": "2006-12-05T14:04:46.960Z",
+      "display_name": "HEMOGLOBIN A1C"
+    },
+    "_meta": {
+      "lwt": 1761781117805.34
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TCr-wUtty2Bps.55vHHm.zwB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TCr-wUtty2Bps.55vHHm.zwB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TCr-wUtty2Bps.55vHHm.zwB",
+        "resource": {
+          "resourceType": "Immunization",
+          "id": "TCr-wUtty2Bps.55vHHm.zwB",
+          "status": "completed",
+          "date": "2022-07-29",
+          "vaccineCode": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/cvx",
+                "code": "20",
+                "display": "DTAP"
+              }
+            ],
+            "text": "DTaP"
+          },
+          "patient": {
+            "display": "Powell, Desiree Caroline",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB"
+          },
+          "wasNotGiven": false,
+          "reported": true,
+          "manufacturer": {
+            "display": "GlaxoSmithKline"
+          },
+          "lotNumber": "2693",
+          "doseQuantity": {
+            "value": 0.5,
+            "unit": "mL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mL"
+          }
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "immunization",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TCr-wUtty2Bps.55vHHm.zwB",
+      "date": "2022-07-29",
+      "display_name": "DTaP"
+    },
+    "_meta": {
+      "lwt": 1761781117805.35
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TDBVH5NhV3HJW3MSXn3whqgB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TDBVH5NhV3HJW3MSXn3whqgB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TDBVH5NhV3HJW3MSXn3whqgB",
+        "resource": {
+          "resourceType": "Immunization",
+          "id": "TDBVH5NhV3HJW3MSXn3whqgB",
+          "status": "completed",
+          "date": "2014-09-25",
+          "vaccineCode": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/cvx",
+                "code": "20",
+                "display": "DTAP"
+              }
+            ],
+            "text": "DTaP"
+          },
+          "patient": {
+            "display": "Powell, Desiree Caroline",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB"
+          },
+          "wasNotGiven": false,
+          "reported": true,
+          "manufacturer": {
+            "display": "GlaxoSmithKline"
+          },
+          "lotNumber": "1089",
+          "doseQuantity": {
+            "value": 0.5,
+            "unit": "mL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mL"
+          }
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "immunization",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TDBVH5NhV3HJW3MSXn3whqgB",
+      "date": "2014-09-25",
+      "display_name": "DTaP"
+    },
+    "_meta": {
+      "lwt": 1761781117805.36
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TFrqPLDX8FhgV9I4jy0asowB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TFrqPLDX8FhgV9I4jy0asowB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TFrqPLDX8FhgV9I4jy0asowB",
+        "resource": {
+          "resourceType": "Immunization",
+          "id": "TFrqPLDX8FhgV9I4jy0asowB",
+          "status": "completed",
+          "date": "2015-12-30",
+          "vaccineCode": {
+            "text": "Cholera"
+          },
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "wasNotGiven": false,
+          "reported": true
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "immunization",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TFrqPLDX8FhgV9I4jy0asowB",
+      "date": "2015-12-30",
+      "display_name": "Cholera"
+    },
+    "_meta": {
+      "lwt": 1761781117805.37
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TILCVdiDJI.Hb1siL38.k7gB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TILCVdiDJI.Hb1siL38.k7gB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TILCVdiDJI.Hb1siL38.k7gB",
+        "resource": {
+          "resourceType": "Immunization",
+          "id": "TILCVdiDJI.Hb1siL38.k7gB",
+          "status": "completed",
+          "date": "2020-12-31",
+          "vaccineCode": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/cvx",
+                "code": "20",
+                "display": "DTAP"
+              },
+              {
+                "system": "http://hl7.org/fhir/sid/ndc",
+                "code": "58160-810-01",
+                "display": "58160-810-01"
+              }
+            ],
+            "text": "DTaP"
+          },
+          "patient": {
+            "display": "Powell, Desiree Caroline",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB"
+          },
+          "wasNotGiven": false,
+          "reported": false,
+          "performer": {
+            "display": "Family Medicine Physician, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/Thh97FZ9lU9.p-Rgpozo6vwB"
+          },
+          "requester": {
+            "display": "Family Medicine Physician, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/Thh97FZ9lU9.p-Rgpozo6vwB"
+          },
+          "manufacturer": {
+            "display": "Sanofi Pasteur"
+          },
+          "lotNumber": "48973",
+          "site": {
+            "coding": [
+              {
+                "system": "urn:oid:1.2.840.114350.1.13.0.1.7.10.768076.4040",
+                "code": "1",
+                "display": "Left vastus lateralis"
+              }
+            ],
+            "text": "Left vastus lateralis"
+          },
+          "route": {
+            "coding": [
+              {
+                "system": "urn:oid:1.2.840.114350.1.13.0.1.7.10.768076.4030",
+                "code": "2",
+                "display": "Intramuscular"
+              }
+            ],
+            "text": "Intramuscular"
+          },
+          "doseQuantity": {
+            "value": 0.5,
+            "unit": "mL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mL"
+          }
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "immunization",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TILCVdiDJI.Hb1siL38.k7gB",
+      "date": "2020-12-31",
+      "display_name": "DTaP"
+    },
+    "_meta": {
+      "lwt": 1761781117805.38
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TJ1l-8wOUEwzkoQlY.iDAvwB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TJ1l-8wOUEwzkoQlY.iDAvwB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TJ1l-8wOUEwzkoQlY.iDAvwB",
+        "resource": {
+          "resourceType": "Immunization",
+          "id": "TJ1l-8wOUEwzkoQlY.iDAvwB",
+          "status": "completed",
+          "date": "2015-12-30",
+          "vaccineCode": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/cvx",
+                "code": "102",
+                "display": "DTP-HIB-HEP B"
+              }
+            ],
+            "text": "DTP-Hib-Hep B"
+          },
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "wasNotGiven": false,
+          "reported": true
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "immunization",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TJ1l-8wOUEwzkoQlY.iDAvwB",
+      "date": "2015-12-30",
+      "display_name": "DTP-Hib-Hep B"
+    },
+    "_meta": {
+      "lwt": 1761781117805.39
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TK4lPVtgcRg6CFqaRe99w5QB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TK4lPVtgcRg6CFqaRe99w5QB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TK4lPVtgcRg6CFqaRe99w5QB",
+        "resource": {
+          "resourceType": "Immunization",
+          "id": "TK4lPVtgcRg6CFqaRe99w5QB",
+          "status": "completed",
+          "date": "2020-12-31",
+          "vaccineCode": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/cvx",
+                "code": "03",
+                "display": "MMR"
+              },
+              {
+                "system": "http://hl7.org/fhir/sid/ndc",
+                "code": "0006-4681-01",
+                "display": "0006-4681-01"
+              }
+            ],
+            "text": "MMR"
+          },
+          "patient": {
+            "display": "Powell, Desiree Caroline",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB"
+          },
+          "wasNotGiven": false,
+          "reported": false,
+          "performer": {
+            "display": "Family Medicine Physician, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/Thh97FZ9lU9.p-Rgpozo6vwB"
+          },
+          "requester": {
+            "display": "Family Medicine Physician, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/Thh97FZ9lU9.p-Rgpozo6vwB"
+          },
+          "manufacturer": {
+            "display": "GeoVax Labs Inc"
+          },
+          "lotNumber": "AMB MMR LOT",
+          "site": {
+            "coding": [
+              {
+                "system": "urn:oid:1.2.840.114350.1.13.0.1.7.10.768076.4040",
+                "code": "22",
+                "display": "Left Thigh"
+              }
+            ],
+            "text": "Left Thigh"
+          },
+          "route": {
+            "coding": [
+              {
+                "system": "urn:oid:1.2.840.114350.1.13.0.1.7.10.768076.4030",
+                "code": "5",
+                "display": "Subcutaneous"
+              }
+            ],
+            "text": "Subcutaneous"
+          },
+          "doseQuantity": {
+            "value": 0.5,
+            "unit": "mL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mL"
+          }
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "immunization",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TK4lPVtgcRg6CFqaRe99w5QB",
+      "date": "2020-12-31",
+      "display_name": "MMR"
+    },
+    "_meta": {
+      "lwt": 1761781117805.4
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TUsOpk4VDbbahslGF63H2EQB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TUsOpk4VDbbahslGF63H2EQB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TUsOpk4VDbbahslGF63H2EQB",
+        "resource": {
+          "resourceType": "Immunization",
+          "id": "TUsOpk4VDbbahslGF63H2EQB",
+          "status": "completed",
+          "date": "2004-01-04",
+          "vaccineCode": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/cvx",
+                "code": "20",
+                "display": "DTAP"
+              }
+            ],
+            "text": "DTaP"
+          },
+          "patient": {
+            "display": "Powell, Desiree Caroline",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB"
+          },
+          "wasNotGiven": false,
+          "reported": true,
+          "manufacturer": {
+            "display": "GlaxoSmithKline"
+          },
+          "lotNumber": "963",
+          "doseQuantity": {
+            "value": 0.5,
+            "unit": "mL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mL"
+          }
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "immunization",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TUsOpk4VDbbahslGF63H2EQB",
+      "date": "2004-01-04",
+      "display_name": "DTaP"
+    },
+    "_meta": {
+      "lwt": 1761781117805.41
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/Tf2K6qrgklzmzZcnZCrJdogB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/Tf2K6qrgklzmzZcnZCrJdogB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/Tf2K6qrgklzmzZcnZCrJdogB",
+        "resource": {
+          "resourceType": "Immunization",
+          "id": "Tf2K6qrgklzmzZcnZCrJdogB",
+          "status": "completed",
+          "date": "2022-07-29",
+          "vaccineCode": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/cvx",
+                "code": "03",
+                "display": "MMR"
+              }
+            ],
+            "text": "MMR"
+          },
+          "patient": {
+            "display": "Powell, Desiree Caroline",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB"
+          },
+          "wasNotGiven": false,
+          "reported": true,
+          "manufacturer": {
+            "display": "Novavax Inc"
+          },
+          "lotNumber": "8741",
+          "doseQuantity": {
+            "value": 0.5,
+            "unit": "mL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mL"
+          }
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "immunization",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/Tf2K6qrgklzmzZcnZCrJdogB",
+      "date": "2022-07-29",
+      "display_name": "MMR"
+    },
+    "_meta": {
+      "lwt": 1761781117805.42
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TmDC1-.UM.nxsA7fJfC1xBQB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TmDC1-.UM.nxsA7fJfC1xBQB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TmDC1-.UM.nxsA7fJfC1xBQB",
+        "resource": {
+          "resourceType": "Immunization",
+          "id": "TmDC1-.UM.nxsA7fJfC1xBQB",
+          "status": "completed",
+          "date": "2021-08-04",
+          "vaccineCode": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/cvx",
+                "code": "20",
+                "display": "DTAP"
+              }
+            ],
+            "text": "DTaP"
+          },
+          "patient": {
+            "display": "Powell, Desiree Caroline",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67Qhz2LcPzxdmAoB"
+          },
+          "wasNotGiven": false,
+          "reported": true,
+          "manufacturer": {
+            "display": "GlaxoSmithKline"
+          },
+          "lotNumber": "156",
+          "doseQuantity": {
+            "value": 0.5,
+            "unit": "mL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mL"
+          }
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "immunization",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TmDC1-.UM.nxsA7fJfC1xBQB",
+      "date": "2021-08-04",
+      "display_name": "DTaP"
+    },
+    "_meta": {
+      "lwt": 1761781117805.43
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/T0lFAVbT96TEVgTgYvOG4tgB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/T0lFAVbT96TEVgTgYvOG4tgB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/T0lFAVbT96TEVgTgYvOG4tgB",
+        "resource": {
+          "resourceType": "MedicationStatement",
+          "id": "T0lFAVbT96TEVgTgYvOG4tgB",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-MedicationStatement.category",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/medication-statement-category",
+                    "code": "community",
+                    "display": "Community"
+                  }
+                ],
+                "text": "Community"
+              }
+            }
+          ],
+          "identifier": [
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.2.798268",
+              "value": "1064866"
+            },
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.3.798268.801",
+              "value": "1064866:1471621391"
+            }
+          ],
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "informationSource": {
+            "display": "Physician O. Cardiology, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/T7B2rL2DT2O29ClEz5ErfwAB"
+          },
+          "status": "active",
+          "effectivePeriod": {
+            "start": "2015-12-30"
+          },
+          "medicationCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "856773",
+                "display": "amitriptyline 150 MG tablet"
+              }
+            ],
+            "text": "amitriptyline 150 MG tablet"
+          },
+          "dosage": [
+            {
+              "extension": [
+                {
+                  "url": "https://open.epic.com/fhir/extensions/ordered-dose",
+                  "valueQuantity": {
+                    "value": 150,
+                    "unit": "mg",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mg"
+                  }
+                },
+                {
+                  "url": "https://open.epic.com/fhir/extensions/admin-amount",
+                  "valueQuantity": {
+                    "value": 1,
+                    "unit": "tablet"
+                  }
+                }
+              ],
+              "text": "Take 1 tablet (150 mg total) by mouth every night.",
+              "timing": {
+                "repeat": {
+                  "boundsPeriod": {
+                    "start": "2015-12-30"
+                  },
+                  "frequency": 1,
+                  "period": 1,
+                  "periodUnits": "d"
+                },
+                "code": {
+                  "text": "every night"
+                }
+              },
+              "asNeededBoolean": false,
+              "route": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.698288.330",
+                    "code": "15",
+                    "display": "Oral"
+                  }
+                ],
+                "text": "Oral"
+              },
+              "method": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.798268.8600",
+                    "code": "11",
+                    "display": "Take"
+                  }
+                ],
+                "text": "Take"
+              },
+              "quantityQuantity": {
+                "value": 150,
+                "unit": "mg",
+                "system": "http://unitsofmeasure.org",
+                "code": "mg"
+              }
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "medicationstatement",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/T0lFAVbT96TEVgTgYvOG4tgB",
+      "date": "2015-12-30",
+      "display_name": "amitriptyline 150 MG tablet"
+    },
+    "_meta": {
+      "lwt": 1761781117805.44
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TNMY9JUb9Mp0VLT9kBVImUQB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TNMY9JUb9Mp0VLT9kBVImUQB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TNMY9JUb9Mp0VLT9kBVImUQB",
+        "resource": {
+          "resourceType": "MedicationStatement",
+          "id": "TNMY9JUb9Mp0VLT9kBVImUQB",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-MedicationStatement.category",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/medication-statement-category",
+                    "code": "community",
+                    "display": "Community"
+                  }
+                ],
+                "text": "Community"
+              }
+            }
+          ],
+          "identifier": [
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.2.798268",
+              "value": "1064868"
+            },
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.3.798268.801",
+              "value": "1064868:1572287105"
+            }
+          ],
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "informationSource": {
+            "display": "Physician O. Cardiology, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/T7B2rL2DT2O29ClEz5ErfwAB"
+          },
+          "status": "active",
+          "effectivePeriod": {
+            "start": "2015-12-30"
+          },
+          "medicationCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "197885",
+                "display": "lisinopril-hydroCHLOROthiazide 10-12.5 MG per tablet"
+              }
+            ],
+            "text": "lisinopril-hydroCHLOROthiazide 10-12.5 MG per tablet"
+          },
+          "dosage": [
+            {
+              "extension": [
+                {
+                  "url": "https://open.epic.com/fhir/extensions/ordered-dose",
+                  "valueQuantity": {
+                    "value": 1,
+                    "unit": "tablet"
+                  }
+                },
+                {
+                  "url": "https://open.epic.com/fhir/extensions/admin-amount",
+                  "valueQuantity": {
+                    "value": 1,
+                    "unit": "tablet"
+                  }
+                }
+              ],
+              "text": "Take 1 tablet by mouth 1 (one) time each day.",
+              "timing": {
+                "repeat": {
+                  "boundsPeriod": {
+                    "start": "2015-12-30"
+                  },
+                  "frequency": 1,
+                  "period": 1,
+                  "periodUnits": "d"
+                },
+                "code": {
+                  "text": "1 (one) time each day"
+                }
+              },
+              "asNeededBoolean": false,
+              "route": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.698288.330",
+                    "code": "15",
+                    "display": "Oral"
+                  }
+                ],
+                "text": "Oral"
+              },
+              "method": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.798268.8600",
+                    "code": "11",
+                    "display": "Take"
+                  }
+                ],
+                "text": "Take"
+              },
+              "quantityQuantity": {
+                "value": 1,
+                "unit": "tablet"
+              }
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "medicationstatement",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TNMY9JUb9Mp0VLT9kBVImUQB",
+      "date": "2015-12-30",
+      "display_name": "lisinopril-hydroCHLOROthiazide 10-12.5 MG per tablet"
+    },
+    "_meta": {
+      "lwt": 1761781117806.01
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TTJAVrU5RzjAq0fU4SoYs5gB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TTJAVrU5RzjAq0fU4SoYs5gB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TTJAVrU5RzjAq0fU4SoYs5gB",
+        "resource": {
+          "resourceType": "MedicationStatement",
+          "id": "TTJAVrU5RzjAq0fU4SoYs5gB",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-MedicationStatement.category",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/medication-statement-category",
+                    "code": "community",
+                    "display": "Community"
+                  }
+                ],
+                "text": "Community"
+              }
+            }
+          ],
+          "identifier": [
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.2.798268",
+              "value": "1064863"
+            },
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.3.798268.801",
+              "value": "1064863:1387733296"
+            }
+          ],
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "informationSource": {
+            "display": "Physician O. Cardiology, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/T7B2rL2DT2O29ClEz5ErfwAB"
+          },
+          "status": "active",
+          "effectivePeriod": {
+            "start": "2015-12-30"
+          },
+          "medicationCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "312859",
+                "display": "rosiglitazone 2 MG tablet"
+              }
+            ],
+            "text": "rosiglitazone 2 MG tablet"
+          },
+          "dosage": [
+            {
+              "extension": [
+                {
+                  "url": "https://open.epic.com/fhir/extensions/ordered-dose",
+                  "valueQuantity": {
+                    "value": 2,
+                    "unit": "mg",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mg"
+                  }
+                },
+                {
+                  "url": "https://open.epic.com/fhir/extensions/admin-amount",
+                  "valueQuantity": {
+                    "value": 1,
+                    "unit": "tablet"
+                  }
+                }
+              ],
+              "text": "Take 1 tablet (2 mg total) by mouth 2 (two) times a day.",
+              "timing": {
+                "repeat": {
+                  "boundsPeriod": {
+                    "start": "2015-12-30"
+                  },
+                  "frequency": 2,
+                  "period": 1,
+                  "periodUnits": "d"
+                },
+                "code": {
+                  "text": "2 (two) times a day"
+                }
+              },
+              "asNeededBoolean": false,
+              "route": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.698288.330",
+                    "code": "15",
+                    "display": "Oral"
+                  }
+                ],
+                "text": "Oral"
+              },
+              "method": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.798268.8600",
+                    "code": "11",
+                    "display": "Take"
+                  }
+                ],
+                "text": "Take"
+              },
+              "quantityQuantity": {
+                "value": 2,
+                "unit": "mg",
+                "system": "http://unitsofmeasure.org",
+                "code": "mg"
+              }
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "medicationstatement",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TTJAVrU5RzjAq0fU4SoYs5gB",
+      "date": "2015-12-30",
+      "display_name": "rosiglitazone 2 MG tablet"
+    },
+    "_meta": {
+      "lwt": 1761781117806.02
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TTa.556Rg9uJKdKiRMHP2CwB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TTa.556Rg9uJKdKiRMHP2CwB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TTa.556Rg9uJKdKiRMHP2CwB",
+        "resource": {
+          "resourceType": "MedicationStatement",
+          "id": "TTa.556Rg9uJKdKiRMHP2CwB",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-MedicationStatement.category",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/medication-statement-category",
+                    "code": "community",
+                    "display": "Community"
+                  }
+                ],
+                "text": "Community"
+              }
+            }
+          ],
+          "identifier": [
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.2.798268",
+              "value": "1064862"
+            },
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.3.798268.801",
+              "value": "1064862:1404510915"
+            }
+          ],
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "informationSource": {
+            "display": "Physician O. Cardiology, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/T7B2rL2DT2O29ClEz5ErfwAB"
+          },
+          "status": "active",
+          "effectivePeriod": {
+            "start": "2015-12-30"
+          },
+          "medicationCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "861223",
+                "display": "amphetamine-dextroamphetamine XR 15 MG 24 hr capsule"
+              }
+            ],
+            "text": "amphetamine-dextroamphetamine XR 15 MG 24 hr capsule"
+          },
+          "dosage": [
+            {
+              "extension": [
+                {
+                  "url": "https://open.epic.com/fhir/extensions/ordered-dose",
+                  "valueQuantity": {
+                    "value": 15,
+                    "unit": "mg",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mg"
+                  }
+                },
+                {
+                  "url": "https://open.epic.com/fhir/extensions/admin-amount",
+                  "valueQuantity": {
+                    "value": 1,
+                    "unit": "capsule"
+                  }
+                }
+              ],
+              "text": "Take 1 capsule (15 mg total) by mouth 1 (one) time each day in the morning. Do not crush or chew.",
+              "timing": {
+                "repeat": {
+                  "boundsPeriod": {
+                    "start": "2015-12-30"
+                  },
+                  "frequency": 1,
+                  "period": 1,
+                  "periodUnits": "d"
+                },
+                "code": {
+                  "text": "1 (one) time each day in the morning"
+                }
+              },
+              "asNeededBoolean": false,
+              "route": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.698288.330",
+                    "code": "15",
+                    "display": "Oral"
+                  }
+                ],
+                "text": "Oral"
+              },
+              "method": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.798268.8600",
+                    "code": "11",
+                    "display": "Take"
+                  }
+                ],
+                "text": "Take"
+              },
+              "quantityQuantity": {
+                "value": 15,
+                "unit": "mg",
+                "system": "http://unitsofmeasure.org",
+                "code": "mg"
+              }
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "medicationstatement",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TTa.556Rg9uJKdKiRMHP2CwB",
+      "date": "2015-12-30",
+      "display_name": "amphetamine-dextroamphetamine XR 15 MG 24 hr capsule"
+    },
+    "_meta": {
+      "lwt": 1761781117806.03
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TmZgT4HVCCKWb6spIX.YHkQB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TmZgT4HVCCKWb6spIX.YHkQB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TmZgT4HVCCKWb6spIX.YHkQB",
+        "resource": {
+          "resourceType": "MedicationStatement",
+          "id": "TmZgT4HVCCKWb6spIX.YHkQB",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-MedicationStatement.category",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/medication-statement-category",
+                    "code": "community",
+                    "display": "Community"
+                  }
+                ],
+                "text": "Community"
+              }
+            }
+          ],
+          "identifier": [
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.2.798268",
+              "value": "1066899"
+            },
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.3.798268.801",
+              "value": "1066899:2157897559"
+            }
+          ],
+          "patient": {
+            "display": "Lopez, Camila Maria",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B"
+          },
+          "informationSource": {
+            "display": "Family Medicine Physician, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/Thh97FZ9lU9.p-Rgpozo6vwB"
+          },
+          "status": "active",
+          "effectivePeriod": {
+            "start": "2020-12-31"
+          },
+          "medicationCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "748798",
+                "display": "drospirenone-ethinyl estradiol 3-0.02 MG per tablet"
+              }
+            ],
+            "text": "drospirenone-ethinyl estradiol 3-0.02 MG per tablet"
+          },
+          "dosage": [
+            {
+              "extension": [
+                {
+                  "url": "https://open.epic.com/fhir/extensions/ordered-dose",
+                  "valueQuantity": {
+                    "value": 1,
+                    "unit": "tablet"
+                  }
+                },
+                {
+                  "url": "https://open.epic.com/fhir/extensions/admin-amount",
+                  "valueQuantity": {
+                    "value": 1,
+                    "unit": "tablet"
+                  }
+                }
+              ],
+              "text": "Take 1 tablet by mouth 1 (one) time each day.",
+              "timing": {
+                "repeat": {
+                  "boundsPeriod": {
+                    "start": "2020-12-31"
+                  },
+                  "frequency": 1,
+                  "period": 1,
+                  "periodUnits": "d"
+                },
+                "code": {
+                  "text": "1 (one) time each day"
+                }
+              },
+              "asNeededBoolean": false,
+              "route": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.698288.330",
+                    "code": "15",
+                    "display": "Oral"
+                  }
+                ],
+                "text": "Oral"
+              },
+              "method": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.798268.8600",
+                    "code": "11",
+                    "display": "Take"
+                  }
+                ],
+                "text": "Take"
+              },
+              "quantityQuantity": {
+                "value": 1,
+                "unit": "tablet"
+              }
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "medicationstatement",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TmZgT4HVCCKWb6spIX.YHkQB",
+      "date": "2020-12-31",
+      "display_name": "drospirenone-ethinyl estradiol 3-0.02 MG per tablet"
+    },
+    "_meta": {
+      "lwt": 1761781117806.04
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TpXU6BLwWRnuBPuvw3V8h1wB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TpXU6BLwWRnuBPuvw3V8h1wB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TpXU6BLwWRnuBPuvw3V8h1wB",
+        "resource": {
+          "resourceType": "MedicationStatement",
+          "id": "TpXU6BLwWRnuBPuvw3V8h1wB",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-MedicationStatement.category",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/medication-statement-category",
+                    "code": "community",
+                    "display": "Community"
+                  }
+                ],
+                "text": "Community"
+              }
+            }
+          ],
+          "identifier": [
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.2.798268",
+              "value": "1064867"
+            },
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.3.798268.801",
+              "value": "1064867:1454843772"
+            }
+          ],
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "informationSource": {
+            "display": "Physician O. Cardiology, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/T7B2rL2DT2O29ClEz5ErfwAB"
+          },
+          "status": "active",
+          "effectivePeriod": {
+            "start": "2015-12-30"
+          },
+          "medicationCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "197604",
+                "display": "digoxin 125 MCG tablet"
+              }
+            ],
+            "text": "digoxin 125 MCG tablet"
+          },
+          "dosage": [
+            {
+              "extension": [
+                {
+                  "url": "https://open.epic.com/fhir/extensions/ordered-dose",
+                  "valueQuantity": {
+                    "value": 125,
+                    "unit": "mcg",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "ug"
+                  }
+                },
+                {
+                  "url": "https://open.epic.com/fhir/extensions/admin-amount",
+                  "valueQuantity": {
+                    "value": 1,
+                    "unit": "tablet"
+                  }
+                }
+              ],
+              "text": "Take 1 tablet (125 mcg total) by mouth 1 (one) time each day.",
+              "timing": {
+                "repeat": {
+                  "boundsPeriod": {
+                    "start": "2015-12-30"
+                  },
+                  "frequency": 1,
+                  "period": 1,
+                  "periodUnits": "d"
+                },
+                "code": {
+                  "text": "1 (one) time each day"
+                }
+              },
+              "asNeededBoolean": false,
+              "route": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.698288.330",
+                    "code": "15",
+                    "display": "Oral"
+                  }
+                ],
+                "text": "Oral"
+              },
+              "method": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.798268.8600",
+                    "code": "11",
+                    "display": "Take"
+                  }
+                ],
+                "text": "Take"
+              },
+              "quantityQuantity": {
+                "value": 125,
+                "unit": "mcg",
+                "system": "http://unitsofmeasure.org",
+                "code": "ug"
+              }
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "medicationstatement",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TpXU6BLwWRnuBPuvw3V8h1wB",
+      "date": "2015-12-30",
+      "display_name": "digoxin 125 MCG tablet"
+    },
+    "_meta": {
+      "lwt": 1761781117806.05
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TtMY9wpnL.-0jPhT3b6QO5AB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TtMY9wpnL.-0jPhT3b6QO5AB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TtMY9wpnL.-0jPhT3b6QO5AB",
+        "resource": {
+          "resourceType": "MedicationStatement",
+          "id": "TtMY9wpnL.-0jPhT3b6QO5AB",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-MedicationStatement.category",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/medication-statement-category",
+                    "code": "community",
+                    "display": "Community"
+                  }
+                ],
+                "text": "Community"
+              }
+            }
+          ],
+          "identifier": [
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.2.798268",
+              "value": "1064864"
+            },
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.3.798268.801",
+              "value": "1064864:1505176629"
+            }
+          ],
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "informationSource": {
+            "display": "Physician O. Cardiology, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/T7B2rL2DT2O29ClEz5ErfwAB"
+          },
+          "status": "active",
+          "effectivePeriod": {
+            "start": "2015-12-30"
+          },
+          "medicationCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "311354",
+                "display": "lisinopril 5 MG tablet"
+              }
+            ],
+            "text": "lisinopril 5 MG tablet"
+          },
+          "dosage": [
+            {
+              "extension": [
+                {
+                  "url": "https://open.epic.com/fhir/extensions/ordered-dose",
+                  "valueQuantity": {
+                    "value": 5,
+                    "unit": "mg",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mg"
+                  }
+                },
+                {
+                  "url": "https://open.epic.com/fhir/extensions/admin-amount",
+                  "valueQuantity": {
+                    "value": 1,
+                    "unit": "tablet"
+                  }
+                }
+              ],
+              "text": "Take 1 tablet (5 mg total) by mouth 1 (one) time each day.",
+              "timing": {
+                "repeat": {
+                  "boundsPeriod": {
+                    "start": "2015-12-30"
+                  },
+                  "frequency": 1,
+                  "period": 1,
+                  "periodUnits": "d"
+                },
+                "code": {
+                  "text": "1 (one) time each day"
+                }
+              },
+              "asNeededBoolean": false,
+              "route": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.698288.330",
+                    "code": "15",
+                    "display": "Oral"
+                  }
+                ],
+                "text": "Oral"
+              },
+              "method": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.798268.8600",
+                    "code": "11",
+                    "display": "Take"
+                  }
+                ],
+                "text": "Take"
+              },
+              "quantityQuantity": {
+                "value": 5,
+                "unit": "mg",
+                "system": "http://unitsofmeasure.org",
+                "code": "mg"
+              }
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "medicationstatement",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/TtMY9wpnL.-0jPhT3b6QO5AB",
+      "date": "2015-12-30",
+      "display_name": "lisinopril 5 MG tablet"
+    },
+    "_meta": {
+      "lwt": 1761781117806.06
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/Tx9DD4H.48QlQWXrrDj1uKQB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/Tx9DD4H.48QlQWXrrDj1uKQB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/Tx9DD4H.48QlQWXrrDj1uKQB",
+        "resource": {
+          "resourceType": "MedicationStatement",
+          "id": "Tx9DD4H.48QlQWXrrDj1uKQB",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-MedicationStatement.category",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/medication-statement-category",
+                    "code": "community",
+                    "display": "Community"
+                  }
+                ],
+                "text": "Community"
+              }
+            }
+          ],
+          "identifier": [
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.2.798268",
+              "value": "1064861"
+            },
+            {
+              "use": "usual",
+              "system": "urn:oid:1.2.840.114350.1.13.0.1.7.3.798268.801",
+              "value": "1064861:1421288534"
+            }
+          ],
+          "patient": {
+            "display": "Argonaut, Jason",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/Tzq4j8Zz14GtEj1vkMR1DfKeTpXPttd5-8DvjtsLBdJsB"
+          },
+          "informationSource": {
+            "display": "Physician O. Cardiology, MD",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Practitioner/T7B2rL2DT2O29ClEz5ErfwAB"
+          },
+          "status": "active",
+          "effectivePeriod": {
+            "start": "2015-12-30"
+          },
+          "medicationCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "259255",
+                "display": "atorvastatin 80 MG tablet"
+              }
+            ],
+            "text": "atorvastatin 80 MG tablet"
+          },
+          "dosage": [
+            {
+              "extension": [
+                {
+                  "url": "https://open.epic.com/fhir/extensions/ordered-dose",
+                  "valueQuantity": {
+                    "value": 80,
+                    "unit": "mg",
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mg"
+                  }
+                },
+                {
+                  "url": "https://open.epic.com/fhir/extensions/admin-amount",
+                  "valueQuantity": {
+                    "value": 1,
+                    "unit": "tablet"
+                  }
+                }
+              ],
+              "text": "Take 1 tablet (80 mg total) by mouth 1 (one) time each day.",
+              "timing": {
+                "repeat": {
+                  "boundsPeriod": {
+                    "start": "2015-12-30"
+                  },
+                  "frequency": 1,
+                  "period": 1,
+                  "periodUnits": "d"
+                },
+                "code": {
+                  "text": "1 (one) time each day"
+                }
+              },
+              "asNeededBoolean": false,
+              "route": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.698288.330",
+                    "code": "15",
+                    "display": "Oral"
+                  }
+                ],
+                "text": "Oral"
+              },
+              "method": {
+                "coding": [
+                  {
+                    "system": "urn:oid:1.2.840.114350.1.13.0.1.7.4.798268.8600",
+                    "code": "11",
+                    "display": "Take"
+                  }
+                ],
+                "text": "Take"
+              },
+              "quantityQuantity": {
+                "value": 80,
+                "unit": "mg",
+                "system": "http://unitsofmeasure.org",
+                "code": "mg"
+              }
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "medicationstatement",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/MedicationStatement/Tx9DD4H.48QlQWXrrDj1uKQB",
+      "date": "2015-12-30",
+      "display_name": "atorvastatin 80 MG tablet"
+    },
+    "_meta": {
+      "lwt": 1761781117806.07
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Observation/TgnIbHY714d5JDcg.iIiVQKhJHnxeIO4rrV03bq1W5VGED",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Observation/TgnIbHY714d5JDcg.iIiVQKhJHnxeIO4rrV03bq1W5VGED"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Observation/TgnIbHY714d5JDcg.iIiVQKhJHnxeIO4rrV03bq1W5VGED",
+        "resource": {
+          "resourceType": "Observation",
+          "id": "TgnIbHY714d5JDcg.iIiVQKhJHnxeIO4rrV03bq1W5VQB",
+          "status": "final",
+          "category": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          },
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "4548-4",
+                "display": "Hemoglobin A1c/Hemoglobin.total in Blood"
+              }
+            ],
+            "text": "HEMOGLOBIN A1C, POC"
+          },
+          "subject": {
+            "display": "Lopez, Camila Maria",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B"
+          },
+          "effectiveDateTime": "2006-12-05T14:04:46.960Z",
+          "valueQuantity": {
+            "value": 5.6,
+            "unit": "%",
+            "system": "http://unitsofmeasure.org",
+            "code": "%"
+          },
+          "comments": "         Prediabetes: 5.7 - 6.4\r\n         Diabetes: >6.4\r\n         Glycemic control for adults with diabetes: <7.0\r\n",
+          "referenceRange": [
+            {
+              "low": {
+                "value": 4.8,
+                "unit": "%",
+                "system": "http://unitsofmeasure.org",
+                "code": "%"
+              },
+              "high": {
+                "value": 5.6,
+                "unit": "%",
+                "system": "http://unitsofmeasure.org",
+                "code": "%"
+              },
+              "text": "4.8 - 5.6 %"
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Observation/TgnIbHY714d5JDcg.iIiVQKhJHnxeIO4rrV03bq1W5VGED",
+      "date": "2008-11-04T14:04:46.960Z",
+      "display_name": "HEMOGLOBIN A1C, POC",
+      "loinc_coding": ["4548-4"]
+    },
+    "_meta": {
+      "lwt": 1761781117806.08
+    },
+    "_deleted": false
+  },
+  {
+    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Observation/TgnIbHY714d5JDcg.iIiVQKhJHnxeIO4rrV03bq1W5VQB",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
+    "data_record": {
+      "raw": {
+        "link": [
+          {
+            "relation": "self",
+            "url": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Observation/TgnIbHY714d5JDcg.iIiVQKhJHnxeIO4rrV03bq1W5VQB"
+          }
+        ],
+        "fullUrl": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Observation/TgnIbHY714d5JDcg.iIiVQKhJHnxeIO4rrV03bq1W5VQB",
+        "resource": {
+          "resourceType": "Observation",
+          "id": "TgnIbHY714d5JDcg.iIiVQKhJHnxeIO4rrV03bq1W5VQB",
+          "status": "final",
+          "category": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          },
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "4548-4",
+                "display": "Hemoglobin A1c/Hemoglobin.total in Blood"
+              }
+            ],
+            "text": "HEMOGLOBIN A1C, POC"
+          },
+          "subject": {
+            "display": "Lopez, Camila Maria",
+            "reference": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Patient/TnOZ.elPXC6zcBNFMcFA7A5KZbYxo2.4T-LylRk4GoW4B"
+          },
+          "effectiveDateTime": "2006-12-05T14:04:46.960Z",
+          "valueQuantity": {
+            "value": 5.1,
+            "unit": "%",
+            "system": "http://unitsofmeasure.org",
+            "code": "%"
+          },
+          "comments": "         Prediabetes: 5.7 - 6.4\r\n         Diabetes: >6.4\r\n         Glycemic control for adults with diabetes: <7.0\r\n",
+          "referenceRange": [
+            {
+              "low": {
+                "value": 4.8,
+                "unit": "%",
+                "system": "http://unitsofmeasure.org",
+                "code": "%"
+              },
+              "high": {
+                "value": 5.6,
+                "unit": "%",
+                "system": "http://unitsofmeasure.org",
+                "code": "%"
+              },
+              "text": "4.8 - 5.6 %"
+            }
+          ]
+        },
+        "search": {
+          "mode": "match"
+        }
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "observation",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Observation/TgnIbHY714d5JDcg.iIiVQKhJHnxeIO4rrV03bq1W5VQB",
+      "date": "2006-12-05T14:04:46.960Z",
+      "display_name": "HEMOGLOBIN A1C, POC",
+      "loinc_coding": ["4548-4"]
+    },
+    "_meta": {
+      "lwt": 1761781117806.09
+    },
+    "_deleted": false
+  }
+]

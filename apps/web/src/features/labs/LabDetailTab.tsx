@@ -62,11 +62,10 @@ export function LabDetailTab() {
     <AppPage
       banner={
         <LabsHeader
-          labCount={labs.length}
-          groupCount={groupedLabs.length}
           query=""
           setQuery={() => undefined}
           hideSearch
+          hideOnMobile
         />
       }
     >

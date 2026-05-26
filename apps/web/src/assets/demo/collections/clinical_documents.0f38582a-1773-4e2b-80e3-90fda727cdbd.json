@@ -1,0 +1,502 @@
+[
+  {
+    "id": "0f38582a-1773-4e2b-80e3-90fda727cdbd|91a8d8cb-6480-4db4-a628-18a5e44536cd|Condition/47026121",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "0f38582a-1773-4e2b-80e3-90fda727cdbd",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "category": {
+            "text": "Diagnosis",
+            "coding": [
+              {
+                "code": "diagnosis",
+                "system": "http://hl7.org/fhir/condition-category",
+                "display": "Diagnosis"
+              }
+            ]
+          },
+          "code": {
+            "text": "Cough, unspecified",
+            "coding": [
+              {
+                "code": "R05.9",
+                "system": "http://hl7.org/fhir/sid/icd-10",
+                "display": "Cough, unspecified"
+              }
+            ]
+          },
+          "patient": {
+            "reference": "Patient/1850092"
+          },
+          "resourceType": "Condition",
+          "dateRecorded": "2021-03-28",
+          "verificationStatus": "confirmed",
+          "id": "47026121",
+          "clinicalStatus": "active"
+        },
+        "fullUrl": ["/api/fhir/Condition/47026121"]
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "condition",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Condition/47026121",
+      "date": "2021-03-28",
+      "display_name": "Cough, unspecified"
+    },
+    "_meta": {
+      "lwt": 1761781117801.97
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "0f38582a-1773-4e2b-80e3-90fda727cdbd|91a8d8cb-6480-4db4-a628-18a5e44536cd|Immunization/912355",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "0f38582a-1773-4e2b-80e3-90fda727cdbd",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "status": "completed",
+          "reported": false,
+          "patient": {
+            "reference": "Patient/1850092"
+          },
+          "date": "2022-03-17T15:38:00-04:00",
+          "site": {
+            "text": "left deltoid",
+            "coding": [
+              {
+                "code": "LD",
+                "system": "http://hl7.org/fhir/v3/ActSite",
+                "display": "left deltoid"
+              }
+            ]
+          },
+          "route": {
+            "text": "Injection, intramuscular",
+            "coding": [
+              {
+                "code": "IM",
+                "system": "http://hl7.org/fhir/v3/RouteOfAdministration",
+                "display": "Injection, intramuscular"
+              }
+            ]
+          },
+          "resourceType": "Immunization",
+          "id": "912355",
+          "wasNotGiven": false,
+          "vaccineCode": {
+            "text": "Tdap",
+            "coding": [
+              {
+                "code": "115",
+                "system": "http://hl7.org/fhir/sid/cvx",
+                "display": "Tdap"
+              }
+            ]
+          }
+        },
+        "fullUrl": ["/api/fhir/Immunization/912355"]
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "immunization",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Immunization/912355",
+      "date": "2022-03-17T15:38:00-04:00",
+      "display_name": "Tdap"
+    },
+    "_meta": {
+      "lwt": 1761781117801.98
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "0f38582a-1773-4e2b-80e3-90fda727cdbd|91a8d8cb-6480-4db4-a628-18a5e44536cd|Immunization/914691",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "0f38582a-1773-4e2b-80e3-90fda727cdbd",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "status": "completed",
+          "reported": false,
+          "patient": {
+            "reference": "Patient/1850092"
+          },
+          "date": "2022-03-30T15:48:00-04:00",
+          "site": {
+            "text": "left deltoid",
+            "coding": [
+              {
+                "code": "LD",
+                "system": "http://hl7.org/fhir/v3/ActSite",
+                "display": "left deltoid"
+              }
+            ]
+          },
+          "route": {
+            "text": "Injection, intramuscular",
+            "coding": [
+              {
+                "code": "IM",
+                "system": "http://hl7.org/fhir/v3/RouteOfAdministration",
+                "display": "Injection, intramuscular"
+              }
+            ]
+          },
+          "resourceType": "Immunization",
+          "id": "914691",
+          "wasNotGiven": false,
+          "vaccineCode": {
+            "text": "Hep B, adult",
+            "coding": [
+              {
+                "code": "43",
+                "system": "http://hl7.org/fhir/sid/cvx",
+                "display": "Hep B, adult"
+              }
+            ]
+          }
+        },
+        "fullUrl": ["/api/fhir/Immunization/914691"]
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "immunization",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Immunization/914691",
+      "date": "2022-03-30T15:48:00-04:00",
+      "display_name": "Hep B, adult"
+    },
+    "_meta": {
+      "lwt": 1761781117801.99
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "0f38582a-1773-4e2b-80e3-90fda727cdbd|91a8d8cb-6480-4db4-a628-18a5e44536cd|Immunization/931523",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "0f38582a-1773-4e2b-80e3-90fda727cdbd",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "status": "completed",
+          "reported": false,
+          "patient": {
+            "reference": "Patient/1850092"
+          },
+          "date": "2022-04-28T09:30:00-04:00",
+          "site": {
+            "text": "left deltoid",
+            "coding": [
+              {
+                "code": "LD",
+                "system": "http://hl7.org/fhir/v3/ActSite",
+                "display": "left deltoid"
+              }
+            ]
+          },
+          "route": {
+            "text": "Injection, intramuscular",
+            "coding": [
+              {
+                "code": "IM",
+                "system": "http://hl7.org/fhir/v3/RouteOfAdministration",
+                "display": "Injection, intramuscular"
+              }
+            ]
+          },
+          "resourceType": "Immunization",
+          "id": "931523",
+          "wasNotGiven": false,
+          "vaccineCode": {
+            "text": "Hep B, adult",
+            "coding": [
+              {
+                "code": "43",
+                "system": "http://hl7.org/fhir/sid/cvx",
+                "display": "Hep B, adult"
+              }
+            ]
+          }
+        },
+        "fullUrl": ["/api/fhir/Immunization/931523"]
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "immunization",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Immunization/931523",
+      "date": "2022-04-28T09:30:00-04:00",
+      "display_name": "Hep B, adult"
+    },
+    "_meta": {
+      "lwt": 1761781117802
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "0f38582a-1773-4e2b-80e3-90fda727cdbd|91a8d8cb-6480-4db4-a628-18a5e44536cd|MedicationStatement/85259764",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "0f38582a-1773-4e2b-80e3-90fda727cdbd",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "status": "active",
+          "dateAsserted": "2021-12-18T00:00:00-05:00",
+          "medicationCodeableConcept": {
+            "text": "BENZONATATE 100 MG CAPSULE",
+            "coding": [
+              {
+                "code": "197397",
+                "system": "https://www.nlm.nih.gov/research/umls/rxnorm/",
+                "display": "BENZONATATE 100 MG CAPSULE"
+              }
+            ]
+          },
+          "patient": {
+            "reference": "Patient/1850092"
+          },
+          "resourceType": "MedicationStatement",
+          "id": "85259764"
+        },
+        "fullUrl": ["/api/fhir/MedicationStatement/85259764"]
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "medicationstatement",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "MedicationStatement/85259764",
+      "date": "2021-12-18T00:00:00-05:00",
+      "display_name": "BENZONATATE 100 MG CAPSULE"
+    },
+    "_meta": {
+      "lwt": 1761781117802.01
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "0f38582a-1773-4e2b-80e3-90fda727cdbd|91a8d8cb-6480-4db4-a628-18a5e44536cd|Patient/1850092",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "0f38582a-1773-4e2b-80e3-90fda727cdbd",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Patient",
+          "gender": "male",
+          "id": "1850092",
+          "birthDate": "2015-10-17",
+          "name": [
+            {
+              "text": "John Smith",
+              "given": ["John"],
+              "family": ["Smith"]
+            }
+          ]
+        },
+        "fullUrl": ["/api/fhir/Patient/1850092"]
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "patient",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Patient/1850092",
+      "date": "2006-04-01T08:53:40.204Z"
+    },
+    "_meta": {
+      "lwt": 1761781117802.02
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "0f38582a-1773-4e2b-80e3-90fda727cdbd|91a8d8cb-6480-4db4-a628-18a5e44536cd|Procedure/214793073",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "0f38582a-1773-4e2b-80e3-90fda727cdbd",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "status": "completed",
+          "performedDateTime": "2022-01-13T13:30:00-05:00",
+          "code": {
+            "text": "ROUTINE VENIPUNCTURE",
+            "coding": [
+              {
+                "code": "36415",
+                "system": "https://www.ama-assn.org/practice-management/cpt-current-procedural-terminology",
+                "display": "ROUTINE VENIPUNCTURE"
+              }
+            ]
+          },
+          "resourceType": "Procedure",
+          "id": "214793073",
+          "subject": {
+            "reference": "Patient/1850092"
+          }
+        },
+        "fullUrl": ["/api/fhir/Procedure/214793073"]
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Procedure/214793073",
+      "date": "2022-01-13T13:30:00-05:00",
+      "display_name": "ROUTINE VENIPUNCTURE"
+    },
+    "_meta": {
+      "lwt": 1761781117802.03
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "0f38582a-1773-4e2b-80e3-90fda727cdbd|91a8d8cb-6480-4db4-a628-18a5e44536cd|Procedure/223817453",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "0f38582a-1773-4e2b-80e3-90fda727cdbd",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "status": "completed",
+          "performedDateTime": "2022-03-17T15:00:00-04:00",
+          "code": {
+            "text": "ROUTINE VENIPUNCTURE",
+            "coding": [
+              {
+                "code": "36415",
+                "system": "https://www.ama-assn.org/practice-management/cpt-current-procedural-terminology",
+                "display": "ROUTINE VENIPUNCTURE"
+              }
+            ]
+          },
+          "resourceType": "Procedure",
+          "id": "223817453",
+          "subject": {
+            "reference": "Patient/1850092"
+          }
+        },
+        "fullUrl": ["/api/fhir/Procedure/223817453"]
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Procedure/223817453",
+      "date": "2022-03-17T15:00:00-04:00",
+      "display_name": "ROUTINE VENIPUNCTURE"
+    },
+    "_meta": {
+      "lwt": 1761781117802.04
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "0f38582a-1773-4e2b-80e3-90fda727cdbd|91a8d8cb-6480-4db4-a628-18a5e44536cd|Procedure/230098748",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "0f38582a-1773-4e2b-80e3-90fda727cdbd",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "status": "completed",
+          "performedDateTime": "2022-04-28T09:30:00-04:00",
+          "code": {
+            "text": "HEPB VACCINE 3 DOSE ADULT IM",
+            "coding": [
+              {
+                "code": "90746",
+                "system": "https://www.ama-assn.org/practice-management/cpt-current-procedural-terminology",
+                "display": "HEPB VACCINE 3 DOSE ADULT IM"
+              }
+            ]
+          },
+          "resourceType": "Procedure",
+          "id": "230098748",
+          "subject": {
+            "reference": "Patient/1850092"
+          }
+        },
+        "fullUrl": ["/api/fhir/Procedure/230098748"]
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Procedure/230098748",
+      "date": "2022-04-28T09:30:00-04:00",
+      "display_name": "HEPB VACCINE 3 DOSE ADULT IM"
+    },
+    "_meta": {
+      "lwt": 1761781117802.05
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  },
+  {
+    "id": "0f38582a-1773-4e2b-80e3-90fda727cdbd|91a8d8cb-6480-4db4-a628-18a5e44536cd|Procedure/230098749",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "0f38582a-1773-4e2b-80e3-90fda727cdbd",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "status": "completed",
+          "performedDateTime": "2022-04-28T09:30:00-04:00",
+          "code": {
+            "text": "IMMUNIZATION ADMIN",
+            "coding": [
+              {
+                "code": "90471",
+                "system": "https://www.ama-assn.org/practice-management/cpt-current-procedural-terminology",
+                "display": "IMMUNIZATION ADMIN"
+              }
+            ]
+          },
+          "resourceType": "Procedure",
+          "id": "230098749",
+          "subject": {
+            "reference": "Patient/1850092"
+          }
+        },
+        "fullUrl": ["/api/fhir/Procedure/230098749"]
+      },
+      "format": "FHIR.DSTU2",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Procedure/230098749",
+      "date": "2022-04-28T09:30:00-04:00",
+      "display_name": "IMMUNIZATION ADMIN"
+    },
+    "_meta": {
+      "lwt": 1761781117802.06
+    },
+    "_deleted": false,
+    "loinc_coding": []
+  }
+]
