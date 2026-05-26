@@ -6,16 +6,12 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { AppPage } from '../../shared/components/AppPage';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { Routes } from '../../Routes';
-import { LabEnrichmentPanel } from './components/LabEnrichmentPanel';
 import { LabHistoryChart } from './components/LabHistoryChart';
 import { LabHistoryTable } from './components/LabHistoryTable';
 import { LabReferenceOverlayControls } from './components/LabReferenceOverlayControls';
 import { LabsHeader } from './components/LabsHeader';
 import { LabsSkeleton } from './components/LabsSkeleton';
-import {
-  buildLabEnrichment,
-  buildLabReferenceOverlays,
-} from './enrichment/labEnrichment';
+import { buildLabReferenceOverlays } from './enrichment/labEnrichment';
 import {
   getLabGraphUnitOptions,
   normalizeReferenceOverlaysForGraph,
@@ -37,10 +33,7 @@ export function LabDetailTab() {
     const decodedKey = labKey ? decodeURIComponent(labKey) : '';
     return groupedLabs.find((item) => item.key === decodedKey);
   }, [groupedLabs, labKey]);
-  const latestLab = group?.labs[0],
-    latestReports = latestLab
-      ? reportsByObservationId.get(latestLab.metadata?.id || '') || []
-      : [];
+  const latestLab = group?.labs[0];
   const referenceOverlays = useMemo(() => {
     if (!group || !latestLab) return [];
     return buildLabReferenceOverlays({ group, lab: latestLab });
@@ -64,16 +57,6 @@ export function LabDetailTab() {
       targetUnit: activeGraphUnit,
     });
   }, [activeGraphUnit, enabledOverlayModes, group, referenceOverlays]);
-  const enrichment = useMemo(() => {
-    if (!group || !latestLab) return undefined;
-
-    return buildLabEnrichment({
-      group,
-      lab: latestLab,
-      reports: latestReports,
-      standardId: 'canadian',
-    });
-  }, [group, latestLab, latestReports]);
 
   return (
     <AppPage
@@ -123,9 +106,6 @@ export function LabDetailTab() {
                   </div>
                 </div>
               </section>
-              {enrichment ? (
-                <LabEnrichmentPanel enrichment={enrichment} />
-              ) : null}
               <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
                 <div className="flex flex-col gap-3">
                   <h2 className="text-base font-semibold text-gray-900">
