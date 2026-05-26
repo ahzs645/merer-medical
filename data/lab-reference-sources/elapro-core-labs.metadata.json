@@ -8,7 +8,7 @@
   "caveat": "LOINC-mapped eligibility-screening lab procedure metadata, not clinical normal ranges.",
   "articleUrl": "https://api.figshare.com/v2/articles/19767803",
   "contentType": "application/zip",
-  "fetchedUrl": "https://s3-eu-west-1.amazonaws.com/pstorage-npg-968563215/35121203/12874_2022_1611_MOESM8_ESM.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIQYK5H3JTELHKKTA/20260526/eu-west-1/s3/aws4_request&X-Amz-Date=20260526T193727Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=9f6bc553d868c6cf4387e0ab7ed04c4cd7e88e5fe1174fabb74e0e154e5937b6",
+  "fetchedUrl": "https://s3-eu-west-1.amazonaws.com/pstorage-npg-968563215/35121203/12874_2022_1611_MOESM8_ESM.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIQYK5H3JTELHKKTA/20260526/eu-west-1/s3/aws4_request&X-Amz-Date=20260526T194348Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=6878f3118f3a2a1f4c08e34480467b8b6cc905a9f42cd893d3644ec75cfe3433",
   "figshareFile": {
     "id": 35121203,
     "name": "12874_2022_1611_MOESM8_ESM.zip",
@@ -19,7 +19,7 @@
     "computed_md5": "056778a897a3a781ff5323928c59e06b",
     "mimetype": "application/zip"
   },
-  "fetchedAt": "2026-05-26T19:37:28.486Z",
+  "fetchedAt": "2026-05-26T19:43:49.672Z",
   "bytes": 44107,
   "sha256": "aa98ced88a12d11481068515206f28829c5f0d45070b623addbd0699ee2f53b9"
 }

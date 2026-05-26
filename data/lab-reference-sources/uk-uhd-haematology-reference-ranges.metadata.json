@@ -1,0 +1,13 @@
+{
+  "id": "uk-uhd-haematology-reference-ranges",
+  "kind": "clinical-reference",
+  "parser": "ukUhdHaematology",
+  "country": "uk",
+  "category": "hematology",
+  "licenseRisk": "curated-citation",
+  "url": "https://www.uhd.nhs.uk/directory/name/187-services/joint-service/pathology/haematology-medical-pathology/2389-test-repertoire-and-reference-ranges",
+  "fetchedAt": "2026-05-26T19:44:04.121Z",
+  "bytes": 47667,
+  "sha256": "ab2e1b5dcff862627bbeed5de0320eba87c5d5be47d0d96b2893aeeaee56f00a",
+  "contentType": "text/html; charset=utf-8"
+}

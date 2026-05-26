@@ -4,7 +4,6 @@ import { EyeMetricsPanel } from './components/EyeMetricsPanel';
 import { EyePrescriptionPanel } from './components/EyePrescriptionPanel';
 import { OcularRecordsPanel } from './components/OcularRecordsPanel';
 import { OptometryCheckupHistoryPanel } from './components/OptometryCheckupHistoryPanel';
-import { OptometryFieldModelPanel } from './components/OptometryFieldModelPanel';
 import { OptometryHeader } from './components/OptometryHeader';
 import { OptometrySummaryPanel } from './components/OptometrySummaryPanel';
 import { useOptometryData } from './hooks/useOptometryData';
@@ -24,7 +23,6 @@ export function OptometryTab() {
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           <OptometrySummaryPanel counts={counts} />
-          <OptometryFieldModelPanel />
           <div className="grid gap-4 xl:grid-cols-2">
             <EyePrescriptionPanel records={records} />
             <EyeMetricsPanel records={records} />

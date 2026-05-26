@@ -1,0 +1,14 @@
+{
+  "id": "nz-awanui-auckland-biochemistry",
+  "kind": "clinical-reference",
+  "parser": "nzAwanuiAucklandBiochemistry",
+  "country": "australian",
+  "category": "chemistry",
+  "licenseRisk": "curated-citation",
+  "fileType": "pdf",
+  "url": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+  "fetchedAt": "2026-05-26T19:43:53.776Z",
+  "bytes": 868728,
+  "sha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b",
+  "contentType": "application/pdf"
+}

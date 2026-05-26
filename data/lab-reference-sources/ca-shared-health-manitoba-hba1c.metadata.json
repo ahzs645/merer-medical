@@ -1,0 +1,14 @@
+{
+  "id": "ca-shared-health-manitoba-hba1c",
+  "kind": "clinical-reference",
+  "parser": "caSharedHealthHba1c",
+  "country": "canadian",
+  "category": "chemistry",
+  "licenseRisk": "copyrighted-review-only",
+  "title": "Shared Health Manitoba Hemoglobin A1c",
+  "url": "https://apps.sbgh.mb.ca/labmanual/test/view?seedId=122",
+  "fetchedAt": "2026-05-26T19:44:09.571Z",
+  "bytes": 14098,
+  "sha256": "b1cf4865fac49903ccb840425767632d3738af6a0c23ebe8969f35bd6bf82b75",
+  "contentType": "text/html;charset=UTF-8"
+}

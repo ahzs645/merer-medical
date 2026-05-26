@@ -1,0 +1,14 @@
+{
+  "id": "ca-shared-health-manitoba-hdl",
+  "kind": "clinical-reference",
+  "parser": "caSharedHealthHdl",
+  "country": "canadian",
+  "category": "lipids",
+  "licenseRisk": "copyrighted-review-only",
+  "title": "Shared Health Manitoba HDL Cholesterol",
+  "url": "https://apps.sbgh.mb.ca/labmanual/test/view?seedId=1401",
+  "fetchedAt": "2026-05-26T19:44:09.670Z",
+  "bytes": 14857,
+  "sha256": "36edacd18b0b63c8894ec5ff23a49d7d5c636f90f16510c214365b8c1937883c",
+  "contentType": "text/html;charset=UTF-8"
+}

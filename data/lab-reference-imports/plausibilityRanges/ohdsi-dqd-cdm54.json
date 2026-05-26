@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T19:37:28.492Z",
+  "generatedAt": "2026-05-26T19:43:49.711Z",
   "kind": "plausibilityRanges",
   "source": {
     "id": "ohdsi-dqd-cdm54-concept-level",
@@ -19,9 +19,7 @@
         9444,
         8785
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -38,9 +36,7 @@
         9225,
         9579
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -58,9 +54,7 @@
         9444,
         8785
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -75,9 +69,7 @@
         8645,
         8923
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -95,9 +87,7 @@
         9444,
         8785
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -111,9 +101,7 @@
       "plausibleUnitConceptIds": [
         8555
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -128,9 +116,7 @@
         8713,
         8859
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -147,9 +133,7 @@
         8596,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -166,9 +150,7 @@
         8961,
         9444
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -184,9 +166,7 @@
         8753,
         9557
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -200,9 +180,7 @@
       "plausibleUnitConceptIds": [
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -217,9 +195,7 @@
         8645,
         8923
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -233,9 +209,7 @@
       "plausibleUnitConceptIds": [
         8837
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -250,9 +224,7 @@
         8483,
         8541
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -266,9 +238,7 @@
       "plausibleUnitConceptIds": [
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -283,9 +253,7 @@
         8554,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -300,9 +268,7 @@
         8636,
         8713
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -318,9 +284,7 @@
         8961,
         9444
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -334,9 +298,7 @@
       "plausibleUnitConceptIds": [
         8554
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -350,9 +312,7 @@
       "plausibleUnitConceptIds": [
         8765
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -367,9 +327,7 @@
         8840,
         9028
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -387,9 +345,7 @@
         8848,
         9444
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -404,9 +360,7 @@
         720870,
         8795
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -421,9 +375,7 @@
         8840,
         9028
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -437,9 +389,7 @@
       "plausibleUnitConceptIds": [
         8837
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -454,9 +404,7 @@
         8820,
         8845
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -476,9 +424,7 @@
         9444,
         8647
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -492,9 +438,7 @@
       "plausibleUnitConceptIds": [
         8786
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -508,9 +452,7 @@
       "plausibleUnitConceptIds": [
         8554
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -525,9 +467,7 @@
         8840,
         9028
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -546,9 +486,7 @@
         8606,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -564,9 +502,7 @@
         8840,
         9028
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -581,9 +517,7 @@
         8753,
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -597,9 +531,7 @@
       "plausibleUnitConceptIds": [
         8554
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -613,9 +545,7 @@
       "plausibleUnitConceptIds": [
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -630,9 +560,7 @@
         8523,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -647,9 +575,7 @@
         8753,
         9557
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -666,9 +592,7 @@
         8753,
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -683,9 +607,7 @@
         8753,
         9557
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -701,9 +623,7 @@
         8786,
         8889
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -719,9 +639,7 @@
         8636,
         8713
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -739,9 +657,7 @@
         8784,
         8785
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -756,9 +672,7 @@
         8753,
         9557
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -777,9 +691,7 @@
         8931,
         8785
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -794,9 +706,7 @@
         8786,
         8889
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -811,9 +721,7 @@
         8645,
         8923
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -827,9 +735,7 @@
       "plausibleUnitConceptIds": [
         9531
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -843,9 +749,7 @@
       "plausibleUnitConceptIds": [
         8876
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -862,9 +766,7 @@
         8961,
         9444
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -881,9 +783,7 @@
         8596,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -898,9 +798,7 @@
         720870,
         8795
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -917,9 +815,7 @@
         8554,
         8753
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -934,9 +830,7 @@
         8840,
         8753
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -952,9 +846,7 @@
         8845,
         8725
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -969,9 +861,7 @@
         8554,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -986,9 +876,7 @@
         8840,
         8753
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1003,9 +891,7 @@
         9448,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1025,9 +911,7 @@
         8923,
         44777583
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1042,9 +926,7 @@
         720870,
         8795
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1058,9 +940,7 @@
       "plausibleUnitConceptIds": [
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1074,9 +954,7 @@
       "plausibleUnitConceptIds": [
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1091,9 +969,7 @@
         8751,
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1108,9 +984,7 @@
         44777604,
         8554
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1125,9 +999,7 @@
         8564,
         9655
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1141,9 +1013,7 @@
       "plausibleUnitConceptIds": [
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1159,9 +1029,7 @@
         8554,
         8523
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1178,9 +1046,7 @@
         8961,
         9444
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1194,9 +1060,7 @@
       "plausibleUnitConceptIds": [
         8583
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1210,9 +1074,7 @@
       "plausibleUnitConceptIds": [
         8876
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1226,9 +1088,7 @@
       "plausibleUnitConceptIds": [
         8752
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1242,9 +1102,7 @@
       "plausibleUnitConceptIds": [
         8554
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1260,9 +1118,7 @@
         8961,
         9444
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1277,9 +1133,7 @@
         8753,
         9557
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1293,9 +1147,7 @@
       "plausibleUnitConceptIds": [
         8617
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1310,9 +1162,7 @@
         8748,
         8842
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1329,9 +1179,7 @@
         8596,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1348,9 +1196,7 @@
         9330,
         9546
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1366,9 +1212,7 @@
         8541,
         8581
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1382,9 +1226,7 @@
       "plausibleUnitConceptIds": [
         8554
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1399,9 +1241,7 @@
         8842,
         8845
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1415,9 +1255,7 @@
       "plausibleUnitConceptIds": [
         8583
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1435,9 +1273,7 @@
         9093,
         8860
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1451,9 +1287,7 @@
       "plausibleUnitConceptIds": [
         8583
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1468,9 +1302,7 @@
         8554,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1486,9 +1318,7 @@
         8753,
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1502,9 +1332,7 @@
       "plausibleUnitConceptIds": [
         8876
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1521,9 +1349,7 @@
         8554,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1538,9 +1364,7 @@
         8845,
         8725
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1554,9 +1378,7 @@
       "plausibleUnitConceptIds": [
         8583
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1578,9 +1400,7 @@
         8888,
         9428
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1594,9 +1414,7 @@
       "plausibleUnitConceptIds": [
         8876
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1612,9 +1430,7 @@
         8713,
         8950
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1630,9 +1446,7 @@
         8541,
         8581
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1650,9 +1464,7 @@
         9444,
         8647
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1667,9 +1479,7 @@
         8753,
         9557
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1687,9 +1497,7 @@
         9444,
         9445
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1703,9 +1511,7 @@
       "plausibleUnitConceptIds": [
         8876
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1719,9 +1525,7 @@
       "plausibleUnitConceptIds": [
         8876
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1737,9 +1541,7 @@
         8596,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1753,9 +1555,7 @@
       "plausibleUnitConceptIds": [
         8876
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1770,9 +1570,7 @@
         8576,
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1789,9 +1587,7 @@
         9373,
         9529
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1806,9 +1602,7 @@
         720870,
         8795
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1824,9 +1618,7 @@
         8753,
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1841,9 +1633,7 @@
         720870,
         8795
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1859,9 +1649,7 @@
         8645,
         8923
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1875,9 +1663,7 @@
       "plausibleUnitConceptIds": [
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1898,9 +1684,7 @@
         8961,
         9444
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1916,9 +1700,7 @@
         8541,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1932,9 +1714,7 @@
       "plausibleUnitConceptIds": [
         8554
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1954,9 +1734,7 @@
         9444,
         8785
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1970,9 +1748,7 @@
       "plausibleUnitConceptIds": [
         8583
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -1987,9 +1763,7 @@
         8525,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2007,9 +1781,7 @@
         8784,
         8785
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2025,9 +1797,7 @@
         8961,
         9444
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2042,9 +1812,7 @@
         8636,
         8713
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2061,9 +1829,7 @@
         9579,
         8923
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2082,9 +1848,7 @@
         8647,
         8785
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2100,9 +1864,7 @@
         8713,
         8950
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2118,9 +1880,7 @@
         9444,
         8961
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2134,9 +1894,7 @@
       "plausibleUnitConceptIds": [
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2153,9 +1911,7 @@
         9444,
         32706
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2173,9 +1929,7 @@
         8504,
         8576
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2190,9 +1944,7 @@
         720870,
         8795
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2207,9 +1959,7 @@
         8817,
         8842
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2224,9 +1974,7 @@
         8840,
         8749
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2241,9 +1989,7 @@
         8645,
         8923
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2264,9 +2010,7 @@
         8785,
         8647
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2282,9 +2026,7 @@
         8961,
         9444
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2301,9 +2043,7 @@
         8737,
         9579
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2318,9 +2058,7 @@
         8483,
         8541
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2334,9 +2072,7 @@
       "plausibleUnitConceptIds": [
         8583
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2351,9 +2087,7 @@
         720870,
         8795
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2367,9 +2101,7 @@
       "plausibleUnitConceptIds": [
         8554
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2384,9 +2116,7 @@
         8554,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2401,9 +2131,7 @@
         8753,
         9557
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2421,9 +2149,7 @@
         9436,
         9444
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2438,9 +2164,7 @@
         8753,
         9557
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2455,9 +2179,7 @@
         8554,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2473,9 +2195,7 @@
         8632,
         8737
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2490,9 +2210,7 @@
         8554,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2509,9 +2227,7 @@
         8606,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2531,9 +2247,7 @@
         9444,
         8785
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2548,9 +2262,7 @@
         586323,
         9289
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2564,9 +2276,7 @@
       "plausibleUnitConceptIds": [
         8554
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2581,9 +2291,7 @@
         8636,
         8713
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2598,9 +2306,7 @@
         8748,
         8842
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2614,9 +2320,7 @@
       "plausibleUnitConceptIds": [
         8554
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2631,9 +2335,7 @@
         8765,
         8786
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2647,9 +2349,7 @@
       "plausibleUnitConceptIds": [
         8554
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2663,9 +2363,7 @@
       "plausibleUnitConceptIds": [
         8583
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2680,9 +2378,7 @@
         8753,
         9557
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2697,9 +2393,7 @@
         8840,
         8749
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2716,9 +2410,7 @@
         8596,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2733,9 +2425,7 @@
         586323,
         9289
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2750,9 +2440,7 @@
         8840,
         8923
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2767,9 +2455,7 @@
         44777578,
         9040
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2783,9 +2469,7 @@
       "plausibleUnitConceptIds": [
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2800,9 +2484,7 @@
         8554,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2816,9 +2498,7 @@
       "plausibleUnitConceptIds": [
         8786
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2833,9 +2513,7 @@
         8753,
         8840
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2852,9 +2530,7 @@
         9444,
         8785
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2870,9 +2546,7 @@
         8645,
         8923
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2887,9 +2561,7 @@
         8554,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2908,9 +2580,7 @@
         8859,
         8636
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2925,9 +2595,7 @@
         8786,
         8889
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2942,9 +2610,7 @@
         8554,
         8848
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2963,9 +2629,7 @@
         9093,
         9550
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -2979,9 +2643,7 @@
       "plausibleUnitConceptIds": [
         8842
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -3001,9 +2663,7 @@
         9257,
         8888
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -3021,9 +2681,7 @@
         9436,
         9444
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -3038,9 +2696,7 @@
         720870,
         8795
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -3054,9 +2710,7 @@
       "plausibleUnitConceptIds": [
         8848
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -3072,9 +2726,7 @@
         8596,
         -1
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -3089,9 +2741,7 @@
         8840,
         8636
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -3106,9 +2756,7 @@
         8840,
         8753
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -3122,9 +2770,7 @@
       "plausibleUnitConceptIds": [
         8554
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -3142,9 +2788,7 @@
         9017,
         9072
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -3159,9 +2803,7 @@
         720870,
         8795
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -3176,9 +2818,7 @@
         8749,
         8837
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",
@@ -3193,9 +2833,7 @@
         8713,
         8753
       ],
-      "plausibleUnitConceptIdsThreshold": [
-        5
-      ],
+      "plausibleUnitConceptIdsThreshold": 5,
       "source": {
         "id": "ohdsi-dqd-cdm54-concept-level",
         "url": "https://raw.githubusercontent.com/OHDSI/DataQualityDashboard/main/inst/csv/OMOP_CDMv5.4_Concept_Level.csv",

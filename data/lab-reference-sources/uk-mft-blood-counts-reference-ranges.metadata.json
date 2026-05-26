@@ -1,0 +1,15 @@
+{
+  "id": "uk-mft-blood-counts-reference-ranges",
+  "kind": "clinical-reference",
+  "parser": "ukMftBloodCounts",
+  "country": "uk",
+  "category": "hematology",
+  "licenseRisk": "curated-citation",
+  "fileType": "pdf",
+  "title": "Manchester University NHS Foundation Trust Blood Counts Reference Ranges",
+  "url": "https://mft.nhs.uk/app/uploads/2024/07/Blood-counts-reference-ranges.pdf",
+  "fetchedAt": "2026-05-26T19:44:03.327Z",
+  "bytes": 89856,
+  "sha256": "ed6b1c0445aebf4ace7da442618cc6e58f10185fcd86b8b558d219f358d944a8",
+  "contentType": "application/pdf"
+}

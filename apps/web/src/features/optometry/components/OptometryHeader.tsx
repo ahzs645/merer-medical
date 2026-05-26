@@ -24,7 +24,7 @@ export function OptometryHeader({
           </p>
         </div>
         <Link
-          to={AppRoutes.AddRecord}
+          to={`${AppRoutes.AddRecord}?specialty=optometry`}
           className="inline-flex w-fit items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-primary-800 shadow-sm hover:bg-primary-50"
         >
           <PlusIcon className="h-5 w-5" />

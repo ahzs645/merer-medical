@@ -1,0 +1,14 @@
+{
+  "id": "nz-awanui-auckland-haematology",
+  "kind": "clinical-reference",
+  "parser": "nzAwanuiAucklandHaematology",
+  "country": "australian",
+  "category": "hematology",
+  "licenseRisk": "curated-citation",
+  "fileType": "pdf",
+  "url": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/03/Haem-Ref-Int-HAE-F012.pdf",
+  "fetchedAt": "2026-05-26T19:43:53.949Z",
+  "bytes": 137265,
+  "sha256": "b5f0ed09a178b9a7c558d52fcae00c7031e281520312991e42a2e952e253d1ee",
+  "contentType": "application/pdf"
+}

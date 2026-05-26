@@ -39,6 +39,60 @@ export const labCitations: Record<string, LabCitation> = {
     quote:
       'RCPA SPIA lists Australasian harmonised serum/plasma chemical pathology intervals with adult, paediatric, and selected sex-specific partitions.',
   },
+  'AUS-AACB-TATE-2014': {
+    id: 'AUS-AACB-TATE-2014',
+    source: 'AACB harmonised Australasian reference intervals',
+    fullCitation:
+      'Tate JR, Sikaris KA, Jones GRD, et al. Harmonising Adult and Paediatric Reference Intervals in Australia and New Zealand. Clinical Biochemist Reviews. 2014;35(4):213-235.',
+    url: 'https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download',
+    quote:
+      'The paper publishes AHRIA adult and AHRIP paediatric common reference intervals for chemistry analytes in Australia and New Zealand.',
+  },
+  'NZ-CHL-GEN-CHEM': {
+    id: 'NZ-CHL-GEN-CHEM',
+    source: 'Canterbury Health Laboratories general chemistry intervals',
+    fullCitation:
+      'Canterbury Health Laboratories. Core Biochemistry Reference Intervals: General Chemistry. Issue 3, July 31, 2025.',
+    url: 'https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf',
+    quote:
+      'CHL publishes general chemistry reference intervals with lower and upper limits, age/sex partitions, units, and revision dates.',
+  },
+  'NZ-AWANUI-AKL-BIOCHEM': {
+    id: 'NZ-AWANUI-AKL-BIOCHEM',
+    source: 'Awanui Labs Auckland biochemistry reference intervals',
+    fullCitation:
+      'Awanui Labs Auckland. Reference Intervals - Clinical Chemistry. BIO-QLT-F007, issued September 21, 2025.',
+    url: 'https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf',
+    quote:
+      'Awanui Auckland publishes clinical chemistry intervals across diabetic, liver function, bone, iron, endocrine, and related test groups.',
+  },
+  'NZ-AWANUI-AKL-HAEM': {
+    id: 'NZ-AWANUI-AKL-HAEM',
+    source: 'Awanui Labs Auckland haematology reference intervals',
+    fullCitation:
+      'Awanui Labs Auckland. Reference Intervals - Haematology. HAE-F012, issued August 13, 2024.',
+    url: 'https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/03/Haem-Ref-Int-HAE-F012.pdf',
+    quote:
+      'Awanui Auckland publishes adult male, female, and antenatal complete blood count intervals plus ESR and coagulation ranges.',
+  },
+  'AUS-MONASH-REF-MASTER': {
+    id: 'AUS-MONASH-REF-MASTER',
+    source: 'Monash Health Pathology reference interval master list',
+    fullCitation:
+      'Monash Health Pathology. Pathology Reference Interval Master List. WIN-QS-19 version 13, issued August 6, 2024.',
+    url: 'https://monashpathology.org/wp-content/uploads/2024/08/WIN-QS-19.pdf',
+    quote:
+      'The Monash master list includes method-specific reference intervals, including blood gas analysis on Radiometer and i-STAT.',
+  },
+  'AUS-PATHWEST-BLOOD-GAS': {
+    id: 'AUS-PATHWEST-BLOOD-GAS',
+    source: 'PathWest blood gas and i-STAT reference intervals',
+    fullCitation:
+      'PathWest Laboratory Medicine WA. Blood Gas Reference Intervals. BMM082 version 1.1, issued January 23, 2025.',
+    url: 'https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf',
+    quote:
+      'PathWest publishes age-related blood gas, i-STAT CG4+, and i-STAT CHEM8 reference interval charts.',
+  },
   'AUS-ADS-HBA1C': {
     id: 'AUS-ADS-HBA1C',
     source: 'Australian Diabetes Society HbA1c diagnosis statement',
@@ -56,6 +110,34 @@ export const labCitations: Record<string, LabCitation> = {
     url: 'https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/',
     quote:
       'NHS FBC table provides age-partitioned counts and adult sex partitions for RBC, haemoglobin, haematocrit, and platelets.',
+  },
+  'UK-SYNNOVIS-CHEM': {
+    id: 'UK-SYNNOVIS-CHEM',
+    source: 'Synnovis chemistry reference intervals',
+    fullCitation:
+      'Synnovis. BSL-ALL-CHEM-INST3 Chemistry Reference Intervals, Version 5. Effective December 22, 2025.',
+    url: 'https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf',
+    quote:
+      'Synnovis publishes blood sciences chemistry intervals for all sites, including age and sex partitions for common chemistry, endocrine, and lipid analytes.',
+  },
+  'UK-MFT-BLOOD-COUNTS': {
+    id: 'UK-MFT-BLOOD-COUNTS',
+    source: 'Manchester University NHS Foundation Trust blood counts',
+    fullCitation:
+      'Manchester University NHS Foundation Trust. Haematology User Guide, Blood Counts reference ranges table, MI_HAEM28 Revision 16. Active July 11, 2024.',
+    url: 'https://mft.nhs.uk/app/uploads/2024/07/Blood-counts-reference-ranges.pdf',
+    page: 'p.26',
+    quote:
+      'MFT blood counts table lists neonatal, paediatric, adolescent, and adult full blood count intervals with adult sex-specific RBC, haemoglobin, haematocrit, and ESR intervals.',
+  },
+  'UK-UHD-HAEMATOLOGY': {
+    id: 'UK-UHD-HAEMATOLOGY',
+    source: 'University Hospitals Dorset haematology reference ranges',
+    fullCitation:
+      'University Hospitals Dorset NHS Foundation Trust. Test Repertoire and Reference Ranges: Haematology and Coagulation.',
+    url: 'https://www.uhd.nhs.uk/directory/name/187-services/joint-service/pathology/haematology-medical-pathology/2389-test-repertoire-and-reference-ranges',
+    quote:
+      'UHD publishes adult, paediatric, infant, ESR, HbA1c, coagulation, and D-dimer reference ranges for haematology and coagulation testing.',
   },
   'UK-NWANGLIA-BIOCHEM': {
     id: 'UK-NWANGLIA-BIOCHEM',
@@ -232,6 +314,42 @@ export const labCitations: Record<string, LabCitation> = {
     page: 'Key Messages',
     quote:
       'The primary treatment goal for people with diabetes is LDL-cholesterol consistently <2.0 mmol/L or more than 50% reduction from baseline.',
+  },
+  'CA-SHARED-HEALTH-HBA1C': {
+    id: 'CA-SHARED-HEALTH-HBA1C',
+    source: 'Shared Health Manitoba Lab Information Manual HbA1c',
+    fullCitation:
+      'Shared Health Manitoba. Lab Information Manual: Hemoglobin A1c - (B).',
+    url: 'https://apps.sbgh.mb.ca/labmanual/test/view?seedId=122',
+    quote:
+      'Shared Health Manitoba lists HbA1c reference values and diabetes guideline context; reuse is review-only because the manual states all rights reserved and use is subject to license terms.',
+  },
+  'CA-SHARED-HEALTH-HDL': {
+    id: 'CA-SHARED-HEALTH-HDL',
+    source: 'Shared Health Manitoba Lab Information Manual HDL cholesterol',
+    fullCitation:
+      'Shared Health Manitoba. Lab Information Manual: HDL Cholesterol (HDL-c) - (P).',
+    url: 'https://apps.sbgh.mb.ca/labmanual/test/view?seedId=1401',
+    quote:
+      'Shared Health Manitoba lists pediatric and adult sex-specific HDL-C decision limits with Canadian dyslipidemia guideline context.',
+  },
+  'CA-LHSC-TRACE-ELEMENTS': {
+    id: 'CA-LHSC-TRACE-ELEMENTS',
+    source: 'London Health Sciences Centre reference ranges',
+    fullCitation:
+      'London Health Sciences Centre Pathology and Laboratory Medicine. Reference Ranges.',
+    url: 'https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges',
+    quote:
+      'LHSC publishes whole blood, erythrocyte, plasma, serum, tissue, and urine reference ranges for essential and toxic trace elements.',
+  },
+  'CA-NORTHERN-HEALTH-DIRECTORY': {
+    id: 'CA-NORTHERN-HEALTH-DIRECTORY',
+    source: 'Northern Health BC laboratory services test directory',
+    fullCitation:
+      'Northern Health Laboratory Services. NH Laboratory Services Test Directory, Version 6.51, Revision Date 2024-07-24.',
+    url: 'https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf',
+    quote:
+      'Northern Health includes chemistry and hematology reference interval appendices; candidate values remain review-only pending licensing and extraction QA.',
   },
   'APL-CRP': {
     id: 'APL-CRP',

@@ -48,6 +48,32 @@ Required before import:
 - `assayPlatform` selection or separate platform-specific standards.
 - Permission or a source we can redistribute.
 
+## Australia / New Zealand Supplements
+
+Recommendation: import only small curated/high-confidence subsets into the
+runtime standard, and keep broader harmonisation/master-list sources as
+review-only candidates unless they add source-specific method context.
+
+Imported to runtime:
+
+- Canterbury Health Laboratories general chemistry: selected chemistry ranges
+  with clear age/sex partitions from the current PDF.
+- Awanui Auckland biochemistry: selected glucose, HbA1c, albumin, calcium,
+  phosphate, magnesium, and lipase rows.
+- Awanui Auckland haematology: adult male/female CBC rows.
+- PathWest blood gas: selected i-STAT CHEM8 chemistry rows with method tags.
+
+Review-only candidates:
+
+- Tate et al. 2014 AACB harmonised Australia/New Zealand intervals. This is
+  useful provenance and cross-checking material, but most selected chemistry
+  intervals overlap newer RCPA/runtime rows.
+- Monash Health Pathology master list. This is a broad institution-specific
+  source; the current pipeline extracts only selected blood gas candidates and
+  leaves them out of promotion pending method-selection UX.
+- PathWest standalone i-STAT POCT PDF. Text extraction did not expose usable
+  interval rows, so it remains profile-only.
+
 ## NHS Pathology Manuals
 
 Recommendation: use selected Trust pages as curated citation sources, not blind

@@ -21,7 +21,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alanine aminotransferase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years, female",
@@ -39,7 +39,37 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alanine aminotransferase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
+      },
+      {
+        "label": "All ages, male",
+        "kind": "range",
+        "display": "0-40",
+        "unit": "U/L",
+        "low": 0,
+        "high": 40,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "sex": "male",
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Alanine aminotransferase",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
+      },
+      {
+        "label": "All ages, female",
+        "kind": "range",
+        "display": "0-30",
+        "unit": "U/L",
+        "low": 0,
+        "high": 30,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "sex": "female",
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Alanine aminotransferase",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
       }
     ],
     "sourceReview": {
@@ -47,6 +77,147 @@
       "parser": "rcpaChemistry",
       "requiresReview": true
     }
+  },
+  {
+    "testIds": [
+      "albumin"
+    ],
+    "name": "Albumin",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "nzChlGeneralChemistry",
+      "promoteReviewed": true
+    },
+    "bands": [
+      {
+        "label": "0 days up to 14 days",
+        "kind": "range",
+        "display": "28-41",
+        "unit": "g/L",
+        "low": 28,
+        "high": 41,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "ageMinDays": 0,
+        "ageMaxDays": 14,
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Albumin",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
+      },
+      {
+        "label": "14 days up to 1 year",
+        "kind": "range",
+        "display": "28-45",
+        "unit": "g/L",
+        "low": 28,
+        "high": 45,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "ageMinDays": 14,
+        "ageMaxYears": 1,
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Albumin",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
+      },
+      {
+        "label": "1 year up to 8 years",
+        "kind": "range",
+        "display": "35-45",
+        "unit": "g/L",
+        "low": 35,
+        "high": 45,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "ageMinYears": 1,
+        "ageMaxYears": 8,
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Albumin",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
+      },
+      {
+        "label": "8 years up to 15 years",
+        "kind": "range",
+        "display": "37-47",
+        "unit": "g/L",
+        "low": 37,
+        "high": 47,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "ageMinYears": 8,
+        "ageMaxYears": 15,
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Albumin",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
+      },
+      {
+        "label": "16 years up to 150 years",
+        "kind": "range",
+        "display": "32-48",
+        "unit": "g/L",
+        "low": 32,
+        "high": 48,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "ageMinYears": 16,
+        "ageMaxYears": 150,
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Albumin",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
+      },
+      {
+        "label": "0 months up to 3 months",
+        "kind": "range",
+        "display": "25-40",
+        "unit": "g/L",
+        "low": 25,
+        "high": 40,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "ageMinDays": 0,
+        "ageMaxDays": 90,
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Albumin",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
+      },
+      {
+        "label": "3 months up to 1 year",
+        "kind": "range",
+        "display": "32-45",
+        "unit": "g/L",
+        "low": 32,
+        "high": 45,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "ageMinDays": 90,
+        "ageMaxYears": 1,
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Albumin",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
+      },
+      {
+        "label": "1 year up to 150 years",
+        "kind": "range",
+        "display": "32-48",
+        "unit": "g/L",
+        "low": 32,
+        "high": 48,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "ageMinYears": 1,
+        "ageMaxYears": 150,
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Albumin",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
+      }
+    ]
   },
   {
     "testIds": [
@@ -68,7 +239,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "1 week up to 4 weeks",
@@ -84,7 +255,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "4 weeks up to 26 weeks",
@@ -100,7 +271,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "26 weeks up to 2 years",
@@ -116,7 +287,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "2 years up to 6 years",
@@ -132,7 +303,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "6 years up to 10 years",
@@ -148,7 +319,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "10 years up to 14 years, male",
@@ -165,7 +336,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "14 years up to 15 years, male",
@@ -182,7 +353,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "15 years up to 17 years, male",
@@ -199,7 +370,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "17 years up to 19 years, male",
@@ -216,7 +387,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "19 years up to 22 years, male",
@@ -233,7 +404,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "22 years up to 120 years, male",
@@ -250,7 +421,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "10 years up to 13 years, female",
@@ -267,7 +438,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "13 years up to 14 years, female",
@@ -284,7 +455,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "14 years up to 15 years, female",
@@ -301,7 +472,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "15 years up to 16 years, female",
@@ -318,7 +489,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "16 years up to 22 years, female",
@@ -335,7 +506,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "22 years up to 120 years, female",
@@ -352,7 +523,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years, female",
@@ -369,7 +540,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years, female",
@@ -386,7 +557,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 60 years, male",
@@ -403,7 +574,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "60 years up to 120 years, male",
@@ -420,7 +591,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years, female",
@@ -437,7 +608,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Alkaline phosphatase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       }
     ],
     "sourceReview": {
@@ -468,7 +639,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Aspartate aminotransferase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years, female",
@@ -486,7 +657,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Aspartate aminotransferase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       }
     ],
     "sourceReview": {
@@ -515,7 +686,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Bicarbonate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "1 week up to 2 years",
@@ -531,7 +702,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Bicarbonate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "2 years up to 10 years",
@@ -547,7 +718,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Bicarbonate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "10 years up to 18 years",
@@ -563,7 +734,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Bicarbonate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years",
@@ -579,7 +750,124 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Bicarbonate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
+      },
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "22-32",
+        "unit": "mmol/L",
+        "low": 22,
+        "high": 32,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Bicarbonate",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "0 weeks up to 1 week",
+        "kind": "range",
+        "display": "15-28",
+        "unit": "mmol/L",
+        "low": 15,
+        "high": 28,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinWeeks": 0,
+        "ageMaxWeeks": 1,
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Bicarbonate",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "1 week up to 2 years",
+        "kind": "range",
+        "display": "16-29",
+        "unit": "mmol/L",
+        "low": 16,
+        "high": 29,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinWeeks": 1,
+        "ageMaxYears": 2,
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Bicarbonate",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "2 years up to 10 years",
+        "kind": "range",
+        "display": "17-30",
+        "unit": "mmol/L",
+        "low": 17,
+        "high": 30,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinYears": 2,
+        "ageMaxYears": 10,
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Bicarbonate",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "10 years up to 18 years",
+        "kind": "range",
+        "display": "20-32",
+        "unit": "mmol/L",
+        "low": 20,
+        "high": 32,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinYears": 10,
+        "ageMaxYears": 18,
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Bicarbonate",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "0 years up to 2 years",
+        "kind": "range",
+        "display": "19-24",
+        "unit": "mmol/L",
+        "low": 19,
+        "high": 24,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "ageMinYears": 0,
+        "ageMaxYears": 2,
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Bicarbonate",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
+      },
+      {
+        "label": "2 years up to 150 years",
+        "kind": "range",
+        "display": "22-32",
+        "unit": "mmol/L",
+        "low": 22,
+        "high": 32,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "ageMinYears": 2,
+        "ageMaxYears": 150,
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Bicarbonate",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
       }
     ],
     "sourceReview": {
@@ -608,7 +896,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Calcium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "1 week up to 26 weeks",
@@ -624,7 +912,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Calcium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "26 weeks up to 2 years",
@@ -640,7 +928,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Calcium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "2 years up to 18 years",
@@ -656,7 +944,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Calcium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years",
@@ -672,7 +960,119 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Calcium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
+      },
+      {
+        "label": "0 days up to 1 week",
+        "kind": "range",
+        "display": "1.9-2.8",
+        "unit": "mmol/L",
+        "low": 1.9,
+        "high": 2.8,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "ageMinDays": 0,
+        "ageMaxWeeks": 1,
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Calcium",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
+      },
+      {
+        "label": "1 week up to 26 weeks",
+        "kind": "range",
+        "display": "2.2-2.8",
+        "unit": "mmol/L",
+        "low": 2.2,
+        "high": 2.8,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "ageMinWeeks": 1,
+        "ageMaxWeeks": 26,
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Calcium",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
+      },
+      {
+        "label": "26 weeks up to 18 years",
+        "kind": "range",
+        "display": "2.2-2.7",
+        "unit": "mmol/L",
+        "low": 2.2,
+        "high": 2.7,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "ageMinWeeks": 26,
+        "ageMaxYears": 18,
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Calcium",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
+      },
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "2.2-2.6",
+        "unit": "mmol/L",
+        "low": 2.2,
+        "high": 2.6,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Calcium",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
+      },
+      {
+        "label": "1 day up to 3 days",
+        "kind": "range",
+        "display": "1.80-2.80",
+        "unit": "mmol/L",
+        "low": 1.8,
+        "high": 2.8,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "ageMinDays": 1,
+        "ageMaxDays": 3,
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Calcium",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
+      },
+      {
+        "label": "4 days up to 1 year",
+        "kind": "range",
+        "display": "2.10-2.80",
+        "unit": "mmol/L",
+        "low": 2.1,
+        "high": 2.8,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "ageMinDays": 4,
+        "ageMaxYears": 1,
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Calcium",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
+      },
+      {
+        "label": "1 year up to 150 years",
+        "kind": "range",
+        "display": "2.10-2.55",
+        "unit": "mmol/L",
+        "low": 2.1,
+        "high": 2.55,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "ageMinYears": 1,
+        "ageMaxYears": 150,
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Calcium",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
       }
     ],
     "sourceReview": {
@@ -701,7 +1101,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Calcium corrected for albumin",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       }
     ],
     "sourceReview": {
@@ -730,7 +1130,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Chloride",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "1 week up to 18 years",
@@ -746,7 +1146,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Chloride",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years",
@@ -762,7 +1162,141 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Chloride",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
+      },
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "95-110",
+        "unit": "mmol/L",
+        "low": 95,
+        "high": 110,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Chloride",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "0 weeks up to 1 week",
+        "kind": "range",
+        "display": "98-115",
+        "unit": "mmol/L",
+        "low": 98,
+        "high": 115,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinWeeks": 0,
+        "ageMaxWeeks": 1,
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Chloride",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "1 week up to 18 years",
+        "kind": "range",
+        "display": "97-110",
+        "unit": "mmol/L",
+        "low": 97,
+        "high": 110,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinWeeks": 1,
+        "ageMaxYears": 18,
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Chloride",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "95-110",
+        "unit": "mmol/L",
+        "low": 95,
+        "high": 110,
+        "citationId": "NZ-CHL-GEN-CHEM",
+        "sourceId": "nz-chl-general-chemistry",
+        "sourceUrl": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+        "sourceTitle": "nz-chl-general-chemistry",
+        "sourceSection": "Chloride",
+        "sourceSha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a"
+      },
+      {
+        "label": "Blood gas adult",
+        "kind": "range",
+        "display": "95-110",
+        "unit": "mmol/L",
+        "low": 95,
+        "high": 110,
+        "citationId": "AUS-MONASH-REF-MASTER",
+        "method": "blood gas Radiometer",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "promoteReviewed": false,
+        "sourceId": "aus-monash-reference-master-list",
+        "sourceUrl": "https://monashpathology.org/wp-content/uploads/2024/08/WIN-QS-19.pdf",
+        "sourceTitle": "aus-monash-reference-master-list",
+        "sourceSection": "Chloride blood gas",
+        "sourceSha256": "036cd6e01edc5c8f8cd66691d82418c87ee989842623ec5a2d03073874bb2ac6"
+      },
+      {
+        "label": "0 days up to 1 week",
+        "kind": "range",
+        "display": "98-115",
+        "unit": "mmol/L",
+        "low": 98,
+        "high": 115,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinDays": 0,
+        "ageMaxWeeks": 1,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Chloride i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
+      },
+      {
+        "label": "1 week up to 18 years",
+        "kind": "range",
+        "display": "97-110",
+        "unit": "mmol/L",
+        "low": 97,
+        "high": 110,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinWeeks": 1,
+        "ageMaxYears": 18,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Chloride i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
+      },
+      {
+        "label": "18 years up to 120 years",
+        "kind": "range",
+        "display": "95-110",
+        "unit": "mmol/L",
+        "low": 95,
+        "high": 110,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinYears": 18,
+        "ageMaxYears": 120,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Chloride i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
       }
     ],
     "sourceReview": {
@@ -792,7 +1326,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Creatinine",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "1 week up to 4 weeks",
@@ -809,7 +1343,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Creatinine",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "4 weeks up to 2 years",
@@ -826,7 +1360,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Creatinine",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "2 years up to 6 years",
@@ -843,7 +1377,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Creatinine",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "6 years up to 12 years",
@@ -860,7 +1394,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Creatinine",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "12 years up to 15 years, male",
@@ -878,7 +1412,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Creatinine",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "15 years up to 19 years, male",
@@ -896,7 +1430,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Creatinine",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "19 years up to 60 years, male",
@@ -914,7 +1448,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Creatinine",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "12 years up to 15 years, female",
@@ -932,7 +1466,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Creatinine",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "15 years up to 19 years, female",
@@ -950,7 +1484,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Creatinine",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "19 years up to 60 years, female",
@@ -968,7 +1502,79 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Creatinine",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
+      },
+      {
+        "label": "18 years up to 60 years, male",
+        "kind": "range",
+        "display": "60-110",
+        "unit": "umol/L",
+        "low": 60,
+        "high": 110,
+        "citationId": "AUS-AACB-TATE-2014",
+        "sex": "male",
+        "ageMinYears": 18,
+        "ageMaxYears": 60,
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Creatinine",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "18 years up to 60 years, female",
+        "kind": "range",
+        "display": "45-90",
+        "unit": "umol/L",
+        "low": 45,
+        "high": 90,
+        "citationId": "AUS-AACB-TATE-2014",
+        "sex": "female",
+        "ageMinYears": 18,
+        "ageMaxYears": 60,
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Creatinine",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "19 years up to 120 years, male",
+        "kind": "range",
+        "display": "60-110",
+        "unit": "umol/L",
+        "low": 60,
+        "high": 110,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "sex": "male",
+        "ageMinYears": 19,
+        "ageMaxYears": 120,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Creatinine i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
+      },
+      {
+        "label": "19 years up to 120 years, female",
+        "kind": "range",
+        "display": "45-90",
+        "unit": "umol/L",
+        "low": 45,
+        "high": 90,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "sex": "female",
+        "ageMinYears": 19,
+        "ageMaxYears": 120,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Creatinine i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
       }
     ],
     "sourceReview": {
@@ -998,7 +1604,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Gamma glutamyltransferase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years, female",
@@ -1015,7 +1621,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Gamma glutamyltransferase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       }
     ],
     "sourceReview": {
@@ -1023,6 +1629,109 @@
       "parser": "rcpaChemistry",
       "requiresReview": true
     }
+  },
+  {
+    "testIds": [
+      "glucose"
+    ],
+    "name": "Glucose",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "nzAwanuiAucklandBiochemistry",
+      "promoteReviewed": true
+    },
+    "bands": [
+      {
+        "label": "Fasting",
+        "kind": "range",
+        "display": "3.5-5.4",
+        "unit": "mmol/L",
+        "low": 3.5,
+        "high": 5.4,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "method": "fasting",
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Glucose",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
+      },
+      {
+        "label": "Non-fasting",
+        "kind": "range",
+        "display": "3.5-7.7",
+        "unit": "mmol/L",
+        "low": 3.5,
+        "high": 7.7,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "method": "non-fasting",
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Glucose",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
+      },
+      {
+        "label": "0 hours up to 3 days",
+        "kind": "range",
+        "display": "2.6-5.4",
+        "unit": "mmol/L",
+        "low": 2.6,
+        "high": 5.4,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinDays": 0,
+        "ageMaxDays": 3,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Glucose i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
+      },
+      {
+        "label": "3 days up to 120 years",
+        "kind": "range",
+        "display": "3.0-5.4",
+        "unit": "mmol/L",
+        "low": 3,
+        "high": 5.4,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinDays": 3,
+        "ageMaxYears": 120,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Glucose i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "hba1c"
+    ],
+    "name": "HbA1c",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "nzAwanuiAucklandBiochemistry",
+      "promoteReviewed": true
+    },
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "lt",
+        "display": "<41",
+        "unit": "mmol/mol",
+        "high": 41,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "HbA1c",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
+      }
+    ]
   },
   {
     "testIds": [
@@ -1045,7 +1754,22 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Lipase",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
+      },
+      {
+        "label": "Serum",
+        "kind": "range",
+        "display": "10-60",
+        "unit": "U/L",
+        "low": 10,
+        "high": 60,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "specimen": "serum",
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Lipase",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
       }
     ],
     "sourceReview": {
@@ -1074,7 +1798,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Magnesium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "1 week up to 18 years",
@@ -1090,7 +1814,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Magnesium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years",
@@ -1106,7 +1830,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Magnesium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years",
@@ -1122,7 +1846,21 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Magnesium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
+      },
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "0.70-1.0",
+        "unit": "mmol/L",
+        "low": 0.7,
+        "high": 1,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Magnesium",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
       }
     ],
     "sourceReview": {
@@ -1151,7 +1889,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Phosphate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "1 week up to 4 weeks",
@@ -1167,7 +1905,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Phosphate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "4 weeks up to 26 weeks",
@@ -1183,7 +1921,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Phosphate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "26 weeks up to 1 year",
@@ -1199,7 +1937,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Phosphate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "1 year up to 4 years",
@@ -1215,7 +1953,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Phosphate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "4 years up to 15 years",
@@ -1231,7 +1969,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Phosphate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "15 years up to 18 years",
@@ -1247,7 +1985,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Phosphate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 20 years",
@@ -1263,7 +2001,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Phosphate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "20 years up to 120 years",
@@ -1279,7 +2017,71 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Phosphate",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
+      },
+      {
+        "label": "1 year up to 4 years",
+        "kind": "range",
+        "display": "1.10-2.20",
+        "unit": "mmol/L",
+        "low": 1.1,
+        "high": 2.2,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "ageMinYears": 1,
+        "ageMaxYears": 4,
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Phosphate",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
+      },
+      {
+        "label": "4 years up to 15 years",
+        "kind": "range",
+        "display": "0.90-2.00",
+        "unit": "mmol/L",
+        "low": 0.9,
+        "high": 2,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "ageMinYears": 4,
+        "ageMaxYears": 15,
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Phosphate",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
+      },
+      {
+        "label": "15 years up to 18 years",
+        "kind": "range",
+        "display": "0.80-1.85",
+        "unit": "mmol/L",
+        "low": 0.8,
+        "high": 1.85,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "ageMinYears": 15,
+        "ageMaxYears": 18,
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Phosphate",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
+      },
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "0.75-1.50",
+        "unit": "mmol/L",
+        "low": 0.75,
+        "high": 1.5,
+        "citationId": "NZ-AWANUI-AKL-BIOCHEM",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "sourceId": "nz-awanui-auckland-biochemistry",
+        "sourceUrl": "https://fl-healthscope-media.s3.amazonaws.com/lab-sites/uploads/sites/2/2025/09/Biochemistry-Reference-intervals-22092025.pdf",
+        "sourceTitle": "nz-awanui-auckland-biochemistry",
+        "sourceSection": "Phosphate",
+        "sourceSha256": "6fe205b7021dde7ac0c085a13e017d3d6b1188006ab313462ab89d02b58cd37b"
       }
     ],
     "sourceReview": {
@@ -1309,7 +2111,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Potassium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "1 week up to 26 weeks",
@@ -1326,7 +2128,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Potassium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "26 weeks up to 2 years",
@@ -1343,7 +2145,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Potassium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "2 years up to 18 years",
@@ -1360,7 +2162,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Potassium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years",
@@ -1377,7 +2179,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Potassium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "0 days up to 1 week",
@@ -1394,7 +2196,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Potassium plasma",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "1 week up to 26 weeks",
@@ -1411,7 +2213,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Potassium plasma",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "26 weeks up to 2 years",
@@ -1428,7 +2230,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Potassium plasma",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "2 years up to 18 years",
@@ -1445,7 +2247,220 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Potassium plasma",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
+      },
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "3.5-5.2",
+        "unit": "mmol/L",
+        "low": 3.5,
+        "high": 5.2,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "specimen": "serum/plasma",
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Potassium",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "0 weeks up to 1 week, plasma",
+        "kind": "range",
+        "display": "3.5-6.2",
+        "unit": "mmol/L",
+        "low": 3.5,
+        "high": 6.2,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinWeeks": 0,
+        "ageMaxWeeks": 1,
+        "specimen": "plasma",
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Potassium",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "1 week up to 26 weeks, plasma",
+        "kind": "range",
+        "display": "3.8-6.4",
+        "unit": "mmol/L",
+        "low": 3.8,
+        "high": 6.4,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinWeeks": 1,
+        "ageMaxWeeks": 26,
+        "specimen": "plasma",
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Potassium",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "26 weeks up to 2 years, plasma",
+        "kind": "range",
+        "display": "3.5-5.4",
+        "unit": "mmol/L",
+        "low": 3.5,
+        "high": 5.4,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinWeeks": 26,
+        "ageMaxYears": 2,
+        "specimen": "plasma",
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Potassium",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "2 years up to 18 years, plasma",
+        "kind": "range",
+        "display": "3.3-4.9",
+        "unit": "mmol/L",
+        "low": 3.3,
+        "high": 4.9,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinYears": 2,
+        "ageMaxYears": 18,
+        "specimen": "plasma",
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Potassium",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "Blood gas arterial/capillary adult",
+        "kind": "range",
+        "display": "3.5-5.2",
+        "unit": "mmol/L",
+        "low": 3.5,
+        "high": 5.2,
+        "citationId": "AUS-MONASH-REF-MASTER",
+        "method": "blood gas Radiometer",
+        "specimen": "arterial/capillary",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "promoteReviewed": false,
+        "sourceId": "aus-monash-reference-master-list",
+        "sourceUrl": "https://monashpathology.org/wp-content/uploads/2024/08/WIN-QS-19.pdf",
+        "sourceTitle": "aus-monash-reference-master-list",
+        "sourceSection": "Potassium blood gas",
+        "sourceSha256": "036cd6e01edc5c8f8cd66691d82418c87ee989842623ec5a2d03073874bb2ac6"
+      },
+      {
+        "label": "Blood gas venous adult",
+        "kind": "range",
+        "display": "3.5-5.2",
+        "unit": "mmol/L",
+        "low": 3.5,
+        "high": 5.2,
+        "citationId": "AUS-MONASH-REF-MASTER",
+        "method": "blood gas Radiometer",
+        "specimen": "venous",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "promoteReviewed": false,
+        "sourceId": "aus-monash-reference-master-list",
+        "sourceUrl": "https://monashpathology.org/wp-content/uploads/2024/08/WIN-QS-19.pdf",
+        "sourceTitle": "aus-monash-reference-master-list",
+        "sourceSection": "Potassium blood gas",
+        "sourceSha256": "036cd6e01edc5c8f8cd66691d82418c87ee989842623ec5a2d03073874bb2ac6"
+      },
+      {
+        "label": "0 days up to 1 week",
+        "kind": "range",
+        "display": "3.5-6.2",
+        "unit": "mmol/L",
+        "low": 3.5,
+        "high": 6.2,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinDays": 0,
+        "ageMaxWeeks": 1,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Potassium i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
+      },
+      {
+        "label": "1 week up to 26 weeks",
+        "kind": "range",
+        "display": "3.8-6.4",
+        "unit": "mmol/L",
+        "low": 3.8,
+        "high": 6.4,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinWeeks": 1,
+        "ageMaxWeeks": 26,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Potassium i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
+      },
+      {
+        "label": "26 weeks up to 1 year",
+        "kind": "range",
+        "display": "3.5-5.4",
+        "unit": "mmol/L",
+        "low": 3.5,
+        "high": 5.4,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinWeeks": 26,
+        "ageMaxYears": 1,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Potassium i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
+      },
+      {
+        "label": "2 years up to 18 years",
+        "kind": "range",
+        "display": "3.3-4.9",
+        "unit": "mmol/L",
+        "low": 3.3,
+        "high": 4.9,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinYears": 2,
+        "ageMaxYears": 18,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Potassium i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
+      },
+      {
+        "label": "18 years up to 120 years",
+        "kind": "range",
+        "display": "3.5-5.2",
+        "unit": "mmol/L",
+        "low": 3.5,
+        "high": 5.2,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinYears": 18,
+        "ageMaxYears": 120,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Potassium i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
       }
     ],
     "sourceReview": {
@@ -1475,7 +2490,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Sodium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "1 week up to 18 years",
@@ -1492,7 +2507,7 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Sodium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
       },
       {
         "label": "18 years up to 120 years",
@@ -1509,7 +2524,150 @@
         "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
         "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
         "sourceSection": "Sodium",
-        "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
+        "sourceSha256": "88f91f7bb276d07f58707554f344ca7c8c1873ab5c9e9132191faa58502813af"
+      },
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "135-145",
+        "unit": "mmol/L",
+        "low": 135,
+        "high": 145,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "specimen": "serum/plasma",
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Sodium",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "0 weeks up to 1 week",
+        "kind": "range",
+        "display": "132-147",
+        "unit": "mmol/L",
+        "low": 132,
+        "high": 147,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinWeeks": 0,
+        "ageMaxWeeks": 1,
+        "specimen": "serum/plasma",
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Sodium",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "1 week up to 18 years",
+        "kind": "range",
+        "display": "133-144",
+        "unit": "mmol/L",
+        "low": 133,
+        "high": 144,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinWeeks": 1,
+        "ageMaxYears": 18,
+        "specimen": "serum/plasma",
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Sodium",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      },
+      {
+        "label": "Blood gas arterial/capillary adult",
+        "kind": "range",
+        "display": "135-145",
+        "unit": "mmol/L",
+        "low": 135,
+        "high": 145,
+        "citationId": "AUS-MONASH-REF-MASTER",
+        "method": "blood gas Radiometer",
+        "specimen": "arterial/capillary",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "promoteReviewed": false,
+        "sourceId": "aus-monash-reference-master-list",
+        "sourceUrl": "https://monashpathology.org/wp-content/uploads/2024/08/WIN-QS-19.pdf",
+        "sourceTitle": "aus-monash-reference-master-list",
+        "sourceSection": "Sodium blood gas",
+        "sourceSha256": "036cd6e01edc5c8f8cd66691d82418c87ee989842623ec5a2d03073874bb2ac6"
+      },
+      {
+        "label": "Blood gas venous adult",
+        "kind": "range",
+        "display": "135-145",
+        "unit": "mmol/L",
+        "low": 135,
+        "high": 145,
+        "citationId": "AUS-MONASH-REF-MASTER",
+        "method": "blood gas Radiometer",
+        "specimen": "venous",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "promoteReviewed": false,
+        "sourceId": "aus-monash-reference-master-list",
+        "sourceUrl": "https://monashpathology.org/wp-content/uploads/2024/08/WIN-QS-19.pdf",
+        "sourceTitle": "aus-monash-reference-master-list",
+        "sourceSection": "Sodium blood gas",
+        "sourceSha256": "036cd6e01edc5c8f8cd66691d82418c87ee989842623ec5a2d03073874bb2ac6"
+      },
+      {
+        "label": "0 days up to 1 week",
+        "kind": "range",
+        "display": "132-147",
+        "unit": "mmol/L",
+        "low": 132,
+        "high": 147,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinDays": 0,
+        "ageMaxWeeks": 1,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Sodium i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
+      },
+      {
+        "label": "1 week up to 18 years",
+        "kind": "range",
+        "display": "133-144",
+        "unit": "mmol/L",
+        "low": 133,
+        "high": 144,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinWeeks": 1,
+        "ageMaxYears": 18,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Sodium i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
+      },
+      {
+        "label": "18 years up to 120 years",
+        "kind": "range",
+        "display": "135-145",
+        "unit": "mmol/L",
+        "low": 135,
+        "high": 145,
+        "citationId": "AUS-PATHWEST-BLOOD-GAS",
+        "ageMinYears": 18,
+        "ageMaxYears": 120,
+        "method": "i-STAT CHEM8",
+        "sourceId": "aus-pathwest-blood-gas",
+        "sourceUrl": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+        "sourceTitle": "aus-pathwest-blood-gas",
+        "sourceSection": "Sodium i-STAT CHEM8",
+        "sourceSha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc"
       }
     ],
     "sourceReview": {
@@ -1517,5 +2675,35 @@
       "parser": "rcpaChemistry",
       "requiresReview": true
     }
+  },
+  {
+    "testIds": [
+      "total-protein"
+    ],
+    "name": "Total protein",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "aacbTate2014Chemistry",
+      "promoteReviewed": false
+    },
+    "bands": [
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "60-80",
+        "unit": "g/L",
+        "low": 60,
+        "high": 80,
+        "citationId": "AUS-AACB-TATE-2014",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "promoteReviewed": false,
+        "sourceId": "aacb-tate-2014-common-reference-intervals",
+        "sourceUrl": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+        "sourceTitle": "aacb-tate-2014-common-reference-intervals",
+        "sourceSection": "Total protein",
+        "sourceSha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389"
+      }
+    ]
   }
 ]

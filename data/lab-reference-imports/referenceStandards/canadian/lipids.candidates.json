@@ -1,0 +1,67 @@
+[
+  {
+    "testIds": [
+      "hdl"
+    ],
+    "name": "HDL cholesterol",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caSharedHealthHdl"
+    },
+    "bands": [
+      {
+        "label": "0 years up to 20 years",
+        "kind": "gte",
+        "display": ">=1.00",
+        "unit": "mmol/L",
+        "low": 1,
+        "citationId": "CA-SHARED-HEALTH-HDL",
+        "ageMinYears": 0,
+        "ageMaxYears": 20,
+        "specimen": "plasma/serum",
+        "note": "Pediatric desired HDL-C decision limit; source also lists borderline and increased-risk categories.",
+        "sourceId": "ca-shared-health-manitoba-hdl",
+        "sourceUrl": "https://apps.sbgh.mb.ca/labmanual/test/view?seedId=1401",
+        "sourceTitle": "Lab Information Manual",
+        "sourceSection": "HDL cholesterol",
+        "sourceSha256": "36edacd18b0b63c8894ec5ff23a49d7d5c636f90f16510c214365b8c1937883c"
+      },
+      {
+        "label": "20 years up to 150 years, male",
+        "kind": "gte",
+        "display": ">=1.00",
+        "unit": "mmol/L",
+        "low": 1,
+        "citationId": "CA-SHARED-HEALTH-HDL",
+        "sex": "male",
+        "ageMinYears": 20,
+        "ageMaxYears": 150,
+        "specimen": "plasma/serum",
+        "note": "Adult male metabolic-syndrome risk decision limit.",
+        "sourceId": "ca-shared-health-manitoba-hdl",
+        "sourceUrl": "https://apps.sbgh.mb.ca/labmanual/test/view?seedId=1401",
+        "sourceTitle": "Lab Information Manual",
+        "sourceSection": "HDL cholesterol",
+        "sourceSha256": "36edacd18b0b63c8894ec5ff23a49d7d5c636f90f16510c214365b8c1937883c"
+      },
+      {
+        "label": "20 years up to 150 years, female",
+        "kind": "gte",
+        "display": ">=1.30",
+        "unit": "mmol/L",
+        "low": 1.3,
+        "citationId": "CA-SHARED-HEALTH-HDL",
+        "sex": "female",
+        "ageMinYears": 20,
+        "ageMaxYears": 150,
+        "specimen": "plasma/serum",
+        "note": "Adult female metabolic-syndrome risk decision limit.",
+        "sourceId": "ca-shared-health-manitoba-hdl",
+        "sourceUrl": "https://apps.sbgh.mb.ca/labmanual/test/view?seedId=1401",
+        "sourceTitle": "Lab Information Manual",
+        "sourceSection": "HDL cholesterol",
+        "sourceSha256": "36edacd18b0b63c8894ec5ff23a49d7d5c636f90f16510c214365b8c1937883c"
+      }
+    ]
+  }
+]

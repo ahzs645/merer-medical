@@ -1,0 +1,280 @@
+[
+  {
+    "testIds": [
+      "hematocrit"
+    ],
+    "name": "Hematocrit",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthHematology"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years, female",
+        "kind": "range",
+        "display": "0.36-0.46",
+        "unit": "L/L",
+        "low": 0.36,
+        "high": 0.46,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "sex": "female",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory-hematology",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Hematocrit",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      },
+      {
+        "label": "19 years up to 150 years, male",
+        "kind": "range",
+        "display": "0.41-0.52",
+        "unit": "L/L",
+        "low": 0.41,
+        "high": 0.52,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "sex": "male",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory-hematology",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Hematocrit",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "hemoglobin"
+    ],
+    "name": "Hemoglobin",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthHematology"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years, female",
+        "kind": "range",
+        "display": "115-150",
+        "unit": "g/L",
+        "low": 115,
+        "high": 150,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "sex": "female",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory-hematology",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Hemoglobin",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      },
+      {
+        "label": "19 years up to 150 years, male",
+        "kind": "range",
+        "display": "135-170",
+        "unit": "g/L",
+        "low": 135,
+        "high": 170,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "sex": "male",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory-hematology",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Hemoglobin",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "mch"
+    ],
+    "name": "MCH",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthHematology"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years",
+        "kind": "range",
+        "display": "26-35",
+        "unit": "pg",
+        "low": 26,
+        "high": 35,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory-hematology",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "MCH",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "mchc"
+    ],
+    "name": "MCHC",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthHematology"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years",
+        "kind": "range",
+        "display": "320-360",
+        "unit": "g/L",
+        "low": 320,
+        "high": 360,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory-hematology",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "MCHC",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "mcv"
+    ],
+    "name": "Mean cell volume",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthHematology"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years",
+        "kind": "range",
+        "display": "80-100",
+        "unit": "fL",
+        "low": 80,
+        "high": 100,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory-hematology",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Mean cell volume",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "platelets"
+    ],
+    "name": "Platelets",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthHematology"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years",
+        "kind": "range",
+        "display": "160-380",
+        "unit": "10^9/L",
+        "low": 160,
+        "high": 380,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory-hematology",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Platelets",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "rbc"
+    ],
+    "name": "Red blood cells",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthHematology"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years, female",
+        "kind": "range",
+        "display": "4.3-5.5",
+        "unit": "10^12/L",
+        "low": 4.3,
+        "high": 5.5,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "sex": "female",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory-hematology",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Red blood cells",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      },
+      {
+        "label": "19 years up to 150 years, male",
+        "kind": "range",
+        "display": "4.0-4.9",
+        "unit": "10^12/L",
+        "low": 4,
+        "high": 4.9,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "sex": "male",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory-hematology",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Red blood cells",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "wbc"
+    ],
+    "name": "White blood cell count",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthHematology"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years",
+        "kind": "range",
+        "display": "4.0-11.0",
+        "unit": "10^9/L",
+        "low": 4,
+        "high": 11,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory-hematology",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "White blood cell count",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  }
+]

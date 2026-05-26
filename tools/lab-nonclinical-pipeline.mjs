@@ -31,7 +31,8 @@ const sources = [
     parser: 'ahrqAppendixO',
     url: 'https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf',
     extension: 'pdf',
-    license: 'US government source; confirm downstream reuse terms before runtime packaging.',
+    license:
+      'US government source; confirm downstream reuse terms before runtime packaging.',
     caveat:
       'Administrative database range checks and LOINC mappings, not patient-specific normal ranges.',
   },
@@ -51,7 +52,8 @@ const sources = [
     parser: 'elaproCoreLabs',
     url: 'https://api.figshare.com/v2/articles/19767803',
     extension: 'zip',
-    license: 'CC BY 4.0 / CC0 per source metadata; verify before app redistribution.',
+    license:
+      'CC BY 4.0 / CC0 per source metadata; verify before app redistribution.',
     caveat:
       'LOINC-mapped eligibility-screening lab procedure metadata, not clinical normal ranges.',
   },
@@ -127,7 +129,8 @@ async function fetchSource(source) {
       Accept: '*/*',
     },
   });
-  if (!response.ok) throw new Error(`${source.id} fetch failed: ${response.status}`);
+  if (!response.ok)
+    throw new Error(`${source.id} fetch failed: ${response.status}`);
 
   const buffer = Buffer.from(await response.arrayBuffer());
   await writeSourceFiles(source, buffer, {
@@ -145,7 +148,9 @@ async function fetchElapro(source) {
     headers: { Accept: 'application/json' },
   });
   if (!articleResponse.ok) {
-    throw new Error(`${source.id} figshare API failed: ${articleResponse.status}`);
+    throw new Error(
+      `${source.id} figshare API failed: ${articleResponse.status}`,
+    );
   }
 
   const article = await articleResponse.json();
@@ -155,7 +160,8 @@ async function fetchElapro(source) {
   );
 
   const file = article.files?.find((item) => item.download_url);
-  if (!file) throw new Error(`${source.id} figshare article had no downloadable file`);
+  if (!file)
+    throw new Error(`${source.id} figshare article had no downloadable file`);
 
   const zipResponse = await fetch(file.download_url);
   if (!zipResponse.ok) {
@@ -193,9 +199,13 @@ async function writeSourceFiles(source, buffer, extraMetadata) {
 async function writePdfTextSidecar(source) {
   const pdfPath = sourcePath(source);
   const textPath = join(sourceDir, `${source.id}.txt`);
-  const { stdout } = await execFileAsync('pdftotext', ['-layout', pdfPath, '-'], {
-    maxBuffer: 10 * 1024 * 1024,
-  });
+  const { stdout } = await execFileAsync(
+    'pdftotext',
+    ['-layout', pdfPath, '-'],
+    {
+      maxBuffer: 10 * 1024 * 1024,
+    },
+  );
   await fs.writeFile(textPath, stdout);
 }
 
@@ -253,15 +263,19 @@ async function parseOhdsi(source) {
     unitConceptId: numberOrString(row.unitConceptId),
     unitConceptName: row.unitConceptName || undefined,
     plausibleValueLow: numberOrUndefined(row.plausibleValueLow),
-    plausibleValueLowThreshold: numberOrUndefined(row.plausibleValueLowThreshold),
+    plausibleValueLowThreshold: numberOrUndefined(
+      row.plausibleValueLowThreshold,
+    ),
     plausibleValueLowNotes: row.plausibleValueLowNotes || undefined,
     plausibleValueHigh: numberOrUndefined(row.plausibleValueHigh),
-    plausibleValueHighThreshold: numberOrUndefined(row.plausibleValueHighThreshold),
+    plausibleValueHighThreshold: numberOrUndefined(
+      row.plausibleValueHighThreshold,
+    ),
     plausibleValueHighNotes: row.plausibleValueHighNotes || undefined,
     plausibleGender: row.plausibleGender || undefined,
     plausibleGenderThreshold: numberOrUndefined(row.plausibleGenderThreshold),
     plausibleUnitConceptIds: splitConceptIds(row.plausibleUnitConceptIds),
-    plausibleUnitConceptIdsThreshold: splitConceptIds(
+    plausibleUnitConceptIdsThreshold: numberOrUndefined(
       row.plausibleUnitConceptIdsThreshold,
     ),
     source: sourceReference(source),
@@ -282,8 +296,9 @@ async function parseOhdsi(source) {
     counts: {
       rows: rows.length,
       measurementThresholds: thresholds.length,
-      withValueLow: thresholds.filter((item) => item.plausibleValueLow !== undefined)
-        .length,
+      withValueLow: thresholds.filter(
+        (item) => item.plausibleValueLow !== undefined,
+      ).length,
       withValueHigh: thresholds.filter(
         (item) => item.plausibleValueHigh !== undefined,
       ).length,
@@ -308,11 +323,11 @@ async function parseAhrq(source) {
 
   const loincMappings = parseAhrqLoincMappings(text).map((item) => ({
     ...item,
-    source: sourceReference(source),
+    source: sourceReference(source, 'loincMetadata'),
   }));
   const rangeChecks = parseAhrqRangeChecks(text).map((item) => ({
     ...item,
-    source: sourceReference(source),
+    source: sourceReference(source, 'plausibilityRanges'),
   }));
 
   const plausibilityOutput = {
@@ -325,13 +340,19 @@ async function parseAhrq(source) {
   const metadataOutput = {
     generatedAt: new Date().toISOString(),
     kind: 'loincMetadata',
-    source: sourceReference(source),
+    source: sourceReference(source, 'loincMetadata'),
     caveat: source.caveat,
     loincMappings,
   };
 
-  const plausibilityPath = join(plausibilityDir, 'ahrq-appendix-o-range-checks.json');
-  const metadataPath = join(loincMetadataDir, 'ahrq-appendix-o-loinc-mappings.json');
+  const plausibilityPath = join(
+    plausibilityDir,
+    'ahrq-appendix-o-range-checks.json',
+  );
+  const metadataPath = join(
+    loincMetadataDir,
+    'ahrq-appendix-o-loinc-mappings.json',
+  );
   await writeJson(plausibilityPath, plausibilityOutput);
   await writeJson(metadataPath, metadataOutput);
 
@@ -457,7 +478,8 @@ async function parseElapro(source) {
     counts: {
       terms: terms.length,
       primaryLoincGroups: byPrimary.size,
-      distinctSecondaryLoinc: new Set(terms.map((term) => term.secondaryLoinc)).size,
+      distinctSecondaryLoinc: new Set(terms.map((term) => term.secondaryLoinc))
+        .size,
     },
     notes: [
       'Reduced to fields useful for search, aliases, units, and LOINC mapping.',
@@ -468,14 +490,17 @@ async function parseElapro(source) {
 }
 
 function parseAhrqLoincMappings(text) {
-  const beforeRanges = text.split('RANGE CHECKS FOR LABORATORY DATA')[0] || text;
+  const beforeRanges =
+    text.split('RANGE CHECKS FOR LABORATORY DATA')[0] || text;
   const mappings = [];
   for (const line of beforeRanges.split(/\r?\n/)) {
     const loincMatch = line.match(/\b(\d{3,5}-\d)\b/);
     if (!loincMatch) continue;
     const compact = line.replace(/\s+/g, ' ').trim();
     const beforeCode = compact.slice(0, compact.indexOf(loincMatch[1])).trim();
-    const afterCode = compact.slice(compact.indexOf(loincMatch[1]) + loincMatch[1].length).trim();
+    const afterCode = compact
+      .slice(compact.indexOf(loincMatch[1]) + loincMatch[1].length)
+      .trim();
     const testNumber = beforeCode.match(/^(\d+[A-Z]?)/)?.[1];
     mappings.push({
       testNumber,
@@ -496,11 +521,14 @@ function parseAhrqRangeChecks(text) {
       /^(.+?)\s+((?:n\/a|-?[\d,.]+%?))\s+((?:n\/a|-?[\d,.]+%?))\s+((?:n\/a|-?[\d,.]+%?))\s+((?:n\/a|-?[\d,.]+%?))$/i,
     );
     if (!match) continue;
-    const [, label, absoluteLow, absoluteHigh, relativeLow, relativeHigh] = match;
-    const unitMatch = label.match(/\(([^)]+)\)|\[([^\]]+)\]/);
+    const [, label, absoluteLow, absoluteHigh, relativeLow, relativeHigh] =
+      match;
+    const unitMatches = [...label.matchAll(/\(([^)]+)\)|\[([^\]]+)\]/g)].map(
+      (item) => item[1] || item[2],
+    );
     checks.push({
       testName: label.replace(/\s*(\([^)]+\)|\[[^\]]+\])\s*/g, '').trim(),
-      unit: unitMatch?.[1] || unitMatch?.[2] || undefined,
+      unit: unitMatches.at(-1) || undefined,
       absoluteLow: boundValue(absoluteLow),
       absoluteHigh: boundValue(absoluteHigh),
       relativeLow: boundValue(relativeLow),
@@ -555,7 +583,9 @@ function parseCsv(csv) {
   for (const parsedRow of parsedRows) {
     if (parsedRow.length === 1 && parsedRow[0] === '') continue;
     rows.push(
-      Object.fromEntries(headers.map((header, index) => [header, parsedRow[index] || ''])),
+      Object.fromEntries(
+        headers.map((header, index) => [header, parsedRow[index] || '']),
+      ),
     );
   }
   return rows;
@@ -582,11 +612,11 @@ function sourceMetadataPath(source) {
   return join(sourceDir, `${source.id}.metadata.json`);
 }
 
-function sourceReference(source) {
+function sourceReference(source, lane = source.lane) {
   return {
     id: source.id,
     url: source.url,
-    lane: source.lane,
+    lane,
     license: source.license,
   };
 }
@@ -597,23 +627,29 @@ async function writeJson(path, value) {
 }
 
 async function writeAnalysis(analysis) {
-  const byLane = Map.groupBy(analysis.sources, (source) => source.lane);
+  const byLane = new Map();
+  for (const source of analysis.sources) {
+    byLane.set(source.lane, [...(byLane.get(source.lane) || []), source]);
+  }
   for (const [lane, sourcesForLane] of byLane.entries()) {
-    const dir = lane === 'plausibilityRanges' ? plausibilityDir : loincMetadataDir;
+    const dir =
+      lane === 'plausibilityRanges' ? plausibilityDir : loincMetadataDir;
     await writeJson(join(dir, 'source-analysis.json'), {
       generatedAt: analysis.generatedAt,
       purpose: analysis.purpose,
       sources: sourcesForLane,
-      outputs: analysis.outputs.filter((output) => output.includes(`/${lane}/`)),
+      outputs: analysis.outputs.filter((output) =>
+        output.includes(`/${lane}/`),
+      ),
     });
   }
   console.log(`Wrote non-clinical lab outputs to ${importDir}`);
 }
 
 function extractXmlBlocks(xml, tagName) {
-  return [...xml.matchAll(new RegExp(`<${tagName}>[\\s\\S]*?<\\/${tagName}>`, 'g'))].map(
-    (match) => match[0],
-  );
+  return [
+    ...xml.matchAll(new RegExp(`<${tagName}>[\\s\\S]*?<\\/${tagName}>`, 'g')),
+  ].map((match) => match[0]);
 }
 
 function parseCodeSystemBlock(block) {
@@ -633,9 +669,9 @@ function extractXmlValue(xml, tagName) {
 }
 
 function extractXmlValues(xml, tagName) {
-  return [...xml.matchAll(new RegExp(`<${tagName}\\s+value="([^"]*)"\\s*\\/>`, 'g'))].map(
-    (match) => decodeXml(match[1]),
-  );
+  return [
+    ...xml.matchAll(new RegExp(`<${tagName}\\s+value="([^"]*)"\\s*\\/>`, 'g')),
+  ].map((match) => decodeXml(match[1]));
 }
 
 function extractXmlText(xml, tagName) {

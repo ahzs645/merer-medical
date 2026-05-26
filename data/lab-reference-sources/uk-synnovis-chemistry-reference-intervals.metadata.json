@@ -1,0 +1,15 @@
+{
+  "id": "uk-synnovis-chemistry-reference-intervals",
+  "kind": "clinical-reference",
+  "parser": "ukSynnovisChemistry",
+  "country": "uk",
+  "category": "chemistry",
+  "licenseRisk": "curated-citation",
+  "fileType": "pdf",
+  "title": "Synnovis Chemistry Reference Intervals",
+  "url": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+  "fetchedAt": "2026-05-26T19:44:02.598Z",
+  "bytes": 330088,
+  "sha256": "65849857c552e4a0bfcc22cbdf8b9ffc2bef583445a6507d2368eea56c9f510f",
+  "contentType": "application/pdf"
+}

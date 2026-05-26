@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useLocalConfig } from '../../app/providers/LocalConfigProvider';
@@ -51,6 +51,7 @@ const MANUAL_CONNECTION_LOCATION = 'manual://local';
 
 type ManualRecordKind =
   | 'condition'
+  | 'visionprescription'
   | 'medicationstatement'
   | 'immunization'
   | 'procedure'
@@ -64,9 +65,30 @@ type ManualRecordKind =
 
 type ClinicalManualRecordKind = Exclude<ManualRecordKind, 'device'>;
 type DeviceImportKind = 'freestyle_libre';
+type ManualSpecialty = 'general' | 'dental' | 'optometry';
+type DentalEntryKind =
+  | 'cleaning'
+  | 'finding'
+  | 'condition'
+  | 'procedure'
+  | 'treatmentPlan'
+  | 'imaging';
+type OptometryEntryKind =
+  | 'checkup'
+  | 'glassesPrescription'
+  | 'contactLensPrescription'
+  | 'refraction'
+  | 'visualAcuity'
+  | 'iop'
+  | 'diagnosis'
+  | 'procedure'
+  | 'imaging'
+  | 'retail';
+type EyeSide = 'OD' | 'OS' | 'OU';
 
 const recordTypes: Array<{ value: ManualRecordKind; label: string }> = [
   { value: 'condition', label: 'Condition' },
+  { value: 'visionprescription', label: 'Vision prescription' },
   { value: 'medicationstatement', label: 'Medication' },
   { value: 'immunization', label: 'Immunization' },
   { value: 'procedure', label: 'Procedure' },
@@ -78,6 +100,121 @@ const recordTypes: Array<{ value: ManualRecordKind; label: string }> = [
   { value: 'vital', label: 'Vital sign' },
   { value: 'device', label: 'Device' },
 ];
+
+const specialtyOptions: Array<{ value: ManualSpecialty; label: string }> = [
+  { value: 'general', label: 'General medical' },
+  { value: 'dental', label: 'Dental' },
+  { value: 'optometry', label: 'Optometry' },
+];
+
+const dentalEntryTypes: Array<{
+  value: DentalEntryKind;
+  label: string;
+  recordType: ClinicalManualRecordKind;
+  title: string;
+}> = [
+  {
+    value: 'cleaning',
+    label: 'Cleaning / hygiene',
+    recordType: 'procedure',
+    title: 'Dental cleaning',
+  },
+  {
+    value: 'finding',
+    label: 'Tooth finding',
+    recordType: 'vital',
+    title: 'Dental finding',
+  },
+  {
+    value: 'condition',
+    label: 'Dental condition',
+    recordType: 'condition',
+    title: 'Dental condition',
+  },
+  {
+    value: 'procedure',
+    label: 'Dental procedure',
+    recordType: 'procedure',
+    title: 'Dental procedure',
+  },
+  {
+    value: 'treatmentPlan',
+    label: 'Treatment plan',
+    recordType: 'careplan',
+    title: 'Dental treatment plan',
+  },
+  {
+    value: 'imaging',
+    label: 'Dental image / scan',
+    recordType: 'document',
+    title: 'Dental image or scan',
+  },
+];
+
+const optometryEntryTypes: Array<{
+  value: OptometryEntryKind;
+  label: string;
+  recordType: ClinicalManualRecordKind;
+  title: string;
+}> = [
+  {
+    value: 'checkup',
+    label: 'Eye exam / checkup',
+    recordType: 'encounter',
+    title: 'Optometry checkup',
+  },
+  {
+    value: 'glassesPrescription',
+    label: 'Glasses prescription',
+    recordType: 'visionprescription',
+    title: 'Glasses prescription',
+  },
+  {
+    value: 'contactLensPrescription',
+    label: 'Contact lens prescription',
+    recordType: 'visionprescription',
+    title: 'Contact lens prescription',
+  },
+  {
+    value: 'refraction',
+    label: 'Refraction',
+    recordType: 'vital',
+    title: 'Refraction',
+  },
+  {
+    value: 'visualAcuity',
+    label: 'Visual acuity',
+    recordType: 'vital',
+    title: 'Visual acuity',
+  },
+  { value: 'iop', label: 'IOP', recordType: 'vital', title: 'IOP' },
+  {
+    value: 'diagnosis',
+    label: 'Ocular diagnosis',
+    recordType: 'condition',
+    title: 'Ocular diagnosis',
+  },
+  {
+    value: 'procedure',
+    label: 'Eye procedure / test',
+    recordType: 'procedure',
+    title: 'Eye procedure',
+  },
+  {
+    value: 'imaging',
+    label: 'Eye image / device report',
+    recordType: 'document',
+    title: 'Eye image or device report',
+  },
+  {
+    value: 'retail',
+    label: 'Optical retail order',
+    recordType: 'document',
+    title: 'Optical order',
+  },
+];
+
+const toothSurfaces = ['M', 'O', 'I', 'D', 'B', 'F', 'L'];
 
 const deviceImportTypes: Array<{ value: DeviceImportKind; label: string }> = [
   { value: 'freestyle_libre', label: 'FreeStyle Libre' },
@@ -137,11 +274,41 @@ export function ManualRecordTab() {
   const db = useRxDb();
   const user = useUser();
   const { recordId } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const localConfig = useLocalConfig();
   const notifyDispatch = useNotificationDispatch();
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const requestedSpecialty =
+    searchParams.get('specialty') === 'dental' ||
+    searchParams.get('specialty') === 'optometry'
+      ? (searchParams.get('specialty') as ManualSpecialty)
+      : 'general';
+  const [specialty, setSpecialty] =
+    useState<ManualSpecialty>(requestedSpecialty);
   const [recordType, setRecordType] = useState<ManualRecordKind>('condition');
+  const [dentalEntryKind, setDentalEntryKind] =
+    useState<DentalEntryKind>('cleaning');
+  const [optometryEntryKind, setOptometryEntryKind] =
+    useState<OptometryEntryKind>('checkup');
+  const [toothNumber, setToothNumber] = useState('');
+  const [dentalSurfaces, setDentalSurfaces] = useState<string[]>([]);
+  const [dentalRecall, setDentalRecall] = useState('');
+  const [eyeSide, setEyeSide] = useState<EyeSide>('OU');
+  const [odSphere, setOdSphere] = useState('');
+  const [odCylinder, setOdCylinder] = useState('');
+  const [odAxis, setOdAxis] = useState('');
+  const [odAdd, setOdAdd] = useState('');
+  const [osSphere, setOsSphere] = useState('');
+  const [osCylinder, setOsCylinder] = useState('');
+  const [osAxis, setOsAxis] = useState('');
+  const [osAdd, setOsAdd] = useState('');
+  const [pd, setPd] = useState('');
+  const [visualAcuityOd, setVisualAcuityOd] = useState('');
+  const [visualAcuityOs, setVisualAcuityOs] = useState('');
+  const [iopOd, setIopOd] = useState('');
+  const [iopOs, setIopOs] = useState('');
+  const [examMethod, setExamMethod] = useState('');
   const [deviceImportType, setDeviceImportType] =
     useState<DeviceImportKind>('freestyle_libre');
   const [title, setTitle] = useState('');
@@ -207,7 +374,64 @@ export function ManualRecordTab() {
     setFileContentType('');
     setFileData(undefined);
     setLinkedFile(null);
+    setToothNumber('');
+    setDentalSurfaces([]);
+    setDentalRecall('');
+    setEyeSide('OU');
+    setOdSphere('');
+    setOdCylinder('');
+    setOdAxis('');
+    setOdAdd('');
+    setOsSphere('');
+    setOsCylinder('');
+    setOsAxis('');
+    setOsAdd('');
+    setPd('');
+    setVisualAcuityOd('');
+    setVisualAcuityOs('');
+    setIopOd('');
+    setIopOs('');
+    setExamMethod('');
     setSubmitAttempted(false);
+  }
+
+  function applyDentalEntryKind(nextKind: DentalEntryKind) {
+    const config = dentalEntryTypes.find((entry) => entry.value === nextKind);
+    if (!config) return;
+    setDentalEntryKind(nextKind);
+    setRecordType(config.recordType);
+    if (!title.trim() || specialty !== 'dental') setTitle(config.title);
+    setSpecialty('dental');
+    setSubmitAttempted(false);
+  }
+
+  function applyOptometryEntryKind(nextKind: OptometryEntryKind) {
+    const config = optometryEntryTypes.find(
+      (entry) => entry.value === nextKind,
+    );
+    if (!config) return;
+    setOptometryEntryKind(nextKind);
+    setRecordType(config.recordType);
+    if (!title.trim() || specialty !== 'optometry') setTitle(config.title);
+    setSpecialty('optometry');
+    setSubmitAttempted(false);
+  }
+
+  function updateSpecialty(nextSpecialty: ManualSpecialty) {
+    setSpecialty(nextSpecialty);
+    if (nextSpecialty === 'dental') {
+      applyDentalEntryKind(dentalEntryKind);
+    } else if (nextSpecialty === 'optometry') {
+      applyOptometryEntryKind(optometryEntryKind);
+    }
+  }
+
+  function toggleDentalSurface(surface: string) {
+    setDentalSurfaces((surfaces) =>
+      surfaces.includes(surface)
+        ? surfaces.filter((item) => item !== surface)
+        : [...surfaces, surface],
+    );
   }
 
   function applyTemplate(template: ManualTemplate) {
@@ -252,6 +476,17 @@ export function ManualRecordTab() {
   }
 
   useEffect(() => {
+    if (recordId) return;
+    if (requestedSpecialty === 'dental') {
+      applyDentalEntryKind('cleaning');
+    } else if (requestedSpecialty === 'optometry') {
+      applyOptometryEntryKind('checkup');
+    }
+    // Apply URL presets once on initial add form load.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (!db || !recordId) return;
 
     let cancelled = false;
@@ -269,6 +504,32 @@ export function ManualRecordTab() {
         }
         setLoadedDocument(doc);
         setRecordType(getManualRecordKind(doc));
+        const manualDetails = getManualSpecialtyDetails(doc);
+        setSpecialty(manualDetails.specialty);
+        if (manualDetails.dentalEntryKind) {
+          setDentalEntryKind(manualDetails.dentalEntryKind);
+        }
+        if (manualDetails.optometryEntryKind) {
+          setOptometryEntryKind(manualDetails.optometryEntryKind);
+        }
+        setToothNumber(manualDetails.toothNumber || '');
+        setDentalSurfaces(manualDetails.dentalSurfaces || []);
+        setDentalRecall(manualDetails.dentalRecall || '');
+        setEyeSide(manualDetails.eyeSide || 'OU');
+        setOdSphere(manualDetails.odSphere || '');
+        setOdCylinder(manualDetails.odCylinder || '');
+        setOdAxis(manualDetails.odAxis || '');
+        setOdAdd(manualDetails.odAdd || '');
+        setOsSphere(manualDetails.osSphere || '');
+        setOsCylinder(manualDetails.osCylinder || '');
+        setOsAxis(manualDetails.osAxis || '');
+        setOsAdd(manualDetails.osAdd || '');
+        setPd(manualDetails.pd || '');
+        setVisualAcuityOd(manualDetails.visualAcuityOd || '');
+        setVisualAcuityOs(manualDetails.visualAcuityOs || '');
+        setIopOd(manualDetails.iopOd || '');
+        setIopOs(manualDetails.iopOs || '');
+        setExamMethod(manualDetails.examMethod || '');
         setTitle(doc.metadata?.display_name || '');
         setDate((doc.metadata?.date || today).slice(0, 10));
         setNotes(getManualRecordNote(doc) || '');
@@ -327,6 +588,30 @@ export function ManualRecordTab() {
     try {
       const connection = await getManualConnection(db, user.id);
       const recordDate = new Date(`${date}T12:00:00.000Z`).toISOString();
+      const specialtyDetails = buildSpecialtyDetails({
+        specialty,
+        dentalEntryKind,
+        toothNumber,
+        dentalSurfaces,
+        dentalRecall,
+        optometryEntryKind,
+        eyeSide,
+        odSphere,
+        odCylinder,
+        odAxis,
+        odAdd,
+        osSphere,
+        osCylinder,
+        osAxis,
+        osAdd,
+        pd,
+        visualAcuityOd,
+        visualAcuityOs,
+        iopOd,
+        iopOs,
+        examMethod,
+      });
+      const enrichedNotes = appendSpecialtyNotes(notes, specialtyDetails);
       const docs =
         recordType === 'lab' && !loadedDocument
           ? completedLabRows.map((row) =>
@@ -336,10 +621,11 @@ export function ManualRecordTab() {
                 recordType,
                 recordDate,
                 title: row.title,
-                notes,
+                notes: enrichedNotes,
                 fileData,
                 fileName,
                 fileContentType,
+                specialtyDetails,
                 observation: {
                   value: row.value,
                   unit: row.unit,
@@ -358,10 +644,11 @@ export function ManualRecordTab() {
                 recordType,
                 recordDate,
                 title,
-                notes,
+                notes: enrichedNotes,
                 fileData,
                 fileName,
                 fileContentType,
+                specialtyDetails,
                 observation: {
                   value,
                   unit,
@@ -501,6 +788,291 @@ export function ManualRecordTab() {
                     </option>
                   ))}
                 </select>
+              </div>
+            )}
+
+            {!isDeviceImportType && (
+              <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label
+                      htmlFor="manual-record-specialty"
+                      className="block text-sm font-semibold text-gray-900"
+                    >
+                      Section
+                    </label>
+                    <select
+                      id="manual-record-specialty"
+                      value={specialty}
+                      onChange={(event) =>
+                        updateSpecialty(event.target.value as ManualSpecialty)
+                      }
+                      className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                    >
+                      {specialtyOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {specialty === 'dental' && (
+                    <div>
+                      <label
+                        htmlFor="manual-record-dental-kind"
+                        className="block text-sm font-semibold text-gray-900"
+                      >
+                        Dental record
+                      </label>
+                      <select
+                        id="manual-record-dental-kind"
+                        value={dentalEntryKind}
+                        onChange={(event) =>
+                          applyDentalEntryKind(
+                            event.target.value as DentalEntryKind,
+                          )
+                        }
+                        disabled={isEditing}
+                        className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                      >
+                        {dentalEntryTypes.map((entry) => (
+                          <option key={entry.value} value={entry.value}>
+                            {entry.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {specialty === 'optometry' && (
+                    <div>
+                      <label
+                        htmlFor="manual-record-optometry-kind"
+                        className="block text-sm font-semibold text-gray-900"
+                      >
+                        Eye-care record
+                      </label>
+                      <select
+                        id="manual-record-optometry-kind"
+                        value={optometryEntryKind}
+                        onChange={(event) =>
+                          applyOptometryEntryKind(
+                            event.target.value as OptometryEntryKind,
+                          )
+                        }
+                        disabled={isEditing}
+                        className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                      >
+                        {optometryEntryTypes.map((entry) => (
+                          <option key={entry.value} value={entry.value}>
+                            {entry.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                {specialty === 'dental' && (
+                  <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <label
+                        htmlFor="manual-record-tooth"
+                        className="block text-sm font-semibold text-gray-900"
+                      >
+                        Tooth
+                      </label>
+                      <input
+                        id="manual-record-tooth"
+                        type="number"
+                        min="1"
+                        max="32"
+                        value={toothNumber}
+                        placeholder="e.g. 14"
+                        onChange={(event) => setToothNumber(event.target.value)}
+                        className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <p className="block text-sm font-semibold text-gray-900">
+                        Surfaces
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {toothSurfaces.map((surface) => (
+                          <button
+                            key={surface}
+                            type="button"
+                            onClick={() => toggleDentalSurface(surface)}
+                            className={`h-9 min-w-9 rounded-md border px-3 text-sm font-semibold ${
+                              dentalSurfaces.includes(surface)
+                                ? 'border-primary-600 bg-primary-50 text-primary-800'
+                                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            {surface}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="sm:col-span-3">
+                      <label
+                        htmlFor="manual-record-dental-recall"
+                        className="block text-sm font-semibold text-gray-900"
+                      >
+                        Recall or follow-up
+                      </label>
+                      <input
+                        id="manual-record-dental-recall"
+                        type="text"
+                        value={dentalRecall}
+                        placeholder="e.g. 6-month cleaning recall"
+                        onChange={(event) =>
+                          setDentalRecall(event.target.value)
+                        }
+                        className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {specialty === 'optometry' && (
+                  <div className="mt-4 grid gap-4">
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <div>
+                        <label
+                          htmlFor="manual-record-eye-side"
+                          className="block text-sm font-semibold text-gray-900"
+                        >
+                          Eye
+                        </label>
+                        <select
+                          id="manual-record-eye-side"
+                          value={eyeSide}
+                          onChange={(event) =>
+                            setEyeSide(event.target.value as EyeSide)
+                          }
+                          className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                        >
+                          <option value="OU">OU / both</option>
+                          <option value="OD">OD / right</option>
+                          <option value="OS">OS / left</option>
+                        </select>
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="manual-record-exam-method"
+                          className="block text-sm font-semibold text-gray-900"
+                        >
+                          Method or device
+                        </label>
+                        <input
+                          id="manual-record-exam-method"
+                          type="text"
+                          value={examMethod}
+                          placeholder="e.g. Goldmann, OCT, Snellen"
+                          onChange={(event) =>
+                            setExamMethod(event.target.value)
+                          }
+                          className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                        />
+                      </div>
+                    </div>
+
+                    {(optometryEntryKind === 'glassesPrescription' ||
+                      optometryEntryKind === 'contactLensPrescription' ||
+                      optometryEntryKind === 'refraction') && (
+                      <div className="grid gap-3 rounded-md bg-white p-3 ring-1 ring-gray-200">
+                        <p className="text-sm font-semibold text-gray-900">
+                          Refraction / Rx
+                        </p>
+                        <div className="grid gap-3 md:grid-cols-5">
+                          <PrescriptionInput
+                            label="OD sphere"
+                            value={odSphere}
+                            onChange={setOdSphere}
+                          />
+                          <PrescriptionInput
+                            label="OD cylinder"
+                            value={odCylinder}
+                            onChange={setOdCylinder}
+                          />
+                          <PrescriptionInput
+                            label="OD axis"
+                            value={odAxis}
+                            onChange={setOdAxis}
+                          />
+                          <PrescriptionInput
+                            label="OD add"
+                            value={odAdd}
+                            onChange={setOdAdd}
+                          />
+                          <PrescriptionInput
+                            label="PD"
+                            value={pd}
+                            onChange={setPd}
+                          />
+                          <PrescriptionInput
+                            label="OS sphere"
+                            value={osSphere}
+                            onChange={setOsSphere}
+                          />
+                          <PrescriptionInput
+                            label="OS cylinder"
+                            value={osCylinder}
+                            onChange={setOsCylinder}
+                          />
+                          <PrescriptionInput
+                            label="OS axis"
+                            value={osAxis}
+                            onChange={setOsAxis}
+                          />
+                          <PrescriptionInput
+                            label="OS add"
+                            value={osAdd}
+                            onChange={setOsAdd}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {(optometryEntryKind === 'visualAcuity' ||
+                      optometryEntryKind === 'checkup') && (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <PrescriptionInput
+                          label="OD visual acuity"
+                          value={visualAcuityOd}
+                          placeholder="20/20"
+                          onChange={setVisualAcuityOd}
+                        />
+                        <PrescriptionInput
+                          label="OS visual acuity"
+                          value={visualAcuityOs}
+                          placeholder="20/25"
+                          onChange={setVisualAcuityOs}
+                        />
+                      </div>
+                    )}
+
+                    {(optometryEntryKind === 'iop' ||
+                      optometryEntryKind === 'checkup') && (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <PrescriptionInput
+                          label="OD IOP"
+                          value={iopOd}
+                          placeholder="14"
+                          onChange={setIopOd}
+                        />
+                        <PrescriptionInput
+                          label="OS IOP"
+                          value={iopOs}
+                          placeholder="15"
+                          onChange={setIopOs}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -765,7 +1337,8 @@ export function ManualRecordTab() {
                 />
                 {!isDocumentType &&
                   recordType !== 'lab' &&
-                  recordType !== 'careplan' && (
+                  recordType !== 'careplan' &&
+                  recordType !== 'visionprescription' && (
                     <TerminologySuggestions
                       kind={recordType}
                       query={title}
@@ -967,6 +1540,233 @@ export function ManualRecordTab() {
   );
 }
 
+function PrescriptionInput({
+  label,
+  value,
+  placeholder,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  placeholder?: string;
+  onChange: (value: string) => void;
+}) {
+  const id = `manual-record-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+  return (
+    <div>
+      <label htmlFor={id} className="block text-sm font-semibold text-gray-900">
+        {label}
+      </label>
+      <input
+        id={id}
+        type="text"
+        value={value}
+        placeholder={placeholder}
+        onChange={(event) => onChange(event.target.value)}
+        className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+      />
+    </div>
+  );
+}
+
+type ManualSpecialtyDetails = {
+  specialty: ManualSpecialty;
+  subtype?: DentalEntryKind | OptometryEntryKind;
+  toothNumber?: string;
+  dentalSurfaces?: string[];
+  dentalRecall?: string;
+  eyeSide?: EyeSide;
+  odSphere?: string;
+  odCylinder?: string;
+  odAxis?: string;
+  odAdd?: string;
+  osSphere?: string;
+  osCylinder?: string;
+  osAxis?: string;
+  osAdd?: string;
+  pd?: string;
+  visualAcuityOd?: string;
+  visualAcuityOs?: string;
+  iopOd?: string;
+  iopOs?: string;
+  examMethod?: string;
+};
+
+type ManualSpecialtyFormValues = Required<
+  Omit<ManualSpecialtyDetails, 'subtype' | 'dentalSurfaces'>
+> & {
+  dentalSurfaces: string[];
+  dentalEntryKind: DentalEntryKind;
+  optometryEntryKind: OptometryEntryKind;
+};
+
+function buildSpecialtyDetails(
+  params: ManualSpecialtyFormValues,
+): ManualSpecialtyDetails | undefined {
+  if (params.specialty === 'general') return undefined;
+  if (params.specialty === 'dental') {
+    return {
+      specialty: 'dental',
+      subtype: params.dentalEntryKind,
+      toothNumber: params.toothNumber.trim(),
+      dentalSurfaces: params.dentalSurfaces,
+      dentalRecall: params.dentalRecall.trim(),
+    };
+  }
+  return {
+    specialty: 'optometry',
+    subtype: params.optometryEntryKind,
+    eyeSide: params.eyeSide,
+    odSphere: params.odSphere.trim(),
+    odCylinder: params.odCylinder.trim(),
+    odAxis: params.odAxis.trim(),
+    odAdd: params.odAdd.trim(),
+    osSphere: params.osSphere.trim(),
+    osCylinder: params.osCylinder.trim(),
+    osAxis: params.osAxis.trim(),
+    osAdd: params.osAdd.trim(),
+    pd: params.pd.trim(),
+    visualAcuityOd: params.visualAcuityOd.trim(),
+    visualAcuityOs: params.visualAcuityOs.trim(),
+    iopOd: params.iopOd.trim(),
+    iopOs: params.iopOs.trim(),
+    examMethod: params.examMethod.trim(),
+  };
+}
+
+function appendSpecialtyNotes(
+  notes: string,
+  details?: ManualSpecialtyDetails,
+): string {
+  if (!details) return notes;
+  const lines = [''];
+  if (details.specialty === 'dental') {
+    if (details.toothNumber) lines.push(`Tooth: ${details.toothNumber}`);
+    if (details.dentalSurfaces?.length) {
+      lines.push(`Surfaces: ${details.dentalSurfaces.join('/')}`);
+    }
+    if (details.dentalRecall) lines.push(`Recall: ${details.dentalRecall}`);
+  } else {
+    if (details.eyeSide) lines.push(`Eye: ${details.eyeSide}`);
+    if (details.examMethod) lines.push(`Method: ${details.examMethod}`);
+    if (
+      details.odSphere ||
+      details.odCylinder ||
+      details.odAxis ||
+      details.odAdd
+    ) {
+      lines.push(
+        `OD Rx: ${formatRxLine(details.odSphere, details.odCylinder, details.odAxis, details.odAdd)}`,
+      );
+    }
+    if (
+      details.osSphere ||
+      details.osCylinder ||
+      details.osAxis ||
+      details.osAdd
+    ) {
+      lines.push(
+        `OS Rx: ${formatRxLine(details.osSphere, details.osCylinder, details.osAxis, details.osAdd)}`,
+      );
+    }
+    if (details.pd) lines.push(`PD: ${details.pd}`);
+    if (details.visualAcuityOd)
+      lines.push(`OD visual acuity: ${details.visualAcuityOd}`);
+    if (details.visualAcuityOs)
+      lines.push(`OS visual acuity: ${details.visualAcuityOs}`);
+    if (details.iopOd) lines.push(`OD IOP: ${details.iopOd} mmHg`);
+    if (details.iopOs) lines.push(`OS IOP: ${details.iopOs} mmHg`);
+  }
+  const structured = lines.filter(Boolean).join('\n');
+  return [notes.trim(), structured].filter(Boolean).join('\n');
+}
+
+function formatRxLine(
+  sphere?: string,
+  cylinder?: string,
+  axis?: string,
+  add?: string,
+) {
+  return [
+    sphere && `sphere ${sphere}`,
+    cylinder && `cylinder ${cylinder}`,
+    axis && `axis ${axis}`,
+    add && `add ${add}`,
+  ]
+    .filter(Boolean)
+    .join(', ');
+}
+
+function getManualSpecialtyDetails(
+  doc: ClinicalDocument,
+): ManualSpecialtyDetails & {
+  dentalEntryKind?: DentalEntryKind;
+  optometryEntryKind?: OptometryEntryKind;
+} {
+  const raw = doc.data_record.raw as {
+    manual_specialty?: ManualSpecialty;
+    manual_subtype?: DentalEntryKind | OptometryEntryKind;
+    manual_specialty_details?: ManualSpecialtyDetails;
+  };
+  const details: ManualSpecialtyDetails = raw.manual_specialty_details || {
+    specialty: 'general',
+  };
+  const specialty = raw.manual_specialty || details.specialty || 'general';
+  return {
+    ...details,
+    specialty,
+    dentalEntryKind:
+      specialty === 'dental'
+        ? ((raw.manual_subtype || details.subtype) as DentalEntryKind)
+        : undefined,
+    optometryEntryKind:
+      specialty === 'optometry'
+        ? ((raw.manual_subtype || details.subtype) as OptometryEntryKind)
+        : undefined,
+  };
+}
+
+function buildVisionLensSpecification(details?: ManualSpecialtyDetails) {
+  if (!details) return undefined;
+  const lenses = [
+    {
+      eye: 'right',
+      sphere: details.odSphere,
+      cylinder: details.odCylinder,
+      axis: details.odAxis,
+      add: details.odAdd,
+    },
+    {
+      eye: 'left',
+      sphere: details.osSphere,
+      cylinder: details.osCylinder,
+      axis: details.osAxis,
+      add: details.osAdd,
+    },
+  ]
+    .map((lens) => ({
+      eye: lens.eye,
+      sphere: parseNumber(lens.sphere),
+      cylinder: parseNumber(lens.cylinder),
+      axis: parseNumber(lens.axis),
+      add: parseNumber(lens.add),
+    }))
+    .filter(
+      (lens) =>
+        lens.sphere !== undefined ||
+        lens.cylinder !== undefined ||
+        lens.axis !== undefined ||
+        lens.add !== undefined,
+    );
+  return lenses.length ? lenses : undefined;
+}
+
+function parseNumber(value?: string) {
+  if (!value?.trim()) return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 async function getManualConnection(
   db: Parameters<typeof findConnectionByUrl>[0],
   userId: string,
@@ -1004,6 +1804,7 @@ function buildClinicalDocument({
   fileData,
   fileName,
   fileContentType,
+  specialtyDetails,
   observation,
   medication,
   terminology,
@@ -1018,6 +1819,7 @@ function buildClinicalDocument({
   fileData?: string;
   fileName: string;
   fileContentType: string;
+  specialtyDetails?: ManualSpecialtyDetails;
   observation?: {
     value: string;
     unit: string;
@@ -1048,6 +1850,7 @@ function buildClinicalDocument({
           observation,
           medication,
           terminology,
+          specialtyDetails,
         );
 
   return {
@@ -1074,6 +1877,9 @@ function buildClinicalDocument({
       terminology_source: terminology?.source,
       terminology_source_version: terminology?.sourceVersion,
       manual_uncoded: recordType !== 'document' && !terminology,
+      manual_specialty: specialtyDetails?.specialty,
+      manual_subtype: specialtyDetails?.subtype,
+      manual_specialty_details: specialtyDetails,
     },
   };
 }
@@ -1097,6 +1903,7 @@ function buildManualFhirEntry(
     route: string;
   },
   terminology?: TerminologyEntry,
+  specialtyDetails?: ManualSpecialtyDetails,
 ) {
   const resourceType = toFhirResourceType(recordType);
   const observationData = observation ?? {
@@ -1123,6 +1930,9 @@ function buildManualFhirEntry(
     resource: {
       resourceType,
       id,
+      category: specialtyDetails?.specialty
+        ? [{ text: specialtyDetails.specialty }]
+        : undefined,
       code: {
         text: title.trim(),
         coding: terminology
@@ -1142,6 +1952,25 @@ function buildManualFhirEntry(
           }
         : undefined,
       note: notes.trim() ? [{ text: notes.trim() }] : undefined,
+      bodySite:
+        specialtyDetails?.specialty === 'dental' && specialtyDetails.toothNumber
+          ? [
+              {
+                text: `Tooth ${specialtyDetails.toothNumber}${
+                  specialtyDetails.dentalSurfaces?.length
+                    ? ` surfaces ${specialtyDetails.dentalSurfaces.join('/')}`
+                    : ''
+                }`,
+              },
+            ]
+          : undefined,
+      method: specialtyDetails?.examMethod
+        ? { text: specialtyDetails.examMethod }
+        : undefined,
+      lensSpecification:
+        recordType === 'visionprescription'
+          ? buildVisionLensSpecification(specialtyDetails)
+          : undefined,
       recordedDate: date,
       effectiveDateTime: date,
       date,
@@ -1209,6 +2038,7 @@ function getClinicalResourceType(
 ): ClinicalDocumentResourceType {
   if (recordType === 'lab' || recordType === 'vital') return 'observation';
   if (recordType === 'document') return 'documentreference_attachment';
+  if (recordType === 'visionprescription') return 'visionprescription';
   return recordType;
 }
 
@@ -1218,6 +2048,9 @@ function getManualRecordKind(doc: ClinicalDocument): ManualRecordKind {
   if (doc.data_record.resource_type === 'observation') return 'lab';
   if (doc.data_record.resource_type === 'documentreference_attachment') {
     return 'document';
+  }
+  if (doc.data_record.resource_type === 'visionprescription') {
+    return 'visionprescription';
   }
   return doc.data_record.resource_type as ManualRecordKind;
 }
@@ -1230,6 +2063,8 @@ function toFhirResourceType(recordType: ClinicalManualRecordKind) {
       return 'AllergyIntolerance';
     case 'careplan':
       return 'CarePlan';
+    case 'visionprescription':
+      return 'VisionPrescription';
     case 'lab':
     case 'vital':
       return 'Observation';

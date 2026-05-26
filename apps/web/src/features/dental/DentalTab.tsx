@@ -2,7 +2,6 @@ import { AppPage } from '../../shared/components/AppPage';
 import { DentalCleaningHistoryPanel } from './components/DentalCleaningHistoryPanel';
 import { DentalHeader } from './components/DentalHeader';
 import { DentalImagingPanel } from './components/DentalImagingPanel';
-import { DentalModelingPanel } from './components/DentalModelingPanel';
 import { DentalRecordsPanel } from './components/DentalRecordsPanel';
 import { DentalScanPreview } from './components/DentalScanPreview';
 import { DentalSummaryPanel } from './components/DentalSummaryPanel';
@@ -26,7 +25,6 @@ export function DentalTab() {
           <DentalSummaryPanel counts={counts} />
           <ToothChartPanel recordsByTooth={recordsByTooth} />
           <DentalCleaningHistoryPanel records={records} />
-          <DentalModelingPanel />
           <DentalScanPreview />
           <div className="grid gap-4 lg:grid-cols-2">
             <DentalRecordsPanel records={records} />

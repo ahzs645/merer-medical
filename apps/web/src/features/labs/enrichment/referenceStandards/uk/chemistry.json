@@ -1,14 +1,240 @@
 [
   {
     "testIds": [
+      "alt"
+    ],
+    "name": "Alanine aminotransferase",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "0 years up to 1 year",
+        "kind": "range",
+        "display": "5-51",
+        "unit": "U/L",
+        "low": 5,
+        "high": 51,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 0,
+        "ageMaxYears": 1,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Alanine aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "1 year up to 12 years",
+        "kind": "range",
+        "display": "11-30",
+        "unit": "U/L",
+        "low": 11,
+        "high": 30,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 1,
+        "ageMaxYears": 12,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Alanine aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "13 years up to 18 years, male",
+        "kind": "range",
+        "display": "10-33",
+        "unit": "U/L",
+        "low": 10,
+        "high": 33,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "male",
+        "ageMinYears": 13,
+        "ageMaxYears": 18,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Alanine aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "13 years up to 18 years, female",
+        "kind": "range",
+        "display": "8-24",
+        "unit": "U/L",
+        "low": 8,
+        "high": 24,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "female",
+        "ageMinYears": 13,
+        "ageMaxYears": 18,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Alanine aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "19 years up to 150 years, male",
+        "kind": "range",
+        "display": "<45",
+        "unit": "U/L",
+        "low": 0,
+        "high": 45,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "male",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Alanine aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "19 years up to 150 years, female",
+        "kind": "range",
+        "display": "<34",
+        "unit": "U/L",
+        "low": 0,
+        "high": 34,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "female",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Alanine aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      }
+    ]
+  },
+  {
+    "testIds": [
       "albumin"
     ],
     "name": "Albumin",
     "sourceReview": {
       "status": "candidate",
-      "parser": "ukGlosChemistry"
+      "parser": "ukSynnovisChemistry"
     },
     "bands": [
+      {
+        "label": "0 days up to 14 days",
+        "kind": "range",
+        "display": "28-41",
+        "unit": "g/L",
+        "low": 28,
+        "high": 41,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinDays": 0,
+        "ageMaxDays": 14,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Albumin",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "15 days up to 1 year",
+        "kind": "range",
+        "display": "25-46",
+        "unit": "g/L",
+        "low": 25,
+        "high": 46,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinDays": 15,
+        "ageMaxYears": 1,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Albumin",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "1 year up to 7 years",
+        "kind": "range",
+        "display": "35-45",
+        "unit": "g/L",
+        "low": 35,
+        "high": 45,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 1,
+        "ageMaxYears": 7,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Albumin",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "8 years up to 14 years",
+        "kind": "range",
+        "display": "37-47",
+        "unit": "g/L",
+        "low": 37,
+        "high": 47,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 8,
+        "ageMaxYears": 14,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Albumin",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "15 years up to 18 years, male",
+        "kind": "range",
+        "display": "38-50",
+        "unit": "g/L",
+        "low": 38,
+        "high": 50,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "male",
+        "ageMinYears": 15,
+        "ageMaxYears": 18,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Albumin",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "15 years up to 18 years, female",
+        "kind": "range",
+        "display": "35-49",
+        "unit": "g/L",
+        "low": 35,
+        "high": 49,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "female",
+        "ageMinYears": 15,
+        "ageMaxYears": 18,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Albumin",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "19 years up to 150 years",
+        "kind": "range",
+        "display": "31-45",
+        "unit": "g/L",
+        "low": 31,
+        "high": 45,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Albumin",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
       {
         "label": "0 years up to 1 year",
         "kind": "range",
@@ -60,14 +286,456 @@
   },
   {
     "testIds": [
+      "alkaline-phosphatase"
+    ],
+    "name": "Alkaline phosphatase",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "0 days up to 28 days",
+        "kind": "range",
+        "display": "70-380",
+        "unit": "U/L",
+        "low": 70,
+        "high": 380,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinDays": 0,
+        "ageMaxDays": 28,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Alkaline phosphatase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "28 days up to 15 years",
+        "kind": "range",
+        "display": "60-425",
+        "unit": "U/L",
+        "low": 60,
+        "high": 425,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinDays": 28,
+        "ageMaxYears": 15,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Alkaline phosphatase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "16 years up to 150 years",
+        "kind": "range",
+        "display": "30-130",
+        "unit": "U/L",
+        "low": 30,
+        "high": 130,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 16,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Alkaline phosphatase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "ast"
+    ],
+    "name": "Aspartate aminotransferase",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "0 days up to 14 days",
+        "kind": "range",
+        "display": "23-186",
+        "unit": "U/L",
+        "low": 23,
+        "high": 186,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinDays": 0,
+        "ageMaxDays": 14,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Aspartate aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "15 days up to 1 year",
+        "kind": "range",
+        "display": "23-83",
+        "unit": "U/L",
+        "low": 23,
+        "high": 83,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinDays": 15,
+        "ageMaxYears": 1,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Aspartate aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "1 year up to 6 years",
+        "kind": "range",
+        "display": "26-55",
+        "unit": "U/L",
+        "low": 26,
+        "high": 55,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 1,
+        "ageMaxYears": 6,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Aspartate aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "7 years up to 11 years",
+        "kind": "range",
+        "display": "22-41",
+        "unit": "U/L",
+        "low": 22,
+        "high": 41,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 7,
+        "ageMaxYears": 11,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Aspartate aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "12 years up to 18 years, male",
+        "kind": "range",
+        "display": "18-40",
+        "unit": "U/L",
+        "low": 18,
+        "high": 40,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "male",
+        "ageMinYears": 12,
+        "ageMaxYears": 18,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Aspartate aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "12 years up to 18 years, female",
+        "kind": "range",
+        "display": "17-33",
+        "unit": "U/L",
+        "low": 17,
+        "high": 33,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "female",
+        "ageMinYears": 12,
+        "ageMaxYears": 18,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Aspartate aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "19 years up to 150 years, male",
+        "kind": "range",
+        "display": "5-34",
+        "unit": "U/L",
+        "low": 5,
+        "high": 34,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "male",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Aspartate aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "19 years up to 150 years, female",
+        "kind": "range",
+        "display": "5-31",
+        "unit": "U/L",
+        "low": 5,
+        "high": 31,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "female",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Aspartate aminotransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "bicarbonate"
+    ],
+    "name": "Bicarbonate",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "0 years up to 15 years",
+        "kind": "range",
+        "display": "19-28",
+        "unit": "mmol/L",
+        "low": 19,
+        "high": 28,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 0,
+        "ageMaxYears": 15,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Bicarbonate",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "16 years up to 150 years",
+        "kind": "range",
+        "display": "22-29",
+        "unit": "mmol/L",
+        "low": 22,
+        "high": 29,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 16,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Bicarbonate",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "bilirubin-total"
+    ],
+    "name": "Bilirubin total",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "<21",
+        "unit": "umol/L",
+        "low": 0,
+        "high": 21,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Bilirubin total",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "crp"
+    ],
+    "name": "C-reactive protein",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "<5",
+        "unit": "mg/L",
+        "low": 0,
+        "high": 5,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "C-reactive protein",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "chloride"
+    ],
+    "name": "Chloride",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "95-108",
+        "unit": "mmol/L",
+        "low": 95,
+        "high": 108,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Chloride",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      }
+    ]
+  },
+  {
+    "testIds": [
       "creatinine"
     ],
     "name": "Creatinine",
     "sourceReview": {
       "status": "candidate",
-      "parser": "ukGlosChemistry"
+      "parser": "ukSynnovisChemistry"
     },
     "bands": [
+      {
+        "label": "0 days up to 15 days",
+        "kind": "range",
+        "display": "29-82",
+        "unit": "umol/L",
+        "low": 29,
+        "high": 82,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinDays": 0,
+        "ageMaxDays": 15,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Creatinine",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "15 days up to 1 year",
+        "kind": "range",
+        "display": "15-37",
+        "unit": "umol/L",
+        "low": 15,
+        "high": 37,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinDays": 15,
+        "ageMaxYears": 1,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Creatinine",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "1 year up to 12 years",
+        "kind": "range",
+        "display": "22-53",
+        "unit": "umol/L",
+        "low": 22,
+        "high": 53,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 1,
+        "ageMaxYears": 12,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Creatinine",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "13 years up to 18 years, male",
+        "kind": "range",
+        "display": "41-105",
+        "unit": "umol/L",
+        "low": 41,
+        "high": 105,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "male",
+        "ageMinYears": 13,
+        "ageMaxYears": 18,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Creatinine",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "13 years up to 18 years, female",
+        "kind": "range",
+        "display": "38-74",
+        "unit": "umol/L",
+        "low": 38,
+        "high": 74,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "female",
+        "ageMinYears": 13,
+        "ageMaxYears": 18,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Creatinine",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "19 years up to 150 years, male",
+        "kind": "range",
+        "display": "59-104",
+        "unit": "umol/L",
+        "low": 59,
+        "high": 104,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "male",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Creatinine",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "19 years up to 150 years, female",
+        "kind": "range",
+        "display": "45-84",
+        "unit": "umol/L",
+        "low": 45,
+        "high": 84,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "female",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Creatinine",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
       {
         "label": "0 days up to 14 days",
         "kind": "range",
@@ -138,14 +806,267 @@
   },
   {
     "testIds": [
+      "ggt"
+    ],
+    "name": "Gamma glutamyltransferase",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "All ages, male",
+        "kind": "range",
+        "display": "<55",
+        "unit": "U/L",
+        "low": 0,
+        "high": 55,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "male",
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Gamma glutamyltransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "All ages, female",
+        "kind": "range",
+        "display": "<38",
+        "unit": "U/L",
+        "low": 0,
+        "high": 38,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sex": "female",
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Gamma glutamyltransferase",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "glucose"
+    ],
+    "name": "Glucose fasting",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "4.0-6.0",
+        "unit": "mmol/L",
+        "low": 4,
+        "high": 6,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "specimen": "fasting serum/plasma",
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Glucose fasting",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "magnesium"
+    ],
+    "name": "Magnesium",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "0 days up to 4 weeks",
+        "kind": "range",
+        "display": "0.60-1.00",
+        "unit": "mmol/L",
+        "low": 0.6,
+        "high": 1,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinDays": 0,
+        "ageMaxWeeks": 4,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Magnesium",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "4 weeks up to 150 years",
+        "kind": "range",
+        "display": "0.70-1.00",
+        "unit": "mmol/L",
+        "low": 0.7,
+        "high": 1,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinWeeks": 4,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Magnesium",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "phosphate"
+    ],
+    "name": "Phosphate",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "0 days up to 4 weeks",
+        "kind": "range",
+        "display": "1.30-2.60",
+        "unit": "mmol/L",
+        "low": 1.3,
+        "high": 2.6,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinDays": 0,
+        "ageMaxWeeks": 4,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Phosphate",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "4 weeks up to 1 year",
+        "kind": "range",
+        "display": "1.50-2.40",
+        "unit": "mmol/L",
+        "low": 1.5,
+        "high": 2.4,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinWeeks": 4,
+        "ageMaxYears": 1,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Phosphate",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "1 year up to 5 years",
+        "kind": "range",
+        "display": "1.30-2.10",
+        "unit": "mmol/L",
+        "low": 1.3,
+        "high": 2.1,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 1,
+        "ageMaxYears": 5,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Phosphate",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "6 years up to 12 years",
+        "kind": "range",
+        "display": "1.00-1.80",
+        "unit": "mmol/L",
+        "low": 1,
+        "high": 1.8,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 6,
+        "ageMaxYears": 12,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Phosphate",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "13 years up to 18 years",
+        "kind": "range",
+        "display": "0.90-1.50",
+        "unit": "mmol/L",
+        "low": 0.9,
+        "high": 1.5,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 13,
+        "ageMaxYears": 18,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Phosphate",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "19 years up to 150 years",
+        "kind": "range",
+        "display": "0.80-1.50",
+        "unit": "mmol/L",
+        "low": 0.8,
+        "high": 1.5,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Phosphate",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      }
+    ]
+  },
+  {
+    "testIds": [
       "potassium"
     ],
     "name": "Potassium",
     "sourceReview": {
       "status": "candidate",
-      "parser": "ukGlosChemistry"
+      "parser": "ukSynnovisChemistry"
     },
     "bands": [
+      {
+        "label": "0 days up to 4 weeks",
+        "kind": "range",
+        "display": "3.4-6.0",
+        "unit": "mmol/L",
+        "low": 3.4,
+        "high": 6,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinDays": 0,
+        "ageMaxWeeks": 4,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Potassium",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "4 weeks up to 150 years",
+        "kind": "range",
+        "display": "3.5-5.3",
+        "unit": "mmol/L",
+        "low": 3.5,
+        "high": 5.3,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinWeeks": 4,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Potassium",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
       {
         "label": "All ages",
         "kind": "range",
@@ -169,9 +1090,23 @@
     "name": "Sodium",
     "sourceReview": {
       "status": "candidate",
-      "parser": "ukGlosChemistry"
+      "parser": "ukSynnovisChemistry"
     },
     "bands": [
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "133-146",
+        "unit": "mmol/L",
+        "low": 133,
+        "high": 146,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Sodium",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
       {
         "label": "All ages",
         "kind": "range",
@@ -185,6 +1120,58 @@
         "sourceTitle": "Sodium (Na)",
         "sourceSection": "Sodium",
         "sourceSha256": "b1523ddd10fdc267d94d44f194b995fd9f478a43927ab27db9ca102927b64c14"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "ft3"
+    ],
+    "name": "T3 free",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "2.4-6.0",
+        "unit": "pmol/L",
+        "low": 2.4,
+        "high": 6,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "T3 free",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "ft4"
+    ],
+    "name": "T4 free",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "9.0-19.1",
+        "unit": "pmol/L",
+        "low": 9,
+        "high": 19.1,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "T4 free",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
       }
     ]
   },
@@ -245,6 +1232,50 @@
         "sourceTitle": "Thyroid Function Tests (TSH, FT4, FT3)",
         "sourceSection": "TSH",
         "sourceSha256": "080dcf5b4c81c0ff3d6885a376e3f9f700522d94658ebb7b4cff01e29f2ae52a"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "urea"
+    ],
+    "name": "Urea",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukSynnovisChemistry"
+    },
+    "bands": [
+      {
+        "label": "0 days up to 4 weeks",
+        "kind": "range",
+        "display": "0.8-5.5",
+        "unit": "mmol/L",
+        "low": 0.8,
+        "high": 5.5,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinDays": 0,
+        "ageMaxWeeks": 4,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Urea",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
+      },
+      {
+        "label": "4 weeks up to 150 years",
+        "kind": "range",
+        "display": "2.5-7.8",
+        "unit": "mmol/L",
+        "low": 2.5,
+        "high": 7.8,
+        "citationId": "UK-SYNNOVIS-CHEM",
+        "ageMinWeeks": 4,
+        "ageMaxYears": 150,
+        "sourceId": "uk-synnovis-chemistry-reference-intervals",
+        "sourceUrl": "https://www.synnovis.co.uk/sites/default/files/upload/Quality/BSL-ALL-CHEM-INST3%20Chemistry%20Reference%20Intervals%20v5.pdf",
+        "sourceTitle": "Synnovis Chemistry Reference Intervals",
+        "sourceSection": "Urea",
+        "sourceSha256": "beeaf485789e51e4e62105bf5cb24b48793f6bb1e26195b621b4cd431b7d4d09"
       }
     ]
   }

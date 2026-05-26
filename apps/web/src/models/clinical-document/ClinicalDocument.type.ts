@@ -66,6 +66,9 @@ export interface ClinicalDocument<T = unknown> {
     terminology_source?: string;
     terminology_source_version?: string;
     manual_uncoded?: boolean;
+    manual_specialty?: string;
+    manual_subtype?: string;
+    manual_specialty_details?: unknown;
   };
 }
 

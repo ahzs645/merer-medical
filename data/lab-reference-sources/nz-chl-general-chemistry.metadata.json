@@ -1,0 +1,14 @@
+{
+  "id": "nz-chl-general-chemistry",
+  "kind": "clinical-reference",
+  "parser": "nzChlGeneralChemistry",
+  "country": "australian",
+  "category": "chemistry",
+  "licenseRisk": "curated-citation",
+  "fileType": "pdf",
+  "url": "https://www.chl.co.nz/wp-content/uploads/2023/10/Laboratory-Reference-Intervals-General-Chemistry-1.pdf",
+  "fetchedAt": "2026-05-26T19:43:52.406Z",
+  "bytes": 221816,
+  "sha256": "149a1ad3438528df8bd8e277d3173a6bc75a4831e1acb951bfc1ac61574bb07a",
+  "contentType": "application/pdf"
+}

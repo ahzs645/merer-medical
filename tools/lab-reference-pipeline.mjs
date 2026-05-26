@@ -131,7 +131,8 @@ const sources = [
     category: 'hematology',
     licenseRisk: 'curated-citation',
     fileType: 'pdf',
-    title: 'Manchester University NHS Foundation Trust Blood Counts Reference Ranges',
+    title:
+      'Manchester University NHS Foundation Trust Blood Counts Reference Ranges',
     url: 'https://mft.nhs.uk/app/uploads/2024/07/Blood-counts-reference-ranges.pdf',
   },
   {
@@ -195,6 +196,7 @@ const sources = [
     country: 'canadian',
     category: 'chemistry',
     licenseRisk: 'copyrighted-review-only',
+    title: 'Shared Health Manitoba Hemoglobin A1c',
     url: 'https://apps.sbgh.mb.ca/labmanual/test/view?seedId=122',
   },
   {
@@ -204,6 +206,7 @@ const sources = [
     country: 'canadian',
     category: 'lipids',
     licenseRisk: 'copyrighted-review-only',
+    title: 'Shared Health Manitoba HDL Cholesterol',
     url: 'https://apps.sbgh.mb.ca/labmanual/test/view?seedId=1401',
   },
   {
@@ -213,6 +216,7 @@ const sources = [
     country: 'canadian',
     category: 'chemistry',
     licenseRisk: 'copyrighted-review-only',
+    title: 'LHSC Reference Ranges',
     url: 'https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges',
   },
   {
@@ -223,6 +227,7 @@ const sources = [
     category: 'chemistry',
     licenseRisk: 'copyrighted-review-only',
     fileType: 'pdf',
+    title: 'Northern Health Laboratory Services Test Directory',
     url: 'https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf',
   },
   {
@@ -233,6 +238,7 @@ const sources = [
     category: 'hematology',
     licenseRisk: 'copyrighted-review-only',
     fileType: 'pdf',
+    title: 'Northern Health Laboratory Services Test Directory',
     url: 'https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf',
   },
   {
@@ -302,7 +308,7 @@ async function main() {
 
   if (!shouldFetch && !shouldAnalyze && !shouldPromote) {
     console.error(
-      'Usage: node tools/lab-reference-pipeline.mjs --list | --fetch | --analyze | --all | --promote-reviewed [--source id]',
+      'Usage: node tools/lab-reference-pipeline.mjs --list | --fetch | --analyze | --all | --promote-reviewed [--source id] [--country id] [--category id]',
     );
     process.exit(1);
   }
@@ -370,12 +376,13 @@ async function analyzeSources(picked) {
 
   for (const source of picked) {
     const sourceText = await ensureSourceText(source);
+    const metadata = await readSourceMetadata(source);
     const text =
       source.fileType === 'pdf' ? sourceText : htmlToText(sourceText);
     const profile = {
       ...source,
-      bytes: Buffer.byteLength(sourceText),
-      sha256: sha256(sourceText),
+      bytes: metadata?.bytes || Buffer.byteLength(sourceText),
+      sha256: metadata?.sha256 || sha256(sourceText),
       title:
         source.fileType === 'pdf'
           ? source.title || source.id
@@ -416,8 +423,34 @@ async function ensureSourceText(source) {
   }
 }
 
+async function readSourceMetadata(source) {
+  try {
+    return JSON.parse(await fs.readFile(sourceMetadataPath(source), 'utf8'));
+  } catch {
+    return undefined;
+  }
+}
+
 function parseSource(source, text) {
   if (source.parser === 'rcpaChemistry') return parseRcpaChemistry(text);
+  if (source.parser === 'aacbTate2014Chemistry') {
+    return parseAacbTate2014Chemistry(text);
+  }
+  if (source.parser === 'nzChlGeneralChemistry') {
+    return parseNzChlGeneralChemistry(text);
+  }
+  if (source.parser === 'nzAwanuiAucklandBiochemistry') {
+    return parseNzAwanuiAucklandBiochemistry(text);
+  }
+  if (source.parser === 'nzAwanuiAucklandHaematology') {
+    return parseNzAwanuiAucklandHaematology(text);
+  }
+  if (source.parser === 'ausMonashReferenceMasterList') {
+    return parseAusMonashReferenceMasterList(text);
+  }
+  if (source.parser === 'ausPathwestBloodGas') {
+    return parseAusPathwestBloodGas(text);
+  }
   if (source.parser === 'ukWorcsFbc') return parseUkWorcsFbc(text);
   if (source.parser === 'ukSynnovisChemistry') {
     return parseCuratedSource({
@@ -432,7 +465,12 @@ function parseSource(source, text) {
     return parseCuratedSource({
       text,
       definitions: ukMftBloodCountsDefinitions,
-      expectedTerms: ['Blood Counts', 'RBC', 'Plats', 'Erythrocyte Sedimentation Rate'],
+      expectedTerms: [
+        'Blood Counts',
+        'RBC',
+        'Plats',
+        'Erythrocyte Sedimentation Rate',
+      ],
       parser: source.parser,
       sourceName: 'MFT blood counts',
     });
@@ -441,7 +479,11 @@ function parseSource(source, text) {
     return parseCuratedSource({
       text,
       definitions: ukUhdHaematologyDefinitions,
-      expectedTerms: ['Adult FBC Reference Ranges', 'Paediatric Reference Ranges', 'ESR Reference ranges'],
+      expectedTerms: [
+        'Adult FBC Reference Ranges',
+        'Paediatric Reference Ranges',
+        'ESR Reference ranges',
+      ],
       parser: source.parser,
       sourceName: 'UHD haematology',
     });
@@ -497,19 +539,25 @@ async function writeAnalysis(analysis) {
 
 async function promoteReviewedCandidates() {
   const candidateRoot = join(outputDir, 'referenceStandards');
+  const selectedCountry = getArg('country');
+  const selectedCategory = getArg('category');
   const promoted = [];
 
   for (const country of await safeReadDir(candidateRoot)) {
+    if (selectedCountry && country !== selectedCountry) continue;
     const countryDir = join(candidateRoot, country);
     const entries = await safeReadDir(countryDir);
     for (const entry of entries) {
       if (!entry.endsWith('.candidates.json')) continue;
 
       const category = entry.replace(/\.candidates\.json$/, '');
+      if (selectedCategory && category !== selectedCategory) continue;
       const candidatePath = join(countryDir, entry);
       const targetDir = join(appReferenceDir, country);
       const targetPath = join(targetDir, `${category}.json`);
-      const definitions = JSON.parse(await fs.readFile(candidatePath, 'utf8'));
+      const definitions = sanitizePromotedDefinitions(
+        JSON.parse(await fs.readFile(candidatePath, 'utf8')),
+      );
 
       await fs.mkdir(targetDir, { recursive: true });
       await fs.writeFile(
@@ -560,6 +608,18 @@ function addSourceReferences(definitions, sourceProfile) {
       sourceSha256: sourceProfile.sha256,
     })),
   }));
+}
+
+function sanitizePromotedDefinitions(definitions) {
+  return definitions
+    .filter((definition) => definition.sourceReview?.promoteReviewed !== false)
+    .map((definition) => ({
+      ...definition,
+      bands: definition.bands
+        .filter((band) => band.promoteReviewed !== false)
+        .map(({ promoteReviewed, ...band }) => band),
+    }))
+    .filter((definition) => definition.bands.length > 0);
 }
 
 function parseRcpaChemistry(text) {
@@ -732,6 +792,1046 @@ function parseRcpaBands(segment, analyte) {
   return bands;
 }
 
+function parseAacbTate2014Chemistry(text) {
+  const expected = [
+    'Australasian Harmonised Reference Intervals for Adults',
+    'Sodium',
+    'Potassium',
+    'Creatinine',
+  ];
+  return parseCuratedSource({
+    text,
+    definitions: [
+      auNzChemistryDefinition(
+        'sodium',
+        'Sodium',
+        'aacbTate2014Chemistry',
+        [
+          rangeBand(
+            '18 years up to 150 years',
+            '135-145',
+            'mmol/L',
+            135,
+            145,
+            'AUS-AACB-TATE-2014',
+            { ageMinYears: 18, ageMaxYears: 150, specimen: 'serum/plasma' },
+          ),
+          rangeBand(
+            '0 weeks up to 1 week',
+            '132-147',
+            'mmol/L',
+            132,
+            147,
+            'AUS-AACB-TATE-2014',
+            { ageMinWeeks: 0, ageMaxWeeks: 1, specimen: 'serum/plasma' },
+          ),
+          rangeBand(
+            '1 week up to 18 years',
+            '133-144',
+            'mmol/L',
+            133,
+            144,
+            'AUS-AACB-TATE-2014',
+            { ageMinWeeks: 1, ageMaxYears: 18, specimen: 'serum/plasma' },
+          ),
+        ],
+        { promoteReviewed: false },
+      ),
+      auNzChemistryDefinition(
+        'potassium',
+        'Potassium',
+        'aacbTate2014Chemistry',
+        [
+          rangeBand(
+            '18 years up to 150 years',
+            '3.5-5.2',
+            'mmol/L',
+            3.5,
+            5.2,
+            'AUS-AACB-TATE-2014',
+            { ageMinYears: 18, ageMaxYears: 150, specimen: 'serum/plasma' },
+          ),
+          rangeBand(
+            '0 weeks up to 1 week, plasma',
+            '3.5-6.2',
+            'mmol/L',
+            3.5,
+            6.2,
+            'AUS-AACB-TATE-2014',
+            { ageMinWeeks: 0, ageMaxWeeks: 1, specimen: 'plasma' },
+          ),
+          rangeBand(
+            '1 week up to 26 weeks, plasma',
+            '3.8-6.4',
+            'mmol/L',
+            3.8,
+            6.4,
+            'AUS-AACB-TATE-2014',
+            { ageMinWeeks: 1, ageMaxWeeks: 26, specimen: 'plasma' },
+          ),
+          rangeBand(
+            '26 weeks up to 2 years, plasma',
+            '3.5-5.4',
+            'mmol/L',
+            3.5,
+            5.4,
+            'AUS-AACB-TATE-2014',
+            { ageMinWeeks: 26, ageMaxYears: 2, specimen: 'plasma' },
+          ),
+          rangeBand(
+            '2 years up to 18 years, plasma',
+            '3.3-4.9',
+            'mmol/L',
+            3.3,
+            4.9,
+            'AUS-AACB-TATE-2014',
+            { ageMinYears: 2, ageMaxYears: 18, specimen: 'plasma' },
+          ),
+        ],
+        { promoteReviewed: false },
+      ),
+      auNzChemistryDefinition(
+        'chloride',
+        'Chloride',
+        'aacbTate2014Chemistry',
+        [
+          rangeBand(
+            '18 years up to 150 years',
+            '95-110',
+            'mmol/L',
+            95,
+            110,
+            'AUS-AACB-TATE-2014',
+            { ageMinYears: 18, ageMaxYears: 150 },
+          ),
+          rangeBand(
+            '0 weeks up to 1 week',
+            '98-115',
+            'mmol/L',
+            98,
+            115,
+            'AUS-AACB-TATE-2014',
+            { ageMinWeeks: 0, ageMaxWeeks: 1 },
+          ),
+          rangeBand(
+            '1 week up to 18 years',
+            '97-110',
+            'mmol/L',
+            97,
+            110,
+            'AUS-AACB-TATE-2014',
+            { ageMinWeeks: 1, ageMaxYears: 18 },
+          ),
+        ],
+        { promoteReviewed: false },
+      ),
+      auNzChemistryDefinition(
+        'bicarbonate',
+        'Bicarbonate',
+        'aacbTate2014Chemistry',
+        [
+          rangeBand(
+            '18 years up to 150 years',
+            '22-32',
+            'mmol/L',
+            22,
+            32,
+            'AUS-AACB-TATE-2014',
+            { ageMinYears: 18, ageMaxYears: 150 },
+          ),
+          rangeBand(
+            '0 weeks up to 1 week',
+            '15-28',
+            'mmol/L',
+            15,
+            28,
+            'AUS-AACB-TATE-2014',
+            { ageMinWeeks: 0, ageMaxWeeks: 1 },
+          ),
+          rangeBand(
+            '1 week up to 2 years',
+            '16-29',
+            'mmol/L',
+            16,
+            29,
+            'AUS-AACB-TATE-2014',
+            { ageMinWeeks: 1, ageMaxYears: 2 },
+          ),
+          rangeBand(
+            '2 years up to 10 years',
+            '17-30',
+            'mmol/L',
+            17,
+            30,
+            'AUS-AACB-TATE-2014',
+            { ageMinYears: 2, ageMaxYears: 10 },
+          ),
+          rangeBand(
+            '10 years up to 18 years',
+            '20-32',
+            'mmol/L',
+            20,
+            32,
+            'AUS-AACB-TATE-2014',
+            { ageMinYears: 10, ageMaxYears: 18 },
+          ),
+        ],
+        { promoteReviewed: false },
+      ),
+      auNzChemistryDefinition(
+        'creatinine',
+        'Creatinine',
+        'aacbTate2014Chemistry',
+        [
+          rangeBand(
+            '18 years up to 60 years, male',
+            '60-110',
+            'umol/L',
+            60,
+            110,
+            'AUS-AACB-TATE-2014',
+            { sex: 'male', ageMinYears: 18, ageMaxYears: 60 },
+          ),
+          rangeBand(
+            '18 years up to 60 years, female',
+            '45-90',
+            'umol/L',
+            45,
+            90,
+            'AUS-AACB-TATE-2014',
+            { sex: 'female', ageMinYears: 18, ageMaxYears: 60 },
+          ),
+        ],
+        { promoteReviewed: false },
+      ),
+      auNzChemistryDefinition(
+        'total-protein',
+        'Total protein',
+        'aacbTate2014Chemistry',
+        [
+          rangeBand(
+            '18 years up to 150 years',
+            '60-80',
+            'g/L',
+            60,
+            80,
+            'AUS-AACB-TATE-2014',
+            { ageMinYears: 18, ageMaxYears: 150 },
+          ),
+        ],
+        { promoteReviewed: false },
+      ),
+    ],
+    expectedTerms: expected,
+    parser: 'aacbTate2014Chemistry',
+    sourceName: 'AACB/Tate 2014 common reference intervals',
+  });
+}
+
+function parseNzChlGeneralChemistry(text) {
+  return parseCuratedSource({
+    text,
+    definitions: [
+      auNzChemistryDefinition(
+        'alt',
+        'Alanine aminotransferase',
+        'nzChlGeneralChemistry',
+        [
+          rangeBand('All ages, male', '0-40', 'U/L', 0, 40, 'NZ-CHL-GEN-CHEM', {
+            sex: 'male',
+          }),
+          rangeBand(
+            'All ages, female',
+            '0-30',
+            'U/L',
+            0,
+            30,
+            'NZ-CHL-GEN-CHEM',
+            { sex: 'female' },
+          ),
+        ],
+      ),
+      auNzChemistryDefinition('albumin', 'Albumin', 'nzChlGeneralChemistry', [
+        rangeBand(
+          '0 days up to 14 days',
+          '28-41',
+          'g/L',
+          28,
+          41,
+          'NZ-CHL-GEN-CHEM',
+          { ageMinDays: 0, ageMaxDays: 14 },
+        ),
+        rangeBand(
+          '14 days up to 1 year',
+          '28-45',
+          'g/L',
+          28,
+          45,
+          'NZ-CHL-GEN-CHEM',
+          { ageMinDays: 14, ageMaxYears: 1 },
+        ),
+        rangeBand(
+          '1 year up to 8 years',
+          '35-45',
+          'g/L',
+          35,
+          45,
+          'NZ-CHL-GEN-CHEM',
+          { ageMinYears: 1, ageMaxYears: 8 },
+        ),
+        rangeBand(
+          '8 years up to 15 years',
+          '37-47',
+          'g/L',
+          37,
+          47,
+          'NZ-CHL-GEN-CHEM',
+          { ageMinYears: 8, ageMaxYears: 15 },
+        ),
+        rangeBand(
+          '16 years up to 150 years',
+          '32-48',
+          'g/L',
+          32,
+          48,
+          'NZ-CHL-GEN-CHEM',
+          { ageMinYears: 16, ageMaxYears: 150 },
+        ),
+      ]),
+      auNzChemistryDefinition(
+        'bicarbonate',
+        'Bicarbonate',
+        'nzChlGeneralChemistry',
+        [
+          rangeBand(
+            '0 years up to 2 years',
+            '19-24',
+            'mmol/L',
+            19,
+            24,
+            'NZ-CHL-GEN-CHEM',
+            { ageMinYears: 0, ageMaxYears: 2 },
+          ),
+          rangeBand(
+            '2 years up to 150 years',
+            '22-32',
+            'mmol/L',
+            22,
+            32,
+            'NZ-CHL-GEN-CHEM',
+            { ageMinYears: 2, ageMaxYears: 150 },
+          ),
+        ],
+      ),
+      auNzChemistryDefinition('calcium', 'Calcium', 'nzChlGeneralChemistry', [
+        rangeBand(
+          '0 days up to 1 week',
+          '1.9-2.8',
+          'mmol/L',
+          1.9,
+          2.8,
+          'NZ-CHL-GEN-CHEM',
+          { ageMinDays: 0, ageMaxWeeks: 1 },
+        ),
+        rangeBand(
+          '1 week up to 26 weeks',
+          '2.2-2.8',
+          'mmol/L',
+          2.2,
+          2.8,
+          'NZ-CHL-GEN-CHEM',
+          { ageMinWeeks: 1, ageMaxWeeks: 26 },
+        ),
+        rangeBand(
+          '26 weeks up to 18 years',
+          '2.2-2.7',
+          'mmol/L',
+          2.2,
+          2.7,
+          'NZ-CHL-GEN-CHEM',
+          { ageMinWeeks: 26, ageMaxYears: 18 },
+        ),
+        rangeBand(
+          '18 years up to 150 years',
+          '2.2-2.6',
+          'mmol/L',
+          2.2,
+          2.6,
+          'NZ-CHL-GEN-CHEM',
+          { ageMinYears: 18, ageMaxYears: 150 },
+        ),
+      ]),
+      auNzChemistryDefinition('chloride', 'Chloride', 'nzChlGeneralChemistry', [
+        rangeBand('All ages', '95-110', 'mmol/L', 95, 110, 'NZ-CHL-GEN-CHEM'),
+      ]),
+    ],
+    expectedTerms: [
+      'Alanine aminotransferase',
+      'Albumin',
+      'Bicarbonate',
+      'Chloride',
+    ],
+    parser: 'nzChlGeneralChemistry',
+    sourceName: 'Canterbury Health Laboratories general chemistry',
+  });
+}
+
+function parseNzAwanuiAucklandBiochemistry(text) {
+  return parseCuratedSource({
+    text,
+    definitions: [
+      auNzChemistryDefinition(
+        'glucose',
+        'Glucose',
+        'nzAwanuiAucklandBiochemistry',
+        [
+          rangeBand(
+            'Fasting',
+            '3.5-5.4',
+            'mmol/L',
+            3.5,
+            5.4,
+            'NZ-AWANUI-AKL-BIOCHEM',
+            { method: 'fasting' },
+          ),
+          rangeBand(
+            'Non-fasting',
+            '3.5-7.7',
+            'mmol/L',
+            3.5,
+            7.7,
+            'NZ-AWANUI-AKL-BIOCHEM',
+            { method: 'non-fasting' },
+          ),
+        ],
+      ),
+      auNzChemistryDefinition(
+        'hba1c',
+        'HbA1c',
+        'nzAwanuiAucklandBiochemistry',
+        [
+          thresholdBand(
+            'All ages',
+            '<41',
+            'mmol/mol',
+            41,
+            'lt',
+            'NZ-AWANUI-AKL-BIOCHEM',
+          ),
+        ],
+      ),
+      auNzChemistryDefinition(
+        'albumin',
+        'Albumin',
+        'nzAwanuiAucklandBiochemistry',
+        [
+          rangeBand(
+            '0 months up to 3 months',
+            '25-40',
+            'g/L',
+            25,
+            40,
+            'NZ-AWANUI-AKL-BIOCHEM',
+            { ageMinDays: 0, ageMaxDays: 90 },
+          ),
+          rangeBand(
+            '3 months up to 1 year',
+            '32-45',
+            'g/L',
+            32,
+            45,
+            'NZ-AWANUI-AKL-BIOCHEM',
+            { ageMinDays: 90, ageMaxYears: 1 },
+          ),
+          rangeBand(
+            '1 year up to 150 years',
+            '32-48',
+            'g/L',
+            32,
+            48,
+            'NZ-AWANUI-AKL-BIOCHEM',
+            { ageMinYears: 1, ageMaxYears: 150 },
+          ),
+        ],
+      ),
+      auNzChemistryDefinition(
+        'calcium',
+        'Calcium',
+        'nzAwanuiAucklandBiochemistry',
+        [
+          rangeBand(
+            '1 day up to 3 days',
+            '1.80-2.80',
+            'mmol/L',
+            1.8,
+            2.8,
+            'NZ-AWANUI-AKL-BIOCHEM',
+            { ageMinDays: 1, ageMaxDays: 3 },
+          ),
+          rangeBand(
+            '4 days up to 1 year',
+            '2.10-2.80',
+            'mmol/L',
+            2.1,
+            2.8,
+            'NZ-AWANUI-AKL-BIOCHEM',
+            { ageMinDays: 4, ageMaxYears: 1 },
+          ),
+          rangeBand(
+            '1 year up to 150 years',
+            '2.10-2.55',
+            'mmol/L',
+            2.1,
+            2.55,
+            'NZ-AWANUI-AKL-BIOCHEM',
+            { ageMinYears: 1, ageMaxYears: 150 },
+          ),
+        ],
+      ),
+      auNzChemistryDefinition(
+        'phosphate',
+        'Phosphate',
+        'nzAwanuiAucklandBiochemistry',
+        [
+          rangeBand(
+            '1 year up to 4 years',
+            '1.10-2.20',
+            'mmol/L',
+            1.1,
+            2.2,
+            'NZ-AWANUI-AKL-BIOCHEM',
+            { ageMinYears: 1, ageMaxYears: 4 },
+          ),
+          rangeBand(
+            '4 years up to 15 years',
+            '0.90-2.00',
+            'mmol/L',
+            0.9,
+            2,
+            'NZ-AWANUI-AKL-BIOCHEM',
+            { ageMinYears: 4, ageMaxYears: 15 },
+          ),
+          rangeBand(
+            '15 years up to 18 years',
+            '0.80-1.85',
+            'mmol/L',
+            0.8,
+            1.85,
+            'NZ-AWANUI-AKL-BIOCHEM',
+            { ageMinYears: 15, ageMaxYears: 18 },
+          ),
+          rangeBand(
+            '18 years up to 150 years',
+            '0.75-1.50',
+            'mmol/L',
+            0.75,
+            1.5,
+            'NZ-AWANUI-AKL-BIOCHEM',
+            { ageMinYears: 18, ageMaxYears: 150 },
+          ),
+        ],
+      ),
+      auNzChemistryDefinition(
+        'magnesium',
+        'Magnesium',
+        'nzAwanuiAucklandBiochemistry',
+        [
+          rangeBand(
+            'All ages',
+            '0.70-1.0',
+            'mmol/L',
+            0.7,
+            1,
+            'NZ-AWANUI-AKL-BIOCHEM',
+          ),
+        ],
+      ),
+      auNzChemistryDefinition(
+        'lipase',
+        'Lipase',
+        'nzAwanuiAucklandBiochemistry',
+        [
+          rangeBand('Serum', '10-60', 'U/L', 10, 60, 'NZ-AWANUI-AKL-BIOCHEM', {
+            specimen: 'serum',
+          }),
+        ],
+      ),
+    ],
+    expectedTerms: [
+      'REFERENCE INTERVALS - CLINICAL CHEMISTRY',
+      'Glucose',
+      'Albumin',
+      'Lipase',
+    ],
+    parser: 'nzAwanuiAucklandBiochemistry',
+    sourceName: 'Awanui Auckland biochemistry',
+  });
+}
+
+function parseNzAwanuiAucklandHaematology(text) {
+  return parseCuratedSource({
+    text,
+    definitions: [
+      auNzHematologyDefinition(
+        'rbc',
+        'Red blood count',
+        'nzAwanuiAucklandHaematology',
+        [
+          rangeBand(
+            'Adult male',
+            '4.3-6.0',
+            '10^12/L',
+            4.3,
+            6,
+            'NZ-AWANUI-AKL-HAEM',
+            { sex: 'male', ageMinYears: 18, ageMaxYears: 150 },
+          ),
+          rangeBand(
+            'Adult female',
+            '3.6-5.6',
+            '10^12/L',
+            3.6,
+            5.6,
+            'NZ-AWANUI-AKL-HAEM',
+            { sex: 'female', ageMinYears: 18, ageMaxYears: 150 },
+          ),
+        ],
+      ),
+      auNzHematologyDefinition(
+        'hemoglobin',
+        'Haemoglobin',
+        'nzAwanuiAucklandHaematology',
+        [
+          rangeBand(
+            'Adult male',
+            '130-175',
+            'g/L',
+            130,
+            175,
+            'NZ-AWANUI-AKL-HAEM',
+            { sex: 'male', ageMinYears: 18, ageMaxYears: 150 },
+          ),
+          rangeBand(
+            'Adult female',
+            '115-155',
+            'g/L',
+            115,
+            155,
+            'NZ-AWANUI-AKL-HAEM',
+            { sex: 'female', ageMinYears: 18, ageMaxYears: 150 },
+          ),
+        ],
+      ),
+      auNzHematologyDefinition(
+        'hematocrit',
+        'HCT',
+        'nzAwanuiAucklandHaematology',
+        [
+          rangeBand(
+            'Adult male',
+            '0.40-0.52',
+            'L/L',
+            0.4,
+            0.52,
+            'NZ-AWANUI-AKL-HAEM',
+            { sex: 'male', ageMinYears: 18, ageMaxYears: 150 },
+          ),
+          rangeBand(
+            'Adult female',
+            '0.35-0.46',
+            'L/L',
+            0.35,
+            0.46,
+            'NZ-AWANUI-AKL-HAEM',
+            { sex: 'female', ageMinYears: 18, ageMaxYears: 150 },
+          ),
+        ],
+      ),
+      auNzHematologyDefinition(
+        'wbc',
+        'White blood count',
+        'nzAwanuiAucklandHaematology',
+        [
+          rangeBand(
+            'Adult male',
+            '4.0-11.0',
+            '10^9/L',
+            4,
+            11,
+            'NZ-AWANUI-AKL-HAEM',
+            { sex: 'male', ageMinYears: 18, ageMaxYears: 150 },
+          ),
+          rangeBand(
+            'Adult female',
+            '4.0-11.0',
+            '10^9/L',
+            4,
+            11,
+            'NZ-AWANUI-AKL-HAEM',
+            { sex: 'female', ageMinYears: 18, ageMaxYears: 150 },
+          ),
+        ],
+      ),
+      auNzHematologyDefinition(
+        'platelets',
+        'Platelet count',
+        'nzAwanuiAucklandHaematology',
+        [
+          rangeBand(
+            'Adult male',
+            '150-400',
+            '10^9/L',
+            150,
+            400,
+            'NZ-AWANUI-AKL-HAEM',
+            { sex: 'male', ageMinYears: 18, ageMaxYears: 150 },
+          ),
+          rangeBand(
+            'Adult female',
+            '150-400',
+            '10^9/L',
+            150,
+            400,
+            'NZ-AWANUI-AKL-HAEM',
+            { sex: 'female', ageMinYears: 18, ageMaxYears: 150 },
+          ),
+        ],
+      ),
+    ],
+    expectedTerms: [
+      'REFERENCE INTERVALS - HAEMATOLOGY',
+      'Red Blood Count',
+      'Platelet Count',
+    ],
+    parser: 'nzAwanuiAucklandHaematology',
+    sourceName: 'Awanui Auckland haematology',
+  });
+}
+
+function parseAusMonashReferenceMasterList(text) {
+  return parseCuratedSource({
+    text,
+    definitions: [
+      auNzChemistryDefinition(
+        'sodium',
+        'Sodium blood gas',
+        'ausMonashReferenceMasterList',
+        [
+          rangeBand(
+            'Blood gas arterial/capillary adult',
+            '135-145',
+            'mmol/L',
+            135,
+            145,
+            'AUS-MONASH-REF-MASTER',
+            {
+              method: 'blood gas Radiometer',
+              specimen: 'arterial/capillary',
+              ageMinYears: 18,
+              ageMaxYears: 150,
+            },
+          ),
+          rangeBand(
+            'Blood gas venous adult',
+            '135-145',
+            'mmol/L',
+            135,
+            145,
+            'AUS-MONASH-REF-MASTER',
+            {
+              method: 'blood gas Radiometer',
+              specimen: 'venous',
+              ageMinYears: 18,
+              ageMaxYears: 150,
+            },
+          ),
+        ],
+        { promoteReviewed: false },
+      ),
+      auNzChemistryDefinition(
+        'potassium',
+        'Potassium blood gas',
+        'ausMonashReferenceMasterList',
+        [
+          rangeBand(
+            'Blood gas arterial/capillary adult',
+            '3.5-5.2',
+            'mmol/L',
+            3.5,
+            5.2,
+            'AUS-MONASH-REF-MASTER',
+            {
+              method: 'blood gas Radiometer',
+              specimen: 'arterial/capillary',
+              ageMinYears: 18,
+              ageMaxYears: 150,
+            },
+          ),
+          rangeBand(
+            'Blood gas venous adult',
+            '3.5-5.2',
+            'mmol/L',
+            3.5,
+            5.2,
+            'AUS-MONASH-REF-MASTER',
+            {
+              method: 'blood gas Radiometer',
+              specimen: 'venous',
+              ageMinYears: 18,
+              ageMaxYears: 150,
+            },
+          ),
+        ],
+        { promoteReviewed: false },
+      ),
+      auNzChemistryDefinition(
+        'chloride',
+        'Chloride blood gas',
+        'ausMonashReferenceMasterList',
+        [
+          rangeBand(
+            'Blood gas adult',
+            '95-110',
+            'mmol/L',
+            95,
+            110,
+            'AUS-MONASH-REF-MASTER',
+            {
+              method: 'blood gas Radiometer',
+              ageMinYears: 18,
+              ageMaxYears: 150,
+            },
+          ),
+        ],
+        { promoteReviewed: false },
+      ),
+    ],
+    expectedTerms: [
+      'PATHOLOGY REFERENCE INTERVAL',
+      'Reference intervals for blood gas analysis',
+      'Sodium',
+    ],
+    parser: 'ausMonashReferenceMasterList',
+    sourceName: 'Monash Health Pathology master list',
+  });
+}
+
+function parseAusPathwestBloodGas(text) {
+  return parseCuratedSource({
+    text,
+    definitions: [
+      auNzChemistryDefinition(
+        'sodium',
+        'Sodium i-STAT CHEM8',
+        'ausPathwestBloodGas',
+        [
+          rangeBand(
+            '0 days up to 1 week',
+            '132-147',
+            'mmol/L',
+            132,
+            147,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinDays: 0, ageMaxWeeks: 1, method: 'i-STAT CHEM8' },
+          ),
+          rangeBand(
+            '1 week up to 18 years',
+            '133-144',
+            'mmol/L',
+            133,
+            144,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinWeeks: 1, ageMaxYears: 18, method: 'i-STAT CHEM8' },
+          ),
+          rangeBand(
+            '18 years up to 120 years',
+            '135-145',
+            'mmol/L',
+            135,
+            145,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinYears: 18, ageMaxYears: 120, method: 'i-STAT CHEM8' },
+          ),
+        ],
+      ),
+      auNzChemistryDefinition(
+        'potassium',
+        'Potassium i-STAT CHEM8',
+        'ausPathwestBloodGas',
+        [
+          rangeBand(
+            '0 days up to 1 week',
+            '3.5-6.2',
+            'mmol/L',
+            3.5,
+            6.2,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinDays: 0, ageMaxWeeks: 1, method: 'i-STAT CHEM8' },
+          ),
+          rangeBand(
+            '1 week up to 26 weeks',
+            '3.8-6.4',
+            'mmol/L',
+            3.8,
+            6.4,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinWeeks: 1, ageMaxWeeks: 26, method: 'i-STAT CHEM8' },
+          ),
+          rangeBand(
+            '26 weeks up to 1 year',
+            '3.5-5.4',
+            'mmol/L',
+            3.5,
+            5.4,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinWeeks: 26, ageMaxYears: 1, method: 'i-STAT CHEM8' },
+          ),
+          rangeBand(
+            '2 years up to 18 years',
+            '3.3-4.9',
+            'mmol/L',
+            3.3,
+            4.9,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinYears: 2, ageMaxYears: 18, method: 'i-STAT CHEM8' },
+          ),
+          rangeBand(
+            '18 years up to 120 years',
+            '3.5-5.2',
+            'mmol/L',
+            3.5,
+            5.2,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinYears: 18, ageMaxYears: 120, method: 'i-STAT CHEM8' },
+          ),
+        ],
+      ),
+      auNzChemistryDefinition(
+        'chloride',
+        'Chloride i-STAT CHEM8',
+        'ausPathwestBloodGas',
+        [
+          rangeBand(
+            '0 days up to 1 week',
+            '98-115',
+            'mmol/L',
+            98,
+            115,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinDays: 0, ageMaxWeeks: 1, method: 'i-STAT CHEM8' },
+          ),
+          rangeBand(
+            '1 week up to 18 years',
+            '97-110',
+            'mmol/L',
+            97,
+            110,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinWeeks: 1, ageMaxYears: 18, method: 'i-STAT CHEM8' },
+          ),
+          rangeBand(
+            '18 years up to 120 years',
+            '95-110',
+            'mmol/L',
+            95,
+            110,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinYears: 18, ageMaxYears: 120, method: 'i-STAT CHEM8' },
+          ),
+        ],
+      ),
+      auNzChemistryDefinition(
+        'glucose',
+        'Glucose i-STAT CHEM8',
+        'ausPathwestBloodGas',
+        [
+          rangeBand(
+            '0 hours up to 3 days',
+            '2.6-5.4',
+            'mmol/L',
+            2.6,
+            5.4,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinDays: 0, ageMaxDays: 3, method: 'i-STAT CHEM8' },
+          ),
+          rangeBand(
+            '3 days up to 120 years',
+            '3.0-5.4',
+            'mmol/L',
+            3,
+            5.4,
+            'AUS-PATHWEST-BLOOD-GAS',
+            { ageMinDays: 3, ageMaxYears: 120, method: 'i-STAT CHEM8' },
+          ),
+        ],
+      ),
+      auNzChemistryDefinition(
+        'creatinine',
+        'Creatinine i-STAT CHEM8',
+        'ausPathwestBloodGas',
+        [
+          rangeBand(
+            '19 years up to 120 years, male',
+            '60-110',
+            'umol/L',
+            60,
+            110,
+            'AUS-PATHWEST-BLOOD-GAS',
+            {
+              sex: 'male',
+              ageMinYears: 19,
+              ageMaxYears: 120,
+              method: 'i-STAT CHEM8',
+            },
+          ),
+          rangeBand(
+            '19 years up to 120 years, female',
+            '45-90',
+            'umol/L',
+            45,
+            90,
+            'AUS-PATHWEST-BLOOD-GAS',
+            {
+              sex: 'female',
+              ageMinYears: 19,
+              ageMaxYears: 120,
+              method: 'i-STAT CHEM8',
+            },
+          ),
+        ],
+      ),
+    ],
+    expectedTerms: ['ISTAT CHEM8 REFERENCE INTERVALS', 'Sodium', 'Haemoglobin'],
+    parser: 'ausPathwestBloodGas',
+    sourceName: 'PathWest blood gas and i-STAT CHEM8',
+  });
+}
+
+function auNzChemistryDefinition(testId, name, parser, bands, options = {}) {
+  return auNzDefinition(testId, name, parser, bands, options);
+}
+
+function auNzHematologyDefinition(testId, name, parser, bands, options = {}) {
+  return auNzDefinition(testId, name, parser, bands, options);
+}
+
+function auNzDefinition(
+  testId,
+  name,
+  parser,
+  bands,
+  { promoteReviewed = true } = {},
+) {
+  return {
+    testIds: [testId],
+    name,
+    sourceReview: { status: 'candidate', parser, promoteReviewed },
+    bands: bands.map((band) =>
+      promoteReviewed ? band : { ...band, promoteReviewed: false },
+    ),
+  };
+}
+
 function parseUkWorcsFbc(text) {
   const requiredTerms = ['Haemoglobin', 'Red Blood Cell Count', 'Platelets'];
   const found = requiredTerms.filter((term) => text.includes(term));
@@ -763,6 +1863,90 @@ function parseUkGlosChemistry(sourceId, text) {
   };
 }
 
+function parseCaSharedHealthHba1c(text) {
+  const found = ['HEMOGLOBIN A1C', 'Reference Values:', '4.0 - 6.0 %'].filter(
+    (term) => text.includes(term),
+  );
+  return {
+    status:
+      found.length === 3 ? 'curated-candidate-json' : 'source-shape-changed',
+    definitions: caSharedHealthHba1cDefinitions,
+    notes: [
+      `Found ${found.length}/3 expected Shared Health Manitoba HbA1c markers.`,
+      'Output is review-only because the Lab Information Manual states all rights reserved and use is subject to license terms.',
+    ],
+  };
+}
+
+function parseCaSharedHealthHdl(text) {
+  const found = [
+    'HDL CHOLESTEROL',
+    'Reference Values:',
+    '>=20 y Female',
+  ].filter((term) => text.includes(term));
+  return {
+    status:
+      found.length === 3 ? 'curated-candidate-json' : 'source-shape-changed',
+    definitions: caSharedHealthHdlDefinitions,
+    notes: [
+      `Found ${found.length}/3 expected Shared Health Manitoba HDL markers.`,
+      'HDL values are decision limits, not classic central 95% reference intervals; keep them as candidate lipid flagging logic unless reviewed.',
+      'Output is review-only because the Lab Information Manual states all rights reserved and use is subject to license terms.',
+    ],
+  };
+}
+
+function parseCaLhscReferenceRanges(text) {
+  const found = [
+    'Whole Blood Reference Range',
+    'Plasma Reference Range',
+    'Random Urine Reference Range',
+  ].filter((term) => text.includes(term));
+  return {
+    status:
+      found.length >= 2 ? 'curated-candidate-json' : 'source-shape-changed',
+    definitions: caLhscTraceElementDefinitions,
+    notes: [
+      `Found ${found.length}/3 expected LHSC reference-range sections.`,
+      'Definitions are curated from SI-unit columns on the LHSC page and kept review-only pending licensing and analyte mapping QA.',
+    ],
+  };
+}
+
+function parseCaNorthernHealthDirectory(text) {
+  const found = [
+    'NH Lab Services – Chemistry Reference Intervals',
+    'Albumin',
+    'Bilirubin Total',
+  ].filter((term) => text.includes(term));
+  return {
+    status:
+      found.length >= 2 ? 'curated-candidate-json' : 'source-shape-changed',
+    definitions: caNorthernHealthChemistryDefinitions,
+    notes: [
+      `Found ${found.length}/3 expected Northern Health chemistry markers.`,
+      'Definitions are curated from the PDF chemistry appendix and kept review-only because the directory is an institutional document with unclear reuse rights.',
+    ],
+  };
+}
+
+function parseCaNorthernHealthHematology(text) {
+  const found = [
+    'NH Lab Services - Hematology Reference Intervals',
+    'Automated Complete Blood Count',
+    'ADULT',
+  ].filter((term) => text.includes(term));
+  return {
+    status:
+      found.length === 3 ? 'curated-candidate-json' : 'source-shape-changed',
+    definitions: caNorthernHealthHematologyDefinitions,
+    notes: [
+      `Found ${found.length}/3 expected Northern Health hematology markers.`,
+      'Definitions are curated from the PDF CBC adult row and kept review-only because the directory is an institutional document with unclear reuse rights.',
+    ],
+  };
+}
+
 function parseCuratedSource({
   text,
   definitions,
@@ -776,7 +1960,8 @@ function parseCuratedSource({
   );
   return {
     status:
-      definitions.length > 0 && found.length >= Math.min(2, expectedTerms.length)
+      definitions.length > 0 &&
+      found.length >= Math.min(2, expectedTerms.length)
         ? 'curated-candidate-json'
         : 'source-shape-changed',
     definitions,
@@ -874,6 +2059,8 @@ function htmlToText(html) {
     .replace(/&micro;|µ/g, 'u')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
+    .replace(/&ge;|&#8805;/g, '>=')
+    .replace(/&le;|&#8804;/g, '<=')
     .replace(/&amp;/g, '&')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
@@ -911,6 +2098,1305 @@ function dedupeDefinitions(definitions) {
 function escapeRegExp(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
+
+const ukSynnovisChemistryDefinitions = [
+  referenceDefinition(['albumin'], 'Albumin', 'ukSynnovisChemistry', [
+    rangeBand(
+      '0 days up to 14 days',
+      '28-41',
+      'g/L',
+      28,
+      41,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinDays: 0,
+        ageMaxDays: 14,
+      },
+    ),
+    rangeBand(
+      '15 days up to 1 year',
+      '25-46',
+      'g/L',
+      25,
+      46,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinDays: 15,
+        ageMaxYears: 1,
+      },
+    ),
+    rangeBand(
+      '1 year up to 7 years',
+      '35-45',
+      'g/L',
+      35,
+      45,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinYears: 1,
+        ageMaxYears: 7,
+      },
+    ),
+    rangeBand(
+      '8 years up to 14 years',
+      '37-47',
+      'g/L',
+      37,
+      47,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinYears: 8,
+        ageMaxYears: 14,
+      },
+    ),
+    rangeBand(
+      '15 years up to 18 years, male',
+      '38-50',
+      'g/L',
+      38,
+      50,
+      'UK-SYNNOVIS-CHEM',
+      {
+        sex: 'male',
+        ageMinYears: 15,
+        ageMaxYears: 18,
+      },
+    ),
+    rangeBand(
+      '15 years up to 18 years, female',
+      '35-49',
+      'g/L',
+      35,
+      49,
+      'UK-SYNNOVIS-CHEM',
+      {
+        sex: 'female',
+        ageMinYears: 15,
+        ageMaxYears: 18,
+      },
+    ),
+    rangeBand(
+      '19 years up to 150 years',
+      '31-45',
+      'g/L',
+      31,
+      45,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(
+    ['alkaline-phosphatase'],
+    'Alkaline phosphatase',
+    'ukSynnovisChemistry',
+    [
+      rangeBand(
+        '0 days up to 28 days',
+        '70-380',
+        'U/L',
+        70,
+        380,
+        'UK-SYNNOVIS-CHEM',
+        {
+          ageMinDays: 0,
+          ageMaxDays: 28,
+        },
+      ),
+      rangeBand(
+        '28 days up to 15 years',
+        '60-425',
+        'U/L',
+        60,
+        425,
+        'UK-SYNNOVIS-CHEM',
+        {
+          ageMinDays: 28,
+          ageMaxYears: 15,
+        },
+      ),
+      rangeBand(
+        '16 years up to 150 years',
+        '30-130',
+        'U/L',
+        30,
+        130,
+        'UK-SYNNOVIS-CHEM',
+        {
+          ageMinYears: 16,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(
+    ['alt'],
+    'Alanine aminotransferase',
+    'ukSynnovisChemistry',
+    [
+      rangeBand(
+        '0 years up to 1 year',
+        '5-51',
+        'U/L',
+        5,
+        51,
+        'UK-SYNNOVIS-CHEM',
+        {
+          ageMinYears: 0,
+          ageMaxYears: 1,
+        },
+      ),
+      rangeBand(
+        '1 year up to 12 years',
+        '11-30',
+        'U/L',
+        11,
+        30,
+        'UK-SYNNOVIS-CHEM',
+        {
+          ageMinYears: 1,
+          ageMaxYears: 12,
+        },
+      ),
+      rangeBand(
+        '13 years up to 18 years, male',
+        '10-33',
+        'U/L',
+        10,
+        33,
+        'UK-SYNNOVIS-CHEM',
+        {
+          sex: 'male',
+          ageMinYears: 13,
+          ageMaxYears: 18,
+        },
+      ),
+      rangeBand(
+        '13 years up to 18 years, female',
+        '8-24',
+        'U/L',
+        8,
+        24,
+        'UK-SYNNOVIS-CHEM',
+        {
+          sex: 'female',
+          ageMinYears: 13,
+          ageMaxYears: 18,
+        },
+      ),
+      rangeBand(
+        '19 years up to 150 years, male',
+        '<45',
+        'U/L',
+        0,
+        45,
+        'UK-SYNNOVIS-CHEM',
+        {
+          sex: 'male',
+          ageMinYears: 19,
+          ageMaxYears: 150,
+        },
+      ),
+      rangeBand(
+        '19 years up to 150 years, female',
+        '<34',
+        'U/L',
+        0,
+        34,
+        'UK-SYNNOVIS-CHEM',
+        {
+          sex: 'female',
+          ageMinYears: 19,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(
+    ['ast'],
+    'Aspartate aminotransferase',
+    'ukSynnovisChemistry',
+    [
+      rangeBand(
+        '0 days up to 14 days',
+        '23-186',
+        'U/L',
+        23,
+        186,
+        'UK-SYNNOVIS-CHEM',
+        {
+          ageMinDays: 0,
+          ageMaxDays: 14,
+        },
+      ),
+      rangeBand(
+        '15 days up to 1 year',
+        '23-83',
+        'U/L',
+        23,
+        83,
+        'UK-SYNNOVIS-CHEM',
+        {
+          ageMinDays: 15,
+          ageMaxYears: 1,
+        },
+      ),
+      rangeBand(
+        '1 year up to 6 years',
+        '26-55',
+        'U/L',
+        26,
+        55,
+        'UK-SYNNOVIS-CHEM',
+        {
+          ageMinYears: 1,
+          ageMaxYears: 6,
+        },
+      ),
+      rangeBand(
+        '7 years up to 11 years',
+        '22-41',
+        'U/L',
+        22,
+        41,
+        'UK-SYNNOVIS-CHEM',
+        {
+          ageMinYears: 7,
+          ageMaxYears: 11,
+        },
+      ),
+      rangeBand(
+        '12 years up to 18 years, male',
+        '18-40',
+        'U/L',
+        18,
+        40,
+        'UK-SYNNOVIS-CHEM',
+        {
+          sex: 'male',
+          ageMinYears: 12,
+          ageMaxYears: 18,
+        },
+      ),
+      rangeBand(
+        '12 years up to 18 years, female',
+        '17-33',
+        'U/L',
+        17,
+        33,
+        'UK-SYNNOVIS-CHEM',
+        {
+          sex: 'female',
+          ageMinYears: 12,
+          ageMaxYears: 18,
+        },
+      ),
+      rangeBand(
+        '19 years up to 150 years, male',
+        '5-34',
+        'U/L',
+        5,
+        34,
+        'UK-SYNNOVIS-CHEM',
+        {
+          sex: 'male',
+          ageMinYears: 19,
+          ageMaxYears: 150,
+        },
+      ),
+      rangeBand(
+        '19 years up to 150 years, female',
+        '5-31',
+        'U/L',
+        5,
+        31,
+        'UK-SYNNOVIS-CHEM',
+        {
+          sex: 'female',
+          ageMinYears: 19,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(['bicarbonate'], 'Bicarbonate', 'ukSynnovisChemistry', [
+    rangeBand(
+      '0 years up to 15 years',
+      '19-28',
+      'mmol/L',
+      19,
+      28,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinYears: 0,
+        ageMaxYears: 15,
+      },
+    ),
+    rangeBand(
+      '16 years up to 150 years',
+      '22-29',
+      'mmol/L',
+      22,
+      29,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinYears: 16,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(
+    ['bilirubin-total'],
+    'Bilirubin total',
+    'ukSynnovisChemistry',
+    [rangeBand('All ages', '<21', 'umol/L', 0, 21, 'UK-SYNNOVIS-CHEM')],
+  ),
+  referenceDefinition(['chloride'], 'Chloride', 'ukSynnovisChemistry', [
+    rangeBand('All ages', '95-108', 'mmol/L', 95, 108, 'UK-SYNNOVIS-CHEM'),
+  ]),
+  referenceDefinition(['creatinine'], 'Creatinine', 'ukSynnovisChemistry', [
+    rangeBand(
+      '0 days up to 15 days',
+      '29-82',
+      'umol/L',
+      29,
+      82,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinDays: 0,
+        ageMaxDays: 15,
+      },
+    ),
+    rangeBand(
+      '15 days up to 1 year',
+      '15-37',
+      'umol/L',
+      15,
+      37,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinDays: 15,
+        ageMaxYears: 1,
+      },
+    ),
+    rangeBand(
+      '1 year up to 12 years',
+      '22-53',
+      'umol/L',
+      22,
+      53,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinYears: 1,
+        ageMaxYears: 12,
+      },
+    ),
+    rangeBand(
+      '13 years up to 18 years, male',
+      '41-105',
+      'umol/L',
+      41,
+      105,
+      'UK-SYNNOVIS-CHEM',
+      {
+        sex: 'male',
+        ageMinYears: 13,
+        ageMaxYears: 18,
+      },
+    ),
+    rangeBand(
+      '13 years up to 18 years, female',
+      '38-74',
+      'umol/L',
+      38,
+      74,
+      'UK-SYNNOVIS-CHEM',
+      {
+        sex: 'female',
+        ageMinYears: 13,
+        ageMaxYears: 18,
+      },
+    ),
+    rangeBand(
+      '19 years up to 150 years, male',
+      '59-104',
+      'umol/L',
+      59,
+      104,
+      'UK-SYNNOVIS-CHEM',
+      {
+        sex: 'male',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+    rangeBand(
+      '19 years up to 150 years, female',
+      '45-84',
+      'umol/L',
+      45,
+      84,
+      'UK-SYNNOVIS-CHEM',
+      {
+        sex: 'female',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['crp'], 'C-reactive protein', 'ukSynnovisChemistry', [
+    rangeBand('All ages', '<5', 'mg/L', 0, 5, 'UK-SYNNOVIS-CHEM'),
+  ]),
+  referenceDefinition(
+    ['ggt'],
+    'Gamma glutamyltransferase',
+    'ukSynnovisChemistry',
+    [
+      rangeBand('All ages, male', '<55', 'U/L', 0, 55, 'UK-SYNNOVIS-CHEM', {
+        sex: 'male',
+      }),
+      rangeBand('All ages, female', '<38', 'U/L', 0, 38, 'UK-SYNNOVIS-CHEM', {
+        sex: 'female',
+      }),
+    ],
+  ),
+  referenceDefinition(['glucose'], 'Glucose fasting', 'ukSynnovisChemistry', [
+    rangeBand('All ages', '4.0-6.0', 'mmol/L', 4, 6, 'UK-SYNNOVIS-CHEM', {
+      specimen: 'fasting serum/plasma',
+    }),
+  ]),
+  referenceDefinition(['magnesium'], 'Magnesium', 'ukSynnovisChemistry', [
+    rangeBand(
+      '0 days up to 4 weeks',
+      '0.60-1.00',
+      'mmol/L',
+      0.6,
+      1,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinDays: 0,
+        ageMaxWeeks: 4,
+      },
+    ),
+    rangeBand(
+      '4 weeks up to 150 years',
+      '0.70-1.00',
+      'mmol/L',
+      0.7,
+      1,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinWeeks: 4,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['phosphate'], 'Phosphate', 'ukSynnovisChemistry', [
+    rangeBand(
+      '0 days up to 4 weeks',
+      '1.30-2.60',
+      'mmol/L',
+      1.3,
+      2.6,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinDays: 0,
+        ageMaxWeeks: 4,
+      },
+    ),
+    rangeBand(
+      '4 weeks up to 1 year',
+      '1.50-2.40',
+      'mmol/L',
+      1.5,
+      2.4,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinWeeks: 4,
+        ageMaxYears: 1,
+      },
+    ),
+    rangeBand(
+      '1 year up to 5 years',
+      '1.30-2.10',
+      'mmol/L',
+      1.3,
+      2.1,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinYears: 1,
+        ageMaxYears: 5,
+      },
+    ),
+    rangeBand(
+      '6 years up to 12 years',
+      '1.00-1.80',
+      'mmol/L',
+      1,
+      1.8,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinYears: 6,
+        ageMaxYears: 12,
+      },
+    ),
+    rangeBand(
+      '13 years up to 18 years',
+      '0.90-1.50',
+      'mmol/L',
+      0.9,
+      1.5,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinYears: 13,
+        ageMaxYears: 18,
+      },
+    ),
+    rangeBand(
+      '19 years up to 150 years',
+      '0.80-1.50',
+      'mmol/L',
+      0.8,
+      1.5,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['potassium'], 'Potassium', 'ukSynnovisChemistry', [
+    rangeBand(
+      '0 days up to 4 weeks',
+      '3.4-6.0',
+      'mmol/L',
+      3.4,
+      6,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinDays: 0,
+        ageMaxWeeks: 4,
+      },
+    ),
+    rangeBand(
+      '4 weeks up to 150 years',
+      '3.5-5.3',
+      'mmol/L',
+      3.5,
+      5.3,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinWeeks: 4,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['sodium'], 'Sodium', 'ukSynnovisChemistry', [
+    rangeBand('All ages', '133-146', 'mmol/L', 133, 146, 'UK-SYNNOVIS-CHEM'),
+  ]),
+  referenceDefinition(['ft3'], 'T3 free', 'ukSynnovisChemistry', [
+    rangeBand('All ages', '2.4-6.0', 'pmol/L', 2.4, 6, 'UK-SYNNOVIS-CHEM'),
+  ]),
+  referenceDefinition(['ft4'], 'T4 free', 'ukSynnovisChemistry', [
+    rangeBand('All ages', '9.0-19.1', 'pmol/L', 9, 19.1, 'UK-SYNNOVIS-CHEM'),
+  ]),
+  referenceDefinition(['urea'], 'Urea', 'ukSynnovisChemistry', [
+    rangeBand(
+      '0 days up to 4 weeks',
+      '0.8-5.5',
+      'mmol/L',
+      0.8,
+      5.5,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinDays: 0,
+        ageMaxWeeks: 4,
+      },
+    ),
+    rangeBand(
+      '4 weeks up to 150 years',
+      '2.5-7.8',
+      'mmol/L',
+      2.5,
+      7.8,
+      'UK-SYNNOVIS-CHEM',
+      {
+        ageMinWeeks: 4,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+];
+
+const ukMftBloodCountsDefinitions = [
+  referenceDefinition(['rbc'], 'Red blood cells', 'ukMftBloodCounts', [
+    rangeBand(
+      '18 years up to 150 years, female',
+      '3.8-5.5',
+      '10^12/L',
+      3.8,
+      5.5,
+      'UK-MFT-BLOOD-COUNTS',
+      {
+        sex: 'female',
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+    rangeBand(
+      '18 years up to 150 years, male',
+      '4.5-6.0',
+      '10^12/L',
+      4.5,
+      6,
+      'UK-MFT-BLOOD-COUNTS',
+      {
+        sex: 'male',
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['hemoglobin'], 'Haemoglobin', 'ukMftBloodCounts', [
+    rangeBand(
+      '18 years up to 150 years, female',
+      '115-165',
+      'g/L',
+      115,
+      165,
+      'UK-MFT-BLOOD-COUNTS',
+      {
+        sex: 'female',
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+    rangeBand(
+      '18 years up to 150 years, male',
+      '130-180',
+      'g/L',
+      130,
+      180,
+      'UK-MFT-BLOOD-COUNTS',
+      {
+        sex: 'male',
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['hematocrit'], 'Haematocrit', 'ukMftBloodCounts', [
+    rangeBand(
+      '18 years up to 150 years, female',
+      '0.37-0.47',
+      'L/L',
+      0.37,
+      0.47,
+      'UK-MFT-BLOOD-COUNTS',
+      {
+        sex: 'female',
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+    rangeBand(
+      '18 years up to 150 years, male',
+      '0.40-0.52',
+      'L/L',
+      0.4,
+      0.52,
+      'UK-MFT-BLOOD-COUNTS',
+      {
+        sex: 'male',
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['mcv'], 'Mean cell volume', 'ukMftBloodCounts', [
+    rangeBand(
+      '18 years up to 150 years',
+      '80-98',
+      'fL',
+      80,
+      98,
+      'UK-MFT-BLOOD-COUNTS',
+      {
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['mch'], 'MCH', 'ukMftBloodCounts', [
+    rangeBand(
+      '18 years up to 150 years',
+      '27.0-33.0',
+      'pg',
+      27,
+      33,
+      'UK-MFT-BLOOD-COUNTS',
+      {
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['mchc'], 'MCHC', 'ukMftBloodCounts', [
+    rangeBand(
+      '18 years up to 150 years',
+      '320-365',
+      'g/L',
+      320,
+      365,
+      'UK-MFT-BLOOD-COUNTS',
+      {
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['wbc'], 'White blood cell count', 'ukMftBloodCounts', [
+    rangeBand(
+      '18 years up to 150 years',
+      '4.0-11.0',
+      '10^9/L',
+      4,
+      11,
+      'UK-MFT-BLOOD-COUNTS',
+      {
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(
+    ['neutrophils-absolute'],
+    'Neutrophils absolute',
+    'ukMftBloodCounts',
+    [
+      rangeBand(
+        '18 years up to 150 years',
+        '1.8-7.5',
+        '10^9/L',
+        1.8,
+        7.5,
+        'UK-MFT-BLOOD-COUNTS',
+        {
+          ageMinYears: 18,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(
+    ['lymphocytes-absolute'],
+    'Lymphocytes absolute',
+    'ukMftBloodCounts',
+    [
+      rangeBand(
+        '18 years up to 150 years',
+        '1.0-4.0',
+        '10^9/L',
+        1,
+        4,
+        'UK-MFT-BLOOD-COUNTS',
+        {
+          ageMinYears: 18,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(
+    ['monocytes-absolute'],
+    'Monocytes absolute',
+    'ukMftBloodCounts',
+    [
+      rangeBand(
+        '18 years up to 150 years',
+        '0.2-1.0',
+        '10^9/L',
+        0.2,
+        1,
+        'UK-MFT-BLOOD-COUNTS',
+        {
+          ageMinYears: 18,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(
+    ['eosinophils-absolute'],
+    'Eosinophils absolute',
+    'ukMftBloodCounts',
+    [
+      rangeBand(
+        '18 years up to 150 years',
+        '0.0-0.4',
+        '10^9/L',
+        0,
+        0.4,
+        'UK-MFT-BLOOD-COUNTS',
+        {
+          ageMinYears: 18,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(
+    ['basophils-absolute'],
+    'Basophils absolute',
+    'ukMftBloodCounts',
+    [
+      rangeBand(
+        '18 years up to 150 years',
+        '0.0-0.1',
+        '10^9/L',
+        0,
+        0.1,
+        'UK-MFT-BLOOD-COUNTS',
+        {
+          ageMinYears: 18,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(['platelets'], 'Platelets', 'ukMftBloodCounts', [
+    rangeBand(
+      '18 years up to 150 years',
+      '150-400',
+      '10^9/L',
+      150,
+      400,
+      'UK-MFT-BLOOD-COUNTS',
+      {
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(
+    ['esr'],
+    'Erythrocyte sedimentation rate',
+    'ukMftBloodCounts',
+    [
+      rangeBand(
+        '0 years up to 16 years',
+        '4-10',
+        'mm/hr',
+        4,
+        10,
+        'UK-MFT-BLOOD-COUNTS',
+        {
+          ageMinYears: 0,
+          ageMaxYears: 16,
+        },
+      ),
+      rangeBand(
+        '16 years up to 150 years, female',
+        '0-7',
+        'mm/hr',
+        0,
+        7,
+        'UK-MFT-BLOOD-COUNTS',
+        {
+          sex: 'female',
+          ageMinYears: 16,
+          ageMaxYears: 150,
+        },
+      ),
+      rangeBand(
+        '16 years up to 150 years, male',
+        '0-5',
+        'mm/hr',
+        0,
+        5,
+        'UK-MFT-BLOOD-COUNTS',
+        {
+          sex: 'male',
+          ageMinYears: 16,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+];
+
+const ukUhdHaematologyDefinitions = [
+  referenceDefinition(['rbc'], 'Red blood cells', 'ukUhdHaematology', [
+    rangeBand(
+      '18 years up to 150 years, male',
+      '4.5-5.5',
+      '10^12/L',
+      4.5,
+      5.5,
+      'UK-UHD-HAEMATOLOGY',
+      {
+        sex: 'male',
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+    rangeBand(
+      '18 years up to 150 years, female',
+      '3.8-4.8',
+      '10^12/L',
+      3.8,
+      4.8,
+      'UK-UHD-HAEMATOLOGY',
+      {
+        sex: 'female',
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['hemoglobin'], 'Haemoglobin', 'ukUhdHaematology', [
+    rangeBand(
+      '18 years up to 150 years, male',
+      '130-170',
+      'g/L',
+      130,
+      170,
+      'UK-UHD-HAEMATOLOGY',
+      {
+        sex: 'male',
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+    rangeBand(
+      '18 years up to 150 years, female',
+      '120-150',
+      'g/L',
+      120,
+      150,
+      'UK-UHD-HAEMATOLOGY',
+      {
+        sex: 'female',
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['hematocrit'], 'Haematocrit', 'ukUhdHaematology', [
+    rangeBand(
+      '18 years up to 150 years, male',
+      '0.40-0.50',
+      'L/L',
+      0.4,
+      0.5,
+      'UK-UHD-HAEMATOLOGY',
+      {
+        sex: 'male',
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+    rangeBand(
+      '18 years up to 150 years, female',
+      '0.36-0.46',
+      'L/L',
+      0.36,
+      0.46,
+      'UK-UHD-HAEMATOLOGY',
+      {
+        sex: 'female',
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['mcv'], 'Mean cell volume', 'ukUhdHaematology', [
+    rangeBand(
+      '18 years up to 150 years',
+      '83-101',
+      'fL',
+      83,
+      101,
+      'UK-UHD-HAEMATOLOGY',
+      {
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['mch'], 'MCH', 'ukUhdHaematology', [
+    rangeBand(
+      '18 years up to 150 years',
+      '27-32',
+      'pg',
+      27,
+      32,
+      'UK-UHD-HAEMATOLOGY',
+      {
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['mchc'], 'MCHC', 'ukUhdHaematology', [
+    rangeBand(
+      '18 years up to 150 years',
+      '315-345',
+      'g/L',
+      315,
+      345,
+      'UK-UHD-HAEMATOLOGY',
+      {
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['platelets'], 'Platelets', 'ukUhdHaematology', [
+    rangeBand(
+      '18 years up to 150 years',
+      '150-410',
+      '10^9/L',
+      150,
+      410,
+      'UK-UHD-HAEMATOLOGY',
+      {
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(['wbc'], 'White blood cell count', 'ukUhdHaematology', [
+    rangeBand(
+      '18 years up to 150 years',
+      '4.0-10.0',
+      '10^9/L',
+      4,
+      10,
+      'UK-UHD-HAEMATOLOGY',
+      {
+        ageMinYears: 18,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  referenceDefinition(
+    ['neutrophils-absolute'],
+    'Neutrophils absolute',
+    'ukUhdHaematology',
+    [
+      rangeBand(
+        '18 years up to 150 years',
+        '2.0-7.0',
+        '10^9/L',
+        2,
+        7,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          ageMinYears: 18,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(
+    ['lymphocytes-absolute'],
+    'Lymphocytes absolute',
+    'ukUhdHaematology',
+    [
+      rangeBand(
+        '18 years up to 150 years',
+        '1.0-3.0',
+        '10^9/L',
+        1,
+        3,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          ageMinYears: 18,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(
+    ['monocytes-absolute'],
+    'Monocytes absolute',
+    'ukUhdHaematology',
+    [
+      rangeBand(
+        '18 years up to 150 years',
+        '0.2-1.0',
+        '10^9/L',
+        0.2,
+        1,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          ageMinYears: 18,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(
+    ['eosinophils-absolute'],
+    'Eosinophils absolute',
+    'ukUhdHaematology',
+    [
+      rangeBand(
+        '18 years up to 150 years',
+        '0.02-0.5',
+        '10^9/L',
+        0.02,
+        0.5,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          ageMinYears: 18,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(
+    ['basophils-absolute'],
+    'Basophils absolute',
+    'ukUhdHaematology',
+    [
+      rangeBand(
+        '18 years up to 150 years',
+        '0.02-0.1',
+        '10^9/L',
+        0.02,
+        0.1,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          ageMinYears: 18,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  ),
+  referenceDefinition(
+    ['esr'],
+    'Erythrocyte sedimentation rate',
+    'ukUhdHaematology',
+    [
+      rangeBand(
+        '0 years up to 50 years, male',
+        '1-10',
+        'mm/hr',
+        1,
+        10,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          sex: 'male',
+          ageMinYears: 0,
+          ageMaxYears: 50,
+          method: 'Starrsed EDTA',
+        },
+      ),
+      rangeBand(
+        '0 years up to 50 years, female',
+        '1-12',
+        'mm/hr',
+        1,
+        12,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          sex: 'female',
+          ageMinYears: 0,
+          ageMaxYears: 50,
+          method: 'Starrsed EDTA',
+        },
+      ),
+      rangeBand(
+        '51 years up to 60 years, male',
+        '1-12',
+        'mm/hr',
+        1,
+        12,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          sex: 'male',
+          ageMinYears: 51,
+          ageMaxYears: 60,
+          method: 'Starrsed EDTA',
+        },
+      ),
+      rangeBand(
+        '51 years up to 60 years, female',
+        '1-19',
+        'mm/hr',
+        1,
+        19,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          sex: 'female',
+          ageMinYears: 51,
+          ageMaxYears: 60,
+          method: 'Starrsed EDTA',
+        },
+      ),
+      rangeBand(
+        '61 years up to 70 years, male',
+        '1-14',
+        'mm/hr',
+        1,
+        14,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          sex: 'male',
+          ageMinYears: 61,
+          ageMaxYears: 70,
+          method: 'Starrsed EDTA',
+        },
+      ),
+      rangeBand(
+        '61 years up to 70 years, female',
+        '1-20',
+        'mm/hr',
+        1,
+        20,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          sex: 'female',
+          ageMinYears: 61,
+          ageMaxYears: 70,
+          method: 'Starrsed EDTA',
+        },
+      ),
+      rangeBand(
+        '70 years up to 150 years, male',
+        '1-30',
+        'mm/hr',
+        1,
+        30,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          sex: 'male',
+          ageMinYears: 70,
+          ageMaxYears: 150,
+          method: 'Starrsed EDTA',
+        },
+      ),
+      rangeBand(
+        '70 years up to 150 years, female',
+        '1-35',
+        'mm/hr',
+        1,
+        35,
+        'UK-UHD-HAEMATOLOGY',
+        {
+          sex: 'female',
+          ageMinYears: 70,
+          ageMaxYears: 150,
+          method: 'Starrsed EDTA',
+        },
+      ),
+    ],
+  ),
+];
 
 const ukWorcsFbcDefinitions = [
   {
@@ -1354,12 +3840,588 @@ const ukGlosChemistryDefinitionsBySource = {
   ],
 };
 
+const caSharedHealthHba1cDefinitions = [
+  chemistryDefinition('hba1c-percent', 'Hemoglobin A1c', [
+    rangeBand('All ages', '4.0-6.0', '%', 4, 6, 'CA-SHARED-HEALTH-HBA1C', {
+      specimen: 'whole blood',
+      method: 'NGSP/DCCT standardized assay',
+    }),
+  ]),
+];
+
+const caSharedHealthHdlDefinitions = [
+  {
+    testIds: ['hdl'],
+    name: 'HDL cholesterol',
+    sourceReview: { status: 'candidate', parser: 'caSharedHealthHdl' },
+    bands: [
+      thresholdBand(
+        '0 years up to 20 years',
+        '>=1.00',
+        'mmol/L',
+        1,
+        'gte',
+        'CA-SHARED-HEALTH-HDL',
+        {
+          ageMinYears: 0,
+          ageMaxYears: 20,
+          specimen: 'plasma/serum',
+          note: 'Pediatric desired HDL-C decision limit; source also lists borderline and increased-risk categories.',
+        },
+      ),
+      thresholdBand(
+        '20 years up to 150 years, male',
+        '>=1.00',
+        'mmol/L',
+        1,
+        'gte',
+        'CA-SHARED-HEALTH-HDL',
+        {
+          sex: 'male',
+          ageMinYears: 20,
+          ageMaxYears: 150,
+          specimen: 'plasma/serum',
+          note: 'Adult male metabolic-syndrome risk decision limit.',
+        },
+      ),
+      thresholdBand(
+        '20 years up to 150 years, female',
+        '>=1.30',
+        'mmol/L',
+        1.3,
+        'gte',
+        'CA-SHARED-HEALTH-HDL',
+        {
+          sex: 'female',
+          ageMinYears: 20,
+          ageMaxYears: 150,
+          specimen: 'plasma/serum',
+          note: 'Adult female metabolic-syndrome risk decision limit.',
+        },
+      ),
+    ],
+  },
+];
+
+const caLhscTraceElementDefinitions = [
+  traceElementDefinition(
+    'calcium-whole-blood',
+    'Calcium, whole blood',
+    '1.06-1.29',
+    'mmol/L',
+    1.06,
+    1.29,
+  ),
+  traceElementDefinition(
+    'chromium-whole-blood',
+    'Chromium, whole blood',
+    '0.00-23.1',
+    'nmol/L',
+    0,
+    23.1,
+  ),
+  traceElementDefinition(
+    'cobalt-whole-blood',
+    'Cobalt, whole blood',
+    '0.00-8.5',
+    'nmol/L',
+    0,
+    8.5,
+  ),
+  traceElementDefinition(
+    'copper-whole-blood',
+    'Copper, whole blood',
+    '10.8-16.3 male',
+    'umol/L',
+    10.8,
+    16.3,
+    {
+      sex: 'male',
+    },
+  ),
+  traceElementDefinition(
+    'copper-whole-blood',
+    'Copper, whole blood',
+    '11.8-24.6 female',
+    'umol/L',
+    11.8,
+    24.6,
+    {
+      sex: 'female',
+    },
+  ),
+  traceElementDefinition(
+    'magnesium-whole-blood',
+    'Magnesium, whole blood',
+    '1.04-1.49',
+    'mmol/L',
+    1.04,
+    1.49,
+  ),
+  traceElementDefinition(
+    'manganese-whole-blood',
+    'Manganese, whole blood',
+    '98-355',
+    'nmol/L',
+    98,
+    355,
+  ),
+  traceElementDefinition(
+    'molybdenum-whole-blood',
+    'Molybdenum, whole blood',
+    '0.00-16.7',
+    'nmol/L',
+    0,
+    16.7,
+  ),
+  traceElementDefinition(
+    'selenium-whole-blood',
+    'Selenium, whole blood',
+    '1.48-2.24',
+    'umol/L',
+    1.48,
+    2.24,
+  ),
+  traceElementDefinition(
+    'vanadium-whole-blood',
+    'Vanadium, whole blood',
+    '0.00-4.9',
+    'nmol/L',
+    0,
+    4.9,
+  ),
+  traceElementDefinition(
+    'zinc-whole-blood',
+    'Zinc, whole blood',
+    '63-92',
+    'umol/L',
+    63,
+    92,
+  ),
+  traceElementDefinition(
+    'chromium-plasma',
+    'Chromium, plasma',
+    '0.00-9.6',
+    'nmol/L',
+    0,
+    9.6,
+    {
+      specimen: 'plasma',
+    },
+  ),
+  traceElementDefinition(
+    'cobalt-plasma',
+    'Cobalt, plasma',
+    '0.00-11.0',
+    'nmol/L',
+    0,
+    11,
+    {
+      specimen: 'plasma',
+    },
+  ),
+  traceElementDefinition(
+    'copper-plasma',
+    'Copper, plasma',
+    '11.2-20.6 male',
+    'umol/L',
+    11.2,
+    20.6,
+    {
+      sex: 'male',
+      specimen: 'plasma',
+      ageMinYears: 14,
+      ageMaxYears: 150,
+    },
+  ),
+  traceElementDefinition(
+    'copper-plasma',
+    'Copper, plasma',
+    '13.5-36.5 female',
+    'umol/L',
+    13.5,
+    36.5,
+    {
+      sex: 'female',
+      specimen: 'plasma',
+      ageMinYears: 14,
+      ageMaxYears: 150,
+    },
+  ),
+  traceElementDefinition(
+    'selenium-plasma',
+    'Selenium, plasma',
+    '1.33-2.03',
+    'umol/L',
+    1.33,
+    2.03,
+    {
+      specimen: 'plasma',
+      ageMinYears: 10,
+      ageMaxYears: 150,
+    },
+  ),
+  traceElementDefinition(
+    'zinc-plasma',
+    'Zinc, plasma',
+    '9.4-15.0',
+    'umol/L',
+    9.4,
+    15,
+    {
+      specimen: 'plasma',
+      ageMinYears: 13,
+      ageMaxYears: 150,
+    },
+  ),
+];
+
+const caNorthernHealthChemistryDefinitions = [
+  chemistryDefinition('albumin', 'Albumin', [
+    rangeBand(
+      '19 years up to 150 years',
+      '35-52',
+      'g/L',
+      35,
+      52,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  chemistryDefinition('alkaline-phosphatase', 'Alkaline phosphatase', [
+    rangeBand(
+      '19 years up to 150 years, male',
+      '40-129',
+      'U/L',
+      40,
+      129,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        sex: 'male',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+    rangeBand(
+      '19 years up to 150 years, female',
+      '35-104',
+      'U/L',
+      35,
+      104,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        sex: 'female',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  chemistryDefinition('alt', 'ALT', [
+    thresholdBand(
+      '19 years up to 150 years, male',
+      '<41',
+      'U/L',
+      41,
+      'lt',
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        sex: 'male',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+    thresholdBand(
+      '19 years up to 150 years, female',
+      '<33',
+      'U/L',
+      33,
+      'lt',
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        sex: 'female',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  chemistryDefinition('amylase', 'Amylase', [
+    rangeBand(
+      '19 years up to 150 years',
+      '28-100',
+      'U/L',
+      28,
+      100,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  chemistryDefinition('ast', 'AST', [
+    thresholdBand(
+      '19 years up to 150 years, male',
+      '<51',
+      'U/L',
+      51,
+      'lt',
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        sex: 'male',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+    thresholdBand(
+      '19 years up to 150 years, female',
+      '<36',
+      'U/L',
+      36,
+      'lt',
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        sex: 'female',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  chemistryDefinition('bilirubin-direct', 'Bilirubin direct', [
+    thresholdBand(
+      '19 years up to 150 years',
+      '<6',
+      'umol/L',
+      6,
+      'lt',
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+];
+
+const caNorthernHealthHematologyDefinitions = [
+  hematologyDefinition('wbc', 'White blood cell count', [
+    rangeBand(
+      '19 years up to 150 years',
+      '4.0-11.0',
+      '10^9/L',
+      4,
+      11,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  hematologyDefinition('rbc', 'Red blood cells', [
+    rangeBand(
+      '19 years up to 150 years, female',
+      '4.3-5.5',
+      '10^12/L',
+      4.3,
+      5.5,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        sex: 'female',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+    rangeBand(
+      '19 years up to 150 years, male',
+      '4.0-4.9',
+      '10^12/L',
+      4,
+      4.9,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        sex: 'male',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  hematologyDefinition('hemoglobin', 'Hemoglobin', [
+    rangeBand(
+      '19 years up to 150 years, female',
+      '115-150',
+      'g/L',
+      115,
+      150,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        sex: 'female',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+    rangeBand(
+      '19 years up to 150 years, male',
+      '135-170',
+      'g/L',
+      135,
+      170,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        sex: 'male',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  hematologyDefinition('hematocrit', 'Hematocrit', [
+    rangeBand(
+      '19 years up to 150 years, female',
+      '0.36-0.46',
+      'L/L',
+      0.36,
+      0.46,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        sex: 'female',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+    rangeBand(
+      '19 years up to 150 years, male',
+      '0.41-0.52',
+      'L/L',
+      0.41,
+      0.52,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        sex: 'male',
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  hematologyDefinition('mcv', 'Mean cell volume', [
+    rangeBand(
+      '19 years up to 150 years',
+      '80-100',
+      'fL',
+      80,
+      100,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  hematologyDefinition('mch', 'MCH', [
+    rangeBand(
+      '19 years up to 150 years',
+      '26-35',
+      'pg',
+      26,
+      35,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  hematologyDefinition('mchc', 'MCHC', [
+    rangeBand(
+      '19 years up to 150 years',
+      '320-360',
+      'g/L',
+      320,
+      360,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+  hematologyDefinition('platelets', 'Platelets', [
+    rangeBand(
+      '19 years up to 150 years',
+      '160-380',
+      '10^9/L',
+      160,
+      380,
+      'CA-NORTHERN-HEALTH-DIRECTORY',
+      {
+        ageMinYears: 19,
+        ageMaxYears: 150,
+      },
+    ),
+  ]),
+];
+
 function chemistryDefinition(testId, name, bands) {
+  const firstCitationId = bands[0]?.citationId || '';
+  const parser = firstCitationId.startsWith('CA-NORTHERN-HEALTH')
+    ? 'caNorthernHealthDirectory'
+    : firstCitationId.startsWith('CA-SHARED-HEALTH')
+      ? 'caSharedHealthHba1c'
+      : 'ukGlosChemistry';
   return {
     testIds: [testId],
     name,
-    sourceReview: { status: 'candidate', parser: 'ukGlosChemistry' },
+    sourceReview: { status: 'candidate', parser },
     bands,
+  };
+}
+
+function hematologyDefinition(testId, name, bands) {
+  return {
+    testIds: [testId],
+    name,
+    sourceReview: { status: 'candidate', parser: 'caNorthernHealthHematology' },
+    bands,
+  };
+}
+
+function referenceDefinition(testIds, name, parser, bands) {
+  return {
+    testIds,
+    name,
+    sourceReview: { status: 'candidate', parser },
+    bands,
+  };
+}
+
+function traceElementDefinition(
+  testId,
+  name,
+  display,
+  unit,
+  low,
+  high,
+  extra = {},
+) {
+  return {
+    testIds: [testId],
+    name,
+    sourceReview: { status: 'candidate', parser: 'caLhscReferenceRanges' },
+    bands: [
+      rangeBand(
+        'All ages unless source row states otherwise',
+        display,
+        unit,
+        low,
+        high,
+        'CA-LHSC-TRACE-ELEMENTS',
+        {
+          specimen: 'whole blood',
+          ...extra,
+        },
+      ),
+    ],
   };
 }
 
@@ -1371,6 +4433,26 @@ function rangeBand(label, display, unit, low, high, citationId, extra = {}) {
     unit,
     low,
     high,
+    citationId,
+    ...extra,
+  };
+}
+
+function thresholdBand(
+  label,
+  display,
+  unit,
+  value,
+  kind,
+  citationId,
+  extra = {},
+) {
+  return {
+    label,
+    kind,
+    display,
+    unit,
+    ...(kind === 'gte' ? { low: value } : { high: value }),
     citationId,
     ...extra,
   };

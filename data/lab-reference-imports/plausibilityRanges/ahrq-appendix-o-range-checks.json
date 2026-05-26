@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T19:37:28.494Z",
+  "generatedAt": "2026-05-26T19:43:49.752Z",
   "kind": "plausibilityRanges",
   "source": {
     "id": "ahrq-appendix-o-lab-ranges",
@@ -65,7 +65,7 @@
     },
     {
       "testName": "Bilirubin",
-      "unit": "total",
+      "unit": "mg/dl",
       "absoluteHigh": 80,
       "relativeHigh": 40,
       "rawLabel": "Bilirubin (total) [mg/dl]",

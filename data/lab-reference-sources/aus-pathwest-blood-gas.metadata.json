@@ -1,0 +1,14 @@
+{
+  "id": "aus-pathwest-blood-gas",
+  "kind": "clinical-reference",
+  "parser": "ausPathwestBloodGas",
+  "country": "australian",
+  "category": "chemistry",
+  "licenseRisk": "curated-citation",
+  "fileType": "pdf",
+  "url": "https://pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/Blood-Gas-Reference-Intervals.pdf",
+  "fetchedAt": "2026-05-26T19:43:59.253Z",
+  "bytes": 350032,
+  "sha256": "ca37d802201b892eabccc0c91355d5dffc91342fc09537265414888a0ef92bdc",
+  "contentType": "application/pdf"
+}

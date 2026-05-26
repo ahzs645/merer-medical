@@ -1,0 +1,15 @@
+{
+  "id": "ca-northern-health-test-directory",
+  "kind": "clinical-reference",
+  "parser": "caNorthernHealthDirectory",
+  "country": "canadian",
+  "category": "chemistry",
+  "licenseRisk": "copyrighted-review-only",
+  "fileType": "pdf",
+  "title": "Northern Health Laboratory Services Test Directory",
+  "url": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+  "fetchedAt": "2026-05-26T19:44:10.642Z",
+  "bytes": 3656741,
+  "sha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce",
+  "contentType": "application/pdf"
+}

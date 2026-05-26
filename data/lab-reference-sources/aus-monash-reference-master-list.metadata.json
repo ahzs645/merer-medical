@@ -1,0 +1,14 @@
+{
+  "id": "aus-monash-reference-master-list",
+  "kind": "clinical-reference",
+  "parser": "ausMonashReferenceMasterList",
+  "country": "australian",
+  "category": "chemistry",
+  "licenseRisk": "curated-citation",
+  "fileType": "pdf",
+  "url": "https://monashpathology.org/wp-content/uploads/2024/08/WIN-QS-19.pdf",
+  "fetchedAt": "2026-05-26T19:43:55.970Z",
+  "bytes": 4994835,
+  "sha256": "036cd6e01edc5c8f8cd66691d82418c87ee989842623ec5a2d03073874bb2ac6",
+  "contentType": "application/pdf"
+}

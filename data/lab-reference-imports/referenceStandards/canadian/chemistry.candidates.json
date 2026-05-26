@@ -1,0 +1,694 @@
+[
+  {
+    "testIds": [
+      "albumin"
+    ],
+    "name": "Albumin",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthDirectory"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years",
+        "kind": "range",
+        "display": "35-52",
+        "unit": "g/L",
+        "low": 35,
+        "high": 52,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Albumin",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "alkaline-phosphatase"
+    ],
+    "name": "Alkaline phosphatase",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthDirectory"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years, male",
+        "kind": "range",
+        "display": "40-129",
+        "unit": "U/L",
+        "low": 40,
+        "high": 129,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "sex": "male",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Alkaline phosphatase",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      },
+      {
+        "label": "19 years up to 150 years, female",
+        "kind": "range",
+        "display": "35-104",
+        "unit": "U/L",
+        "low": 35,
+        "high": 104,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "sex": "female",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Alkaline phosphatase",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "alt"
+    ],
+    "name": "ALT",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthDirectory"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years, male",
+        "kind": "lt",
+        "display": "<41",
+        "unit": "U/L",
+        "high": 41,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "sex": "male",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "ALT",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      },
+      {
+        "label": "19 years up to 150 years, female",
+        "kind": "lt",
+        "display": "<33",
+        "unit": "U/L",
+        "high": 33,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "sex": "female",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "ALT",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "amylase"
+    ],
+    "name": "Amylase",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthDirectory"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years",
+        "kind": "range",
+        "display": "28-100",
+        "unit": "U/L",
+        "low": 28,
+        "high": 100,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Amylase",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "ast"
+    ],
+    "name": "AST",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthDirectory"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years, male",
+        "kind": "lt",
+        "display": "<51",
+        "unit": "U/L",
+        "high": 51,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "sex": "male",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "AST",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      },
+      {
+        "label": "19 years up to 150 years, female",
+        "kind": "lt",
+        "display": "<36",
+        "unit": "U/L",
+        "high": 36,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "sex": "female",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "AST",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "bilirubin-direct"
+    ],
+    "name": "Bilirubin direct",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caNorthernHealthDirectory"
+    },
+    "bands": [
+      {
+        "label": "19 years up to 150 years",
+        "kind": "lt",
+        "display": "<6",
+        "unit": "umol/L",
+        "high": 6,
+        "citationId": "CA-NORTHERN-HEALTH-DIRECTORY",
+        "ageMinYears": 19,
+        "ageMaxYears": 150,
+        "sourceId": "ca-northern-health-test-directory",
+        "sourceUrl": "https://physicians.northernhealth.ca/sites/physicians/files/physician-resources/laboratory-services/documents/nh-lab-services-test-directory.pdf",
+        "sourceTitle": "Northern Health Laboratory Services Test Directory",
+        "sourceSection": "Bilirubin direct",
+        "sourceSha256": "0dae2d7f03bdb6627bfbdcfc8af6555fd1dfa6b66b394076d6ab3e4b759ec9ce"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "calcium-whole-blood"
+    ],
+    "name": "Calcium, whole blood",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "1.06-1.29",
+        "unit": "mmol/L",
+        "low": 1.06,
+        "high": 1.29,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "whole blood",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Calcium, whole blood",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "chromium-plasma"
+    ],
+    "name": "Chromium, plasma",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "0.00-9.6",
+        "unit": "nmol/L",
+        "low": 0,
+        "high": 9.6,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "plasma",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Chromium, plasma",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "chromium-whole-blood"
+    ],
+    "name": "Chromium, whole blood",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "0.00-23.1",
+        "unit": "nmol/L",
+        "low": 0,
+        "high": 23.1,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "whole blood",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Chromium, whole blood",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "cobalt-plasma"
+    ],
+    "name": "Cobalt, plasma",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "0.00-11.0",
+        "unit": "nmol/L",
+        "low": 0,
+        "high": 11,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "plasma",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Cobalt, plasma",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "cobalt-whole-blood"
+    ],
+    "name": "Cobalt, whole blood",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "0.00-8.5",
+        "unit": "nmol/L",
+        "low": 0,
+        "high": 8.5,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "whole blood",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Cobalt, whole blood",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "copper-plasma"
+    ],
+    "name": "Copper, plasma",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "11.2-20.6 male",
+        "unit": "umol/L",
+        "low": 11.2,
+        "high": 20.6,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "plasma",
+        "sex": "male",
+        "ageMinYears": 14,
+        "ageMaxYears": 150,
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Copper, plasma",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      },
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "13.5-36.5 female",
+        "unit": "umol/L",
+        "low": 13.5,
+        "high": 36.5,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "plasma",
+        "sex": "female",
+        "ageMinYears": 14,
+        "ageMaxYears": 150,
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Copper, plasma",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "copper-whole-blood"
+    ],
+    "name": "Copper, whole blood",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "10.8-16.3 male",
+        "unit": "umol/L",
+        "low": 10.8,
+        "high": 16.3,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "whole blood",
+        "sex": "male",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Copper, whole blood",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      },
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "11.8-24.6 female",
+        "unit": "umol/L",
+        "low": 11.8,
+        "high": 24.6,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "whole blood",
+        "sex": "female",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Copper, whole blood",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "hba1c-percent"
+    ],
+    "name": "Hemoglobin A1c",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caSharedHealthHba1c"
+    },
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "4.0-6.0",
+        "unit": "%",
+        "low": 4,
+        "high": 6,
+        "citationId": "CA-SHARED-HEALTH-HBA1C",
+        "specimen": "whole blood",
+        "method": "NGSP/DCCT standardized assay",
+        "sourceId": "ca-shared-health-manitoba-hba1c",
+        "sourceUrl": "https://apps.sbgh.mb.ca/labmanual/test/view?seedId=122",
+        "sourceTitle": "Lab Information Manual",
+        "sourceSection": "Hemoglobin A1c",
+        "sourceSha256": "b1cf4865fac49903ccb840425767632d3738af6a0c23ebe8969f35bd6bf82b75"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "magnesium-whole-blood"
+    ],
+    "name": "Magnesium, whole blood",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "1.04-1.49",
+        "unit": "mmol/L",
+        "low": 1.04,
+        "high": 1.49,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "whole blood",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Magnesium, whole blood",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "manganese-whole-blood"
+    ],
+    "name": "Manganese, whole blood",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "98-355",
+        "unit": "nmol/L",
+        "low": 98,
+        "high": 355,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "whole blood",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Manganese, whole blood",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "molybdenum-whole-blood"
+    ],
+    "name": "Molybdenum, whole blood",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "0.00-16.7",
+        "unit": "nmol/L",
+        "low": 0,
+        "high": 16.7,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "whole blood",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Molybdenum, whole blood",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "selenium-plasma"
+    ],
+    "name": "Selenium, plasma",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "1.33-2.03",
+        "unit": "umol/L",
+        "low": 1.33,
+        "high": 2.03,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "plasma",
+        "ageMinYears": 10,
+        "ageMaxYears": 150,
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Selenium, plasma",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "selenium-whole-blood"
+    ],
+    "name": "Selenium, whole blood",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "1.48-2.24",
+        "unit": "umol/L",
+        "low": 1.48,
+        "high": 2.24,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "whole blood",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Selenium, whole blood",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "vanadium-whole-blood"
+    ],
+    "name": "Vanadium, whole blood",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "0.00-4.9",
+        "unit": "nmol/L",
+        "low": 0,
+        "high": 4.9,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "whole blood",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Vanadium, whole blood",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "zinc-plasma"
+    ],
+    "name": "Zinc, plasma",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "9.4-15.0",
+        "unit": "umol/L",
+        "low": 9.4,
+        "high": 15,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "plasma",
+        "ageMinYears": 13,
+        "ageMaxYears": 150,
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Zinc, plasma",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "zinc-whole-blood"
+    ],
+    "name": "Zinc, whole blood",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "caLhscReferenceRanges"
+    },
+    "bands": [
+      {
+        "label": "All ages unless source row states otherwise",
+        "kind": "range",
+        "display": "63-92",
+        "unit": "umol/L",
+        "low": 63,
+        "high": 92,
+        "citationId": "CA-LHSC-TRACE-ELEMENTS",
+        "specimen": "whole blood",
+        "sourceId": "ca-lhsc-reference-ranges",
+        "sourceUrl": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+        "sourceTitle": "Reference Ranges | LHSC",
+        "sourceSection": "Zinc, whole blood",
+        "sourceSha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd"
+      }
+    ]
+  }
+]

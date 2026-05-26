@@ -1,0 +1,14 @@
+{
+  "id": "ca-lhsc-reference-ranges",
+  "kind": "clinical-reference",
+  "parser": "caLhscReferenceRanges",
+  "country": "canadian",
+  "category": "chemistry",
+  "licenseRisk": "copyrighted-review-only",
+  "title": "LHSC Reference Ranges",
+  "url": "https://www.lhsc.on.ca/pathology-and-laboratory-medicine/reference-ranges",
+  "fetchedAt": "2026-05-26T19:44:09.985Z",
+  "bytes": 234864,
+  "sha256": "69241eba50982c8dab8a7ef413834692ba9add759e07c68017a21ca29db61dcd",
+  "contentType": "text/html; charset=UTF-8"
+}

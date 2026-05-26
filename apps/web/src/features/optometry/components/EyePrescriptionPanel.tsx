@@ -1,3 +1,7 @@
+import { Link } from 'react-router-dom';
+
+import { Routes as AppRoutes } from '../../../Routes';
+import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { OptometryRecord } from '../types';
 
 export function EyePrescriptionPanel({
@@ -22,9 +26,22 @@ export function EyePrescriptionPanel({
                 <h3 className="text-sm font-semibold text-gray-900">
                   {record.title}
                 </h3>
-                <span className="text-xs font-medium uppercase text-gray-500">
-                  VisionPrescription
-                </span>
+                <div className="flex items-center gap-2">
+                  {isManualRecord(record.document) && (
+                    <Link
+                      to={AppRoutes.EditRecord.replace(
+                        ':recordId',
+                        record.document.id,
+                      )}
+                      className="text-xs font-semibold text-primary-700 hover:text-primary-900"
+                    >
+                      Edit
+                    </Link>
+                  )}
+                  <span className="text-xs font-medium uppercase text-gray-500">
+                    VisionPrescription
+                  </span>
+                </div>
               </div>
               <MetricList metrics={record.metrics} />
             </article>

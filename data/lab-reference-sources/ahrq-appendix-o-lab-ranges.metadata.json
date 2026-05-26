@@ -8,7 +8,7 @@
   "caveat": "Administrative database range checks and LOINC mappings, not patient-specific normal ranges.",
   "contentType": "application/pdf",
   "fetchedUrl": "https://hcup-us.ahrq.gov/datainnovations/clinicaldata/AppendixO_LabDataVariablesandRelevantRanges.pdf",
-  "fetchedAt": "2026-05-26T19:37:26.538Z",
+  "fetchedAt": "2026-05-26T19:43:47.457Z",
   "bytes": 81276,
   "sha256": "32e8726cf77e019ca111bcc4786b77ced0dc84537a712a1104b1d9fb73fe13ff"
 }

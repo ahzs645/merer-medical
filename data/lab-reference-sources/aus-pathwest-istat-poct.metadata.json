@@ -1,0 +1,14 @@
+{
+  "id": "aus-pathwest-istat-poct",
+  "kind": "clinical-reference",
+  "parser": "profileOnly",
+  "country": "australian",
+  "category": "chemistry",
+  "licenseRisk": "curated-citation-source-text-not-extractable",
+  "fileType": "pdf",
+  "url": "https://www.pathwest.health.wa.gov.au/~/media/PathWest/Documents/Our-Services/Clinical-Services/Point-of-Care-Testing/i-STAT-Point-of-Care-Testing-Reference-Intervals.pdf",
+  "fetchedAt": "2026-05-26T19:44:00.677Z",
+  "bytes": 99594,
+  "sha256": "e4c16d79e0630326483c934d277e62a9d55268a6023db56060156aeb70388648",
+  "contentType": "application/pdf"
+}

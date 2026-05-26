@@ -1,0 +1,14 @@
+{
+  "id": "aacb-tate-2014-common-reference-intervals",
+  "kind": "clinical-reference",
+  "parser": "aacbTate2014Chemistry",
+  "country": "australian",
+  "category": "chemistry",
+  "licenseRisk": "open-repository-review-before-runtime",
+  "fileType": "pdf",
+  "url": "https://openresearch-repository.anu.edu.au/bitstreams/d21c9162-1f8f-4605-bea3-9686fd4cc620/download",
+  "fetchedAt": "2026-05-26T19:43:52.167Z",
+  "bytes": 865218,
+  "sha256": "2b728c2121ad85f8f1cecded2130dfe6b5e4863d3bcf3d25a199053debf47389",
+  "contentType": "application/pdf;charset=UTF-8"
+}
