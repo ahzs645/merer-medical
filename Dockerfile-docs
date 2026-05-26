@@ -2,6 +2,7 @@ FROM node:25.3.0 as build-stage
 
 WORKDIR /app
 COPY ./apps/docs/package*.json /app/
+RUN npm install -g npm@11.7.0
 RUN npm install
 COPY ./apps/docs /app/
 COPY ./nginx.conf /nginx.conf

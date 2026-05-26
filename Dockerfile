@@ -2,6 +2,7 @@ FROM node:25.3.0 as build-api-stage
 
 WORKDIR /app
 COPY package*.json /app/
+RUN npm install -g npm@11.7.0
 RUN npm ci 
 COPY . /app/
 # Increase Node memory limit for production build
@@ -19,6 +20,7 @@ FROM node:25.3.0 as build-web-base
 
 WORKDIR /app
 COPY package*.json /app/
+RUN npm install -g npm@11.7.0
 RUN npm ci
 COPY ./ /app/
 COPY ./nginx.conf /nginx.conf
