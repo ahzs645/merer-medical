@@ -60,6 +60,11 @@ jobs:
         shell: bash
         run: |
           cp dist/apps/web/index.html dist/apps/web/404.html
+          # Serve the /demo entry point with a real 200 (GitHub Pages returns
+          # 404.html with a 404 status for unknown paths). Deeper demo routes
+          # still fall back to 404.html and route client-side.
+          mkdir -p dist/apps/web/demo
+          cp dist/apps/web/index.html dist/apps/web/demo/index.html
           mkdir -p dist/apps/web/api/v1
           printf '{}' > dist/apps/web/api/v1/instance-config
           touch dist/apps/web/.nojekyll
