@@ -1,3 +1,4 @@
+import './polyfills';
 import * as ReactDOM from 'react-dom/client';
 import App from './app/App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';

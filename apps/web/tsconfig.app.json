@@ -11,6 +11,8 @@
   "files": [
     "../../node_modules/@nx/react/typings/cssmodule.d.ts",
     "../../node_modules/@nx/react/typings/image.d.ts",
+    "src/environment.d.ts",
+    "src/vendor.d.ts",
     "src/shared/components/EmptyRecordsPlaceholder.tsx",
     "src/shared/components/Modal.tsx",
     "src/shared/components/ModalHeader.tsx",
@@ -107,8 +109,7 @@
     "**/*.jsx",
     "**/*.ts",
     "**/*.tsx",
-    "../../webpack.config.js",
-    "webpack.config.js",
+    "vite.config.ts",
     "postcss.config.js"
   ]
 }

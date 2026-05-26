@@ -1,4 +1,6 @@
 /* eslint-disable no-var */
+/// <reference types="vite/client" />
+
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
