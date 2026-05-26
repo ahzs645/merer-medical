@@ -35,6 +35,7 @@ import { TimelineTab } from '../features/timeline/TimelineTab';
 import VARedirect from '../features/connections/oauth-callbacks/VARedirect';
 import VeradigmRedirect from '../features/connections/oauth-callbacks/VeradigmRedirect';
 import { Routes as AppRoutes } from '../Routes';
+import { getRouterBasename, isDemoMode } from '../shared/utils/demoMode';
 
 export default function App() {
   useConsoleLogEasterEgg();
@@ -44,7 +45,7 @@ export default function App() {
       <LocalConfigProvider>
         <DeveloperLogsProvider>
           <TutorialConfigProvider>
-            {IS_DEMO !== 'enabled' && <TutorialOverlay />}
+            {!isDemoMode() && <TutorialOverlay />}
           </TutorialConfigProvider>
           <NotificationProvider>
             <UpdateAppChecker />
@@ -131,10 +132,5 @@ const routes = [
     ],
   },
 ];
-
-function getRouterBasename() {
-  const basePath = new URL(document.baseURI).pathname.replace(/\/$/, '');
-  return basePath === '' ? undefined : basePath;
-}
 
 const router = createBrowserRouter(routes, { basename: getRouterBasename() });

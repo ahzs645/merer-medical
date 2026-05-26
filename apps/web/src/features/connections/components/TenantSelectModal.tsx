@@ -28,6 +28,7 @@ import {
 import VALogo from '../../../assets/img/va-logo.png';
 import HealowLogo from '../../../assets/img/eclinicalworks-logo.jpeg';
 import { useConfig } from '../../../app/providers/AppConfigProvider';
+import { isDemoMode } from '../../../shared/utils/demoMode';
 
 export type EMRVendor =
   | 'epic'
@@ -447,7 +448,7 @@ export function TenantSelectModal({
                         }
                         onClick={() => {
                           if (!file.enabled) return;
-                          if (IS_DEMO === 'enabled') {
+                          if (isDemoMode()) {
                             notifyDispatch({
                               type: 'set_notification',
                               message:
@@ -527,7 +528,7 @@ export function TenantSelectModal({
                           }`}
                           onClick={() => {
                             if (!file.enabled) return;
-                            if (IS_DEMO === 'enabled') {
+                            if (isDemoMode()) {
                               notifyDispatch({
                                 type: 'set_notification',
                                 message:
@@ -617,7 +618,7 @@ export function TenantSelectModal({
                               }`}
                               onClick={() => {
                                 if (!file.enabled) return;
-                                if (IS_DEMO === 'enabled') {
+                                if (isDemoMode()) {
                                   notifyDispatch({
                                     type: 'set_notification',
                                     message:

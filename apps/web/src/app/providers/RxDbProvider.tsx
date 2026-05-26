@@ -37,6 +37,7 @@ import { useLocalConfig } from './LocalConfigProvider';
 import { SummaryPagePreferencesSchema } from '../../models/summary-page-preferences/SummaryPagePreferences.collection';
 import { SummaryPagePreferencesMigrations } from '../../models/summary-page-preferences/SummaryPagePreferences.migration';
 import { DatabaseCollections } from './DatabaseCollections';
+import { isDemoMode } from '../../shared/utils/demoMode';
 import { VectorStorageDocumentSchema } from '../../models/vector-storage-document/VectorStorageDocument.collection';
 import { VectorStorageDocumentMigrations } from '../../models/vector-storage-document/VectorStorageDocument.migration';
 import { USPSTFRecommendationDocumentSchema } from '../../models/uspstf-recommendation-document/USPSTFRecommendationDocument.collection';
@@ -281,8 +282,9 @@ export function RxDbProvider(props: RxDbProviderProps) {
   };
 
   useEffect(() => {
-    if (IS_DEMO === 'enabled') {
-      // If this is a demo instance, load the demo data
+    if (isDemoMode()) {
+      // Demo instance (build-time IS_DEMO or the /demo route): load the demo
+      // portfolio into an in-memory database so the real records are untouched.
       setInitialized('PROGRESS');
       initDemoRxDb().then((db) => {
         loadDemoData(db)

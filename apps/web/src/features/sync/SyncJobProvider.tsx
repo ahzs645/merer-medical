@@ -36,6 +36,7 @@ import {
 import { useUser } from '../../app/providers/UserProvider';
 import { addNotification } from '../../repositories/NotificationRepository';
 import { Routes as AppRoutes } from '../../Routes';
+import { isDemoMode } from '../../shared/utils/demoMode';
 
 type SyncJobProviderProps = PropsWithChildren<unknown>;
 
@@ -129,7 +130,7 @@ function HandleInitalSync({ children }: PropsWithChildren) {
     conList = useConnectionCards(),
     db = useRxDb(),
     { config, isLoading: isConfigLoading } = useAppConfig(),
-    isDemo = IS_DEMO === 'enabled',
+    isDemo = isDemoMode(),
     currentSyncJobLength = Object.keys(sync).length,
     syncJobEntries = useMemo(() => new Set(Object.keys(sync)), [sync]),
     handleFetchData = useCallback(
