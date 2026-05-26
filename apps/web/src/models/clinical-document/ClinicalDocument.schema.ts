@@ -62,6 +62,14 @@ export const clinicalDocumentSchemaLiteral = {
         },
       },
     },
+    attachment_ids: {
+      type: 'array',
+      items: {
+        type: 'string',
+      },
+      description:
+        'Attachment ids for files linked to this clinical document in local storage',
+    },
     type: {
       type: 'string',
     },

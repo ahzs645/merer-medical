@@ -2,7 +2,6 @@ import { ImagingCategory } from '../types';
 
 const FILTERS: { key: ImagingCategory | 'all'; label: string }[] = [
   { key: 'all', label: 'All' },
-  { key: 'dental', label: 'Dental' },
   { key: 'xray', label: 'X-rays' },
   { key: 'scan', label: 'Scans' },
   { key: 'report', label: 'Reports' },

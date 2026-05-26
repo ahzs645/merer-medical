@@ -20246,6 +20246,505 @@
           },
           "_meta": { "lwt": 1761781117811.02 },
           "_deleted": false
+        },
+        {
+          "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalCondition/demo-caries-30",
+          "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+          "connection_record_id": "dental-demo-connection",
+          "data_record": {
+            "raw": {
+              "resource": {
+                "resourceType": "Condition",
+                "id": "demo-caries-30",
+                "clinicalStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                      "code": "active",
+                      "display": "Active"
+                    }
+                  ]
+                },
+                "category": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/us/dental-data-exchange/CodeSystem/dental-category",
+                        "code": "dental",
+                        "display": "Dental"
+                      }
+                    ],
+                    "text": "Dental condition"
+                  }
+                ],
+                "code": {
+                  "text": "Dental caries on tooth 30 occlusal surface",
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "80967001",
+                      "display": "Dental caries"
+                    }
+                  ]
+                },
+                "bodySite": [{ "text": "Tooth 30 O surface" }],
+                "subject": {
+                  "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+                },
+                "onsetDateTime": "2026-02-12T18:00:00.000Z",
+                "note": [
+                  {
+                    "text": "Small occlusal lesion detected on tooth 30. Monitor sensitivity and restore if progression is noted."
+                  }
+                ]
+              }
+            },
+            "format": "FHIR.R4",
+            "content_type": "application/json",
+            "resource_type": "condition",
+            "version_history": []
+          },
+          "metadata": {
+            "id": "DentalCondition/demo-caries-30",
+            "date": "2026-02-12T18:00:00.000Z",
+            "display_name": "Occlusal caries on tooth 30"
+          },
+          "_meta": { "lwt": 1779823045896 },
+          "_deleted": false
+        },
+        {
+          "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalFinding/demo-perio-14",
+          "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+          "connection_record_id": "dental-demo-connection",
+          "data_record": {
+            "raw": {
+              "resource": {
+                "resourceType": "Observation",
+                "id": "demo-perio-14",
+                "status": "final",
+                "category": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                        "code": "exam",
+                        "display": "Exam"
+                      }
+                    ],
+                    "text": "Dental finding"
+                  }
+                ],
+                "code": {
+                  "text": "Periodontal probing depth tooth 14",
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "252398008",
+                      "display": "Periodontal pocket depth"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+                },
+                "effectiveDateTime": "2026-02-12T18:05:00.000Z",
+                "bodySite": { "text": "Tooth 14 mesial buccal site" },
+                "component": [
+                  {
+                    "code": { "text": "Pocket depth MB" },
+                    "valueQuantity": {
+                      "value": 5,
+                      "unit": "mm",
+                      "system": "http://unitsofmeasure.org",
+                      "code": "mm"
+                    }
+                  },
+                  {
+                    "code": { "text": "Bleeding on probing" },
+                    "valueBoolean": true
+                  },
+                  { "code": { "text": "Mobility" }, "valueString": "Class I" }
+                ],
+                "note": [
+                  {
+                    "text": "Localized 5 mm pocketing with bleeding on probing around tooth 14."
+                  }
+                ]
+              }
+            },
+            "format": "FHIR.R4",
+            "content_type": "application/json",
+            "resource_type": "observation",
+            "version_history": []
+          },
+          "metadata": {
+            "id": "DentalFinding/demo-perio-14",
+            "date": "2026-02-12T18:05:00.000Z",
+            "display_name": "Periodontal pocketing tooth 14"
+          },
+          "_meta": { "lwt": 1779823045896 },
+          "_deleted": false
+        },
+        {
+          "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalProcedure/demo-crown-14",
+          "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+          "connection_record_id": "dental-demo-connection",
+          "data_record": {
+            "raw": {
+              "resource": {
+                "resourceType": "Procedure",
+                "id": "demo-crown-14",
+                "status": "completed",
+                "code": {
+                  "text": "Crown preparation tooth 14",
+                  "coding": [
+                    {
+                      "system": "http://www.ada.org/cdt",
+                      "code": "D2740",
+                      "display": "Crown - porcelain/ceramic"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+                },
+                "performedDateTime": "2026-01-20T17:30:00.000Z",
+                "bodySite": [{ "text": "Tooth 14 MOD surfaces" }],
+                "note": [
+                  {
+                    "text": "Crown preparation and provisional crown placed on tooth 14. Final crown delivery planned."
+                  }
+                ]
+              }
+            },
+            "format": "FHIR.R4",
+            "content_type": "application/json",
+            "resource_type": "procedure",
+            "version_history": []
+          },
+          "metadata": {
+            "id": "DentalProcedure/demo-crown-14",
+            "date": "2026-01-20T17:30:00.000Z",
+            "display_name": "Crown preparation tooth 14"
+          },
+          "_meta": { "lwt": 1779823045896 },
+          "_deleted": false
+        },
+        {
+          "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalServiceRequest/demo-implant-19",
+          "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+          "connection_record_id": "dental-demo-connection",
+          "data_record": {
+            "raw": {
+              "resource": {
+                "resourceType": "ServiceRequest",
+                "id": "demo-implant-19",
+                "status": "active",
+                "intent": "plan",
+                "code": {
+                  "text": "Implant consultation for tooth 19",
+                  "coding": [
+                    {
+                      "system": "http://www.ada.org/cdt",
+                      "code": "D6010",
+                      "display": "Surgical placement of implant body"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+                },
+                "authoredOn": "2026-02-13T16:00:00.000Z",
+                "bodySite": [{ "text": "Tooth 19 edentulous site" }],
+                "reasonCode": [
+                  {
+                    "text": "Treatment plan phase 2: evaluate implant at tooth 19 site."
+                  }
+                ],
+                "note": [
+                  {
+                    "text": "Discuss implant versus bridge. Needs CBCT review and oral surgery referral."
+                  }
+                ]
+              }
+            },
+            "format": "FHIR.R4",
+            "content_type": "application/json",
+            "resource_type": "servicerequest",
+            "version_history": []
+          },
+          "metadata": {
+            "id": "DentalServiceRequest/demo-implant-19",
+            "date": "2026-02-13T16:00:00.000Z",
+            "display_name": "Implant consultation for tooth 19"
+          },
+          "_meta": { "lwt": 1779823045896 },
+          "_deleted": false
+        },
+        {
+          "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalNote/demo-treatment-plan",
+          "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+          "connection_record_id": "dental-demo-connection",
+          "data_record": {
+            "raw": {
+              "resource": {
+                "resourceType": "DocumentReference",
+                "id": "demo-treatment-plan",
+                "status": "current",
+                "type": { "text": "Dental treatment plan" },
+                "subject": {
+                  "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+                },
+                "date": "2026-02-13T16:15:00.000Z",
+                "description": "Treatment plan: restore tooth 30 O, deliver crown tooth 14, consult for implant tooth 19, periodontal maintenance in 3 months.",
+                "content": [
+                  {
+                    "attachment": {
+                      "contentType": "application/pdf",
+                      "title": "Dental treatment plan estimate.pdf",
+                      "url": "demo://dental/treatment-plan-estimate.pdf",
+                      "size": 182340
+                    }
+                  }
+                ]
+              }
+            },
+            "format": "FHIR.R4",
+            "content_type": "application/json",
+            "resource_type": "documentreference",
+            "version_history": []
+          },
+          "metadata": {
+            "id": "DentalNote/demo-treatment-plan",
+            "date": "2026-02-13T16:15:00.000Z",
+            "display_name": "Dental treatment plan summary"
+          },
+          "_meta": { "lwt": 1779823045896 },
+          "_deleted": false
+        },
+        {
+          "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalReferral/demo-endo-30",
+          "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+          "connection_record_id": "dental-demo-connection",
+          "data_record": {
+            "raw": {
+              "resource": {
+                "resourceType": "ServiceRequest",
+                "id": "demo-endo-30",
+                "status": "active",
+                "intent": "order",
+                "code": { "text": "Endodontic consultation tooth 30" },
+                "subject": {
+                  "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+                },
+                "authoredOn": "2026-02-15T17:00:00.000Z",
+                "bodySite": [{ "text": "Tooth 30" }],
+                "reasonCode": [
+                  {
+                    "text": "Intermittent cold sensitivity after caries diagnosis."
+                  }
+                ],
+                "note": [
+                  {
+                    "text": "Refer to endodontist if symptoms persist after restoration."
+                  }
+                ]
+              }
+            },
+            "format": "FHIR.R4",
+            "content_type": "application/json",
+            "resource_type": "servicerequest",
+            "version_history": []
+          },
+          "metadata": {
+            "id": "DentalReferral/demo-endo-30",
+            "date": "2026-02-15T17:00:00.000Z",
+            "display_name": "Endodontic referral tooth 30"
+          },
+          "_meta": { "lwt": 1779823045896 },
+          "_deleted": false
+        },
+        {
+          "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalDiagnosticReport/demo-pano",
+          "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+          "connection_record_id": "dental-demo-connection",
+          "data_record": {
+            "raw": {
+              "resource": {
+                "resourceType": "DiagnosticReport",
+                "id": "demo-pano",
+                "status": "final",
+                "category": [{ "text": "Dental imaging" }],
+                "code": {
+                  "text": "Panoramic dental X-ray",
+                  "coding": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "30745-4",
+                      "display": "XR Panorex mandible"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+                },
+                "effectiveDateTime": "2026-02-12T18:20:00.000Z",
+                "issued": "2026-02-12T18:35:00.000Z",
+                "conclusion": "Panoramic radiograph shows restored tooth 14, missing tooth 19, and occlusal radiolucency consistent with caries on tooth 30.",
+                "imagingStudy": [{ "reference": "ImagingStudy/demo-cbct-2026" }]
+              }
+            },
+            "format": "FHIR.R4",
+            "content_type": "application/json",
+            "resource_type": "diagnosticreport",
+            "version_history": []
+          },
+          "metadata": {
+            "id": "DentalDiagnosticReport/demo-pano",
+            "date": "2026-02-12T18:20:00.000Z",
+            "display_name": "Panoramic dental radiograph report",
+            "loinc_coding": ["30745-4"]
+          },
+          "_meta": { "lwt": 1779823045896 },
+          "_deleted": false
+        },
+        {
+          "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|ImagingStudy/demo-cbct-2026",
+          "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+          "connection_record_id": "dental-demo-connection",
+          "data_record": {
+            "raw": {
+              "resource": {
+                "resourceType": "ImagingStudy",
+                "id": "demo-cbct-2026",
+                "status": "available",
+                "subject": {
+                  "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+                },
+                "started": "2026-02-12T18:25:00.000Z",
+                "description": "Dental CBCT for implant planning and endodontic assessment",
+                "modality": [
+                  {
+                    "system": "http://dicom.nema.org/resources/ontology/DCM",
+                    "code": "CT",
+                    "display": "Computed Tomography"
+                  }
+                ],
+                "series": [
+                  {
+                    "uid": "1.2.826.0.1.3680043.10.543.demo.cbct.1",
+                    "modality": { "code": "CT", "display": "CBCT" },
+                    "description": "CBCT maxillofacial volume",
+                    "bodySite": { "display": "Mandible and maxilla" },
+                    "numberOfInstances": 1
+                  }
+                ]
+              }
+            },
+            "format": "FHIR.R4",
+            "content_type": "application/json",
+            "resource_type": "imagingstudy",
+            "version_history": []
+          },
+          "metadata": {
+            "id": "ImagingStudy/demo-cbct-2026",
+            "date": "2026-02-12T18:25:00.000Z",
+            "display_name": "Dental CBCT mandible/maxilla"
+          },
+          "_meta": { "lwt": 1779823045896 },
+          "_deleted": false
+        },
+        {
+          "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalScan/demo-intraoral-stl",
+          "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+          "connection_record_id": "dental-demo-connection",
+          "data_record": {
+            "raw": {
+              "resource": {
+                "resourceType": "DocumentReference",
+                "id": "demo-intraoral-stl",
+                "status": "current",
+                "type": { "text": "Intraoral dental scan STL" },
+                "subject": {
+                  "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+                },
+                "date": "2026-02-12T18:40:00.000Z",
+                "description": "STL intraoral scan files for upper and lower arches captured for crown and implant planning.",
+                "content": [
+                  {
+                    "attachment": {
+                      "contentType": "model/stl",
+                      "title": "upper-arch-demo.stl",
+                      "url": "demo://dental/scans/upper-arch-demo.stl",
+                      "size": 3821440,
+                      "hash": "demo-upper-stl"
+                    }
+                  },
+                  {
+                    "attachment": {
+                      "contentType": "model/stl",
+                      "title": "lower-arch-demo.stl",
+                      "url": "demo://dental/scans/lower-arch-demo.stl",
+                      "size": 3569100,
+                      "hash": "demo-lower-stl"
+                    }
+                  }
+                ]
+              }
+            },
+            "format": "FHIR.R4",
+            "content_type": "application/json",
+            "resource_type": "documentreference",
+            "version_history": []
+          },
+          "metadata": {
+            "id": "DentalScan/demo-intraoral-stl",
+            "date": "2026-02-12T18:40:00.000Z",
+            "display_name": "Intraoral scan upper/lower arches"
+          },
+          "_meta": { "lwt": 1779823045896 },
+          "_deleted": false
+        },
+        {
+          "id": "dental-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DentalPhoto/demo-intraoral-photo-30",
+          "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+          "connection_record_id": "dental-demo-connection",
+          "data_record": {
+            "raw": {
+              "resource": {
+                "resourceType": "DocumentReference",
+                "id": "demo-intraoral-photo-30",
+                "status": "current",
+                "type": { "text": "Intraoral dental photo" },
+                "subject": {
+                  "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+                },
+                "date": "2026-02-12T18:45:00.000Z",
+                "description": "Intraoral photo documenting tooth 30 occlusal caries.",
+                "content": [
+                  {
+                    "attachment": {
+                      "contentType": "image/jpeg",
+                      "title": "tooth-30-occlusal-photo.jpg",
+                      "url": "demo://dental/photos/tooth-30-occlusal-photo.jpg",
+                      "size": 642112
+                    }
+                  }
+                ]
+              }
+            },
+            "format": "FHIR.R4",
+            "content_type": "application/json",
+            "resource_type": "documentreference",
+            "version_history": []
+          },
+          "metadata": {
+            "id": "DentalPhoto/demo-intraoral-photo-30",
+            "date": "2026-02-12T18:45:00.000Z",
+            "display_name": "Intraoral photo tooth 30"
+          },
+          "_meta": { "lwt": 1779823045896 },
+          "_deleted": false
         }
       ]
     },
@@ -20345,6 +20844,21 @@
           "last_sync_attempt": "2025-10-29T23:38:42.512Z",
           "expires_at": 1675218797,
           "_meta": { "lwt": 1761781122516.02 },
+          "_deleted": false
+        },
+        {
+          "id": "dental-demo-connection",
+          "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+          "source": "manual",
+          "location": "demo://dental-smiles-family-dentistry",
+          "name": "Smiles Family Dentistry",
+          "access_token": "*****",
+          "refresh_token": "*****",
+          "last_refreshed": "2026-03-03T16:30:00.000Z",
+          "last_sync_was_error": false,
+          "last_sync_attempt": "2026-03-03T16:30:00.000Z",
+          "expires_at": 1772555400,
+          "_meta": { "lwt": 1779823045896 },
           "_deleted": false
         }
       ]

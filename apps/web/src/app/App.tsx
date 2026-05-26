@@ -26,6 +26,7 @@ import { TutorialOverlay } from '../features/tutorial/TutorialOverlay';
 import CernerRedirect from '../features/connections/oauth-callbacks/CernerRedirect';
 import ConnectionTab from '../features/connections/ConnectionTab';
 import EpicRedirect from '../features/connections/oauth-callbacks/EpicRedirect';
+import { DentalTab } from '../features/dental/DentalTab';
 import HealowRedirect from '../features/connections/oauth-callbacks/HealowRedirect';
 import { LabDetailTab } from '../features/labs/LabDetailTab';
 import { LabsTab } from '../features/labs/LabsTab';
@@ -103,6 +104,10 @@ const routes = [
             element: <ImagingTab />,
           },
           {
+            path: 'dental',
+            element: <DentalTab />,
+          },
+          {
             path: 'new',
             element: <ManualRecordTab />,
           },
@@ -163,6 +168,10 @@ const routes = [
       {
         path: '/imaging',
         element: <Navigate to={AppRoutes.Imaging} replace />,
+      },
+      {
+        path: '/dental',
+        element: <Navigate to={AppRoutes.Dental} replace />,
       },
       {
         path: '*',

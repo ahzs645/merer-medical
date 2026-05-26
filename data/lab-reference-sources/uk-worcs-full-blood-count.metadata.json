@@ -1,0 +1,13 @@
+{
+  "id": "uk-worcs-full-blood-count",
+  "kind": "clinical-reference",
+  "parser": "ukWorcsFbc",
+  "country": "uk",
+  "category": "hematology",
+  "licenseRisk": "curated-citation",
+  "url": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+  "fetchedAt": "2026-05-26T18:58:36.643Z",
+  "bytes": 169612,
+  "sha256": "52819df6629c21253bac35e34707152dd2ed840ecef817f407af3ae1c5cf3495",
+  "contentType": "text/html; charset=UTF-8"
+}

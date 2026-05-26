@@ -1,0 +1,13 @@
+{
+  "id": "uk-glos-albumin",
+  "kind": "clinical-reference",
+  "parser": "ukGlosChemistry",
+  "country": "uk",
+  "category": "chemistry",
+  "licenseRisk": "curated-citation",
+  "url": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/albumin/",
+  "fetchedAt": "2026-05-26T18:58:40.070Z",
+  "bytes": 160492,
+  "sha256": "46bfb641cb6d3727bd20fb59101ffc6e371e3a295da6901ad61ba3a50ce0b1c6",
+  "contentType": "text/html; charset=utf-8"
+}

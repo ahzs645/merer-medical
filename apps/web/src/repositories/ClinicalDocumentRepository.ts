@@ -105,9 +105,14 @@ export async function deleteClinicalDocument(
   id: string,
 ): Promise<void> {
   if (isDexieReposEnabled()) {
-    const doc = await getDataClient().clinicalDocuments.get(id);
+    const client = getDataClient();
+    const doc = await client.clinicalDocuments.get(id);
     if (!doc || doc.userId !== userId) return;
-    await getDataClient().clinicalDocuments.delete(id);
+    const attachments = await client.attachments.list('clinical_document', id);
+    await Promise.all(
+      attachments.map((attachment) => client.attachments.delete(attachment.id)),
+    );
+    await client.clinicalDocuments.delete(id);
     return;
   }
 

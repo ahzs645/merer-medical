@@ -1,11 +1,20 @@
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { MouseEvent, useState } from 'react';
+import {
+  DocumentArrowDownIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from '@heroicons/react/24/outline';
+import { MouseEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useNotificationDispatch } from '../../app/providers/NotificationProvider';
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
+import {
+  listClinicalDocumentAttachments,
+  openClinicalDocumentAttachment,
+  supportsClinicalDocumentAttachments,
+} from '../../repositories/AttachmentRepository';
 import { Routes as AppRoutes } from '../../Routes';
 import { deleteClinicalDocument } from '../../repositories/ClinicalDocumentRepository';
 import { isManualRecord } from '../../shared/utils/manualRecordUtils';
@@ -16,6 +25,26 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
   const navigate = useNavigate();
   const notifyDispatch = useNotificationDispatch();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [linkedFiles, setLinkedFiles] = useState<
+    Array<{ id: string; filename?: string }>
+  >([]);
+
+  useEffect(() => {
+    if (!supportsClinicalDocumentAttachments()) return;
+
+    let cancelled = false;
+    listClinicalDocumentAttachments(item.id)
+      .then((attachments) => {
+        if (!cancelled) setLinkedFiles(attachments);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [item.id]);
 
   if (!isManualRecord(item)) return null;
 
@@ -48,8 +77,39 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
     }
   }
 
+  async function onOpenAttachment(
+    event: MouseEvent<HTMLButtonElement>,
+    attachmentId: string,
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    try {
+      await openClinicalDocumentAttachment(attachmentId);
+    } catch (error) {
+      console.error(error);
+      notifyDispatch({
+        type: 'set_notification',
+        message: `Unable to open linked file: ${(error as Error).message}`,
+        variant: 'error',
+      });
+    }
+  }
+
   return (
-    <div className="mt-3 flex gap-2">
+    <div className="mt-3 flex flex-wrap gap-2">
+      {linkedFiles.map((file) => (
+        <button
+          key={file.id}
+          type="button"
+          onClick={(event) => onOpenAttachment(event, file.id)}
+          className="inline-flex items-center gap-1 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 shadow-sm hover:bg-primary-50"
+          title={file.filename || 'Open linked file'}
+        >
+          <DocumentArrowDownIcon className="h-4 w-4" />
+          Source file
+        </button>
+      ))}
       <Link
         to={AppRoutes.EditRecord.replace(
           ':recordId',

@@ -2,12 +2,10 @@ import { MagnifyingGlassIcon, PhotoIcon } from '@heroicons/react/24/outline';
 
 export function ImagingHeader({
   totalCount,
-  dentalCount,
   query,
   setQuery,
 }: {
   totalCount: number;
-  dentalCount: number;
   query: string;
   setQuery: (query: string) => void;
 }) {
@@ -20,7 +18,7 @@ export function ImagingHeader({
             <h1 className="text-2xl font-semibold">Imaging & Scans</h1>
           </div>
           <p className="mt-1 text-sm text-primary-100">
-            {totalCount} imaging records · {dentalCount} dental-focused
+            {totalCount} imaging records
           </p>
         </div>
         <label className="relative block w-full md:max-w-md">

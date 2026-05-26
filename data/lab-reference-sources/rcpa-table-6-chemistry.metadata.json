@@ -1,0 +1,13 @@
+{
+  "id": "rcpa-table-6-chemistry",
+  "kind": "clinical-reference",
+  "parser": "rcpaChemistry",
+  "country": "australian",
+  "category": "chemistry",
+  "licenseRisk": "permission-gated",
+  "url": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+  "fetchedAt": "2026-05-26T18:58:35.990Z",
+  "bytes": 181064,
+  "sha256": "65f92f395fe3bb1dadff11e8edd2ffa10d61b285b1c5a68d75ca2a002f6a739c",
+  "contentType": "text/html; charset=utf-8"
+}

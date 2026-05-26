@@ -232,6 +232,7 @@ export function clinicalDocumentToDomain<T>(
     resourceType: input.data_record.resource_type,
     raw: input.data_record.raw,
     versionHistory: input.data_record.version_history,
+    attachmentIds: input.attachment_ids,
     metadata: {
       sourceId: input.metadata?.id,
       date: input.metadata?.date,
@@ -259,6 +260,7 @@ export function clinicalDocumentToLegacy<T>(
       resource_type: input.resourceType,
       version_history: input.versionHistory ?? [],
     },
+    attachment_ids: input.attachmentIds,
     metadata: {
       id: input.metadata?.sourceId,
       date: input.metadata?.date,

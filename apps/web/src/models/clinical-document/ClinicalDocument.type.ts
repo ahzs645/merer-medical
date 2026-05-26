@@ -55,6 +55,7 @@ export interface ClinicalDocument<T = unknown> {
     resource_type: ClinicalDocumentResourceType;
     version_history: T[];
   };
+  attachment_ids?: string[];
   metadata?: {
     id?: string;
     date?: TDateISO | string;

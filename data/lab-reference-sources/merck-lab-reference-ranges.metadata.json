@@ -1,0 +1,11 @@
+{
+  "id": "merck-lab-reference-ranges",
+  "kind": "citation-only",
+  "parser": "profileOnly",
+  "licenseRisk": "do-not-import",
+  "url": "https://www.merckmanuals.com/professional/resources/normal-laboratory-values/laboratory-reference-ranges",
+  "fetchedAt": "2026-05-26T18:58:43.353Z",
+  "bytes": 447318,
+  "sha256": "2d66fbf75ff52770b306c8a5c0e19951e7ddcee85d57f93113069d8130edb044",
+  "contentType": "text/html; charset=utf-8"
+}

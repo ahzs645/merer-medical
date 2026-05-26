@@ -24,6 +24,12 @@ import {
   upsertClinicalDocuments,
 } from '../../repositories/ClinicalDocumentRepository';
 import {
+  LinkedAttachmentFile,
+  prepareLinkedAttachmentFile,
+  saveClinicalDocumentAttachment,
+  supportsClinicalDocumentAttachments,
+} from '../../repositories/AttachmentRepository';
+import {
   getManualMedicationParts,
   getManualObservationInterpretation,
   getManualObservationRange,
@@ -155,6 +161,9 @@ export function ManualRecordTab() {
   const [fileName, setFileName] = useState('');
   const [fileContentType, setFileContentType] = useState('');
   const [fileData, setFileData] = useState<string | undefined>(undefined);
+  const [linkedFile, setLinkedFile] = useState<LinkedAttachmentFile | null>(
+    null,
+  );
   const [loadedDocument, setLoadedDocument] = useState<ClinicalDocument | null>(
     null,
   );
@@ -170,6 +179,7 @@ export function ManualRecordTab() {
   const isObservationType = recordType === 'lab' || recordType === 'vital';
   const isDocumentType = recordType === 'document';
   const isMedicationType = recordType === 'medicationstatement';
+  const canLinkSourceFile = supportsClinicalDocumentAttachments();
   const completedLabRows = labRows.filter((row) => row.title.trim());
   const titleMissing =
     recordType === 'lab' || isDeviceImportType ? false : !title.trim();
@@ -196,6 +206,7 @@ export function ManualRecordTab() {
     setFileName('');
     setFileContentType('');
     setFileData(undefined);
+    setLinkedFile(null);
     setSubmitAttempted(false);
   }
 
@@ -364,10 +375,16 @@ export function ManualRecordTab() {
               }),
             ];
 
-      if (loadedDocument) {
-        await upsertClinicalDocuments(db, docs);
-      } else {
-        await Promise.all(docs.map((doc) => insertClinicalDocument(db, doc)));
+      const savedDocs = loadedDocument
+        ? await upsertClinicalDocuments(db, docs)
+        : await Promise.all(docs.map((doc) => insertClinicalDocument(db, doc)));
+
+      if (linkedFile) {
+        await Promise.all(
+          savedDocs.map((doc) =>
+            saveClinicalDocumentAttachment(doc, linkedFile),
+          ),
+        );
       }
 
       // Batch mode: stay on the form and clear the inputs so the next
@@ -816,40 +833,89 @@ export function ManualRecordTab() {
             )}
 
             {!isDeviceImportType && (
-            <div>
-              <label
-                htmlFor="manual-record-date"
-                className="block text-sm font-semibold text-gray-900"
-              >
-                Date
-              </label>
-              <input
-                id="manual-record-date"
-                type="date"
-                value={date}
-                onChange={(event) => setDate(event.target.value)}
-                required
-                className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-              />
-            </div>
+              <div>
+                <label
+                  htmlFor="manual-record-source-file"
+                  className="block text-sm font-semibold text-gray-900"
+                >
+                  Link original document
+                </label>
+                <p className="mt-1 text-sm text-gray-600">
+                  Attach a scan, photo, PDF, or lab report to this record in the
+                  local database.
+                </p>
+                <input
+                  id="manual-record-source-file"
+                  type="file"
+                  disabled={!canLinkSourceFile}
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) {
+                      setLinkedFile(null);
+                      return;
+                    }
+                    prepareLinkedAttachmentFile(file)
+                      .then(setLinkedFile)
+                      .catch((error) => {
+                        console.error(error);
+                        notifyDispatch({
+                          type: 'set_notification',
+                          message: `Unable to read linked file: ${(error as Error).message}`,
+                          variant: 'error',
+                        });
+                      });
+                  }}
+                  className="mt-2 block w-full text-sm text-gray-900 file:mr-4 file:rounded-md file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-700 file:ring-1 file:ring-inset file:ring-primary-200 hover:file:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-60"
+                />
+                {linkedFile && (
+                  <p className="mt-2 text-xs font-medium text-gray-600">
+                    Linked: {linkedFile.filename}
+                  </p>
+                )}
+                {!canLinkSourceFile && (
+                  <p className="mt-2 text-xs font-medium text-gray-500">
+                    File linking is available when the local Dexie database is
+                    enabled.
+                  </p>
+                )}
+              </div>
             )}
 
             {!isDeviceImportType && (
-            <div>
-              <label
-                htmlFor="manual-record-notes"
-                className="block text-sm font-semibold text-gray-900"
-              >
-                Notes
-              </label>
-              <textarea
-                id="manual-record-notes"
-                value={notes}
-                onChange={(event) => setNotes(event.target.value)}
-                rows={5}
-                className="mt-2 block w-full resize-y rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-              />
-            </div>
+              <div>
+                <label
+                  htmlFor="manual-record-date"
+                  className="block text-sm font-semibold text-gray-900"
+                >
+                  Date
+                </label>
+                <input
+                  id="manual-record-date"
+                  type="date"
+                  value={date}
+                  onChange={(event) => setDate(event.target.value)}
+                  required
+                  className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                />
+              </div>
+            )}
+
+            {!isDeviceImportType && (
+              <div>
+                <label
+                  htmlFor="manual-record-notes"
+                  className="block text-sm font-semibold text-gray-900"
+                >
+                  Notes
+                </label>
+                <textarea
+                  id="manual-record-notes"
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
+                  rows={5}
+                  className="mt-2 block w-full resize-y rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                />
+              </div>
             )}
 
             {!isEditing && !isDeviceImportType && (
@@ -865,34 +931,34 @@ export function ManualRecordTab() {
             )}
 
             {!isDeviceImportType && (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-xs font-medium text-gray-500">
-                {savedCount > 0 &&
-                  `${savedCount} record${savedCount === 1 ? '' : 's'} added this session`}
-              </span>
-              <div className="flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => navigate(AppRoutes.Timeline)}
-                  className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
-                >
-                  {savedCount > 0 && !isEditing ? 'Done' : 'Cancel'}
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSaving}
-                  className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-                >
-                  {isSaving
-                    ? 'Saving'
-                    : isEditing
-                      ? 'Update record'
-                      : keepAdding
-                        ? 'Save & add another'
-                        : 'Save record'}
-                </button>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs font-medium text-gray-500">
+                  {savedCount > 0 &&
+                    `${savedCount} record${savedCount === 1 ? '' : 's'} added this session`}
+                </span>
+                <div className="flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => navigate(AppRoutes.Timeline)}
+                    className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
+                  >
+                    {savedCount > 0 && !isEditing ? 'Done' : 'Cancel'}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                  >
+                    {isSaving
+                      ? 'Saving'
+                      : isEditing
+                        ? 'Update record'
+                        : keepAdding
+                          ? 'Save & add another'
+                          : 'Save record'}
+                  </button>
+                </div>
               </div>
-            </div>
             )}
           </form>
         </div>

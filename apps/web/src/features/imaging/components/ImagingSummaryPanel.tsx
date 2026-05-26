@@ -1,17 +1,14 @@
 export function ImagingSummaryPanel({
   total,
-  dental,
   scans,
   xray,
 }: {
   total: number;
-  dental: number;
   scans: number;
   xray: number;
 }) {
   const stats = [
     { label: 'All imaging', value: total },
-    { label: 'Dental', value: dental },
     { label: 'DICOM scans', value: scans },
     { label: 'X-rays', value: xray },
   ];

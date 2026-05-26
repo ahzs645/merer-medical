@@ -13,6 +13,7 @@
     "test": "nx test",
     "dev": "nx serve-all",
     "preview:web:local": "node scripts/serve-web-local.mjs",
+    "labs:references": "node tools/lab-reference-pipeline.mjs --all",
     "prepare": "[ -d .git ] && husky && git config blame.ignoreRevsFile .git-blame-ignore-revs || true"
   },
   "engines": {
@@ -79,6 +80,7 @@
     "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@types/react-window": "^1.8.5",
     "@types/supertest": "^6.0.3",
+    "@types/three": "^0.184.1",
     "@types/uuid": "^8.3.4",
     "@types/uuid4": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "7.18.0",
@@ -163,6 +165,7 @@
     "react-hook-form": "^7.71.1",
     "react-image-crop": "^10.1.8",
     "react-markdown": "^9.0.1",
+    "react-odontogram": "^0.5.6",
     "react-router": "^6.21.2",
     "react-router-dom": "6.11.2",
     "recharts": "^3.8.1",
@@ -172,6 +175,7 @@
     "rxdb": "^13.17.1",
     "rxjs": "^7.5.6",
     "sylviejs": "^0.0.14",
+    "three": "^0.184.0",
     "tslib": "^2.3.0",
     "url": "^0.11.0",
     "url-join": "^5.0.0",

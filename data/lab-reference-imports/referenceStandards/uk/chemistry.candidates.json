@@ -1,0 +1,191 @@
+[
+  {
+    "testIds": [
+      "albumin"
+    ],
+    "name": "Albumin",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukGlosChemistry"
+    },
+    "bands": [
+      {
+        "label": "0 years up to 1 year",
+        "kind": "range",
+        "display": "30-45",
+        "unit": "g/L",
+        "low": 30,
+        "high": 45,
+        "citationId": "UK-GLOS-ALBUMIN",
+        "ageMaxYears": 1
+      },
+      {
+        "label": "1 year up to 16 years",
+        "kind": "range",
+        "display": "30-50",
+        "unit": "g/L",
+        "low": 30,
+        "high": 50,
+        "citationId": "UK-GLOS-ALBUMIN",
+        "ageMinYears": 1,
+        "ageMaxYears": 16
+      },
+      {
+        "label": "16 years up to 150 years",
+        "kind": "range",
+        "display": "35-50",
+        "unit": "g/L",
+        "low": 35,
+        "high": 50,
+        "citationId": "UK-GLOS-ALBUMIN",
+        "ageMinYears": 16,
+        "ageMaxYears": 150
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "creatinine"
+    ],
+    "name": "Creatinine",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukGlosChemistry"
+    },
+    "bands": [
+      {
+        "label": "0 days up to 14 days",
+        "kind": "range",
+        "display": "27-77",
+        "unit": "umol/L",
+        "low": 27,
+        "high": 77,
+        "citationId": "UK-GLOS-CREATININE-EGFR",
+        "ageMinDays": 0,
+        "ageMaxDays": 14
+      },
+      {
+        "label": "14 days up to 1 year",
+        "kind": "range",
+        "display": "14-34",
+        "unit": "umol/L",
+        "low": 14,
+        "high": 34,
+        "citationId": "UK-GLOS-CREATININE-EGFR",
+        "ageMinDays": 14,
+        "ageMaxYears": 1
+      },
+      {
+        "label": "15 years up to 150 years, male",
+        "kind": "range",
+        "display": "59-104",
+        "unit": "umol/L",
+        "low": 59,
+        "high": 104,
+        "citationId": "UK-GLOS-CREATININE-EGFR",
+        "sex": "male",
+        "ageMinYears": 15,
+        "ageMaxYears": 150
+      },
+      {
+        "label": "15 years up to 150 years, female",
+        "kind": "range",
+        "display": "45-84",
+        "unit": "umol/L",
+        "low": 45,
+        "high": 84,
+        "citationId": "UK-GLOS-CREATININE-EGFR",
+        "sex": "female",
+        "ageMinYears": 15,
+        "ageMaxYears": 150
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "potassium"
+    ],
+    "name": "Potassium",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukGlosChemistry"
+    },
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "3.5-5.3",
+        "unit": "mmol/L",
+        "low": 3.5,
+        "high": 5.3,
+        "citationId": "UK-GLOS-POTASSIUM"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "sodium"
+    ],
+    "name": "Sodium",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukGlosChemistry"
+    },
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "133-146",
+        "unit": "mmol/L",
+        "low": 133,
+        "high": 146,
+        "citationId": "UK-GLOS-SODIUM"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "tsh"
+    ],
+    "name": "TSH",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukGlosChemistry"
+    },
+    "bands": [
+      {
+        "label": "0 days up to 7 days",
+        "kind": "range",
+        "display": "0.7-15.2",
+        "unit": "mIU/L",
+        "low": 0.7,
+        "high": 15.2,
+        "citationId": "UK-GLOS-THYROID",
+        "ageMinDays": 0,
+        "ageMaxDays": 7
+      },
+      {
+        "label": "7 days up to 15 days",
+        "kind": "range",
+        "display": "0.72-11.0",
+        "unit": "mIU/L",
+        "low": 0.72,
+        "high": 11,
+        "citationId": "UK-GLOS-THYROID",
+        "ageMinDays": 7,
+        "ageMaxDays": 15
+      },
+      {
+        "label": "15 days up to 150 years",
+        "kind": "range",
+        "display": "0.27-4.2",
+        "unit": "mIU/L",
+        "low": 0.27,
+        "high": 4.2,
+        "citationId": "UK-GLOS-THYROID",
+        "ageMinDays": 15,
+        "ageMaxYears": 150
+      }
+    ]
+  }
+]
