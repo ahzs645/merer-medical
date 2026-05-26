@@ -14,6 +14,10 @@ const DENTAL_TERMS = [
   'gingiva',
   'implant',
   'intraoral',
+  'aligner',
+  'braces',
+  'cephalometric',
+  'malocclusion',
   'mandible',
   'maxilla',
   'odontogram',
@@ -23,6 +27,12 @@ const DENTAL_TERMS = [
   'periodontal',
   'pulp',
   'root canal',
+  'orthodontic',
+  'orthodontist',
+  'retainer',
+  'overbite',
+  'overjet',
+  'crossbite',
   'scaling',
   'cleaning',
   'prophylaxis',
@@ -48,7 +58,29 @@ const PERIO_TERMS = [
   'suppuration',
 ];
 
-const REFERRAL_TERMS = ['referral', 'consult', 'oral surgery', 'orthodont'];
+const REFERRAL_TERMS = ['referral', 'consult', 'oral surgery'];
+const ORTHODONTIC_TERMS = [
+  'aligner',
+  'angle class',
+  'appliance',
+  'braces',
+  'bracket',
+  'cephalometric',
+  'class i',
+  'class ii',
+  'class iii',
+  'crossbite',
+  'elastics',
+  'expander',
+  'malocclusion',
+  'midline',
+  'orthodontic',
+  'orthodontist',
+  'overbite',
+  'overjet',
+  'retainer',
+  'wire change',
+];
 const CLEANING_TERMS = [
   'cleaning',
   'prophylaxis',
@@ -104,6 +136,8 @@ export function buildDentalCounts(
   return {
     conditions: records.filter((record) => record.kind === 'condition').length,
     cleanings: records.filter((record) => record.kind === 'cleaning').length,
+    orthodontics: records.filter((record) => record.kind === 'orthodontic')
+      .length,
     findings: records.filter((record) => record.kind === 'finding').length,
     procedures: records.filter((record) => record.kind === 'procedure').length,
     treatmentPlan: records.filter((record) => record.kind === 'treatmentPlan')
@@ -131,6 +165,9 @@ function inferDentalKind(
     CLEANING_TERMS.some((term) => normalized.includes(term))
   ) {
     return 'cleaning';
+  }
+  if (ORTHODONTIC_TERMS.some((term) => normalized.includes(term))) {
+    return 'orthodontic';
   }
   if (PERIO_TERMS.some((term) => normalized.includes(term))) return 'perio';
   if (REFERRAL_TERMS.some((term) => normalized.includes(term))) {

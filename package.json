@@ -18,7 +18,8 @@
     "prepare": "[ -d .git ] && husky && git config blame.ignoreRevsFile .git-blame-ignore-revs || true"
   },
   "engines": {
-    "node": ">=20.19.0"
+    "node": ">=25.3.0",
+    "npm": ">=11.7.0"
   },
   "browser": {
     "assert": false

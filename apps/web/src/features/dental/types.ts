@@ -7,6 +7,7 @@ export type DentalRecordKind =
   | 'condition'
   | 'finding'
   | 'cleaning'
+  | 'orthodontic'
   | 'procedure'
   | 'treatmentPlan'
   | 'perio'
@@ -39,6 +40,7 @@ export type DentalWorkspaceData = {
   counts: {
     conditions: number;
     cleanings: number;
+    orthodontics: number;
     findings: number;
     procedures: number;
     treatmentPlan: number;

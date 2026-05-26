@@ -9,6 +9,7 @@ export function DentalSummaryPanel({
     { label: 'Findings', value: counts.findings },
     { label: 'Conditions', value: counts.conditions },
     { label: 'Cleanings', value: counts.cleanings },
+    { label: 'Orthodontics', value: counts.orthodontics },
     { label: 'Procedures', value: counts.procedures },
     { label: 'Treatment plan', value: counts.treatmentPlan },
     { label: 'Perio', value: counts.perio },

@@ -17,9 +17,11 @@ import {
 
 const DENTAL_RESOURCE_TYPES = [
   'condition',
+  'careplan',
   'diagnosticreport',
   'documentreference',
   'documentreference_attachment',
+  'encounter',
   'imagingstudy',
   'media',
   'observation',

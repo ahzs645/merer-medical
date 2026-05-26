@@ -5,6 +5,7 @@ import { DentalImagingPanel } from './components/DentalImagingPanel';
 import { DentalRecordsPanel } from './components/DentalRecordsPanel';
 import { DentalScanPreview } from './components/DentalScanPreview';
 import { DentalSummaryPanel } from './components/DentalSummaryPanel';
+import { OrthodonticPanel } from './components/OrthodonticPanel';
 import { ToothChartPanel } from './components/ToothChartPanel';
 import { useDentalData } from './hooks/useDentalData';
 
@@ -24,6 +25,7 @@ export function DentalTab() {
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           <DentalSummaryPanel counts={counts} />
           <ToothChartPanel recordsByTooth={recordsByTooth} />
+          <OrthodonticPanel records={records} />
           <DentalCleaningHistoryPanel records={records} />
           <DentalScanPreview />
           <div className="grid gap-4 lg:grid-cols-2">

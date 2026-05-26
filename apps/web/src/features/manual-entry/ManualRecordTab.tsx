@@ -72,7 +72,15 @@ type DentalEntryKind =
   | 'condition'
   | 'procedure'
   | 'treatmentPlan'
-  | 'imaging';
+  | 'imaging'
+  | 'orthodonticAssessment'
+  | 'orthodonticTreatmentPlan'
+  | 'orthodonticAppliance'
+  | 'orthodonticAdjustment'
+  | 'alignerCase'
+  | 'cephalometricAnalysis'
+  | 'retention'
+  | 'orthodonticConsent';
 type OptometryEntryKind =
   | 'checkup'
   | 'glassesPrescription'
@@ -148,6 +156,54 @@ const dentalEntryTypes: Array<{
     label: 'Dental image / scan',
     recordType: 'document',
     title: 'Dental image or scan',
+  },
+  {
+    value: 'orthodonticAssessment',
+    label: 'Ortho assessment',
+    recordType: 'condition',
+    title: 'Orthodontic assessment',
+  },
+  {
+    value: 'orthodonticTreatmentPlan',
+    label: 'Ortho treatment plan',
+    recordType: 'careplan',
+    title: 'Orthodontic treatment plan',
+  },
+  {
+    value: 'orthodonticAppliance',
+    label: 'Appliance / hardware',
+    recordType: 'procedure',
+    title: 'Orthodontic appliance',
+  },
+  {
+    value: 'alignerCase',
+    label: 'Aligner case',
+    recordType: 'procedure',
+    title: 'Aligner case',
+  },
+  {
+    value: 'orthodonticAdjustment',
+    label: 'Adjustment visit',
+    recordType: 'encounter',
+    title: 'Orthodontic adjustment visit',
+  },
+  {
+    value: 'cephalometricAnalysis',
+    label: 'Ceph analysis',
+    recordType: 'vital',
+    title: 'Cephalometric analysis',
+  },
+  {
+    value: 'retention',
+    label: 'Retention',
+    recordType: 'procedure',
+    title: 'Orthodontic retention',
+  },
+  {
+    value: 'orthodonticConsent',
+    label: 'Consent / transfer',
+    recordType: 'document',
+    title: 'Orthodontic consent',
   },
 ];
 
@@ -294,6 +350,16 @@ export function ManualRecordTab() {
   const [toothNumber, setToothNumber] = useState('');
   const [dentalSurfaces, setDentalSurfaces] = useState<string[]>([]);
   const [dentalRecall, setDentalRecall] = useState('');
+  const [orthoPhase, setOrthoPhase] = useState('');
+  const [orthoArch, setOrthoArch] = useState('');
+  const [orthoAppliance, setOrthoAppliance] = useState('');
+  const [orthoStatus, setOrthoStatus] = useState('');
+  const [alignerCurrent, setAlignerCurrent] = useState('');
+  const [alignerTotal, setAlignerTotal] = useState('');
+  const [overjet, setOverjet] = useState('');
+  const [overbite, setOverbite] = useState('');
+  const [molarClass, setMolarClass] = useState('');
+  const [nextVisit, setNextVisit] = useState('');
   const [eyeSide, setEyeSide] = useState<EyeSide>('OU');
   const [odSphere, setOdSphere] = useState('');
   const [odCylinder, setOdCylinder] = useState('');
@@ -377,6 +443,16 @@ export function ManualRecordTab() {
     setToothNumber('');
     setDentalSurfaces([]);
     setDentalRecall('');
+    setOrthoPhase('');
+    setOrthoArch('');
+    setOrthoAppliance('');
+    setOrthoStatus('');
+    setAlignerCurrent('');
+    setAlignerTotal('');
+    setOverjet('');
+    setOverbite('');
+    setMolarClass('');
+    setNextVisit('');
     setEyeSide('OU');
     setOdSphere('');
     setOdCylinder('');
@@ -434,6 +510,12 @@ export function ManualRecordTab() {
     );
   }
 
+  const isOrthodonticDentalEntry =
+    dentalEntryKind.startsWith('orthodontic') ||
+    dentalEntryKind === 'alignerCase' ||
+    dentalEntryKind === 'cephalometricAnalysis' ||
+    dentalEntryKind === 'retention';
+
   function applyTemplate(template: ManualTemplate) {
     setRecordType(template.kind);
     setTitle(template.title);
@@ -478,7 +560,15 @@ export function ManualRecordTab() {
   useEffect(() => {
     if (recordId) return;
     if (requestedSpecialty === 'dental') {
-      applyDentalEntryKind('cleaning');
+      const requestedDental = searchParams.get(
+        'dental',
+      ) as DentalEntryKind | null;
+      applyDentalEntryKind(
+        requestedDental &&
+          dentalEntryTypes.some((entry) => entry.value === requestedDental)
+          ? requestedDental
+          : 'cleaning',
+      );
     } else if (requestedSpecialty === 'optometry') {
       applyOptometryEntryKind('checkup');
     }
@@ -515,6 +605,16 @@ export function ManualRecordTab() {
         setToothNumber(manualDetails.toothNumber || '');
         setDentalSurfaces(manualDetails.dentalSurfaces || []);
         setDentalRecall(manualDetails.dentalRecall || '');
+        setOrthoPhase(manualDetails.orthoPhase || '');
+        setOrthoArch(manualDetails.orthoArch || '');
+        setOrthoAppliance(manualDetails.orthoAppliance || '');
+        setOrthoStatus(manualDetails.orthoStatus || '');
+        setAlignerCurrent(manualDetails.alignerCurrent || '');
+        setAlignerTotal(manualDetails.alignerTotal || '');
+        setOverjet(manualDetails.overjet || '');
+        setOverbite(manualDetails.overbite || '');
+        setMolarClass(manualDetails.molarClass || '');
+        setNextVisit(manualDetails.nextVisit || '');
         setEyeSide(manualDetails.eyeSide || 'OU');
         setOdSphere(manualDetails.odSphere || '');
         setOdCylinder(manualDetails.odCylinder || '');
@@ -594,6 +694,16 @@ export function ManualRecordTab() {
         toothNumber,
         dentalSurfaces,
         dentalRecall,
+        orthoPhase,
+        orthoArch,
+        orthoAppliance,
+        orthoStatus,
+        alignerCurrent,
+        alignerTotal,
+        overjet,
+        overbite,
+        molarClass,
+        nextVisit,
         optometryEntryKind,
         eyeSide,
         odSphere,
@@ -933,6 +1043,70 @@ export function ManualRecordTab() {
                         className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
                       />
                     </div>
+                    {isOrthodonticDentalEntry && (
+                      <>
+                        <SpecialtyTextInput
+                          label="Phase"
+                          value={orthoPhase}
+                          placeholder="Phase I, Phase II, retention"
+                          onChange={setOrthoPhase}
+                        />
+                        <SpecialtyTextInput
+                          label="Arch"
+                          value={orthoArch}
+                          placeholder="Upper, lower, both"
+                          onChange={setOrthoArch}
+                        />
+                        <SpecialtyTextInput
+                          label="Appliance"
+                          value={orthoAppliance}
+                          placeholder="Braces, aligners, expander, retainer"
+                          onChange={setOrthoAppliance}
+                        />
+                        <SpecialtyTextInput
+                          label="Status"
+                          value={orthoStatus}
+                          placeholder="Active, planned, complete"
+                          onChange={setOrthoStatus}
+                        />
+                        <SpecialtyTextInput
+                          label="Aligner current"
+                          value={alignerCurrent}
+                          placeholder="e.g. 8"
+                          onChange={setAlignerCurrent}
+                        />
+                        <SpecialtyTextInput
+                          label="Aligner total"
+                          value={alignerTotal}
+                          placeholder="e.g. 24"
+                          onChange={setAlignerTotal}
+                        />
+                        <SpecialtyTextInput
+                          label="Overjet (mm)"
+                          value={overjet}
+                          placeholder="e.g. 4"
+                          onChange={setOverjet}
+                        />
+                        <SpecialtyTextInput
+                          label="Overbite (mm)"
+                          value={overbite}
+                          placeholder="e.g. 3"
+                          onChange={setOverbite}
+                        />
+                        <SpecialtyTextInput
+                          label="Molar / canine class"
+                          value={molarClass}
+                          placeholder="Class II div 1, right Class I"
+                          onChange={setMolarClass}
+                        />
+                        <SpecialtyTextInput
+                          label="Next visit"
+                          value={nextVisit}
+                          placeholder="6 weeks, wire change, tray review"
+                          onChange={setNextVisit}
+                        />
+                      </>
+                    )}
                   </div>
                 )}
 
@@ -1569,12 +1743,24 @@ function PrescriptionInput({
   );
 }
 
+const SpecialtyTextInput = PrescriptionInput;
+
 type ManualSpecialtyDetails = {
   specialty: ManualSpecialty;
   subtype?: DentalEntryKind | OptometryEntryKind;
   toothNumber?: string;
   dentalSurfaces?: string[];
   dentalRecall?: string;
+  orthoPhase?: string;
+  orthoArch?: string;
+  orthoAppliance?: string;
+  orthoStatus?: string;
+  alignerCurrent?: string;
+  alignerTotal?: string;
+  overjet?: string;
+  overbite?: string;
+  molarClass?: string;
+  nextVisit?: string;
   eyeSide?: EyeSide;
   odSphere?: string;
   odCylinder?: string;
@@ -1611,6 +1797,16 @@ function buildSpecialtyDetails(
       toothNumber: params.toothNumber.trim(),
       dentalSurfaces: params.dentalSurfaces,
       dentalRecall: params.dentalRecall.trim(),
+      orthoPhase: params.orthoPhase.trim(),
+      orthoArch: params.orthoArch.trim(),
+      orthoAppliance: params.orthoAppliance.trim(),
+      orthoStatus: params.orthoStatus.trim(),
+      alignerCurrent: params.alignerCurrent.trim(),
+      alignerTotal: params.alignerTotal.trim(),
+      overjet: params.overjet.trim(),
+      overbite: params.overbite.trim(),
+      molarClass: params.molarClass.trim(),
+      nextVisit: params.nextVisit.trim(),
     };
   }
   return {
@@ -1646,6 +1842,22 @@ function appendSpecialtyNotes(
       lines.push(`Surfaces: ${details.dentalSurfaces.join('/')}`);
     }
     if (details.dentalRecall) lines.push(`Recall: ${details.dentalRecall}`);
+    if (details.orthoPhase) lines.push(`Ortho phase: ${details.orthoPhase}`);
+    if (details.orthoArch) lines.push(`Arch: ${details.orthoArch}`);
+    if (details.orthoAppliance) {
+      lines.push(`Appliance: ${details.orthoAppliance}`);
+    }
+    if (details.orthoStatus) lines.push(`Ortho status: ${details.orthoStatus}`);
+    if (details.alignerCurrent || details.alignerTotal) {
+      lines.push(
+        `Aligner: ${details.alignerCurrent || '-'} of ${details.alignerTotal || '-'}`,
+      );
+    }
+    if (details.overjet) lines.push(`Overjet: ${details.overjet} mm`);
+    if (details.overbite) lines.push(`Overbite: ${details.overbite} mm`);
+    if (details.molarClass)
+      lines.push(`Molar/canine class: ${details.molarClass}`);
+    if (details.nextVisit) lines.push(`Next visit: ${details.nextVisit}`);
   } else {
     if (details.eyeSide) lines.push(`Eye: ${details.eyeSide}`);
     if (details.examMethod) lines.push(`Method: ${details.examMethod}`);
