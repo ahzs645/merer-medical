@@ -1,0 +1,11 @@
+{
+  "id": "loinc-2-82-downloads",
+  "kind": "terminology-metadata",
+  "parser": "profileOnly",
+  "licenseRisk": "login-gated-reduce-before-runtime-use",
+  "url": "https://cdn.loinc.org/downloads/",
+  "fetchedAt": "2026-05-26T19:24:42.181Z",
+  "bytes": 158792,
+  "sha256": "c46582b8dc04d3c093923fca36064cf3311596df7743794c49f922c6c6fdba7f",
+  "contentType": "text/html; charset=UTF-8"
+}

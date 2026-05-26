@@ -51,6 +51,11 @@ export interface LabReferenceBand {
   specimen?: string;
   method?: string;
   assayPlatform?: string;
+  sourceId?: string;
+  sourceUrl?: string;
+  sourceTitle?: string;
+  sourceSection?: string;
+  sourceSha256?: string;
 }
 
 export interface LabReferenceDefinition {

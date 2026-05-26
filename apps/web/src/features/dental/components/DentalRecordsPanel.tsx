@@ -8,31 +8,34 @@ export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
       </h2>
       {records.length > 0 ? (
         <div className="mt-3 grid gap-2">
-          {records.slice(0, 12).map((record) => (
-            <article key={record.id} className="rounded-md bg-gray-50 p-3">
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {record.title}
-                </h3>
-                <span className="text-xs font-medium uppercase text-gray-500">
-                  {record.kind}
-                </span>
-              </div>
-              <p className="mt-1 text-sm text-gray-600">
-                {record.toothNumbers.length > 0
-                  ? `Teeth: ${record.toothNumbers.join(', ')}`
-                  : 'No tooth number detected'}
-                {record.surfaces.length > 0
-                  ? ` · Surfaces: ${record.surfaces.join(', ')}`
-                  : ''}
-              </p>
-              {record.summary && (
-                <p className="mt-2 line-clamp-2 text-sm text-gray-700">
-                  {record.summary}
+          {records
+            .filter((record) => record.kind !== 'cleaning')
+            .slice(0, 12)
+            .map((record) => (
+              <article key={record.id} className="rounded-md bg-gray-50 p-3">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    {record.title}
+                  </h3>
+                  <span className="text-xs font-medium uppercase text-gray-500">
+                    {record.kind}
+                  </span>
+                </div>
+                <p className="mt-1 text-sm text-gray-600">
+                  {record.toothNumbers.length > 0
+                    ? `Teeth: ${record.toothNumbers.join(', ')}`
+                    : 'No tooth number detected'}
+                  {record.surfaces.length > 0
+                    ? ` · Surfaces: ${record.surfaces.join(', ')}`
+                    : ''}
                 </p>
-              )}
-            </article>
-          ))}
+                {record.summary && (
+                  <p className="mt-2 line-clamp-2 text-sm text-gray-700">
+                    {record.summary}
+                  </p>
+                )}
+              </article>
+            ))}
         </div>
       ) : (
         <p className="mt-3 text-sm leading-6 text-gray-600">

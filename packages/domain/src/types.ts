@@ -150,7 +150,8 @@ export type ClinicalResourceType =
   | 'schedule'
   | 'servicerequest'
   | 'slot'
-  | 'specimen';
+  | 'specimen'
+  | 'visionprescription';
 
 export interface ClinicalDocument<T = unknown> extends BaseRecord {
   userId: AppId;

@@ -1,0 +1,1221 @@
+- generic [ref=e2]:
+  - generic [ref=e59]:
+    - generic [ref=e61]:
+      - navigation "Records" [ref=e63]:
+        - link "Labs" [ref=e64] [cursor=pointer]:
+          - /url: /demo/records/labs
+          - img [ref=e65]
+          - text: Labs
+        - link "Imaging" [ref=e67] [cursor=pointer]:
+          - /url: /demo/records/imaging
+          - img [ref=e68]
+          - text: Imaging
+        - link "Dental" [ref=e70] [cursor=pointer]:
+          - /url: /demo/records/dental
+          - img [ref=e71]
+          - text: Dental
+        - link "Add record" [ref=e73] [cursor=pointer]:
+          - /url: /demo/records/new
+          - img [ref=e74]
+          - text: Add record
+      - generic [ref=e77]:
+        - generic [ref=e79]:
+          - generic [ref=e80]:
+            - generic [ref=e81]:
+              - img [ref=e82]
+              - text: Labs
+            - heading "All lab results" [level=1] [ref=e84]
+            - paragraph [ref=e85]: 181 results grouped into 51 lab types across your connected records.
+          - generic [ref=e86]:
+            - generic [ref=e87]: Search labs
+            - img
+            - searchbox "Search labs" [ref=e88]
+        - generic [ref=e91]:
+          - generic [ref=e93]:
+            - generic [ref=e94]:
+              - heading "Reference standard" [level=2] [ref=e95]
+              - paragraph [ref=e96]: Table ranges and high/low status update against the selected standard.
+            - radiogroup "Reference standard" [ref=e97]:
+              - radio "Canadian" [ref=e98] [cursor=pointer]: Canadian
+              - radio "Australian" [ref=e100] [cursor=pointer]: Australian
+              - radio "UK" [checked] [active] [ref=e102] [cursor=pointer]: UK
+              - radio "Original" [ref=e104] [cursor=pointer]: Original
+          - generic [ref=e106]:
+            - generic [ref=e108]:
+              - generic [ref=e109]:
+                - heading "Blood Counts" [level=2] [ref=e110]
+                - paragraph [ref=e111]: CBC, platelets, hemoglobin, hematocrit, and white cells.
+              - generic [ref=e112]: 20 lab types
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - generic [ref=e116]: Lab test
+                - generic [ref=e117]: Latest
+                - generic [ref=e118]: Reference
+                - generic [ref=e119]: Date
+                - generic [ref=e120]: Linked report
+                - generic [ref=e121]: Status
+              - generic [ref=e122]:
+                - 'button "Expand LYMPHS LYMPHS LOINC 736-9 5 results 36 % Range: Use absolute count Age band: All ages UK FBC differential intervals are represented as absolute counts in this source set. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora 1 high" [ref=e124] [cursor=pointer]':
+                  - generic [ref=e125]:
+                    - button "Expand LYMPHS" [ref=e126]:
+                      - img [ref=e127]
+                    - generic [ref=e129]:
+                      - heading "LYMPHS" [level=2] [ref=e130]
+                      - generic [ref=e131]:
+                        - generic [ref=e132]: LOINC 736-9
+                        - generic [ref=e133]: 5 results
+                  - generic [ref=e134]: 36 %
+                  - generic [ref=e135]:
+                    - generic [ref=e136]:
+                      - generic [ref=e139]: "Range: Use absolute count"
+                      - generic [ref=e140]: "Age band: All ages"
+                    - generic [ref=e141]: UK FBC differential intervals are represented as absolute counts in this source set.
+                  - generic [ref=e142]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e145]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e146]
+                    - generic [ref=e148]:
+                      - generic [ref=e149]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e150]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e151]: 1 high
+                - 'button "Expand MONOCYTES MONOCYTES LOINC 5905-5 2 results 8 % Range: Use absolute count Age band: All ages UK FBC differential intervals are represented as absolute counts in this source set. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e153] [cursor=pointer]':
+                  - generic [ref=e154]:
+                    - button "Expand MONOCYTES" [ref=e155]:
+                      - img [ref=e156]
+                    - generic [ref=e158]:
+                      - heading "MONOCYTES" [level=2] [ref=e159]
+                      - generic [ref=e160]:
+                        - generic [ref=e161]: LOINC 5905-5
+                        - generic [ref=e162]: 2 results
+                  - generic [ref=e163]: 8 %
+                  - generic [ref=e164]:
+                    - generic [ref=e165]:
+                      - generic [ref=e168]: "Range: Use absolute count"
+                      - generic [ref=e169]: "Age band: All ages"
+                    - generic [ref=e170]: UK FBC differential intervals are represented as absolute counts in this source set.
+                  - generic [ref=e171]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e174]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e175]
+                    - generic [ref=e177]:
+                      - generic [ref=e178]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e179]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e180]: In range
+                - 'button "Expand HEMATOCRIT HEMATOCRIT LOINC 4544-3 5 results 46.3 % Range: 37.5 - 51.0 % No mapped standard; using source range. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e182] [cursor=pointer]':
+                  - generic [ref=e183]:
+                    - button "Expand HEMATOCRIT" [ref=e184]:
+                      - img [ref=e185]
+                    - generic [ref=e187]:
+                      - heading "HEMATOCRIT" [level=2] [ref=e188]
+                      - generic [ref=e189]:
+                        - generic [ref=e190]: LOINC 4544-3
+                        - generic [ref=e191]: 5 results
+                  - generic [ref=e192]: 46.3 %
+                  - generic [ref=e193]:
+                    - generic [ref=e195]: "Range: 37.5 - 51.0 %"
+                    - generic [ref=e196]: No mapped standard; using source range.
+                  - generic [ref=e197]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e200]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e201]
+                    - generic [ref=e203]:
+                      - generic [ref=e204]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e205]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e206]: In range
+                - 'button "Expand HEMOGLOBIN HEMOGLOBIN LOINC 718-7 5 results 15.9 g/dL Range: 13.0 - 17.7 g/dL No mapped standard; using source range. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e208] [cursor=pointer]':
+                  - generic [ref=e209]:
+                    - button "Expand HEMOGLOBIN" [ref=e210]:
+                      - img [ref=e211]
+                    - generic [ref=e213]:
+                      - heading "HEMOGLOBIN" [level=2] [ref=e214]
+                      - generic [ref=e215]:
+                        - generic [ref=e216]: LOINC 718-7
+                        - generic [ref=e217]: 5 results
+                  - generic [ref=e218]: 15.9 g/dL
+                  - generic [ref=e219]:
+                    - generic [ref=e221]: "Range: 13.0 - 17.7 g/dL"
+                    - generic [ref=e222]: No mapped standard; using source range.
+                  - generic [ref=e223]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e226]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e227]
+                    - generic [ref=e229]:
+                      - generic [ref=e230]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e231]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e232]: In range
+                - 'button "Expand MCH MCH LOINC 785-6 5 results 29.6 pg Range: 28.0-32.0 Age band: 18 years up to 150 years Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e234] [cursor=pointer]':
+                  - generic [ref=e235]:
+                    - button "Expand MCH" [ref=e236]:
+                      - img [ref=e237]
+                    - generic [ref=e239]:
+                      - heading "MCH" [level=2] [ref=e240]
+                      - generic [ref=e241]:
+                        - generic [ref=e242]: LOINC 785-6
+                        - generic [ref=e243]: 5 results
+                  - generic [ref=e244]: 29.6 pg
+                  - generic [ref=e246]:
+                    - generic [ref=e249]: "Range: 28.0-32.0"
+                    - generic [ref=e250]: "Age band: 18 years up to 150 years"
+                  - generic [ref=e251]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e254]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e255]
+                    - generic [ref=e257]:
+                      - generic [ref=e258]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e259]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e260]: In range
+                - 'button "Expand BASOS BASOS LOINC 706-2 5 results 1 % Range: Use absolute count Age band: All ages UK FBC differential intervals are represented as absolute counts in this source set. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora 1 high" [ref=e262] [cursor=pointer]':
+                  - generic [ref=e263]:
+                    - button "Expand BASOS" [ref=e264]:
+                      - img [ref=e265]
+                    - generic [ref=e267]:
+                      - heading "BASOS" [level=2] [ref=e268]
+                      - generic [ref=e269]:
+                        - generic [ref=e270]: LOINC 706-2
+                        - generic [ref=e271]: 5 results
+                  - generic [ref=e272]: 1 %
+                  - generic [ref=e273]:
+                    - generic [ref=e274]:
+                      - generic [ref=e277]: "Range: Use absolute count"
+                      - generic [ref=e278]: "Age band: All ages"
+                    - generic [ref=e279]: UK FBC differential intervals are represented as absolute counts in this source set.
+                  - generic [ref=e280]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e283]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e284]
+                    - generic [ref=e286]:
+                      - generic [ref=e287]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e288]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e289]: 1 high
+                - 'button "Expand MONOCYTES(ABSOLUTE) MONOCYTES(ABSOLUTE) LOINC 742-7 4 results 0.4 x10E3/uL Range: 0.1 - 0.9 x10E3/uL No mapped standard; using source range. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e291] [cursor=pointer]':
+                  - generic [ref=e292]:
+                    - button "Expand MONOCYTES(ABSOLUTE)" [ref=e293]:
+                      - img [ref=e294]
+                    - generic [ref=e296]:
+                      - heading "MONOCYTES(ABSOLUTE)" [level=2] [ref=e297]
+                      - generic [ref=e298]:
+                        - generic [ref=e299]: LOINC 742-7
+                        - generic [ref=e300]: 4 results
+                  - generic [ref=e301]: 0.4 x10E3/uL
+                  - generic [ref=e302]:
+                    - generic [ref=e304]: "Range: 0.1 - 0.9 x10E3/uL"
+                    - generic [ref=e305]: No mapped standard; using source range.
+                  - generic [ref=e306]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e309]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e310]
+                    - generic [ref=e312]:
+                      - generic [ref=e313]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e314]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e315]: In range
+                - 'button "Expand EOS (ABSOLUTE) EOS (ABSOLUTE) LOINC 711-2 4 results 0 x10E3/uL Range: 0.0 - 0.4 x10E3/uL No mapped standard; using source range. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e317] [cursor=pointer]':
+                  - generic [ref=e318]:
+                    - button "Expand EOS (ABSOLUTE)" [ref=e319]:
+                      - img [ref=e320]
+                    - generic [ref=e322]:
+                      - heading "EOS (ABSOLUTE)" [level=2] [ref=e323]
+                      - generic [ref=e324]:
+                        - generic [ref=e325]: LOINC 711-2
+                        - generic [ref=e326]: 4 results
+                  - generic [ref=e327]: 0 x10E3/uL
+                  - generic [ref=e328]:
+                    - generic [ref=e330]: "Range: 0.0 - 0.4 x10E3/uL"
+                    - generic [ref=e331]: No mapped standard; using source range.
+                  - generic [ref=e332]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e335]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e336]
+                    - generic [ref=e338]:
+                      - generic [ref=e339]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e340]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e341]: In range
+                - 'button "Expand NEUTROPHILS NEUTROPHILS LOINC 770-8 2 results 52 % Range: Use absolute count Age band: All ages UK FBC differential intervals are represented as absolute counts in this source set. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e343] [cursor=pointer]':
+                  - generic [ref=e344]:
+                    - button "Expand NEUTROPHILS" [ref=e345]:
+                      - img [ref=e346]
+                    - generic [ref=e348]:
+                      - heading "NEUTROPHILS" [level=2] [ref=e349]
+                      - generic [ref=e350]:
+                        - generic [ref=e351]: LOINC 770-8
+                        - generic [ref=e352]: 2 results
+                  - generic [ref=e353]: 52 %
+                  - generic [ref=e354]:
+                    - generic [ref=e355]:
+                      - generic [ref=e358]: "Range: Use absolute count"
+                      - generic [ref=e359]: "Age band: All ages"
+                    - generic [ref=e360]: UK FBC differential intervals are represented as absolute counts in this source set.
+                  - generic [ref=e361]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e364]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e365]
+                    - generic [ref=e367]:
+                      - generic [ref=e368]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e369]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e370]: In range
+                - 'button "Expand MCHC MCHC LOINC 786-4 5 results 34.3 g/dL Range: 320-360 Age band: All ages Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora 5 low" [ref=e372] [cursor=pointer]':
+                  - generic [ref=e373]:
+                    - button "Expand MCHC" [ref=e374]:
+                      - img [ref=e375]
+                    - generic [ref=e377]:
+                      - heading "MCHC" [level=2] [ref=e378]
+                      - generic [ref=e379]:
+                        - generic [ref=e380]: LOINC 786-4
+                        - generic [ref=e381]: 5 results
+                  - generic [ref=e382]: 34.3 g/dL
+                  - generic [ref=e384]:
+                    - generic [ref=e387]: "Range: 320-360"
+                    - generic [ref=e388]: "Age band: All ages"
+                  - generic [ref=e389]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e392]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e393]
+                    - generic [ref=e395]:
+                      - generic [ref=e396]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e397]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e398]: 5 low
+                - 'button "Expand BASO (ABSOLUTE) BASO (ABSOLUTE) LOINC 704-7 4 results 0 x10E3/uL Range: 0.0 - 0.2 x10E3/uL No mapped standard; using source range. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e400] [cursor=pointer]':
+                  - generic [ref=e401]:
+                    - button "Expand BASO (ABSOLUTE)" [ref=e402]:
+                      - img [ref=e403]
+                    - generic [ref=e405]:
+                      - heading "BASO (ABSOLUTE)" [level=2] [ref=e406]
+                      - generic [ref=e407]:
+                        - generic [ref=e408]: LOINC 704-7
+                        - generic [ref=e409]: 4 results
+                  - generic [ref=e410]: 0 x10E3/uL
+                  - generic [ref=e411]:
+                    - generic [ref=e413]: "Range: 0.0 - 0.2 x10E3/uL"
+                    - generic [ref=e414]: No mapped standard; using source range.
+                  - generic [ref=e415]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e418]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e419]
+                    - generic [ref=e421]:
+                      - generic [ref=e422]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e423]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e424]: In range
+                - 'button "Expand LYMPHS (ABSOLUTE) LYMPHS (ABSOLUTE) LOINC 731-0 4 results 1.6 x10E3/uL Range: 0.7 - 3.1 x10E3/uL No mapped standard; using source range. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e426] [cursor=pointer]':
+                  - generic [ref=e427]:
+                    - button "Expand LYMPHS (ABSOLUTE)" [ref=e428]:
+                      - img [ref=e429]
+                    - generic [ref=e431]:
+                      - heading "LYMPHS (ABSOLUTE)" [level=2] [ref=e432]
+                      - generic [ref=e433]:
+                        - generic [ref=e434]: LOINC 731-0
+                        - generic [ref=e435]: 4 results
+                  - generic [ref=e436]: 1.6 x10E3/uL
+                  - generic [ref=e437]:
+                    - generic [ref=e439]: "Range: 0.7 - 3.1 x10E3/uL"
+                    - generic [ref=e440]: No mapped standard; using source range.
+                  - generic [ref=e441]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e444]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e445]
+                    - generic [ref=e447]:
+                      - generic [ref=e448]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e449]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e450]: In range
+                - 'button "Expand RBC RBC LOINC 789-8 5 results 5.37 x10E6/uL Range: 4.14 - 5.80 x10E6/uL No mapped standard; using source range. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e452] [cursor=pointer]':
+                  - generic [ref=e453]:
+                    - button "Expand RBC" [ref=e454]:
+                      - img [ref=e455]
+                    - generic [ref=e457]:
+                      - heading "RBC" [level=2] [ref=e458]
+                      - generic [ref=e459]:
+                        - generic [ref=e460]: LOINC 789-8
+                        - generic [ref=e461]: 5 results
+                  - generic [ref=e462]: 5.37 x10E6/uL
+                  - generic [ref=e463]:
+                    - generic [ref=e465]: "Range: 4.14 - 5.80 x10E6/uL"
+                    - generic [ref=e466]: No mapped standard; using source range.
+                  - generic [ref=e467]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e470]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e471]
+                    - generic [ref=e473]:
+                      - generic [ref=e474]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e475]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e476]: In range
+                - 'button "Expand PLATELETS PLATELETS LOINC 777-3 5 results 297 x10E3/uL Range: 150-400 Age band: 18 years up to 150 years Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e478] [cursor=pointer]':
+                  - generic [ref=e479]:
+                    - button "Expand PLATELETS" [ref=e480]:
+                      - img [ref=e481]
+                    - generic [ref=e483]:
+                      - heading "PLATELETS" [level=2] [ref=e484]
+                      - generic [ref=e485]:
+                        - generic [ref=e486]: LOINC 777-3
+                        - generic [ref=e487]: 5 results
+                  - generic [ref=e488]: 297 x10E3/uL
+                  - generic [ref=e490]:
+                    - generic [ref=e493]: "Range: 150-400"
+                    - generic [ref=e494]: "Age band: 18 years up to 150 years"
+                  - generic [ref=e495]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e498]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e499]
+                    - generic [ref=e501]:
+                      - generic [ref=e502]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e503]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e504]: In range
+                - 'button "Expand MCV MCV LOINC 787-2 5 results 86 fL Range: 78.0-96.0 Age band: 18 years up to 150 years Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e506] [cursor=pointer]':
+                  - generic [ref=e507]:
+                    - button "Expand MCV" [ref=e508]:
+                      - img [ref=e509]
+                    - generic [ref=e511]:
+                      - heading "MCV" [level=2] [ref=e512]
+                      - generic [ref=e513]:
+                        - generic [ref=e514]: LOINC 787-2
+                        - generic [ref=e515]: 5 results
+                  - generic [ref=e516]: 86 fL
+                  - generic [ref=e518]:
+                    - generic [ref=e521]: "Range: 78.0-96.0"
+                    - generic [ref=e522]: "Age band: 18 years up to 150 years"
+                  - generic [ref=e523]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e526]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e527]
+                    - generic [ref=e529]:
+                      - generic [ref=e530]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e531]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e532]: In range
+                - 'button "Expand RDW RDW LOINC 788-0 5 results 13 % Range: 11.6 - 15.4 % No mapped standard; using source range. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e534] [cursor=pointer]':
+                  - generic [ref=e535]:
+                    - button "Expand RDW" [ref=e536]:
+                      - img [ref=e537]
+                    - generic [ref=e539]:
+                      - heading "RDW" [level=2] [ref=e540]
+                      - generic [ref=e541]:
+                        - generic [ref=e542]: LOINC 788-0
+                        - generic [ref=e543]: 5 results
+                  - generic [ref=e544]: 13 %
+                  - generic [ref=e545]:
+                    - generic [ref=e547]: "Range: 11.6 - 15.4 %"
+                    - generic [ref=e548]: No mapped standard; using source range.
+                  - generic [ref=e549]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e552]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e553]
+                    - generic [ref=e555]:
+                      - generic [ref=e556]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e557]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e558]: In range
+                - 'button "Expand EOS EOS LOINC 713-8 5 results 1 % Range: Use absolute count Age band: All ages UK FBC differential intervals are represented as absolute counts in this source set. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e560] [cursor=pointer]':
+                  - generic [ref=e561]:
+                    - button "Expand EOS" [ref=e562]:
+                      - img [ref=e563]
+                    - generic [ref=e565]:
+                      - heading "EOS" [level=2] [ref=e566]
+                      - generic [ref=e567]:
+                        - generic [ref=e568]: LOINC 713-8
+                        - generic [ref=e569]: 5 results
+                  - generic [ref=e570]: 1 %
+                  - generic [ref=e571]:
+                    - generic [ref=e572]:
+                      - generic [ref=e575]: "Range: Use absolute count"
+                      - generic [ref=e576]: "Age band: All ages"
+                    - generic [ref=e577]: UK FBC differential intervals are represented as absolute counts in this source set.
+                  - generic [ref=e578]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e581]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e582]
+                    - generic [ref=e584]:
+                      - generic [ref=e585]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e586]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e587]: In range
+                - 'button "Expand NEUTROPHILS (ABSOLUTE) NEUTROPHILS (ABSOLUTE) LOINC 751-8 2 results 2.3 x10E3/uL Range: 1.4 - 7.0 x10E3/uL No mapped standard; using source range. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e589] [cursor=pointer]':
+                  - generic [ref=e590]:
+                    - button "Expand NEUTROPHILS (ABSOLUTE)" [ref=e591]:
+                      - img [ref=e592]
+                    - generic [ref=e594]:
+                      - heading "NEUTROPHILS (ABSOLUTE)" [level=2] [ref=e595]
+                      - generic [ref=e596]:
+                        - generic [ref=e597]: LOINC 751-8
+                        - generic [ref=e598]: 2 results
+                  - generic [ref=e599]: 2.3 x10E3/uL
+                  - generic [ref=e600]:
+                    - generic [ref=e602]: "Range: 1.4 - 7.0 x10E3/uL"
+                    - generic [ref=e603]: No mapped standard; using source range.
+                  - generic [ref=e604]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e607]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e608]
+                    - generic [ref=e610]:
+                      - generic [ref=e611]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e612]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e613]: In range
+                - 'button "Expand WBC WBC LOINC 6690-2 5 results 4.4 x10E3/uL Range: 4.0-11.0 Age band: 18 years up to 150 years Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e615] [cursor=pointer]':
+                  - generic [ref=e616]:
+                    - button "Expand WBC" [ref=e617]:
+                      - img [ref=e618]
+                    - generic [ref=e620]:
+                      - heading "WBC" [level=2] [ref=e621]
+                      - generic [ref=e622]:
+                        - generic [ref=e623]: LOINC 6690-2
+                        - generic [ref=e624]: 5 results
+                  - generic [ref=e625]: 4.4 x10E3/uL
+                  - generic [ref=e627]:
+                    - generic [ref=e630]: "Range: 4.0-11.0"
+                    - generic [ref=e631]: "Age band: 18 years up to 150 years"
+                  - generic [ref=e632]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e635]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e636]
+                    - generic [ref=e638]:
+                      - generic [ref=e639]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e640]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e641]: In range
+                - 'button "Expand HEMOGLOBIN A1C HEMOGLOBIN A1C LOINC 4548-4 3 results 6.6 % Range: 4.8 - 5.6 % No mapped standard; using source range. Dec 31, 2022 HEMOGLOBIN A1C Dec 31, 2022 - Ben Bora 1 high" [ref=e643] [cursor=pointer]':
+                  - generic [ref=e644]:
+                    - button "Expand HEMOGLOBIN A1C" [ref=e645]:
+                      - img [ref=e646]
+                    - generic [ref=e648]:
+                      - heading "HEMOGLOBIN A1C" [level=2] [ref=e649]
+                      - generic [ref=e650]:
+                        - generic [ref=e651]: LOINC 4548-4
+                        - generic [ref=e652]: 3 results
+                  - generic [ref=e653]: 6.6 %
+                  - generic [ref=e654]:
+                    - generic [ref=e656]: "Range: 4.8 - 5.6 %"
+                    - generic [ref=e657]: No mapped standard; using source range.
+                  - generic [ref=e658]: Dec 31, 2022
+                  - link "HEMOGLOBIN A1C Dec 31, 2022 - Ben Bora" [ref=e661]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e662]
+                    - generic [ref=e664]:
+                      - generic [ref=e665]: HEMOGLOBIN A1C
+                      - generic [ref=e666]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e667]: 1 high
+          - generic [ref=e668]:
+            - generic [ref=e670]:
+              - generic [ref=e671]:
+                - heading "Metabolic Panel" [level=2] [ref=e672]
+                - paragraph [ref=e673]: Electrolytes, kidney function, liver enzymes, and proteins.
+              - generic [ref=e674]: 17 lab types
+            - generic [ref=e676]:
+              - generic [ref=e677]:
+                - generic [ref=e678]: Lab test
+                - generic [ref=e679]: Latest
+                - generic [ref=e680]: Reference
+                - generic [ref=e681]: Date
+                - generic [ref=e682]: Linked report
+                - generic [ref=e683]: Status
+              - generic [ref=e684]:
+                - 'button "Expand POTASSIUM, SERUM POTASSIUM, SERUM LOINC 2823-3 4 results 5.1 mmol/L Range: 3.5-5.3 Age band: All ages Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e686] [cursor=pointer]':
+                  - generic [ref=e687]:
+                    - button "Expand POTASSIUM, SERUM" [ref=e688]:
+                      - img [ref=e689]
+                    - generic [ref=e691]:
+                      - heading "POTASSIUM, SERUM" [level=2] [ref=e692]
+                      - generic [ref=e693]:
+                        - generic [ref=e694]: LOINC 2823-3
+                        - generic [ref=e695]: 4 results
+                  - generic [ref=e696]: 5.1 mmol/L
+                  - generic [ref=e698]:
+                    - generic [ref=e701]: "Range: 3.5-5.3"
+                    - generic [ref=e702]: "Age band: All ages"
+                  - generic [ref=e703]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e706]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e707]
+                    - generic [ref=e709]:
+                      - generic [ref=e710]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e711]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e712]: In range
+                - 'button "Expand CHLORIDE, SERUM CHLORIDE, SERUM LOINC 2075-0 4 results 101 mmol/L Range: 96 - 106 mmol/L No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e714] [cursor=pointer]':
+                  - generic [ref=e715]:
+                    - button "Expand CHLORIDE, SERUM" [ref=e716]:
+                      - img [ref=e717]
+                    - generic [ref=e719]:
+                      - heading "CHLORIDE, SERUM" [level=2] [ref=e720]
+                      - generic [ref=e721]:
+                        - generic [ref=e722]: LOINC 2075-0
+                        - generic [ref=e723]: 4 results
+                  - generic [ref=e724]: 101 mmol/L
+                  - generic [ref=e725]:
+                    - generic [ref=e727]: "Range: 96 - 106 mmol/L"
+                    - generic [ref=e728]: No mapped standard; using source range.
+                  - generic [ref=e729]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e732]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e733]
+                    - generic [ref=e735]:
+                      - generic [ref=e736]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e737]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e738]: In range
+                - 'button "Expand GLOBULIN, TOTAL GLOBULIN, TOTAL LOINC 10834-0 1 results 2.1 g/dL Range: 1.5 - 4.5 g/dL No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e740] [cursor=pointer]':
+                  - generic [ref=e741]:
+                    - button "Expand GLOBULIN, TOTAL" [ref=e742]:
+                      - img [ref=e743]
+                    - generic [ref=e745]:
+                      - heading "GLOBULIN, TOTAL" [level=2] [ref=e746]
+                      - generic [ref=e747]:
+                        - generic [ref=e748]: LOINC 10834-0
+                        - generic [ref=e749]: 1 results
+                  - generic [ref=e750]: 2.1 g/dL
+                  - generic [ref=e751]:
+                    - generic [ref=e753]: "Range: 1.5 - 4.5 g/dL"
+                    - generic [ref=e754]: No mapped standard; using source range.
+                  - generic [ref=e755]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e758]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e759]
+                    - generic [ref=e761]:
+                      - generic [ref=e762]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e763]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e764]: In range
+                - 'button "Expand BUN/CREATININE RATIO BUN/CREATININE RATIO LOINC 3097-3 4 results 10 Range: 9 - 20 No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e766] [cursor=pointer]':
+                  - generic [ref=e767]:
+                    - button "Expand BUN/CREATININE RATIO" [ref=e768]:
+                      - img [ref=e769]
+                    - generic [ref=e771]:
+                      - heading "BUN/CREATININE RATIO" [level=2] [ref=e772]
+                      - generic [ref=e773]:
+                        - generic [ref=e774]: LOINC 3097-3
+                        - generic [ref=e775]: 4 results
+                  - generic [ref=e776]: "10"
+                  - generic [ref=e777]:
+                    - generic [ref=e779]: "Range: 9 - 20"
+                    - generic [ref=e780]: No mapped standard; using source range.
+                  - generic [ref=e781]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e784]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e785]
+                    - generic [ref=e787]:
+                      - generic [ref=e788]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e789]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e790]: In range
+                - 'button "Expand AST (SGOT) AST (SGOT) LOINC 1920-8 4 results 32 IU/L Range: 0 - 40 IU/L No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e792] [cursor=pointer]':
+                  - generic [ref=e793]:
+                    - button "Expand AST (SGOT)" [ref=e794]:
+                      - img [ref=e795]
+                    - generic [ref=e797]:
+                      - heading "AST (SGOT)" [level=2] [ref=e798]
+                      - generic [ref=e799]:
+                        - generic [ref=e800]: LOINC 1920-8
+                        - generic [ref=e801]: 4 results
+                  - generic [ref=e802]: 32 IU/L
+                  - generic [ref=e803]:
+                    - generic [ref=e805]: "Range: 0 - 40 IU/L"
+                    - generic [ref=e806]: No mapped standard; using source range.
+                  - generic [ref=e807]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e810]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e811]
+                    - generic [ref=e813]:
+                      - generic [ref=e814]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e815]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e816]: In range
+                - 'button "Expand CREATININE CREATININE LOINC 2160-0 4 results 0.97 mg/dL Range: 0.76 - 1.27 mg/dL No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e818] [cursor=pointer]':
+                  - generic [ref=e819]:
+                    - button "Expand CREATININE" [ref=e820]:
+                      - img [ref=e821]
+                    - generic [ref=e823]:
+                      - heading "CREATININE" [level=2] [ref=e824]
+                      - generic [ref=e825]:
+                        - generic [ref=e826]: LOINC 2160-0
+                        - generic [ref=e827]: 4 results
+                  - generic [ref=e828]: 0.97 mg/dL
+                  - generic [ref=e829]:
+                    - generic [ref=e831]: "Range: 0.76 - 1.27 mg/dL"
+                    - generic [ref=e832]: No mapped standard; using source range.
+                  - generic [ref=e833]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e836]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e837]
+                    - generic [ref=e839]:
+                      - generic [ref=e840]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e841]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e842]: In range
+                - 'button "Expand CALCIUM, SERUM (QUEST) CALCIUM, SERUM (QUEST) LOINC 17861-6 4 results 10 mg/dL Range: 8.7 - 10.2 mg/dL No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e844] [cursor=pointer]':
+                  - generic [ref=e845]:
+                    - button "Expand CALCIUM, SERUM (QUEST)" [ref=e846]:
+                      - img [ref=e847]
+                    - generic [ref=e849]:
+                      - heading "CALCIUM, SERUM (QUEST)" [level=2] [ref=e850]
+                      - generic [ref=e851]:
+                        - generic [ref=e852]: LOINC 17861-6
+                        - generic [ref=e853]: 4 results
+                  - generic [ref=e854]: 10 mg/dL
+                  - generic [ref=e855]:
+                    - generic [ref=e857]: "Range: 8.7 - 10.2 mg/dL"
+                    - generic [ref=e858]: No mapped standard; using source range.
+                  - generic [ref=e859]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e862]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e863]
+                    - generic [ref=e865]:
+                      - generic [ref=e866]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e867]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e868]: In range
+                - 'button "Expand ALBUMIN, SERUM ALBUMIN, SERUM LOINC 1751-7 4 results 5.1 g/dL 5.1 g/dL converted to 51 g/L. Range: 35-50 Age band: 16 years up to 150 years Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora 2 high" [ref=e870] [cursor=pointer]':
+                  - generic [ref=e871]:
+                    - button "Expand ALBUMIN, SERUM" [ref=e872]:
+                      - img [ref=e873]
+                    - generic [ref=e875]:
+                      - heading "ALBUMIN, SERUM" [level=2] [ref=e876]
+                      - generic [ref=e877]:
+                        - generic [ref=e878]: LOINC 1751-7
+                        - generic [ref=e879]: 4 results
+                  - generic [ref=e880]:
+                    - text: 5.1 g/dL
+                    - generic [ref=e881]: 5.1 g/dL converted to 51 g/L.
+                  - generic [ref=e883]:
+                    - generic [ref=e886]: "Range: 35-50"
+                    - generic [ref=e887]: "Age band: 16 years up to 150 years"
+                  - generic [ref=e888]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e891]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e892]
+                    - generic [ref=e894]:
+                      - generic [ref=e895]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e896]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e897]: 2 high
+                - 'button "Expand CARBON DIOXIDE, TOTAL CARBON DIOXIDE, TOTAL LOINC 2028-9 4 results 25 mmol/L Range: 20 - 29 mmol/L No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e899] [cursor=pointer]':
+                  - generic [ref=e900]:
+                    - button "Expand CARBON DIOXIDE, TOTAL" [ref=e901]:
+                      - img [ref=e902]
+                    - generic [ref=e904]:
+                      - heading "CARBON DIOXIDE, TOTAL" [level=2] [ref=e905]
+                      - generic [ref=e906]:
+                        - generic [ref=e907]: LOINC 2028-9
+                        - generic [ref=e908]: 4 results
+                  - generic [ref=e909]: 25 mmol/L
+                  - generic [ref=e910]:
+                    - generic [ref=e912]: "Range: 20 - 29 mmol/L"
+                    - generic [ref=e913]: No mapped standard; using source range.
+                  - generic [ref=e914]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e917]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e918]
+                    - generic [ref=e920]:
+                      - generic [ref=e921]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e922]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e923]: In range
+                - 'button "Expand SODIUM (QUEST) SODIUM (QUEST) LOINC 2951-2 4 results 142 mmol/L Range: 133-146 Age band: All ages Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e925] [cursor=pointer]':
+                  - generic [ref=e926]:
+                    - button "Expand SODIUM (QUEST)" [ref=e927]:
+                      - img [ref=e928]
+                    - generic [ref=e930]:
+                      - heading "SODIUM (QUEST)" [level=2] [ref=e931]
+                      - generic [ref=e932]:
+                        - generic [ref=e933]: LOINC 2951-2
+                        - generic [ref=e934]: 4 results
+                  - generic [ref=e935]: 142 mmol/L
+                  - generic [ref=e937]:
+                    - generic [ref=e940]: "Range: 133-146"
+                    - generic [ref=e941]: "Age band: All ages"
+                  - generic [ref=e942]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e945]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e946]
+                    - generic [ref=e948]:
+                      - generic [ref=e949]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e950]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e951]: In range
+                - 'button "Expand BILIRUBIN, TOTAL BILIRUBIN, TOTAL LOINC 1975-2 4 results 0.5 mg/dL Range: 0.0 - 1.2 mg/dL No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e953] [cursor=pointer]':
+                  - generic [ref=e954]:
+                    - button "Expand BILIRUBIN, TOTAL" [ref=e955]:
+                      - img [ref=e956]
+                    - generic [ref=e958]:
+                      - heading "BILIRUBIN, TOTAL" [level=2] [ref=e959]
+                      - generic [ref=e960]:
+                        - generic [ref=e961]: LOINC 1975-2
+                        - generic [ref=e962]: 4 results
+                  - generic [ref=e963]: 0.5 mg/dL
+                  - generic [ref=e964]:
+                    - generic [ref=e966]: "Range: 0.0 - 1.2 mg/dL"
+                    - generic [ref=e967]: No mapped standard; using source range.
+                  - generic [ref=e968]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e971]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e972]
+                    - generic [ref=e974]:
+                      - generic [ref=e975]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e976]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e977]: In range
+                - 'button "Expand ALKALINE PHOSPHATASE (QUEST) ALKALINE PHOSPHATASE (QUEST) LOINC 6768-6 4 results 52 IU/L Range: 44 - 121 IU/L No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e979] [cursor=pointer]':
+                  - generic [ref=e980]:
+                    - button "Expand ALKALINE PHOSPHATASE (QUEST)" [ref=e981]:
+                      - img [ref=e982]
+                    - generic [ref=e984]:
+                      - heading "ALKALINE PHOSPHATASE (QUEST)" [level=2] [ref=e985]
+                      - generic [ref=e986]:
+                        - generic [ref=e987]: LOINC 6768-6
+                        - generic [ref=e988]: 4 results
+                  - generic [ref=e989]: 52 IU/L
+                  - generic [ref=e990]:
+                    - generic [ref=e992]: "Range: 44 - 121 IU/L"
+                    - generic [ref=e993]: No mapped standard; using source range.
+                  - generic [ref=e994]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e997]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e998]
+                    - generic [ref=e1000]:
+                      - generic [ref=e1001]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e1002]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e1003]: In range
+                - 'button "Expand BUN BUN LOINC 3094-0 4 results 10 mg/dL Range: 6 - 20 mg/dL No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e1005] [cursor=pointer]':
+                  - generic [ref=e1006]:
+                    - button "Expand BUN" [ref=e1007]:
+                      - img [ref=e1008]
+                    - generic [ref=e1010]:
+                      - heading "BUN" [level=2] [ref=e1011]
+                      - generic [ref=e1012]:
+                        - generic [ref=e1013]: LOINC 3094-0
+                        - generic [ref=e1014]: 4 results
+                  - generic [ref=e1015]: 10 mg/dL
+                  - generic [ref=e1016]:
+                    - generic [ref=e1018]: "Range: 6 - 20 mg/dL"
+                    - generic [ref=e1019]: No mapped standard; using source range.
+                  - generic [ref=e1020]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e1023]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e1024]
+                    - generic [ref=e1026]:
+                      - generic [ref=e1027]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e1028]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e1029]: In range
+                - 'button "Expand PROTEIN,TOTAL, SERUM (QUEST) PROTEIN,TOTAL, SERUM (QUEST) LOINC 2885-2 4 results 7.2 g/dL Range: 6.0 - 8.5 g/dL No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e1031] [cursor=pointer]':
+                  - generic [ref=e1032]:
+                    - button "Expand PROTEIN,TOTAL, SERUM (QUEST)" [ref=e1033]:
+                      - img [ref=e1034]
+                    - generic [ref=e1036]:
+                      - heading "PROTEIN,TOTAL, SERUM (QUEST)" [level=2] [ref=e1037]
+                      - generic [ref=e1038]:
+                        - generic [ref=e1039]: LOINC 2885-2
+                        - generic [ref=e1040]: 4 results
+                  - generic [ref=e1041]: 7.2 g/dL
+                  - generic [ref=e1042]:
+                    - generic [ref=e1044]: "Range: 6.0 - 8.5 g/dL"
+                    - generic [ref=e1045]: No mapped standard; using source range.
+                  - generic [ref=e1046]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e1049]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e1050]
+                    - generic [ref=e1052]:
+                      - generic [ref=e1053]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e1054]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e1055]: In range
+                - 'button "Expand EGFR EGFR 1 results 110 mL/min/1.73 Range: >59 No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e1057] [cursor=pointer]':
+                  - generic [ref=e1058]:
+                    - button "Expand EGFR" [ref=e1059]:
+                      - img [ref=e1060]
+                    - generic [ref=e1062]:
+                      - heading "EGFR" [level=2] [ref=e1063]
+                      - generic [ref=e1065]: 1 results
+                  - generic [ref=e1066]: 110 mL/min/1.73
+                  - generic [ref=e1067]:
+                    - generic [ref=e1069]: "Range: >59"
+                    - generic [ref=e1070]: No mapped standard; using source range.
+                  - generic [ref=e1071]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e1074]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e1075]
+                    - generic [ref=e1077]:
+                      - generic [ref=e1078]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e1079]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e1080]: In range
+                - 'button "Expand ALT (SGPT) ALT (SGPT) LOINC 1742-6 4 results 36 IU/L Range: 0 - 44 IU/L No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e1082] [cursor=pointer]':
+                  - generic [ref=e1083]:
+                    - button "Expand ALT (SGPT)" [ref=e1084]:
+                      - img [ref=e1085]
+                    - generic [ref=e1087]:
+                      - heading "ALT (SGPT)" [level=2] [ref=e1088]
+                      - generic [ref=e1089]:
+                        - generic [ref=e1090]: LOINC 1742-6
+                        - generic [ref=e1091]: 4 results
+                  - generic [ref=e1092]: 36 IU/L
+                  - generic [ref=e1093]:
+                    - generic [ref=e1095]: "Range: 0 - 44 IU/L"
+                    - generic [ref=e1096]: No mapped standard; using source range.
+                  - generic [ref=e1097]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e1100]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e1101]
+                    - generic [ref=e1103]:
+                      - generic [ref=e1104]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e1105]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e1106]: In range
+                - 'button "Expand BR- GLOBULIN, SERUM BR- GLOBULIN, SERUM LOINC 2336-6 3 results 2.6 g/dL Range: 1.7 - 3.7 g/dL No mapped standard; using source range. Jun 30, 2019 COMPREHENSIVE METABOLIC PANEL Jun 30, 2019 - Christy Chin, MD In range" [ref=e1108] [cursor=pointer]':
+                  - generic [ref=e1109]:
+                    - button "Expand BR- GLOBULIN, SERUM" [ref=e1110]:
+                      - img [ref=e1111]
+                    - generic [ref=e1113]:
+                      - heading "BR- GLOBULIN, SERUM" [level=2] [ref=e1114]
+                      - generic [ref=e1115]:
+                        - generic [ref=e1116]: LOINC 2336-6
+                        - generic [ref=e1117]: 3 results
+                  - generic [ref=e1118]: 2.6 g/dL
+                  - generic [ref=e1119]:
+                    - generic [ref=e1121]: "Range: 1.7 - 3.7 g/dL"
+                    - generic [ref=e1122]: No mapped standard; using source range.
+                  - generic [ref=e1123]: Jun 30, 2019
+                  - link "COMPREHENSIVE METABOLIC PANEL Jun 30, 2019 - Christy Chin, MD" [ref=e1126]:
+                    - /url: /demo/timeline#Jun-30-2019
+                    - img [ref=e1127]
+                    - generic [ref=e1129]:
+                      - generic [ref=e1130]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e1131]: Jun 30, 2019 - Christy Chin, MD
+                  - generic [ref=e1132]: In range
+          - generic [ref=e1133]:
+            - generic [ref=e1135]:
+              - generic [ref=e1136]:
+                - heading "Glucose & Endocrine" [level=2] [ref=e1137]
+                - paragraph [ref=e1138]: Glucose, A1c, insulin, thyroid, and hormone-related labs.
+              - generic [ref=e1139]: 1 lab type
+            - generic [ref=e1141]:
+              - generic [ref=e1142]:
+                - generic [ref=e1143]: Lab test
+                - generic [ref=e1144]: Latest
+                - generic [ref=e1145]: Reference
+                - generic [ref=e1146]: Date
+                - generic [ref=e1147]: Linked report
+                - generic [ref=e1148]: Status
+              - 'button "Expand GLUCOSE (QUEST) GLUCOSE (QUEST) LOINC 2345-7 4 results 88 mg/dL Range: 65 - 99 mg/dL No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e1151] [cursor=pointer]':
+                - generic [ref=e1152]:
+                  - button "Expand GLUCOSE (QUEST)" [ref=e1153]:
+                    - img [ref=e1154]
+                  - generic [ref=e1156]:
+                    - heading "GLUCOSE (QUEST)" [level=2] [ref=e1157]
+                    - generic [ref=e1158]:
+                      - generic [ref=e1159]: LOINC 2345-7
+                      - generic [ref=e1160]: 4 results
+                - generic [ref=e1161]: 88 mg/dL
+                - generic [ref=e1162]:
+                  - generic [ref=e1164]: "Range: 65 - 99 mg/dL"
+                  - generic [ref=e1165]: No mapped standard; using source range.
+                - generic [ref=e1166]: Dec 31, 2022
+                - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e1169]:
+                  - /url: /demo/timeline#Dec-31-2022
+                  - img [ref=e1170]
+                  - generic [ref=e1172]:
+                    - generic [ref=e1173]: COMPREHENSIVE METABOLIC PANEL
+                    - generic [ref=e1174]: Dec 31, 2022 - Ben Bora
+                - generic [ref=e1175]: In range
+          - generic [ref=e1176]:
+            - generic [ref=e1178]:
+              - generic [ref=e1179]:
+                - heading "Vitamins & Nutrition" [level=2] [ref=e1180]
+                - paragraph [ref=e1181]: Iron, ferritin, vitamins, B12, folate, and nutrition labs.
+              - generic [ref=e1182]: 1 lab type
+            - generic [ref=e1184]:
+              - generic [ref=e1185]:
+                - generic [ref=e1186]: Lab test
+                - generic [ref=e1187]: Latest
+                - generic [ref=e1188]: Reference
+                - generic [ref=e1189]: Date
+                - generic [ref=e1190]: Linked report
+                - generic [ref=e1191]: Status
+              - 'button "Expand VITAMIN D, 25-HYDROXY, SERUM VITAMIN D, 25-HYDROXY, SERUM LOINC 62292-8 3 results 26.6 ng/mL Range: 30.0 - 100.0 ng/mL No mapped standard; using source range. Dec 31, 2022 VITAMIN D 25 HYDROXY Dec 31, 2022 - Ben Bora 2 low" [ref=e1194] [cursor=pointer]':
+                - generic [ref=e1195]:
+                  - button "Expand VITAMIN D, 25-HYDROXY, SERUM" [ref=e1196]:
+                    - img [ref=e1197]
+                  - generic [ref=e1199]:
+                    - heading "VITAMIN D, 25-HYDROXY, SERUM" [level=2] [ref=e1200]
+                    - generic [ref=e1201]:
+                      - generic [ref=e1202]: LOINC 62292-8
+                      - generic [ref=e1203]: 3 results
+                - generic [ref=e1204]: 26.6 ng/mL
+                - generic [ref=e1205]:
+                  - generic [ref=e1207]: "Range: 30.0 - 100.0 ng/mL"
+                  - generic [ref=e1208]: No mapped standard; using source range.
+                - generic [ref=e1209]: Dec 31, 2022
+                - link "VITAMIN D 25 HYDROXY Dec 31, 2022 - Ben Bora" [ref=e1212]:
+                  - /url: /demo/timeline#Dec-31-2022
+                  - img [ref=e1213]
+                  - generic [ref=e1215]:
+                    - generic [ref=e1216]: VITAMIN D 25 HYDROXY
+                    - generic [ref=e1217]: Dec 31, 2022 - Ben Bora
+                - generic [ref=e1218]: 2 low
+          - generic [ref=e1219]:
+            - generic [ref=e1221]:
+              - generic [ref=e1222]:
+                - heading "Other Labs" [level=2] [ref=e1223]
+                - paragraph [ref=e1224]: Labs that do not match one of the common sections.
+              - generic [ref=e1225]: 12 lab types
+            - generic [ref=e1227]:
+              - generic [ref=e1228]:
+                - generic [ref=e1229]: Lab test
+                - generic [ref=e1230]: Latest
+                - generic [ref=e1231]: Reference
+                - generic [ref=e1232]: Date
+                - generic [ref=e1233]: Linked report
+                - generic [ref=e1234]: Status
+              - generic [ref=e1235]:
+                - button "Expand Periodontal pocketing tooth 14 Periodontal pocketing tooth 14 1 results No value No mapped standard; using source range. Feb 12, 2026 No linked report found In range" [ref=e1237] [cursor=pointer]:
+                  - generic [ref=e1238]:
+                    - button "Expand Periodontal pocketing tooth 14" [ref=e1239]:
+                      - img [ref=e1240]
+                    - generic [ref=e1242]:
+                      - heading "Periodontal pocketing tooth 14" [level=2] [ref=e1243]
+                      - generic [ref=e1245]: 1 results
+                  - generic [ref=e1246]: No value
+                  - generic [ref=e1248]: No mapped standard; using source range.
+                  - generic [ref=e1249]: Feb 12, 2026
+                  - generic [ref=e1250]: No linked report found
+                  - generic [ref=e1251]: In range
+                - button "Expand IMMATURE CELLS IMMATURE CELLS 1 results Note No mapped standard; using source range. Dec 31, 2022 CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora In range" [ref=e1253] [cursor=pointer]:
+                  - generic [ref=e1254]:
+                    - button "Expand IMMATURE CELLS" [ref=e1255]:
+                      - img [ref=e1256]
+                    - generic [ref=e1258]:
+                      - heading "IMMATURE CELLS" [level=2] [ref=e1259]
+                      - generic [ref=e1261]: 1 results
+                  - generic [ref=e1262]: Note
+                  - generic [ref=e1264]: No mapped standard; using source range.
+                  - generic [ref=e1265]: Dec 31, 2022
+                  - link "CBC W/AUTOMATED DIFF Dec 31, 2022 - Ben Bora" [ref=e1268]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e1269]
+                    - generic [ref=e1271]:
+                      - generic [ref=e1272]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e1273]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e1274]: In range
+                - 'button "Expand A/G RATIO A/G RATIO LOINC 1759-0 4 results 2.1 Range: 1.2 - 2.2 No mapped standard; using source range. Dec 31, 2022 COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora In range" [ref=e1276] [cursor=pointer]':
+                  - generic [ref=e1277]:
+                    - button "Expand A/G RATIO" [ref=e1278]:
+                      - img [ref=e1279]
+                    - generic [ref=e1281]:
+                      - heading "A/G RATIO" [level=2] [ref=e1282]
+                      - generic [ref=e1283]:
+                        - generic [ref=e1284]: LOINC 1759-0
+                        - generic [ref=e1285]: 4 results
+                  - generic [ref=e1286]: "2.1"
+                  - generic [ref=e1287]:
+                    - generic [ref=e1289]: "Range: 1.2 - 2.2"
+                    - generic [ref=e1290]: No mapped standard; using source range.
+                  - generic [ref=e1291]: Dec 31, 2022
+                  - link "COMPREHENSIVE METABOLIC PANEL Dec 31, 2022 - Ben Bora" [ref=e1294]:
+                    - /url: /demo/timeline#Dec-31-2022
+                    - img [ref=e1295]
+                    - generic [ref=e1297]:
+                      - generic [ref=e1298]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e1299]: Dec 31, 2022 - Ben Bora
+                  - generic [ref=e1300]: In range
+                - 'button "Expand BR- ABSOLUTE POLYS COUNT BR- ABSOLUTE POLYS COUNT LOINC 768-2 2 results 1.63 x10(3)/uL Range: 1.22 - 9.20 x10(3)/uL No mapped standard; using source range. Jun 30, 2019 HIST CBC 5 PART DIFF Jun 30, 2019 - Christy Chin, MD In range" [ref=e1302] [cursor=pointer]':
+                  - generic [ref=e1303]:
+                    - button "Expand BR- ABSOLUTE POLYS COUNT" [ref=e1304]:
+                      - img [ref=e1305]
+                    - generic [ref=e1307]:
+                      - heading "BR- ABSOLUTE POLYS COUNT" [level=2] [ref=e1308]
+                      - generic [ref=e1309]:
+                        - generic [ref=e1310]: LOINC 768-2
+                        - generic [ref=e1311]: 2 results
+                  - generic [ref=e1312]: 1.63 x10(3)/uL
+                  - generic [ref=e1313]:
+                    - generic [ref=e1315]: "Range: 1.22 - 9.20 x10(3)/uL"
+                    - generic [ref=e1316]: No mapped standard; using source range.
+                  - generic [ref=e1317]: Jun 30, 2019
+                  - link "HIST CBC 5 PART DIFF Jun 30, 2019 - Christy Chin, MD" [ref=e1320]:
+                    - /url: /demo/timeline#Jun-30-2019
+                    - img [ref=e1321]
+                    - generic [ref=e1323]:
+                      - generic [ref=e1324]: HIST CBC 5 PART DIFF
+                      - generic [ref=e1325]: Jun 30, 2019 - Christy Chin, MD
+                  - generic [ref=e1326]: In range
+                - 'button "Expand BR- POLYS PCT BR- POLYS PCT LOINC 31160-5 3 results 38.2 % Range: 36.0 - 78.0 % No mapped standard; using source range. Jun 30, 2019 HIST CBC 5 PART DIFF Jun 30, 2019 - Christy Chin, MD In range" [ref=e1328] [cursor=pointer]':
+                  - generic [ref=e1329]:
+                    - button "Expand BR- POLYS PCT" [ref=e1330]:
+                      - img [ref=e1331]
+                    - generic [ref=e1333]:
+                      - heading "BR- POLYS PCT" [level=2] [ref=e1334]
+                      - generic [ref=e1335]:
+                        - generic [ref=e1336]: LOINC 31160-5
+                        - generic [ref=e1337]: 3 results
+                  - generic [ref=e1338]: 38.2 %
+                  - generic [ref=e1339]:
+                    - generic [ref=e1341]: "Range: 36.0 - 78.0 %"
+                    - generic [ref=e1342]: No mapped standard; using source range.
+                  - generic [ref=e1343]: Jun 30, 2019
+                  - link "HIST CBC 5 PART DIFF Jun 30, 2019 - Christy Chin, MD" [ref=e1346]:
+                    - /url: /demo/timeline#Jun-30-2019
+                    - img [ref=e1347]
+                    - generic [ref=e1349]:
+                      - generic [ref=e1350]: HIST CBC 5 PART DIFF
+                      - generic [ref=e1351]: Jun 30, 2019 - Christy Chin, MD
+                  - generic [ref=e1352]: In range
+                - 'button "Expand BR- IMMATURE GRANULOCYTES % BR- IMMATURE GRANULOCYTES % LOINC 38518-7 3 results 0.9 % Range: 0.0 - 1.6 % No mapped standard; using source range. Jun 30, 2019 HIST CBC 5 PART DIFF Jun 30, 2019 - Christy Chin, MD In range" [ref=e1354] [cursor=pointer]':
+                  - generic [ref=e1355]:
+                    - button "Expand BR- IMMATURE GRANULOCYTES %" [ref=e1356]:
+                      - img [ref=e1357]
+                    - generic [ref=e1359]:
+                      - heading "BR- IMMATURE GRANULOCYTES %" [level=2] [ref=e1360]
+                      - generic [ref=e1361]:
+                        - generic [ref=e1362]: LOINC 38518-7
+                        - generic [ref=e1363]: 3 results
+                  - generic [ref=e1364]: 0.9 %
+                  - generic [ref=e1365]:
+                    - generic [ref=e1367]: "Range: 0.0 - 1.6 %"
+                    - generic [ref=e1368]: No mapped standard; using source range.
+                  - generic [ref=e1369]: Jun 30, 2019
+                  - link "HIST CBC 5 PART DIFF Jun 30, 2019 - Christy Chin, MD" [ref=e1372]:
+                    - /url: /demo/timeline#Jun-30-2019
+                    - img [ref=e1373]
+                    - generic [ref=e1375]:
+                      - generic [ref=e1376]: HIST CBC 5 PART DIFF
+                      - generic [ref=e1377]: Jun 30, 2019 - Christy Chin, MD
+                  - generic [ref=e1378]: In range
+                - 'button "Expand BR- MONONUCLEAR CELLS % BR- MONONUCLEAR CELLS % LOINC 51384-6 3 results 5.8 % Range: 0.0 - 13.0 % No mapped standard; using source range. Jun 30, 2019 HIST CBC 5 PART DIFF Jun 30, 2019 - Christy Chin, MD In range" [ref=e1380] [cursor=pointer]':
+                  - generic [ref=e1381]:
+                    - button "Expand BR- MONONUCLEAR CELLS %" [ref=e1382]:
+                      - img [ref=e1383]
+                    - generic [ref=e1385]:
+                      - heading "BR- MONONUCLEAR CELLS %" [level=2] [ref=e1386]
+                      - generic [ref=e1387]:
+                        - generic [ref=e1388]: LOINC 51384-6
+                        - generic [ref=e1389]: 3 results
+                  - generic [ref=e1390]: 5.8 %
+                  - generic [ref=e1391]:
+                    - generic [ref=e1393]: "Range: 0.0 - 13.0 %"
+                    - generic [ref=e1394]: No mapped standard; using source range.
+                  - generic [ref=e1395]: Jun 30, 2019
+                  - link "HIST CBC 5 PART DIFF Jun 30, 2019 - Christy Chin, MD" [ref=e1398]:
+                    - /url: /demo/timeline#Jun-30-2019
+                    - img [ref=e1399]
+                    - generic [ref=e1401]:
+                      - generic [ref=e1402]: HIST CBC 5 PART DIFF
+                      - generic [ref=e1403]: Jun 30, 2019 - Christy Chin, MD
+                  - generic [ref=e1404]: In range
+                - 'button "Expand BR- MPV BR- MPV LOINC 32623-1 3 results 8.7 fL Range: 8.2 - 11.9 fL No mapped standard; using source range. Jun 30, 2019 HIST CBC 5 PART DIFF Jun 30, 2019 - Christy Chin, MD In range" [ref=e1406] [cursor=pointer]':
+                  - generic [ref=e1407]:
+                    - button "Expand BR- MPV" [ref=e1408]:
+                      - img [ref=e1409]
+                    - generic [ref=e1411]:
+                      - heading "BR- MPV" [level=2] [ref=e1412]
+                      - generic [ref=e1413]:
+                        - generic [ref=e1414]: LOINC 32623-1
+                        - generic [ref=e1415]: 3 results
+                  - generic [ref=e1416]: 8.7 fL
+                  - generic [ref=e1417]:
+                    - generic [ref=e1419]: "Range: 8.2 - 11.9 fL"
+                    - generic [ref=e1420]: No mapped standard; using source range.
+                  - generic [ref=e1421]: Jun 30, 2019
+                  - link "HIST CBC 5 PART DIFF Jun 30, 2019 - Christy Chin, MD" [ref=e1424]:
+                    - /url: /demo/timeline#Jun-30-2019
+                    - img [ref=e1425]
+                    - generic [ref=e1427]:
+                      - generic [ref=e1428]: HIST CBC 5 PART DIFF
+                      - generic [ref=e1429]: Jun 30, 2019 - Christy Chin, MD
+                  - generic [ref=e1430]: In range
+                - 'button "Expand BR- E-GFR, AFRICAN AMERICAN BR- E-GFR, AFRICAN AMERICAN 3 results 134 mL/min Range: >or=60 No mapped standard; using source range. Jun 30, 2019 COMPREHENSIVE METABOLIC PANEL Jun 30, 2019 - Christy Chin, MD In range" [ref=e1432] [cursor=pointer]':
+                  - generic [ref=e1433]:
+                    - button "Expand BR- E-GFR, AFRICAN AMERICAN" [ref=e1434]:
+                      - img [ref=e1435]
+                    - generic [ref=e1437]:
+                      - heading "BR- E-GFR, AFRICAN AMERICAN" [level=2] [ref=e1438]
+                      - generic [ref=e1440]: 3 results
+                  - generic [ref=e1441]: 134 mL/min
+                  - generic [ref=e1442]:
+                    - generic [ref=e1444]: "Range: >or=60"
+                    - generic [ref=e1445]: No mapped standard; using source range.
+                  - generic [ref=e1446]: Jun 30, 2019
+                  - link "COMPREHENSIVE METABOLIC PANEL Jun 30, 2019 - Christy Chin, MD" [ref=e1449]:
+                    - /url: /demo/timeline#Jun-30-2019
+                    - img [ref=e1450]
+                    - generic [ref=e1452]:
+                      - generic [ref=e1453]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e1454]: Jun 30, 2019 - Christy Chin, MD
+                  - generic [ref=e1455]: In range
+                - 'button "Expand BR- E-GFR BR- E-GFR 3 results 116 mL/min Range: >or=60 No mapped standard; using source range. Jun 30, 2019 COMPREHENSIVE METABOLIC PANEL Jun 30, 2019 - Christy Chin, MD In range" [ref=e1457] [cursor=pointer]':
+                  - generic [ref=e1458]:
+                    - button "Expand BR- E-GFR" [ref=e1459]:
+                      - img [ref=e1460]
+                    - generic [ref=e1462]:
+                      - heading "BR- E-GFR" [level=2] [ref=e1463]
+                      - generic [ref=e1465]: 3 results
+                  - generic [ref=e1466]: 116 mL/min
+                  - generic [ref=e1467]:
+                    - generic [ref=e1469]: "Range: >or=60"
+                    - generic [ref=e1470]: No mapped standard; using source range.
+                  - generic [ref=e1471]: Jun 30, 2019
+                  - link "COMPREHENSIVE METABOLIC PANEL Jun 30, 2019 - Christy Chin, MD" [ref=e1474]:
+                    - /url: /demo/timeline#Jun-30-2019
+                    - img [ref=e1475]
+                    - generic [ref=e1477]:
+                      - generic [ref=e1478]: COMPREHENSIVE METABOLIC PANEL
+                      - generic [ref=e1479]: Jun 30, 2019 - Christy Chin, MD
+                  - generic [ref=e1480]: In range
+                - 'button "Expand IMMATURE GRANULOCYTES IMMATURE GRANULOCYTES LOINC 71695-1 1 results 1 % Range: Not Estab. No mapped standard; using source range. Jul 30, 2017 CBC W/AUTOMATED DIFF Jul 30, 2017 - Ben Bora In range" [ref=e1482] [cursor=pointer]':
+                  - generic [ref=e1483]:
+                    - button "Expand IMMATURE GRANULOCYTES" [ref=e1484]:
+                      - img [ref=e1485]
+                    - generic [ref=e1487]:
+                      - heading "IMMATURE GRANULOCYTES" [level=2] [ref=e1488]
+                      - generic [ref=e1489]:
+                        - generic [ref=e1490]: LOINC 71695-1
+                        - generic [ref=e1491]: 1 results
+                  - generic [ref=e1492]: 1 %
+                  - generic [ref=e1493]:
+                    - generic [ref=e1495]: "Range: Not Estab."
+                    - generic [ref=e1496]: No mapped standard; using source range.
+                  - generic [ref=e1497]: Jul 30, 2017
+                  - link "CBC W/AUTOMATED DIFF Jul 30, 2017 - Ben Bora" [ref=e1500]:
+                    - /url: /demo/timeline#Jul-30-2017
+                    - img [ref=e1501]
+                    - generic [ref=e1503]:
+                      - generic [ref=e1504]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e1505]: Jul 30, 2017 - Ben Bora
+                  - generic [ref=e1506]: In range
+                - 'button "Expand IMMATURE GRANS (ABS) IMMATURE GRANS (ABS) LOINC 53115-2 1 results 0.1 x10E3/uL Range: 0.0 - 0.1 x10E3/uL No mapped standard; using source range. Jul 30, 2017 CBC W/AUTOMATED DIFF Jul 30, 2017 - Ben Bora In range" [ref=e1508] [cursor=pointer]':
+                  - generic [ref=e1509]:
+                    - button "Expand IMMATURE GRANS (ABS)" [ref=e1510]:
+                      - img [ref=e1511]
+                    - generic [ref=e1513]:
+                      - heading "IMMATURE GRANS (ABS)" [level=2] [ref=e1514]
+                      - generic [ref=e1515]:
+                        - generic [ref=e1516]: LOINC 53115-2
+                        - generic [ref=e1517]: 1 results
+                  - generic [ref=e1518]: 0.1 x10E3/uL
+                  - generic [ref=e1519]:
+                    - generic [ref=e1521]: "Range: 0.0 - 0.1 x10E3/uL"
+                    - generic [ref=e1522]: No mapped standard; using source range.
+                  - generic [ref=e1523]: Jul 30, 2017
+                  - link "CBC W/AUTOMATED DIFF Jul 30, 2017 - Ben Bora" [ref=e1526]:
+                    - /url: /demo/timeline#Jul-30-2017
+                    - img [ref=e1527]
+                    - generic [ref=e1529]:
+                      - generic [ref=e1530]: CBC W/AUTOMATED DIFF
+                      - generic [ref=e1531]: Jul 30, 2017 - Ben Bora
+                  - generic [ref=e1532]: In range
+    - generic [ref=e1534]:
+      - img "logo" [ref=e1535]
+      - link "Timeline" [ref=e1536] [cursor=pointer]:
+        - /url: /demo/timeline
+        - paragraph [ref=e1537]:
+          - img [ref=e1538]
+        - paragraph [ref=e1540]: Timeline
+      - link "Summary" [ref=e1541] [cursor=pointer]:
+        - /url: /demo/summary
+        - paragraph [ref=e1542]:
+          - img [ref=e1543]
+        - paragraph [ref=e1545]: Summary
+      - link "Records" [ref=e1546] [cursor=pointer]:
+        - /url: /demo/records
+        - paragraph [ref=e1547]:
+          - img [ref=e1548]
+        - paragraph [ref=e1550]: Records
+      - link "Connections" [ref=e1551] [cursor=pointer]:
+        - /url: /demo/connections
+        - paragraph [ref=e1552]:
+          - img [ref=e1553]
+        - paragraph [ref=e1555]: Connections
+      - link "Settings" [ref=e1556] [cursor=pointer]:
+        - /url: /demo/settings
+        - paragraph [ref=e1557]:
+          - img [ref=e1558]
+        - paragraph [ref=e1561]: Settings
+      - button "Notifications" [ref=e1562] [cursor=pointer]:
+        - img [ref=e1564]
+        - paragraph [ref=e1566]: Alerts
+      - generic [ref=e1570]:
+        - img "profile" [ref=e1572]
+        - generic [ref=e1573]:
+          - paragraph [ref=e1574]: John Smith
+          - link "View details" [ref=e1575] [cursor=pointer]:
+            - /url: /demo/settings
+  - generic [ref=e1578]:
+    - img [ref=e1580]
+    - paragraph [ref=e1583]: Welcome to the Mere Medical demo! We have added some test data for you. Some features are disabled while in demo mode.
+    - button "Close" [ref=e1585] [cursor=pointer]:
+      - generic [ref=e1586]: Close
+      - img [ref=e1587]

@@ -6,8 +6,8 @@
   "category": "hematology",
   "licenseRisk": "curated-citation",
   "url": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
-  "fetchedAt": "2026-05-26T18:58:36.643Z",
+  "fetchedAt": "2026-05-26T19:24:36.146Z",
   "bytes": 169612,
-  "sha256": "52819df6629c21253bac35e34707152dd2ed840ecef817f407af3ae1c5cf3495",
+  "sha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70",
   "contentType": "text/html; charset=UTF-8"
 }

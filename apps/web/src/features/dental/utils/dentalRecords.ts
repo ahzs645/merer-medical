@@ -24,6 +24,11 @@ const DENTAL_TERMS = [
   'pulp',
   'root canal',
   'scaling',
+  'cleaning',
+  'prophylaxis',
+  'hygiene',
+  'fluoride',
+  'recall',
   'tooth',
   'teeth',
 ];
@@ -44,6 +49,16 @@ const PERIO_TERMS = [
 ];
 
 const REFERRAL_TERMS = ['referral', 'consult', 'oral surgery', 'orthodont'];
+const CLEANING_TERMS = [
+  'cleaning',
+  'prophylaxis',
+  'hygiene',
+  'scaling',
+  'root planing',
+  'periodontal maintenance',
+  'fluoride',
+  'recall',
+];
 
 const SURFACE_PATTERN = /\b(MOD|MO|DO|MID|MOB|MOL|M|O|I|D|B|F|L)\b/g;
 const TOOTH_PATTERN =
@@ -88,6 +103,7 @@ export function buildDentalCounts(
 ) {
   return {
     conditions: records.filter((record) => record.kind === 'condition').length,
+    cleanings: records.filter((record) => record.kind === 'cleaning').length,
     findings: records.filter((record) => record.kind === 'finding').length,
     procedures: records.filter((record) => record.kind === 'procedure').length,
     treatmentPlan: records.filter((record) => record.kind === 'treatmentPlan')
@@ -110,6 +126,12 @@ function inferDentalKind(
   const resourceType = document.data_record.resource_type;
   const normalized = text.toLowerCase();
 
+  if (
+    resourceType === 'procedure' &&
+    CLEANING_TERMS.some((term) => normalized.includes(term))
+  ) {
+    return 'cleaning';
+  }
   if (PERIO_TERMS.some((term) => normalized.includes(term))) return 'perio';
   if (REFERRAL_TERMS.some((term) => normalized.includes(term))) {
     return 'referral';

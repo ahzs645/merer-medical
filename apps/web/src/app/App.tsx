@@ -34,6 +34,7 @@ import { ImagingTab } from '../features/imaging/ImagingTab';
 import MereAITab from '../features/ai-chat/MereAITab';
 import { ManualRecordTab } from '../features/manual-entry/ManualRecordTab';
 import OnPatientRedirect from '../features/connections/oauth-callbacks/OnPatientRedirect';
+import { OptometryTab } from '../features/optometry/OptometryTab';
 import { RecordsLayout } from '../features/records/RecordsLayout';
 import SettingsTab from '../features/settings/SettingsTab';
 import SummaryTab from '../features/summary/SummaryTab';
@@ -108,6 +109,10 @@ const routes = [
             element: <DentalTab />,
           },
           {
+            path: 'optometry',
+            element: <OptometryTab />,
+          },
+          {
             path: 'new',
             element: <ManualRecordTab />,
           },
@@ -172,6 +177,10 @@ const routes = [
       {
         path: '/dental',
         element: <Navigate to={AppRoutes.Dental} replace />,
+      },
+      {
+        path: '/optometry',
+        element: <Navigate to={AppRoutes.Optometry} replace />,
       },
       {
         path: '*',

@@ -4,8 +4,8 @@
   "parser": "profileOnly",
   "licenseRisk": "permission-gated-platform-specific",
   "url": "https://caliperproject.ca/caliper/database/",
-  "fetchedAt": "2026-05-26T18:58:43.052Z",
+  "fetchedAt": "2026-05-26T19:24:41.546Z",
   "bytes": 112937,
-  "sha256": "0f658c9a4b92c988be8ec2a68e7f3fbe1a47d4748795e6fdb9f059b297f62a55",
+  "sha256": "82bb6aa2c6b314abf9526b5c6479d9d8da0877a4aa228be8aec264a7b84c2422",
   "contentType": "text/html; charset=UTF-8"
 }

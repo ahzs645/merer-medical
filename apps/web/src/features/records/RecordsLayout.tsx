@@ -3,6 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import {
   BeakerIcon,
   DocumentPlusIcon,
+  EyeIcon,
   FaceSmileIcon,
   PhotoIcon,
 } from '@heroicons/react/24/outline';
@@ -13,6 +14,7 @@ const recordTabs = [
   { to: AppRoutes.Labs, label: 'Labs', icon: BeakerIcon },
   { to: AppRoutes.Imaging, label: 'Imaging', icon: PhotoIcon },
   { to: AppRoutes.Dental, label: 'Dental', icon: FaceSmileIcon },
+  { to: AppRoutes.Optometry, label: 'Optometry', icon: EyeIcon },
   { to: AppRoutes.AddRecord, label: 'Add record', icon: DocumentPlusIcon },
 ];
 

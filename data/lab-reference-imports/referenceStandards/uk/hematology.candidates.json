@@ -1,6 +1,34 @@
 [
   {
     "testIds": [
+      "neutrophils-pct",
+      "eosinophils-pct",
+      "basophils-pct",
+      "lymphocytes-pct",
+      "monocytes-pct"
+    ],
+    "name": "Differential percentage",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukWorcsFbc"
+    },
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "note",
+        "display": "Use absolute count",
+        "citationId": "UK-WORCS-FBC",
+        "note": "UK FBC differential intervals are represented as absolute counts in this source set.",
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "Differential percentage",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
+      }
+    ]
+  },
+  {
+    "testIds": [
       "hematocrit"
     ],
     "name": "Haematocrit",
@@ -19,7 +47,12 @@
         "citationId": "UK-WORCS-FBC",
         "sex": "male",
         "ageMinYears": 18,
-        "ageMaxYears": 150
+        "ageMaxYears": 150,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "Haematocrit",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       },
       {
         "label": "18 years up to 150 years, female",
@@ -31,7 +64,12 @@
         "citationId": "UK-WORCS-FBC",
         "sex": "female",
         "ageMinYears": 18,
-        "ageMaxYears": 150
+        "ageMaxYears": 150,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "Haematocrit",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       }
     ]
   },
@@ -55,7 +93,12 @@
         "citationId": "UK-WORCS-FBC",
         "sex": "male",
         "ageMinYears": 18,
-        "ageMaxYears": 150
+        "ageMaxYears": 150,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "Haemoglobin",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       },
       {
         "label": "18 years up to 150 years, female",
@@ -67,7 +110,66 @@
         "citationId": "UK-WORCS-FBC",
         "sex": "female",
         "ageMinYears": 18,
-        "ageMaxYears": 150
+        "ageMaxYears": 150,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "Haemoglobin",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "mch"
+    ],
+    "name": "MCH",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukWorcsFbc"
+    },
+    "bands": [
+      {
+        "label": "18 years up to 150 years",
+        "kind": "range",
+        "display": "28.0-32.0",
+        "unit": "pg",
+        "low": 28,
+        "high": 32,
+        "citationId": "UK-WORCS-FBC",
+        "ageMinYears": 18,
+        "ageMaxYears": 150,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "MCH",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
+      }
+    ]
+  },
+  {
+    "testIds": [
+      "mchc"
+    ],
+    "name": "MCHC",
+    "sourceReview": {
+      "status": "candidate",
+      "parser": "ukWorcsFbc"
+    },
+    "bands": [
+      {
+        "label": "All ages",
+        "kind": "range",
+        "display": "320-360",
+        "unit": "g/L",
+        "low": 320,
+        "high": 360,
+        "citationId": "UK-WORCS-FBC",
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "MCHC",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       }
     ]
   },
@@ -90,7 +192,12 @@
         "high": 96,
         "citationId": "UK-WORCS-FBC",
         "ageMinYears": 18,
-        "ageMaxYears": 150
+        "ageMaxYears": 150,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "Mean cell volume",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       }
     ]
   },
@@ -113,7 +220,12 @@
         "high": 400,
         "citationId": "UK-WORCS-FBC",
         "ageMinYears": 18,
-        "ageMaxYears": 150
+        "ageMaxYears": 150,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "Platelets",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       }
     ]
   },
@@ -137,7 +249,12 @@
         "citationId": "UK-WORCS-FBC",
         "sex": "male",
         "ageMinYears": 18,
-        "ageMaxYears": 150
+        "ageMaxYears": 150,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "Red blood cells",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       },
       {
         "label": "18 years up to 150 years, female",
@@ -149,7 +266,12 @@
         "citationId": "UK-WORCS-FBC",
         "sex": "female",
         "ageMinYears": 18,
-        "ageMaxYears": 150
+        "ageMaxYears": 150,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "Red blood cells",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       }
     ]
   },
@@ -172,7 +294,12 @@
         "high": 21,
         "citationId": "UK-WORCS-FBC",
         "ageMinDays": 7,
-        "ageMaxWeeks": 4
+        "ageMaxWeeks": 4,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "White blood cell count",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       },
       {
         "label": "1 month up to 6 months",
@@ -183,7 +310,12 @@
         "high": 19.5,
         "citationId": "UK-WORCS-FBC",
         "ageMinWeeks": 4,
-        "ageMaxWeeks": 26
+        "ageMaxWeeks": 26,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "White blood cell count",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       },
       {
         "label": "6 months up to 4 years",
@@ -194,7 +326,12 @@
         "high": 17.5,
         "citationId": "UK-WORCS-FBC",
         "ageMinWeeks": 26,
-        "ageMaxYears": 4
+        "ageMaxYears": 4,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "White blood cell count",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       },
       {
         "label": "4 years up to 6 years",
@@ -205,7 +342,12 @@
         "high": 15.5,
         "citationId": "UK-WORCS-FBC",
         "ageMinYears": 4,
-        "ageMaxYears": 6
+        "ageMaxYears": 6,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "White blood cell count",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       },
       {
         "label": "6 years up to 10 years",
@@ -216,7 +358,12 @@
         "high": 14.5,
         "citationId": "UK-WORCS-FBC",
         "ageMinYears": 6,
-        "ageMaxYears": 10
+        "ageMaxYears": 10,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "White blood cell count",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       },
       {
         "label": "10 years up to 16 years",
@@ -227,7 +374,12 @@
         "high": 13.5,
         "citationId": "UK-WORCS-FBC",
         "ageMinYears": 10,
-        "ageMaxYears": 16
+        "ageMaxYears": 16,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "White blood cell count",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       },
       {
         "label": "16 years up to 18 years",
@@ -238,7 +390,12 @@
         "high": 13,
         "citationId": "UK-WORCS-FBC",
         "ageMinYears": 16,
-        "ageMaxYears": 18
+        "ageMaxYears": 18,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "White blood cell count",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       },
       {
         "label": "18 years up to 150 years",
@@ -249,7 +406,12 @@
         "high": 11,
         "citationId": "UK-WORCS-FBC",
         "ageMinYears": 18,
-        "ageMaxYears": 150
+        "ageMaxYears": 150,
+        "sourceId": "uk-worcs-full-blood-count",
+        "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+        "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+        "sourceSection": "White blood cell count",
+        "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
       }
     ]
   }

@@ -1,0 +1,21 @@
+{
+  "promotedAt": "2026-05-26T19:24:42.223Z",
+  "targetDir": "/Users/ahmadjalil/github/merer-medical/apps/web/src/features/labs/enrichment/referenceStandards",
+  "promoted": [
+    {
+      "country": "australian",
+      "category": "chemistry",
+      "definitions": 14
+    },
+    {
+      "country": "uk",
+      "category": "chemistry",
+      "definitions": 5
+    },
+    {
+      "country": "uk",
+      "category": "hematology",
+      "definitions": 9
+    }
+  ]
+}

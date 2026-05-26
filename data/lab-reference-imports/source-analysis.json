@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T18:58:43.401Z",
+  "generatedAt": "2026-05-26T19:24:42.182Z",
   "purpose": "Review candidates extracted from lab reference sources. Outputs are not promoted into app reference standards automatically.",
   "sources": [
     {
@@ -11,7 +11,7 @@
       "licenseRisk": "permission-gated",
       "url": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
       "bytes": 181064,
-      "sha256": "65f92f395fe3bb1dadff11e8edd2ffa10d61b285b1c5a68d75ca2a002f6a739c",
+      "sha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa",
       "title": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
       "textBytes": 15236,
       "parserStatus": "candidate-json",
@@ -30,11 +30,11 @@
       "licenseRisk": "curated-citation",
       "url": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
       "bytes": 169612,
-      "sha256": "52819df6629c21253bac35e34707152dd2ed840ecef817f407af3ae1c5cf3495",
+      "sha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70",
       "title": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
       "textBytes": 11490,
       "parserStatus": "curated-candidate-json",
-      "definitionCount": 6,
+      "definitionCount": 9,
       "notes": [
         "Found 2/3 expected Worcestershire FBC terms.",
         "Definitions are curated from the source page and must be reviewed before promotion."
@@ -142,7 +142,7 @@
       "licenseRisk": "permission-gated-platform-specific",
       "url": "https://caliperproject.ca/caliper/database/",
       "bytes": 112937,
-      "sha256": "0f658c9a4b92c988be8ec2a68e7f3fbe1a47d4748795e6fdb9f059b297f62a55",
+      "sha256": "82bb6aa2c6b314abf9526b5c6479d9d8da0877a4aa228be8aec264a7b84c2422",
       "title": "Database (CALIPER) - CALIPER Project",
       "textBytes": 2614,
       "parserStatus": "profile-only",
@@ -182,6 +182,22 @@
       "notes": [
         "plausibility-thresholds source is intentionally not converted to ranges."
       ]
+    },
+    {
+      "id": "loinc-2-82-downloads",
+      "kind": "terminology-metadata",
+      "parser": "profileOnly",
+      "licenseRisk": "login-gated-reduce-before-runtime-use",
+      "url": "https://cdn.loinc.org/downloads/",
+      "bytes": 158792,
+      "sha256": "c46582b8dc04d3c093923fca36064cf3311596df7743794c49f922c6c6fdba7f",
+      "title": "Download LOINC - LOINC",
+      "textBytes": 7891,
+      "parserStatus": "profile-only",
+      "definitionCount": 0,
+      "notes": [
+        "terminology-metadata source is intentionally not converted to ranges."
+      ]
     }
   ],
   "candidates": {
@@ -202,7 +218,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinDays": 0,
             "ageMaxWeeks": 1,
-            "specimen": "serum/plasma"
+            "specimen": "serum/plasma",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Sodium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "1 week up to 18 years",
@@ -214,7 +235,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 1,
             "ageMaxYears": 18,
-            "specimen": "serum/plasma"
+            "specimen": "serum/plasma",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Sodium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years",
@@ -226,7 +252,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 18,
             "ageMaxYears": 120,
-            "specimen": "serum/plasma"
+            "specimen": "serum/plasma",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Sodium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -251,7 +282,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinDays": 0,
             "ageMaxWeeks": 1,
-            "specimen": "serum"
+            "specimen": "serum",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Potassium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "1 week up to 26 weeks",
@@ -263,7 +299,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 1,
             "ageMaxWeeks": 26,
-            "specimen": "serum"
+            "specimen": "serum",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Potassium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "26 weeks up to 2 years",
@@ -275,7 +316,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 26,
             "ageMaxYears": 2,
-            "specimen": "serum"
+            "specimen": "serum",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Potassium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "2 years up to 18 years",
@@ -287,7 +333,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 2,
             "ageMaxYears": 18,
-            "specimen": "serum"
+            "specimen": "serum",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Potassium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years",
@@ -299,7 +350,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 18,
             "ageMaxYears": 120,
-            "specimen": "serum"
+            "specimen": "serum",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Potassium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -324,7 +380,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinDays": 0,
             "ageMaxWeeks": 1,
-            "specimen": "plasma"
+            "specimen": "plasma",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Potassium plasma",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "1 week up to 26 weeks",
@@ -336,7 +397,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 1,
             "ageMaxWeeks": 26,
-            "specimen": "plasma"
+            "specimen": "plasma",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Potassium plasma",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "26 weeks up to 2 years",
@@ -348,7 +414,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 26,
             "ageMaxYears": 2,
-            "specimen": "plasma"
+            "specimen": "plasma",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Potassium plasma",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "2 years up to 18 years",
@@ -360,7 +431,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 2,
             "ageMaxYears": 18,
-            "specimen": "plasma"
+            "specimen": "plasma",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Potassium plasma",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -384,7 +460,12 @@
             "high": 115,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinDays": 0,
-            "ageMaxWeeks": 1
+            "ageMaxWeeks": 1,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Chloride",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "1 week up to 18 years",
@@ -395,7 +476,12 @@
             "high": 110,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 1,
-            "ageMaxYears": 18
+            "ageMaxYears": 18,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Chloride",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years",
@@ -406,7 +492,12 @@
             "high": 110,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 18,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Chloride",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -430,7 +521,12 @@
             "high": 28,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinDays": 0,
-            "ageMaxWeeks": 1
+            "ageMaxWeeks": 1,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Bicarbonate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "1 week up to 2 years",
@@ -441,7 +537,12 @@
             "high": 29,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 1,
-            "ageMaxYears": 2
+            "ageMaxYears": 2,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Bicarbonate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "2 years up to 10 years",
@@ -452,7 +553,12 @@
             "high": 30,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 2,
-            "ageMaxYears": 10
+            "ageMaxYears": 10,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Bicarbonate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "10 years up to 18 years",
@@ -463,7 +569,12 @@
             "high": 32,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 10,
-            "ageMaxYears": 18
+            "ageMaxYears": 18,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Bicarbonate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years",
@@ -474,7 +585,12 @@
             "high": 32,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 18,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Bicarbonate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -499,7 +615,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinDays": 0,
             "ageMaxWeeks": 1,
-            "method": "Vitros enzymatic assay"
+            "method": "Vitros enzymatic assay",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "1 week up to 4 weeks",
@@ -511,7 +632,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 1,
             "ageMaxWeeks": 4,
-            "method": "Vitros enzymatic assay"
+            "method": "Vitros enzymatic assay",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "4 weeks up to 2 years",
@@ -523,7 +649,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 4,
             "ageMaxYears": 2,
-            "method": "Vitros enzymatic assay"
+            "method": "Vitros enzymatic assay",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "2 years up to 6 years",
@@ -535,7 +666,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 2,
             "ageMaxYears": 6,
-            "method": "Vitros enzymatic assay"
+            "method": "Vitros enzymatic assay",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "6 years up to 12 years",
@@ -547,7 +683,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 6,
             "ageMaxYears": 12,
-            "method": "Vitros enzymatic assay"
+            "method": "Vitros enzymatic assay",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "12 years up to 15 years, male",
@@ -560,7 +701,12 @@
             "sex": "male",
             "ageMinYears": 12,
             "ageMaxYears": 15,
-            "method": "Vitros enzymatic assay"
+            "method": "Vitros enzymatic assay",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "15 years up to 19 years, male",
@@ -573,7 +719,12 @@
             "sex": "male",
             "ageMinYears": 15,
             "ageMaxYears": 19,
-            "method": "Vitros enzymatic assay"
+            "method": "Vitros enzymatic assay",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "19 years up to 60 years, male",
@@ -586,7 +737,12 @@
             "sex": "male",
             "ageMinYears": 19,
             "ageMaxYears": 60,
-            "method": "Vitros enzymatic assay"
+            "method": "Vitros enzymatic assay",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "12 years up to 15 years, female",
@@ -599,7 +755,12 @@
             "sex": "female",
             "ageMinYears": 12,
             "ageMaxYears": 15,
-            "method": "Vitros enzymatic assay"
+            "method": "Vitros enzymatic assay",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "15 years up to 19 years, female",
@@ -612,7 +773,12 @@
             "sex": "female",
             "ageMinYears": 15,
             "ageMaxYears": 19,
-            "method": "Vitros enzymatic assay"
+            "method": "Vitros enzymatic assay",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "19 years up to 60 years, female",
@@ -625,7 +791,12 @@
             "sex": "female",
             "ageMinYears": 19,
             "ageMaxYears": 60,
-            "method": "Vitros enzymatic assay"
+            "method": "Vitros enzymatic assay",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -649,7 +820,12 @@
             "high": 2.8,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinDays": 0,
-            "ageMaxWeeks": 1
+            "ageMaxWeeks": 1,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Calcium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "1 week up to 26 weeks",
@@ -660,7 +836,12 @@
             "high": 2.8,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 1,
-            "ageMaxWeeks": 26
+            "ageMaxWeeks": 26,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Calcium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "26 weeks up to 2 years",
@@ -671,7 +852,12 @@
             "high": 2.7,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 26,
-            "ageMaxYears": 2
+            "ageMaxYears": 2,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Calcium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "2 years up to 18 years",
@@ -682,7 +868,12 @@
             "high": 2.65,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 2,
-            "ageMaxYears": 18
+            "ageMaxYears": 18,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Calcium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years",
@@ -693,7 +884,12 @@
             "high": 2.6,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 18,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Calcium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -717,7 +913,12 @@
             "high": 2.6,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 18,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Calcium corrected for albumin",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -741,7 +942,12 @@
             "high": 2.85,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinDays": 0,
-            "ageMaxWeeks": 1
+            "ageMaxWeeks": 1,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Phosphate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "1 week up to 4 weeks",
@@ -752,7 +958,12 @@
             "high": 2.75,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 1,
-            "ageMaxWeeks": 4
+            "ageMaxWeeks": 4,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Phosphate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "4 weeks up to 26 weeks",
@@ -763,7 +974,12 @@
             "high": 2.5,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 4,
-            "ageMaxWeeks": 26
+            "ageMaxWeeks": 26,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Phosphate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "26 weeks up to 1 year",
@@ -774,7 +990,12 @@
             "high": 2.3,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 26,
-            "ageMaxYears": 1
+            "ageMaxYears": 1,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Phosphate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "1 year up to 4 years",
@@ -785,7 +1006,12 @@
             "high": 2.2,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 1,
-            "ageMaxYears": 4
+            "ageMaxYears": 4,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Phosphate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "4 years up to 15 years",
@@ -796,7 +1022,12 @@
             "high": 2,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 4,
-            "ageMaxYears": 15
+            "ageMaxYears": 15,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Phosphate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "15 years up to 18 years",
@@ -807,7 +1038,12 @@
             "high": 1.85,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 15,
-            "ageMaxYears": 18
+            "ageMaxYears": 18,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Phosphate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 20 years",
@@ -818,7 +1054,12 @@
             "high": 1.65,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 18,
-            "ageMaxYears": 20
+            "ageMaxYears": 20,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Phosphate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "20 years up to 120 years",
@@ -829,7 +1070,12 @@
             "high": 1.5,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 20,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Phosphate",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -853,7 +1099,12 @@
             "high": 1,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinDays": 0,
-            "ageMaxWeeks": 1
+            "ageMaxWeeks": 1,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Magnesium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "1 week up to 18 years",
@@ -864,7 +1115,12 @@
             "high": 1.1,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 1,
-            "ageMaxYears": 18
+            "ageMaxYears": 18,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Magnesium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years",
@@ -875,7 +1131,12 @@
             "high": 1.1,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 18,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Magnesium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years",
@@ -886,7 +1147,12 @@
             "high": 250,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 18,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Magnesium",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -910,7 +1176,12 @@
             "high": 380,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinDays": 0,
-            "ageMaxWeeks": 1
+            "ageMaxWeeks": 1,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "1 week up to 4 weeks",
@@ -921,7 +1192,12 @@
             "high": 550,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 1,
-            "ageMaxWeeks": 4
+            "ageMaxWeeks": 4,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "4 weeks up to 26 weeks",
@@ -932,7 +1208,12 @@
             "high": 650,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 4,
-            "ageMaxWeeks": 26
+            "ageMaxWeeks": 26,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "26 weeks up to 2 years",
@@ -943,7 +1224,12 @@
             "high": 450,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinWeeks": 26,
-            "ageMaxYears": 2
+            "ageMaxYears": 2,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "2 years up to 6 years",
@@ -954,7 +1240,12 @@
             "high": 370,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 2,
-            "ageMaxYears": 6
+            "ageMaxYears": 6,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "6 years up to 10 years",
@@ -965,7 +1256,12 @@
             "high": 440,
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 6,
-            "ageMaxYears": 10
+            "ageMaxYears": 10,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "10 years up to 14 years, male",
@@ -977,7 +1273,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "male",
             "ageMinYears": 10,
-            "ageMaxYears": 14
+            "ageMaxYears": 14,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "14 years up to 15 years, male",
@@ -989,7 +1290,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "male",
             "ageMinYears": 14,
-            "ageMaxYears": 15
+            "ageMaxYears": 15,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "15 years up to 17 years, male",
@@ -1001,7 +1307,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "male",
             "ageMinYears": 15,
-            "ageMaxYears": 17
+            "ageMaxYears": 17,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "17 years up to 19 years, male",
@@ -1013,7 +1324,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "male",
             "ageMinYears": 17,
-            "ageMaxYears": 19
+            "ageMaxYears": 19,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "19 years up to 22 years, male",
@@ -1025,7 +1341,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "male",
             "ageMinYears": 19,
-            "ageMaxYears": 22
+            "ageMaxYears": 22,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "22 years up to 120 years, male",
@@ -1037,7 +1358,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "male",
             "ageMinYears": 22,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "10 years up to 13 years, female",
@@ -1049,7 +1375,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "female",
             "ageMinYears": 10,
-            "ageMaxYears": 13
+            "ageMaxYears": 13,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "13 years up to 14 years, female",
@@ -1061,7 +1392,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "female",
             "ageMinYears": 13,
-            "ageMaxYears": 14
+            "ageMaxYears": 14,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "14 years up to 15 years, female",
@@ -1073,7 +1409,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "female",
             "ageMinYears": 14,
-            "ageMaxYears": 15
+            "ageMaxYears": 15,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "15 years up to 16 years, female",
@@ -1085,7 +1426,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "female",
             "ageMinYears": 15,
-            "ageMaxYears": 16
+            "ageMaxYears": 16,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "16 years up to 22 years, female",
@@ -1097,7 +1443,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "female",
             "ageMinYears": 16,
-            "ageMaxYears": 22
+            "ageMaxYears": 22,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "22 years up to 120 years, female",
@@ -1109,7 +1460,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "female",
             "ageMinYears": 22,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years, female",
@@ -1121,7 +1477,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "female",
             "ageMinYears": 18,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years, female",
@@ -1133,7 +1494,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "female",
             "ageMinYears": 18,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 60 years, male",
@@ -1145,7 +1511,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "male",
             "ageMinYears": 18,
-            "ageMaxYears": 60
+            "ageMaxYears": 60,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "60 years up to 120 years, male",
@@ -1157,7 +1528,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "male",
             "ageMinYears": 60,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years, female",
@@ -1169,7 +1545,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "female",
             "ageMinYears": 18,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alkaline phosphatase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -1195,7 +1576,12 @@
             "sex": "male",
             "ageMinYears": 18,
             "ageMaxYears": 120,
-            "method": "No pyridoxal 5-phosphate"
+            "method": "No pyridoxal 5-phosphate",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alanine aminotransferase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years, female",
@@ -1208,7 +1594,12 @@
             "sex": "female",
             "ageMinYears": 18,
             "ageMaxYears": 120,
-            "method": "No pyridoxal 5-phosphate"
+            "method": "No pyridoxal 5-phosphate",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Alanine aminotransferase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -1234,7 +1625,12 @@
             "sex": "male",
             "ageMinYears": 18,
             "ageMaxYears": 120,
-            "method": "No pyridoxal 5-phosphate"
+            "method": "No pyridoxal 5-phosphate",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Aspartate aminotransferase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years, female",
@@ -1247,7 +1643,12 @@
             "sex": "female",
             "ageMinYears": 18,
             "ageMaxYears": 120,
-            "method": "No pyridoxal 5-phosphate"
+            "method": "No pyridoxal 5-phosphate",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Aspartate aminotransferase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -1272,7 +1673,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "male",
             "ageMinYears": 18,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Gamma glutamyltransferase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           },
           {
             "label": "18 years up to 120 years, female",
@@ -1284,7 +1690,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "sex": "female",
             "ageMinYears": 18,
-            "ageMaxYears": 120
+            "ageMaxYears": 120,
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Gamma glutamyltransferase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -1309,7 +1720,12 @@
             "citationId": "AUS-RCPA-CHEM-HRI",
             "ageMinYears": 18,
             "ageMaxYears": 120,
-            "note": "Adult serum lipase interval excludes Siemens Dimension and Ortho Clinical Vitros assays."
+            "note": "Adult serum lipase interval excludes Siemens Dimension and Ortho Clinical Vitros assays.",
+            "sourceId": "rcpa-table-6-chemistry",
+            "sourceUrl": "https://www.rcpa.edu.au/Manuals/RCPA-Manual/General-Information/IG/Table-6-Harmonised-reference-intervals-for-chem",
+            "sourceTitle": "RCPA - Table 6 - Harmonised reference intervals for chemical pathology",
+            "sourceSection": "Lipase",
+            "sourceSha256": "438860b1431940e6a197b08851c81fd37483f174213f73c580e63afd64567dfa"
           }
         ],
         "sourceReview": {
@@ -1339,7 +1755,12 @@
             "high": 21,
             "citationId": "UK-WORCS-FBC",
             "ageMinDays": 7,
-            "ageMaxWeeks": 4
+            "ageMaxWeeks": 4,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "White blood cell count",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           },
           {
             "label": "1 month up to 6 months",
@@ -1350,7 +1771,12 @@
             "high": 19.5,
             "citationId": "UK-WORCS-FBC",
             "ageMinWeeks": 4,
-            "ageMaxWeeks": 26
+            "ageMaxWeeks": 26,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "White blood cell count",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           },
           {
             "label": "6 months up to 4 years",
@@ -1361,7 +1787,12 @@
             "high": 17.5,
             "citationId": "UK-WORCS-FBC",
             "ageMinWeeks": 26,
-            "ageMaxYears": 4
+            "ageMaxYears": 4,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "White blood cell count",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           },
           {
             "label": "4 years up to 6 years",
@@ -1372,7 +1803,12 @@
             "high": 15.5,
             "citationId": "UK-WORCS-FBC",
             "ageMinYears": 4,
-            "ageMaxYears": 6
+            "ageMaxYears": 6,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "White blood cell count",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           },
           {
             "label": "6 years up to 10 years",
@@ -1383,7 +1819,12 @@
             "high": 14.5,
             "citationId": "UK-WORCS-FBC",
             "ageMinYears": 6,
-            "ageMaxYears": 10
+            "ageMaxYears": 10,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "White blood cell count",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           },
           {
             "label": "10 years up to 16 years",
@@ -1394,7 +1835,12 @@
             "high": 13.5,
             "citationId": "UK-WORCS-FBC",
             "ageMinYears": 10,
-            "ageMaxYears": 16
+            "ageMaxYears": 16,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "White blood cell count",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           },
           {
             "label": "16 years up to 18 years",
@@ -1405,7 +1851,12 @@
             "high": 13,
             "citationId": "UK-WORCS-FBC",
             "ageMinYears": 16,
-            "ageMaxYears": 18
+            "ageMaxYears": 18,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "White blood cell count",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           },
           {
             "label": "18 years up to 150 years",
@@ -1416,7 +1867,12 @@
             "high": 11,
             "citationId": "UK-WORCS-FBC",
             "ageMinYears": 18,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "White blood cell count",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           }
         ]
       },
@@ -1440,7 +1896,12 @@
             "citationId": "UK-WORCS-FBC",
             "sex": "male",
             "ageMinYears": 18,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "Haemoglobin",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           },
           {
             "label": "18 years up to 150 years, female",
@@ -1452,7 +1913,12 @@
             "citationId": "UK-WORCS-FBC",
             "sex": "female",
             "ageMinYears": 18,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "Haemoglobin",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           }
         ]
       },
@@ -1476,7 +1942,12 @@
             "citationId": "UK-WORCS-FBC",
             "sex": "male",
             "ageMinYears": 18,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "Red blood cells",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           },
           {
             "label": "18 years up to 150 years, female",
@@ -1488,7 +1959,12 @@
             "citationId": "UK-WORCS-FBC",
             "sex": "female",
             "ageMinYears": 18,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "Red blood cells",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           }
         ]
       },
@@ -1512,7 +1988,12 @@
             "citationId": "UK-WORCS-FBC",
             "sex": "male",
             "ageMinYears": 18,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "Haematocrit",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           },
           {
             "label": "18 years up to 150 years, female",
@@ -1524,7 +2005,12 @@
             "citationId": "UK-WORCS-FBC",
             "sex": "female",
             "ageMinYears": 18,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "Haematocrit",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           }
         ]
       },
@@ -1547,7 +2033,12 @@
             "high": 96,
             "citationId": "UK-WORCS-FBC",
             "ageMinYears": 18,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "Mean cell volume",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           }
         ]
       },
@@ -1570,7 +2061,94 @@
             "high": 400,
             "citationId": "UK-WORCS-FBC",
             "ageMinYears": 18,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "Platelets",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
+          }
+        ]
+      },
+      {
+        "testIds": [
+          "mch"
+        ],
+        "name": "MCH",
+        "sourceReview": {
+          "status": "candidate",
+          "parser": "ukWorcsFbc"
+        },
+        "bands": [
+          {
+            "label": "18 years up to 150 years",
+            "kind": "range",
+            "display": "28.0-32.0",
+            "unit": "pg",
+            "low": 28,
+            "high": 32,
+            "citationId": "UK-WORCS-FBC",
+            "ageMinYears": 18,
+            "ageMaxYears": 150,
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "MCH",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
+          }
+        ]
+      },
+      {
+        "testIds": [
+          "mchc"
+        ],
+        "name": "MCHC",
+        "sourceReview": {
+          "status": "candidate",
+          "parser": "ukWorcsFbc"
+        },
+        "bands": [
+          {
+            "label": "All ages",
+            "kind": "range",
+            "display": "320-360",
+            "unit": "g/L",
+            "low": 320,
+            "high": 360,
+            "citationId": "UK-WORCS-FBC",
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "MCHC",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
+          }
+        ]
+      },
+      {
+        "testIds": [
+          "neutrophils-pct",
+          "eosinophils-pct",
+          "basophils-pct",
+          "lymphocytes-pct",
+          "monocytes-pct"
+        ],
+        "name": "Differential percentage",
+        "sourceReview": {
+          "status": "candidate",
+          "parser": "ukWorcsFbc"
+        },
+        "bands": [
+          {
+            "label": "All ages",
+            "kind": "note",
+            "display": "Use absolute count",
+            "citationId": "UK-WORCS-FBC",
+            "note": "UK FBC differential intervals are represented as absolute counts in this source set.",
+            "sourceId": "uk-worcs-full-blood-count",
+            "sourceUrl": "https://www.worcsacute.nhs.uk/pathology-tests-a-to-z/full-blood-count/",
+            "sourceTitle": "Full Blood Count - Worcestershire Acute Hospitals NHS Trust",
+            "sourceSection": "Differential percentage",
+            "sourceSha256": "654d6c1db936fdd6c981f3f8c95512f529175cf4ad2a1bfbe2501e764b399d70"
           }
         ]
       }
@@ -1593,7 +2171,12 @@
             "unit": "mmol/L",
             "low": 133,
             "high": 146,
-            "citationId": "UK-GLOS-SODIUM"
+            "citationId": "UK-GLOS-SODIUM",
+            "sourceId": "uk-glos-sodium",
+            "sourceUrl": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/sodium-na/",
+            "sourceTitle": "Sodium (Na)",
+            "sourceSection": "Sodium",
+            "sourceSha256": "b1523ddd10fdc267d94d44f194b995fd9f478a43927ab27db9ca102927b64c14"
           }
         ]
       },
@@ -1614,7 +2197,12 @@
             "unit": "mmol/L",
             "low": 3.5,
             "high": 5.3,
-            "citationId": "UK-GLOS-POTASSIUM"
+            "citationId": "UK-GLOS-POTASSIUM",
+            "sourceId": "uk-glos-potassium",
+            "sourceUrl": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/potassium-k/",
+            "sourceTitle": "Potassium (K)",
+            "sourceSection": "Potassium",
+            "sourceSha256": "f6029633c3d90750d6f06277cc9ef69ac3ced0c4ce55151c84db2b56a141e2aa"
           }
         ]
       },
@@ -1636,7 +2224,12 @@
             "low": 30,
             "high": 45,
             "citationId": "UK-GLOS-ALBUMIN",
-            "ageMaxYears": 1
+            "ageMaxYears": 1,
+            "sourceId": "uk-glos-albumin",
+            "sourceUrl": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/albumin/",
+            "sourceTitle": "Albumin",
+            "sourceSection": "Albumin",
+            "sourceSha256": "46bfb641cb6d3727bd20fb59101ffc6e371e3a295da6901ad61ba3a50ce0b1c6"
           },
           {
             "label": "1 year up to 16 years",
@@ -1647,7 +2240,12 @@
             "high": 50,
             "citationId": "UK-GLOS-ALBUMIN",
             "ageMinYears": 1,
-            "ageMaxYears": 16
+            "ageMaxYears": 16,
+            "sourceId": "uk-glos-albumin",
+            "sourceUrl": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/albumin/",
+            "sourceTitle": "Albumin",
+            "sourceSection": "Albumin",
+            "sourceSha256": "46bfb641cb6d3727bd20fb59101ffc6e371e3a295da6901ad61ba3a50ce0b1c6"
           },
           {
             "label": "16 years up to 150 years",
@@ -1658,7 +2256,12 @@
             "high": 50,
             "citationId": "UK-GLOS-ALBUMIN",
             "ageMinYears": 16,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-glos-albumin",
+            "sourceUrl": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/albumin/",
+            "sourceTitle": "Albumin",
+            "sourceSection": "Albumin",
+            "sourceSha256": "46bfb641cb6d3727bd20fb59101ffc6e371e3a295da6901ad61ba3a50ce0b1c6"
           }
         ]
       },
@@ -1681,7 +2284,12 @@
             "high": 77,
             "citationId": "UK-GLOS-CREATININE-EGFR",
             "ageMinDays": 0,
-            "ageMaxDays": 14
+            "ageMaxDays": 14,
+            "sourceId": "uk-glos-creatinine-egfr",
+            "sourceUrl": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/creatinine-and-egfr-ckd-epi/",
+            "sourceTitle": "Creatinine and eGFR CKD-EPI",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "c6bcc2f5f04bab86cfea24bcbe05b34a45c969f6c105678318656bd99f2d6ab1"
           },
           {
             "label": "14 days up to 1 year",
@@ -1692,7 +2300,12 @@
             "high": 34,
             "citationId": "UK-GLOS-CREATININE-EGFR",
             "ageMinDays": 14,
-            "ageMaxYears": 1
+            "ageMaxYears": 1,
+            "sourceId": "uk-glos-creatinine-egfr",
+            "sourceUrl": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/creatinine-and-egfr-ckd-epi/",
+            "sourceTitle": "Creatinine and eGFR CKD-EPI",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "c6bcc2f5f04bab86cfea24bcbe05b34a45c969f6c105678318656bd99f2d6ab1"
           },
           {
             "label": "15 years up to 150 years, male",
@@ -1704,7 +2317,12 @@
             "citationId": "UK-GLOS-CREATININE-EGFR",
             "sex": "male",
             "ageMinYears": 15,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-glos-creatinine-egfr",
+            "sourceUrl": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/creatinine-and-egfr-ckd-epi/",
+            "sourceTitle": "Creatinine and eGFR CKD-EPI",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "c6bcc2f5f04bab86cfea24bcbe05b34a45c969f6c105678318656bd99f2d6ab1"
           },
           {
             "label": "15 years up to 150 years, female",
@@ -1716,7 +2334,12 @@
             "citationId": "UK-GLOS-CREATININE-EGFR",
             "sex": "female",
             "ageMinYears": 15,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-glos-creatinine-egfr",
+            "sourceUrl": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/creatinine-and-egfr-ckd-epi/",
+            "sourceTitle": "Creatinine and eGFR CKD-EPI",
+            "sourceSection": "Creatinine",
+            "sourceSha256": "c6bcc2f5f04bab86cfea24bcbe05b34a45c969f6c105678318656bd99f2d6ab1"
           }
         ]
       },
@@ -1739,7 +2362,12 @@
             "high": 15.2,
             "citationId": "UK-GLOS-THYROID",
             "ageMinDays": 0,
-            "ageMaxDays": 7
+            "ageMaxDays": 7,
+            "sourceId": "uk-glos-thyroid",
+            "sourceUrl": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/thyroid-function-tests-tsh-ft4-ft3/",
+            "sourceTitle": "Thyroid Function Tests (TSH, FT4, FT3)",
+            "sourceSection": "TSH",
+            "sourceSha256": "080dcf5b4c81c0ff3d6885a376e3f9f700522d94658ebb7b4cff01e29f2ae52a"
           },
           {
             "label": "7 days up to 15 days",
@@ -1750,7 +2378,12 @@
             "high": 11,
             "citationId": "UK-GLOS-THYROID",
             "ageMinDays": 7,
-            "ageMaxDays": 15
+            "ageMaxDays": 15,
+            "sourceId": "uk-glos-thyroid",
+            "sourceUrl": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/thyroid-function-tests-tsh-ft4-ft3/",
+            "sourceTitle": "Thyroid Function Tests (TSH, FT4, FT3)",
+            "sourceSection": "TSH",
+            "sourceSha256": "080dcf5b4c81c0ff3d6885a376e3f9f700522d94658ebb7b4cff01e29f2ae52a"
           },
           {
             "label": "15 days up to 150 years",
@@ -1761,7 +2394,12 @@
             "high": 4.2,
             "citationId": "UK-GLOS-THYROID",
             "ageMinDays": 15,
-            "ageMaxYears": 150
+            "ageMaxYears": 150,
+            "sourceId": "uk-glos-thyroid",
+            "sourceUrl": "https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/thyroid-function-tests-tsh-ft4-ft3/",
+            "sourceTitle": "Thyroid Function Tests (TSH, FT4, FT3)",
+            "sourceSection": "TSH",
+            "sourceSha256": "080dcf5b4c81c0ff3d6885a376e3f9f700522d94658ebb7b4cff01e29f2ae52a"
           }
         ]
       }

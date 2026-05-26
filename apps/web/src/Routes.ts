@@ -5,6 +5,7 @@ export enum Routes {
   LabDetail = '/records/labs/:labKey',
   Imaging = '/records/imaging',
   Dental = '/records/dental',
+  Optometry = '/records/optometry',
   AddRecord = '/records/new',
   EditRecord = '/records/:recordId/edit',
   AddConnection = '/connections',

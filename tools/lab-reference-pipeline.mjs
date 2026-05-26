@@ -7,6 +7,16 @@ import { dirname, join, resolve } from 'node:path';
 const repoRoot = resolve(dirname(new URL(import.meta.url).pathname), '..');
 const sourceDir = join(repoRoot, 'data', 'lab-reference-sources');
 const outputDir = join(repoRoot, 'data', 'lab-reference-imports');
+const appReferenceDir = join(
+  repoRoot,
+  'apps',
+  'web',
+  'src',
+  'features',
+  'labs',
+  'enrichment',
+  'referenceStandards',
+);
 
 const sources = [
   {
@@ -93,6 +103,13 @@ const sources = [
     licenseRisk: 'separate-from-reference-standards',
     url: 'https://ohdsi.github.io/DataQualityDashboard/articles/Thresholds.html',
   },
+  {
+    id: 'loinc-2-82-downloads',
+    kind: 'terminology-metadata',
+    parser: 'profileOnly',
+    licenseRisk: 'login-gated-reduce-before-runtime-use',
+    url: 'https://cdn.loinc.org/downloads/',
+  },
 ];
 
 const sourceById = new Map(sources.map((source) => [source.id, source]));
@@ -128,10 +145,11 @@ async function main() {
 
   const shouldFetch = hasFlag('fetch') || hasFlag('all');
   const shouldAnalyze = hasFlag('analyze') || hasFlag('all');
+  const shouldPromote = hasFlag('promote-reviewed') || hasFlag('promote');
 
-  if (!shouldFetch && !shouldAnalyze) {
+  if (!shouldFetch && !shouldAnalyze && !shouldPromote) {
     console.error(
-      'Usage: node tools/lab-reference-pipeline.mjs --list | --fetch | --analyze | --all [--source id]',
+      'Usage: node tools/lab-reference-pipeline.mjs --list | --fetch | --analyze | --all | --promote-reviewed [--source id]',
     );
     process.exit(1);
   }
@@ -148,6 +166,9 @@ async function main() {
   if (shouldAnalyze) {
     const analysis = await analyzeSources(picked);
     await writeAnalysis(analysis);
+  }
+  if (shouldPromote) {
+    await promoteReviewedCandidates();
   }
 }
 
@@ -206,18 +227,19 @@ async function analyzeSources(picked) {
     };
 
     const parsed = parseSource(source, text);
+    const definitions = addSourceReferences(parsed.definitions, profile);
     analysis.sources.push({
       ...profile,
       parserStatus: parsed.status,
-      definitionCount: parsed.definitions.length,
+      definitionCount: definitions.length,
       notes: parsed.notes,
     });
 
-    if (parsed.definitions.length > 0 && source.country && source.category) {
+    if (definitions.length > 0 && source.country && source.category) {
       const key = `${source.country}/${source.category}`;
       analysis.candidates[key] = [
         ...(analysis.candidates[key] || []),
-        ...parsed.definitions,
+        ...definitions,
       ];
     }
   }
@@ -270,6 +292,73 @@ async function writeAnalysis(analysis) {
   }
 
   console.log(`Wrote lab reference import review to ${outputDir}`);
+}
+
+async function promoteReviewedCandidates() {
+  const candidateRoot = join(outputDir, 'referenceStandards');
+  const promoted = [];
+
+  for (const country of await safeReadDir(candidateRoot)) {
+    const countryDir = join(candidateRoot, country);
+    const entries = await safeReadDir(countryDir);
+    for (const entry of entries) {
+      if (!entry.endsWith('.candidates.json')) continue;
+
+      const category = entry.replace(/\.candidates\.json$/, '');
+      const candidatePath = join(countryDir, entry);
+      const targetDir = join(appReferenceDir, country);
+      const targetPath = join(targetDir, `${category}.json`);
+      const definitions = JSON.parse(await fs.readFile(candidatePath, 'utf8'));
+
+      await fs.mkdir(targetDir, { recursive: true });
+      await fs.writeFile(
+        targetPath,
+        `${JSON.stringify(definitions, null, 2)}\n`,
+      );
+      promoted.push({ country, category, definitions: definitions.length });
+    }
+  }
+
+  await fs.writeFile(
+    join(outputDir, 'promoted-reference-standards.json'),
+    `${JSON.stringify(
+      {
+        promotedAt: new Date().toISOString(),
+        targetDir: appReferenceDir,
+        promoted,
+      },
+      null,
+      2,
+    )}\n`,
+  );
+
+  console.log(
+    `Promoted ${promoted.length} candidate files to ${appReferenceDir}`,
+  );
+}
+
+async function safeReadDir(path) {
+  try {
+    return await fs.readdir(path);
+  } catch (error) {
+    if (error.code === 'ENOENT') return [];
+    throw error;
+  }
+}
+
+function addSourceReferences(definitions, sourceProfile) {
+  return definitions.map((definition) => ({
+    ...definition,
+    bands: definition.bands.map((band) => ({
+      ...band,
+      sourceId: sourceProfile.id,
+      sourceUrl: sourceProfile.url,
+      sourceTitle: sourceProfile.title,
+      sourceSection:
+        band.sourceSection || definition.sourceSection || definition.name,
+      sourceSha256: sourceProfile.sha256,
+    })),
+  }));
 }
 
 function parseRcpaChemistry(text) {
@@ -824,6 +913,51 @@ const ukWorcsFbcDefinitions = [
           ageMaxYears: 150,
         },
       ),
+    ],
+  },
+  {
+    testIds: ['mch'],
+    name: 'MCH',
+    sourceReview: { status: 'candidate', parser: 'ukWorcsFbc' },
+    bands: [
+      rangeBand(
+        '18 years up to 150 years',
+        '28.0-32.0',
+        'pg',
+        28,
+        32,
+        'UK-WORCS-FBC',
+        {
+          ageMinYears: 18,
+          ageMaxYears: 150,
+        },
+      ),
+    ],
+  },
+  {
+    testIds: ['mchc'],
+    name: 'MCHC',
+    sourceReview: { status: 'candidate', parser: 'ukWorcsFbc' },
+    bands: [rangeBand('All ages', '320-360', 'g/L', 320, 360, 'UK-WORCS-FBC')],
+  },
+  {
+    testIds: [
+      'neutrophils-pct',
+      'eosinophils-pct',
+      'basophils-pct',
+      'lymphocytes-pct',
+      'monocytes-pct',
+    ],
+    name: 'Differential percentage',
+    sourceReview: { status: 'candidate', parser: 'ukWorcsFbc' },
+    bands: [
+      {
+        label: 'All ages',
+        kind: 'note',
+        display: 'Use absolute count',
+        citationId: 'UK-WORCS-FBC',
+        note: 'UK FBC differential intervals are represented as absolute counts in this source set.',
+      },
     ],
   },
 ];

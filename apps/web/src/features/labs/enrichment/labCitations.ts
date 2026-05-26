@@ -83,6 +83,41 @@ export const labCitations: Record<string, LabCitation> = {
     quote:
       'NHS pathology page lists serum sodium reference range as 133-146 mmol/L.',
   },
+  'UK-GLOS-POTASSIUM': {
+    id: 'UK-GLOS-POTASSIUM',
+    source: 'Gloucestershire Hospitals NHS potassium',
+    fullCitation:
+      'Gloucestershire Hospitals NHS Foundation Trust. Potassium (K).',
+    url: 'https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/potassium-k/',
+    quote:
+      'NHS pathology page lists serum potassium and adult 24 hour urine potassium reference ranges.',
+  },
+  'UK-GLOS-ALBUMIN': {
+    id: 'UK-GLOS-ALBUMIN',
+    source: 'Gloucestershire Hospitals NHS albumin',
+    fullCitation: 'Gloucestershire Hospitals NHS Foundation Trust. Albumin.',
+    url: 'https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/albumin/',
+    quote:
+      'NHS pathology page lists age-partitioned albumin reference ranges and page review/update date.',
+  },
+  'UK-GLOS-CREATININE-EGFR': {
+    id: 'UK-GLOS-CREATININE-EGFR',
+    source: 'Gloucestershire Hospitals NHS creatinine/eGFR',
+    fullCitation:
+      'Gloucestershire Hospitals NHS Foundation Trust. Creatinine and eGFR CKD-EPI.',
+    url: 'https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/creatinine-and-egfr-ckd-epi/',
+    quote:
+      'NHS pathology page lists creatinine intervals by pediatric age bands and sex-specific adolescent/adult partitions.',
+  },
+  'UK-GLOS-THYROID': {
+    id: 'UK-GLOS-THYROID',
+    source: 'Gloucestershire Hospitals NHS thyroid function tests',
+    fullCitation:
+      'Gloucestershire Hospitals NHS Foundation Trust. Thyroid Function Tests (TSH, FT4, FT3).',
+    url: 'https://www.gloshospitals.nhs.uk/our-services/services-we-offer/pathology/tests-and-investigations/thyroid-function-tests-tsh-ft4-ft3/',
+    quote:
+      'NHS pathology page lists adult, pediatric, and pregnancy-related intervals for TSH, FT4, and FT3.',
+  },
   'UK-WORCS-LIPIDS': {
     id: 'UK-WORCS-LIPIDS',
     source: 'Worcestershire Acute Hospitals NHS cholesterol health check',

@@ -1,18 +1,17 @@
-import { DentalWorkspaceData } from '../types';
+import { OptometryWorkspaceData } from '../types';
 
-export function DentalSummaryPanel({
+export function OptometrySummaryPanel({
   counts,
 }: {
-  counts: DentalWorkspaceData['counts'];
+  counts: OptometryWorkspaceData['counts'];
 }) {
   const stats = [
-    { label: 'Findings', value: counts.findings },
-    { label: 'Conditions', value: counts.conditions },
-    { label: 'Cleanings', value: counts.cleanings },
-    { label: 'Procedures', value: counts.procedures },
-    { label: 'Treatment plan', value: counts.treatmentPlan },
-    { label: 'Perio', value: counts.perio },
-    { label: 'Images', value: counts.images },
+    { label: 'Prescriptions', value: counts.prescriptions },
+    { label: 'Refractions', value: counts.refractions },
+    { label: 'Visual acuity', value: counts.visualAcuity },
+    { label: 'IOP', value: counts.iop },
+    { label: 'Diagnoses', value: counts.diagnoses },
+    { label: 'Imaging', value: counts.imaging },
   ];
 
   return (

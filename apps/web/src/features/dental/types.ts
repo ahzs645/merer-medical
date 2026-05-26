@@ -6,6 +6,7 @@ export type ToothSurface = 'M' | 'O' | 'I' | 'D' | 'B' | 'F' | 'L';
 export type DentalRecordKind =
   | 'condition'
   | 'finding'
+  | 'cleaning'
   | 'procedure'
   | 'treatmentPlan'
   | 'perio'
@@ -37,6 +38,7 @@ export type DentalWorkspaceData = {
   recordsByTooth: Map<string, DentalRecord[]>;
   counts: {
     conditions: number;
+    cleanings: number;
     findings: number;
     procedures: number;
     treatmentPlan: number;
