@@ -5,6 +5,7 @@ import {
   createBrowserRouter,
   Navigate,
   RouterProvider,
+  useParams,
 } from 'react-router-dom';
 
 import { ErrorBoundary } from '../shared/components/ErrorBoundary';
@@ -32,6 +33,7 @@ import { ImagingTab } from '../features/imaging/ImagingTab';
 import MereAITab from '../features/ai-chat/MereAITab';
 import { ManualRecordTab } from '../features/manual-entry/ManualRecordTab';
 import OnPatientRedirect from '../features/connections/oauth-callbacks/OnPatientRedirect';
+import { RecordsLayout } from '../features/records/RecordsLayout';
 import SettingsTab from '../features/settings/SettingsTab';
 import SummaryTab from '../features/summary/SummaryTab';
 import { TimelineTab } from '../features/timeline/TimelineTab';
@@ -81,28 +83,38 @@ const routes = [
         element: <TimelineTab />,
       },
       {
-        path: AppRoutes.Labs,
-        element: <LabsTab />,
-      },
-      {
-        path: AppRoutes.LabDetail,
-        element: <LabDetailTab />,
-      },
-      {
-        path: AppRoutes.Imaging,
-        element: <ImagingTab />,
+        path: AppRoutes.Records,
+        element: <RecordsLayout />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to={AppRoutes.Labs} replace />,
+          },
+          {
+            path: 'labs',
+            element: <LabsTab />,
+          },
+          {
+            path: 'labs/:labKey',
+            element: <LabDetailTab />,
+          },
+          {
+            path: 'imaging',
+            element: <ImagingTab />,
+          },
+          {
+            path: 'new',
+            element: <ManualRecordTab />,
+          },
+          {
+            path: ':recordId/edit',
+            element: <ManualRecordTab />,
+          },
+        ],
       },
       {
         path: AppRoutes.AddConnection,
         element: <ConnectionTab />,
-      },
-      {
-        path: AppRoutes.AddRecord,
-        element: <ManualRecordTab />,
-      },
-      {
-        path: AppRoutes.EditRecord,
-        element: <ManualRecordTab />,
       },
       {
         path: AppRoutes.MereAIAssistant,
@@ -141,6 +153,18 @@ const routes = [
         element: <HealowRedirect />,
       },
       {
+        path: '/labs',
+        element: <Navigate to={AppRoutes.Labs} replace />,
+      },
+      {
+        path: '/labs/:labKey',
+        element: <LegacyLabDetailRedirect />,
+      },
+      {
+        path: '/imaging',
+        element: <Navigate to={AppRoutes.Imaging} replace />,
+      },
+      {
         path: '*',
         element: <Navigate to={AppRoutes.Timeline} />,
       },
@@ -149,3 +173,13 @@ const routes = [
 ];
 
 const router = createBrowserRouter(routes, { basename: getRouterBasename() });
+
+function LegacyLabDetailRedirect() {
+  const { labKey } = useParams();
+  return (
+    <Navigate
+      to={`${AppRoutes.Labs}/${encodeURIComponent(labKey || '')}`}
+      replace
+    />
+  );
+}

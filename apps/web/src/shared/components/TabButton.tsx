@@ -14,12 +14,16 @@ export function TabButton({
   icon: JSX.Element;
 }) {
   const location = useLocation()?.pathname;
+  const isActive =
+    route === AppRoutes.Records
+      ? location.startsWith(AppRoutes.Records)
+      : location === route;
 
   return (
     <Link
       to={route}
       className={`flex w-24 flex-col items-center justify-center p-2 text-white duration-75 active:scale-90 sm:active:scale-95 md:m-1 md:w-auto md:flex-row md:justify-start md:rounded-md md:p-4 ${
-        location === route
+        isActive
           ? 'bg-gray-0 md:bg-primary-700 border-primary border-t-2 md:border-t-0'
           : ''
       }`}
@@ -27,7 +31,7 @@ export function TabButton({
       <>
         <p
           className={`font-xs h-5 w-5 text-base md:mr-4 md:h-8 md:w-8 md:text-white ${
-            location === route ? 'text-primary font-bold' : 'text-slate-800'
+            isActive ? 'text-primary font-bold' : 'text-slate-800'
           }`}
         >
           {icon}
@@ -36,14 +40,14 @@ export function TabButton({
           <>
             <p
               className={`hidden md:block pt-1 text-[11px] md:pt-0 md:text-base md:text-white ${
-                location === route ? 'text-primary font-bold' : 'text-slate-800'
+                isActive ? 'text-primary font-bold' : 'text-slate-800'
               }`}
             >
               {title}
             </p>
             <p
               className={`${!smallTitle ? '' : 'md:hidden'} pt-1 text-[11px] md:pt-0 md:text-base md:text-white ${
-                location === route ? 'text-primary font-bold' : 'text-slate-800'
+                isActive ? 'text-primary font-bold' : 'text-slate-800'
               }`}
             >
               {smallTitle}
@@ -52,7 +56,7 @@ export function TabButton({
         ) : (
           <p
             className={`pt-1 text-[11px] md:pt-0 md:text-base md:text-white ${
-              location === route ? 'text-primary font-bold' : 'text-slate-800'
+              isActive ? 'text-primary font-bold' : 'text-slate-800'
             }`}
           >
             {title}

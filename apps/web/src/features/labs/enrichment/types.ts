@@ -48,6 +48,9 @@ export interface LabReferenceBand {
   sex?: ReferenceSex;
   ageMinDays?: number;
   ageMaxDays?: number;
+  specimen?: string;
+  method?: string;
+  assayPlatform?: string;
 }
 
 export interface LabReferenceDefinition {

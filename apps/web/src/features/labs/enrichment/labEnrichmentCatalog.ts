@@ -24,6 +24,10 @@ type RawLabReferenceBand = Omit<
 > & {
   kind: ReferenceKind;
   sex?: ReferenceSex;
+  ageMinDays?: number;
+  ageMaxDays?: number;
+  ageMinWeeks?: number;
+  ageMaxWeeks?: number;
   ageMinYears?: number;
   ageMaxYears?: number;
 };
@@ -64,15 +68,46 @@ function normalizeReferenceStandard(
     ...standard,
     definitions: standard.definitions.map((definition) => ({
       ...definition,
-      bands: definition.bands.map(({ ageMinYears, ageMaxYears, ...band }) => ({
-        ...band,
-        ageMinDays:
-          ageMinYears === undefined ? undefined : ageMinYears * YEAR_IN_DAYS,
-        ageMaxDays:
-          ageMaxYears === undefined ? undefined : ageMaxYears * YEAR_IN_DAYS,
-      })),
+      bands: definition.bands.map(
+        ({
+          ageMinDays,
+          ageMaxDays,
+          ageMinWeeks,
+          ageMaxWeeks,
+          ageMinYears,
+          ageMaxYears,
+          ...band
+        }) => ({
+          ...band,
+          ageMinDays: normalizeAgeToDays({
+            days: ageMinDays,
+            weeks: ageMinWeeks,
+            years: ageMinYears,
+          }),
+          ageMaxDays: normalizeAgeToDays({
+            days: ageMaxDays,
+            weeks: ageMaxWeeks,
+            years: ageMaxYears,
+          }),
+        }),
+      ),
     })),
   };
+}
+
+function normalizeAgeToDays({
+  days,
+  weeks,
+  years,
+}: {
+  days?: number;
+  weeks?: number;
+  years?: number;
+}) {
+  if (days !== undefined) return days;
+  if (weeks !== undefined) return weeks * 7;
+  if (years !== undefined) return years * YEAR_IN_DAYS;
+  return undefined;
 }
 
 const standardById = new Map(

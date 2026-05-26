@@ -2,10 +2,8 @@ import { Link, Outlet } from 'react-router-dom';
 
 import {
   Cog6ToothIcon,
-  BeakerIcon,
   DocumentPlusIcon,
   NewspaperIcon,
-  PhotoIcon,
   PlusCircleIcon,
   QueueListIcon,
   SparklesIcon,
@@ -45,19 +43,8 @@ export function TabWrapper() {
             icon={<QueueListIcon />}
           />
           <TabButton
-            route={AppRoutes.Labs}
-            title="Labs"
-            icon={<BeakerIcon />}
-          />
-          <TabButton
-            route={AppRoutes.Imaging}
-            title="Imaging"
-            icon={<PhotoIcon />}
-          />
-          <TabButton
-            route={AppRoutes.AddRecord}
-            title="Add Record"
-            smallTitle="Add"
+            route={AppRoutes.Records}
+            title="Records"
             icon={<DocumentPlusIcon />}
           />
           {experimental__use_openai_rag && (
