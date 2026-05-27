@@ -35,6 +35,7 @@ import { getLoginUrl as getVaLoginUrl } from '../../services/fhir/VA';
 import { VeradigmLocalStorageKeys } from '../../services/fhir/Veradigm';
 import { HealowLocalStorageKeys } from '../../services/fhir/Healow';
 import { Routes } from '../../Routes';
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 
 const epicClient = createEpicClient({ signJwt });
 const cernerClient = createCernerClient();
@@ -473,6 +474,7 @@ function setTenantHealowUrl(
 
 const ConnectionTab: React.FC = () => {
   const list = useConnectionCards(),
+    { t } = useInterfaceLanguage(),
     config = useConfig(),
     [openSelectModal, setOpenSelectModal] = useState(false),
     handleTogglePanel = useCallback(
@@ -558,14 +560,15 @@ const ConnectionTab: React.FC = () => {
     );
 
   return (
-    <AppPage banner={<GenericBanner text="Add Connections" />}>
+    <AppPage banner={<GenericBanner text={t('Add Connections')} />}>
       <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pt-2 sm:px-6 lg:px-8">
         <div className="py-6 text-xl font-extrabold">
-          Connect to Patient Portal
+          {t('Connect to Patient Portal')}
         </div>
         <div className="text-sm font-medium text-gray-800">
-          Connect to a patient portal to automatic download your most recent
-          data.
+          {t(
+            'Connect to a patient portal to automatically download your most recent data.',
+          )}
         </div>
       </div>
       <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pb-20 sm:px-6 sm:pb-6 lg:px-8">
@@ -583,7 +586,7 @@ const ConnectionTab: React.FC = () => {
             className="bg-primary hover:bg-primary-600 active:bg-primary-700 w-full rounded-lg p-4 text-white duration-75 active:scale-[98%]"
             onClick={() => setOpenSelectModal((x) => !x)}
           >
-            <p className="font-bold">Add a new connection</p>
+            <p className="font-bold">{t('Add a new connection')}</p>
           </button>
         </div>
       </div>

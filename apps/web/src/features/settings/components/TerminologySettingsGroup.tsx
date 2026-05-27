@@ -10,11 +10,13 @@ import {
   listTerminologyPacks,
 } from '../../terminology/terminologyService';
 import { useNotificationDispatch } from '../../../app/providers/NotificationProvider';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 export function TerminologySettingsGroup() {
   const localConfig = useLocalConfig();
   const updateLocalConfig = useUpdateLocalConfig();
   const notifyDispatch = useNotificationDispatch();
+  const { t } = useInterfaceLanguage();
   const [packs, setPacks] = useState<TerminologyPack[]>([]);
 
   async function refreshPacks() {
@@ -33,10 +35,10 @@ export function TerminologySettingsGroup() {
 
   return (
     <>
-      <div className="py-6 text-xl font-extrabold">Terminology</div>
+      <div className="py-6 text-xl font-extrabold">{t('Terminology')}</div>
       <div className="grid gap-4 rounded border border-gray-200 bg-gray-50 p-4 text-sm">
         <label className="grid gap-1">
-          <span className="font-semibold text-gray-900">Profile</span>
+          <span className="font-semibold text-gray-900">{t('Profile')}</span>
           <select
             value={localConfig.terminology_profile}
             onChange={(event) =>
@@ -49,14 +51,16 @@ export function TerminologySettingsGroup() {
             }
             className="max-w-xs rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-600 focus:ring-primary-600"
           >
-            <option value="canada">Canada</option>
-            <option value="us">United States</option>
-            <option value="global">Global baseline</option>
+            <option value="canada">{t('Canada')}</option>
+            <option value="us">{t('United States')}</option>
+            <option value="global">{t('Global baseline')}</option>
           </select>
         </label>
 
         <label className="grid gap-1">
-          <span className="font-semibold text-gray-900">Lookup mode</span>
+          <span className="font-semibold text-gray-900">
+            {t('Lookup mode')}
+          </span>
           <select
             value={localConfig.terminology_lookup_mode}
             onChange={(event) =>
@@ -69,14 +73,14 @@ export function TerminologySettingsGroup() {
             }
             className="max-w-xs rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-600 focus:ring-primary-600"
           >
-            <option value="hybrid">Hybrid local-first</option>
-            <option value="local-only">Local only</option>
-            <option value="server-first">Server first</option>
+            <option value="hybrid">{t('Hybrid local-first')}</option>
+            <option value="local-only">{t('Local only')}</option>
+            <option value="server-first">{t('Server first')}</option>
           </select>
         </label>
 
         <label className="grid gap-1">
-          <span className="font-semibold text-gray-900">Language</span>
+          <span className="font-semibold text-gray-900">{t('Language')}</span>
           <select
             value={localConfig.terminology_language}
             onChange={(event) =>
@@ -86,8 +90,8 @@ export function TerminologySettingsGroup() {
             }
             className="max-w-xs rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-600 focus:ring-primary-600"
           >
-            <option value="en">English</option>
-            <option value="fr">French</option>
+            <option value="en">{t('English')}</option>
+            <option value="fr">{t('French')}</option>
           </select>
         </label>
 
@@ -102,13 +106,15 @@ export function TerminologySettingsGroup() {
             }
             className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
           />
-          Enable configured remote terminology lookup
+          {t('Enable configured remote terminology lookup')}
         </label>
 
         <div>
-          <div className="font-semibold text-gray-900">Installed packs</div>
+          <div className="font-semibold text-gray-900">
+            {t('Installed packs')}
+          </div>
           <label className="mt-2 inline-flex cursor-pointer items-center rounded-md border border-primary-200 px-3 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-50">
-            Import terminology pack
+            {t('Import terminology pack')}
             <input
               type="file"
               accept="application/json,.json"
@@ -121,15 +127,15 @@ export function TerminologySettingsGroup() {
                   await refreshPacks();
                   notifyDispatch({
                     type: 'set_notification',
-                    message: 'Terminology pack imported',
+                    message: t('Terminology pack imported'),
                     variant: 'success',
                   });
                 } catch (error) {
                   notifyDispatch({
                     type: 'set_notification',
-                    message: `Unable to import terminology pack: ${
-                      (error as Error).message
-                    }`,
+                    message: t(
+                      'Unable to import terminology pack: {message}',
+                    ).replace('{message}', (error as Error).message),
                     variant: 'error',
                   });
                 } finally {
@@ -140,7 +146,9 @@ export function TerminologySettingsGroup() {
           </label>
           <div className="mt-2 divide-y divide-gray-200 rounded border border-gray-200 bg-white">
             {packs.length === 0 ? (
-              <div className="p-3 text-gray-600">No packs installed.</div>
+              <div className="p-3 text-gray-600">
+                {t('No packs installed.')}
+              </div>
             ) : (
               packs.map((pack) => (
                 <div key={pack.id} className="p-3">

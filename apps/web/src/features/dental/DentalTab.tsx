@@ -8,9 +8,11 @@ import { DentalSummaryPanel } from './components/DentalSummaryPanel';
 import { OrthodonticPanel } from './components/OrthodonticPanel';
 import { ToothChartPanel } from './components/ToothChartPanel';
 import { useDentalData } from './hooks/useDentalData';
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 
 export function DentalTab() {
   const { records, imaging, recordsByTooth, counts, status } = useDentalData();
+  const { t } = useInterfaceLanguage();
 
   return (
     <AppPage
@@ -34,7 +36,7 @@ export function DentalTab() {
           </div>
           {status === 'loading' && (
             <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
-              Loading dental records...
+              {t('Loading dental records...')}
             </div>
           )}
         </div>

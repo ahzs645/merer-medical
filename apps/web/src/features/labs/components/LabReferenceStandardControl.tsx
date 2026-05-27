@@ -1,3 +1,4 @@
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import {
   referenceOverlayColors,
   referenceOverlayLabels,
@@ -12,21 +13,24 @@ export function LabReferenceStandardControl({
   selectedMode: ReferenceOverlayMode;
   setSelectedMode: (mode: ReferenceOverlayMode) => void;
 }) {
+  const { t } = useInterfaceLanguage();
+
   return (
     <section className="rounded-md border border-gray-200 bg-white px-3 py-3 shadow-sm sm:px-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-sm font-semibold text-gray-900">
-            Reference standard
+            {t('Reference standard')}
           </h2>
           <p className="mt-0.5 text-xs text-gray-600">
-            Table ranges and high/low status update against the selected
-            standard.
+            {t(
+              'Table ranges and high/low status update against the selected standard.',
+            )}
           </p>
         </div>
         <div
           role="radiogroup"
-          aria-label="Reference standard"
+          aria-label={t('Reference standard')}
           className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap"
         >
           {referenceOverlayModes.map((mode) => {
@@ -50,7 +54,7 @@ export function LabReferenceStandardControl({
                   className="h-2.5 w-2.5 rounded-sm"
                   style={{ backgroundColor: referenceOverlayColors[mode] }}
                 />
-                {referenceOverlayLabels[mode]}
+                {t(referenceOverlayLabels[mode])}
               </button>
             );
           })}

@@ -19,6 +19,7 @@ import { TutorialConfigProvider } from '../features/tutorial/TutorialConfigProvi
 import { UpdateAppChecker } from '../app/providers/UpdateAppChecker';
 import { UserPreferencesProvider } from '../app/providers/UserPreferencesProvider';
 import { UserProvider } from '../app/providers/UserProvider';
+import { InterfaceLanguageProvider } from '../app/providers/InterfaceLanguageProvider';
 import VectorProvider from '../features/vectors';
 import { AppConfigProvider } from '../app/providers/AppConfigProvider';
 import { TabWrapper } from '../shared/components/TabWrapper';
@@ -61,9 +62,11 @@ export default function App() {
                 <UserProvider>
                   <VectorProvider>
                     <UserPreferencesProvider>
-                      <SyncJobProvider>
-                        <RouterProvider router={router} />
-                      </SyncJobProvider>
+                      <InterfaceLanguageProvider>
+                        <SyncJobProvider>
+                          <RouterProvider router={router} />
+                        </SyncJobProvider>
+                      </InterfaceLanguageProvider>
                     </UserPreferencesProvider>
                   </VectorProvider>
                 </UserProvider>

@@ -49,22 +49,42 @@ export function ShowObservationResultsExpandable({
             key={list_item.id || list_item.fullUrl}
             className="flex flex-row gap-2 text-sm text-gray-600"
           >
-            {!(list_item.resource as Observation)?.dataAbsentReason && (
-              <>
-                <div>{list_item.resource?.category?.text} result: </div>
-                <div>
-                  {(list_item.resource as Observation)?.interpretation?.text ||
-                    (list_item.resource as Observation)?.valueString}
-                </div>
-                <div>
-                  {(list_item.resource as Observation)?.valueQuantity?.value}
-                  {(list_item.resource as Observation)?.valueQuantity?.unit}
-                </div>
-              </>
-            )}
+            <div>{list_item.resource?.category?.text} result: </div>
+            <div>
+              {formatObservationResult(list_item.resource as Observation)}
+            </div>
           </div>
         ))}
       </div>
     </div>
   );
+}
+
+function formatObservationResult(observation: Observation): string {
+  const absentReason = observation.dataAbsentReason;
+  if (absentReason) {
+    return (
+      absentReason.text ||
+      absentReason.coding?.find((coding) => coding.display || coding.code)
+        ?.display ||
+      absentReason.coding?.find((coding) => coding.display || coding.code)
+        ?.code ||
+      ''
+    );
+  }
+
+  if (observation.valueString) return observation.valueString;
+
+  const valueCodeableConcept = observation.valueCodeableConcept;
+  if (valueCodeableConcept) {
+    return (
+      valueCodeableConcept.text ||
+      valueCodeableConcept.coding?.find((coding) => coding.display)?.display ||
+      ''
+    );
+  }
+
+  const quantity = observation.valueQuantity;
+  if (!quantity || quantity.value === undefined) return '';
+  return `${quantity.comparator || ''}${quantity.value}${quantity.unit || ''}`;
 }

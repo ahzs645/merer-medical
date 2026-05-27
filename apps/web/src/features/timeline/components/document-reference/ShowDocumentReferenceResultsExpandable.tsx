@@ -45,9 +45,12 @@ export function ShowDocumentResultsExpandable({
     >(undefined),
     attachmentUrl =
       item.data_record.raw.resource?.content?.[0]?.attachment?.url,
+    resource = item.data_record.raw.resource,
+    attachmentMetadata = resource?.content?.[0]?.attachment,
     attachment = useClinicalDoc(attachmentUrl),
     [hasLoadedDocument, setHasLoadedDocument] = useState(false),
     [pdfUrl, setPdfUrl] = useState<string | undefined>(undefined),
+    [imageUrl, setImageUrl] = useState<string | undefined>(undefined),
     [html, setHtml] = useState<
       string | JSX.Element | JSX.Element[] | undefined
     >(undefined);
@@ -55,10 +58,6 @@ export function ShowDocumentResultsExpandable({
   useEffect(() => {
     if (expanded) {
       if (!attachment) {
-        console.error(
-          '[ShowDocumentResultsExpandable] No attachment found in DB for URL:',
-          attachmentUrl,
-        );
         setHasLoadedDocument(true);
       } else if (
         attachment
@@ -95,6 +94,30 @@ export function ShowDocumentResultsExpandable({
           setHasLoadedDocument(true);
         }
       } else if (
+        attachment.get('data_record.content_type')?.startsWith('image/') &&
+        typeof attachment.get('data_record.raw') === 'string'
+      ) {
+        try {
+          const contentType = attachment.get('data_record.content_type');
+          const base64 = attachment.get('data_record.raw');
+          const byteCharacters = atob(base64);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: contentType });
+          const url = URL.createObjectURL(blob);
+          setImageUrl(url);
+          setHasLoadedDocument(true);
+        } catch (error) {
+          console.error(
+            '[ShowDocumentResultsExpandable] Error converting image base64 to Blob:',
+            error,
+          );
+          setHasLoadedDocument(true);
+        }
+      } else if (
         attachment.get('data_record.content_type')?.includes('text/html') &&
         typeof attachment.get('data_record.raw') === 'string'
       ) {
@@ -120,6 +143,9 @@ export function ShowDocumentResultsExpandable({
     return () => {
       if (pdfUrl) {
         URL.revokeObjectURL(pdfUrl);
+      }
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
       }
     };
   }, [expanded, cd, attachment]);
@@ -162,20 +188,92 @@ export function ShowDocumentResultsExpandable({
               </div>
             )}
 
+            {/* Display Image Document */}
+            {imageUrl && (
+              <div className="flex max-h-[700px] justify-center overflow-auto p-4">
+                <img
+                  src={imageUrl}
+                  alt={item.metadata?.display_name || 'Linked image'}
+                  className="max-h-[660px] max-w-full object-contain"
+                />
+              </div>
+            )}
+
             {/* Display HTML Document */}
             {html && (
               <div className="prose prose-sm overflow-x-auto p-4">{html}</div>
             )}
 
-            {/* Error message when document can't be displayed */}
-            {hasLoadedDocument && !ccda && !pdfUrl && !html && (
-              <p className="text-md p-4 text-gray-900">
-                Sorry, looks like we were unable to get the linked document
-              </p>
+            {/* Fallback when the linked binary is not stored locally */}
+            {hasLoadedDocument && !ccda && !pdfUrl && !imageUrl && !html && (
+              <DocumentReferenceFallback
+                description={resource?.description}
+                status={resource?.status}
+                attachment={attachmentMetadata}
+              />
             )}
           </div>
         </div>
       </div>
     </Modal>
   );
+}
+
+function DocumentReferenceFallback({
+  description,
+  status,
+  attachment,
+}: {
+  description?: string;
+  status?: string;
+  attachment?: {
+    contentType?: string;
+    title?: string;
+    url?: string;
+    size?: number;
+  };
+}) {
+  const rows = [
+    ['Attachment title', attachment?.title],
+    ['Content type', attachment?.contentType],
+    ['Attachment URL', attachment?.url],
+    ['Size', formatAttachmentSize(attachment?.size)],
+    ['Status', status],
+  ].filter(([, value]) => Boolean(value));
+
+  return (
+    <div className="space-y-4 p-4 text-gray-900">
+      <div>
+        <h3 className="text-sm font-semibold text-gray-900">
+          Linked attachment metadata
+        </h3>
+        <p className="mt-1 text-sm leading-6 text-gray-600">
+          The source record points to an attachment, but the binary file is not
+          stored locally.
+        </p>
+      </div>
+      {description && (
+        <p className="rounded-md bg-gray-50 p-3 text-sm leading-6 text-gray-700">
+          {description}
+        </p>
+      )}
+      <dl className="grid gap-3 sm:grid-cols-2">
+        {rows.map(([label, value]) => (
+          <div key={label} className="min-w-0 rounded-md bg-gray-50 p-3">
+            <dt className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              {label}
+            </dt>
+            <dd className="mt-1 break-words text-sm text-gray-900">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+function formatAttachmentSize(size?: number) {
+  if (!size) return undefined;
+  if (size < 1024) return `${size} bytes`;
+  if (size < 1024 * 1024) return `${Math.round(size / 1024)} KB`;
+  return `${(size / 1024 / 1024).toFixed(1)} MB`;
 }

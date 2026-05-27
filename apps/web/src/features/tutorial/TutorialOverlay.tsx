@@ -10,6 +10,7 @@ import { TutorialAddConnectionScreen } from './components/TutorialAddConnectionS
 import { TutorialWelcomeScreen } from './components/TutorialWelcomeScreen';
 import { TutorialInstallPWAScreen } from './components/TutorialInstallPWAScreen';
 import { TutorialCompleteScreen } from './components/TutorialCompleteScreen';
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 
 export type TutorialState = {
   currentStep: number;
@@ -97,6 +98,7 @@ const isInstalledPWA = () => {
 export function TutorialOverlay() {
   const tutorialConfig = useTutorialLocalStorage(),
     updateTutorialConfig = useUpdateTutorialLocalStorage(),
+    { t } = useInterfaceLanguage(),
     tutorialSteps = useMemo(
       () =>
         getTutorialKeysFromLocalStorage(tutorialConfig).filter((key) =>
@@ -191,7 +193,7 @@ export function TutorialOverlay() {
                 dispatch({ type: 'complete_tutorial' });
               }}
             >
-              Skip Tutorial
+              {t('Skip Tutorial')}
             </button>
             <TutorialPageCounter
               currentPage={state.currentStep + 1}

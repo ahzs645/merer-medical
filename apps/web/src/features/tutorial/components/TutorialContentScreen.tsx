@@ -1,5 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { TutorialAction } from '../TutorialOverlay';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 export function TutorialContentScreen({
   dispatch,
@@ -11,6 +12,8 @@ export function TutorialContentScreen({
   hideBackButton?: boolean;
   isLastScreen?: boolean;
 }>) {
+  const { t } = useInterfaceLanguage();
+
   return (
     <div className="flex h-full flex-col items-center justify-center text-white">
       <div className="mx-auto mb-12 max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -22,14 +25,14 @@ export function TutorialContentScreen({
         className="bg-primary-500 hover:bg-primary-600 rounded py-2 px-4 font-bold text-white"
         onClick={() => dispatch({ type: 'next_step' })}
       >
-        {isLastScreen ? 'Finish' : 'Next'}
+        {isLastScreen ? t('Finish') : t('Next')}
       </button>
       {!hideBackButton && (
         <button
           className="hover:bg-primary-600 mt-1 rounded py-2 px-4 font-bold text-white"
           onClick={() => dispatch({ type: 'previous_step' })}
         >
-          Back
+          {t('Back')}
         </button>
       )}
     </div>

@@ -1,3 +1,4 @@
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { AppPage } from '../../shared/components/AppPage';
 import { EyeImagingPanel } from './components/EyeImagingPanel';
 import { EyeMetricsPanel } from './components/EyeMetricsPanel';
@@ -9,6 +10,7 @@ import { OptometrySummaryPanel } from './components/OptometrySummaryPanel';
 import { useOptometryData } from './hooks/useOptometryData';
 
 export function OptometryTab() {
+  const { t } = useInterfaceLanguage();
   const { records, imaging, counts, status } = useOptometryData();
 
   return (
@@ -34,7 +36,7 @@ export function OptometryTab() {
           </div>
           {status === 'loading' && (
             <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
-              Loading optometry records...
+              {t('Loading optometry records...')}
             </div>
           )}
         </div>

@@ -120,6 +120,18 @@ export async function importEmrpkgToRxDb(
     if (replace) {
       const existing = await collection.find().exec();
       await Promise.all(existing.map((doc) => doc.remove()));
+    } else if (
+      tableName === 'user_documents' &&
+      rows.some((row) => row['is_selected_user'] === true)
+    ) {
+      const selectedUsers = await db.user_documents
+        .find({ selector: { is_selected_user: true } })
+        .exec();
+      await Promise.all(
+        selectedUsers.map((doc) =>
+          doc.update({ $set: { is_selected_user: false } }),
+        ),
+      );
     }
     if (rows.length > 0) {
       // bulkUpsert exists on RxCollection; falling back to per-row upsert keeps

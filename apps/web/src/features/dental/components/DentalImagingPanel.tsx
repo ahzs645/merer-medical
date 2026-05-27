@@ -2,25 +2,29 @@ import { Link } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../../Routes';
 import { ImagingItem } from '../../imaging/types';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 export function DentalImagingPanel({ items }: { items: ImagingItem[] }) {
+  const { t } = useInterfaceLanguage();
+
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
           <h2 className="text-base font-semibold text-gray-900">
-            Dental imaging
+            {t('Dental imaging')}
           </h2>
           <p className="text-sm text-gray-600">
-            Dental X-rays, CBCT, intraoral photos, and scans remain connected to
-            the Imaging workspace.
+            {t(
+              'Dental X-rays, CBCT, intraoral photos, and scans remain connected to the Imaging workspace.',
+            )}
           </p>
         </div>
         <Link
           to={AppRoutes.Imaging}
           className="text-sm font-medium text-primary-700 hover:text-primary-900"
         >
-          Open imaging
+          {t('Open imaging')}
         </Link>
       </div>
       {items.length > 0 ? (
@@ -40,8 +44,9 @@ export function DentalImagingPanel({ items }: { items: ImagingItem[] }) {
         </div>
       ) : (
         <p className="mt-3 text-sm leading-6 text-gray-600">
-          No dental imaging has been detected yet. The dental workspace will
-          pull from imaging records tagged by oral/dental terms.
+          {t(
+            'No dental imaging has been detected yet. The dental workspace will pull from imaging records tagged by oral/dental terms.',
+          )}
         </p>
       )}
     </section>

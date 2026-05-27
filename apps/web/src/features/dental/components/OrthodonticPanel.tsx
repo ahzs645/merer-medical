@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Routes as AppRoutes } from '../../../Routes';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { DentalRecord } from '../types';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 const orthodonticOrder = [
   'diagnosis',
@@ -16,6 +17,7 @@ const orthodonticOrder = [
 ];
 
 export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
+  const { t } = useInterfaceLanguage();
   const orthodonticRecords = records
     .filter((record) => record.kind === 'orthodontic')
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -25,18 +27,19 @@ export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
       <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
           <h2 className="text-base font-semibold text-gray-900">
-            Orthodontics
+            {t('Orthodontics')}
           </h2>
           <p className="text-sm text-gray-600">
-            Assessment, active treatment, appliances, aligners, adjustments,
-            ceph measurements, retention, and consent.
+            {t(
+              'Assessment, active treatment, appliances, aligners, adjustments, ceph measurements, retention, and consent.',
+            )}
           </p>
         </div>
         <Link
           to={`${AppRoutes.AddRecord}?specialty=dental&dental=orthodonticAssessment`}
           className="text-sm font-semibold text-primary-700 hover:text-primary-900"
         >
-          Add ortho record
+          {t('Add ortho record')}
         </Link>
       </div>
       {orthodonticRecords.length > 0 ? (
@@ -56,11 +59,11 @@ export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
                       )}
                       className="text-xs font-semibold text-primary-700 hover:text-primary-900"
                     >
-                      Edit
+                      {t('Edit')}
                     </Link>
                   )}
                   <span className="text-xs font-medium uppercase text-gray-500">
-                    {record.date?.split('T')[0] || 'Undated'}
+                    {record.date?.split('T')[0] || t('Undated')}
                   </span>
                 </div>
               </div>
@@ -77,7 +80,7 @@ export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
           {orthodonticOrder.map((item) => (
             <div key={item} className="rounded-md bg-gray-50 p-3">
               <p className="text-sm font-semibold capitalize text-gray-900">
-                {item}
+                {t(item)}
               </p>
             </div>
           ))}

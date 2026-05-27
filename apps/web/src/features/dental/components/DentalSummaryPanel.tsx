@@ -1,10 +1,12 @@
 import { DentalWorkspaceData } from '../types';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 export function DentalSummaryPanel({
   counts,
 }: {
   counts: DentalWorkspaceData['counts'];
 }) {
+  const { t } = useInterfaceLanguage();
   const stats = [
     { label: 'Findings', value: counts.findings },
     { label: 'Conditions', value: counts.conditions },
@@ -23,7 +25,7 @@ export function DentalSummaryPanel({
           key={stat.label}
           className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
         >
-          <p className="text-sm font-medium text-gray-600">{stat.label}</p>
+          <p className="text-sm font-medium text-gray-600">{t(stat.label)}</p>
           <p className="mt-2 text-3xl font-semibold text-gray-900">
             {stat.value}
           </p>

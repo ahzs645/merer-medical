@@ -21,6 +21,7 @@ import {
   inspectEmrpkg,
 } from '../../../services/emrpkg';
 import React from 'react';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 export type ImportFields = {
   backup?: FileList;
@@ -94,6 +95,7 @@ function readFileAsBytes(file: File): Promise<Uint8Array> {
 }
 
 export function UserDataSettingsGroup() {
+  const { t } = useInterfaceLanguage();
   const db = useRxDb(),
     [fileDownloadLink, setFileDownloadLink] = useState(''),
     notifyDispatch = useNotificationDispatch(),
@@ -111,6 +113,9 @@ export function UserDataSettingsGroup() {
   const [emrpkgDownloadUrl, setEmrpkgDownloadUrl] = useState('');
   const [emrpkgDownloadName, setEmrpkgDownloadName] = useState('');
   const [emrpkgBusy, setEmrpkgBusy] = useState(false);
+  const [emrpkgImportMode, setEmrpkgImportMode] = useState<'merge' | 'replace'>(
+    'merge',
+  );
   const emrpkgDownloadRef = useRef<HTMLAnchorElement | null>(null);
   const emrpkgImportRef = useRef<HTMLInputElement | null>(null);
 
@@ -181,7 +186,7 @@ export function UserDataSettingsGroup() {
         }
         const { counts, unknownTables } = await importEmrpkgToRxDb(bytes, db, {
           passphrase: needsPassphrase ? emrpkgPassphrase : undefined,
-          replace: true,
+          replace: emrpkgImportMode === 'replace',
         });
         const total = Object.values(counts).reduce<number>(
           (a, b) => a + (b ?? 0),
@@ -206,7 +211,7 @@ export function UserDataSettingsGroup() {
         setEmrpkgBusy(false);
       }
     },
-    [db, emrpkgPassphrase, notifyDispatch],
+    [db, emrpkgImportMode, emrpkgPassphrase, notifyDispatch],
   );
 
   const importData: SubmitHandler<ImportFields> = useCallback(
@@ -246,10 +251,10 @@ export function UserDataSettingsGroup() {
 
   const file = getFileFromFileList(backupFile);
   const importButtonText = !file
-    ? 'Select backup file'
+    ? t('Select backup file')
     : file instanceof File
       ? file.name
-      : 'File selected';
+      : t('File selected');
 
   useEffect(() => {
     if (backupFile) {
@@ -271,18 +276,19 @@ export function UserDataSettingsGroup() {
 
   return (
     <>
-      <h1 className="py-6 text-xl font-extrabold">Data</h1>
+      <h1 className="py-6 text-xl font-extrabold">{t('Data')}</h1>
       <div className="divide-y divide-gray-200">
         <div className="px-4 sm:px-6">
           <ul className="mt-2 divide-y divide-gray-200">
             <li className="flex items-center pb-4">
               <div className="flex flex-1 flex-col">
                 <h2 className="text-primary-800 text-lg leading-6">
-                  Export data
+                  {t('Export data')}
                 </h2>
                 <p className="pt-2 text-sm text-gray-800">
-                  Export all of your data in JSON format. You can use this to
-                  backup your data and can import it back if needed.
+                  {t(
+                    'Export all of your data in JSON format. You can use this to backup your data and can import it back if needed.',
+                  )}
                 </p>
               </div>
               {!fileDownloadLink ? (
@@ -297,7 +303,7 @@ export function UserDataSettingsGroup() {
                     });
                   }}
                 >
-                  <p className="font-bold">Start Export</p>
+                  <p className="font-bold">{t('Start Export')}</p>
                 </button>
               ) : (
                 <a
@@ -310,17 +316,17 @@ export function UserDataSettingsGroup() {
                   download={`mere_export_${new Date().toISOString()}.json`}
                   href={fileDownloadLink}
                 >
-                  Download
+                  {t('Download')}
                 </a>
               )}
             </li>
             <li className="flex items-center py-4">
               <div className="flex flex-1 flex-col">
                 <h2 className="text-primary-800 text-lg leading-6">
-                  Import data
+                  {t('Import data')}
                 </h2>
                 <p className="pt-2 text-sm text-gray-800">
-                  Import previously exported data
+                  {t('Import previously exported data')}
                 </p>
               </div>
               <form
@@ -353,11 +359,11 @@ export function UserDataSettingsGroup() {
                   >
                     {backupInProgress ? (
                       <>
-                        <p className="pr-2">{'Importing'}</p>
+                        <p className="pr-2">{t('Importing')}</p>
                         <ButtonLoadingSpinner />
                       </>
                     ) : (
-                      'Start Import'
+                      t('Start Import')
                     )}
                   </button>
                 )}
@@ -367,10 +373,10 @@ export function UserDataSettingsGroup() {
             <li className="flex flex-col py-4">
               <div className="flex flex-col">
                 <h2 className="text-primary-800 text-lg leading-6">
-                  Encrypted package (.emrpkg)
+                  {t('Encrypted package (.emrpkg)')}
                 </h2>
                 <p className="pt-2 text-sm text-gray-800">
-                  Export and import your data as a single{' '}
+                  {t('Export and import your data as a single')}{' '}
                   <code className="text-xs">.emrpkg</code> file. Optionally
                   protect the file with a passphrase (AES-GCM, PBKDF2-SHA256,
                   600,000 iterations) or a passkey (WebAuthn PRF). Use this to
@@ -385,7 +391,7 @@ export function UserDataSettingsGroup() {
                     checked={emrpkgEncrypt}
                     onChange={(e) => setEmrpkgEncrypt(e.target.checked)}
                   />
-                  Encrypt export
+                  {t('Encrypt export')}
                 </label>
                 {emrpkgEncrypt && (
                   <label className="inline-flex items-center text-sm text-gray-800">
@@ -395,12 +401,12 @@ export function UserDataSettingsGroup() {
                       checked={emrpkgUseWebauthn}
                       onChange={(e) => setEmrpkgUseWebauthn(e.target.checked)}
                     />
-                    Use a passkey instead of a passphrase
+                    {t('Use a passkey instead of a passphrase')}
                   </label>
                 )}
                 <input
                   type="password"
-                  placeholder="Passphrase for encrypted package"
+                  placeholder={t('Passphrase for encrypted package')}
                   disabled={emrpkgUseWebauthn}
                   className="focus:ring-primary-500 focus:border-primary-500 block w-56 rounded-md border-gray-300 text-sm shadow-sm disabled:bg-gray-100 disabled:text-gray-400"
                   value={emrpkgPassphrase}
@@ -415,20 +421,35 @@ export function UserDataSettingsGroup() {
                 >
                   {emrpkgBusy ? (
                     <>
-                      <span className="pr-2">Working</span>
+                      <span className="pr-2">{t('Working')}</span>
                       <ButtonLoadingSpinner />
                     </>
                   ) : (
-                    'Export .emrpkg'
+                    t('Export .emrpkg')
                   )}
                 </button>
+                <label className="inline-flex items-center text-sm text-gray-800">
+                  <span className="mr-2 font-medium">{t('Import mode')}</span>
+                  <select
+                    value={emrpkgImportMode}
+                    onChange={(event) =>
+                      setEmrpkgImportMode(
+                        event.target.value as 'merge' | 'replace',
+                      )
+                    }
+                    className="focus:ring-primary-500 focus:border-primary-500 block rounded-md border-gray-300 text-sm shadow-sm"
+                  >
+                    <option value="merge">{t('Add to this app')}</option>
+                    <option value="replace">{t('Replace everything')}</option>
+                  </select>
+                </label>
                 <button
                   type="button"
                   disabled={emrpkgBusy}
                   onClick={() => emrpkgImportRef.current?.click()}
                   className="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-500"
                 >
-                  Import .emrpkg
+                  {t('Import .emrpkg')}
                 </button>
                 <input
                   ref={emrpkgImportRef}
@@ -455,13 +476,15 @@ export function UserDataSettingsGroup() {
             <li className="flex items-center py-4">
               <div className="mr-2 flex flex-1 flex-col sm:mr-4">
                 <h2 className="text-primary-800 text-lg leading-6">
-                  Storage usage
+                  {t('Storage usage')}
                 </h2>
                 {/* show if persistant storage is enabled */}
                 <p className="pt-2 text-sm text-gray-800">
                   {hasPersistentStorageEnabled
-                    ? 'Persistent storage is enabled.'
-                    : 'Persistent storage is not enabled - data may be cleared by the browser.'}
+                    ? t('Persistent storage is enabled.')
+                    : t(
+                        'Persistent storage is not enabled - data may be cleared by the browser.',
+                      )}
                 </p>
                 {/* Progress bar */}
                 {quotaDetails.usage && quotaDetails.quota && (

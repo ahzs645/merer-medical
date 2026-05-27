@@ -1,4 +1,8 @@
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+
 export function EmptyUserPlaceholder({ openModal }: { openModal: () => void }) {
+  const { t } = useInterfaceLanguage();
+
   return (
     <div
       onClick={openModal}
@@ -20,7 +24,7 @@ export function EmptyUserPlaceholder({ openModal }: { openModal: () => void }) {
         />
       </svg>
       <span className="mt-2 block text-sm font-medium text-gray-900">
-        Add your information
+        {t('Add your information')}
       </span>
     </div>
   );

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { safeFormatDate } from '../../../shared/utils/dateFormatters';
 import {
   buildLabReferenceEvaluation,
@@ -29,6 +30,7 @@ export function LabsTable({
   description?: string;
   referenceMode: ReferenceOverlayMode;
 }) {
+  const { t } = useInterfaceLanguage();
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
 
   function toggleExpanded(key: string) {
@@ -49,9 +51,11 @@ export function LabsTable({
         <div className="border-b border-gray-200 px-3 py-3 sm:px-5 sm:py-4">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-base font-semibold text-gray-900">{title}</h2>
+              <h2 className="text-base font-semibold text-gray-900">
+                {t(title)}
+              </h2>
               {description ? (
-                <p className="mt-1 text-sm text-gray-600">{description}</p>
+                <p className="mt-1 text-sm text-gray-600">{t(description)}</p>
               ) : null}
             </div>
           </div>
@@ -72,12 +76,12 @@ export function LabsTable({
       <div className="hidden overflow-x-auto md:block">
         <div className="min-w-[62rem] xl:min-w-full">
           <div className="grid grid-cols-[minmax(13rem,1.4fr)_minmax(7rem,0.65fr)_minmax(9rem,0.85fr)_minmax(8rem,0.7fr)_minmax(13rem,1.15fr)_minmax(7rem,0.65fr)] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-            <div>Lab test</div>
-            <div>Latest</div>
-            <div>Reference</div>
-            <div>Date</div>
-            <div>Linked report</div>
-            <div>Status</div>
+            <div>{t('Lab test')}</div>
+            <div>{t('Latest')}</div>
+            <div>{t('Reference')}</div>
+            <div>{t('Date')}</div>
+            <div>{t('Linked report')}</div>
+            <div>{t('Status')}</div>
           </div>
           <div className="divide-y divide-gray-200">
             {groups.map((group) => (
@@ -110,6 +114,7 @@ function LabMobileRow({
   reportsByObservationId: Map<string, ReportLink[]>;
   referenceMode: ReferenceOverlayMode;
 }) {
+  const { t } = useInterfaceLanguage();
   const navigate = useNavigate();
   const latest = group.labs[0],
     latestReference = buildLabReferenceEvaluation({
@@ -146,7 +151,9 @@ function LabMobileRow({
               onToggle();
             }}
             className="shrink-0 rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-            aria-label={`${expanded ? 'Collapse' : 'Expand'} ${group.name}`}
+            aria-label={`${expanded ? t('Collapse') : t('Expand')} ${
+              group.name
+            }`}
           >
             {expanded ? (
               <ChevronDownIcon className="h-5 w-5" />
@@ -162,7 +169,9 @@ function LabMobileRow({
                 </h2>
                 <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-600">
                   {group.code ? <span>LOINC {group.code}</span> : null}
-                  <span>{group.labs.length} results</span>
+                  <span>
+                    {group.labs.length} {t('results')}
+                  </span>
                 </div>
               </div>
               <div
@@ -170,12 +179,12 @@ function LabMobileRow({
                   latestReference.flag,
                 )}`}
               >
-                {formatLabValue(latest) || 'No value'}
+                {formatLabValue(latest) || t('No value')}
               </div>
             </div>
             <div className="mt-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs">
               <span className="text-gray-600">
-                {safeFormatDate(latest.metadata?.date, 'PP', 'Unknown')}
+                {safeFormatDate(latest.metadata?.date, 'PP', t('Unknown'))}
               </span>
               {statusSummary.abnormalCount > 0 ? (
                 <span
@@ -188,7 +197,9 @@ function LabMobileRow({
                   {statusSummary.label}
                 </span>
               ) : (
-                <span className="font-medium text-gray-600">In range</span>
+                <span className="font-medium text-gray-600">
+                  {t('In range')}
+                </span>
               )}
             </div>
           </div>
@@ -217,6 +228,7 @@ function LabTableRow({
   reportsByObservationId: Map<string, ReportLink[]>;
   referenceMode: ReferenceOverlayMode;
 }) {
+  const { t } = useInterfaceLanguage();
   const navigate = useNavigate();
   const latest = group.labs[0],
     latestReports = reportsByObservationId.get(latest.metadata?.id || '') || [],
@@ -254,7 +266,9 @@ function LabTableRow({
               onToggle();
             }}
             className="mt-0.5 shrink-0 rounded p-0.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-            aria-label={`${expanded ? 'Collapse' : 'Expand'} ${group.name}`}
+            aria-label={`${expanded ? t('Collapse') : t('Expand')} ${
+              group.name
+            }`}
           >
             {expanded ? (
               <ChevronDownIcon className="h-5 w-5" />
@@ -268,7 +282,9 @@ function LabTableRow({
             </h2>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600">
               {group.code ? <span>LOINC {group.code}</span> : null}
-              <span>{group.labs.length} results</span>
+              <span>
+                {group.labs.length} {t('results')}
+              </span>
             </div>
           </div>
         </div>
@@ -277,7 +293,7 @@ function LabTableRow({
             latestReference.flag,
           )}`}
         >
-          {formatLabValue(latest) || 'No value'}
+          {formatLabValue(latest) || t('No value')}
           {latestReference.normalizedValue?.note ? (
             <div className="mt-1 text-[11px] font-medium leading-4 text-gray-500">
               {latestReference.normalizedValue.note}
@@ -292,7 +308,7 @@ function LabTableRow({
           isMappedStandard={latestReference.isMappedStandard}
         />
         <div className="text-sm text-gray-700">
-          {safeFormatDate(latest.metadata?.date, 'PP', 'Unknown')}
+          {safeFormatDate(latest.metadata?.date, 'PP', t('Unknown'))}
         </div>
         <div className="text-sm">
           <LinkedReportList reports={latestReports} />
@@ -309,7 +325,7 @@ function LabTableRow({
               {statusSummary.label}
             </span>
           ) : (
-            <span className="text-gray-600">In range</span>
+            <span className="text-gray-600">{t('In range')}</span>
           )}
         </div>
       </div>

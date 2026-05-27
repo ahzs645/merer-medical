@@ -22,6 +22,7 @@ import useIntersectionObserver from '../../shared/hooks/useIntersectionObserver'
 import { useScrollToHash } from '../../shared/hooks/useScrollToHash';
 import { DatabaseCollections } from '../../app/providers/DatabaseCollections';
 import { useLocalConfig } from '../../app/providers/LocalConfigProvider';
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { useVectorSyncStatus } from '../vectors/providers/VectorGeneratorSyncInitializer';
 import { JumpToPanel } from './components/layout/JumpToPanel';
@@ -40,6 +41,7 @@ export { QueryStatus };
 export function TimelineTab() {
   const user = useUser(),
     [query, setQuery] = useState(''),
+    { t } = useInterfaceLanguage(),
     { experimental__use_openai_rag } = useLocalConfig(),
     vectorSyncStatus = useVectorSyncStatus(),
     enableVectorSearch =
@@ -133,8 +135,11 @@ export function TimelineTab() {
             user?.profile_picture?.data ? user.profile_picture.data : undefined
           }
           text={
-            user?.first_name ? `Welcome back ${user.first_name}!` : 'Hello!'
+            user?.first_name
+              ? t('Welcome back {name}!').replace('{name}', user.first_name)
+              : t('Hello!')
           }
+          subtext={t('Your recent medical updates')}
         />
       }
     >
@@ -189,9 +194,14 @@ export function TimelineTab() {
                         <MagnifyingGlassIcon className="h-12 w-12 mx-auto" />
                       </p>
                       <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-                        No matching records
+                        {t('No matching records')}
                       </h1>
-                      <p className="mt-6 text-lg leading-7 text-gray-700">{`No records found with query: ${query}`}</p>
+                      <p className="mt-6 text-lg leading-7 text-gray-700">
+                        {t('No records found with query: {query}').replace(
+                          '{query}',
+                          query,
+                        )}
+                      </p>
                     </div>
                   </main>
                 ) : null}

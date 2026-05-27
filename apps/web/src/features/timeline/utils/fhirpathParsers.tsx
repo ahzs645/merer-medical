@@ -32,10 +32,12 @@ export function getReferenceRangeHigh(
 export function getValueUnit(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ): string | undefined {
-  return fhirpath.evaluate(
-    item.data_record.raw.resource,
-    'valueQuantity.unit',
-  )?.[0];
+  return (
+    fhirpath.evaluate(
+      item.data_record.raw.resource,
+      'valueQuantity.unit',
+    )?.[0] || undefined
+  );
 }
 
 export function getValueQuantity(
@@ -62,7 +64,15 @@ function formatValueQuantity(
 export function getValueString(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
-  return fhirpath.evaluate(item.data_record.raw.resource, 'valueString')?.[0];
+  const resource = item.data_record.raw.resource;
+  return (
+    fhirpath.evaluate(resource, 'valueString')?.[0] ||
+    fhirpath.evaluate(resource, 'valueCodeableConcept.text')?.[0] ||
+    fhirpath.evaluate(resource, 'valueCodeableConcept.coding.display')?.[0] ||
+    fhirpath.evaluate(resource, 'dataAbsentReason.text')?.[0] ||
+    fhirpath.evaluate(resource, 'dataAbsentReason.coding.display')?.[0] ||
+    fhirpath.evaluate(resource, 'dataAbsentReason.coding.code')?.[0]
+  );
 }
 
 export function getComments(item: ClinicalDocument<BundleEntry<Observation>>) {

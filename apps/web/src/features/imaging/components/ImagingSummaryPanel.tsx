@@ -1,3 +1,5 @@
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+
 export function ImagingSummaryPanel({
   total,
   scans,
@@ -7,6 +9,7 @@ export function ImagingSummaryPanel({
   scans: number;
   xray: number;
 }) {
+  const { t } = useInterfaceLanguage();
   const stats = [
     { label: 'All imaging', value: total },
     { label: 'DICOM scans', value: scans },
@@ -20,7 +23,7 @@ export function ImagingSummaryPanel({
           key={stat.label}
           className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
         >
-          <p className="text-sm font-medium text-gray-600">{stat.label}</p>
+          <p className="text-sm font-medium text-gray-600">{t(stat.label)}</p>
           <p className="mt-2 text-3xl font-semibold text-gray-900">
             {stat.value}
           </p>

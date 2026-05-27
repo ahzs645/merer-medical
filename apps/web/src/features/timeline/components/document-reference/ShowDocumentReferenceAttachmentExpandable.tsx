@@ -41,6 +41,7 @@ export function ShowDocumentResultsAttachmentExpandable({
     >(undefined),
     [hasLoadedDocument, setHasLoadedDocument] = useState(false),
     [pdfUrl, setPdfUrl] = useState<string | undefined>(undefined);
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
   const [textContent, setTextContent] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -77,6 +78,31 @@ export function ShowDocumentResultsAttachmentExpandable({
           setHasLoadedDocument(true);
         }
       } else if (
+        item.data_record.content_type.startsWith('image/') &&
+        typeof item.data_record.raw === 'string'
+      ) {
+        try {
+          const base64 = item.data_record.raw;
+          const byteCharacters = atob(base64);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], {
+            type: item.data_record.content_type,
+          });
+          const url = URL.createObjectURL(blob);
+          setImageUrl(url);
+          setHasLoadedDocument(true);
+        } catch (error) {
+          console.error(
+            '[ShowDocumentResultsAttachmentExpandable] Error converting image base64 to Blob:',
+            error,
+          );
+          setHasLoadedDocument(true);
+        }
+      } else if (
         item.data_record.content_type.startsWith('text/') &&
         typeof item.data_record.raw === 'string'
       ) {
@@ -91,6 +117,9 @@ export function ShowDocumentResultsAttachmentExpandable({
     return () => {
       if (pdfUrl) {
         URL.revokeObjectURL(pdfUrl);
+      }
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
       }
     };
   }, [expanded, cd, item.data_record.content_type, item.data_record.raw]);
@@ -133,6 +162,16 @@ export function ShowDocumentResultsAttachmentExpandable({
               </div>
             )}
 
+            {imageUrl && (
+              <div className="flex max-h-[700px] justify-center overflow-auto p-4">
+                <img
+                  src={imageUrl}
+                  alt={item.metadata?.display_name || 'Linked image'}
+                  className="max-h-[660px] max-w-full object-contain"
+                />
+              </div>
+            )}
+
             {textContent && (
               <pre className="max-h-[600px] overflow-auto whitespace-pre-wrap p-4 text-sm text-gray-900">
                 {textContent}
@@ -140,11 +179,15 @@ export function ShowDocumentResultsAttachmentExpandable({
             )}
 
             {/* Error message when document can't be displayed */}
-            {hasLoadedDocument && !ccda && !pdfUrl && !textContent && (
-              <p className="text-md p-4 text-gray-900">
-                Sorry, looks like we were unable to get the linked document
-              </p>
-            )}
+            {hasLoadedDocument &&
+              !ccda &&
+              !pdfUrl &&
+              !imageUrl &&
+              !textContent && (
+                <p className="text-md p-4 text-gray-900">
+                  Sorry, looks like we were unable to get the linked document
+                </p>
+              )}
           </div>
         </div>
       </div>

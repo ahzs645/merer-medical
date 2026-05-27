@@ -23,14 +23,57 @@ export type TerminologyEntry = DomainTerminologyEntry & {
   display: string;
 };
 
+export type ManualObservationValueKind =
+  | 'quantity'
+  | 'string'
+  | 'coded'
+  | 'absent';
+
+export type ManualObservationComparator = '<' | '<=' | '>' | '>=';
+
+export type ManualObservationAbsentReason =
+  | 'pending'
+  | 'not-performed'
+  | 'unknown'
+  | 'not-applicable';
+
+export type ManualObservationValue =
+  | {
+      kind: 'quantity';
+      value: number;
+      unit?: string;
+      comparator?: ManualObservationComparator;
+    }
+  | {
+      kind: 'string';
+      value: string;
+      unit?: string;
+    }
+  | {
+      kind: 'coded';
+      text: string;
+      code?: string;
+      system?: string;
+      display?: string;
+    }
+  | {
+      kind: 'absent';
+      reason: ManualObservationAbsentReason;
+      text?: string;
+    };
+
 export type LabResultRow = {
   id: string;
   title: string;
+  valueKind: ManualObservationValueKind;
+  comparator: string;
   value: string;
   unit: string;
   rangeLow: string;
   rangeHigh: string;
+  rangeText: string;
   interpretation: string;
+  absentReason: ManualObservationAbsentReason;
   terminology?: TerminologyEntry;
 };
 

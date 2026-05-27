@@ -5,7 +5,20 @@ type ManualRawResource = {
   resource?: {
     note?: Array<{ text?: string }>;
     text?: { div?: string };
-    valueQuantity?: { value?: number | string; unit?: string };
+    valueQuantity?: {
+      value?: number | string;
+      unit?: string;
+      comparator?: string;
+    };
+    valueString?: string;
+    valueCodeableConcept?: {
+      text?: string;
+      coding?: Array<{ display?: string }>;
+    };
+    dataAbsentReason?: {
+      text?: string;
+      coding?: Array<{ display?: string; code?: string }>;
+    };
     referenceRange?: Array<{
       low?: { value?: number | string; unit?: string };
       high?: { value?: number | string; unit?: string };
@@ -56,10 +69,29 @@ export function getManualObservationValue(
 ): string | undefined {
   if (!isManualRecord(item)) return undefined;
   const raw = item.data_record.raw as ManualRawResource;
+  const absentReason =
+    raw.resource?.dataAbsentReason?.text ||
+    raw.resource?.dataAbsentReason?.coding?.find(
+      (coding) => coding.display || coding.code,
+    )?.display ||
+    raw.resource?.dataAbsentReason?.coding?.find(
+      (coding) => coding.display || coding.code,
+    )?.code;
+  if (absentReason) return absentReason;
+
+  const codedValue =
+    raw.resource?.valueCodeableConcept?.text ||
+    raw.resource?.valueCodeableConcept?.coding?.find((coding) => coding.display)
+      ?.display;
+  if (codedValue) return codedValue;
+
+  if (raw.resource?.valueString) return raw.resource.valueString;
+
   const value = raw.resource?.valueQuantity?.value;
   if (value === undefined || value === '') return undefined;
   const unit = raw.resource?.valueQuantity?.unit;
-  return `${value}${unit ? ` ${unit}` : ''}`;
+  const comparator = raw.resource?.valueQuantity?.comparator || '';
+  return `${comparator}${value}${unit ? ` ${unit}` : ''}`;
 }
 
 export function getManualObservationRange(

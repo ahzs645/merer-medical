@@ -43,6 +43,7 @@ import {
 import { EyeIcon } from '@heroicons/react/24/outline';
 import { EyeSlashIcon } from '@heroicons/react/24/outline';
 import { useLocalConfig } from '../../app/providers/LocalConfigProvider';
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 
 function fetchMedications(
   db: RxDatabase<DatabaseCollections>,
@@ -448,6 +449,7 @@ function useSummaryData(): [SummaryState, React.Dispatch<SummaryActions>] {
 }
 
 function SummaryTab() {
+  const { t } = useInterfaceLanguage();
   const [
     { meds, cond, imm, careplan, allergy, pinned, cards, initialized },
     reducer,
@@ -483,7 +485,7 @@ function SummaryTab() {
 
   if (!initialized) {
     return (
-      <AppPage banner={<GenericBanner text="Summary" />}>
+      <AppPage banner={<GenericBanner text={t('Summary')} />}>
         <div
           className={
             'mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pb-20 pt-2 lg:px-8' +
@@ -517,14 +519,14 @@ function SummaryTab() {
     (!cards || cards.length === 0) // Check if cards is not null or empty
   ) {
     return (
-      <AppPage banner={<GenericBanner text="Summary" />}>
+      <AppPage banner={<GenericBanner text={t('Summary')} />}>
         <EmptyRecordsPlaceholder />
       </AppPage>
     );
   }
 
   return (
-    <AppPage banner={<GenericBanner text="Summary" />}>
+    <AppPage banner={<GenericBanner text={t('Summary')} />}>
       <div className="relative mx-auto flex lg:max-w-7xl flex-col gap-x-4 px-4 lg:px-8 sm:grid sm:grid-cols-6">
         {sortedCards.map((card) => {
           if (!card.is_visible) return null;
@@ -552,13 +554,14 @@ function SummaryTab() {
       </div>
       <Modal open={showEditModal} setOpen={setShowEditModal}>
         <ModalHeader
-          title={'Edit Layout'}
+          title={t('Edit Layout')}
           setClose={() => setShowEditModal(false)}
         />
         <div className="p-4 relative">
           <p className="max-w-lg">
-            Drag and drop the cards to change the order you see them on your
-            summary dashboard.
+            {t(
+              'Drag and drop the cards to change the order you see them on your summary dashboard.',
+            )}
           </p>
           <div className="my-4">
             <DragDropContext onDragEnd={onDragEnd}>
@@ -591,7 +594,7 @@ function SummaryTab() {
                               className={`flex justify-between overflow-hidden bg-white px-4 py-4 my-2 shadow sm:rounded-md sm:px-6 ${snapshot.isDragging ? 'border border-primary-400' : ''}`}
                             >
                               <div className="flex justify-center align-middle items-center h-full">
-                                {CardTypeToDisplayMap[card.type]}
+                                {t(CardTypeToDisplayMap[card.type])}
                               </div>
                               <div className="flex justify-center align-middle items-center h-full">
                                 <button
@@ -634,8 +637,8 @@ function SummaryTab() {
           setShowEditModal(true);
         }}
       >
-        <p>Edit Layout</p>
-        <PencilSquareIcon className="h-4 w-4 ml-1" />
+        <p>{t('Edit Layout')}</p>
+        <PencilSquareIcon className="ms-1 h-4 w-4" />
       </button>
     </AppPage>
   );

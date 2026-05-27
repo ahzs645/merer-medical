@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import { Routes as AppRoutes } from '../../../Routes';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { DentalRecord } from '../types';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 export function DentalCleaningHistoryPanel({
   records,
 }: {
   records: DentalRecord[];
 }) {
+  const { t } = useInterfaceLanguage();
   const cleanings = records
     .filter((record) => record.kind === 'cleaning')
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -18,15 +20,16 @@ export function DentalCleaningHistoryPanel({
       <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
           <h2 className="text-base font-semibold text-gray-900">
-            Cleaning history
+            {t('Cleaning history')}
           </h2>
           <p className="text-sm text-gray-600">
-            Prophy, periodontal maintenance, scaling/root planing, fluoride, and
-            hygiene recall.
+            {t(
+              'Prophy, periodontal maintenance, scaling/root planing, fluoride, and hygiene recall.',
+            )}
           </p>
         </div>
         <span className="text-sm font-medium text-gray-600">
-          {cleanings.length} visits
+          {t('{count} visits').replace('{count}', `${cleanings.length}`)}
         </span>
       </div>
       {cleanings.length > 0 ? (
@@ -46,11 +49,11 @@ export function DentalCleaningHistoryPanel({
                       )}
                       className="text-xs font-semibold text-primary-700 hover:text-primary-900"
                     >
-                      Edit
+                      {t('Edit')}
                     </Link>
                   )}
                   <span className="text-xs font-medium uppercase text-gray-500">
-                    {record.date?.split('T')[0] || 'Undated'}
+                    {record.date?.split('T')[0] || t('Undated')}
                   </span>
                 </div>
               </div>
@@ -64,8 +67,9 @@ export function DentalCleaningHistoryPanel({
         </div>
       ) : (
         <p className="mt-3 text-sm leading-6 text-gray-600">
-          Dental cleanings and hygiene recalls will appear here when synced or
-          added.
+          {t(
+            'Dental cleanings and hygiene recalls will appear here when synced or added.',
+          )}
         </p>
       )}
     </section>

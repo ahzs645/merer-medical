@@ -5,12 +5,15 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { CardBase } from '../../connections/components/CardBase';
 import { ObservationResultRow } from '../../timeline/components/ObservationResultRow';
 import { BookmarkIcon } from '@heroicons/react/24/outline';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 export function BookmarkedListCard({
   items,
 }: {
   items: ClinicalDocument<BundleEntry<DiagnosticReport | Observation>>[];
 }) {
+  const { t } = useInterfaceLanguage();
+
   return (
     <div className="col-span-6 lg:col-span-3">
       <Disclosure defaultOpen={true}>
@@ -18,7 +21,7 @@ export function BookmarkedListCard({
           <>
             <Disclosure.Button className="w-full font-bold">
               <div className="flex w-full items-center justify-between py-6 text-xl font-extrabold">
-                Bookmarked Labs
+                {t('Bookmarked Labs')}
                 <ChevronDownIcon
                   className={`h-8 w-8 rounded duration-150 active:scale-95 active:bg-slate-50 ${
                     open ? 'rotate-180 transform ' : ''
@@ -41,10 +44,10 @@ export function BookmarkedListCard({
                       <>
                         <div className="grid grid-cols-6 gap-2 gap-y-2 border-b-2 border-solid border-gray-200 p-2 px-4 text-gray-800">
                           <div className="col-span-3 text-sm font-semibold">
-                            Name
+                            {t('Name')}
                           </div>
                           <div className="col-span-2 text-sm font-semibold">
-                            Value
+                            {t('Value')}
                           </div>
                         </div>
                         {items.map((item, i, arr) => (
@@ -58,13 +61,13 @@ export function BookmarkedListCard({
                     ) : (
                       <div className="mx-4 flex flex-col py-6">
                         <div className="self-center font-semibold text-gray-700">
-                          Bookmark some labs to see them here
+                          {t('Bookmark some labs to see them here')}
                         </div>
                         <p className="self-center text-gray-600">
-                          Bookmarking labs will allow you to quickly access them
-                          here. You can bookmark labs from the timeline by
-                          selecting the{' '}
-                          <BookmarkIcon className="h-4 w-4 inline" /> icon.
+                          {t(
+                            'Bookmarking labs will allow you to quickly access them here. You can bookmark labs from the timeline by selecting the icon.',
+                          )}{' '}
+                          <BookmarkIcon className="inline h-4 w-4" />
                         </p>
                       </div>
                     )}

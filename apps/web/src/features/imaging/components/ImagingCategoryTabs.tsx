@@ -1,3 +1,4 @@
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { ImagingCategory } from '../types';
 
 const FILTERS: { key: ImagingCategory | 'all'; label: string }[] = [
@@ -14,6 +15,8 @@ export function ImagingCategoryTabs({
   selected: ImagingCategory | 'all';
   onSelect: (category: ImagingCategory | 'all') => void;
 }) {
+  const { t } = useInterfaceLanguage();
+
   return (
     <div className="flex flex-wrap gap-2">
       {FILTERS.map((filter) => (
@@ -27,7 +30,7 @@ export function ImagingCategoryTabs({
               : 'bg-white text-gray-700 ring-1 ring-inset ring-gray-200 hover:bg-gray-50'
           }`}
         >
-          {filter.label}
+          {t(filter.label)}
         </button>
       ))}
     </div>

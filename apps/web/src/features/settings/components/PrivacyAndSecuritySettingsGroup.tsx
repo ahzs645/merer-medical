@@ -22,6 +22,7 @@ import { Modal } from '../../../shared/components/Modal';
 import { ModalHeader } from '../../../shared/components/ModalHeader';
 import { CryptedIndexedDBAdapter } from 'sylviejs/storage-adapter/crypted-indexeddb-adapter';
 import { ButtonLoadingSpinner } from '../../connections/components/ButtonLoadingSpinner';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 export function PrivacyAndSecuritySettingsGroup() {
   const db = useRxDb(),
@@ -180,6 +181,7 @@ function PasswordPromptModal({
   toggleModal: boolean;
   setToggleModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const { t } = useInterfaceLanguage();
   const updateLocalConfig = useUpdateLocalConfig();
   const db = useRxDb();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -261,8 +263,10 @@ function PasswordPromptModal({
   return (
     <Modal open={toggleModal} setOpen={() => setToggleModal(false)}>
       <ModalHeader
-        title="Remove password and decrypt data"
-        subtitle="Are you sure you want to remove your password? This will decrypt your medical records and you will no longer be prompted to provide a password before seeing your medical records."
+        title={t('Remove password and decrypt data')}
+        subtitle={t(
+          'Are you sure you want to remove your password? This will decrypt your medical records and you will no longer be prompted to provide a password before seeing your medical records.',
+        )}
         setClose={isProcessing ? undefined : () => setToggleModal(false)}
       />
       <div className="flex flex-shrink-0 justify-end px-4 py-4">
@@ -272,7 +276,7 @@ function PasswordPromptModal({
           className="focus:ring-primary-500 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-300"
           onClick={() => setToggleModal(false)}
         >
-          Cancel
+          {t('Cancel')}
         </button>
         <button
           type="button"
@@ -284,7 +288,9 @@ function PasswordPromptModal({
             setIsProcessing(false);
           }}
         >
-          <p className={`${isProcessing ? 'mr-2' : ''}`}>Remove Password</p>
+          <p className={`${isProcessing ? 'mr-2' : ''}`}>
+            {t('Remove Password')}
+          </p>
           {isProcessing && <ButtonLoadingSpinner />}
         </button>
       </div>
@@ -302,6 +308,7 @@ function DatabasePasswordModal({
   toggleModal: boolean;
   setToggleModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const { t } = useInterfaceLanguage();
   const [password, setPassword] = useState('');
   const [isSettingPassword, setIsSettingPassword] = useState(false);
   const updateLocalConfig = useUpdateLocalConfig();
@@ -379,8 +386,10 @@ function DatabasePasswordModal({
   return (
     <Modal open={toggleModal} setOpen={() => setToggleModal(false)}>
       <ModalHeader
-        title="Set encryption password"
-        subtitle="Set a password to encrypt your medical records with. Note that forgetting your password will prevent you from accessing your data permanently."
+        title={t('Set encryption password')}
+        subtitle={t(
+          'Set a password to encrypt your medical records with. Note that forgetting your password will prevent you from accessing your data permanently.',
+        )}
         setClose={() => setToggleModal(false)}
       />
       <form
@@ -396,7 +405,7 @@ function DatabasePasswordModal({
               htmlFor="password"
               className="text-primary-900 block text-sm font-medium leading-6"
             >
-              Password
+              {t('Password')}
             </label>
             <input
               id="password"
@@ -419,14 +428,16 @@ function DatabasePasswordModal({
             className="focus:ring-primary-500 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-800"
             onClick={() => setToggleModal(false)}
           >
-            Cancel
+            {t('Cancel')}
           </button>
           <button
             type="submit"
             disabled={isSettingPassword}
             className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 ml-4 inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-800"
           >
-            <p className={`${isSettingPassword ? 'mr-2' : ''}`}>Set Password</p>
+            <p className={`${isSettingPassword ? 'mr-2' : ''}`}>
+              {t('Set Password')}
+            </p>
             {isSettingPassword && <ButtonLoadingSpinner />}
           </button>
         </div>

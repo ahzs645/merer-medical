@@ -1,3 +1,4 @@
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { OptometryWorkspaceData } from '../types';
 
 export function OptometrySummaryPanel({
@@ -5,6 +6,7 @@ export function OptometrySummaryPanel({
 }: {
   counts: OptometryWorkspaceData['counts'];
 }) {
+  const { t } = useInterfaceLanguage();
   const stats = [
     { label: 'Prescriptions', value: counts.prescriptions },
     { label: 'Refractions', value: counts.refractions },
@@ -21,7 +23,7 @@ export function OptometrySummaryPanel({
           key={stat.label}
           className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
         >
-          <p className="text-sm font-medium text-gray-600">{stat.label}</p>
+          <p className="text-sm font-medium text-gray-600">{t(stat.label)}</p>
           <p className="mt-2 text-3xl font-semibold text-gray-900">
             {stat.value}
           </p>

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { AppPage } from '../../shared/components/AppPage';
 import { ImagingCategoryTabs } from './components/ImagingCategoryTabs';
 import { ImagingHeader } from './components/ImagingHeader';
@@ -10,6 +11,7 @@ import { ImagingCategory } from './types';
 import { filterImagingItems } from './utils/imagingRecords';
 
 export function ImagingTab() {
+  const { t } = useInterfaceLanguage();
   const { items, counts, status } = useImagingData(),
     [query, setQuery] = useState(''),
     [category, setCategory] = useState<ImagingCategory | 'all'>('all');
@@ -35,7 +37,7 @@ export function ImagingTab() {
           <ImagingCategoryTabs selected={category} onSelect={setCategory} />
           {status === 'loading' ? (
             <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
-              Loading imaging records...
+              {t('Loading imaging records...')}
             </div>
           ) : filteredItems.length > 0 ? (
             <div className="grid gap-3">
@@ -46,11 +48,12 @@ export function ImagingTab() {
           ) : (
             <div className="rounded-md bg-white p-8 text-center shadow-sm ring-1 ring-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">
-                No matching imaging records
+                {t('No matching imaging records')}
               </h2>
               <p className="mt-2 text-sm text-gray-600">
-                Imaging reports, X-rays, DICOM studies, photos, and scan files
-                will appear here when they are synced or added.
+                {t(
+                  'Imaging reports, X-rays, DICOM studies, photos, and scan files will appear here when they are synced or added.',
+                )}
               </p>
             </div>
           )}

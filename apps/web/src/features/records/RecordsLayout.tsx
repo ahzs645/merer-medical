@@ -8,6 +8,7 @@ import {
   PhotoIcon,
 } from '@heroicons/react/24/outline';
 
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { Routes as AppRoutes } from '../../Routes';
 
 const recordTabs = [
@@ -19,6 +20,8 @@ const recordTabs = [
 ];
 
 export function RecordsLayout() {
+  const { t } = useInterfaceLanguage();
+
   return (
     <div className="flex h-full flex-col overflow-hidden bg-gray-50">
       <div className="border-b border-gray-200 bg-white px-2 sm:px-6 lg:px-8">
@@ -39,7 +42,7 @@ export function RecordsLayout() {
               }
             >
               <Icon className="h-5 w-5 shrink-0" />
-              {label}
+              {t(label)}
             </NavLink>
           ))}
         </nav>

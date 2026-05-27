@@ -4,6 +4,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useLocalConfig } from '../../app/providers/LocalConfigProvider';
 import { useNotificationDispatch } from '../../app/providers/NotificationProvider';
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { AppPage } from '../../shared/components/AppPage';
 import { GenericBanner } from '../../shared/components/GenericBanner';
@@ -37,7 +38,13 @@ import {
   getManualRecordNote,
   isManualRecord,
 } from '../../shared/utils/manualRecordUtils';
-import { LabResultRow, TerminologyEntry } from './clinicalTerminology';
+import {
+  LabResultRow,
+  ManualObservationAbsentReason,
+  ManualObservationComparator,
+  ManualObservationValueKind,
+  TerminologyEntry,
+} from './clinicalTerminology';
 import { LabResultsTable } from './LabResultsTable';
 import { TerminologySuggestions } from './TerminologyCombobox';
 import {
@@ -318,11 +325,15 @@ function createLabRow(): LabResultRow {
   return {
     id: uuid4(),
     title: '',
+    valueKind: 'quantity',
+    comparator: '',
     value: '',
     unit: '',
     rangeLow: '',
     rangeHigh: '',
+    rangeText: '',
     interpretation: '',
+    absentReason: 'pending',
   };
 }
 
@@ -334,6 +345,7 @@ export function ManualRecordTab() {
   const navigate = useNavigate();
   const localConfig = useLocalConfig();
   const notifyDispatch = useNotificationDispatch();
+  const { t } = useInterfaceLanguage();
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
   const requestedSpecialty =
     searchParams.get('specialty') === 'dental' ||
@@ -380,6 +392,9 @@ export function ManualRecordTab() {
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(today);
   const [notes, setNotes] = useState('');
+  const [valueKind, setValueKind] =
+    useState<ManualObservationValueKind>('quantity');
+  const [comparator, setComparator] = useState('');
   const [value, setValue] = useState('');
   const [unit, setUnit] = useState('');
   const [selectedTerminology, setSelectedTerminology] =
@@ -387,7 +402,10 @@ export function ManualRecordTab() {
   const [labRows, setLabRows] = useState<LabResultRow[]>([createLabRow()]);
   const [rangeLow, setRangeLow] = useState('');
   const [rangeHigh, setRangeHigh] = useState('');
+  const [rangeText, setRangeText] = useState('');
   const [interpretation, setInterpretation] = useState('');
+  const [absentReason, setAbsentReason] =
+    useState<ManualObservationAbsentReason>('pending');
   const [dose, setDose] = useState('');
   const [frequency, setFrequency] = useState('');
   const [route, setRoute] = useState('');
@@ -426,13 +444,17 @@ export function ManualRecordTab() {
   function resetFields() {
     setTitle('');
     setNotes('');
+    setValueKind('quantity');
+    setComparator('');
     setValue('');
     setUnit('');
     setSelectedTerminology(undefined);
     setLabRows([createLabRow()]);
     setRangeLow('');
     setRangeHigh('');
+    setRangeText('');
     setInterpretation('');
+    setAbsentReason('pending');
     setDose('');
     setFrequency('');
     setRoute('');
@@ -634,6 +656,35 @@ export function ManualRecordTab() {
         setDate((doc.metadata?.date || today).slice(0, 10));
         setNotes(getManualRecordNote(doc) || '');
         const observationValue = getManualObservationValue(doc);
+        const rawObservation = doc.data_record.raw as {
+          resource?: {
+            valueQuantity?: { comparator?: string };
+            valueString?: string;
+            valueCodeableConcept?: { text?: string };
+            dataAbsentReason?: {
+              coding?: Array<{ code?: string }>;
+              text?: string;
+            };
+            referenceRange?: Array<{ text?: string }>;
+          };
+        };
+        if (rawObservation.resource?.dataAbsentReason) {
+          setValueKind('absent');
+          setAbsentReason(
+            normalizeAbsentReason(
+              rawObservation.resource.dataAbsentReason.coding?.[0]?.code ||
+                rawObservation.resource.dataAbsentReason.text,
+            ),
+          );
+        } else if (rawObservation.resource?.valueCodeableConcept) {
+          setValueKind('coded');
+        } else if (rawObservation.resource?.valueString) {
+          setValueKind('string');
+        } else {
+          setValueKind('quantity');
+        }
+        setComparator(rawObservation.resource?.valueQuantity?.comparator || '');
+        setRangeText(rawObservation.resource?.referenceRange?.[0]?.text || '');
         if (observationValue) {
           const [first, ...rest] = observationValue.split(' ');
           setValue(first);
@@ -737,11 +788,15 @@ export function ManualRecordTab() {
                 fileContentType,
                 specialtyDetails,
                 observation: {
+                  valueKind: row.valueKind,
+                  comparator: row.comparator,
                   value: row.value,
                   unit: row.unit,
                   rangeLow: row.rangeLow,
                   rangeHigh: row.rangeHigh,
+                  rangeText: row.rangeText,
                   interpretation: row.interpretation,
+                  absentReason: row.absentReason,
                 },
                 terminology: row.terminology,
               }),
@@ -760,11 +815,15 @@ export function ManualRecordTab() {
                 fileContentType,
                 specialtyDetails,
                 observation: {
+                  valueKind,
+                  comparator,
                   value,
                   unit,
                   rangeLow,
                   rangeHigh,
+                  rangeText,
                   interpretation,
+                  absentReason,
                 },
                 medication: { dose, frequency, route },
                 terminology: selectedTerminology,
@@ -867,7 +926,9 @@ export function ManualRecordTab() {
 
   return (
     <AppPage
-      banner={<GenericBanner text={isEditing ? 'Edit record' : 'Add record'} />}
+      banner={
+        <GenericBanner text={t(isEditing ? 'Edit record' : 'Add record')} />
+      }
     >
       <div className="h-full overflow-y-auto bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-2xl flex-col gap-5">
@@ -881,7 +942,7 @@ export function ManualRecordTab() {
                   htmlFor="manual-record-type"
                   className="block text-sm font-semibold text-gray-900"
                 >
-                  Type
+                  {t('Type')}
                 </label>
                 <select
                   id="manual-record-type"
@@ -894,7 +955,7 @@ export function ManualRecordTab() {
                 >
                   {recordTypes.map((type) => (
                     <option key={type.value} value={type.value}>
-                      {type.label}
+                      {t(type.label)}
                     </option>
                   ))}
                 </select>
@@ -909,7 +970,7 @@ export function ManualRecordTab() {
                       htmlFor="manual-record-specialty"
                       className="block text-sm font-semibold text-gray-900"
                     >
-                      Section
+                      {t('Section')}
                     </label>
                     <select
                       id="manual-record-specialty"
@@ -921,7 +982,7 @@ export function ManualRecordTab() {
                     >
                       {specialtyOptions.map((option) => (
                         <option key={option.value} value={option.value}>
-                          {option.label}
+                          {t(option.label)}
                         </option>
                       ))}
                     </select>
@@ -933,7 +994,7 @@ export function ManualRecordTab() {
                         htmlFor="manual-record-dental-kind"
                         className="block text-sm font-semibold text-gray-900"
                       >
-                        Dental record
+                        {t('Dental record')}
                       </label>
                       <select
                         id="manual-record-dental-kind"
@@ -948,7 +1009,7 @@ export function ManualRecordTab() {
                       >
                         {dentalEntryTypes.map((entry) => (
                           <option key={entry.value} value={entry.value}>
-                            {entry.label}
+                            {t(entry.label)}
                           </option>
                         ))}
                       </select>
@@ -961,7 +1022,7 @@ export function ManualRecordTab() {
                         htmlFor="manual-record-optometry-kind"
                         className="block text-sm font-semibold text-gray-900"
                       >
-                        Eye-care record
+                        {t('Eye-care record')}
                       </label>
                       <select
                         id="manual-record-optometry-kind"
@@ -976,7 +1037,7 @@ export function ManualRecordTab() {
                       >
                         {optometryEntryTypes.map((entry) => (
                           <option key={entry.value} value={entry.value}>
-                            {entry.label}
+                            {t(entry.label)}
                           </option>
                         ))}
                       </select>
@@ -991,7 +1052,7 @@ export function ManualRecordTab() {
                         htmlFor="manual-record-tooth"
                         className="block text-sm font-semibold text-gray-900"
                       >
-                        Tooth
+                        {t('Tooth')}
                       </label>
                       <input
                         id="manual-record-tooth"
@@ -999,14 +1060,14 @@ export function ManualRecordTab() {
                         min="1"
                         max="32"
                         value={toothNumber}
-                        placeholder="e.g. 14"
+                        placeholder={t('e.g. 14')}
                         onChange={(event) => setToothNumber(event.target.value)}
                         className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
                       />
                     </div>
                     <div className="sm:col-span-2">
                       <p className="block text-sm font-semibold text-gray-900">
-                        Surfaces
+                        {t('Surfaces')}
                       </p>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {toothSurfaces.map((surface) => (
@@ -1030,13 +1091,13 @@ export function ManualRecordTab() {
                         htmlFor="manual-record-dental-recall"
                         className="block text-sm font-semibold text-gray-900"
                       >
-                        Recall or follow-up
+                        {t('Recall or follow-up')}
                       </label>
                       <input
                         id="manual-record-dental-recall"
                         type="text"
                         value={dentalRecall}
-                        placeholder="e.g. 6-month cleaning recall"
+                        placeholder={t('e.g. 6-month cleaning recall')}
                         onChange={(event) =>
                           setDentalRecall(event.target.value)
                         }
@@ -1046,63 +1107,65 @@ export function ManualRecordTab() {
                     {isOrthodonticDentalEntry && (
                       <>
                         <SpecialtyTextInput
-                          label="Phase"
+                          label={t('Phase')}
                           value={orthoPhase}
-                          placeholder="Phase I, Phase II, retention"
+                          placeholder={t('Phase I, Phase II, retention')}
                           onChange={setOrthoPhase}
                         />
                         <SpecialtyTextInput
-                          label="Arch"
+                          label={t('Arch')}
                           value={orthoArch}
-                          placeholder="Upper, lower, both"
+                          placeholder={t('Upper, lower, both')}
                           onChange={setOrthoArch}
                         />
                         <SpecialtyTextInput
-                          label="Appliance"
+                          label={t('Appliance')}
                           value={orthoAppliance}
-                          placeholder="Braces, aligners, expander, retainer"
+                          placeholder={t(
+                            'Braces, aligners, expander, retainer',
+                          )}
                           onChange={setOrthoAppliance}
                         />
                         <SpecialtyTextInput
-                          label="Status"
+                          label={t('Status')}
                           value={orthoStatus}
-                          placeholder="Active, planned, complete"
+                          placeholder={t('Active, planned, complete')}
                           onChange={setOrthoStatus}
                         />
                         <SpecialtyTextInput
-                          label="Aligner current"
+                          label={t('Aligner current')}
                           value={alignerCurrent}
-                          placeholder="e.g. 8"
+                          placeholder={t('e.g. 8')}
                           onChange={setAlignerCurrent}
                         />
                         <SpecialtyTextInput
-                          label="Aligner total"
+                          label={t('Aligner total')}
                           value={alignerTotal}
-                          placeholder="e.g. 24"
+                          placeholder={t('e.g. 24')}
                           onChange={setAlignerTotal}
                         />
                         <SpecialtyTextInput
-                          label="Overjet (mm)"
+                          label={t('Overjet (mm)')}
                           value={overjet}
-                          placeholder="e.g. 4"
+                          placeholder={t('e.g. 4')}
                           onChange={setOverjet}
                         />
                         <SpecialtyTextInput
-                          label="Overbite (mm)"
+                          label={t('Overbite (mm)')}
                           value={overbite}
-                          placeholder="e.g. 3"
+                          placeholder={t('e.g. 3')}
                           onChange={setOverbite}
                         />
                         <SpecialtyTextInput
-                          label="Molar / canine class"
+                          label={t('Molar / canine class')}
                           value={molarClass}
-                          placeholder="Class II div 1, right Class I"
+                          placeholder={t('Class II div 1, right Class I')}
                           onChange={setMolarClass}
                         />
                         <SpecialtyTextInput
-                          label="Next visit"
+                          label={t('Next visit')}
                           value={nextVisit}
-                          placeholder="6 weeks, wire change, tray review"
+                          placeholder={t('6 weeks, wire change, tray review')}
                           onChange={setNextVisit}
                         />
                       </>
@@ -1118,7 +1181,7 @@ export function ManualRecordTab() {
                           htmlFor="manual-record-eye-side"
                           className="block text-sm font-semibold text-gray-900"
                         >
-                          Eye
+                          {t('Eye')}
                         </label>
                         <select
                           id="manual-record-eye-side"
@@ -1128,9 +1191,9 @@ export function ManualRecordTab() {
                           }
                           className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
                         >
-                          <option value="OU">OU / both</option>
-                          <option value="OD">OD / right</option>
-                          <option value="OS">OS / left</option>
+                          <option value="OU">{t('OU / both')}</option>
+                          <option value="OD">{t('OD / right')}</option>
+                          <option value="OS">{t('OS / left')}</option>
                         </select>
                       </div>
                       <div className="sm:col-span-2">
@@ -1138,13 +1201,13 @@ export function ManualRecordTab() {
                           htmlFor="manual-record-exam-method"
                           className="block text-sm font-semibold text-gray-900"
                         >
-                          Method or device
+                          {t('Method or device')}
                         </label>
                         <input
                           id="manual-record-exam-method"
                           type="text"
                           value={examMethod}
-                          placeholder="e.g. Goldmann, OCT, Snellen"
+                          placeholder={t('e.g. Goldmann, OCT, Snellen')}
                           onChange={(event) =>
                             setExamMethod(event.target.value)
                           }
@@ -1158,51 +1221,51 @@ export function ManualRecordTab() {
                       optometryEntryKind === 'refraction') && (
                       <div className="grid gap-3 rounded-md bg-white p-3 ring-1 ring-gray-200">
                         <p className="text-sm font-semibold text-gray-900">
-                          Refraction / Rx
+                          {t('Refraction / Rx')}
                         </p>
                         <div className="grid gap-3 md:grid-cols-5">
                           <PrescriptionInput
-                            label="OD sphere"
+                            label={t('OD sphere')}
                             value={odSphere}
                             onChange={setOdSphere}
                           />
                           <PrescriptionInput
-                            label="OD cylinder"
+                            label={t('OD cylinder')}
                             value={odCylinder}
                             onChange={setOdCylinder}
                           />
                           <PrescriptionInput
-                            label="OD axis"
+                            label={t('OD axis')}
                             value={odAxis}
                             onChange={setOdAxis}
                           />
                           <PrescriptionInput
-                            label="OD add"
+                            label={t('OD add')}
                             value={odAdd}
                             onChange={setOdAdd}
                           />
                           <PrescriptionInput
-                            label="PD"
+                            label={t('PD')}
                             value={pd}
                             onChange={setPd}
                           />
                           <PrescriptionInput
-                            label="OS sphere"
+                            label={t('OS sphere')}
                             value={osSphere}
                             onChange={setOsSphere}
                           />
                           <PrescriptionInput
-                            label="OS cylinder"
+                            label={t('OS cylinder')}
                             value={osCylinder}
                             onChange={setOsCylinder}
                           />
                           <PrescriptionInput
-                            label="OS axis"
+                            label={t('OS axis')}
                             value={osAxis}
                             onChange={setOsAxis}
                           />
                           <PrescriptionInput
-                            label="OS add"
+                            label={t('OS add')}
                             value={osAdd}
                             onChange={setOsAdd}
                           />
@@ -1214,13 +1277,13 @@ export function ManualRecordTab() {
                       optometryEntryKind === 'checkup') && (
                       <div className="grid gap-3 sm:grid-cols-2">
                         <PrescriptionInput
-                          label="OD visual acuity"
+                          label={t('OD visual acuity')}
                           value={visualAcuityOd}
                           placeholder="20/20"
                           onChange={setVisualAcuityOd}
                         />
                         <PrescriptionInput
-                          label="OS visual acuity"
+                          label={t('OS visual acuity')}
                           value={visualAcuityOs}
                           placeholder="20/25"
                           onChange={setVisualAcuityOs}
@@ -1232,13 +1295,13 @@ export function ManualRecordTab() {
                       optometryEntryKind === 'checkup') && (
                       <div className="grid gap-3 sm:grid-cols-2">
                         <PrescriptionInput
-                          label="OD IOP"
+                          label={t('OD IOP')}
                           value={iopOd}
                           placeholder="14"
                           onChange={setIopOd}
                         />
                         <PrescriptionInput
-                          label="OS IOP"
+                          label={t('OS IOP')}
                           value={iopOs}
                           placeholder="15"
                           onChange={setIopOs}
@@ -1256,7 +1319,7 @@ export function ManualRecordTab() {
                   htmlFor="manual-device-type"
                   className="block text-sm font-semibold text-gray-900"
                 >
-                  Device
+                  {t('Device')}
                 </label>
                 <select
                   id="manual-device-type"
@@ -1268,7 +1331,7 @@ export function ManualRecordTab() {
                 >
                   {deviceImportTypes.map((device) => (
                     <option key={device.value} value={device.value}>
-                      {device.label}
+                      {t(device.label)}
                     </option>
                   ))}
                 </select>
@@ -1279,14 +1342,15 @@ export function ManualRecordTab() {
                       htmlFor="libre-import-file"
                       className="block text-sm font-semibold text-gray-900"
                     >
-                      LibreView file
+                      {t('LibreView file')}
                     </label>
                     <p className="mt-1 text-sm text-gray-600">
-                      Import a LibreView JSON or CSV export. Readings will
-                      appear as glucose observations in Labs.
+                      {t(
+                        'Import a LibreView JSON or CSV export. Readings will appear as glucose observations in Labs.',
+                      )}
                     </p>
                     <label className="mt-3 inline-flex cursor-pointer items-center justify-center rounded-md bg-primary-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-800">
-                      {isImportingLibre ? 'Importing...' : 'Choose file'}
+                      {t(isImportingLibre ? 'Importing...' : 'Choose file')}
                       <input
                         id="libre-import-file"
                         type="file"
@@ -1304,7 +1368,7 @@ export function ManualRecordTab() {
             {!isEditing && !isDeviceImportType && (
               <div>
                 <p className="block text-sm font-semibold text-gray-900">
-                  Quick templates
+                  {t('Quick templates')}
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {quickTemplates.map((template) => (
@@ -1314,7 +1378,7 @@ export function ManualRecordTab() {
                       onClick={() => applyTemplate(template)}
                       className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100"
                     >
-                      {template.label}
+                      {t(template.label)}
                     </button>
                   ))}
                 </div>
@@ -1328,13 +1392,13 @@ export function ManualRecordTab() {
                     htmlFor="manual-record-dose"
                     className="block text-sm font-semibold text-gray-900"
                   >
-                    Dose
+                    {t('Dose')}
                   </label>
                   <input
                     id="manual-record-dose"
                     type="text"
                     value={dose}
-                    placeholder="e.g. 10 mg"
+                    placeholder={t('e.g. 10 mg')}
                     onChange={(event) => setDose(event.target.value)}
                     className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
                   />
@@ -1344,13 +1408,13 @@ export function ManualRecordTab() {
                     htmlFor="manual-record-frequency"
                     className="block text-sm font-semibold text-gray-900"
                   >
-                    Frequency
+                    {t('Frequency')}
                   </label>
                   <input
                     id="manual-record-frequency"
                     type="text"
                     value={frequency}
-                    placeholder="e.g. twice daily"
+                    placeholder={t('e.g. twice daily')}
                     onChange={(event) => setFrequency(event.target.value)}
                     className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
                   />
@@ -1360,13 +1424,13 @@ export function ManualRecordTab() {
                     htmlFor="manual-record-route"
                     className="block text-sm font-semibold text-gray-900"
                   >
-                    Route
+                    {t('Route')}
                   </label>
                   <input
                     id="manual-record-route"
                     type="text"
                     value={route}
-                    placeholder="e.g. oral"
+                    placeholder={t('e.g. oral')}
                     onChange={(event) => setRoute(event.target.value)}
                     className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
                   />
@@ -1402,18 +1466,85 @@ export function ManualRecordTab() {
                   <>
                     <div>
                       <label
+                        htmlFor="manual-record-value-kind"
+                        className="block text-sm font-semibold text-gray-900"
+                      >
+                        {t('Value type')}
+                      </label>
+                      <select
+                        id="manual-record-value-kind"
+                        value={valueKind}
+                        onChange={(event) =>
+                          setValueKind(
+                            event.target.value as ManualObservationValueKind,
+                          )
+                        }
+                        className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                      >
+                        <option value="quantity">{t('Quantity')}</option>
+                        <option value="string">{t('Text')}</option>
+                        <option value="coded">{t('Coded')}</option>
+                        <option value="absent">{t('Absent')}</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="manual-record-comparator"
+                        className="block text-sm font-semibold text-gray-900"
+                      >
+                        {t('Comparator')}
+                      </label>
+                      <select
+                        id="manual-record-comparator"
+                        value={comparator}
+                        disabled={valueKind !== 'quantity'}
+                        onChange={(event) => setComparator(event.target.value)}
+                        className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 disabled:bg-gray-100 disabled:text-gray-400"
+                      >
+                        <option value="">=</option>
+                        <option value="<">&lt;</option>
+                        <option value="<=">&lt;=</option>
+                        <option value=">">&gt;</option>
+                        <option value=">=">&gt;=</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label
                         htmlFor="manual-record-value"
                         className="block text-sm font-semibold text-gray-900"
                       >
-                        Value
+                        {t('Value')}
                       </label>
-                      <input
-                        id="manual-record-value"
-                        type="text"
-                        value={value}
-                        onChange={(event) => setValue(event.target.value)}
-                        className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                      />
+                      {valueKind === 'absent' ? (
+                        <select
+                          id="manual-record-value"
+                          value={absentReason}
+                          onChange={(event) =>
+                            setAbsentReason(
+                              event.target
+                                .value as ManualObservationAbsentReason,
+                            )
+                          }
+                          className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                        >
+                          <option value="pending">{t('Pending')}</option>
+                          <option value="not-performed">
+                            {t('Not performed')}
+                          </option>
+                          <option value="unknown">{t('Unknown')}</option>
+                          <option value="not-applicable">{t('N/A')}</option>
+                        </select>
+                      ) : (
+                        <input
+                          id="manual-record-value"
+                          type="text"
+                          value={value}
+                          onChange={(event) => setValue(event.target.value)}
+                          className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                        />
+                      )}
                     </div>
 
                     <div>
@@ -1421,7 +1552,7 @@ export function ManualRecordTab() {
                         htmlFor="manual-record-unit"
                         className="block text-sm font-semibold text-gray-900"
                       >
-                        Unit
+                        {t('Unit')}
                       </label>
                       <input
                         id="manual-record-unit"
@@ -1437,7 +1568,7 @@ export function ManualRecordTab() {
                         htmlFor="manual-record-range-low"
                         className="block text-sm font-semibold text-gray-900"
                       >
-                        Range low
+                        {t('Range low')}
                       </label>
                       <input
                         id="manual-record-range-low"
@@ -1453,7 +1584,7 @@ export function ManualRecordTab() {
                         htmlFor="manual-record-range-high"
                         className="block text-sm font-semibold text-gray-900"
                       >
-                        Range high
+                        {t('Range high')}
                       </label>
                       <input
                         id="manual-record-range-high"
@@ -1466,10 +1597,27 @@ export function ManualRecordTab() {
 
                     <div className="sm:col-span-2">
                       <label
+                        htmlFor="manual-record-range-text"
+                        className="block text-sm font-semibold text-gray-900"
+                      >
+                        {t('Range text')}
+                      </label>
+                      <input
+                        id="manual-record-range-text"
+                        type="text"
+                        value={rangeText}
+                        placeholder={t('e.g. Negative')}
+                        onChange={(event) => setRangeText(event.target.value)}
+                        className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label
                         htmlFor="manual-record-interpretation"
                         className="block text-sm font-semibold text-gray-900"
                       >
-                        Interpretation
+                        {t('Interpretation')}
                       </label>
                       <input
                         id="manual-record-interpretation"
@@ -1492,7 +1640,7 @@ export function ManualRecordTab() {
                   htmlFor="manual-record-title"
                   className="block text-sm font-semibold text-gray-900"
                 >
-                  Name <span className="text-red-600">*</span>
+                  {t('Name')} <span className="text-red-600">*</span>
                 </label>
                 <input
                   id="manual-record-title"
@@ -1526,7 +1674,7 @@ export function ManualRecordTab() {
                   )}
                 {submitAttempted && titleMissing && (
                   <p className="mt-1 text-xs font-medium text-red-600">
-                    A name is required.
+                    {t('A name is required.')}
                   </p>
                 )}
               </div>
@@ -1538,7 +1686,7 @@ export function ManualRecordTab() {
                   htmlFor="manual-record-file"
                   className="block text-sm font-semibold text-gray-900"
                 >
-                  File
+                  {t('File')}
                 </label>
                 <input
                   id="manual-record-file"
@@ -1573,7 +1721,7 @@ export function ManualRecordTab() {
                 )}
                 {submitAttempted && fileMissing && (
                   <p className="mt-1 text-xs font-medium text-red-600">
-                    Select a file before saving this document.
+                    {t('Select a file before saving this document.')}
                   </p>
                 )}
               </div>
@@ -1585,11 +1733,12 @@ export function ManualRecordTab() {
                   htmlFor="manual-record-source-file"
                   className="block text-sm font-semibold text-gray-900"
                 >
-                  Link original document
+                  {t('Link original document')}
                 </label>
                 <p className="mt-1 text-sm text-gray-600">
-                  Attach a scan, photo, PDF, or lab report to this record in the
-                  local database.
+                  {t(
+                    'Attach a scan, photo, PDF, or lab report to this record in the local database.',
+                  )}
                 </p>
                 <input
                   id="manual-record-source-file"
@@ -1616,13 +1765,14 @@ export function ManualRecordTab() {
                 />
                 {linkedFile && (
                   <p className="mt-2 text-xs font-medium text-gray-600">
-                    Linked: {linkedFile.filename}
+                    {t('Linked')}: {linkedFile.filename}
                   </p>
                 )}
                 {!canLinkSourceFile && (
                   <p className="mt-2 text-xs font-medium text-gray-500">
-                    File linking is available when the local Dexie database is
-                    enabled.
+                    {t(
+                      'File linking is available when the local Dexie database is enabled.',
+                    )}
                   </p>
                 )}
               </div>
@@ -1634,7 +1784,7 @@ export function ManualRecordTab() {
                   htmlFor="manual-record-date"
                   className="block text-sm font-semibold text-gray-900"
                 >
-                  Date
+                  {t('Date')}
                 </label>
                 <input
                   id="manual-record-date"
@@ -1653,7 +1803,7 @@ export function ManualRecordTab() {
                   htmlFor="manual-record-notes"
                   className="block text-sm font-semibold text-gray-900"
                 >
-                  Notes
+                  {t('Notes')}
                 </label>
                 <textarea
                   id="manual-record-notes"
@@ -1673,7 +1823,7 @@ export function ManualRecordTab() {
                   onChange={(event) => setKeepAdding(event.target.checked)}
                   className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
                 />
-                Keep adding more records after saving
+                {t('Keep adding more records after saving')}
               </label>
             )}
 
@@ -1681,7 +1831,9 @@ export function ManualRecordTab() {
               <div className="flex items-center justify-between gap-3">
                 <span className="text-xs font-medium text-gray-500">
                   {savedCount > 0 &&
-                    `${savedCount} record${savedCount === 1 ? '' : 's'} added this session`}
+                    t(
+                      `${savedCount} record${savedCount === 1 ? '' : 's'} added this session`,
+                    )}
                 </span>
                 <div className="flex justify-end gap-3">
                   <button
@@ -1689,20 +1841,22 @@ export function ManualRecordTab() {
                     onClick={() => navigate(AppRoutes.Timeline)}
                     className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
                   >
-                    {savedCount > 0 && !isEditing ? 'Done' : 'Cancel'}
+                    {t(savedCount > 0 && !isEditing ? 'Done' : 'Cancel')}
                   </button>
                   <button
                     type="submit"
                     disabled={isSaving}
                     className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                   >
-                    {isSaving
-                      ? 'Saving'
-                      : isEditing
-                        ? 'Update record'
-                        : keepAdding
-                          ? 'Save & add another'
-                          : 'Save record'}
+                    {t(
+                      isSaving
+                        ? 'Saving'
+                        : isEditing
+                          ? 'Update record'
+                          : keepAdding
+                            ? 'Save & add another'
+                            : 'Save record',
+                    )}
                   </button>
                 </div>
               </div>
@@ -2033,11 +2187,15 @@ function buildClinicalDocument({
   fileContentType: string;
   specialtyDetails?: ManualSpecialtyDetails;
   observation?: {
+    valueKind: ManualObservationValueKind;
+    comparator: string;
     value: string;
     unit: string;
     rangeLow: string;
     rangeHigh: string;
+    rangeText: string;
     interpretation: string;
+    absentReason: ManualObservationAbsentReason;
   };
   medication?: {
     dose: string;
@@ -2103,11 +2261,15 @@ function buildManualFhirEntry(
   notes: string,
   date: string,
   observation?: {
+    valueKind: ManualObservationValueKind;
+    comparator: string;
     value: string;
     unit: string;
     rangeLow: string;
     rangeHigh: string;
+    rangeText: string;
     interpretation: string;
+    absentReason: ManualObservationAbsentReason;
   },
   medication?: {
     dose: string;
@@ -2119,11 +2281,15 @@ function buildManualFhirEntry(
 ) {
   const resourceType = toFhirResourceType(recordType);
   const observationData = observation ?? {
+    valueKind: 'quantity' as ManualObservationValueKind,
+    comparator: '',
     value: '',
     unit: '',
     rangeLow: '',
     rangeHigh: '',
+    rangeText: '',
     interpretation: '',
+    absentReason: 'pending' as ManualObservationAbsentReason,
   };
   const medicationData = medication ?? { dose: '', frequency: '', route: '' };
   const hasMedicationDetail =
@@ -2131,7 +2297,7 @@ function buildManualFhirEntry(
     (medicationData.dose.trim() ||
       medicationData.frequency.trim() ||
       medicationData.route.trim());
-  const hasObservationValue = observationData.value.trim();
+  const observationValue = buildObservationValue(observationData);
   return {
     fullUrl: `manual:${id}`,
     manual_kind: recordType,
@@ -2194,22 +2360,17 @@ function buildManualFhirEntry(
           ? [{ location: { display: notes.trim() } }]
           : undefined,
       title: recordType === 'careplan' ? title.trim() : undefined,
-      valueQuantity: hasObservationValue
-        ? {
-            value: Number.isFinite(Number(observationData.value))
-              ? Number(observationData.value)
-              : observationData.value.trim(),
-            unit: observationData.unit.trim() || undefined,
-            system: observationData.unit.trim()
-              ? 'http://unitsofmeasure.org'
-              : undefined,
-            code: observationData.unit.trim() || undefined,
-          }
-        : undefined,
+      valueQuantity: observationValue.valueQuantity,
+      valueString: observationValue.valueString,
+      valueCodeableConcept: observationValue.valueCodeableConcept,
+      dataAbsentReason: observationValue.dataAbsentReason,
       referenceRange:
-        observationData.rangeLow.trim() || observationData.rangeHigh.trim()
+        observationData.rangeLow.trim() ||
+        observationData.rangeHigh.trim() ||
+        observationData.rangeText.trim()
           ? [
               {
+                text: observationData.rangeText.trim() || undefined,
                 low: observationData.rangeLow.trim()
                   ? {
                       value: observationData.rangeLow.trim(),
@@ -2243,6 +2404,124 @@ function buildManualFhirEntry(
         : undefined,
     },
   };
+}
+
+function buildObservationValue(observationData: {
+  valueKind: ManualObservationValueKind;
+  comparator: string;
+  value: string;
+  unit: string;
+  absentReason: ManualObservationAbsentReason;
+}) {
+  const value = observationData.value.trim();
+  const unit = observationData.unit.trim();
+  const parsedQuantity = parseQuantityInput(value);
+  const comparator =
+    normalizeComparator(observationData.comparator) ||
+    parsedQuantity.comparator;
+
+  if (observationData.valueKind === 'absent') {
+    return {
+      dataAbsentReason: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/data-absent-reason',
+            code: observationData.absentReason,
+            display: formatAbsentReason(observationData.absentReason),
+          },
+        ],
+        text: formatAbsentReason(observationData.absentReason),
+      },
+    };
+  }
+
+  if (!value) return {};
+
+  if (observationData.valueKind === 'quantity') {
+    const numericValue = Number(parsedQuantity.value);
+    if (Number.isFinite(numericValue)) {
+      return {
+        valueQuantity: {
+          value: numericValue,
+          comparator,
+          unit: unit || undefined,
+          system: unit ? 'http://unitsofmeasure.org' : undefined,
+          code: unit || undefined,
+        },
+      };
+    }
+
+    return {
+      valueString: `${comparator || ''}${value}${unit ? ` ${unit}` : ''}`,
+    };
+  }
+
+  if (observationData.valueKind === 'coded') {
+    return {
+      valueCodeableConcept: {
+        text: value,
+        coding: [{ display: value }],
+      },
+    };
+  }
+
+  return {
+    valueString: unit ? `${value} ${unit}` : value,
+  };
+}
+
+function parseQuantityInput(value: string): {
+  comparator?: ManualObservationComparator;
+  value: string;
+} {
+  const match = value.trim().match(/^(<=|>=|<|>)\s*(.+)$/);
+  if (!match) return { value };
+  return {
+    comparator: normalizeComparator(match[1]),
+    value: match[2].trim(),
+  };
+}
+
+function normalizeComparator(
+  comparator: string,
+): ManualObservationComparator | undefined {
+  return comparator === '<' ||
+    comparator === '<=' ||
+    comparator === '>' ||
+    comparator === '>='
+    ? comparator
+    : undefined;
+}
+
+function formatAbsentReason(reason: ManualObservationAbsentReason) {
+  switch (reason) {
+    case 'not-performed':
+      return 'Not performed';
+    case 'not-applicable':
+      return 'Not applicable';
+    case 'unknown':
+      return 'Unknown';
+    case 'pending':
+    default:
+      return 'Pending';
+  }
+}
+
+function normalizeAbsentReason(reason?: string): ManualObservationAbsentReason {
+  switch (reason?.toLowerCase()) {
+    case 'not-performed':
+    case 'not performed':
+      return 'not-performed';
+    case 'not-applicable':
+    case 'not applicable':
+    case 'n/a':
+      return 'not-applicable';
+    case 'unknown':
+      return 'unknown';
+    case 'pending':
+    default:
+      return 'pending';
+  }
 }
 
 function getClinicalResourceType(

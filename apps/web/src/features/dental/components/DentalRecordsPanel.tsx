@@ -3,12 +3,15 @@ import { Link } from 'react-router-dom';
 import { Routes as AppRoutes } from '../../../Routes';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { DentalRecord } from '../types';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
+  const { t } = useInterfaceLanguage();
+
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <h2 className="text-base font-semibold text-gray-900">
-        Dental records projection
+        {t('Dental records projection')}
       </h2>
       {records.length > 0 ? (
         <div className="mt-3 grid gap-2">
@@ -30,7 +33,7 @@ export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
                         )}
                         className="text-xs font-semibold text-primary-700 hover:text-primary-900"
                       >
-                        Edit
+                        {t('Edit')}
                       </Link>
                     )}
                     <span className="text-xs font-medium uppercase text-gray-500">
@@ -40,10 +43,10 @@ export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
                 </div>
                 <p className="mt-1 text-sm text-gray-600">
                   {record.toothNumbers.length > 0
-                    ? `Teeth: ${record.toothNumbers.join(', ')}`
-                    : 'No tooth number detected'}
+                    ? `${t('Teeth')}: ${record.toothNumbers.join(', ')}`
+                    : t('No tooth number detected')}
                   {record.surfaces.length > 0
-                    ? ` · Surfaces: ${record.surfaces.join(', ')}`
+                    ? ` · ${t('Surfaces')}: ${record.surfaces.join(', ')}`
                     : ''}
                 </p>
                 {record.summary && (
@@ -56,8 +59,9 @@ export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
         </div>
       ) : (
         <p className="mt-3 text-sm leading-6 text-gray-600">
-          Dental findings, procedures, treatment plans, referrals, and perio
-          records will appear here when synced or added.
+          {t(
+            'Dental findings, procedures, treatment plans, referrals, and perio records will appear here when synced or added.',
+          )}
         </p>
       )}
     </section>

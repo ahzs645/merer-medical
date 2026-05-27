@@ -1,15 +1,27 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 export function DentalScanPreview() {
   const mountRef = useRef<HTMLDivElement | null>(null);
+  const [webGlUnavailable, setWebGlUnavailable] = useState(false);
+  const { t } = useInterfaceLanguage();
 
   useEffect(() => {
     const mount = mountRef.current;
-    if (!mount) return;
+    if (!mount || webGlUnavailable) return;
 
     const width = mount.clientWidth || 320;
     const height = 220;
+
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+    } catch {
+      setWebGlUnavailable(true);
+      return;
+    }
+
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf8fafc);
 
@@ -17,7 +29,6 @@ export function DentalScanPreview() {
     camera.position.set(0, 1.8, 6);
     camera.lookAt(0, 0, 0);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     mount.appendChild(renderer.domElement);
@@ -82,27 +93,59 @@ export function DentalScanPreview() {
       archGeometry.dispose();
       material.dispose();
       highlightMaterial.dispose();
-      mount.removeChild(renderer.domElement);
+      if (renderer.domElement.parentNode === mount) {
+        mount.removeChild(renderer.domElement);
+      }
     };
-  }, []);
+  }, [webGlUnavailable]);
 
   return (
     <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
           <h2 className="text-base font-semibold text-gray-900">
-            3D scan preview
+            {t('3D scan preview')}
           </h2>
           <p className="text-sm text-gray-600">
-            Three.js is wired for STL/PLY/OBJ-style scan rendering. This demo
-            preview uses a generated arch until uploaded scan files are stored.
+            {t(
+              'Three.js is wired for STL/PLY/OBJ-style scan rendering. This demo preview uses a generated arch until uploaded scan files are stored.',
+            )}
           </p>
         </div>
       </div>
       <div
         ref={mountRef}
         className="mt-3 h-[220px] overflow-hidden rounded-md border border-gray-200"
-      />
+      >
+        {webGlUnavailable && (
+          <div className="flex h-full items-center justify-center bg-slate-50 px-6">
+            <div className="w-full max-w-sm">
+              <div className="relative mx-auto h-28 w-64 max-w-full rounded-b-full border-b-4 border-slate-300">
+                {Array.from({ length: 10 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="absolute top-7 h-11 w-5 rounded-full bg-slate-200 ring-1 ring-slate-300"
+                    style={{
+                      left: `${12 + index * 8}%`,
+                      transform: `translateX(-50%) rotate(${(index - 4.5) * 3}deg)`,
+                    }}
+                  />
+                ))}
+                <div className="absolute left-[36%] top-7 h-11 w-5 rounded-full bg-sky-300 ring-1 ring-sky-400" />
+                <div className="absolute left-[64%] top-7 h-11 w-5 rounded-full bg-sky-300 ring-1 ring-sky-400" />
+              </div>
+              <p className="mt-4 text-center text-sm font-medium text-slate-700">
+                {t('3D preview unavailable')}
+              </p>
+              <p className="mt-1 text-center text-xs text-slate-500">
+                {t(
+                  'Showing a static dental scan preview because WebGL is not available in this browser.',
+                )}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
