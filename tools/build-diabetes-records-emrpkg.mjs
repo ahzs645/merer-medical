@@ -61,6 +61,7 @@ for (const panel of records.labPanels || []) {
   for (const result of panel.results || []) {
     const observationId = stableId(`lab-${panel.id}-${result.id}`);
     resultRefs.push({ reference: `Observation/${observationId}` });
+    const nutritionRelevance = nutritionRelevanceForLab(result);
     clinicalDocuments.push(
       clinicalDocument({
         id: observationId,
@@ -83,7 +84,7 @@ for (const panel of records.labPanels || []) {
             issued: atNoon(panel.collectedAt),
             ...observationValue(result.value, result.unit),
             referenceRange: buildReferenceRange(result),
-            extension: buildLabExtensions(result),
+            extension: buildLabExtensions(result, nutritionRelevance),
             interpretation:
               result.flag && result.flag !== 'identity'
                 ? { text: result.flag }
@@ -114,6 +115,82 @@ for (const panel of records.labPanels || []) {
         },
       }),
     );
+
+    if (nutritionRelevance) {
+      const nutritionId = stableId(
+        `nutrition-relevance-${panel.id}-${result.id}`,
+      );
+      clinicalDocuments.push(
+        clinicalDocument({
+          id: nutritionId,
+          resourceType: 'observation',
+          date: panel.collectedAt,
+          displayName: `${nutritionRelevance.display} nutrition relevance`,
+          raw: {
+            fullUrl: `manual:${nutritionId}`,
+            manual_kind: 'nutrition-relevance',
+            source_panel_id: panel.id,
+            source_observation_id: observationId,
+            source_image: panel.sourceImage,
+            audit: panel.audit,
+            resource: {
+              resourceType: 'Observation',
+              id: nutritionId,
+              status: 'final',
+              category: {
+                text: 'Nutrition relevance',
+                coding: [
+                  {
+                    system:
+                      'https://mere.health/fhir/CodeSystem/observation-category',
+                    code: 'nutrition-relevance',
+                    display: 'Nutrition relevance',
+                  },
+                ],
+              },
+              code: {
+                text: `${nutritionRelevance.display} nutrition relevance`,
+                coding: [
+                  {
+                    system:
+                      'https://mere.health/fhir/CodeSystem/nutrition-relevance',
+                    code: nutritionRelevance.code,
+                    display: nutritionRelevance.display,
+                  },
+                ],
+              },
+              effectiveDateTime: atNoon(panel.collectedAt),
+              issued: atNoon(panel.collectedAt),
+              valueString: nutritionRelevance.text,
+              derivedFrom: [{ reference: `Observation/${observationId}` }],
+              extension: [
+                {
+                  url: 'https://mere.health/fhir/StructureDefinition/nutrient',
+                  valueCodeableConcept: {
+                    text: nutritionRelevance.display,
+                    coding: [nutritionRelevance.coding],
+                  },
+                },
+                {
+                  url: 'https://mere.health/fhir/StructureDefinition/not-medication-evidence',
+                  valueBoolean: true,
+                },
+              ],
+              note: buildNotes([
+                'Lab-linked nutrition marker only; this does not assert that the patient takes a supplement.',
+                `Source lab: ${result.name}`,
+                `Source value: ${formatValueWithUnit(result.value, result.unit)}`,
+              ]),
+            },
+          },
+          metadata: {
+            source_panel_id: panel.id,
+            source_result_id: result.id,
+            nutrition_relevance: nutritionRelevance.code,
+          },
+        }),
+      );
+    }
   }
 
   const reportId = stableId(`lab-panel-${panel.id}`);
@@ -263,8 +340,12 @@ for (const report of records.imagingReports || []) {
 }
 
 for (const group of records.medicationPlans || []) {
+  const medicationListEntries = [];
   for (const item of group.items || []) {
     const medicationId = stableId(`medication-${group.id}-${item.id}`);
+    medicationListEntries.push({
+      item: { reference: `MedicationStatement/${medicationId}` },
+    });
     clinicalDocuments.push(
       clinicalDocument({
         id: medicationId,
@@ -281,25 +362,15 @@ for (const group of records.medicationPlans || []) {
             id: medicationId,
             status: mapMedicationStatus(item.status),
             category: {
-              text: inferMedicationCategory(item),
+              text: inferMedicationCategory(item).display,
+              coding: [inferMedicationCategory(item)],
             },
-            effectiveDateTime: atNoon(item.assignedDate || group.encounterDate),
+            effectivePeriod: buildMedicationEffectivePeriod(item, group),
+            informationSource: buildMedicationInformationSource(item, group),
             medicationCodeableConcept: buildMedicationCode(item.medication),
             reasonCode: buildMedicationReason(item),
-            statusReason: item.status
-              ? {
-                  text: item.status,
-                  coding: [
-                    {
-                      system:
-                        'https://mere.health/fhir/CodeSystem/medication-plan-status',
-                      code: stableId(item.status),
-                      display: item.status,
-                    },
-                  ],
-                }
-              : undefined,
-            extension: buildMedicationExtensions(item),
+            statusReason: buildMedicationStatusReason(item),
+            extension: buildMedicationExtensions(item, group),
             dosage: [
               {
                 text: item.dose,
@@ -314,9 +385,57 @@ for (const group of records.medicationPlans || []) {
               `Provider: ${group.provider}`,
               `Source section: ${item.sourceSection}`,
               `Plan status: ${item.status}`,
+              stopReason(item) ? `Stop reason: ${stopReason(item)}` : undefined,
+              conditionalInstruction(item)
+                ? `Conditional instruction: ${conditionalInstruction(item)}`
+                : undefined,
               item.plannerImplication,
               item.note,
               ...(item.mappedTo || []).map((target) => `Mapped to: ${target}`),
+            ]),
+          },
+        },
+      }),
+    );
+  }
+
+  if (medicationListEntries.length) {
+    const listId = stableId(`medication-reconciliation-list-${group.id}`);
+    clinicalDocuments.push(
+      clinicalDocument({
+        id: listId,
+        resourceType: 'list',
+        date: group.encounterDate,
+        displayName: `${group.title} medication reconciliation`,
+        raw: {
+          fullUrl: `manual:${listId}`,
+          manual_kind: 'medication-reconciliation-list',
+          source_image: group.sourceImage,
+          audit: group.audit,
+          resource: {
+            resourceType: 'List',
+            id: listId,
+            status: 'current',
+            mode: 'working',
+            title: `${group.title} medication reconciliation`,
+            date: atNoon(group.encounterDate),
+            source: buildMedicationInformationSource(undefined, group),
+            code: {
+              text: 'Medication reconciliation list',
+              coding: [
+                {
+                  system: 'http://loinc.org',
+                  code: '10160-0',
+                  display: 'History of Medication use Narrative',
+                },
+              ],
+            },
+            entry: medicationListEntries,
+            note: buildNotes([
+              `Provider: ${group.provider}`,
+              `Source: ${group.sourceImage}`,
+              auditText(group.audit),
+              ...(group.planSummary || []).map((item) => `Plan: ${item}`),
             ]),
           },
         },
@@ -591,10 +710,13 @@ function buildObservationCode(result) {
   };
 }
 
-function buildLabExtensions(result) {
+function buildLabExtensions(result, nutritionRelevance) {
   const extensions = [];
   const qualitative = qualitativeObservationCode(`${result.value}`.trim());
-  const semi = parseSemiQuantitativeValue(`${result.value}`.trim(), result.unit);
+  const semi = parseSemiQuantitativeValue(
+    `${result.value}`.trim(),
+    result.unit,
+  );
 
   if (qualitative) {
     extensions.push({
@@ -639,6 +761,15 @@ function buildLabExtensions(result) {
             display: 'Diabetes target',
           },
         ],
+      },
+    });
+  }
+  if (nutritionRelevance) {
+    extensions.push({
+      url: 'https://mere.health/fhir/StructureDefinition/nutrition-relevance',
+      valueCodeableConcept: {
+        text: nutritionRelevance.display,
+        coding: [nutritionRelevance.coding],
       },
     });
   }
@@ -893,13 +1024,19 @@ function imagingFindingExtension(finding) {
             },
           }
         : undefined,
-      finding.category ? { url: 'category', valueCode: finding.category } : undefined,
+      finding.category
+        ? { url: 'category', valueCode: finding.category }
+        : undefined,
       typeof finding.value === 'number'
         ? {
             url: 'valueQuantity',
             valueQuantity: quantity(finding.value, finding.unit),
           }
-        : { url: 'valueString', valueString: `${finding.value || ''}${finding.unit ? ` ${finding.unit}` : ''}`.trim() },
+        : {
+            url: 'valueString',
+            valueString:
+              `${finding.value || ''}${finding.unit ? ` ${finding.unit}` : ''}`.trim(),
+          },
     ].filter(Boolean),
   };
 }
@@ -940,12 +1077,47 @@ function medicationCoding(name) {
   return codes[normalized];
 }
 
+function buildMedicationInformationSource(item, group) {
+  const sourceText = [
+    group?.provider,
+    item?.sourceSection ? `section: ${item.sourceSection}` : undefined,
+  ]
+    .filter(Boolean)
+    .join('; ');
+  return sourceText
+    ? {
+        display: sourceText,
+      }
+    : undefined;
+}
+
+function buildMedicationEffectivePeriod(item, group) {
+  const start = atNoon(item.assignedDate || group.encounterDate);
+  const period = { start };
+  const stoppedAt = stopDate(item);
+  if (stoppedAt) period.end = atNoon(stoppedAt);
+  return period;
+}
+
+function buildMedicationStatusReason(item) {
+  const statusText = item.status || 'active';
+  const reason = stopReason(item);
+  return {
+    text: reason ? `${statusText}: ${reason}` : statusText,
+    coding: [
+      {
+        system: 'https://mere.health/fhir/CodeSystem/medication-plan-status',
+        code: stableId(statusText),
+        display: statusText,
+      },
+    ],
+  };
+}
+
 function buildMedicationReason(item) {
-  const text = [
-    item.plannerImplication,
-    item.note,
-    item.sourceSection,
-  ].join(' ');
+  const text = [item.plannerImplication, item.note, item.sourceSection].join(
+    ' ',
+  );
   if (/diabetes|glucose|carbohydrate|cgm/i.test(text)) {
     return [
       {
@@ -966,37 +1138,319 @@ function buildMedicationReason(item) {
   return undefined;
 }
 
-function buildMedicationExtensions(item) {
+function buildMedicationExtensions(item, group) {
   const extensions = [];
-  if (/after 3 days/i.test([item.note, item.plannerImplication].join(' '))) {
+  const category = inferMedicationCategory(item);
+  const adherence = inferMedicationAdherence(item);
+  const condition = conditionalInstruction(item);
+  const stoppedAt = stopDate(item);
+  const stoppedBecause = stopReason(item);
+  const historyEvents = buildMedicationHistoryEvents(item, group);
+
+  extensions.push({
+    url: 'https://mere.health/fhir/StructureDefinition/medication-category',
+    valueCodeableConcept: {
+      text: category.display,
+      coding: [category],
+    },
+  });
+
+  if (adherence) {
     extensions.push({
-      url: 'https://mere.health/fhir/StructureDefinition/medication-start-condition',
-      valueString: 'Start after 3 days of higher-carbohydrate intake',
-    });
-  }
-  if (item.status === 'assigned') {
-    extensions.push({
-      url: 'https://mere.health/fhir/StructureDefinition/medication-history-event',
+      url: 'https://mere.health/fhir/StructureDefinition/medication-adherence',
       valueCodeableConcept: {
-        text: 'Assigned but not yet current',
-        coding: [
-          {
-            system: 'https://mere.health/fhir/CodeSystem/medication-history-event',
-            code: 'assigned',
-            display: 'Assigned',
-          },
-        ],
+        text: adherence.display,
+        coding: [adherence],
       },
     });
   }
+
+  if (condition) {
+    extensions.push({
+      url: 'https://mere.health/fhir/StructureDefinition/medication-start-condition',
+      valueString: condition,
+    });
+  }
+
+  if (stoppedAt) {
+    extensions.push({
+      url: 'https://mere.health/fhir/StructureDefinition/medication-stop-date',
+      valueDateTime: atNoon(stoppedAt),
+    });
+  }
+
+  if (stoppedBecause) {
+    extensions.push({
+      url: 'https://mere.health/fhir/StructureDefinition/medication-stop-reason',
+      valueString: stoppedBecause,
+    });
+  }
+
+  for (const event of historyEvents) {
+    extensions.push({
+      url: 'https://mere.health/fhir/StructureDefinition/medication-history-event',
+      extension: [
+        {
+          url: 'type',
+          valueCodeableConcept: {
+            text: event.display,
+            coding: [
+              {
+                system:
+                  'https://mere.health/fhir/CodeSystem/medication-history-event',
+                code: event.code,
+                display: event.display,
+              },
+            ],
+          },
+        },
+        event.date
+          ? { url: 'date', valueDateTime: atNoon(event.date) }
+          : undefined,
+        event.source ? { url: 'source', valueString: event.source } : undefined,
+        event.note ? { url: 'note', valueString: event.note } : undefined,
+      ].filter(Boolean),
+    });
+  }
+
   return extensions.length ? extensions : undefined;
 }
 
 function inferMedicationCategory(item) {
-  if (/vitamin|supplement|mineral|omega|b12|d3/i.test(item.medication)) {
-    return 'supplement';
+  const text = [item.medication, item.note, item.sourceSection].join(' ');
+  const categories = [
+    ['vitamin', /vitamin|b12|d3|folate/i, 'Vitamin'],
+    ['supplement', /supplement|omega|fish oil|coq10/i, 'Supplement'],
+    ['herbal', /herbal|turmeric|curcumin|ginseng/i, 'Herbal product'],
+    ['otc', /over[-\s]?the[-\s]?counter|otc|aspirin/i, 'OTC medication'],
+  ];
+  const match = categories.find(([, pattern]) => pattern.test(text));
+  const code = match?.[0] || 'prescription';
+  const display = match?.[2] || 'Prescription medication';
+  return {
+    system: 'https://mere.health/fhir/CodeSystem/medication-category',
+    code,
+    display,
+  };
+}
+
+function inferMedicationAdherence(item) {
+  const text = [item.status, item.note, item.plannerImplication].join(' ');
+  if (/not taking|not-taking/i.test(text)) {
+    return {
+      system: 'https://mere.health/fhir/CodeSystem/medication-adherence',
+      code: 'not-taking',
+      display: 'Patient reported not taking',
+    };
   }
-  return 'medication';
+  if (/continue|current/i.test(text)) {
+    return {
+      system: 'https://mere.health/fhir/CodeSystem/medication-adherence',
+      code: 'taking-as-directed',
+      display: 'Taking as directed',
+    };
+  }
+  if (/assigned|planned|begin|start/i.test(text)) {
+    return {
+      system: 'https://mere.health/fhir/CodeSystem/medication-adherence',
+      code: 'not-yet-started',
+      display: 'Not yet started',
+    };
+  }
+  if (/stopped|discontinu/i.test(text)) {
+    return {
+      system: 'https://mere.health/fhir/CodeSystem/medication-adherence',
+      code: 'stopped',
+      display: 'Stopped',
+    };
+  }
+  return undefined;
+}
+
+function buildMedicationHistoryEvents(item, group) {
+  const events = [];
+  const source = item.sourceSection || group?.title;
+  if (item.status === 'current') {
+    events.push({
+      code: 'current',
+      display: 'Listed as current',
+      date: item.assignedDate || group?.encounterDate,
+      source,
+      note: item.note,
+    });
+  }
+  if (item.status === 'assigned' || item.status === 'planned') {
+    events.push({
+      code: 'assigned',
+      display: 'Assigned',
+      date: item.assignedDate || group?.encounterDate,
+      source,
+      note: conditionOrNote(item),
+    });
+  }
+  if (/not taking/i.test([item.note, item.plannerImplication].join(' '))) {
+    events.push({
+      code: 'patient-not-taking',
+      display: 'Patient reported not taking',
+      date: item.assignedDate || group?.encounterDate,
+      source,
+      note: item.note,
+    });
+  }
+  if (stopDate(item) || item.status === 'stopped') {
+    events.push({
+      code: 'stopped',
+      display: 'Stopped',
+      date: stopDate(item) || item.assignedDate || group?.encounterDate,
+      source,
+      note: stopReason(item) || item.note,
+    });
+  }
+  if (
+    /dose|daily|twice|morning|with meals/i.test(
+      item.frequency || item.dose || '',
+    )
+  ) {
+    events.push({
+      code: 'dose-instruction',
+      display: 'Dose instruction recorded',
+      date: item.assignedDate || group?.encounterDate,
+      source,
+      note: [item.dose, item.frequency, item.route].filter(Boolean).join(', '),
+    });
+  }
+  return events;
+}
+
+function conditionalInstruction(item) {
+  const text = [item.note, item.plannerImplication].filter(Boolean).join(' ');
+  const afterDays = text.match(
+    /(?:begin|start).*?after\s+(\d+)\s+days?[^.;]*/i,
+  );
+  if (afterDays) return sentenceCase(afterDays[0]);
+  const cgmSplit = text.match(
+    /first\s+\d+\s+days?[^.;]+last\s+\d+\s+days?[^.;]+/i,
+  );
+  if (cgmSplit) return sentenceCase(cgmSplit[0]);
+  return undefined;
+}
+
+function conditionOrNote(item) {
+  return conditionalInstruction(item) || item.note || item.plannerImplication;
+}
+
+function stopDate(item) {
+  if (item.status !== 'stopped' && item.status !== 'not-taking')
+    return undefined;
+  return item.assignedDate;
+}
+
+function stopReason(item) {
+  const text = [item.note, item.plannerImplication].filter(Boolean).join(' ');
+  const because = text.match(/because of ([^.;]+)/i);
+  if (because) return sentenceCase(because[1]);
+  const afterStopping = text.match(/after discontinuing ([^.;]+)/i);
+  if (/urinary frequency/i.test(text) && afterStopping) {
+    return 'Urinary frequency concern';
+  }
+  if (/urinary frequency/i.test(text)) return 'Urinary frequency concern';
+  if (/discontinu/i.test(text)) return text;
+  return undefined;
+}
+
+function nutritionRelevanceForLab(result) {
+  const text = [result.name, result.shortName, result.note]
+    .filter(Boolean)
+    .join(' ');
+  const matches = [
+    {
+      pattern: /25[-\s]?hydroxyvitamin d|vitamin d|25-oh/i,
+      code: 'vitamin-d',
+      display: 'Vitamin D',
+      coding: {
+        system: 'http://loinc.org',
+        code: '1989-3',
+        display: '25-hydroxyvitamin D',
+      },
+    },
+    {
+      pattern: /cyanocobalamine|vitamin b12|\bb12\b/i,
+      code: 'vitamin-b12',
+      display: 'Vitamin B12',
+      coding: {
+        system: 'http://loinc.org',
+        code: '2132-9',
+        display: 'Cobalamin (Vitamin B12)',
+      },
+    },
+    {
+      pattern: /magnesium/i,
+      code: 'magnesium',
+      display: 'Magnesium',
+      coding: {
+        system: 'http://loinc.org',
+        code: '19123-9',
+        display: 'Magnesium',
+      },
+    },
+    {
+      pattern: /\biron\b/i,
+      code: 'iron',
+      display: 'Iron',
+      coding: {
+        system: 'http://loinc.org',
+        code: '2498-4',
+        display: 'Iron',
+      },
+    },
+    {
+      pattern: /ferritin/i,
+      code: 'ferritin',
+      display: 'Ferritin',
+      coding: {
+        system: 'http://loinc.org',
+        code: '2276-4',
+        display: 'Ferritin',
+      },
+    },
+    {
+      pattern: /zinc/i,
+      code: 'zinc',
+      display: 'Zinc',
+      coding: {
+        system: 'http://loinc.org',
+        code: '5763-8',
+        display: 'Zinc',
+      },
+    },
+    {
+      pattern: /folate/i,
+      code: 'folate',
+      display: 'Folate',
+      coding: {
+        system: 'http://loinc.org',
+        code: '2284-8',
+        display: 'Folate',
+      },
+    },
+  ];
+  const match = matches.find((candidate) => candidate.pattern.test(text));
+  if (!match) return undefined;
+  return {
+    ...match,
+    text: `${match.display} lab marker: ${formatValueWithUnit(result.value, result.unit)}`,
+  };
+}
+
+function formatValueWithUnit(value, unit) {
+  return [value, unit]
+    .filter((part) => part !== undefined && part !== '')
+    .join(' ');
+}
+
+function sentenceCase(value) {
+  const text = `${value}`.trim();
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
 }
 
 function titleCase(value) {

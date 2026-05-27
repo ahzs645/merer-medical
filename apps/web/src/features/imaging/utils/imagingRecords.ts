@@ -54,6 +54,26 @@ const OPTOMETRY_TERMS = [
   'visual field',
 ];
 
+const SPECIALTY_IMAGING_TERMS = [
+  'bitewing',
+  'cbct',
+  'cephalometric',
+  'ceph',
+  'dicom',
+  'fundus',
+  'intraoral photo',
+  'intraoral scan',
+  'oct',
+  'panoramic',
+  'periapical',
+  'ply',
+  'retinal image',
+  'retinal photo',
+  'stl',
+  'topography',
+  'visual field',
+];
+
 const CATEGORY_TERMS: Record<ImagingCategory, string[]> = {
   dental: DENTAL_TERMS,
   optometry: OPTOMETRY_TERMS,
@@ -89,8 +109,7 @@ const GENERAL_IMAGING_TERMS = [
   'ultrasound',
   'x-ray',
   'xray',
-  ...DENTAL_TERMS,
-  ...OPTOMETRY_TERMS,
+  ...SPECIALTY_IMAGING_TERMS,
 ];
 
 export function mapImagingDocument(document: ImagingDocument): ImagingItem {
@@ -345,11 +364,19 @@ function getModality(resource: any, text: string): string | undefined {
 function inferModalityFromText(text: string): string | undefined {
   const normalized = text.toLowerCase();
   if (normalized.includes('cbct')) return 'CBCT';
+  if (/\boct\b/.test(normalized)) return 'OCT';
   if (normalized.includes('x-ray') || normalized.includes('radiograph')) {
     return 'X-ray';
   }
-  if (normalized.includes('ct')) return 'CT';
-  if (normalized.includes('mri')) return 'MRI';
+  if (/\bct\b/.test(normalized) || normalized.includes('computed tomography')) {
+    return 'CT';
+  }
+  if (
+    /\bmri?\b/.test(normalized) ||
+    normalized.includes('magnetic resonance')
+  ) {
+    return 'MRI';
+  }
   if (normalized.includes('ultrasound')) return 'Ultrasound';
   return undefined;
 }
