@@ -5,6 +5,7 @@ import {
   DocumentPlusIcon,
   EyeIcon,
   FaceSmileIcon,
+  ClipboardDocumentListIcon,
   PhotoIcon,
 } from '@heroicons/react/24/outline';
 
@@ -14,6 +15,11 @@ import { Routes as AppRoutes } from '../../Routes';
 const recordTabs = [
   { to: AppRoutes.Labs, label: 'Labs', icon: BeakerIcon },
   { to: AppRoutes.Imaging, label: 'Imaging', icon: PhotoIcon },
+  {
+    to: AppRoutes.Medications,
+    label: 'Medications',
+    icon: ClipboardDocumentListIcon,
+  },
   { to: AppRoutes.Dental, label: 'Dental', icon: FaceSmileIcon },
   { to: AppRoutes.Optometry, label: 'Optometry', icon: EyeIcon },
   { to: AppRoutes.AddRecord, label: 'Add record', icon: DocumentPlusIcon },

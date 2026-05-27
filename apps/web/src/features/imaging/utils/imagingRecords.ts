@@ -39,16 +39,59 @@ const DENTAL_TERMS = [
   'teeth',
 ];
 
+const OPTOMETRY_TERMS = [
+  'biometry',
+  'eye',
+  'fundus',
+  'ocular',
+  'oct',
+  'ophthalmic',
+  'optical coherence',
+  'optometry',
+  'retina',
+  'retinal',
+  'topography',
+  'visual field',
+];
+
 const CATEGORY_TERMS: Record<ImagingCategory, string[]> = {
   dental: DENTAL_TERMS,
-  xray: ['x-ray', 'xray', 'radiograph', 'radiography', 'dx'],
-  ct: [' ct ', 'computed tomography', 'cbct'],
-  mri: ['mri', 'magnetic resonance'],
-  ultrasound: ['ultrasound', 'sonogram', 'us '],
-  scan: ['scan', 'imaging study', 'dicom'],
-  report: ['report', 'diagnostic'],
+  optometry: OPTOMETRY_TERMS,
+  xray: ['x-ray', 'xray', 'radiograph', 'radiography', 'dx', 'cr'],
+  ct: [' ct ', 'computed tomography', 'cbct', 'cat scan'],
+  mri: ['mri', 'magnetic resonance', 'mr '],
+  ultrasound: ['ultrasound', 'sonogram', ' us '],
+  scan: ['scan', 'imaging study', 'dicom', 'series', 'study uid'],
+  report: ['report', 'diagnostic', 'radiology', 'impression', 'findings'],
+  attachment: [],
   other: [],
 };
+
+const GENERAL_IMAGING_TERMS = [
+  'angiogram',
+  'angiography',
+  'bone density',
+  'cat scan',
+  'ct',
+  'diagnostic imaging',
+  'dicom',
+  'fluoroscopy',
+  'image',
+  'imaging',
+  'mammogram',
+  'mammography',
+  'mri',
+  'nuclear medicine',
+  'pet',
+  'radiology',
+  'scan',
+  'scintigraphy',
+  'ultrasound',
+  'x-ray',
+  'xray',
+  ...DENTAL_TERMS,
+  ...OPTOMETRY_TERMS,
+];
 
 export function mapImagingDocument(document: ImagingDocument): ImagingItem {
   const resource = getResource(document);
@@ -71,6 +114,7 @@ export function mapImagingDocument(document: ImagingDocument): ImagingItem {
     summary: getSummary(resource),
     attachmentType: getAttachmentType(resource),
     categories,
+    findings: getStructuredFindings(resource),
   };
 }
 
@@ -95,6 +139,7 @@ export function filterImagingItems(
       item.modality,
       item.bodySite,
       item.summary,
+      item.findings.map((finding) => finding.searchableText).join(' '),
       item.attachmentType,
       item.type,
       item.date ? formatDate(item.date) : '',
@@ -103,6 +148,77 @@ export function filterImagingItems(
       .toLowerCase()
       .includes(normalizedQuery);
   });
+}
+
+export function isImagingDocument(document: ImagingDocument): boolean {
+  const resourceType = document.data_record.resource_type;
+  if (resourceType === 'imagingstudy' || resourceType === 'media') return true;
+
+  const resource = getResource(document);
+  const text = searchableText(document, resource).toLowerCase();
+  const categories = inferCategories(document, text);
+  const specialtyDetails = document.metadata?.manual_specialty_details as
+    | { subtype?: string; specialty?: string }
+    | undefined;
+  const manualSubtype =
+    document.metadata?.manual_subtype || specialtyDetails?.subtype;
+  const contentType = document.data_record.content_type || '';
+
+  if (manualSubtype === 'imaging') return true;
+  if (contentType.startsWith('image/')) return true;
+  if (resourceType === 'documentreference_attachment') {
+    return (
+      contentType === 'application/dicom' ||
+      contentType.includes('dicom') ||
+      categories.some((category) => category !== 'other')
+    );
+  }
+
+  return GENERAL_IMAGING_TERMS.some((term) => text.includes(term));
+}
+
+function getStructuredFindings(resource: any) {
+  const findings =
+    resource?.extension?.find(
+      (extension: any) =>
+        extension.url ===
+        'https://mere.health/fhir/StructureDefinition/imaging-findings',
+    )?.extension || [];
+
+  return findings
+    .map((finding: any) => {
+      const label = finding.extension?.find(
+        (item: any) => item.url === 'label',
+      )?.valueString;
+      const valueQuantity = finding.extension?.find(
+        (item: any) => item.url === 'valueQuantity',
+      )?.valueQuantity;
+      const valueString = finding.extension?.find(
+        (item: any) => item.url === 'valueString',
+      )?.valueString;
+      const bodySite = finding.extension?.find(
+        (item: any) => item.url === 'bodySite',
+      )?.valueCodeableConcept?.text;
+      const category = finding.extension?.find(
+        (item: any) => item.url === 'category',
+      )?.valueCode;
+      const value = valueQuantity
+        ? `${valueQuantity.value}${valueQuantity.unit ? ` ${valueQuantity.unit}` : ''}`
+        : valueString;
+
+      if (!label) return undefined;
+
+      return {
+        label,
+        value,
+        bodySite,
+        category,
+        searchableText: [label, value, bodySite, category]
+          .filter(Boolean)
+          .join(' '),
+      };
+    })
+    .filter(Boolean);
 }
 
 export function formatDate(date?: string) {
@@ -137,6 +253,25 @@ function inferCategories(
   if (document.data_record.resource_type === 'documentreference') {
     categories.add('report');
   }
+  if (document.data_record.resource_type === 'documentreference_attachment') {
+    categories.add('attachment');
+  }
+  const specialtyDetails = document.metadata?.manual_specialty_details as
+    | { subtype?: string; specialty?: string }
+    | undefined;
+  const manualSubtype =
+    document.metadata?.manual_subtype || specialtyDetails?.subtype;
+  const manualSpecialty =
+    document.metadata?.manual_specialty || specialtyDetails?.specialty;
+  if (manualSubtype === 'imaging') {
+    categories.add('scan');
+  }
+  if (manualSpecialty === 'dental') {
+    categories.add('dental');
+  }
+  if (manualSpecialty === 'optometry') {
+    categories.add('optometry');
+  }
 
   if (categories.size === 0) {
     categories.add('other');
@@ -156,10 +291,13 @@ function searchableText(document: ImagingDocument, resource: any): string {
     getAttachmentTitle(resource),
     getAttachmentType(resource),
     getSummary(resource),
+    JSON.stringify(resource?.media || ''),
+    JSON.stringify(resource?.series || ''),
     JSON.stringify(resource?.modality || ''),
     JSON.stringify(resource?.bodySite || ''),
     JSON.stringify(resource?.category || ''),
     JSON.stringify(resource?.type || ''),
+    JSON.stringify(document.metadata?.manual_specialty_details || ''),
   ]
     .filter(Boolean)
     .join(' ');

@@ -11,12 +11,14 @@ export type ImagingDocument = ClinicalDocument<unknown>;
 
 export type ImagingCategory =
   | 'dental'
+  | 'optometry'
   | 'xray'
   | 'ct'
   | 'mri'
   | 'ultrasound'
   | 'scan'
   | 'report'
+  | 'attachment'
   | 'other';
 
 export type ImagingItem = {
@@ -30,4 +32,13 @@ export type ImagingItem = {
   summary?: string;
   attachmentType?: string;
   categories: ImagingCategory[];
+  findings: ImagingFinding[];
+};
+
+export type ImagingFinding = {
+  label: string;
+  value?: string;
+  bodySite?: string;
+  category?: string;
+  searchableText: string;
 };

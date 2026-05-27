@@ -4,8 +4,14 @@ import { ImagingCategory } from '../types';
 const FILTERS: { key: ImagingCategory | 'all'; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'xray', label: 'X-rays' },
+  { key: 'ct', label: 'CT' },
+  { key: 'mri', label: 'MRI' },
+  { key: 'ultrasound', label: 'Ultrasound' },
   { key: 'scan', label: 'Scans' },
   { key: 'report', label: 'Reports' },
+  { key: 'attachment', label: 'Files' },
+  { key: 'dental', label: 'Dental' },
+  { key: 'optometry', label: 'Eye care' },
 ];
 
 export function ImagingCategoryTabs({

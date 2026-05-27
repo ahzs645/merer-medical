@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
+import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
 import { ImagingCategoryTabs } from './components/ImagingCategoryTabs';
 import { ImagingHeader } from './components/ImagingHeader';
@@ -55,6 +57,14 @@ export function ImagingTab() {
                   'Imaging reports, X-rays, DICOM studies, photos, and scan files will appear here when they are synced or added.',
                 )}
               </p>
+              <Link
+                to={`${AppRoutes.AddRecord}?type=document&title=${encodeURIComponent(
+                  'Imaging record',
+                )}`}
+                className="mt-4 inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+              >
+                {t('Add image or scan')}
+              </Link>
             </div>
           )}
         </div>

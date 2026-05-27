@@ -1,0 +1,106 @@
+[     663ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=2aae118e:21608
+[     785ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
+[     795ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[     795ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[    1057ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
+[    1122ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:4200/demo/settings:0
+[   17833ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[   17833ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[   17855ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:4200/demo/settings:0
+[   33107ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:4200/@vite/client:963
+[   33108ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   34110ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   35111ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   36113ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   37113ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   38115ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   39117ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   40119ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   41122ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   42124ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   43128ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   44133ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   45138ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   46146ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   47154ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   48176ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   49197ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   52349ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=2aae118e:21608
+[   52399ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
+[   52402ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[   52402ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[   52598ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
+[   52695ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:4200/demo/settings:0
+[   64268ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:4200/@fs/Users/ahmadjalil/github/merer-medical/node_modules/.vite/apps/web/deps/chunk-NOEBFBYR.js?v=2aae118e:21608
+[   64328ms] [LOG] Service worker not installed in development @ http://127.0.0.1:4200/src/serviceWorkerRegistration.ts:33
+[   64333ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:6
+[   64333ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4200/src/shared/hooks/useConsoleLogEasterEgg.tsx:10
+[   64522ms] [WARNING] Config API did not return JSON. Is the API server running? @ http://127.0.0.1:4200/src/app/providers/AppConfigProvider.tsx:45
+[   64602ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:4200/demo/settings:0
+[   75344ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:4200/@vite/client:963
+[   75345ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   76346ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   77348ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   78351ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   79354ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   80357ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   81362ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   82365ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   83369ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   84374ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   85380ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   86386ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   87393ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   88399ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   89403ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   90410ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   91418ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   92430ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   93443ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   94451ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   95459ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   96481ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   97494ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   98519ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[   99547ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  100563ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  101594ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  102631ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  103673ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  104740ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  105793ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  106819ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  107893ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  108968ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  110009ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  111113ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  112252ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  113381ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  114580ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  115885ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  117161ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  118310ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  119585ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  121093ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  122468ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  124046ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  125373ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  126952ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  128870ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  130846ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  132983ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  134294ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  136296ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  138792ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  140672ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  142949ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  146021ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  148496ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  151580ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  155889ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  159050ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  163939ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  169576ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  172592ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  175054ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[  179826ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034

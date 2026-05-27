@@ -352,6 +352,11 @@ export function ManualRecordTab() {
     searchParams.get('specialty') === 'optometry'
       ? (searchParams.get('specialty') as ManualSpecialty)
       : 'general';
+  const requestedRecordType = recordTypes.some(
+    (entry) => entry.value === searchParams.get('type'),
+  )
+    ? (searchParams.get('type') as ManualRecordKind)
+    : undefined;
   const [specialty, setSpecialty] =
     useState<ManualSpecialty>(requestedSpecialty);
   const [recordType, setRecordType] = useState<ManualRecordKind>('condition');
@@ -592,8 +597,22 @@ export function ManualRecordTab() {
           : 'cleaning',
       );
     } else if (requestedSpecialty === 'optometry') {
-      applyOptometryEntryKind('checkup');
+      const requestedOptometry = searchParams.get(
+        'optometry',
+      ) as OptometryEntryKind | null;
+      applyOptometryEntryKind(
+        requestedOptometry &&
+          optometryEntryTypes.some(
+            (entry) => entry.value === requestedOptometry,
+          )
+          ? requestedOptometry
+          : 'checkup',
+      );
+    } else if (requestedRecordType) {
+      setRecordType(requestedRecordType);
     }
+    const requestedTitle = searchParams.get('title');
+    if (requestedTitle) setTitle(requestedTitle);
     // Apply URL presets once on initial add form load.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

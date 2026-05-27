@@ -53,6 +53,8 @@ export const arabicTranslations: Record<string, string> = {
   Canadian: 'الكندي',
   'Care Plans': 'خطط الرعاية',
   'Choose File': 'اختيار ملف',
+  'Choose the language used for menus, headings, and app copy.':
+    'اختر اللغة المستخدمة للقوائم والعناوين ونصوص التطبيق.',
   Clear: 'مسح',
   'Clear all': 'مسح الكل',
   Close: 'إغلاق',
@@ -66,6 +68,7 @@ export const arabicTranslations: Record<string, string> = {
   'Date range': 'نطاق التاريخ',
   Delete: 'حذف',
   Details: 'التفاصيل',
+  'Display language': 'لغة العرض',
   'DICOM scans': 'فحوصات DICOM',
   Diagnoses: 'التشخيصات',
   Developer: 'المطور',

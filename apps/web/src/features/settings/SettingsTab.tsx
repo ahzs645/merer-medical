@@ -18,6 +18,7 @@ import { ExperimentalSettingsGroup } from './components/ExperimentalSettingsGrou
 import { UserSwitchModal } from './components/UserSwitchModal';
 import { UserSwitchDrawer } from './components/UserSwitchDrawer';
 import { AddUserModal } from './components/AddUserModal';
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 
 export function fetchPatientRecords(
   db: RxDatabase<DatabaseCollections>,
@@ -73,6 +74,7 @@ export function parseGender(
 }
 
 const SettingsTab: React.FC = () => {
+  const { t } = useInterfaceLanguage();
   const { pathname, hash, key } = useLocation();
   const [showUserSwitcher, setShowUserSwitcher] = useState(false);
   const [showAddUserModal, setShowAddUserModal] = useState(false);
@@ -106,22 +108,25 @@ const SettingsTab: React.FC = () => {
   }, [pathname, hash, key]);
 
   return (
-    <AppPage banner={<GenericBanner text="Settings" />}>
+    <AppPage
+      banner={<GenericBanner text={t('Settings')} />}
+      contentClassName="overflow-y-auto overscroll-contain"
+    >
       <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pt-2 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-6">
-          <div className="text-xl font-extrabold">About Me</div>
+          <div className="text-xl font-extrabold">{t('About Me')}</div>
           <button
             onClick={() => setShowUserSwitcher(true)}
             className="text-primary-600 hover:text-primary-700 text-sm font-medium px-3 py-1 rounded-md hover:bg-primary-50 transition-colors"
           >
-            Switch User
+            {t('Switch User')}
           </button>
         </div>
       </div>
       <UserCard />
       <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pb-20 pt-2 sm:px-6 sm:pb-6 lg:px-8">
-        <PrivacyAndSecuritySettingsGroup />
         <InterfaceLanguageSettingsGroup />
+        <PrivacyAndSecuritySettingsGroup />
         <TerminologySettingsGroup />
         <UserDataSettingsGroup />
         <AboutMereSettingsGroup />

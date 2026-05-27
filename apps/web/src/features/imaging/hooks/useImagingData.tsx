@@ -5,6 +5,7 @@ import { useUser } from '../../../app/providers/UserProvider';
 import { ImagingItem } from '../types';
 import {
   IMAGING_RESOURCE_TYPES,
+  isImagingDocument,
   mapImagingDocument,
 } from '../utils/imagingRecords';
 
@@ -32,7 +33,12 @@ export function useImagingData() {
 
       if (!isMounted) return;
 
-      setItems(docs.map((doc) => mapImagingDocument(doc.toMutableJSON())));
+      setItems(
+        docs
+          .map((doc) => doc.toMutableJSON())
+          .filter(isImagingDocument)
+          .map(mapImagingDocument),
+      );
       setStatus('success');
     }
 
@@ -47,8 +53,15 @@ export function useImagingData() {
     () => ({
       total: items.length,
       dental: items.filter((item) => item.categories.includes('dental')).length,
+      optometry: items.filter((item) => item.categories.includes('optometry'))
+        .length,
       scans: items.filter((item) => item.categories.includes('scan')).length,
       xray: items.filter((item) => item.categories.includes('xray')).length,
+      reports: items.filter((item) => item.categories.includes('report'))
+        .length,
+      attachments: items.filter((item) =>
+        item.categories.includes('attachment'),
+      ).length,
     }),
     [items],
   );

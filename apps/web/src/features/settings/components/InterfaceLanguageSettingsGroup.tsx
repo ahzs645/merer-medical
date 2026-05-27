@@ -11,7 +11,10 @@ export function InterfaceLanguageSettingsGroup() {
         <div className="px-4 sm:px-6">
           <label className="flex flex-col gap-2 pb-4">
             <span className="text-primary-800 text-lg leading-6">
-              {t('Language')}
+              {t('Display language')}
+            </span>
+            <span className="max-w-xl text-sm text-gray-700">
+              {t('Choose the language used for menus, headings, and app copy.')}
             </span>
             <select
               value={language}
@@ -22,7 +25,7 @@ export function InterfaceLanguageSettingsGroup() {
             >
               {interfaceLanguages.map((item) => (
                 <option key={item.code} value={item.code}>
-                  {item.nativeLabel}
+                  {item.nativeLabel} ({item.label})
                 </option>
               ))}
             </select>
