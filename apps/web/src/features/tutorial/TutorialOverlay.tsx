@@ -102,9 +102,11 @@ export function TutorialOverlay() {
     tutorialSteps = useMemo(
       () =>
         getTutorialKeysFromLocalStorage(tutorialConfig).filter((key) =>
-          key !== TutorialLocalStorageKeys.INSTALL_PWA
-            ? true
-            : !isInstalledPWA(),
+          key === TutorialLocalStorageKeys.COMPLETE
+            ? false
+            : key !== TutorialLocalStorageKeys.INSTALL_PWA
+              ? true
+              : !isInstalledPWA(),
         ),
       [tutorialConfig],
     );
@@ -136,6 +138,58 @@ export function TutorialOverlay() {
     }
   }, [state.isComplete, tutorialSteps]);
 
+  const activeStep = state.steps[state.currentStep];
+  const activeTutorialItem = (() => {
+    switch (activeStep) {
+      case TutorialLocalStorageKeys.WELCOME_SCREEN:
+        return (
+          <TutorialItemWrapper
+            key={TutorialLocalStorageKeys.WELCOME_SCREEN}
+            localStorageKey={TutorialLocalStorageKeys.WELCOME_SCREEN}
+            state={state}
+            dispatch={dispatch}
+          >
+            <TutorialWelcomeScreen dispatch={dispatch} state={state} />
+          </TutorialItemWrapper>
+        );
+      case TutorialLocalStorageKeys.INSTALL_PWA:
+        return (
+          <TutorialItemWrapper
+            key={TutorialLocalStorageKeys.INSTALL_PWA}
+            localStorageKey={TutorialLocalStorageKeys.INSTALL_PWA}
+            state={state}
+            dispatch={dispatch}
+          >
+            <TutorialInstallPWAScreen dispatch={dispatch} />
+          </TutorialItemWrapper>
+        );
+      case TutorialLocalStorageKeys.ADD_A_CONNECTION:
+        return (
+          <TutorialItemWrapper
+            key={TutorialLocalStorageKeys.ADD_A_CONNECTION}
+            localStorageKey={TutorialLocalStorageKeys.ADD_A_CONNECTION}
+            state={state}
+            dispatch={dispatch}
+          >
+            <TutorialAddConnectionScreen dispatch={dispatch} />
+          </TutorialItemWrapper>
+        );
+      case TutorialLocalStorageKeys.COMPLETE:
+        return (
+          <TutorialItemWrapper
+            key={TutorialLocalStorageKeys.COMPLETE}
+            localStorageKey={TutorialLocalStorageKeys.COMPLETE}
+            state={state}
+            dispatch={dispatch}
+          >
+            <TutorialCompleteScreen dispatch={dispatch} />
+          </TutorialItemWrapper>
+        );
+      default:
+        return null;
+    }
+  })();
+
   return (
     <AnimatePresence initial={true}>
       {!tutorialSteps.length || state.isComplete ? null : (
@@ -147,47 +201,9 @@ export function TutorialOverlay() {
           className="bg-primary-700 mobile-full-height absolute z-50 flex w-full flex-grow flex-col overflow-hidden opacity-25"
         >
           <AnimatePresence initial={false} custom={state.direction}>
-            <TutorialItemWrapper
-              key={TutorialLocalStorageKeys.WELCOME_SCREEN}
-              localStorageKey={TutorialLocalStorageKeys.WELCOME_SCREEN}
-              state={state}
-              dispatch={dispatch}
-            >
-              <TutorialWelcomeScreen dispatch={dispatch} state={state} />
-            </TutorialItemWrapper>
-            <TutorialItemWrapper
-              key={TutorialLocalStorageKeys.INSTALL_PWA}
-              localStorageKey={TutorialLocalStorageKeys.INSTALL_PWA}
-              state={state}
-              dispatch={dispatch}
-            >
-              <TutorialInstallPWAScreen dispatch={dispatch} />
-            </TutorialItemWrapper>
-            <TutorialItemWrapper
-              key={TutorialLocalStorageKeys.ADD_A_CONNECTION}
-              localStorageKey={TutorialLocalStorageKeys.ADD_A_CONNECTION}
-              state={state}
-              dispatch={dispatch}
-            >
-              <TutorialAddConnectionScreen dispatch={dispatch} />
-            </TutorialItemWrapper>
-            {/* <TutorialItemWrapper
-              key={TutorialLocalStorageKeys.ENABLE_ANALYTICS}
-              localStorageKey={TutorialLocalStorageKeys.ENABLE_ANALYTICS}
-              state={state}
-              dispatch={dispatch}
-            >
-              <TutorialEnableAnalytics dispatch={dispatch} />
-            </TutorialItemWrapper> */}
-            <TutorialItemWrapper
-              key={TutorialLocalStorageKeys.COMPLETE}
-              localStorageKey={TutorialLocalStorageKeys.COMPLETE}
-              state={state}
-              dispatch={dispatch}
-            >
-              <TutorialCompleteScreen dispatch={dispatch} />
-            </TutorialItemWrapper>
+            {activeTutorialItem}
             <button
+              key="tutorial_skip_button"
               className="hover:bg-primary-600 mx-auto max-w-sm rounded py-4 px-4 text-white"
               onClick={() => {
                 dispatch({ type: 'complete_tutorial' });
@@ -196,6 +212,7 @@ export function TutorialOverlay() {
               {t('Skip Tutorial')}
             </button>
             <TutorialPageCounter
+              key="tutorial_page_counter"
               currentPage={state.currentStep + 1}
               totalPages={state.steps.length}
             />
