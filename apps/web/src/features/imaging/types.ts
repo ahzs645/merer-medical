@@ -29,6 +29,10 @@ export type ImagingItem = {
   type: ImagingResourceType;
   modality?: string;
   bodySite?: string;
+  laterality?: string;
+  studyType?: string;
+  accessionId?: string;
+  studyId?: string;
   summary?: string;
   attachmentType?: string;
   categories: ImagingCategory[];

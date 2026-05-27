@@ -67,6 +67,23 @@ export async function openClinicalDocumentAttachment(attachmentId: string) {
   window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
+export async function downloadClinicalDocumentAttachment(attachmentId: string) {
+  if (!supportsClinicalDocumentAttachments()) return;
+
+  const attachment = await getDataClient().attachments.read(attachmentId);
+  if (!attachment) throw new Error('Linked file not found');
+
+  const blob = new Blob([attachment.bytes], { type: attachment.meta.mime });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = attachment.meta.filename || 'source-file';
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
 function clientClinicalDocumentFromLegacy(doc: ClinicalDocument) {
   return {
     id: doc.id,
@@ -87,6 +104,10 @@ function clientClinicalDocumentFromLegacy(doc: ClinicalDocument) {
       terminologySource: doc.metadata?.terminology_source,
       terminologySourceVersion: doc.metadata?.terminology_source_version,
       manualUncoded: doc.metadata?.manual_uncoded,
+      manualSpecialty: doc.metadata?.manual_specialty,
+      manualSubtype: doc.metadata?.manual_subtype,
+      manualSpecialtyDetails: doc.metadata?.manual_specialty_details,
+      manualImagingDetails: doc.metadata?.manual_imaging_details,
     },
   };
 }

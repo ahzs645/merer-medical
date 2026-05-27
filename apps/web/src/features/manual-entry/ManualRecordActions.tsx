@@ -1,5 +1,6 @@
 import {
   DocumentArrowDownIcon,
+  EyeIcon,
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
@@ -12,6 +13,7 @@ import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import {
   listClinicalDocumentAttachments,
+  downloadClinicalDocumentAttachment,
   openClinicalDocumentAttachment,
   supportsClinicalDocumentAttachments,
 } from '../../repositories/AttachmentRepository';
@@ -96,19 +98,48 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
     }
   }
 
+  async function onDownloadAttachment(
+    event: MouseEvent<HTMLButtonElement>,
+    attachmentId: string,
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    try {
+      await downloadClinicalDocumentAttachment(attachmentId);
+    } catch (error) {
+      console.error(error);
+      notifyDispatch({
+        type: 'set_notification',
+        message: `Unable to download linked file: ${(error as Error).message}`,
+        variant: 'error',
+      });
+    }
+  }
+
   return (
     <div className="mt-3 flex flex-wrap gap-2">
       {linkedFiles.map((file) => (
-        <button
-          key={file.id}
-          type="button"
-          onClick={(event) => onOpenAttachment(event, file.id)}
-          className="inline-flex items-center gap-1 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 shadow-sm hover:bg-primary-50"
-          title={file.filename || 'Open linked file'}
-        >
-          <DocumentArrowDownIcon className="h-4 w-4" />
-          Source file
-        </button>
+        <span key={file.id} className="inline-flex gap-1">
+          <button
+            type="button"
+            onClick={(event) => onOpenAttachment(event, file.id)}
+            className="inline-flex items-center gap-1 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 shadow-sm hover:bg-primary-50"
+            title={file.filename || 'Open linked file'}
+          >
+            <EyeIcon className="h-4 w-4" />
+            Open source
+          </button>
+          <button
+            type="button"
+            onClick={(event) => onDownloadAttachment(event, file.id)}
+            className="inline-flex items-center gap-1 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 shadow-sm hover:bg-primary-50"
+            title={file.filename || 'Download linked file'}
+          >
+            <DocumentArrowDownIcon className="h-4 w-4" />
+            Download
+          </button>
+        </span>
       ))}
       <Link
         to={AppRoutes.EditRecord.replace(

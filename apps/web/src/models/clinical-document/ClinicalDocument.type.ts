@@ -69,6 +69,14 @@ export interface ClinicalDocument<T = unknown> {
     manual_specialty?: string;
     manual_subtype?: string;
     manual_specialty_details?: unknown;
+    manual_imaging_details?: {
+      modality?: string;
+      bodySite?: string;
+      laterality?: string;
+      studyType?: string;
+      accessionId?: string;
+      studyId?: string;
+    };
   };
 }
 

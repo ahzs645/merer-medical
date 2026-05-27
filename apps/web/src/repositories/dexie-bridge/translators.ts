@@ -242,6 +242,10 @@ export function clinicalDocumentToDomain<T>(
       terminologySource: input.metadata?.terminology_source,
       terminologySourceVersion: input.metadata?.terminology_source_version,
       manualUncoded: input.metadata?.manual_uncoded,
+      manualSpecialty: input.metadata?.manual_specialty,
+      manualSubtype: input.metadata?.manual_subtype,
+      manualSpecialtyDetails: input.metadata?.manual_specialty_details,
+      manualImagingDetails: input.metadata?.manual_imaging_details,
     },
   };
 }
@@ -270,6 +274,10 @@ export function clinicalDocumentToLegacy<T>(
       terminology_source: input.metadata?.terminologySource,
       terminology_source_version: input.metadata?.terminologySourceVersion,
       manual_uncoded: input.metadata?.manualUncoded,
+      manual_specialty: input.metadata?.manualSpecialty,
+      manual_subtype: input.metadata?.manualSubtype,
+      manual_specialty_details: input.metadata?.manualSpecialtyDetails,
+      manual_imaging_details: input.metadata?.manualImagingDetails,
     },
   };
 }

@@ -22,6 +22,7 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
   const [expanded, setExpanded] = useState(false);
   const { t } = useInterfaceLanguage();
   const canManageRecord = isManualRecord(item.document as ClinicalDocument);
+  const thumbnailUrl = getInlineImageUrl(item.document as ClinicalDocument);
 
   return (
     <>
@@ -32,9 +33,17 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
           className="block w-full text-left transition hover:text-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
         >
           <div className="flex items-start gap-3">
-            <div className="rounded-md bg-primary-50 p-2 text-primary-700">
-              <Icon className="h-5 w-5" />
-            </div>
+            {thumbnailUrl ? (
+              <img
+                src={thumbnailUrl}
+                alt=""
+                className="h-16 w-16 shrink-0 rounded-md border border-gray-200 object-cover"
+              />
+            ) : (
+              <div className="rounded-md bg-primary-50 p-2 text-primary-700">
+                <Icon className="h-5 w-5" />
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                 <h2 className="break-words text-base font-semibold text-gray-900">
@@ -48,6 +57,8 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
                 <Badge>{item.type}</Badge>
                 {item.modality && <Badge>{item.modality}</Badge>}
                 {item.bodySite && <Badge>{item.bodySite}</Badge>}
+                {item.laterality && <Badge>{item.laterality}</Badge>}
+                {item.studyType && <Badge>{item.studyType}</Badge>}
                 {item.attachmentType && <Badge>{item.attachmentType}</Badge>}
                 {item.categories.includes('dental') && (
                   <Badge>{t('Dental')}</Badge>
@@ -118,15 +129,24 @@ function ImagingRecordDetailsModal({
 }) {
   const raw = item.document.data_record.raw as any;
   const resource = raw?.resource || raw || {};
+  const imagingStudy = getImagingStudyDetails(resource);
   const detailRows = [
     ['Date', formatDate(item.date)],
     ['Type', item.type],
     ['Modality', item.modality],
     ['Body site', item.bodySite],
+    ['Laterality', item.laterality],
+    ['Study / report type', item.studyType],
+    ['Accession ID', item.accessionId],
+    ['Study ID', item.studyId],
     ['Attachment', item.attachmentType],
     ['FHIR id', resource?.id],
     ['Status', resource?.status],
     ['Description', resource?.description],
+    ['Series count', imagingStudy.seriesCount],
+    ['Instance count', imagingStudy.instanceCount],
+    ['Endpoint', imagingStudy.endpoint],
+    ['Study UID', imagingStudy.studyUid],
   ].filter(([, value]) => Boolean(value));
 
   return (
@@ -152,6 +172,30 @@ function ImagingRecordDetailsModal({
               <p className="mt-2 text-sm leading-6 text-gray-700">
                 {item.summary}
               </p>
+            </div>
+          )}
+          {imagingStudy.series.length > 0 && (
+            <div className="mt-4 rounded-md border border-gray-200 bg-white p-4">
+              <h3 className="text-sm font-semibold text-gray-900">Series</h3>
+              <div className="mt-3 grid gap-3">
+                {imagingStudy.series.map((series) => (
+                  <div
+                    key={`${series.uid || series.number || series.description}`}
+                    className="rounded-md border border-gray-100 bg-gray-50 p-3"
+                  >
+                    <div className="text-sm font-semibold text-gray-900">
+                      {series.description || series.uid || 'Series'}
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {series.modality && <Badge>{series.modality}</Badge>}
+                      {series.bodySite && <Badge>{series.bodySite}</Badge>}
+                      {series.instances !== undefined && (
+                        <Badge>{series.instances} instances</Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           {item.findings.length > 0 && (
@@ -186,6 +230,55 @@ function ImagingRecordDetailsModal({
       </div>
     </Modal>
   );
+}
+
+function getInlineImageUrl(document: ClinicalDocument) {
+  if (
+    !document.data_record.content_type.startsWith('image/') ||
+    typeof document.data_record.raw !== 'string'
+  ) {
+    return undefined;
+  }
+
+  return document.data_record.raw.startsWith('data:')
+    ? document.data_record.raw
+    : `data:${document.data_record.content_type};base64,${document.data_record.raw}`;
+}
+
+function getImagingStudyDetails(resource: any) {
+  const series = Array.isArray(resource?.series)
+    ? resource.series.map((series: any) => ({
+        uid: series.uid,
+        number: series.number,
+        description: series.description,
+        modality:
+          series.modality?.display ||
+          series.modality?.code ||
+          series.modality?.coding?.[0]?.display ||
+          series.modality?.coding?.[0]?.code,
+        bodySite:
+          series.bodySite?.display ||
+          series.bodySite?.text ||
+          series.bodySite?.coding?.[0]?.display,
+        instances: Array.isArray(series.instance)
+          ? series.instance.length
+          : series.numberOfInstances,
+      }))
+    : [];
+  const instanceCount = series.reduce(
+    (count: number, seriesItem: { instances?: number }) =>
+      count + (seriesItem.instances || 0),
+    0,
+  );
+
+  return {
+    series,
+    seriesCount: series.length || resource?.numberOfSeries,
+    instanceCount: instanceCount || resource?.numberOfInstances,
+    endpoint:
+      resource?.endpoint?.[0]?.reference || resource?.endpoint?.[0]?.url,
+    studyUid: resource?.uid,
+  };
 }
 
 function Badge({ children }: { children: React.ReactNode }) {

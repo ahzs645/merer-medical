@@ -78,6 +78,19 @@ export const clinicalDocumentSchema = z.object({
       terminologySource: z.string().optional(),
       terminologySourceVersion: z.string().optional(),
       manualUncoded: z.boolean().optional(),
+      manualSpecialty: z.string().optional(),
+      manualSubtype: z.string().optional(),
+      manualSpecialtyDetails: z.unknown().optional(),
+      manualImagingDetails: z
+        .object({
+          modality: z.string().optional(),
+          bodySite: z.string().optional(),
+          laterality: z.string().optional(),
+          studyType: z.string().optional(),
+          accessionId: z.string().optional(),
+          studyId: z.string().optional(),
+        })
+        .optional(),
     })
     .optional(),
 });

@@ -115,6 +115,7 @@ const GENERAL_IMAGING_TERMS = [
 export function mapImagingDocument(document: ImagingDocument): ImagingItem {
   const resource = getResource(document);
   const text = searchableText(document, resource);
+  const manualImaging = getManualImagingDetails(document);
   const title =
     document.metadata?.display_name ||
     getCodeText(resource) ||
@@ -128,8 +129,12 @@ export function mapImagingDocument(document: ImagingDocument): ImagingItem {
     title,
     date: document.metadata?.date,
     type: document.data_record.resource_type as ImagingResourceType,
-    modality: getModality(resource, text),
-    bodySite: getBodySite(resource),
+    modality: manualImaging?.modality || getModality(resource, text),
+    bodySite: manualImaging?.bodySite || getBodySite(resource),
+    laterality: manualImaging?.laterality || getLaterality(resource),
+    studyType: manualImaging?.studyType || getStudyType(resource),
+    accessionId: manualImaging?.accessionId || getAccessionId(resource),
+    studyId: manualImaging?.studyId || getStudyId(resource),
     summary: getSummary(resource),
     attachmentType: getAttachmentType(resource),
     categories,
@@ -157,6 +162,10 @@ export function filterImagingItems(
       item.title,
       item.modality,
       item.bodySite,
+      item.laterality,
+      item.studyType,
+      item.accessionId,
+      item.studyId,
       item.summary,
       item.findings.map((finding) => finding.searchableText).join(' '),
       item.attachmentType,
@@ -182,18 +191,24 @@ export function isImagingDocument(document: ImagingDocument): boolean {
   const manualSubtype =
     document.metadata?.manual_subtype || specialtyDetails?.subtype;
   const contentType = document.data_record.content_type || '';
+  const manualImaging = getManualImagingDetails(document);
 
+  if (manualImaging) return true;
   if (manualSubtype === 'imaging') return true;
   if (contentType.startsWith('image/')) return true;
   if (resourceType === 'documentreference_attachment') {
     return (
       contentType === 'application/dicom' ||
       contentType.includes('dicom') ||
-      categories.some((category) => category !== 'other')
+      categories.some((category) =>
+        ['xray', 'ct', 'mri', 'ultrasound', 'scan', 'report'].includes(
+          category,
+        ),
+      )
     );
   }
 
-  return GENERAL_IMAGING_TERMS.some((term) => text.includes(term));
+  return GENERAL_IMAGING_TERMS.some((term) => textHasTerm(text, term));
 }
 
 function getStructuredFindings(resource: any) {
@@ -238,6 +253,11 @@ function getStructuredFindings(resource: any) {
       };
     })
     .filter(Boolean);
+}
+
+function textHasTerm(text: string, term: string) {
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, 'i').test(text);
 }
 
 export function formatDate(date?: string) {
@@ -306,6 +326,10 @@ function searchableText(document: ImagingDocument, resource: any): string {
     document.data_record.resource_type,
     getCodeText(resource),
     getBodySite(resource),
+    getLaterality(resource),
+    getStudyType(resource),
+    getAccessionId(resource),
+    getStudyId(resource),
     getModality(resource, ''),
     getAttachmentTitle(resource),
     getAttachmentType(resource),
@@ -316,6 +340,7 @@ function searchableText(document: ImagingDocument, resource: any): string {
     JSON.stringify(resource?.bodySite || ''),
     JSON.stringify(resource?.category || ''),
     JSON.stringify(resource?.type || ''),
+    JSON.stringify(getManualImagingDetails(document) || ''),
     JSON.stringify(document.metadata?.manual_specialty_details || ''),
   ]
     .filter(Boolean)
@@ -349,6 +374,57 @@ function getBodySite(resource: any): string | undefined {
   );
 }
 
+function getLaterality(resource: any): string | undefined {
+  return (
+    resource?.laterality?.text ||
+    resource?.laterality?.coding?.[0]?.display ||
+    resource?.bodySite?.coding?.find((coding: any) =>
+      ['left', 'right', 'bilateral'].includes(
+        `${coding.display}`.toLowerCase(),
+      ),
+    )?.display
+  );
+}
+
+function getStudyType(resource: any): string | undefined {
+  return (
+    resource?.description ||
+    resource?.type?.text ||
+    resource?.code?.text ||
+    resource?.procedureCode?.[0]?.text ||
+    resource?.procedureCode?.[0]?.coding?.[0]?.display
+  );
+}
+
+function getAccessionId(resource: any): string | undefined {
+  return (
+    resource?.accession?.identifier?.value ||
+    resource?.accession?.value ||
+    resource?.identifier?.find((identifier: any) =>
+      `${identifier.type?.text || identifier.system || ''}`
+        .toLowerCase()
+        .includes('accession'),
+    )?.value
+  );
+}
+
+function getStudyId(resource: any): string | undefined {
+  return (
+    resource?.uid ||
+    resource?.identifier?.find((identifier: any) =>
+      `${identifier.system || identifier.type?.text || ''}`
+        .toLowerCase()
+        .includes('study'),
+    )?.value ||
+    resource?.identifier?.[0]?.value
+  );
+}
+
+function getManualImagingDetails(document: ImagingDocument) {
+  const details = document.metadata?.manual_imaging_details;
+  return details && Object.values(details).some(Boolean) ? details : undefined;
+}
+
 function getModality(resource: any, text: string): string | undefined {
   return (
     resource?.modality?.display ||
@@ -361,7 +437,7 @@ function getModality(resource: any, text: string): string | undefined {
   );
 }
 
-function inferModalityFromText(text: string): string | undefined {
+export function inferModalityFromText(text: string): string | undefined {
   const normalized = text.toLowerCase();
   if (normalized.includes('cbct')) return 'CBCT';
   if (/\boct\b/.test(normalized)) return 'OCT';

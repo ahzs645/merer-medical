@@ -392,6 +392,12 @@ export function ManualRecordTab() {
   const [iopOd, setIopOd] = useState('');
   const [iopOs, setIopOs] = useState('');
   const [examMethod, setExamMethod] = useState('');
+  const [imagingModality, setImagingModality] = useState('');
+  const [imagingBodySite, setImagingBodySite] = useState('');
+  const [imagingLaterality, setImagingLaterality] = useState('');
+  const [imagingStudyType, setImagingStudyType] = useState('');
+  const [imagingAccessionId, setImagingAccessionId] = useState('');
+  const [imagingStudyId, setImagingStudyId] = useState('');
   const [deviceImportType, setDeviceImportType] =
     useState<DeviceImportKind>('freestyle_libre');
   const [title, setTitle] = useState('');
@@ -495,6 +501,12 @@ export function ManualRecordTab() {
     setIopOd('');
     setIopOs('');
     setExamMethod('');
+    setImagingModality('');
+    setImagingBodySite('');
+    setImagingLaterality('');
+    setImagingStudyType('');
+    setImagingAccessionId('');
+    setImagingStudyId('');
     setSubmitAttempted(false);
   }
 
@@ -671,6 +683,13 @@ export function ManualRecordTab() {
         setIopOd(manualDetails.iopOd || '');
         setIopOs(manualDetails.iopOs || '');
         setExamMethod(manualDetails.examMethod || '');
+        const imagingDetails = doc.metadata?.manual_imaging_details;
+        setImagingModality(imagingDetails?.modality || '');
+        setImagingBodySite(imagingDetails?.bodySite || '');
+        setImagingLaterality(imagingDetails?.laterality || '');
+        setImagingStudyType(imagingDetails?.studyType || '');
+        setImagingAccessionId(imagingDetails?.accessionId || '');
+        setImagingStudyId(imagingDetails?.studyId || '');
         setTitle(doc.metadata?.display_name || '');
         setDate((doc.metadata?.date || today).slice(0, 10));
         setNotes(getManualRecordNote(doc) || '');
@@ -790,6 +809,14 @@ export function ManualRecordTab() {
         iopOd,
         iopOs,
         examMethod,
+        imagingDetails: {
+          modality: imagingModality,
+          bodySite: imagingBodySite,
+          laterality: imagingLaterality,
+          studyType: imagingStudyType,
+          accessionId: imagingAccessionId,
+          studyId: imagingStudyId,
+        },
       });
       const enrichedNotes = appendSpecialtyNotes(notes, specialtyDetails);
       const docs =
@@ -806,6 +833,14 @@ export function ManualRecordTab() {
                 fileName,
                 fileContentType,
                 specialtyDetails,
+                imagingDetails: normalizeImagingDetails({
+                  modality: imagingModality,
+                  bodySite: imagingBodySite,
+                  laterality: imagingLaterality,
+                  studyType: imagingStudyType,
+                  accessionId: imagingAccessionId,
+                  studyId: imagingStudyId,
+                }),
                 observation: {
                   valueKind: row.valueKind,
                   comparator: row.comparator,
@@ -833,6 +868,14 @@ export function ManualRecordTab() {
                 fileName,
                 fileContentType,
                 specialtyDetails,
+                imagingDetails: normalizeImagingDetails({
+                  modality: imagingModality,
+                  bodySite: imagingBodySite,
+                  laterality: imagingLaterality,
+                  studyType: imagingStudyType,
+                  accessionId: imagingAccessionId,
+                  studyId: imagingStudyId,
+                }),
                 observation: {
                   valueKind,
                   comparator,
@@ -1329,6 +1372,57 @@ export function ManualRecordTab() {
                     )}
                   </div>
                 )}
+              </div>
+            )}
+
+            {isDocumentType && !isDeviceImportType && (
+              <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
+                <div>
+                  <h2 className="text-sm font-semibold text-gray-900">
+                    {t('Imaging metadata')}
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-600">
+                    {t(
+                      'Optional details used to classify and find scans, photos, imaging reports, and DICOM studies.',
+                    )}
+                  </p>
+                </div>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <SpecialtyTextInput
+                    label={t('Modality')}
+                    value={imagingModality}
+                    placeholder={t('X-ray, CT, MRI, OCT, CBCT')}
+                    onChange={setImagingModality}
+                  />
+                  <SpecialtyTextInput
+                    label={t('Body site')}
+                    value={imagingBodySite}
+                    placeholder={t('Chest, mandible, retina, left knee')}
+                    onChange={setImagingBodySite}
+                  />
+                  <SpecialtyTextInput
+                    label={t('Laterality')}
+                    value={imagingLaterality}
+                    placeholder={t('Left, right, bilateral, OD, OS, OU')}
+                    onChange={setImagingLaterality}
+                  />
+                  <SpecialtyTextInput
+                    label={t('Study / report type')}
+                    value={imagingStudyType}
+                    placeholder={t('Radiology report, DICOM study, photo')}
+                    onChange={setImagingStudyType}
+                  />
+                  <SpecialtyTextInput
+                    label={t('Accession ID')}
+                    value={imagingAccessionId}
+                    onChange={setImagingAccessionId}
+                  />
+                  <SpecialtyTextInput
+                    label={t('Study ID')}
+                    value={imagingStudyId}
+                    onChange={setImagingStudyId}
+                  />
+                </div>
               </div>
             )}
 
@@ -1951,12 +2045,22 @@ type ManualSpecialtyDetails = {
   examMethod?: string;
 };
 
+type ManualImagingDetails = {
+  modality?: string;
+  bodySite?: string;
+  laterality?: string;
+  studyType?: string;
+  accessionId?: string;
+  studyId?: string;
+};
+
 type ManualSpecialtyFormValues = Required<
   Omit<ManualSpecialtyDetails, 'subtype' | 'dentalSurfaces'>
 > & {
   dentalSurfaces: string[];
   dentalEntryKind: DentalEntryKind;
   optometryEntryKind: OptometryEntryKind;
+  imagingDetails: Required<ManualImagingDetails>;
 };
 
 function buildSpecialtyDetails(
@@ -2066,6 +2170,20 @@ function appendSpecialtyNotes(
   return [notes.trim(), structured].filter(Boolean).join('\n');
 }
 
+function normalizeImagingDetails(
+  details: ManualImagingDetails,
+): ManualImagingDetails | undefined {
+  const normalized = {
+    modality: details.modality?.trim(),
+    bodySite: details.bodySite?.trim(),
+    laterality: details.laterality?.trim(),
+    studyType: details.studyType?.trim(),
+    accessionId: details.accessionId?.trim(),
+    studyId: details.studyId?.trim(),
+  };
+  return Object.values(normalized).some(Boolean) ? normalized : undefined;
+}
+
 function formatRxLine(
   sphere?: string,
   cylinder?: string,
@@ -2093,20 +2211,36 @@ function getManualSpecialtyDetails(
     manual_subtype?: DentalEntryKind | OptometryEntryKind;
     manual_specialty_details?: ManualSpecialtyDetails;
   };
-  const details: ManualSpecialtyDetails = raw.manual_specialty_details || {
-    specialty: 'general',
-  };
-  const specialty = raw.manual_specialty || details.specialty || 'general';
+  const metadata = doc.metadata as
+    | {
+        manual_specialty?: ManualSpecialty;
+        manual_subtype?: DentalEntryKind | OptometryEntryKind;
+        manual_specialty_details?: ManualSpecialtyDetails;
+      }
+    | undefined;
+  const details: ManualSpecialtyDetails = raw.manual_specialty_details ||
+    metadata?.manual_specialty_details || {
+      specialty: 'general',
+    };
+  const specialty =
+    raw.manual_specialty ||
+    metadata?.manual_specialty ||
+    details.specialty ||
+    'general';
   return {
     ...details,
     specialty,
     dentalEntryKind:
       specialty === 'dental'
-        ? ((raw.manual_subtype || details.subtype) as DentalEntryKind)
+        ? ((raw.manual_subtype ||
+            metadata?.manual_subtype ||
+            details.subtype) as DentalEntryKind)
         : undefined,
     optometryEntryKind:
       specialty === 'optometry'
-        ? ((raw.manual_subtype || details.subtype) as OptometryEntryKind)
+        ? ((raw.manual_subtype ||
+            metadata?.manual_subtype ||
+            details.subtype) as OptometryEntryKind)
         : undefined,
   };
 }
@@ -2190,6 +2324,7 @@ function buildClinicalDocument({
   fileName,
   fileContentType,
   specialtyDetails,
+  imagingDetails,
   observation,
   medication,
   terminology,
@@ -2205,6 +2340,7 @@ function buildClinicalDocument({
   fileName: string;
   fileContentType: string;
   specialtyDetails?: ManualSpecialtyDetails;
+  imagingDetails?: ManualImagingDetails;
   observation?: {
     valueKind: ManualObservationValueKind;
     comparator: string;
@@ -2269,6 +2405,7 @@ function buildClinicalDocument({
       manual_specialty: specialtyDetails?.specialty,
       manual_subtype: specialtyDetails?.subtype,
       manual_specialty_details: specialtyDetails,
+      manual_imaging_details: imagingDetails,
     },
   };
 }

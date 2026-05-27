@@ -171,6 +171,17 @@ export interface ClinicalDocument<T = unknown> extends BaseRecord {
     terminologySource?: string;
     terminologySourceVersion?: string;
     manualUncoded?: boolean;
+    manualSpecialty?: string;
+    manualSubtype?: string;
+    manualSpecialtyDetails?: unknown;
+    manualImagingDetails?: {
+      modality?: string;
+      bodySite?: string;
+      laterality?: string;
+      studyType?: string;
+      accessionId?: string;
+      studyId?: string;
+    };
   };
 }
 
