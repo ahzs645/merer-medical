@@ -17,6 +17,15 @@ import { ImagingItem } from '../types';
 import { formatDate } from '../utils/imagingRecords';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
+type ImagingStudySeriesSummary = {
+  uid?: string;
+  number?: string | number;
+  description?: string;
+  modality?: string;
+  bodySite?: string;
+  instances?: number;
+};
+
 export function ImagingItemCard({ item }: { item: ImagingItem }) {
   const Icon = item.type === 'diagnosticreport' ? DocumentTextIcon : PhotoIcon;
   const [expanded, setExpanded] = useState(false);
@@ -246,7 +255,7 @@ function getInlineImageUrl(document: ClinicalDocument) {
 }
 
 function getImagingStudyDetails(resource: any) {
-  const series = Array.isArray(resource?.series)
+  const series: ImagingStudySeriesSummary[] = Array.isArray(resource?.series)
     ? resource.series.map((series: any) => ({
         uid: series.uid,
         number: series.number,
