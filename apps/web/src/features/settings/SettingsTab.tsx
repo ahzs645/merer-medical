@@ -1,5 +1,5 @@
 import { BundleEntry, Patient } from 'fhir/r2';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { RxDatabase, RxDocument } from 'rxdb';
 
@@ -17,8 +17,10 @@ import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocumen
 import { ExperimentalSettingsGroup } from './components/ExperimentalSettingsGroup';
 import { UserSwitchModal } from './components/UserSwitchModal';
 import { UserSwitchDrawer } from './components/UserSwitchDrawer';
-import { AddUserModal } from './components/AddUserModal';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
+import { useRxDb } from '../../app/providers/RxDbProvider';
+import { useNotificationDispatch } from '../../app/providers/NotificationProvider';
+import { importEmrpkgToRxDb, inspectEmrpkg } from '../../services/emrpkg';
 
 export function fetchPatientRecords(
   db: RxDatabase<DatabaseCollections>,
@@ -73,12 +75,84 @@ export function parseGender(
   return item?.data_record.raw.resource?.gender;
 }
 
+function readFileAsBytes(file: File): Promise<Uint8Array> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const buf = e.target?.result;
+      if (buf instanceof ArrayBuffer) resolve(new Uint8Array(buf));
+      else reject(new Error('Unable to read file'));
+    };
+    reader.onerror = (e) =>
+      reject(new Error('File read error: ' + e.target?.error));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
 const SettingsTab: React.FC = () => {
   const { t } = useInterfaceLanguage();
+  const db = useRxDb();
+  const notifyDispatch = useNotificationDispatch();
   const { pathname, hash, key } = useLocation();
   const [showUserSwitcher, setShowUserSwitcher] = useState(false);
-  const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const importUserProfileRef = useRef<HTMLInputElement | null>(null);
+
+  const handleUserProfileImport = useCallback(
+    async (file: File) => {
+      if (!db) {
+        notifyDispatch({
+          type: 'set_notification',
+          message: 'Import failed: database is not ready yet.',
+          variant: 'error',
+        });
+        return;
+      }
+
+      try {
+        const bytes = await readFileAsBytes(file);
+        const info = await inspectEmrpkg(bytes);
+        if (info.encrypted) {
+          notifyDispatch({
+            type: 'set_notification',
+            message:
+              'This user profile package is encrypted. Import it from Data settings so you can enter the passphrase.',
+            variant: 'error',
+          });
+          return;
+        }
+
+        const { counts, unknownTables } = await importEmrpkgToRxDb(bytes, db, {
+          replace: false,
+        });
+        const total = Object.values(counts).reduce<number>(
+          (a, b) => a + (b ?? 0),
+          0,
+        );
+        const extra = unknownTables.length
+          ? ` Skipped: ${unknownTables.join(', ')}.`
+          : '';
+        notifyDispatch({
+          type: 'set_notification',
+          message: `Imported user profile with ${total} records.${extra} Reloading...`,
+          variant: 'success',
+        });
+        setShowUserSwitcher(false);
+        setTimeout(() => window.location.reload(), 1500);
+      } catch (e) {
+        notifyDispatch({
+          type: 'set_notification',
+          message: `Import failed: ${(e as Error).message}`,
+          variant: 'error',
+        });
+      }
+    },
+    [db, notifyDispatch],
+  );
+
+  const openUserProfileImport = useCallback(() => {
+    importUserProfileRef.current?.click();
+  }, []);
 
   // Detect screen size - matches Tailwind's sm: breakpoint (640px)
   useEffect(() => {
@@ -138,26 +212,28 @@ const SettingsTab: React.FC = () => {
         <UserSwitchModal
           open={showUserSwitcher}
           onClose={() => setShowUserSwitcher(false)}
-          onAddNewUser={() => {
-            setShowUserSwitcher(false);
-            setShowAddUserModal(true);
-          }}
+          onAddNewUser={openUserProfileImport}
         />
       ) : (
         <UserSwitchDrawer
           open={showUserSwitcher}
           onClose={() => setShowUserSwitcher(false)}
-          onAddNewUser={() => {
-            setShowUserSwitcher(false);
-            setShowAddUserModal(true);
-          }}
+          onAddNewUser={openUserProfileImport}
         />
       )}
 
-      <AddUserModal
-        open={showAddUserModal}
-        onClose={() => setShowAddUserModal(false)}
-        switchToNewUser={true}
+      <input
+        ref={importUserProfileRef}
+        type="file"
+        accept=".emrpkg,application/octet-stream,application/zip"
+        className="hidden"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          if (file) {
+            handleUserProfileImport(file);
+          }
+          event.target.value = '';
+        }}
       />
     </AppPage>
   );

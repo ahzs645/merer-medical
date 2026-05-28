@@ -1,6 +1,6 @@
 import { ConnectionDocument } from '../../../models/connection-document/ConnectionDocument.type';
 import { getDiagnosticReportPerformer } from '../../../shared/utils/fhirAccessHelpers';
-import { resolveObservationReferences } from '../../../shared/utils/fhirReferenceResolver';
+import { resolveObservationReferenceKeys } from '../../../shared/utils/fhirReferenceResolver';
 import { ReportDocument, ReportLink } from '../types';
 
 export function buildReportsByObservationId(
@@ -14,23 +14,27 @@ export function buildReportsByObservationId(
     if (references.length === 0) return;
 
     const connection = connectionsById.get(report.connection_record_id),
-      resolvedReferences = resolveObservationReferences({
+      referenceKeys = resolveObservationReferenceKeys({
         references: references.filter((item) => item.reference) as Array<{
           reference: string;
         }>,
         baseUrl: connection?.location as string | undefined,
       });
 
-    resolvedReferences.forEach((reference) => {
+    const reportLink = {
+      id: report.id,
+      date: report.metadata?.date,
+      displayName: report.metadata?.display_name
+        ?.replace(/- final result/gi, '')
+        .replace(/- final/gi, ''),
+      performer: getDiagnosticReportPerformer(report),
+    };
+
+    referenceKeys.forEach((reference) => {
       const reportLinks = map.get(reference) || [];
-      reportLinks.push({
-        id: report.id,
-        date: report.metadata?.date,
-        displayName: report.metadata?.display_name
-          ?.replace(/- final result/gi, '')
-          .replace(/- final/gi, ''),
-        performer: getDiagnosticReportPerformer(report),
-      });
+      if (!reportLinks.some((item) => item.id === reportLink.id)) {
+        reportLinks.push(reportLink);
+      }
       map.set(reference, reportLinks);
     });
   });

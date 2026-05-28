@@ -93,12 +93,13 @@ export function UserSwitchDrawer({
                         })}
 
                         <button
+                          type="button"
                           onClick={onAddNewUser}
                           className="w-full flex items-center justify-center space-x-2 rounded-lg border-2 border-dashed border-gray-300 px-3 py-3 text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors"
                         >
                           <PlusIcon className="h-5 w-5" />
                           <span className="text-sm font-medium">
-                            Add New User
+                            Import User Profile
                           </span>
                         </button>
                       </div>

@@ -21,7 +21,7 @@ import { SkeletonLoadingText } from '../skeletons/SkeletonLoadingText';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
 import { TimelineCardSubtitile } from '../TimelineCardSubtitile';
 import { TimelineCardTitle } from '../TimelineCardTitle';
-import { resolveObservationReferences } from '../../../../shared/utils/fhirReferenceResolver';
+import { resolveObservationReferenceKeys } from '../../../../shared/utils/fhirReferenceResolver';
 
 /**
  * Function that encapsulates the logic of the useRelatedDocuments Hook.
@@ -48,7 +48,7 @@ export async function getRelatedDocuments({
   const listToQuery: string[] = [];
   const isDrResult = item.data_record.raw.resource?.result;
   if (isDrResult) {
-    const resolvedReferences = resolveObservationReferences({
+    const resolvedReferences = resolveObservationReferenceKeys({
       references: isDrResult.filter((r) => r.reference) as Array<{
         reference: string;
       }>,

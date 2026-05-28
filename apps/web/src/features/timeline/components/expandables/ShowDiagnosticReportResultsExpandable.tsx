@@ -9,6 +9,8 @@ import { ButtonLoadingSpinner } from '../../../connections/components/ButtonLoad
 import { Modal } from '../../../../shared/components/Modal';
 import { ModalHeader } from '../../../../shared/components/ModalHeader';
 import { ObservationResultRow } from '../ObservationResultRow';
+import { useClinicalDoc } from '../../../../shared/hooks/useClinicalDoc';
+import { EmbeddedAttachmentViewer } from '../document-reference/EmbeddedAttachmentViewer';
 
 export function ShowDiagnosticReportResultsExpandable({
   item,
@@ -26,6 +28,11 @@ export function ShowDiagnosticReportResultsExpandable({
   loading?: boolean;
 }) {
   const toggleOpen = () => setExpanded((x) => !x);
+  const presentedForm =
+    item.data_record.raw.resource?.resourceType === 'DiagnosticReport'
+      ? item.data_record.raw.resource?.presentedForm?.[0]
+      : undefined;
+  const attachment = useClinicalDoc(presentedForm?.url);
 
   return (
     <Modal open={expanded} setOpen={setExpanded}>
@@ -67,6 +74,28 @@ export function ShowDiagnosticReportResultsExpandable({
           </div>
         ) : (
           <>
+            {attachment && (
+              <div className="max-h-full scroll-py-3 p-3">
+                <div
+                  className={`${
+                    expanded ? '' : 'hidden'
+                  } rounded-lg border border-solid border-gray-200`}
+                >
+                  <div className="border-b-2 border-solid border-gray-200 p-2 px-4 text-sm font-semibold text-gray-800">
+                    Source document
+                  </div>
+                  <EmbeddedAttachmentViewer
+                    attachment={{
+                      contentType: attachment.get('data_record.content_type'),
+                      raw: attachment.get('data_record.raw'),
+                      title:
+                        presentedForm?.title ||
+                        attachment.get('metadata.display_name'),
+                    }}
+                  />
+                </div>
+              </div>
+            )}
             {docs.length > 0 ? (
               <div className="max-h-full scroll-py-3 p-3">
                 <div

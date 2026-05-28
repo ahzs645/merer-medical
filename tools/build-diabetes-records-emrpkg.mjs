@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { basename, dirname, extname, join, resolve } from 'node:path';
 import { strToU8, zipSync } from 'fflate';
 
 const FORMAT_NAME = 'mere-emr-package';
@@ -12,6 +12,7 @@ if (!args.source || !args.output) {
   node tools/build-diabetes-records-emrpkg.mjs \\
     --source /path/to/medicalRecords.json \\
     --output /path/to/profile.emrpkg \\
+    [--assets-dir /path/to/source/files] \\
     [--first-name First] [--last-name Last] [--profile-id stable-id]
 
 This tool reads a local medicalRecords.json file and writes a Mere .emrpkg.
@@ -23,6 +24,12 @@ const sourcePath = resolve(args.source);
 const outputPath = resolve(args.output);
 const records = JSON.parse(readFileSync(sourcePath, 'utf8'));
 const now = Date.now();
+const assetsDir = args.assetsDir
+  ? resolve(args.assetsDir)
+  : records.audit?.sourceDirectory && existsSync(records.audit.sourceDirectory)
+    ? records.audit.sourceDirectory
+    : undefined;
+const sourceAssetIndex = buildSourceAssetIndex(assetsDir);
 
 const profileId = stableId(args.profileId || `manual-profile-${now}`);
 const userId = `manual-patient-${profileId}`;
@@ -55,8 +62,16 @@ const connection = {
 };
 
 const clinicalDocuments = [];
+const sourceDocumentsByKey = new Map();
 
 for (const panel of records.labPanels || []) {
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: panel.sourceImage,
+    date: panel.collectedAt,
+    title: panel.title,
+    provider: panel.provider,
+    audit: panel.audit,
+  });
   const resultRefs = [];
   for (const result of panel.results || []) {
     const observationId = stableId(`lab-${panel.id}-${result.id}`);
@@ -92,6 +107,9 @@ for (const panel of records.labPanels || []) {
             note: buildNotes([
               `Provider: ${panel.provider}`,
               `Source: ${panel.sourceImage}`,
+              sourceDocument
+                ? `Source document: ${sourceDocument.documentReferenceId}`
+                : undefined,
               result.note,
               result.referenceCitationId
                 ? `Reference citation: ${result.referenceCitationId}`
@@ -214,6 +232,7 @@ for (const panel of records.labPanels || []) {
           issued: atNoon(panel.collectedAt),
           performer: [{ display: panel.provider }],
           result: resultRefs,
+          presentedForm: sourceDocument ? [sourceDocument.attachment] : undefined,
           text: {
             status: 'generated',
             div: [
@@ -232,6 +251,13 @@ for (const panel of records.labPanels || []) {
 
 for (const report of records.imagingReports || []) {
   const reportId = stableId(`imaging-${report.id}`);
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: report.sourceImage,
+    date: report.studyDate,
+    title: report.title,
+    provider: report.provider,
+    audit: report.audit,
+  });
   const imagingFindingRefs = [];
   for (const finding of extractImagingFindings(report)) {
     const findingId = stableId(`imaging-finding-${report.id}-${finding.id}`);
@@ -283,7 +309,12 @@ for (const report of records.imagingReports || []) {
             issued: atNoon(report.studyDate),
             ...observationValue(finding.value, finding.unit),
             derivedFrom: [{ reference: `DiagnosticReport/${reportId}` }],
-            note: buildNotes([finding.sourceText]),
+            note: buildNotes([
+              finding.sourceText,
+              sourceDocument
+                ? `Source document: ${sourceDocument.documentReferenceId}`
+                : undefined,
+            ]),
           },
         },
         metadata: {
@@ -314,6 +345,7 @@ for (const report of records.imagingReports || []) {
           issued: atNoon(report.studyDate),
           performer: [{ display: report.provider }],
           result: imagingFindingRefs,
+          presentedForm: sourceDocument ? [sourceDocument.attachment] : undefined,
           conclusion: report.findings?.join('\n'),
           extension: [
             {
@@ -340,6 +372,13 @@ for (const report of records.imagingReports || []) {
 }
 
 for (const group of records.medicationPlans || []) {
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: group.sourceImage,
+    date: group.encounterDate,
+    title: group.title,
+    provider: group.provider,
+    audit: group.audit,
+  });
   const medicationListEntries = [];
   for (const item of group.items || []) {
     const medicationId = stableId(`medication-${group.id}-${item.id}`);
@@ -391,6 +430,9 @@ for (const group of records.medicationPlans || []) {
                 : undefined,
               item.plannerImplication,
               item.note,
+              sourceDocument
+                ? `Source document: ${sourceDocument.documentReferenceId}`
+                : undefined,
               ...(item.mappedTo || []).map((target) => `Mapped to: ${target}`),
             ]),
           },
@@ -446,6 +488,13 @@ for (const group of records.medicationPlans || []) {
 
 for (const encounter of records.clinicalEncounters || []) {
   const encounterId = stableId(`encounter-${encounter.id}`);
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: encounter.sourceImage,
+    date: encounter.encounterDate,
+    title: encounter.title,
+    provider: encounter.provider,
+    audit: encounter.audit,
+  });
   clinicalDocuments.push(
     clinicalDocument({
       id: encounterId,
@@ -481,12 +530,105 @@ for (const encounter of records.clinicalEncounters || []) {
             (encounter.sections || []).flatMap((section) => [
               section.title,
               ...(section.items || []).map((item) => `- ${item}`),
-            ]),
+            ]).concat(
+              sourceDocument
+                ? [`Source document: ${sourceDocument.documentReferenceId}`]
+                : [],
+            ),
           ),
         },
       },
     }),
   );
+}
+
+function getOrCreateSourceDocument({ sourceImage, date, title, provider, audit }) {
+  if (!sourceImage) return undefined;
+
+  const sourceKey = `${sourceImage}`;
+  const existing = sourceDocumentsByKey.get(sourceKey);
+  if (existing) return existing;
+
+  const asset = findSourceAsset(sourceImage);
+  const sourceId = stableId(`source-document-${sourceImage}`);
+  const documentReferenceId = `manual:source-document-${sourceId}`;
+  const attachmentMetadataId = `manual:source-attachment-${sourceId}`;
+  const contentType = asset ? contentTypeForPath(asset.path) : undefined;
+  const attachment = {
+    contentType,
+    url: attachmentMetadataId,
+    title: sourceImage,
+    size: asset?.bytes.byteLength,
+  };
+
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: `source-document-${sourceId}`,
+      resourceType: 'documentreference',
+      date,
+      displayName: `${title} source document`,
+      raw: {
+        fullUrl: documentReferenceId,
+        manual_kind: 'source-document',
+        source_image: sourceImage,
+        audit,
+        resource: {
+          resourceType: 'DocumentReference',
+          id: `source-document-${sourceId}`,
+          status: 'current',
+          type: { text: title },
+          subject: { reference: `Patient/${userId}` },
+          indexed: atNoon(date),
+          author: provider ? [{ display: provider }] : undefined,
+          description: asset
+            ? `Embedded source file: ${basename(asset.path)}`
+            : `Source file not found while packaging: ${sourceImage}`,
+          content: [{ attachment }],
+          text: {
+            status: 'generated',
+            div: buildReportText([
+              `Source: ${sourceImage}`,
+              asset ? `Embedded file: ${asset.path}` : undefined,
+              provider ? `Provider: ${provider}` : undefined,
+              auditText(audit),
+            ]),
+          },
+        },
+      },
+      metadata: {
+        id: documentReferenceId,
+        source_image: sourceImage,
+        source_file_path: asset?.path,
+      },
+    }),
+  );
+
+  if (asset && contentType) {
+    clinicalDocuments.push(
+      clinicalDocument({
+        id: `source-attachment-${sourceId}`,
+        resourceType: 'documentreference_attachment',
+        date,
+        displayName: sourceImage,
+        raw: asset.bytes.toString('base64'),
+        metadata: {
+          id: attachmentMetadataId,
+          source_image: sourceImage,
+          source_file_path: asset.path,
+        },
+      }),
+    );
+    const attachmentDoc = clinicalDocuments[clinicalDocuments.length - 1];
+    attachmentDoc.data_record.content_type = contentType;
+  }
+
+  const sourceDocument = {
+    documentReferenceId,
+    attachment,
+    assetPath: asset?.path,
+  };
+  sourceDocumentsByKey.set(sourceKey, sourceDocument);
+  return sourceDocument;
 }
 
 const tables = {
@@ -575,6 +717,78 @@ function clinicalDocument({
     _meta: { lwt: now },
     _deleted: false,
   };
+}
+
+function buildSourceAssetIndex(root) {
+  if (!root || !existsSync(root)) return new Map();
+  const files = [];
+  collectFiles(root, files);
+
+  const index = new Map();
+  files.forEach((filePath) => {
+    const name = basename(filePath);
+    index.set(normalizeAssetName(name), filePath);
+  });
+  return index;
+}
+
+function collectFiles(dir, files) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      collectFiles(fullPath, files);
+    } else if (entry.isFile() && entry.name !== '.DS_Store') {
+      files.push(fullPath);
+    }
+  }
+}
+
+function findSourceAsset(sourceImage) {
+  const filename = sourceImageToFilename(sourceImage);
+  const path = sourceAssetIndex.get(normalizeAssetName(filename));
+  if (!path) return undefined;
+  return {
+    path,
+    bytes: readFileSync(path),
+  };
+}
+
+function sourceImageToFilename(sourceImage) {
+  return `${sourceImage}`
+    .replace(/\s+pages?\s+.*$/i, '')
+    .replace(/\s+page\s+.*$/i, '')
+    .trim();
+}
+
+function normalizeAssetName(value) {
+  return `${value}`
+    .normalize('NFKC')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function contentTypeForPath(path) {
+  switch (extname(path).toLowerCase()) {
+    case '.pdf':
+      return 'application/pdf';
+    case '.png':
+      return 'image/png';
+    case '.jpg':
+    case '.jpeg':
+      return 'image/jpeg';
+    case '.webp':
+      return 'image/webp';
+    case '.txt':
+      return 'text/plain';
+    case '.html':
+    case '.htm':
+      return 'text/html';
+    case '.xml':
+      return 'application/xml';
+    default:
+      return 'application/octet-stream';
+  }
 }
 
 function observationValue(value, unit) {
