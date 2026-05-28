@@ -20,6 +20,13 @@ type InterfaceLanguageContextType = {
   t: (text: string) => string;
 };
 
+const translatableAttributes = ['aria-label', 'placeholder', 'title', 'alt'];
+const originalTextByNode = new WeakMap<Text, string>();
+const originalAttributesByElement = new WeakMap<
+  Element,
+  Partial<Record<string, string>>
+>();
+
 const InterfaceLanguageContext =
   React.createContext<InterfaceLanguageContextType>({
     language: 'en',
@@ -82,8 +89,19 @@ function translateElementText(root: ParentNode, language: InterfaceLanguage) {
   }
 
   nodes.forEach((textNode) => {
-    const translatedText = translateText(textNode.textContent ?? '', language);
-    if (translatedText !== textNode.textContent) {
+    const currentText = textNode.textContent ?? '';
+    const originalText = originalTextByNode.get(textNode) ?? currentText;
+
+    if (language === 'en') {
+      if (originalTextByNode.has(textNode) && currentText !== originalText) {
+        textNode.textContent = originalText;
+      }
+      return;
+    }
+
+    const translatedText = translateText(originalText, language);
+    if (translatedText !== currentText) {
+      originalTextByNode.set(textNode, originalText);
       textNode.textContent = translatedText;
     }
   });
@@ -99,14 +117,28 @@ function translateElementAttributes(
       : Array.from(root.querySelectorAll<HTMLElement>('*'));
 
   elements.forEach((element) => {
-    ['aria-label', 'placeholder', 'title', 'alt'].forEach((attribute) => {
+    translatableAttributes.forEach((attribute) => {
       const value = element.getAttribute(attribute);
       if (!value) {
         return;
       }
 
-      const translatedValue = translateText(value, language);
+      const originalAttributes = originalAttributesByElement.get(element) ?? {};
+      const originalValue = originalAttributes[attribute] ?? value;
+
+      if (language === 'en') {
+        if (originalAttributes[attribute] && value !== originalValue) {
+          element.setAttribute(attribute, originalValue);
+        }
+        return;
+      }
+
+      const translatedValue = translateText(originalValue, language);
       if (translatedValue !== value) {
+        originalAttributesByElement.set(element, {
+          ...originalAttributes,
+          [attribute]: originalValue,
+        });
         element.setAttribute(attribute, translatedValue);
       }
     });

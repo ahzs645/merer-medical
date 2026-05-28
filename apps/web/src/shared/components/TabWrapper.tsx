@@ -21,8 +21,8 @@ export function TabWrapper() {
     { experimental__use_openai_rag } = useLocalConfig();
 
   return (
-    <div className="mobile-full-height flex flex-col max-w-[100vw] md:flex-row-reverse">
-      <div className="flex-grow overflow-y-auto">
+    <div className="mobile-full-height flex min-h-0 flex-col max-w-[100vw] overflow-hidden md:flex-row-reverse">
+      <div className="min-h-0 flex-grow overflow-y-auto">
         <Outlet />
       </div>
       <div className="flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 md:relative md:bottom-auto md:top-0 md:h-full md:w-auto">

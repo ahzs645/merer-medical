@@ -54,26 +54,26 @@ export default function App() {
       <LocalConfigProvider>
         <DeveloperLogsProvider>
           <TutorialConfigProvider>
-            {!isDemoMode() && <TutorialOverlay />}
+            <NotificationProvider>
+              <UpdateAppChecker />
+              <RxDbProvider>
+                <AppConfigProvider>
+                  <UserProvider>
+                    <VectorProvider>
+                      <UserPreferencesProvider>
+                        <InterfaceLanguageProvider>
+                          <SyncJobProvider>
+                            {!isDemoMode() && <TutorialOverlay />}
+                            <RouterProvider router={router} />
+                          </SyncJobProvider>
+                        </InterfaceLanguageProvider>
+                      </UserPreferencesProvider>
+                    </VectorProvider>
+                  </UserProvider>
+                </AppConfigProvider>
+              </RxDbProvider>
+            </NotificationProvider>
           </TutorialConfigProvider>
-          <NotificationProvider>
-            <UpdateAppChecker />
-            <RxDbProvider>
-              <AppConfigProvider>
-                <UserProvider>
-                  <VectorProvider>
-                    <UserPreferencesProvider>
-                      <InterfaceLanguageProvider>
-                        <SyncJobProvider>
-                          <RouterProvider router={router} />
-                        </SyncJobProvider>
-                      </InterfaceLanguageProvider>
-                    </UserPreferencesProvider>
-                  </VectorProvider>
-                </UserProvider>
-              </AppConfigProvider>
-            </RxDbProvider>
-          </NotificationProvider>
         </DeveloperLogsProvider>
       </LocalConfigProvider>
     </ErrorBoundary>

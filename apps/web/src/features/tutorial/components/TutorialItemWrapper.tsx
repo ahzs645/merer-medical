@@ -44,7 +44,7 @@ export const TutorialItemWrapper = ({
     return (
       <motion.div
         key={localStorageKey}
-        className="flex flex-1 flex-col"
+        className="absolute inset-0 flex flex-col"
         custom={state.direction}
         variants={variants}
         initial="enter"

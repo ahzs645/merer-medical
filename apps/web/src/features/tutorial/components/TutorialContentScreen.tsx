@@ -7,10 +7,16 @@ export function TutorialContentScreen({
   children,
   hideBackButton,
   isLastScreen,
+  primaryAction,
+  primaryActionLabel,
+  primaryActionDisabled,
 }: PropsWithChildren<{
   dispatch: React.Dispatch<TutorialAction>;
   hideBackButton?: boolean;
   isLastScreen?: boolean;
+  primaryAction?: () => void;
+  primaryActionLabel?: string;
+  primaryActionDisabled?: boolean;
 }>) {
   const { t } = useInterfaceLanguage();
 
@@ -22,10 +28,11 @@ export function TutorialContentScreen({
         </div>
       </div>
       <button
-        className="bg-primary-500 hover:bg-primary-600 rounded py-2 px-4 font-bold text-white"
-        onClick={() => dispatch({ type: 'next_step' })}
+        className="bg-primary-500 hover:bg-primary-600 disabled:bg-primary-400 rounded py-2 px-4 font-bold text-white disabled:cursor-not-allowed"
+        disabled={primaryActionDisabled}
+        onClick={primaryAction ?? (() => dispatch({ type: 'next_step' }))}
       >
-        {isLastScreen ? t('Finish') : t('Next')}
+        {primaryActionLabel ?? (isLastScreen ? t('Finish') : t('Next'))}
       </button>
       {!hideBackButton && (
         <button

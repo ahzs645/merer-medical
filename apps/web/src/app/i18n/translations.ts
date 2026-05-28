@@ -92,6 +92,10 @@ export const arabicTranslations: Record<string, string> = {
   Export: 'تصدير',
   'Family Name': 'اسم العائلة',
   Finish: 'إنهاء',
+  'Start fresh': 'ابدأ من جديد',
+  'Import existing .emrpkg': 'استيراد ملف .emrpkg موجود',
+  'Already have a Mere profile? Import your .emrpkg file.':
+    'هل لديك ملف شخصي في مير؟ استورد ملف .emrpkg الخاص بك.',
   File: 'الملف',
   'First Name': 'الاسم الأول',
   Flag: 'العلامة',

@@ -31,8 +31,15 @@
   font-weight: 100 900;
 }
 
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
 .mobile-full-height {
-  @apply: h-full max-w-full;
+  @apply h-full max-w-full;
 }
 
 @supports (height: 100cqh) {

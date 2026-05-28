@@ -198,10 +198,14 @@ export function TutorialOverlay() {
           initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="bg-primary-700 mobile-full-height absolute z-50 flex w-full flex-grow flex-col overflow-hidden opacity-25"
+          className="bg-primary-700 mobile-full-height absolute inset-0 z-50 flex w-full flex-col overflow-hidden opacity-25"
         >
-          <AnimatePresence initial={false} custom={state.direction}>
-            {activeTutorialItem}
+          <div className="relative flex min-h-0 flex-1 overflow-hidden">
+            <AnimatePresence initial={false} custom={state.direction}>
+              {activeTutorialItem}
+            </AnimatePresence>
+          </div>
+          <div className="flex shrink-0 flex-col">
             <button
               key="tutorial_skip_button"
               className="hover:bg-primary-600 mx-auto max-w-sm rounded py-4 px-4 text-white"
@@ -216,7 +220,7 @@ export function TutorialOverlay() {
               currentPage={state.currentStep + 1}
               totalPages={state.steps.length}
             />
-          </AnimatePresence>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
