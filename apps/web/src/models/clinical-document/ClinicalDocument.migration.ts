@@ -22,4 +22,8 @@ export const ClinicalDocumentMigrations: MigrationStrategies = {
       .is_pinned;
     return oldDoc;
   },
+  5: function (oldDoc: Required<ClinicalDocument>) {
+    oldDoc.attachment_ids ??= [];
+    return oldDoc;
+  },
 };

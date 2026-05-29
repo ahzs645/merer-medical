@@ -3,7 +3,7 @@ export const clinicalDocumentSchemaLiteral = {
   name: 'clinical_documents',
   description:
     "Represents a document that contains a specific health resource (e.g. a FHIR resource or a C-CDA document) for a patient/user as well as metadata about the resource's content",
-  version: 4,
+  version: 5,
   primaryKey: {
     key: 'id',
     fields: ['connection_record_id', 'user_id', 'metadata.id'] as string[],
