@@ -4,6 +4,7 @@ import { ClinicalDocument } from '../../../../models/clinical-document/ClinicalD
 import { formatFullDate } from '../../../../shared/utils/dateFormatters';
 import { Modal } from '../../../../shared/components/Modal';
 import { ModalHeader } from '../../../../shared/components/ModalHeader';
+import { getFhirResource } from '../../../../shared/utils/fhirResource';
 
 export function ShowCarePlanDetailsExpandable({
   item,
@@ -15,7 +16,7 @@ export function ShowCarePlanDetailsExpandable({
   setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const toggleOpen = () => setExpanded((x) => !x);
-  const carePlan = item.data_record.raw.resource;
+  const carePlan = getFhirResource<CarePlan>(item);
 
   return (
     <Modal open={expanded} setOpen={setExpanded}>

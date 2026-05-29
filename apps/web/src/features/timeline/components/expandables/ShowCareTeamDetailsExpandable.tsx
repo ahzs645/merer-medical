@@ -4,6 +4,7 @@ import { ClinicalDocument } from '../../../../models/clinical-document/ClinicalD
 import { formatFullDate } from '../../../../shared/utils/dateFormatters';
 import { Modal } from '../../../../shared/components/Modal';
 import { ModalHeader } from '../../../../shared/components/ModalHeader';
+import { getFhirResource } from '../../../../shared/utils/fhirResource';
 
 export function ShowCareTeamDetailsExpandable({
   item,
@@ -15,7 +16,7 @@ export function ShowCareTeamDetailsExpandable({
   setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const toggleOpen = () => setExpanded((x) => !x);
-  const careTeam = item.data_record.raw.resource;
+  const careTeam = getFhirResource<CareTeam>(item);
 
   return (
     <Modal open={expanded} setOpen={setExpanded}>
@@ -94,6 +95,15 @@ export function ShowCareTeamDetailsExpandable({
                             {formatFullDate(participant.period.start)}
                             {participant.period.end &&
                               ` - ${formatFullDate(participant.period.end)}`}
+                          </div>
+                        )}
+                        {(participant as any).extension?.length > 0 && (
+                          <div className="text-gray-500 text-xs">
+                            Contact:{' '}
+                            {(participant as any).extension
+                              .map((extension: any) => extension.valueString)
+                              .filter(Boolean)
+                              .join(', ')}
                           </div>
                         )}
                       </div>

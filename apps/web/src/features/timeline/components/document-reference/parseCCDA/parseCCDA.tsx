@@ -208,12 +208,10 @@ export function getMatchingSections(
   id: string[] | string,
 ) {
   return [...(sections as unknown as HTMLElement[])]?.filter((s) =>
-    Array.isArray(id)
-      ? id.includes(
-          s?.getElementsByTagName('templateId')?.[0]?.getAttribute('root') ||
-            '',
-        )
-      : s?.getElementsByTagName('templateId')?.[0]?.getAttribute('root') === id,
+    [...s.getElementsByTagName('templateId')].some((templateId) => {
+      const root = templateId.getAttribute('root') || '';
+      return Array.isArray(id) ? id.includes(root) : root === id;
+    }),
   );
 }
 

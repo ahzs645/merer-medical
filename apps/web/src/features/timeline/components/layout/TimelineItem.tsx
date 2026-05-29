@@ -32,6 +32,7 @@ import { AppointmentCard } from '../cards/AppointmentCard';
 import { CarePlanCard } from '../cards/CarePlanCard';
 import { CareTeamCard } from '../cards/CareTeamCard';
 import { ConditionCard } from '../cards/ConditionCard';
+import { ConsentCard } from '../cards/ConsentCard';
 import { CoverageCard } from '../cards/CoverageCard';
 import { DiagnosticReportCard } from '../cards/DiagnosticReportCard';
 import {
@@ -41,6 +42,7 @@ import {
 import { ElementsByDateListCard } from './ElementsByDateListCard';
 import { EncounterCard } from '../cards/EncounterCard';
 import { GoalCard } from '../cards/GoalCard';
+import { FamilyMemberHistoryCard } from '../cards/FamilyMemberHistoryCard';
 import { ImmunizationCard } from '../cards/ImmunizationCard';
 import { MedicationCard } from '../cards/MedicationCard';
 import { MedicationOrderCard } from '../cards/MedicationOrderCard';
@@ -87,6 +89,9 @@ export const TimelineItem = memo(function TimelineItem({
                     key={item.id}
                     item={item as ClinicalDocument<BundleEntry<Condition>>}
                   />
+                )}
+                {item.data_record.resource_type === 'consent' && (
+                  <ConsentCard key={item.id} item={item} />
                 )}
                 {item.data_record.resource_type === 'procedure' && (
                   <ProcedureCard
@@ -135,6 +140,9 @@ export const TimelineItem = memo(function TimelineItem({
                     matchedChunks={(item as any).matchedChunks}
                     searchQuery={searchQuery}
                   />
+                )}
+                {item.data_record.resource_type === 'familymemberhistory' && (
+                  <FamilyMemberHistoryCard key={item.id} item={item} />
                 )}
                 {item.data_record.resource_type ===
                   'documentreference_attachment' && (

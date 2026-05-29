@@ -11,6 +11,7 @@ import { OpenableCardIcon } from '../OpenableCardIcon';
 import { ShowCarePlanDetailsExpandable } from '../expandables/ShowCarePlanDetailsExpandable';
 import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
 import { getManualRecordNote } from '../../../../shared/utils/manualRecordUtils';
+import { getFhirResource } from '../../../../shared/utils/fhirResource';
 
 export const CarePlanCard = memo(function CarePlanCard({
   item,
@@ -19,7 +20,7 @@ export const CarePlanCard = memo(function CarePlanCard({
 }) {
   const conn = useConnectionDoc(item.connection_record_id);
   const [expanded, setExpanded] = useState(false);
-  const carePlan = item.data_record.raw.resource;
+  const carePlan = getFhirResource<CarePlan>(item);
   const manualNote = getManualRecordNote(item);
 
   return (

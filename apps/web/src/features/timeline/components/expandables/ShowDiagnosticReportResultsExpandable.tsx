@@ -11,6 +11,7 @@ import { ModalHeader } from '../../../../shared/components/ModalHeader';
 import { ObservationResultRow } from '../ObservationResultRow';
 import { useClinicalDoc } from '../../../../shared/hooks/useClinicalDoc';
 import { EmbeddedAttachmentViewer } from '../document-reference/EmbeddedAttachmentViewer';
+import { getFhirResource } from '../../../../shared/utils/fhirResource';
 
 export function ShowDiagnosticReportResultsExpandable({
   item,
@@ -28,9 +29,10 @@ export function ShowDiagnosticReportResultsExpandable({
   loading?: boolean;
 }) {
   const toggleOpen = () => setExpanded((x) => !x);
+  const resource = getFhirResource<any>(item);
   const presentedForm =
-    item.data_record.raw.resource?.resourceType === 'DiagnosticReport'
-      ? item.data_record.raw.resource?.presentedForm?.[0]
+    resource?.resourceType === 'DiagnosticReport'
+      ? resource?.presentedForm?.[0]
       : undefined;
   const attachment = useClinicalDoc(presentedForm?.url);
 
@@ -118,7 +120,12 @@ export function ShowDiagnosticReportResultsExpandable({
                 </div>
               </div>
             ) : (
-              <div className="mx-4 flex flex-col border-b-2 border-solid border-gray-100 py-2">
+              <div className="mx-4 flex flex-col gap-3 border-b-2 border-solid border-gray-100 py-2">
+                {resource?.conclusion && (
+                  <div className="whitespace-pre-line rounded-md bg-gray-50 p-3 text-sm leading-6 text-gray-800">
+                    {resource.conclusion}
+                  </div>
+                )}
                 <div className="self-center font-semibold text-gray-600">
                   No data available for this report
                 </div>

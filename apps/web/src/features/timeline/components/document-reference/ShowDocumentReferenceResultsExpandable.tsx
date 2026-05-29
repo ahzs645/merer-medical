@@ -10,6 +10,7 @@ import { useConnectionDoc } from '../../../connections/hooks/useConnectionDoc';
 import { CCDAStructureDefinitionKeys2_1 } from './CCDAStructureDefinitionKeys2_1';
 import { DisplayCCDADocument } from './DisplayCCDADocument';
 import { parseCCDA } from './parseCCDA/parseCCDA';
+import { getFhirResource } from '../../../../shared/utils/fhirResource';
 
 export const LOINC_CODE_SYSTEM = '2.16.840.1.113883.6.1';
 export const SNOMED_CT_CODE_SYSTEM = '2.16.840.1.113883.6.96';
@@ -43,9 +44,8 @@ export function ShowDocumentResultsExpandable({
       | Partial<Record<CCDAStructureDefinitionKeys2_1, string | JSX.Element>>
       | undefined
     >(undefined),
-    attachmentUrl =
-      item.data_record.raw.resource?.content?.[0]?.attachment?.url,
-    resource = item.data_record.raw.resource,
+    resource = getFhirResource<any>(item),
+    attachmentUrl = resource?.content?.[0]?.attachment?.url,
     attachmentMetadata = resource?.content?.[0]?.attachment,
     attachment = useClinicalDoc(attachmentUrl),
     [hasLoadedDocument, setHasLoadedDocument] = useState(false),
@@ -57,7 +57,37 @@ export function ShowDocumentResultsExpandable({
 
   useEffect(() => {
     if (expanded) {
-      if (!attachment) {
+      if (!attachment && attachmentMetadata?.data) {
+        const embeddedContentType = attachmentMetadata.contentType || '';
+        const embeddedRaw = attachmentMetadata.data;
+        if (
+          embeddedContentType.includes('application/xml') &&
+          typeof embeddedRaw === 'string'
+        ) {
+          const xml = atob(embeddedRaw);
+          if (checkIfXmlIsCCDA(xml)) {
+            setCCDA(parseCCDA(xml));
+          } else {
+            setHtml(<pre>{xml}</pre>);
+          }
+        } else if (
+          embeddedContentType.includes('application/pdf') &&
+          typeof embeddedRaw === 'string'
+        ) {
+          setPdfUrl(createBlobUrlFromBase64(embeddedRaw, 'application/pdf'));
+        } else if (
+          embeddedContentType.startsWith('image/') &&
+          typeof embeddedRaw === 'string'
+        ) {
+          setImageUrl(createBlobUrlFromBase64(embeddedRaw, embeddedContentType));
+        } else if (
+          embeddedContentType.includes('text/html') &&
+          typeof embeddedRaw === 'string'
+        ) {
+          setHtml(parse(DOMPurify.sanitize(atob(embeddedRaw))));
+        }
+        setHasLoadedDocument(true);
+      } else if (!attachment) {
         setHasLoadedDocument(true);
       } else if (
         attachment
@@ -217,6 +247,17 @@ export function ShowDocumentResultsExpandable({
       </div>
     </Modal>
   );
+}
+
+function createBlobUrlFromBase64(base64: string, contentType: string): string {
+  const byteCharacters = atob(base64);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: contentType });
+  return URL.createObjectURL(blob);
 }
 
 function DocumentReferenceFallback({

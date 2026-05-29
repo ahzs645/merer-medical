@@ -45,6 +45,7 @@ import { AppointmentCard } from '../cards/AppointmentCard';
 import { CarePlanCard } from '../cards/CarePlanCard';
 import { CareTeamCard } from '../cards/CareTeamCard';
 import { ConditionCard } from '../cards/ConditionCard';
+import { ConsentCard } from '../cards/ConsentCard';
 import { CoverageCard } from '../cards/CoverageCard';
 import { DiagnosticReportCard } from '../cards/DiagnosticReportCard';
 import {
@@ -53,6 +54,7 @@ import {
 } from '../cards/DocumentReferenceCard';
 import { EncounterCard } from '../cards/EncounterCard';
 import { GoalCard } from '../cards/GoalCard';
+import { FamilyMemberHistoryCard } from '../cards/FamilyMemberHistoryCard';
 import { ImmunizationCard } from '../cards/ImmunizationCard';
 import { MedicationCard } from '../cards/MedicationCard';
 import { MedicationOrderCard } from '../cards/MedicationOrderCard';
@@ -208,6 +210,20 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
       () =>
         itemList
           .filter((item) => item.data_record.resource_type === 'procedure')
+          .sort((a, b) => {
+            if (a.metadata?.display_name && b.metadata?.display_name) {
+              return a.metadata.display_name.localeCompare(
+                b.metadata.display_name,
+              );
+            }
+            return 0;
+          }),
+      [itemList],
+    ),
+    consents = useMemo(
+      () =>
+        itemList
+          .filter((item) => item.data_record.resource_type === 'consent')
           .sort((a, b) => {
             if (a.metadata?.display_name && b.metadata?.display_name) {
               return a.metadata.display_name.localeCompare(
@@ -427,6 +443,22 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           }) as ClinicalDocument<BundleEntry<AllergyIntolerance>>[],
       [itemList],
     ),
+    familyMemberHistories = useMemo(
+      () =>
+        itemList
+          .filter(
+            (item) => item.data_record.resource_type === 'familymemberhistory',
+          )
+          .sort((a, b) => {
+            if (a.metadata?.display_name && b.metadata?.display_name) {
+              return a.metadata.display_name.localeCompare(
+                b.metadata.display_name,
+              );
+            }
+            return 0;
+          }),
+      [itemList],
+    ),
     medicationOrders = useMemo(
       () =>
         itemList
@@ -452,6 +484,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
         immunizations.length > 0 ? 'Immunizations' : '',
         conditions.length > 0 ? 'Conditions' : '',
         procedures.length > 0 ? 'Procedures' : '',
+        consents.length > 0 ? 'Consents' : '',
         observations.length > 0 ? 'Labs' : '',
         medicationStatements.length > 0 ||
         medicationRequests.length > 0 ||
@@ -470,6 +503,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
         appointments.length > 0 ? 'Appointments' : '',
         specimens.length > 0 ? 'Specimens' : '',
         allergyIntolerances.length > 0 ? 'Allergies' : '',
+        familyMemberHistories.length > 0 ? 'Family History' : '',
       ].filter(Boolean),
     [
       conditions.length,
@@ -483,6 +517,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
       medicationOrders.length,
       observations.length,
       procedures.length,
+      consents.length,
       coverages.length,
       carePlans.length,
       careTeams.length,
@@ -490,6 +525,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
       appointments.length,
       specimens.length,
       allergyIntolerances.length,
+      familyMemberHistories.length,
     ],
   );
 
@@ -598,6 +634,21 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
             />
             <ul className="list-disc list-inside">
               {procedures.map((item) => (
+                <li
+                  className="text-xs font-medium md:text-sm text-gray-900"
+                  key={item.id}
+                >
+                  {item.metadata?.display_name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {consents.length > 0 && (
+          <div className="mb-2 ml-2">
+            <TimelineCardCategoryTitle title={'Consents'} color="text-rose-700" />
+            <ul className="list-disc list-inside">
+              {consents.map((item) => (
                 <li
                   className="text-xs font-medium md:text-sm text-gray-900"
                   key={item.id}
@@ -853,6 +904,24 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
             </ul>
           </div>
         )}
+        {familyMemberHistories.length > 0 && (
+          <div className="mb-2 ml-2">
+            <TimelineCardCategoryTitle
+              title={'Family History'}
+              color="text-amber-700"
+            />
+            <ul className="list-disc list-inside">
+              {familyMemberHistories.map((item) => (
+                <li
+                  className="text-xs font-medium md:text-sm text-gray-900"
+                  key={item.id}
+                >
+                  {item.metadata?.display_name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="relative">
           <div
             className="absolute inset-0 flex items-center"
@@ -919,6 +988,11 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
                 />
               </div>
             ))}
+            {consents.map((item) => (
+              <div key={item.id} className="my-2">
+                <ConsentCard key={item.id} item={item} />
+              </div>
+            ))}
             {diagnosticReports.map((item) => (
               <div key={item.id} className="my-2">
                 <DiagnosticReportCard
@@ -941,6 +1015,11 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
                   key={item.id}
                   item={item as ClinicalDocument<BundleEntry<Immunization>>}
                 />
+              </div>
+            ))}
+            {familyMemberHistories.map((item) => (
+              <div key={item.id} className="my-2">
+                <FamilyMemberHistoryCard key={item.id} item={item} />
               </div>
             ))}
             {conditions.map((item) => (

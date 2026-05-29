@@ -28,7 +28,7 @@ export async function fetchRawRecords(
   const selector: MangoQuerySelector<ClinicalDocument<unknown>> = {
     user_id: user_id,
     'data_record.resource_type': {
-      $nin: ['patient', 'careplan', 'provenance'],
+      $nin: ['patient', 'provenance'],
     },
     'metadata.date': { $nin: [null, undefined, ''] },
   };

@@ -22,6 +22,7 @@ import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
 import { TimelineCardSubtitile } from '../TimelineCardSubtitile';
 import { TimelineCardTitle } from '../TimelineCardTitle';
 import { resolveObservationReferenceKeys } from '../../../../shared/utils/fhirReferenceResolver';
+import { getFhirResource } from '../../../../shared/utils/fhirResource';
 
 /**
  * Function that encapsulates the logic of the useRelatedDocuments Hook.
@@ -46,7 +47,8 @@ export async function getRelatedDocuments({
   [RxDocument<ClinicalDocument<BundleEntry<Observation>>>[], boolean]
 > {
   const listToQuery: string[] = [];
-  const isDrResult = item.data_record.raw.resource?.result;
+  const resource = getFhirResource<DiagnosticReport>(item);
+  const isDrResult = resource?.result;
   if (isDrResult) {
     const resolvedReferences = resolveObservationReferenceKeys({
       references: isDrResult.filter((r) => r.reference) as Array<{
@@ -161,10 +163,12 @@ function DiagnosticReportCardUnmemo({
       <CardBase isFocusable onClick={() => setExpanded((x) => !x)}>
         <div className={'min-w-0 flex-1'} ref={ref}>
           <div className="items-top flex justify-between">
-            <TimelineCardCategoryTitle
-              title={
-                <>
-                  <p className="mr-1">Lab Panel</p>
+          <TimelineCardCategoryTitle
+            title={
+              <>
+                  <p className="mr-1">
+                    {isImagingReport(item) ? 'Imaging Report' : 'Lab Panel'}
+                  </p>
                   {status === 'loading' && (
                     <div className="ml-2">
                       <ButtonLoadingSpinner height="h-3" width="w-3" />
@@ -206,3 +210,31 @@ function DiagnosticReportCardUnmemo({
 }
 
 export const DiagnosticReportCard = memo(DiagnosticReportCardUnmemo);
+
+function isImagingReport(
+  item: ClinicalDocument<BundleEntry<DiagnosticReport>>,
+): boolean {
+  const resource = getFhirResource<any>(item);
+  const text = [
+    item.metadata?.display_name,
+    resource?.code?.text,
+    resource?.conclusion,
+    resource?.presentedForm?.[0]?.title,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  return [
+    'xray',
+    'x-ray',
+    'ct ',
+    'ultrasound',
+    ' us ',
+    'mri',
+    'ecg',
+    'knee',
+    'abdomen',
+    'chest',
+  ].some((term) => ` ${text} `.includes(term));
+}

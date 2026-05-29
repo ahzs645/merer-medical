@@ -1,4 +1,5 @@
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
+import { getFhirResource } from './fhirResource';
 
 type ManualRawResource = {
   fullUrl?: string;
@@ -42,10 +43,15 @@ export type ManualMedicationParts = {
 export function isManualRecord(item: ClinicalDocument): boolean {
   const raw = item.data_record.raw as {
     fullUrl?: string;
+    source_file?: string;
   };
   return (
     raw.fullUrl?.startsWith('manual:') ||
+    item.connection_record_id?.startsWith('c-') ||
     item.metadata?.id?.startsWith('manual:') ||
+    Boolean(
+      (item.metadata as Record<string, unknown> | undefined)?.['source_file'],
+    ) ||
     false
   );
 }
@@ -57,9 +63,9 @@ export function getManualRecordNote(
     return undefined;
   }
 
-  const raw = item.data_record.raw as ManualRawResource;
-  const noteText = raw.resource?.note?.find((note) => note.text)?.text;
-  const fallbackText = raw.resource?.text?.div;
+  const resource = getFhirResource<ManualRawResource['resource']>(item);
+  const noteText = resource?.note?.find((note) => note.text)?.text;
+  const fallbackText = resource?.text?.div;
   const text = noteText || fallbackText;
   return text?.trim() ? text.trim() : undefined;
 }
@@ -68,29 +74,29 @@ export function getManualObservationValue(
   item: ClinicalDocument,
 ): string | undefined {
   if (!isManualRecord(item)) return undefined;
-  const raw = item.data_record.raw as ManualRawResource;
+  const resource = getFhirResource<ManualRawResource['resource']>(item);
   const absentReason =
-    raw.resource?.dataAbsentReason?.text ||
-    raw.resource?.dataAbsentReason?.coding?.find(
+    resource?.dataAbsentReason?.text ||
+    resource?.dataAbsentReason?.coding?.find(
       (coding) => coding.display || coding.code,
     )?.display ||
-    raw.resource?.dataAbsentReason?.coding?.find(
+    resource?.dataAbsentReason?.coding?.find(
       (coding) => coding.display || coding.code,
     )?.code;
   if (absentReason) return absentReason;
 
   const codedValue =
-    raw.resource?.valueCodeableConcept?.text ||
-    raw.resource?.valueCodeableConcept?.coding?.find((coding) => coding.display)
+    resource?.valueCodeableConcept?.text ||
+    resource?.valueCodeableConcept?.coding?.find((coding) => coding.display)
       ?.display;
   if (codedValue) return codedValue;
 
-  if (raw.resource?.valueString) return raw.resource.valueString;
+  if (resource?.valueString) return resource.valueString;
 
-  const value = raw.resource?.valueQuantity?.value;
+  const value = resource?.valueQuantity?.value;
   if (value === undefined || value === '') return undefined;
-  const unit = raw.resource?.valueQuantity?.unit;
-  const comparator = raw.resource?.valueQuantity?.comparator || '';
+  const unit = resource?.valueQuantity?.unit;
+  const comparator = resource?.valueQuantity?.comparator || '';
   return `${comparator}${value}${unit ? ` ${unit}` : ''}`;
 }
 
@@ -98,14 +104,14 @@ export function getManualObservationRange(
   item: ClinicalDocument,
 ): string | undefined {
   if (!isManualRecord(item)) return undefined;
-  const raw = item.data_record.raw as ManualRawResource;
-  const range = raw.resource?.referenceRange?.[0];
+  const resource = getFhirResource<ManualRawResource['resource']>(item);
+  const range = resource?.referenceRange?.[0];
   if (!range) return undefined;
   if (range.text?.trim()) return range.text.trim();
   const low = range.low?.value;
   const high = range.high?.value;
   const unit =
-    range.low?.unit || range.high?.unit || raw.resource?.valueQuantity?.unit;
+    range.low?.unit || range.high?.unit || resource?.valueQuantity?.unit;
   if (low === undefined && high === undefined) return undefined;
   if (low !== undefined && high !== undefined)
     return `${low}-${high}${unit ? ` ${unit}` : ''}`;
@@ -117,10 +123,10 @@ export function getManualObservationInterpretation(
   item: ClinicalDocument,
 ): string | undefined {
   if (!isManualRecord(item)) return undefined;
-  const raw = item.data_record.raw as ManualRawResource;
+  const resource = getFhirResource<ManualRawResource['resource']>(item);
   return (
-    raw.resource?.interpretation?.text ||
-    raw.resource?.interpretation?.coding?.find((coding) => coding.display)
+    resource?.interpretation?.text ||
+    resource?.interpretation?.coding?.find((coding) => coding.display)
       ?.display
   );
 }
@@ -130,8 +136,8 @@ export function getManualMedicationParts(
 ): ManualMedicationParts {
   const empty = { dose: '', frequency: '', route: '' };
   if (!isManualRecord(item)) return empty;
-  const raw = item.data_record.raw as ManualRawResource;
-  const dosage = raw.resource?.dosage?.[0];
+  const resource = getFhirResource<ManualRawResource['resource']>(item);
+  const dosage = resource?.dosage?.[0];
   if (!dosage) return empty;
   return {
     dose: dosage.text?.trim() || '',

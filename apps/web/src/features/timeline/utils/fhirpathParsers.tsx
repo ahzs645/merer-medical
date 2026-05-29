@@ -1,12 +1,13 @@
 import { BundleEntry, Observation } from 'fhir/r2';
 import * as fhirpath from 'fhirpath';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
+import { getFhirResource } from '../../../shared/utils/fhirResource';
 
 export function getReferenceRangeString(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
   return fhirpath.evaluate(
-    item.data_record.raw.resource,
+    getFhirResource(item),
     'referenceRange.text',
   )?.[0];
 }
@@ -15,7 +16,7 @@ export function getReferenceRangeLow(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
   return fhirpath.evaluate(
-    item.data_record.raw.resource,
+    getFhirResource(item),
     'referenceRange.low',
   )?.[0];
 }
@@ -24,7 +25,7 @@ export function getReferenceRangeHigh(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
   return fhirpath.evaluate(
-    item.data_record.raw.resource,
+    getFhirResource(item),
     'referenceRange.high',
   )?.[0];
 }
@@ -34,7 +35,7 @@ export function getValueUnit(
 ): string | undefined {
   return (
     fhirpath.evaluate(
-      item.data_record.raw.resource,
+      getFhirResource(item),
       'valueQuantity.unit',
     )?.[0] || undefined
   );
@@ -44,7 +45,7 @@ export function getValueQuantity(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ): number | undefined {
   const val: number | undefined = fhirpath.evaluate(
-    item.data_record.raw.resource,
+    getFhirResource(item),
     'valueQuantity.value',
   )?.[0];
 
@@ -64,7 +65,7 @@ function formatValueQuantity(
 export function getValueString(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
-  const resource = item.data_record.raw.resource;
+  const resource = getFhirResource(item);
   return (
     fhirpath.evaluate(resource, 'valueString')?.[0] ||
     fhirpath.evaluate(resource, 'valueCodeableConcept.text')?.[0] ||
@@ -76,14 +77,14 @@ export function getValueString(
 }
 
 export function getComments(item: ClinicalDocument<BundleEntry<Observation>>) {
-  return fhirpath.evaluate(item.data_record.raw.resource, 'comments')?.[0];
+  return fhirpath.evaluate(getFhirResource(item), 'comments')?.[0];
 }
 
 export function getInterpretationText(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
   return fhirpath.evaluate(
-    item.data_record.raw.resource,
+    getFhirResource(item),
     'interpretation.text',
   )?.[0];
 }
@@ -95,9 +96,10 @@ export function getInterpretationText(
 export function isOutOfRangeResult(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ): boolean {
-  const low = item.data_record.raw.resource?.referenceRange?.[0]?.low?.value;
-  const high = item.data_record.raw.resource?.referenceRange?.[0]?.high?.value;
-  const value = item.data_record.raw.resource?.valueQuantity?.value;
+  const resource = getFhirResource<any>(item);
+  const low = resource?.referenceRange?.[0]?.low?.value;
+  const high = resource?.referenceRange?.[0]?.high?.value;
+  const value = resource?.valueQuantity?.value;
 
   if (low && high && value && !isNaN(low) && !isNaN(high) && !isNaN(value)) {
     return value < low || value > high;

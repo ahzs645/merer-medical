@@ -17,6 +17,7 @@ import { Modal } from '../../shared/components/Modal';
 import { ModalHeader } from '../../shared/components/ModalHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { EmbeddedAttachmentViewer } from '../timeline/components/document-reference/EmbeddedAttachmentViewer';
+import { getFhirResource } from '../../shared/utils/fhirResource';
 
 type DocumentRecord = ClinicalDocument<BundleEntry<DocumentReference>>;
 type AttachmentRecord = ClinicalDocument<string | Blob>;
@@ -144,8 +145,8 @@ function useDocumentsData() {
       setItems(
         documentDocs.map((doc) => {
           const document = doc.toMutableJSON() as DocumentRecord;
-          const attachmentUrl =
-            document.data_record.raw.resource?.content?.[0]?.attachment?.url;
+          const resource = getFhirResource<any>(document);
+          const attachmentUrl = resource?.content?.[0]?.attachment?.url;
           const attachment = attachmentUrl
             ? attachmentsByMetadataId.get(attachmentUrl)
             : undefined;
@@ -221,8 +222,8 @@ function DocumentItemCard({ item }: { item: DocumentItem }) {
   const { t } = useInterfaceLanguage();
   const [expanded, setExpanded] = useState(false);
   const attachment = item.attachment;
-  const attachmentMetadata =
-    item.document.data_record.raw.resource?.content?.[0]?.attachment;
+  const resource = getFhirResource<any>(item.document);
+  const attachmentMetadata = resource?.content?.[0]?.attachment;
 
   return (
     <>
@@ -296,11 +297,13 @@ function DocumentItemCard({ item }: { item: DocumentItem }) {
           />
           <div className="max-h-full scroll-py-3 p-3">
             <div className="rounded-lg border border-solid border-gray-200">
-              {attachment ? (
+              {attachment || attachmentMetadata?.data ? (
                 <EmbeddedAttachmentViewer
                   attachment={{
-                    contentType: attachment.data_record.content_type,
-                    raw: attachment.data_record.raw,
+                    contentType:
+                      attachment?.data_record.content_type ||
+                      attachmentMetadata?.contentType,
+                    raw: attachment?.data_record.raw || attachmentMetadata?.data,
                     title:
                       attachmentMetadata?.title ||
                       item.document.metadata?.display_name,
@@ -323,9 +326,12 @@ function DocumentItemCard({ item }: { item: DocumentItem }) {
 }
 
 function reportUsesAttachment(report: ReportRecord, attachmentUrl?: string) {
-  if (!attachmentUrl) return false;
-  const presentedForms = report.data_record.raw.resource?.presentedForm || [];
-  return presentedForms.some((form) => form.url === attachmentUrl);
+  const resource = getFhirResource<any>(report);
+  const presentedForms = resource?.presentedForm || [];
+  if (attachmentUrl) {
+    return presentedForms.some((form: any) => form.url === attachmentUrl);
+  }
+  return false;
 }
 
 function getMetadataString(

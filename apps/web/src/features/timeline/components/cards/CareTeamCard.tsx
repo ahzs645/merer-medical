@@ -9,6 +9,7 @@ import { memo, useState } from 'react';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
 import { OpenableCardIcon } from '../OpenableCardIcon';
 import { ShowCareTeamDetailsExpandable } from '../expandables/ShowCareTeamDetailsExpandable';
+import { getFhirResource } from '../../../../shared/utils/fhirResource';
 
 export const CareTeamCard = memo(function CareTeamCard({
   item,
@@ -17,7 +18,7 @@ export const CareTeamCard = memo(function CareTeamCard({
 }) {
   const conn = useConnectionDoc(item.connection_record_id);
   const [expanded, setExpanded] = useState(false);
-  const careTeam = item.data_record.raw.resource;
+  const careTeam = getFhirResource<CareTeam>(item);
 
   const participantCount = careTeam?.participant?.length || 0;
 

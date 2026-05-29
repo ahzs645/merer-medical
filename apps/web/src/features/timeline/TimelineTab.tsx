@@ -395,7 +395,7 @@ export async function fetchRecordsWithVectorSearch({
       selector: {
         id: { $in: cleanedIds },
         'data_record.resource_type': {
-          $nin: ['patient', 'careplan', 'allergyintolerance', 'provenance'],
+          $nin: ['patient', 'provenance'],
         },
       },
     })
@@ -512,7 +512,6 @@ export async function fetchRecords(
       $nin: [
         'patient',
         // 'observation', - Not all labs are part of a diagnostic report, and will be missed if we exclude this
-        'careplan',
         'documentreference_attachment',
         'provenance',
       ],
@@ -522,7 +521,6 @@ export async function fetchRecords(
   if (parsedQuery) {
     selector['data_record.resource_type']['$nin'] = [
       'patient',
-      'careplan',
       'documentreference_attachment',
       'provenance',
     ];

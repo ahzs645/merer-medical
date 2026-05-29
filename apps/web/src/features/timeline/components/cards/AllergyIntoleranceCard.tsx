@@ -9,6 +9,7 @@ import { memo } from 'react';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
 import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
 import { getManualRecordNote } from '../../../../shared/utils/manualRecordUtils';
+import { getFhirResource } from '../../../../shared/utils/fhirResource';
 
 export const AllergyIntoleranceCard = memo(function AllergyIntoleranceCard({
   item,
@@ -17,10 +18,12 @@ export const AllergyIntoleranceCard = memo(function AllergyIntoleranceCard({
 }) {
   const conn = useConnectionDoc(item.connection_record_id);
   const manualNote = getManualRecordNote(item);
-  const resource = item.data_record.raw.resource;
+  const resource = getFhirResource<any>(item);
   const displayName =
     resource?.substance?.text ||
     resource?.substance?.coding?.[0]?.display ||
+    resource?.code?.text ||
+    resource?.code?.coding?.[0]?.display ||
     item.metadata?.display_name;
 
   return (
