@@ -193,6 +193,7 @@ export function isImagingDocument(document: ImagingDocument): boolean {
   const contentType = document.data_record.content_type || '';
   const manualImaging = getManualImagingDetails(document);
 
+  if (manualSubtype === 'source-document') return false;
   if (manualImaging) return true;
   if (manualSubtype === 'imaging') return true;
   if (contentType.startsWith('image/')) return true;

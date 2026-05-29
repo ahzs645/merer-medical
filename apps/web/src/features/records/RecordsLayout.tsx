@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 
 import {
   BeakerIcon,
+  DocumentTextIcon,
   DocumentPlusIcon,
   EyeIcon,
   FaceSmileIcon,
@@ -14,6 +15,7 @@ import { Routes as AppRoutes } from '../../Routes';
 
 const recordTabs = [
   { to: AppRoutes.Labs, label: 'Labs', icon: BeakerIcon },
+  { to: AppRoutes.Documents, label: 'Documents', icon: DocumentTextIcon },
   { to: AppRoutes.Imaging, label: 'Imaging', icon: PhotoIcon },
   {
     to: AppRoutes.Medications,

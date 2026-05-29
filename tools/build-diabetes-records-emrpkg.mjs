@@ -597,6 +597,7 @@ function getOrCreateSourceDocument({ sourceImage, date, title, provider, audit }
       },
       metadata: {
         id: documentReferenceId,
+        manual_subtype: 'source-document',
         source_image: sourceImage,
         source_file_path: asset?.path,
       },
@@ -613,6 +614,7 @@ function getOrCreateSourceDocument({ sourceImage, date, title, provider, audit }
         raw: asset.bytes.toString('base64'),
         metadata: {
           id: attachmentMetadataId,
+          manual_subtype: 'source-document',
           source_image: sourceImage,
           source_file_path: asset.path,
         },

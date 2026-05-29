@@ -28,6 +28,7 @@ import CernerRedirect from '../features/connections/oauth-callbacks/CernerRedire
 import ConnectionTab from '../features/connections/ConnectionTab';
 import EpicRedirect from '../features/connections/oauth-callbacks/EpicRedirect';
 import { DentalTab } from '../features/dental/DentalTab';
+import { DocumentsTab } from '../features/documents/DocumentsTab';
 import HealowRedirect from '../features/connections/oauth-callbacks/HealowRedirect';
 import { LabDetailTab } from '../features/labs/LabDetailTab';
 import { LabsTab } from '../features/labs/LabsTab';
@@ -103,6 +104,10 @@ const routes = [
           {
             path: 'labs/:labKey',
             element: <LabDetailTab />,
+          },
+          {
+            path: 'documents',
+            element: <DocumentsTab />,
           },
           {
             path: 'imaging',

@@ -61,6 +61,22 @@ describe('imagingRecords', () => {
     expect(isImagingDocument(item)).toBe(true);
   });
 
+  it('does not classify embedded source document screenshots as imaging', () => {
+    const item = doc({
+      data_record: {
+        content_type: 'image/png',
+        raw: 'base64-image',
+      },
+      metadata: {
+        display_name: 'Complete Blood Count source document',
+        manual_subtype: 'source-document',
+        source_image: 'Screenshot 2026-04-20 at 11.32.40 AM.png',
+      },
+    });
+
+    expect(isImagingDocument(item)).toBe(false);
+  });
+
   it('classifies generic document uploads with explicit imaging metadata as imaging', () => {
     const item = doc({
       data_record: {
