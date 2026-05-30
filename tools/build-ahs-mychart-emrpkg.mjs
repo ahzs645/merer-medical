@@ -1012,11 +1012,15 @@ function addCcdaConditions(section, fallbackDate, sourceFile) {
 }
 
 function addCcdaMedications(section, fallbackDate, sourceFile) {
-  for (const row of rowsForSection(section)) {
-    const name = row.Medication || row[0];
+  for (const row of tableRowsForSection(section)) {
+    const name = row.Medication || row['Medication Order'] || row[0];
     if (!isMeaningfulText(name)) continue;
+    if (isMedicationAdministrationAction(name)) continue;
     const sig = row.Sig || row.Instructions || row[1];
-    const start = row['Start Date'] || extractParentheticalDate(row[1]);
+    const start =
+      row['Start Date'] ||
+      row['Action Date'] ||
+      extractParentheticalDate(row[1]);
     const end = row['End Date'];
     const status = row.Status || section.title;
     const id = stableId(
@@ -1298,11 +1302,37 @@ function addCcdaCarePlan(section, fallbackDate, sourceFile) {
 }
 
 function addCcdaCoverage(section, fallbackDate, sourceFile) {
-  const rows = rowsForSection(section);
+  const rows = tableRowsForSection(section);
   const text = sectionText(section.xml);
   for (const [index, row] of rows.entries()) {
-    const payer = row.Payer || row['Insurance'] || row['Plan'] || row[0];
+    const payer =
+      row.Payer ||
+      row['Insurance'] ||
+      row['Plan / Payer'] ||
+      row._caption ||
+      row.Plan ||
+      row[0];
     if (!isMeaningfulText(payer)) continue;
+    if (isGuarantorAccountType(payer)) continue;
+    const memberText = row.Member || '';
+    const subscriberText = row.Subscriber || '';
+    const planHeader = Object.keys(row).find((key) =>
+      key.startsWith('Plan / Payer'),
+    );
+    const planText = planHeader ? row[planHeader] : '';
+    const subscriberId =
+      extractLabelValue(memberText, 'Member ID') ||
+      extractLabelValue(subscriberText, 'Subscriber ID') ||
+      row['Policy Number'] ||
+      '';
+    const relationship = extractLabelValue(
+      memberText,
+      'Relation to Subscriber',
+    );
+    const planType = extractLabelValue(planText, 'Type');
+    const phone = extractLabelValue(planText, 'Phone');
+    const address = extractAddressFromPlanText(planText);
+    const period = parseCoveragePeriod(planHeader);
     const id = stableId(
       `ccda-coverage-${payer}-${row['Policy Number'] || row[1] || index}`,
     );
@@ -1315,12 +1345,19 @@ function addCcdaCoverage(section, fallbackDate, sourceFile) {
         resourceType: 'Coverage',
         id,
         status: 'active',
+        type: planType ? { text: cleanText(planType) } : undefined,
         beneficiary: { reference: `Patient/${userId}` },
         payor: [{ display: cleanText(payer) }],
-        subscriberId: cleanText(row['Policy Number'] || row['Member ID'] || ''),
-        class: row.Plan
-          ? [{ type: { text: 'plan' }, value: cleanText(row.Plan) }]
-          : undefined,
+        subscriberId: cleanText(subscriberId),
+        relationship: relationship ? { text: cleanText(relationship) } : undefined,
+        period,
+        class: [
+          { type: { text: 'plan' }, value: cleanText(payer) },
+          phone ? { type: { text: 'phone' }, value: cleanText(phone) } : undefined,
+          address
+            ? { type: { text: 'address' }, value: cleanText(address) }
+            : undefined,
+        ].filter(Boolean),
         text: text ? { status: 'generated', div: text } : undefined,
       },
       metadata: ccdaMetadata(sourceFile, section.title),
@@ -1448,7 +1485,7 @@ function addCcdaCareTeams(section, fallbackDate, sourceFile) {
 }
 
 function addCcdaSocialHistory(section, fallbackDate, sourceFile) {
-  for (const row of rowsForSection(section)) {
+  for (const row of tableRowsForSection(section)) {
     const entries = socialHistoryEntries(row);
     for (const entry of entries) {
       const id = stableId(
@@ -1588,7 +1625,7 @@ function addCompanionResourcesForLooseFiles(root) {
         resourceType: 'medicationrequest',
         id,
         date: source.exportDate,
-        displayName: basename(file, extname(file)),
+        displayName: 'Prescription document',
         raw: {
           resourceType: 'MedicationRequest',
           id,
@@ -2653,6 +2690,31 @@ function rowsForSection(section) {
     .filter((row) => Object.values(row).some(isMeaningfulText));
 }
 
+function tableRowsForSection(section) {
+  const tables = [...section.xml.matchAll(/<table\b[\s\S]*?<\/table>/g)].map(
+    (match) => match[0],
+  );
+  const rows = [];
+  for (const tableXml of tables) {
+    const tableRows = [...tableXml.matchAll(/<tr\b[\s\S]*?<\/tr>/g)].map(
+      (match) => extractCells(match[0]),
+    );
+    if (tableRows.length <= 1) continue;
+    const headers = tableRows[0].map((cell) => cell.text);
+    if (!headers.some(isMeaningfulText)) continue;
+    const caption = cleanText(
+      tableXml.match(/<caption\b[^>]*>([\s\S]*?)<\/caption>/)?.[1] || '',
+    );
+    for (const cells of tableRows.slice(1)) {
+      const row = rowFromCells(headers, cells);
+      if (caption) row._caption = caption;
+      if (Object.values(row).some(isMeaningfulText)) rows.push(row);
+    }
+  }
+  if (rows.length) return rows;
+  return rowsForSection(section);
+}
+
 function vitalRowsForSection(section) {
   const textXml =
     section.xml.match(/<text\b[^>]*>([\s\S]*?)<\/text>/)?.[1] || section.xml;
@@ -2711,6 +2773,62 @@ function itemToRow(itemXml) {
     row['Procedure Name'] = bold;
   }
   return row;
+}
+
+function isMedicationAdministrationAction(value) {
+  return [
+    'given',
+    'held',
+    'not given',
+    'refused',
+    'missed',
+    'stopped',
+    'paused',
+    'restarted',
+  ].includes(cleanText(value).toLowerCase());
+}
+
+function isGuarantorAccountType(value) {
+  return ['personal/family'].includes(cleanText(value).toLowerCase());
+}
+
+function extractLabelValue(text, label) {
+  const normalized = cleanText(text);
+  const labels = [
+    'Name',
+    'Member ID',
+    'Relation to Subscriber',
+    'Subscriber ID',
+    'Payer ID',
+    'Group ID',
+    'Type',
+    'Phone',
+    'Address',
+  ];
+  const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const nextLabels = labels
+    .filter((item) => item !== label)
+    .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|');
+  const match = normalized.match(
+    new RegExp(`${escapedLabel}:\\s*(.*?)(?=\\s+(?:${nextLabels}):|$)`, 'i'),
+  );
+  const value = cleanText(match?.[1] || '');
+  return value && value.toLowerCase() !== 'not on file' ? value : undefined;
+}
+
+function extractAddressFromPlanText(text) {
+  return extractLabelValue(text, 'Address');
+}
+
+function parseCoveragePeriod(header) {
+  const match = cleanText(header).match(/\(Effective\s+([^)]+)\)/i);
+  if (!match?.[1]) return undefined;
+  const [start, end] = match[1].split('-').map(cleanText);
+  return {
+    start: parseAnyDate(start),
+    end: end && end.toLowerCase() !== 'present' ? parseAnyDate(end) : undefined,
+  };
 }
 
 function extractResultItems(sectionXml) {

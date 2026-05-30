@@ -61,24 +61,9 @@ export const labUnitConversions: Record<
 };
 
 const equivalentUnits: Record<string, string> = {
-  '10*9/L': '10^9/L',
-  'x10(3)/uL': '10^9/L',
-  '10*3/uL': '10^9/L',
-  'x10E3/uL': '10^9/L',
-  'x10e3/uL': '10^9/L',
-  '10^3/uL': '10^9/L',
   'K/uL': '10^9/L',
-  '10*12/L': '10^12/L',
-  'x10(6)/uL': '10^12/L',
-  '10*6/uL': '10^12/L',
-  'x10E6/uL': '10^12/L',
-  'x10e6/uL': '10^12/L',
-  '10^6/uL': '10^12/L',
   'M/uL': '10^12/L',
   'gm/dL': 'g/dL',
-  'gm/dl': 'g/dL',
-  'mg/dl': 'mg/dL',
-  'ng/ml': 'ng/mL',
   'IU/L': 'U/L',
   'uIU/mL': 'mIU/L',
   'µmol/L': 'umol/L',
@@ -88,8 +73,30 @@ const equivalentUnits: Record<string, string> = {
 
 export function normalizeLabUnit(unit?: string): string | undefined {
   if (!unit) return undefined;
-  const trimmed = unit.trim();
-  return equivalentUnits[trimmed] || trimmed;
+  const trimmed = normalizeLiterDenominatorCasing(unit.trim());
+  return normalizePowerCountUnit(trimmed) || equivalentUnits[trimmed] || trimmed;
+}
+
+function normalizeLiterDenominatorCasing(unit: string): string {
+  return unit.replace(/\/(d|m|u|µ|μ)?l\b/g, (_, prefix = '') => {
+    const normalizedPrefix = prefix === 'u' ? 'u' : prefix;
+    return `/${normalizedPrefix}L`;
+  });
+}
+
+function normalizePowerCountUnit(unit: string): string | undefined {
+  const compactUnit = unit.replace(/\s+/g, '');
+  const match = compactUnit.match(
+    /^(?:x?10(?:\^|\*|E|e|\()(\d+)\)?)(?:\/(uL|µL|μL|L))$/i,
+  );
+  if (!match) return undefined;
+
+  const exponent = Number(match[1]);
+  if (!Number.isInteger(exponent)) return undefined;
+
+  const denominator = match[2].toLowerCase();
+  const literExponent = denominator === 'l' ? exponent : exponent + 6;
+  return `10^${literExponent}/L`;
 }
 
 export function convertLabUnit(

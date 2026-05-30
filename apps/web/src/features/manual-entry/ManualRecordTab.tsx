@@ -402,6 +402,17 @@ export function ManualRecordTab() {
   const [optometryEntryKind, setOptometryEntryKind] =
     useState<OptometryEntryKind>('checkup');
   const [toothNumber, setToothNumber] = useState('');
+  const [dentalTeeth, setDentalTeeth] = useState('');
+  const [toothRange, setToothRange] = useState('');
+  const [dentalQuadrant, setDentalQuadrant] = useState('');
+  const [dentalArch, setDentalArch] = useState('');
+  const [dentition, setDentition] = useState('');
+  const [dentalStatus, setDentalStatus] = useState('');
+  const [dentalSeverity, setDentalSeverity] = useState('');
+  const [procedureCode, setProcedureCode] = useState('');
+  const [dentalProvider, setDentalProvider] = useState('');
+  const [dentalLocation, setDentalLocation] = useState('');
+  const [dentalFollowUp, setDentalFollowUp] = useState('');
   const [dentalSurfaces, setDentalSurfaces] = useState<string[]>([]);
   const [dentalRecall, setDentalRecall] = useState('');
   const [orthoPhase, setOrthoPhase] = useState('');
@@ -513,6 +524,17 @@ export function ManualRecordTab() {
     setFileData(undefined);
     setLinkedFile(null);
     setToothNumber('');
+    setDentalTeeth('');
+    setToothRange('');
+    setDentalQuadrant('');
+    setDentalArch('');
+    setDentition('');
+    setDentalStatus('');
+    setDentalSeverity('');
+    setProcedureCode('');
+    setDentalProvider('');
+    setDentalLocation('');
+    setDentalFollowUp('');
     setDentalSurfaces([]);
     setDentalRecall('');
     setOrthoPhase('');
@@ -695,6 +717,17 @@ export function ManualRecordTab() {
           setOptometryEntryKind(manualDetails.optometryEntryKind);
         }
         setToothNumber(manualDetails.toothNumber || '');
+        setDentalTeeth(manualDetails.dentalTeeth || '');
+        setToothRange(manualDetails.toothRange || '');
+        setDentalQuadrant(manualDetails.dentalQuadrant || '');
+        setDentalArch(manualDetails.dentalArch || '');
+        setDentition(manualDetails.dentition || '');
+        setDentalStatus(manualDetails.dentalStatus || '');
+        setDentalSeverity(manualDetails.dentalSeverity || '');
+        setProcedureCode(manualDetails.procedureCode || '');
+        setDentalProvider(manualDetails.dentalProvider || '');
+        setDentalLocation(manualDetails.dentalLocation || '');
+        setDentalFollowUp(manualDetails.dentalFollowUp || '');
         setDentalSurfaces(manualDetails.dentalSurfaces || []);
         setDentalRecall(manualDetails.dentalRecall || '');
         setOrthoPhase(manualDetails.orthoPhase || '');
@@ -820,6 +853,17 @@ export function ManualRecordTab() {
         specialty,
         dentalEntryKind,
         toothNumber,
+        dentalTeeth,
+        toothRange,
+        dentalQuadrant,
+        dentalArch,
+        dentition,
+        dentalStatus,
+        dentalSeverity,
+        procedureCode,
+        dentalProvider,
+        dentalLocation,
+        dentalFollowUp,
         dentalSurfaces,
         dentalRecall,
         orthoPhase,
@@ -1169,15 +1213,79 @@ export function ManualRecordTab() {
                       </label>
                       <input
                         id="manual-record-tooth"
-                        type="number"
-                        min="1"
-                        max="32"
+                        type="text"
                         value={toothNumber}
                         placeholder={t('e.g. 14')}
                         onChange={(event) => setToothNumber(event.target.value)}
                         className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
                       />
                     </div>
+                    <SpecialtyTextInput
+                      label={t('Multiple teeth')}
+                      value={dentalTeeth}
+                      placeholder={t('e.g. 3, 14, 19')}
+                      onChange={setDentalTeeth}
+                    />
+                    <SpecialtyTextInput
+                      label={t('Tooth range')}
+                      value={toothRange}
+                      placeholder={t('e.g. 12-15')}
+                      onChange={setToothRange}
+                    />
+                    <SpecialtyTextInput
+                      label={t('Quadrant')}
+                      value={dentalQuadrant}
+                      placeholder={t('UR, UL, LR, LL')}
+                      onChange={setDentalQuadrant}
+                    />
+                    <SpecialtyTextInput
+                      label={t('Arch')}
+                      value={dentalArch}
+                      placeholder={t('Maxillary, mandibular, both')}
+                      onChange={setDentalArch}
+                    />
+                    <SpecialtyTextInput
+                      label={t('Dentition')}
+                      value={dentition}
+                      placeholder={t('Permanent, primary, mixed')}
+                      onChange={setDentition}
+                    />
+                    <SpecialtyTextInput
+                      label={t('Status')}
+                      value={dentalStatus}
+                      placeholder={t('Planned, active, complete')}
+                      onChange={setDentalStatus}
+                    />
+                    <SpecialtyTextInput
+                      label={t('Severity')}
+                      value={dentalSeverity}
+                      placeholder={t('Mild, moderate, severe')}
+                      onChange={setDentalSeverity}
+                    />
+                    <SpecialtyTextInput
+                      label={t('Procedure code')}
+                      value={procedureCode}
+                      placeholder={t('CDT, ADA, clinic code')}
+                      onChange={setProcedureCode}
+                    />
+                    <SpecialtyTextInput
+                      label={t('Provider')}
+                      value={dentalProvider}
+                      placeholder={t('Dentist, hygienist, orthodontist')}
+                      onChange={setDentalProvider}
+                    />
+                    <SpecialtyTextInput
+                      label={t('Location')}
+                      value={dentalLocation}
+                      placeholder={t('Clinic, room, chair')}
+                      onChange={setDentalLocation}
+                    />
+                    <SpecialtyTextInput
+                      label={t('Follow-up')}
+                      value={dentalFollowUp}
+                      placeholder={t('e.g. restoration review in 2 weeks')}
+                      onChange={setDentalFollowUp}
+                    />
                     <div className="sm:col-span-2">
                       <p className="block text-sm font-semibold text-gray-900">
                         {t('Surfaces')}
@@ -2107,6 +2215,17 @@ type ManualSpecialtyDetails = {
   specialty: ManualSpecialty;
   subtype?: DentalEntryKind | OptometryEntryKind;
   toothNumber?: string;
+  dentalTeeth?: string;
+  toothRange?: string;
+  dentalQuadrant?: string;
+  dentalArch?: string;
+  dentition?: string;
+  dentalStatus?: string;
+  dentalSeverity?: string;
+  procedureCode?: string;
+  dentalProvider?: string;
+  dentalLocation?: string;
+  dentalFollowUp?: string;
   dentalSurfaces?: string[];
   dentalRecall?: string;
   orthoPhase?: string;
@@ -2163,6 +2282,17 @@ function buildSpecialtyDetails(
       specialty: 'dental',
       subtype: params.dentalEntryKind,
       toothNumber: params.toothNumber.trim(),
+      dentalTeeth: params.dentalTeeth.trim(),
+      toothRange: params.toothRange.trim(),
+      dentalQuadrant: params.dentalQuadrant.trim(),
+      dentalArch: params.dentalArch.trim(),
+      dentition: params.dentition.trim(),
+      dentalStatus: params.dentalStatus.trim(),
+      dentalSeverity: params.dentalSeverity.trim(),
+      procedureCode: params.procedureCode.trim(),
+      dentalProvider: params.dentalProvider.trim(),
+      dentalLocation: params.dentalLocation.trim(),
+      dentalFollowUp: params.dentalFollowUp.trim(),
       dentalSurfaces: params.dentalSurfaces,
       dentalRecall: params.dentalRecall.trim(),
       orthoPhase: params.orthoPhase.trim(),
@@ -2206,8 +2336,31 @@ function appendSpecialtyNotes(
   const lines = [''];
   if (details.specialty === 'dental') {
     if (details.toothNumber) lines.push(`Tooth: ${details.toothNumber}`);
+    if (details.dentalTeeth) lines.push(`Teeth: ${details.dentalTeeth}`);
+    if (details.toothRange) lines.push(`Tooth range: ${details.toothRange}`);
+    if (details.dentalQuadrant) {
+      lines.push(`Quadrant: ${details.dentalQuadrant}`);
+    }
+    if (details.dentalArch) lines.push(`Dental arch: ${details.dentalArch}`);
+    if (details.dentition) lines.push(`Dentition: ${details.dentition}`);
     if (details.dentalSurfaces?.length) {
       lines.push(`Surfaces: ${details.dentalSurfaces.join('/')}`);
+    }
+    if (details.dentalStatus) lines.push(`Status: ${details.dentalStatus}`);
+    if (details.dentalSeverity) {
+      lines.push(`Severity: ${details.dentalSeverity}`);
+    }
+    if (details.procedureCode) {
+      lines.push(`Procedure code: ${details.procedureCode}`);
+    }
+    if (details.dentalProvider) {
+      lines.push(`Provider: ${details.dentalProvider}`);
+    }
+    if (details.dentalLocation) {
+      lines.push(`Location: ${details.dentalLocation}`);
+    }
+    if (details.dentalFollowUp) {
+      lines.push(`Follow-up: ${details.dentalFollowUp}`);
     }
     if (details.dentalRecall) lines.push(`Recall: ${details.dentalRecall}`);
     if (details.orthoPhase) lines.push(`Ortho phase: ${details.orthoPhase}`);
@@ -2369,6 +2522,21 @@ function buildVisionLensSpecification(details?: ManualSpecialtyDetails) {
         lens.add !== undefined,
     );
   return lenses.length ? lenses : undefined;
+}
+
+function buildDentalBodySite(details?: ManualSpecialtyDetails) {
+  if (details?.specialty !== 'dental') return undefined;
+  const parts = [
+    details.toothNumber && `tooth ${details.toothNumber}`,
+    details.dentalTeeth && `teeth ${details.dentalTeeth}`,
+    details.toothRange && `range ${details.toothRange}`,
+    details.dentalQuadrant && `quadrant ${details.dentalQuadrant}`,
+    details.dentalArch && `arch ${details.dentalArch}`,
+    details.dentition && `dentition ${details.dentition}`,
+    details.dentalSurfaces?.length &&
+      `surfaces ${details.dentalSurfaces.join('/')}`,
+  ].filter(Boolean);
+  return parts.length ? [{ text: parts.join('; ') }] : undefined;
 }
 
 function parseNumber(value?: string) {
@@ -2579,7 +2747,15 @@ function buildManualFhirEntry(
                 display: terminology.display,
               },
             ]
-          : undefined,
+          : specialtyDetails?.specialty === 'dental' &&
+              specialtyDetails.procedureCode
+            ? [
+                {
+                  code: specialtyDetails.procedureCode,
+                  display: title.trim(),
+                },
+              ]
+            : undefined,
       },
       text: notes.trim()
         ? {
@@ -2588,21 +2764,20 @@ function buildManualFhirEntry(
           }
         : undefined,
       note: notes.trim() ? [{ text: notes.trim() }] : undefined,
-      bodySite:
-        specialtyDetails?.specialty === 'dental' && specialtyDetails.toothNumber
-          ? [
-              {
-                text: `Tooth ${specialtyDetails.toothNumber}${
-                  specialtyDetails.dentalSurfaces?.length
-                    ? ` surfaces ${specialtyDetails.dentalSurfaces.join('/')}`
-                    : ''
-                }`,
-              },
-            ]
-          : undefined,
+      bodySite: buildDentalBodySite(specialtyDetails),
       method: specialtyDetails?.examMethod
         ? { text: specialtyDetails.examMethod }
         : undefined,
+      severity:
+        specialtyDetails?.specialty === 'dental' &&
+        specialtyDetails.dentalSeverity
+          ? { text: specialtyDetails.dentalSeverity }
+          : undefined,
+      performer:
+        specialtyDetails?.specialty === 'dental' &&
+        specialtyDetails.dentalProvider
+          ? [{ display: specialtyDetails.dentalProvider }]
+          : undefined,
       lensSpecification:
         recordType === 'visionprescription'
           ? buildVisionLensSpecification(specialtyDetails)
@@ -2614,9 +2789,12 @@ function buildManualFhirEntry(
       status: recordType === 'careplan' ? 'active' : 'final',
       class: recordType === 'encounter' ? 'manual' : undefined,
       location:
-        recordType === 'encounter' && notes.trim()
-          ? [{ location: { display: notes.trim() } }]
-          : undefined,
+        specialtyDetails?.specialty === 'dental' &&
+        specialtyDetails.dentalLocation
+          ? [{ location: { display: specialtyDetails.dentalLocation } }]
+          : recordType === 'encounter' && notes.trim()
+            ? [{ location: { display: notes.trim() } }]
+            : undefined,
       title: recordType === 'careplan' ? title.trim() : undefined,
       valueQuantity: observationValue.valueQuantity,
       valueString: observationValue.valueString,

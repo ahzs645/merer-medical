@@ -35,6 +35,7 @@ import HealowRedirect from '../features/connections/oauth-callbacks/HealowRedire
 import { LabDetailTab } from '../features/labs/LabDetailTab';
 import { LabsTab } from '../features/labs/LabsTab';
 import { ImagingTab } from '../features/imaging/ImagingTab';
+import { InsuranceTab } from '../features/insurance/InsuranceTab';
 import { MedicationsTab } from '../features/medications/MedicationsTab';
 import MereAITab from '../features/ai-chat/MereAITab';
 import { ManualRecordTab } from '../features/manual-entry/ManualRecordTab';
@@ -122,6 +123,10 @@ const routes = [
           {
             path: 'medications',
             element: <MedicationsTab />,
+          },
+          {
+            path: 'insurance',
+            element: <InsuranceTab />,
           },
           {
             path: 'care-plans',

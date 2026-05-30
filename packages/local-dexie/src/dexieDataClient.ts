@@ -1,11 +1,5 @@
-import { liveQuery } from 'dexie';
 import { createId } from '@mere/domain';
 import type {
-  AppId,
-  Attachment,
-  AttachmentOwnerType,
-  ClinicalDocument,
-  ClinicalResourceType,
   Connection,
   ConnectionSource,
   InstanceConfig,
@@ -21,21 +15,9 @@ import type { AppDataClient } from '@mere/data';
 import { getDb, closeDb, type MereDb } from './db';
 import { createPackageCommands } from './exportImport';
 import { makeObservable } from './observable';
-import { sha256Hex } from './crypto';
-
-function now() {
-  return Date.now();
-}
-
-function dexieLive<T>(query: () => Promise<T> | T) {
-  return (emit: (v: T) => void) => {
-    const sub = liveQuery(query).subscribe({
-      next: emit,
-      error: (err) => console.error('[mere/local-dexie] liveQuery error', err),
-    });
-    return () => sub.unsubscribe();
-  };
-}
+import { createAttachmentCommands } from './commands/attachments';
+import { createClinicalDocumentCommands } from './commands/clinicalDocuments';
+import { dexieLive, now } from './commands/common';
 
 export interface CreateDexieDataClientOptions {
   dbName?: string;
@@ -195,117 +177,8 @@ export function createDexieDataClient(
       ),
   };
 
-  const clinicalDocuments: AppDataClient['clinicalDocuments'] = {
-    async query(q) {
-      let coll = db.clinical_documents.where('userId').equals(q.userId);
-      let rows = await coll.toArray();
-      if (q.connectionId)
-        rows = rows.filter((r) => r.connectionId === q.connectionId);
-      if (q.resourceTypes?.length) {
-        const set = new Set(q.resourceTypes);
-        rows = rows.filter((r) => set.has(r.resourceType));
-      }
-      if (q.format) rows = rows.filter((r) => r.format === q.format);
-      if (q.sinceUpdatedAt)
-        rows = rows.filter((r) => r.updatedAt >= q.sinceUpdatedAt!);
-      rows = rows.filter((r) => !r.deletedAt);
-      const offset = q.offset ?? 0;
-      const limit = q.limit ?? rows.length;
-      return rows.slice(offset, offset + limit);
-    },
-    get: async (id) => (await db.clinical_documents.get(id)) ?? null,
-    async upsertBatch(docs) {
-      const t = now();
-      const prepared: ClinicalDocument[] = docs.map((d) => ({
-        ...(d as ClinicalDocument),
-        id: d.id ?? createId('cdoc'),
-        createdAt: (d as ClinicalDocument).createdAt ?? t,
-        updatedAt: t,
-      }));
-      await db.clinical_documents.bulkPut(prepared);
-      return prepared;
-    },
-    async delete(id) {
-      await db.clinical_documents.delete(id);
-    },
-    async countByResource(userId) {
-      const rows = await db.clinical_documents
-        .where('userId')
-        .equals(userId)
-        .toArray();
-      const out: Partial<Record<ClinicalResourceType, number>> = {};
-      for (const r of rows) {
-        if (r.deletedAt) continue;
-        out[r.resourceType] = (out[r.resourceType] ?? 0) + 1;
-      }
-      return out as Record<ClinicalResourceType, number>;
-    },
-    observe: (q) =>
-      makeObservable<ClinicalDocument[]>(
-        () => [],
-        dexieLive(() => clinicalDocuments.query(q)),
-      ),
-  };
-
-  const attachments: AppDataClient['attachments'] = {
-    list: (ownerType: AttachmentOwnerType, ownerId) =>
-      db.attachments
-        .where('[ownerType+ownerId]' as never)
-        .equals([ownerType, ownerId] as never)
-        .toArray()
-        .catch(async () => {
-          const rows = await db.attachments
-            .where('ownerId')
-            .equals(ownerId)
-            .toArray();
-          return rows.filter((r) => r.ownerType === ownerType);
-        }),
-    get: async (id) => (await db.attachments.get(id)) ?? null,
-    async read(id) {
-      const meta = await db.attachments.get(id);
-      if (!meta) return null;
-      const blob = await db.attachment_blobs.get(id);
-      if (!blob) return null;
-      return { meta, bytes: blob.bytes };
-    },
-    async put(input) {
-      const t = now();
-      const id = createId('att');
-      const sha256 = await sha256Hex(input.bytes);
-      const att: Attachment = {
-        id,
-        createdAt: t,
-        updatedAt: t,
-        ownerType: input.ownerType,
-        ownerId: input.ownerId,
-        filename: input.filename,
-        mime: input.mime,
-        size: input.bytes.byteLength,
-        sha256,
-      };
-      await db.transaction(
-        'rw',
-        db.attachments,
-        db.attachment_blobs,
-        async () => {
-          await db.attachments.put(att);
-          await db.attachment_blobs.put({ id, bytes: input.bytes });
-        },
-      );
-      return att;
-    },
-    async delete(id) {
-      await db.transaction(
-        'rw',
-        db.attachments,
-        db.attachment_blobs,
-        async () => {
-          await db.attachments.delete(id);
-          await db.attachment_blobs.delete(id);
-        },
-      );
-    },
-  };
+  const clinicalDocuments = createClinicalDocumentCommands(db);
+  const attachments = createAttachmentCommands(db);
 
   const instanceConfig: AppDataClient['instanceConfig'] = {
     async get() {

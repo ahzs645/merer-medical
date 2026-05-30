@@ -36,6 +36,11 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
     const width = mount.clientWidth || 320;
     const height = 220;
 
+    if (!isWebGlAvailable()) {
+      setWebGlUnavailable(true);
+      return;
+    }
+
     let renderer: THREE.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -214,6 +219,18 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
       )}
     </div>
   );
+}
+
+function isWebGlAvailable() {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext('webgl2') || canvas.getContext('webgl'))
+    );
+  } catch {
+    return false;
+  }
 }
 
 function getDentalScanSources(imaging: ImagingItem[]): ScanSource[] {

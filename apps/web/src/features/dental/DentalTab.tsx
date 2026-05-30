@@ -5,13 +5,27 @@ import { DentalImagingPanel } from './components/DentalImagingPanel';
 import { DentalRecordsPanel } from './components/DentalRecordsPanel';
 import { DentalScanPreview } from './components/DentalScanPreview';
 import { DentalSummaryPanel } from './components/DentalSummaryPanel';
+import { DentalWorkflowContextPanel } from './components/DentalWorkflowContextPanel';
+import { OdontogramStatusPanel } from './components/OdontogramStatusPanel';
 import { OrthodonticPanel } from './components/OrthodonticPanel';
+import { PerioOverviewPanel } from './components/PerioOverviewPanel';
+import { TreatmentPlanPanel } from './components/TreatmentPlanPanel';
 import { ToothChartPanel } from './components/ToothChartPanel';
 import { useDentalData } from './hooks/useDentalData';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 
 export function DentalTab() {
-  const { records, imaging, recordsByTooth, counts, status } = useDentalData();
+  const {
+    records,
+    imaging,
+    recordsByTooth,
+    odontogramStatuses,
+    treatmentPlan,
+    perioOverview,
+    workflowContext,
+    counts,
+    status,
+  } = useDentalData();
   const { t } = useInterfaceLanguage();
 
   return (
@@ -27,6 +41,12 @@ export function DentalTab() {
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           <DentalSummaryPanel counts={counts} />
           <ToothChartPanel recordsByTooth={recordsByTooth} />
+          <OdontogramStatusPanel statuses={odontogramStatuses} />
+          <div className="grid gap-4 lg:grid-cols-3">
+            <TreatmentPlanPanel items={treatmentPlan} />
+            <PerioOverviewPanel overview={perioOverview} />
+            <DentalWorkflowContextPanel context={workflowContext} />
+          </div>
           <OrthodonticPanel records={records} />
           <DentalCleaningHistoryPanel records={records} />
           <DentalScanPreview imaging={imaging} />

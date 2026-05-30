@@ -4,7 +4,7 @@ import { BundleEntry, FhirResource } from 'fhir/r2';
 import { RxDatabase } from 'rxdb';
 import { differenceInDays, parseISO } from 'date-fns';
 import { UserDocument } from '../../../models/user-document/UserDocument.type';
-import { fetchRecordsWithVectorSearch } from '../../timeline/TimelineTab';
+import { fetchRecordsWithVectorSearch } from '../../timeline/services/timelineRecords';
 import { VectorStorage } from '@mere/vector-storage';
 import { DocumentPreparer } from '../../ai-chat/services/document-preparer';
 import {

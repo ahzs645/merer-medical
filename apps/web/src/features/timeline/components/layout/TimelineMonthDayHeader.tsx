@@ -3,7 +3,7 @@ import {
   checkIfDefaultDate,
   formattedTitleDateMonthString,
   formattedTitleDateDayString,
-} from '../../TimelineTab';
+} from '../../utils/timelineDates';
 
 interface TimelineMonthDayHeaderProps {
   dateKey: string;

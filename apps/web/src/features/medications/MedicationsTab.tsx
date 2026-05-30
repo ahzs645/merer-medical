@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import {
   AllergyIntolerance,
   BundleEntry,
@@ -20,41 +20,20 @@ import { Link } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../Routes';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
-import { useRxDb } from '../../app/providers/RxDbProvider';
-import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { useMedicationsData } from './hooks/useMedicationsData';
 import {
-  normalizeMedicationDocuments,
   type MedicationReconciliationState,
   type MedicationTimelineItem,
 } from './';
-
-const MEDICATION_RESOURCE_TYPES = [
-  'medicationstatement',
-  'medicationrequest',
-  'medicationorder',
-  'medicationdispense',
-  'medicationadministration',
-];
-
-type MedicationGroup =
-  | 'current'
-  | 'planned'
-  | 'stopped'
-  | 'supplements'
-  | 'needsReview';
-
-type NutritionFact = {
-  label: string;
-  value: string;
-};
-
-type MedicationViewItem = MedicationTimelineItem & {
-  group: MedicationGroup;
-  nutritionFacts: NutritionFact[];
-};
+import {
+  humanize,
+  type MedicationGroup,
+  type MedicationViewItem,
+  sourceLabel,
+} from './medicationViewModel';
 
 type FilterChip = {
   id: MedicationGroup | 'all';
@@ -78,59 +57,11 @@ const FILTERS: FilterChip[] = [
 const ADD_MEDICATION_PATH = `${AppRoutes.AddRecord}?type=medicationstatement`;
 
 export function MedicationsTab() {
-  const db = useRxDb();
-  const user = useUser();
-  const [items, setItems] = useState<MedicationViewItem[]>([]);
-  const [allergies, setAllergies] = useState<ClinicalDocument[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success'>('loading');
   const [selectedFilter, setSelectedFilter] = useState<FilterChip['id']>('all');
   const [query, setQuery] = useState('');
   const { t } = useInterfaceLanguage();
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function fetchMedications() {
-      setStatus('loading');
-      const [docs, allergyDocs] = await Promise.all([
-        db.clinical_documents
-          .find({
-            selector: {
-              user_id: user.id,
-              'data_record.resource_type': { $in: MEDICATION_RESOURCE_TYPES },
-            },
-            sort: [{ 'metadata.date': 'desc' }],
-          })
-          .exec(),
-        db.clinical_documents
-          .find({
-            selector: {
-              user_id: user.id,
-              'data_record.resource_type': 'allergyintolerance',
-            },
-            sort: [{ 'metadata.date': 'desc' }],
-          })
-          .exec(),
-      ]);
-
-      if (!isMounted) return;
-      setItems(
-        normalizeMedicationDocuments(
-          docs.map((doc) => doc.toMutableJSON() as ClinicalDocument),
-        ).map(toMedicationViewItem),
-      );
-      setAllergies(
-        allergyDocs.map((doc) => doc.toMutableJSON() as ClinicalDocument),
-      );
-      setStatus('success');
-    }
-
-    fetchMedications();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [db, user.id]);
+  const { allergies, filteredItems, items, status, supplementItems } =
+    useMedicationsData({ query, selectedFilter });
 
   const counts = useMemo(() => {
     return FILTERS.reduce(
@@ -144,37 +75,6 @@ export function MedicationsTab() {
       {} as Record<FilterChip['id'], number>,
     );
   }, [items]);
-
-  const filteredItems = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
-    return items.filter((item) => {
-      const matchesFilter =
-        selectedFilter === 'all' || item.group === selectedFilter;
-      if (!matchesFilter) return false;
-      if (!normalizedQuery) return true;
-
-      return [
-        item.name,
-        item.status,
-        item.conditionReason,
-        sourceLabel(item.source),
-        item.category,
-        item.adherence,
-        item.conditionalInstructions,
-        item.rxNorm?.code,
-        item.rxNorm?.display,
-        item.reconciliationState,
-        ...item.nutritionFacts.map((fact) => `${fact.label} ${fact.value}`),
-      ]
-        .filter(Boolean)
-        .some((value) => value!.toLowerCase().includes(normalizedQuery));
-    });
-  }, [items, query, selectedFilter]);
-
-  const supplementItems = filteredItems.filter(
-    (item) => item.group === 'supplements',
-  );
 
   return (
     <AppPage
@@ -680,112 +580,6 @@ function ReconciliationBadge({
   return <Badge tone={tone}>{humanize(state)}</Badge>;
 }
 
-function toMedicationViewItem(
-  item: MedicationTimelineItem,
-): MedicationViewItem {
-  const nutritionFacts = nutritionFactsFrom(item);
-  const group = classifyGroup(item, nutritionFacts);
-
-  return {
-    ...item,
-    group,
-    nutritionFacts,
-  };
-}
-
-function classifyGroup(
-  item: MedicationTimelineItem,
-  nutritionFacts: NutritionFact[],
-): MedicationGroup {
-  const searchable = `${item.category || ''} ${item.name}`.toLowerCase();
-  if (
-    nutritionFacts.length > 0 ||
-    ['supplement', 'vitamin', 'mineral', 'herbal'].some((word) =>
-      searchable.includes(word),
-    )
-  ) {
-    return 'supplements';
-  }
-  if (
-    item.stopDate ||
-    ['stopped', 'completed', 'entered-in-error'].includes(item.status)
-  ) {
-    return 'stopped';
-  }
-  if (
-    item.conditionalInstructions ||
-    item.resourceType === 'MedicationRequest' ||
-    item.resourceType === 'MedicationOrder' ||
-    ['intended', 'on-hold', 'unknown'].includes(item.status)
-  ) {
-    return 'planned';
-  }
-  if (item.reconciliationState === 'needs-review') return 'needsReview';
-  if (item.status === 'active') return 'current';
-  return 'needsReview';
-}
-
-function nutritionFactsFrom(item: MedicationTimelineItem): NutritionFact[] {
-  const facts: NutritionFact[] = [];
-  const raw = item.document.data_record.raw as any;
-  const resource = raw?.resource || raw || {};
-  const rawFacts = raw?.nutrition_facts || raw?.nutritionFacts;
-
-  if (Array.isArray(rawFacts)) {
-    rawFacts.forEach((fact: any) => {
-      const label = fact.label || fact.name || fact.nutrient;
-      const value = fact.value || fact.amount || fact.text;
-      if (label && value) facts.push({ label, value: String(value) });
-    });
-  }
-
-  resource.ingredient?.forEach((ingredient: any) => {
-    const label =
-      textFromCodeableConcept(ingredient.itemCodeableConcept) ||
-      referenceDisplay(ingredient.itemReference);
-    const value = ratioText(ingredient.strength);
-    if (label) facts.push({ label, value: value || 'ingredient' });
-  });
-
-  const vitaminMatch = item.notes
-    .join('\n')
-    .match(
-      /\b(vitamin\s+[a-z0-9]+|magnesium|omega-?3|zinc|calcium|iron|folate)\b[^,\n;]*/gi,
-    );
-  vitaminMatch?.forEach((value) => {
-    facts.push({ label: value.split(/\s+/).slice(0, 2).join(' '), value });
-  });
-
-  return facts;
-}
-
-function textFromCodeableConcept(value: any): string | undefined {
-  if (!value) return undefined;
-  if (typeof value === 'string') return value;
-  return value.text || value.coding?.[0]?.display || value.coding?.[0]?.code;
-}
-
-function referenceDisplay(value: any): string | undefined {
-  if (!value) return undefined;
-  if (typeof value === 'string') return value;
-  return value.display || value.reference;
-}
-
-function ratioText(value: any) {
-  if (!value) return undefined;
-  const numerator = value.numerator
-    ? `${value.numerator.value || ''} ${
-        value.numerator.unit || value.numerator.code || ''
-      }`.trim()
-    : undefined;
-  const denominator = value.denominator
-    ? `${value.denominator.value || ''} ${
-        value.denominator.unit || value.denominator.code || ''
-      }`.trim()
-    : undefined;
-  return [numerator, denominator].filter(Boolean).join(' / ') || undefined;
-}
-
 function statusTone(status: string): 'gray' | 'green' | 'yellow' | 'red' {
   if (status === 'active') return 'green';
   if (['intended', 'on-hold', 'unknown'].includes(status)) return 'yellow';
@@ -796,16 +590,6 @@ function statusTone(status: string): 'gray' | 'green' | 'yellow' | 'red' {
 function sectionTitle(filter: FilterChip['id']) {
   const selected = FILTERS.find((item) => item.id === filter);
   return selected?.label || 'Medications';
-}
-
-function humanize(value: string) {
-  return value.replace(/[-_]/g, ' ');
-}
-
-function sourceLabel(source: MedicationTimelineItem['source']) {
-  return [source.label, source.type && humanize(source.type)]
-    .filter(Boolean)
-    .join(' - ');
 }
 
 function formatDate(date?: string) {

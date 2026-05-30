@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns';
 import React from 'react';
-import { checkIfDefaultDate } from '../../TimelineTab';
+import { checkIfDefaultDate } from '../../utils/timelineDates';
 
 export function TimelineYearHeader({
   year,

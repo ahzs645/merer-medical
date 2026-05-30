@@ -1,6 +1,11 @@
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { ImagingItem } from '../../imaging/types';
-import { DentalRecord, DentalRecordKind, ToothSurface } from '../types';
+import {
+  DentalRecord,
+  DentalRecordDetails,
+  DentalRecordKind,
+  ToothSurface,
+} from '../types';
 
 const DENTAL_TERMS = [
   'bitewing',
@@ -97,6 +102,9 @@ const TOOTH_PATTERN =
   /\b(?:tooth|teeth|#|no\.?|number)?\s*(3[0-2]|[1-2][0-9]|[1-9])\b/gi;
 
 export function isDentalDocument(document: ClinicalDocument<unknown>): boolean {
+  const details = getDentalDetails(document);
+  if (details?.specialty === 'dental') return true;
+
   const text = searchableText(document).toLowerCase();
   return DENTAL_TERMS.some((term) => text.includes(term));
 }
@@ -105,15 +113,17 @@ export function mapDentalDocument(
   document: ClinicalDocument<unknown>,
 ): DentalRecord {
   const text = searchableText(document);
+  const details = getDentalDetails(document);
   return {
     id: document.id,
     document,
-    kind: inferDentalKind(document, text),
+    kind: inferDentalKind(document, text, details),
     title: getTitle(document),
     date: document.metadata?.date,
-    toothNumbers: extractToothNumbers(text),
-    surfaces: extractSurfaces(text),
-    summary: getSummary(document),
+    toothNumbers: getToothNumbers(details, text),
+    surfaces: getSurfaces(details, text),
+    summary: getSummary(document, details),
+    details,
   };
 }
 
@@ -156,9 +166,28 @@ export function filterDentalImaging(items: ImagingItem[]) {
 function inferDentalKind(
   document: ClinicalDocument<unknown>,
   text: string,
+  details?: DentalRecordDetails,
 ): DentalRecordKind {
   const resourceType = document.data_record.resource_type;
   const normalized = text.toLowerCase();
+  const subtype = details?.subtype;
+
+  if (subtype) {
+    if (subtype === 'cleaning') return 'cleaning';
+    if (subtype === 'treatmentPlan' || subtype === 'orthodonticTreatmentPlan') {
+      return 'treatmentPlan';
+    }
+    if (subtype === 'imaging') return 'image';
+    if (
+      subtype.startsWith('orthodontic') ||
+      ['alignerCase', 'cephalometricAnalysis', 'retention'].includes(subtype)
+    ) {
+      return 'orthodontic';
+    }
+    if (subtype === 'condition') return 'condition';
+    if (subtype === 'procedure') return 'procedure';
+    if (subtype === 'finding') return 'finding';
+  }
 
   if (
     resourceType === 'procedure' &&
@@ -222,16 +251,32 @@ function getTitle(document: ClinicalDocument<unknown>) {
   );
 }
 
-function getSummary(document: ClinicalDocument<unknown>) {
+function getSummary(
+  document: ClinicalDocument<unknown>,
+  details?: DentalRecordDetails,
+) {
   const resource = getResource(document);
-  return (
+  const summary =
     resource?.conclusion ||
     resource?.note?.[0]?.text ||
     resource?.text?.div
       ?.replace(/<[^>]+>/g, ' ')
       ?.replace(/\s+/g, ' ')
-      ?.trim()
-  );
+      ?.trim();
+
+  if (summary) return summary;
+
+  return [
+    details?.dentalStatus && `Status: ${details.dentalStatus}`,
+    details?.dentalSeverity && `Severity: ${details.dentalSeverity}`,
+    details?.procedureCode && `Code: ${details.procedureCode}`,
+    details?.dentalProvider && `Provider: ${details.dentalProvider}`,
+    details?.dentalLocation && `Location: ${details.dentalLocation}`,
+    details?.dentalFollowUp && `Follow-up: ${details.dentalFollowUp}`,
+    details?.dentalRecall && `Recall: ${details.dentalRecall}`,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 }
 
 function searchableText(document: ClinicalDocument<unknown>): string {
@@ -248,6 +293,7 @@ function searchableText(document: ClinicalDocument<unknown>): string {
     JSON.stringify(resource?.text || ''),
     JSON.stringify(resource?.procedureCode || ''),
     JSON.stringify(resource?.description || ''),
+    JSON.stringify(getDentalDetails(document) || ''),
   ]
     .filter(Boolean)
     .join(' ');
@@ -256,4 +302,76 @@ function searchableText(document: ClinicalDocument<unknown>): string {
 function getResource(document: ClinicalDocument<unknown>): any {
   const raw = document.data_record.raw as any;
   return raw?.resource || raw || {};
+}
+
+function getDentalDetails(
+  document: ClinicalDocument<unknown>,
+): DentalRecordDetails | undefined {
+  const details = document.metadata?.manual_specialty_details as
+    | DentalRecordDetails
+    | undefined;
+  const specialty = document.metadata?.manual_specialty || details?.specialty;
+
+  if (specialty !== 'dental') return details;
+  return { ...details, specialty: 'dental' };
+}
+
+function getToothNumbers(
+  details: DentalRecordDetails | undefined,
+  text: string,
+): string[] {
+  const teeth = new Set<string>();
+  addToothList(teeth, details?.toothNumber);
+  addToothList(teeth, details?.dentalTeeth);
+  addToothRange(teeth, details?.toothRange);
+
+  if (teeth.size === 0) {
+    extractToothNumbers(text).forEach((tooth) => teeth.add(tooth));
+  }
+
+  return [...teeth].sort((a, b) => Number(a) - Number(b));
+}
+
+function getSurfaces(
+  details: DentalRecordDetails | undefined,
+  text: string,
+): ToothSurface[] {
+  const surfaces = new Set<ToothSurface>();
+
+  for (const surface of details?.dentalSurfaces || []) {
+    if (isToothSurface(surface)) surfaces.add(surface);
+  }
+
+  if (surfaces.size === 0) {
+    extractSurfaces(text).forEach((surface) => surfaces.add(surface));
+  }
+
+  return [...surfaces];
+}
+
+function addToothList(teeth: Set<string>, value?: string) {
+  if (!value) return;
+  for (const match of value.matchAll(/\b(3[0-2]|[1-2][0-9]|[1-9])\b/g)) {
+    teeth.add(`${Number(match[1])}`);
+  }
+}
+
+function addToothRange(teeth: Set<string>, value?: string) {
+  const match = value?.match(
+    /\b(3[0-2]|[1-2][0-9]|[1-9])\s*-\s*(3[0-2]|[1-2][0-9]|[1-9])\b/,
+  );
+  if (!match) return;
+
+  const start = Number(match[1]);
+  const end = Number(match[2]);
+  const low = Math.min(start, end);
+  const high = Math.max(start, end);
+
+  for (let tooth = low; tooth <= high; tooth += 1) {
+    teeth.add(`${tooth}`);
+  }
+}
+
+function isToothSurface(surface: string): surface is ToothSurface {
+  return ['M', 'O', 'I', 'D', 'B', 'F', 'L'].includes(surface);
 }

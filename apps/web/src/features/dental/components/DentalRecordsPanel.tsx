@@ -49,6 +49,35 @@ export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
                     ? ` · ${t('Surfaces')}: ${record.surfaces.join(', ')}`
                     : ''}
                 </p>
+                {[
+                  record.details?.dentalArch &&
+                    `${t('Arch')}: ${record.details.dentalArch}`,
+                  record.details?.dentition &&
+                    `${t('Dentition')}: ${record.details.dentition}`,
+                  record.details?.dentalStatus &&
+                    `${t('Status')}: ${record.details.dentalStatus}`,
+                  record.details?.dentalSeverity &&
+                    `${t('Severity')}: ${record.details.dentalSeverity}`,
+                  record.details?.procedureCode &&
+                    `${t('Code')}: ${record.details.procedureCode}`,
+                ].filter(Boolean).length > 0 && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    {[
+                      record.details?.dentalArch &&
+                        `${t('Arch')}: ${record.details.dentalArch}`,
+                      record.details?.dentition &&
+                        `${t('Dentition')}: ${record.details.dentition}`,
+                      record.details?.dentalStatus &&
+                        `${t('Status')}: ${record.details.dentalStatus}`,
+                      record.details?.dentalSeverity &&
+                        `${t('Severity')}: ${record.details.dentalSeverity}`,
+                      record.details?.procedureCode &&
+                        `${t('Code')}: ${record.details.procedureCode}`,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </p>
+                )}
                 {record.summary && (
                   <p className="mt-2 line-clamp-2 text-sm text-gray-700">
                     {record.summary}

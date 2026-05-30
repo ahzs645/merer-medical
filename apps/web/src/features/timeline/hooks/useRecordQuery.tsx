@@ -19,7 +19,7 @@ import {
   fetchRecords,
   fetchRecordsWithVectorSearch,
   PAGE_SIZE,
-} from '../TimelineTab';
+} from '../services/timelineRecords';
 
 export const GROUPED_VIEW_BATCH_SIZE = 250;
 
@@ -33,7 +33,7 @@ export async function fetchRawRecords(
   const selector: MangoQuerySelector<ClinicalDocument<unknown>> = {
     user_id: user_id,
     'data_record.resource_type': {
-      $nin: ['patient', 'provenance'],
+      $nin: ['patient', 'careplan', 'provenance'],
     },
     'metadata.date': { $nin: [null, undefined, ''] },
   };

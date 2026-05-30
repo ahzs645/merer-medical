@@ -9,6 +9,7 @@ import {
   DocumentPlusIcon,
   EyeIcon,
   FaceSmileIcon,
+  IdentificationIcon,
   ClipboardDocumentListIcon,
   ExclamationCircleIcon,
   PrinterIcon,
@@ -27,6 +28,11 @@ const recordTabs = [
     to: AppRoutes.Medications,
     label: 'Medications',
     icon: ClipboardDocumentListIcon,
+  },
+  {
+    to: AppRoutes.Insurance,
+    label: 'Insurance',
+    icon: IdentificationIcon,
   },
   {
     to: AppRoutes.CarePlans,
@@ -50,7 +56,7 @@ export function RecordsLayout() {
     <div className="flex h-full flex-col overflow-hidden bg-gray-50">
       <div className="border-b border-gray-200 bg-white px-2 sm:px-6 lg:px-8">
         <nav
-          className="mx-auto flex max-w-7xl gap-1 overflow-x-auto py-2 sm:gap-2"
+          className="scrollbar-hide mx-auto flex max-w-7xl gap-1 overflow-x-auto py-2 sm:gap-2"
           aria-label="Records"
         >
           {recordTabs.map(({ to, label, icon: Icon }) => (

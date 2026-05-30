@@ -1,4 +1,4 @@
-import { differenceInDays, format, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { BundleEntry, FhirResource } from 'fhir/r2';
 import {
   UIEventHandler,
@@ -8,19 +8,15 @@ import {
   useRef,
   useState,
 } from 'react';
-import { MangoQuerySelector, RxDatabase, RxDocument } from 'rxdb';
 
 import { Transition } from '@headlessui/react';
 import { ArrowUpIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { IVSSimilaritySearchParams, VectorStorage } from '@mere/vector-storage';
-import { SEARCH_CONFIG } from '../ai-chat/constants/config';
 import { useDebounceCallback } from '@react-hook/debounce';
 
 import { AppPage } from '../../shared/components/AppPage';
 import { EmptyRecordsPlaceholder } from '../../shared/components/EmptyRecordsPlaceholder';
 import useIntersectionObserver from '../../shared/hooks/useIntersectionObserver';
 import { useScrollToHash } from '../../shared/hooks/useScrollToHash';
-import { DatabaseCollections } from '../../app/providers/DatabaseCollections';
 import { useLocalConfig } from '../../app/providers/LocalConfigProvider';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { useUser } from '../../app/providers/UserProvider';
@@ -35,8 +31,18 @@ import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocumen
 import { TimelineMonthDayHeader } from './components/layout/TimelineMonthDayHeader';
 import { useRecordQuery, useTimelineDateKeys } from './hooks/useRecordQuery';
 import { QueryStatus, TimelineRecordTypeFilter } from './types';
+import {
+  checkIfDefaultDate,
+  formattedTitleDateDayString,
+  formattedTitleDateMonthString,
+} from './utils/timelineDates';
 
 export { QueryStatus };
+export {
+  checkIfDefaultDate,
+  formattedTitleDateDayString,
+  formattedTitleDateMonthString,
+};
 
 export function TimelineTab() {
   const user = useUser(),
@@ -302,297 +308,3 @@ const getActiveDateKey = (container: HTMLElement, dateKeys: string[]) => {
 
   return activeDateKey;
 };
-
-export const checkIfDefaultDate = (date: string) =>
-  differenceInDays(parseISO(date), new Date(0)) < 1;
-
-export const formattedTitleDateMonthString = (dateKey: string) =>
-  !dateKey || checkIfDefaultDate(dateKey)
-    ? ''
-    : format(parseISO(dateKey), 'MMM');
-
-export const formattedTitleDateDayString = (dateKey: string) =>
-  !dateKey || checkIfDefaultDate(dateKey)
-    ? ''
-    : format(parseISO(dateKey), 'dd');
-
-export const PAGE_SIZE = 50;
-
-export async function fetchRecordsWithVectorSearch({
-  db,
-  vectorStorage,
-  query,
-  userId,
-  numResults = 10,
-  enableSearchAttachments = false,
-  groupByDate = true,
-  typeFilter = 'all',
-}: {
-  db: RxDatabase<DatabaseCollections>;
-  vectorStorage: VectorStorage<any>;
-  query?: string;
-  userId?: string;
-  numResults?: number;
-  enableSearchAttachments?: boolean;
-  groupByDate?: boolean;
-  typeFilter?: TimelineRecordTypeFilter;
-}): Promise<{
-  records: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]>;
-  idsOfMostRelatedChunksFromSemanticSearch: string[];
-}> {
-  if (!query) {
-    return {
-      records: {},
-      idsOfMostRelatedChunksFromSemanticSearch: [],
-    };
-  }
-
-  let searchParams: IVSSimilaritySearchParams = {
-    query,
-    k: numResults,
-  };
-
-  const includeFilter: Record<string, any> = {};
-  if (userId) {
-    includeFilter['user_id'] = userId;
-  }
-
-  if (!enableSearchAttachments) {
-    searchParams = {
-      ...searchParams,
-      filterOptions: {
-        include: {
-          metadata: includeFilter,
-        },
-        exclude: {
-          metadata: {
-            category: 'documentreference_attachment',
-          },
-        },
-      },
-    };
-  } else if (userId) {
-    searchParams = {
-      ...searchParams,
-      filterOptions: {
-        include: {
-          metadata: includeFilter,
-        },
-      },
-    };
-  }
-
-  const results = await vectorStorage.similaritySearch(searchParams);
-
-  const filteredItems = results.similarItems;
-
-  const ids = filteredItems.map((item) => item.id);
-
-  const docIdToChunks = new Map<string, { id: string; metadata?: any }[]>();
-
-  // Extract document IDs and preserve chunk metadata
-  filteredItems.forEach((item) => {
-    const documentId = item.metadata?.['documentId'];
-    if (documentId) {
-      if (!docIdToChunks.has(documentId)) {
-        docIdToChunks.set(documentId, []);
-      }
-      docIdToChunks.get(documentId)!.push({
-        id: item.id,
-        metadata: item.metadata,
-      });
-    }
-  });
-
-  const cleanedIds = [...docIdToChunks.keys()];
-
-  const docs = await db.clinical_documents
-    .find({
-      selector: {
-        id: { $in: cleanedIds },
-        'data_record.resource_type':
-          typeFilter === 'all'
-            ? {
-                $nin: ['patient', 'provenance'],
-              }
-            : typeFilter,
-      },
-    })
-    .exec();
-
-  const lst = docs as unknown as RxDocument<
-    ClinicalDocument<BundleEntry<FhirResource>>
-  >[];
-
-  if (!groupByDate) {
-    return {
-      records: {
-        [new Date(0).toISOString()]: lst.map((item) => {
-          const docId = item.get('id');
-          const mutableDoc = item.toMutableJSON() as ClinicalDocument<
-            BundleEntry<FhirResource>
-          > & { matchedChunks?: { id: string; metadata?: any }[] };
-
-          if (docIdToChunks.has(docId)) {
-            const chunks = docIdToChunks.get(docId);
-            mutableDoc.matchedChunks = chunks;
-          }
-
-          return mutableDoc;
-        }),
-      },
-      idsOfMostRelatedChunksFromSemanticSearch: ids,
-    };
-  }
-
-  const groupedRecords: Record<
-    string,
-    ClinicalDocument<BundleEntry<FhirResource>>[]
-  > = {};
-
-  lst.forEach((item) => {
-    const docId = item.get('id');
-    const mutableDoc = item.toMutableJSON() as ClinicalDocument<
-      BundleEntry<FhirResource>
-    > & { matchedChunks?: { id: string; metadata?: any }[] };
-
-    if (docIdToChunks.has(docId)) {
-      const chunks = docIdToChunks.get(docId);
-      mutableDoc.matchedChunks = chunks;
-    }
-
-    if (item.get('metadata')?.date === undefined) {
-      console.warn('Date is undefined for object:', item.toJSON());
-      const minDate = new Date(0).toISOString();
-      if (groupedRecords[minDate]) {
-        groupedRecords[minDate].push(mutableDoc);
-      } else {
-        groupedRecords[minDate] = [mutableDoc];
-      }
-    } else {
-      const date = item.get('metadata')?.date
-        ? format(parseISO(item.get('metadata')?.date), 'yyyy-MM-dd')
-        : '-1';
-      if (groupedRecords[date]) {
-        groupedRecords[date].push(mutableDoc);
-      } else {
-        groupedRecords[date] = [mutableDoc];
-      }
-    }
-  });
-  try {
-    const ordered = Object.keys(groupedRecords)
-      .sort((a, b) => {
-        const aDate = parseISO(a);
-        const bDate = parseISO(b);
-        if (aDate > bDate) {
-          return -1;
-        } else if (aDate < bDate) {
-          return 1;
-        } else {
-          return 0;
-        }
-      })
-      .reduce((obj: any, key) => {
-        obj[key] = groupedRecords[key];
-        return obj;
-      }, {});
-    const res = {
-      records: ordered,
-      idsOfMostRelatedChunksFromSemanticSearch: ids,
-    };
-    return res;
-  } catch (e) {
-    console.error(e);
-  }
-
-  const res = {
-    records: groupedRecords,
-    idsOfMostRelatedChunksFromSemanticSearch: ids,
-  };
-  return res;
-}
-
-/**
- * Fetches records from the database and groups them by date
- * @param db
- * @returns
- */
-export async function fetchRecords(
-  db: RxDatabase<DatabaseCollections>,
-  user_id: string,
-  query?: string,
-  page?: number,
-  typeFilter: TimelineRecordTypeFilter = 'all',
-): Promise<Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]>> {
-  const parsedQuery = query?.trim() === '' ? undefined : query;
-  let selector: MangoQuerySelector<ClinicalDocument<unknown>> = {
-    user_id: user_id,
-    'data_record.resource_type': {
-      $nin: [
-        'patient',
-        // 'observation', - Not all labs are part of a diagnostic report, and will be missed if we exclude this
-        'documentreference_attachment',
-        'provenance',
-      ],
-    },
-    'metadata.date': { $nin: [null, undefined, ''] },
-  };
-  if (typeFilter !== 'all') {
-    selector['data_record.resource_type'] = typeFilter;
-  }
-  if (parsedQuery) {
-    if (typeFilter === 'all') {
-      selector['data_record.resource_type']['$nin'] = [
-        'patient',
-        'documentreference_attachment',
-        'provenance',
-      ];
-    }
-    selector = {
-      ...selector,
-      'metadata.display_name': { $regex: `.*${parsedQuery}.*`, $options: 'si' },
-    };
-  }
-  const gr = db.clinical_documents
-    .find({
-      selector,
-      sort: [{ 'metadata.date': 'desc' }],
-    })
-    .skip(page ? page * PAGE_SIZE : 0)
-    .limit(PAGE_SIZE)
-    .exec()
-    .then((list) => {
-      const lst = list as unknown as RxDocument<
-        ClinicalDocument<BundleEntry<FhirResource>>
-      >[];
-
-      const groupedRecords: Record<
-        string,
-        ClinicalDocument<BundleEntry<FhirResource>>[]
-      > = {};
-
-      lst.forEach((item) => {
-        if (item.get('metadata')?.date === undefined) {
-          console.warn('Date is undefined for object:', item.toJSON());
-        } else {
-          const date = item.get('metadata')?.date
-            ? format(parseISO(item.get('metadata')?.date), 'yyyy-MM-dd')
-            : '-1';
-          if (groupedRecords[date]) {
-            groupedRecords[date].push(
-              item.toMutableJSON() as ClinicalDocument<
-                BundleEntry<FhirResource>
-              >,
-            );
-          } else {
-            groupedRecords[date] = [item.toMutableJSON()];
-          }
-        }
-      });
-
-      return groupedRecords;
-    });
-
-  return gr;
-}

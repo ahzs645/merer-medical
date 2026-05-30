@@ -1,0 +1,216 @@
+import {
+  DentalActionLevel,
+  DentalRecord,
+  DentalWorkflowContext,
+  OdontogramToothStatus,
+  PerioOverview,
+  ToothSurface,
+  TreatmentPlanItem,
+} from '../types';
+import { UNIVERSAL_TEETH } from './dentalReferenceData';
+
+const ACTIVE_KINDS = new Set(['condition', 'finding', 'perio', 'referral']);
+const PLANNED_KINDS = new Set(['treatmentPlan']);
+const COMPLETE_KINDS = new Set(['procedure', 'cleaning']);
+
+const HIGH_PRIORITY_TERMS = [
+  'abscess',
+  'acute',
+  'bleeding',
+  'caries',
+  'cavity',
+  'cracked',
+  'fracture',
+  'infection',
+  'pain',
+  'urgent',
+];
+
+const PERIO_RISK_TERMS = [
+  'attachment loss',
+  'bleeding',
+  'calculus',
+  'furcation',
+  'mobility',
+  'pocket',
+  'probing',
+  'recession',
+  'suppuration',
+];
+
+export function buildOdontogramStatuses(
+  recordsByTooth: Map<string, DentalRecord[]>,
+): OdontogramToothStatus[] {
+  return UNIVERSAL_TEETH.map((tooth) => {
+    const records = recordsByTooth.get(tooth.universal) || [];
+    const activeRecords = records.filter((record) =>
+      ACTIVE_KINDS.has(record.kind),
+    );
+    const plannedRecords = records.filter((record) =>
+      PLANNED_KINDS.has(record.kind),
+    );
+    const completeRecords = records.filter((record) =>
+      COMPLETE_KINDS.has(record.kind),
+    );
+
+    return {
+      tooth: tooth.universal,
+      fdi: tooth.fdi,
+      label: `#${tooth.universal} / FDI ${tooth.fdi}`,
+      actionLevel: getActionLevel(
+        activeRecords,
+        plannedRecords,
+        completeRecords,
+      ),
+      recordCount: records.length,
+      surfaces: collectSurfaces(records),
+      latestRecord: records[0],
+      activeRecords,
+      plannedRecords,
+    };
+  }).filter((status) => status.recordCount > 0);
+}
+
+export function buildTreatmentPlan(
+  records: DentalRecord[],
+): TreatmentPlanItem[] {
+  return records
+    .filter((record) => record.kind === 'treatmentPlan')
+    .map((record) => ({
+      id: record.id,
+      record,
+      status: inferTreatmentStatus(record),
+      priority: hasAnyTerm(record, HIGH_PRIORITY_TERMS) ? 'high' : 'routine',
+      toothNumbers: record.toothNumbers,
+      label: record.toothNumbers.length
+        ? `Teeth ${record.toothNumbers.join(', ')}`
+        : 'No tooth number detected',
+      date: record.date,
+    }));
+}
+
+export function buildPerioOverview(records: DentalRecord[]): PerioOverview {
+  const perioRecords = records.filter((record) => record.kind === 'perio');
+  const maintenanceRecords = records.filter(
+    (record) =>
+      record.kind === 'cleaning' &&
+      hasAnyTerm(record, [
+        'periodontal maintenance',
+        'scaling',
+        'root planing',
+      ]),
+  );
+  const affectedTeeth = new Set<string>();
+  const riskSignals = new Set<string>();
+
+  for (const record of perioRecords) {
+    record.toothNumbers.forEach((tooth) => affectedTeeth.add(tooth));
+    for (const term of PERIO_RISK_TERMS) {
+      if (hasAnyTerm(record, [term])) riskSignals.add(term);
+    }
+  }
+
+  return {
+    recordCount: perioRecords.length,
+    latestRecord: perioRecords[0],
+    riskSignals: [...riskSignals],
+    affectedTeeth: [...affectedTeeth].sort((a, b) => Number(a) - Number(b)),
+    maintenanceRecords,
+  };
+}
+
+export function buildWorkflowContext(
+  records: DentalRecord[],
+  imagingCount: number,
+): DentalWorkflowContext {
+  const openDentalIssues = records.filter((record) =>
+    ACTIVE_KINDS.has(record.kind),
+  ).length;
+  const plannedTreatmentCount = records.filter(
+    (record) => record.kind === 'treatmentPlan',
+  ).length;
+  const perioRecordCount = records.filter(
+    (record) => record.kind === 'perio',
+  ).length;
+  const nextActions: string[] = [];
+
+  if (openDentalIssues > 0) {
+    nextActions.push('Review active findings and conditions');
+  }
+  if (plannedTreatmentCount > 0) {
+    nextActions.push('Confirm planned treatment status');
+  }
+  if (perioRecordCount > 0) {
+    nextActions.push('Track periodontal measurements and maintenance');
+  }
+  if (imagingCount > 0) {
+    nextActions.push('Link imaging to tooth-specific records');
+  }
+  if (nextActions.length === 0) {
+    nextActions.push('Add dental findings, plans, or imaging to build context');
+  }
+
+  return {
+    latestRecord: records[0],
+    openDentalIssues,
+    plannedTreatmentCount,
+    perioRecordCount,
+    imagingCount,
+    nextActions,
+  };
+}
+
+function getActionLevel(
+  activeRecords: DentalRecord[],
+  plannedRecords: DentalRecord[],
+  completeRecords: DentalRecord[],
+): DentalActionLevel {
+  if (activeRecords.length > 0) return 'active';
+  if (plannedRecords.length > 0) return 'planned';
+  if (completeRecords.length > 0) return 'complete';
+  return 'watch';
+}
+
+function collectSurfaces(records: DentalRecord[]): ToothSurface[] {
+  const surfaces = new Set<ToothSurface>();
+  for (const record of records) {
+    record.surfaces.forEach((surface) => surfaces.add(surface));
+  }
+  return [...surfaces];
+}
+
+function inferTreatmentStatus(
+  record: DentalRecord,
+): TreatmentPlanItem['status'] {
+  const structuredStatus = record.details?.dentalStatus?.toLowerCase();
+  if (structuredStatus?.includes('complete')) return 'completed';
+  if (structuredStatus?.includes('scheduled')) return 'scheduled';
+  if (
+    structuredStatus?.includes('active') ||
+    structuredStatus?.includes('progress')
+  ) {
+    return 'active';
+  }
+
+  if (hasAnyTerm(record, ['completed', 'complete', 'done'])) return 'completed';
+  if (hasAnyTerm(record, ['scheduled', 'booked', 'appointment'])) {
+    return 'scheduled';
+  }
+  if (hasAnyTerm(record, ['active', 'in progress', 'started'])) return 'active';
+  return 'proposed';
+}
+
+function hasAnyTerm(record: DentalRecord, terms: string[]) {
+  const text = [
+    record.title,
+    record.summary,
+    record.details?.dentalStatus,
+    record.details?.dentalSeverity,
+    record.details?.procedureCode,
+    record.details?.dentalFollowUp,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  return terms.some((term) => text.includes(term));
+}

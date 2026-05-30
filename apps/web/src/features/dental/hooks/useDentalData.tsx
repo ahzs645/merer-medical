@@ -14,6 +14,12 @@ import {
   isDentalDocument,
   mapDentalDocument,
 } from '../utils/dentalRecords';
+import {
+  buildOdontogramStatuses,
+  buildPerioOverview,
+  buildTreatmentPlan,
+  buildWorkflowContext,
+} from '../utils/dentalClinicalModels';
 
 const DENTAL_RESOURCE_TYPES = [
   'condition',
@@ -80,11 +86,16 @@ export function useDentalData() {
       .filter(isDentalDocument)
       .map(mapDentalDocument)
       .filter((record) => record.kind !== 'image');
+    const recordsByTooth = buildRecordsByTooth(records);
 
     return {
       records,
       imaging,
-      recordsByTooth: buildRecordsByTooth(records),
+      recordsByTooth,
+      odontogramStatuses: buildOdontogramStatuses(recordsByTooth),
+      treatmentPlan: buildTreatmentPlan(records),
+      perioOverview: buildPerioOverview(records),
+      workflowContext: buildWorkflowContext(records, imaging.length),
       counts: buildDentalCounts(records, imaging),
     };
   }, [documents]);
