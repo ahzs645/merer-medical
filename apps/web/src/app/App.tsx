@@ -24,6 +24,8 @@ import VectorProvider from '../features/vectors';
 import { AppConfigProvider } from '../app/providers/AppConfigProvider';
 import { TabWrapper } from '../shared/components/TabWrapper';
 import { TutorialOverlay } from '../features/tutorial/TutorialOverlay';
+import { AuditLogTab } from '../features/audit/AuditLogTab';
+import { CarePlansTab } from '../features/care/CarePlansTab';
 import CernerRedirect from '../features/connections/oauth-callbacks/CernerRedirect';
 import ConnectionTab from '../features/connections/ConnectionTab';
 import EpicRedirect from '../features/connections/oauth-callbacks/EpicRedirect';
@@ -38,10 +40,14 @@ import MereAITab from '../features/ai-chat/MereAITab';
 import { ManualRecordTab } from '../features/manual-entry/ManualRecordTab';
 import OnPatientRedirect from '../features/connections/oauth-callbacks/OnPatientRedirect';
 import { OptometryTab } from '../features/optometry/OptometryTab';
+import { ProblemsTab } from '../features/problems/ProblemsTab';
 import { RecordsLayout } from '../features/records/RecordsLayout';
 import SettingsTab from '../features/settings/SettingsTab';
+import { SharingTab } from '../features/sharing/SharingTab';
 import SummaryTab from '../features/summary/SummaryTab';
 import { TimelineTab } from '../features/timeline/TimelineTab';
+import { TrackersTab } from '../features/trackers/TrackersTab';
+import { VisitPrepTab } from '../features/visit-prep/VisitPrepTab';
 import VARedirect from '../features/connections/oauth-callbacks/VARedirect';
 import VeradigmRedirect from '../features/connections/oauth-callbacks/VeradigmRedirect';
 import { Routes as AppRoutes } from '../Routes';
@@ -116,6 +122,30 @@ const routes = [
           {
             path: 'medications',
             element: <MedicationsTab />,
+          },
+          {
+            path: 'care-plans',
+            element: <CarePlansTab />,
+          },
+          {
+            path: 'trackers',
+            element: <TrackersTab />,
+          },
+          {
+            path: 'problems',
+            element: <ProblemsTab />,
+          },
+          {
+            path: 'sharing',
+            element: <SharingTab />,
+          },
+          {
+            path: 'visit-prep',
+            element: <VisitPrepTab />,
+          },
+          {
+            path: 'audit-log',
+            element: <AuditLogTab />,
           },
           {
             path: 'dental',

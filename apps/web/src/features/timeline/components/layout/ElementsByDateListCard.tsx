@@ -333,6 +333,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
       () =>
         itemList
           .filter((item) => item.data_record.resource_type === 'encounter')
+          .filter((item) => getEncounterClass(item) || getEncounterLocation(item))
           .sort((a, b) => {
             if (a.metadata?.display_name && b.metadata?.display_name) {
               return a.metadata.display_name.localeCompare(
@@ -610,10 +611,20 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
                   key={item.id}
                   className="text-xs font-medium md:text-sm text-gray-900"
                 >
-                  <p className="capitalize inline-block">{`${getEncounterClass(item)} -`}</p>
-                  <p className="inline-block ml-1">
-                    {`${getEncounterLocation(item)}`}
-                  </p>
+                  {getEncounterClass(item) && (
+                    <p className="capitalize inline-block">{`${getEncounterClass(item)} -`}</p>
+                  )}
+                  {getEncounterLocation(item) && (
+                    <p
+                      className={
+                        getEncounterClass(item)
+                          ? 'inline-block ml-1'
+                          : 'inline-block'
+                      }
+                    >
+                      {getEncounterLocation(item)}
+                    </p>
+                  )}
                 </li>
               ))}
             </ul>

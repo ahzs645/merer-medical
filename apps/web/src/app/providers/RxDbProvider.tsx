@@ -43,6 +43,7 @@ import { VectorStorageDocumentMigrations } from '../../models/vector-storage-doc
 import { USPSTFRecommendationDocumentSchema } from '../../models/uspstf-recommendation-document/USPSTFRecommendationDocument.collection';
 import { InstanceConfigDocumentSchema } from '../../models/instance-config/InstanceConfig.collection';
 import { NotificationSchema } from '../../models/notification/Notification.collection';
+import { WorkflowRecordSchema } from '../../models/workflow-record/WorkflowRecord.collection';
 
 if (process.env.NODE_ENV === 'development') {
   addRxPlugin(RxDBDevModePlugin);
@@ -88,6 +89,9 @@ export const databaseCollections = {
   },
   notifications: {
     schema: NotificationSchema,
+  },
+  workflow_records: {
+    schema: WorkflowRecordSchema,
   },
   instance_config: {
     schema: InstanceConfigDocumentSchema,

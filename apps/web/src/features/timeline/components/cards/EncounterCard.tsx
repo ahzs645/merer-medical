@@ -29,6 +29,8 @@ export const EncounterCard = memo(function EncounterCard({
   const conn = useConnectionDoc(item.connection_record_id);
   const [expanded, setExpanded] = useState(false);
   const manualNote = getManualRecordNote(item);
+  const encounterClass = getEncounterClass(item);
+  const encounterLocation = getEncounterLocation(item);
 
   return (
     <>
@@ -46,8 +48,12 @@ export const EncounterCard = memo(function EncounterCard({
           <TimelineCardTitle>
             {
               <>
-                <p className="capitalize">{`${getEncounterClass(item)} - `}</p>
-                <p>{`${getEncounterLocation(item)}`}</p>
+                {encounterClass && (
+                  <p className="capitalize">
+                    {encounterLocation ? `${encounterClass} - ` : encounterClass}
+                  </p>
+                )}
+                {encounterLocation && <p>{encounterLocation}</p>}
               </>
             }
           </TimelineCardTitle>

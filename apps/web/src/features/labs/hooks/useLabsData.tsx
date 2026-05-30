@@ -4,6 +4,7 @@ import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
 import { LabDocument, ReportDocument, ReportLink } from '../types';
 import { buildReportsByObservationId } from '../utils/reportLinks';
+import { getFhirResource } from '../../../shared/utils/fhirResource';
 
 export function useLabsData() {
   const db = useRxDb(),
@@ -61,7 +62,9 @@ export function useLabsData() {
       );
 
       setLabs(
-        labDocs.map((doc) => doc.toMutableJSON() as unknown as LabDocument),
+        labDocs
+          .map((doc) => doc.toMutableJSON() as unknown as LabDocument)
+          .filter(isLaboratoryObservation),
       );
       setReportsByObservationId(
         buildReportsByObservationId(
@@ -88,4 +91,17 @@ export function useLabsData() {
     connectionsById,
     status,
   };
+}
+
+function isLaboratoryObservation(lab: LabDocument) {
+  if (lab.metadata?.manual_specialty === 'laboratory') return true;
+  const resource = getFhirResource<any>(lab);
+  const categories = Array.isArray(resource?.category) ? resource.category : [];
+  return categories.some((category: any) => {
+    const text = String(category?.text || '').toLowerCase();
+    const codes = (category?.coding || []).map((coding: any) =>
+      String(coding?.code || coding?.display || '').toLowerCase(),
+    );
+    return text.includes('laboratory') || codes.includes('laboratory') || codes.includes('lab');
+  });
 }

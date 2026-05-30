@@ -11,6 +11,7 @@ import {
 } from '../../terminology/terminologyService';
 import { useNotificationDispatch } from '../../../app/providers/NotificationProvider';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { StylizedSelect } from '../../../shared/components/StylizedSelect';
 
 export function TerminologySettingsGroup() {
   const localConfig = useLocalConfig();
@@ -39,60 +40,60 @@ export function TerminologySettingsGroup() {
       <div className="grid gap-4 rounded border border-gray-200 bg-gray-50 p-4 text-sm">
         <label className="grid gap-1">
           <span className="font-semibold text-gray-900">{t('Profile')}</span>
-          <select
-            value={localConfig.terminology_profile}
-            onChange={(event) =>
+          <StylizedSelect
+            value={localConfig.terminology_profile ?? 'canada'}
+            onChange={(value) =>
               updateLocalConfig({
-                terminology_profile: event.target.value as
-                  | 'canada'
-                  | 'us'
-                  | 'global',
+                terminology_profile: value as 'canada' | 'us' | 'global',
               })
             }
-            className="max-w-xs rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-600 focus:ring-primary-600"
-          >
-            <option value="canada">{t('Canada')}</option>
-            <option value="us">{t('United States')}</option>
-            <option value="global">{t('Global baseline')}</option>
-          </select>
+            className="max-w-xs"
+            options={[
+              { value: 'canada', label: t('Canada') },
+              { value: 'us', label: t('United States') },
+              { value: 'global', label: t('Global baseline') },
+            ]}
+          />
         </label>
 
         <label className="grid gap-1">
           <span className="font-semibold text-gray-900">
             {t('Lookup mode')}
           </span>
-          <select
-            value={localConfig.terminology_lookup_mode}
-            onChange={(event) =>
+          <StylizedSelect
+            value={localConfig.terminology_lookup_mode ?? 'hybrid'}
+            onChange={(value) =>
               updateLocalConfig({
-                terminology_lookup_mode: event.target.value as
+                terminology_lookup_mode: value as
                   | 'local-only'
                   | 'hybrid'
                   | 'server-first',
               })
             }
-            className="max-w-xs rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-600 focus:ring-primary-600"
-          >
-            <option value="hybrid">{t('Hybrid local-first')}</option>
-            <option value="local-only">{t('Local only')}</option>
-            <option value="server-first">{t('Server first')}</option>
-          </select>
+            className="max-w-xs"
+            options={[
+              { value: 'hybrid', label: t('Hybrid local-first') },
+              { value: 'local-only', label: t('Local only') },
+              { value: 'server-first', label: t('Server first') },
+            ]}
+          />
         </label>
 
         <label className="grid gap-1">
           <span className="font-semibold text-gray-900">{t('Language')}</span>
-          <select
-            value={localConfig.terminology_language}
-            onChange={(event) =>
+          <StylizedSelect
+            value={localConfig.terminology_language ?? 'en'}
+            onChange={(value) =>
               updateLocalConfig({
-                terminology_language: event.target.value as 'en' | 'fr',
+                terminology_language: value as 'en' | 'fr',
               })
             }
-            className="max-w-xs rounded-md border-gray-300 text-sm shadow-sm focus:border-primary-600 focus:ring-primary-600"
-          >
-            <option value="en">{t('English')}</option>
-            <option value="fr">{t('French')}</option>
-          </select>
+            className="max-w-xs"
+            options={[
+              { value: 'en', label: t('English') },
+              { value: 'fr', label: t('French') },
+            ]}
+          />
         </label>
 
         <label className="flex items-center gap-2 font-medium text-gray-800">

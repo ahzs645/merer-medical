@@ -275,6 +275,7 @@ const TABLES: readonly TableName[] = [
   'attachments',
   'instance_config',
   'summary_page_preferences',
+  'workflow_records',
 ];
 
 async function collectFromDb(
@@ -348,6 +349,7 @@ export function createPackageCommands(dbName: string): PackageCommands {
           db.attachment_blobs,
           db.instance_config,
           db.summary_page_preferences,
+          db.workflow_records,
         ],
         async () => {
           for (const t of tables) {

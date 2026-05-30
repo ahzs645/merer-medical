@@ -14,3 +14,25 @@ export type RecordsByDate = Record<
   string,
   ClinicalDocument<BundleEntry<FhirResource>>[]
 >;
+
+export type TimelineRecordTypeFilter =
+  | 'all'
+  | 'allergyintolerance'
+  | 'appointment'
+  | 'careplan'
+  | 'careteam'
+  | 'condition'
+  | 'consent'
+  | 'coverage'
+  | 'diagnosticreport'
+  | 'documentreference'
+  | 'encounter'
+  | 'familymemberhistory'
+  | 'goal'
+  | 'immunization'
+  | 'medication'
+  | 'medicationorder'
+  | 'medicationrequest'
+  | 'observation'
+  | 'procedure'
+  | 'specimen';

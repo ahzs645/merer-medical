@@ -24,10 +24,12 @@ const parseYear = (key: string) => {
 
 export function JumpToPanel({
   items,
+  dateKeys,
   isLoading = false,
   activeDateKey,
 }: {
   items?: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]>;
+  dateKeys?: string[];
   isLoading: boolean;
   activeDateKey?: string;
 }) {
@@ -36,9 +38,10 @@ export function JumpToPanel({
     pauseAutoFollowUntil = useRef(0);
 
   const list = useMemo(() => {
+    if (dateKeys) return dateKeys.map((key) => [key] as [string]);
     if (items) return Object.entries(items);
     else return undefined;
-  }, [items]);
+  }, [dateKeys, items]);
 
   const pauseAutoFollow = useCallback(() => {
     pauseAutoFollowUntil.current = Date.now() + 1500;

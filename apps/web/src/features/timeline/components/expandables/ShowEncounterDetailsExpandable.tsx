@@ -62,11 +62,15 @@ export function ShowEncounterDetailsExpandable({
     });
   }, [encounter?.participant]);
 
+  const encounterTitle = [getEncounterClass(item), getEncounterLocation(item)]
+    .filter(Boolean)
+    .join(' - ');
+
   return (
     <Modal open={expanded} setOpen={setExpanded}>
       <div className="flex flex-col">
         <ModalHeader
-          title={`${getEncounterClass(item)} - ${getEncounterLocation(item)}`}
+          title={encounterTitle || 'Encounter'}
           subtitle={
             <div className="flex flex-col">
               {encounter?.period?.start && (

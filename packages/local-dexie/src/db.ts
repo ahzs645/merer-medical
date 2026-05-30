@@ -10,6 +10,7 @@ import type {
   TerminologySearchIndex,
   User,
   UserPreferences,
+  WorkflowRecord,
 } from '@mere/domain';
 
 export interface AttachmentBlob {
@@ -29,6 +30,7 @@ export class MereDb extends Dexie {
   terminology_packs!: Table<TerminologyPack, string>;
   terminology_entries!: Table<TerminologyEntry, string>;
   terminology_search_index!: Table<TerminologySearchIndex, string>;
+  workflow_records!: Table<WorkflowRecord, string>;
 
   constructor(name = 'mere') {
     super(name);
@@ -63,6 +65,25 @@ export class MereDb extends Dexie {
         'id, packId, profile, domain, system, code, active, [profile+domain], [system+code]',
       terminology_search_index:
         'id, packId, profile, domain, language, [profile+domain+language]',
+    });
+
+    this.version(3).stores({
+      users: 'id, updatedAt, isSelected, deletedAt',
+      user_preferences: 'id, userId, updatedAt',
+      connections: 'id, userId, source, updatedAt, deletedAt',
+      clinical_documents:
+        'id, userId, connectionId, resourceType, updatedAt, deletedAt, [userId+resourceType], [userId+connectionId]',
+      attachments: 'id, ownerType, ownerId, updatedAt, [ownerType+ownerId]',
+      attachment_blobs: 'id',
+      instance_config: 'id, updatedAt',
+      summary_page_preferences: 'id, userId, updatedAt',
+      terminology_packs:
+        'id, profile, source, sourceVersion, importedAt, [profile+source]',
+      terminology_entries:
+        'id, packId, profile, domain, system, code, active, [profile+domain], [system+code]',
+      terminology_search_index:
+        'id, packId, profile, domain, language, [profile+domain+language]',
+      workflow_records: 'id, userId, kind, updatedAt, [userId+kind]',
     });
   }
 }

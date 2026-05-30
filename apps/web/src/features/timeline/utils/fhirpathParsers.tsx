@@ -6,38 +6,46 @@ import { getFhirResource } from '../../../shared/utils/fhirResource';
 export function getReferenceRangeString(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
-  return fhirpath.evaluate(
-    getFhirResource(item),
-    'referenceRange.text',
-  )?.[0];
+  return fhirpath.evaluate(getFhirResource(item), 'referenceRange.text')?.[0];
+}
+
+export function getReferenceRangeDisplay(
+  item: ClinicalDocument<BundleEntry<Observation>>,
+): string | undefined {
+  const resource = getFhirResource<any>(item);
+  const range = resource?.referenceRange?.[0];
+  if (!range) return undefined;
+  if (range.text) return range.text;
+
+  const low = range.low?.value;
+  const high = range.high?.value;
+  const unit = range.low?.unit || range.high?.unit || getValueUnit(item);
+  if (low !== undefined && high !== undefined) {
+    return `${low} - ${high}${unit ? ` ${unit}` : ''}`;
+  }
+  if (low !== undefined) return `>= ${low}${unit ? ` ${unit}` : ''}`;
+  if (high !== undefined) return `<= ${high}${unit ? ` ${unit}` : ''}`;
+  return undefined;
 }
 
 export function getReferenceRangeLow(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
-  return fhirpath.evaluate(
-    getFhirResource(item),
-    'referenceRange.low',
-  )?.[0];
+  return fhirpath.evaluate(getFhirResource(item), 'referenceRange.low')?.[0];
 }
 
 export function getReferenceRangeHigh(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
-  return fhirpath.evaluate(
-    getFhirResource(item),
-    'referenceRange.high',
-  )?.[0];
+  return fhirpath.evaluate(getFhirResource(item), 'referenceRange.high')?.[0];
 }
 
 export function getValueUnit(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ): string | undefined {
   return (
-    fhirpath.evaluate(
-      getFhirResource(item),
-      'valueQuantity.unit',
-    )?.[0] || undefined
+    fhirpath.evaluate(getFhirResource(item), 'valueQuantity.unit')?.[0] ||
+    undefined
   );
 }
 
@@ -83,10 +91,46 @@ export function getComments(item: ClinicalDocument<BundleEntry<Observation>>) {
 export function getInterpretationText(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
-  return fhirpath.evaluate(
-    getFhirResource(item),
-    'interpretation.text',
-  )?.[0];
+  return fhirpath.evaluate(getFhirResource(item), 'interpretation.text')?.[0];
+}
+
+export type ObservationInterpretationFlag =
+  | 'normal'
+  | 'low'
+  | 'high'
+  | 'abnormal'
+  | 'borderline';
+
+export function getObservationInterpretationFlag(
+  item: ClinicalDocument<BundleEntry<Observation>>,
+): ObservationInterpretationFlag {
+  const resource = getFhirResource<any>(item);
+  const interpretationValues = [
+    ...(Array.isArray(resource?.interpretation) ? resource.interpretation : []),
+  ]
+    .flatMap((interpretation) => [
+      interpretation?.text,
+      ...(interpretation?.coding || []).flatMap((coding: any) => [
+        coding?.code,
+        coding?.display,
+      ]),
+    ])
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  if (/\b(low|below|decreased|l)\b/.test(interpretationValues)) return 'low';
+  if (/\b(high|above|elevated|increased|h)\b/.test(interpretationValues)) {
+    return 'high';
+  }
+  if (/\b(borderline|indeterminate)\b/.test(interpretationValues)) {
+    return 'borderline';
+  }
+  if (/\b(abnormal|positive|detected|a)\b/.test(interpretationValues)) {
+    return 'abnormal';
+  }
+
+  return isOutOfRangeResult(item) ? 'abnormal' : 'normal';
 }
 /**
  * Takes a RxDocument of type ClinicalDocument<Observation> and returns true if the value is out of reference range
@@ -101,7 +145,14 @@ export function isOutOfRangeResult(
   const high = resource?.referenceRange?.[0]?.high?.value;
   const value = resource?.valueQuantity?.value;
 
-  if (low && high && value && !isNaN(low) && !isNaN(high) && !isNaN(value)) {
+  if (
+    low !== undefined &&
+    high !== undefined &&
+    value !== undefined &&
+    !isNaN(Number(low)) &&
+    !isNaN(Number(high)) &&
+    !isNaN(Number(value))
+  ) {
     return value < low || value > high;
   }
   return false;

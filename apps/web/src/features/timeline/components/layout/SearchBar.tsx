@@ -2,6 +2,34 @@ import React, { useMemo } from 'react';
 import { QueryStatus } from '../../TimelineTab';
 import { useLocalConfig } from '../../../../app/providers/LocalConfigProvider';
 import { useVectorSyncStatus } from '../../../vectors/providers/VectorGeneratorSyncInitializer';
+import { TimelineRecordTypeFilter } from '../../types';
+import { StylizedSelect } from '../../../../shared/components/StylizedSelect';
+
+const recordTypeOptions: {
+  value: TimelineRecordTypeFilter;
+  label: string;
+}[] = [
+  { value: 'all', label: 'All records' },
+  { value: 'encounter', label: 'Encounters' },
+  { value: 'observation', label: 'Labs' },
+  { value: 'diagnosticreport', label: 'Reports' },
+  { value: 'documentreference', label: 'Documents' },
+  { value: 'condition', label: 'Conditions' },
+  { value: 'procedure', label: 'Procedures' },
+  { value: 'medication', label: 'Medications' },
+  { value: 'medicationrequest', label: 'Medication requests' },
+  { value: 'immunization', label: 'Immunizations' },
+  { value: 'allergyintolerance', label: 'Allergies' },
+  { value: 'appointment', label: 'Appointments' },
+  { value: 'careplan', label: 'Care plans' },
+  { value: 'careteam', label: 'Care teams' },
+  { value: 'familymemberhistory', label: 'Family history' },
+  { value: 'goal', label: 'Goals' },
+  { value: 'coverage', label: 'Coverage' },
+  { value: 'consent', label: 'Consents' },
+  { value: 'specimen', label: 'Specimens' },
+  { value: 'medicationorder', label: 'Medication orders' },
+];
 
 function LoadingSpinner({ tailwindColor }: { tailwindColor?: string }) {
   return (
@@ -34,10 +62,14 @@ export function SearchBar({
   query,
   setQuery,
   status,
+  typeFilter,
+  setTypeFilter,
 }: {
   query: string;
   setQuery: (s: string) => void;
   status: QueryStatus;
+  typeFilter: TimelineRecordTypeFilter;
+  setTypeFilter: (filter: TimelineRecordTypeFilter) => void;
 }) {
   const { experimental__use_openai_rag } = useLocalConfig();
   const vectorSyncStatus = useVectorSyncStatus();
@@ -54,8 +86,8 @@ export function SearchBar({
   }, [experimental__use_openai_rag, vectorSyncStatus, isVectorSearchEnabled]);
 
   return (
-    <div className="mb-1 mt-4 w-full sm:mt-6 flex flex-row">
-      <div className="relative flex items-center flex-1">
+    <div className="mb-3 mt-4 flex w-full flex-col gap-2 sm:mt-6 sm:flex-row">
+      <div className="relative flex flex-1 items-center">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
           <svg
             aria-hidden="true"
@@ -104,6 +136,27 @@ export function SearchBar({
             {status === QueryStatus.LOADING && <LoadingSpinner />}
           </div>
         )}
+      </div>
+      <div className="flex shrink-0 items-center gap-2">
+        <label className="sr-only" htmlFor="timeline-type-filter">
+          Filter timeline records
+        </label>
+        <StylizedSelect
+          id="timeline-type-filter"
+          value={typeFilter}
+          onChange={(value) => setTypeFilter(value as TimelineRecordTypeFilter)}
+          className="w-full sm:w-56"
+          options={recordTypeOptions}
+        />
+        {typeFilter !== 'all' ? (
+          <button
+            type="button"
+            onClick={() => setTypeFilter('all')}
+            className="h-[38px] rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+          >
+            Clear
+          </button>
+        ) : null}
       </div>
     </div>
   );

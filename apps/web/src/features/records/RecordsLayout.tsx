@@ -2,12 +2,18 @@ import { NavLink, Outlet } from 'react-router-dom';
 
 import {
   BeakerIcon,
+  ChartBarIcon,
+  ClockIcon,
+  ClipboardDocumentCheckIcon,
   DocumentTextIcon,
   DocumentPlusIcon,
   EyeIcon,
   FaceSmileIcon,
   ClipboardDocumentListIcon,
+  ExclamationCircleIcon,
+  PrinterIcon,
   PhotoIcon,
+  ShareIcon,
 } from '@heroicons/react/24/outline';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
@@ -22,6 +28,16 @@ const recordTabs = [
     label: 'Medications',
     icon: ClipboardDocumentListIcon,
   },
+  {
+    to: AppRoutes.CarePlans,
+    label: 'Care plans',
+    icon: ClipboardDocumentCheckIcon,
+  },
+  { to: AppRoutes.Trackers, label: 'Trackers', icon: ChartBarIcon },
+  { to: AppRoutes.Problems, label: 'Problems', icon: ExclamationCircleIcon },
+  { to: AppRoutes.Sharing, label: 'Sharing', icon: ShareIcon },
+  { to: AppRoutes.VisitPrep, label: 'Visit prep', icon: PrinterIcon },
+  { to: AppRoutes.AuditLog, label: 'Audit log', icon: ClockIcon },
   { to: AppRoutes.Dental, label: 'Dental', icon: FaceSmileIcon },
   { to: AppRoutes.Optometry, label: 'Optometry', icon: EyeIcon },
   { to: AppRoutes.AddRecord, label: 'Add record', icon: DocumentPlusIcon },

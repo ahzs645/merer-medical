@@ -92,6 +92,10 @@ const isInstalledPWA = () => {
   return window.matchMedia('(display-mode: standalone)').matches;
 };
 
+const isDirectEntryPage = (pathname: string) => {
+  return pathname.replace(/\/+$/, '').endsWith('/records/new');
+};
+
 /**
  * Display a tutorial overlay carousel to the user on app start if localstrage keys are set
  */
@@ -139,6 +143,7 @@ export function TutorialOverlay() {
   }, [state.isComplete, tutorialSteps]);
 
   const activeStep = state.steps[state.currentStep];
+  const shouldHideForPage = isDirectEntryPage(window.location.pathname);
   const activeTutorialItem = (() => {
     switch (activeStep) {
       case TutorialLocalStorageKeys.WELCOME_SCREEN:
@@ -192,7 +197,7 @@ export function TutorialOverlay() {
 
   return (
     <AnimatePresence initial={true}>
-      {!tutorialSteps.length || state.isComplete ? null : (
+      {!tutorialSteps.length || state.isComplete || shouldHideForPage ? null : (
         <motion.div
           key="tutorial_overlay"
           initial={{ opacity: 1 }}

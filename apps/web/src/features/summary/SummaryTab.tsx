@@ -44,6 +44,8 @@ import { EyeIcon } from '@heroicons/react/24/outline';
 import { EyeSlashIcon } from '@heroicons/react/24/outline';
 import { useLocalConfig } from '../../app/providers/LocalConfigProvider';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
+import { Link } from 'react-router-dom';
+import { Routes as AppRoutes } from '../../Routes';
 
 function fetchMedications(
   db: RxDatabase<DatabaseCollections>,
@@ -528,6 +530,13 @@ function SummaryTab() {
   return (
     <AppPage banner={<GenericBanner text={t('Summary')} />}>
       <div className="relative mx-auto flex lg:max-w-7xl flex-col gap-x-4 px-4 lg:px-8 sm:grid sm:grid-cols-6">
+        <ForYouFeed
+          medicationCount={meds.length}
+          conditionCount={cond.length}
+          immunizationCount={imm.length}
+          allergyCount={allergy.length}
+          pinnedCount={pinned.length}
+        />
         {sortedCards.map((card) => {
           if (!card.is_visible) return null;
           switch (card.type) {
@@ -641,6 +650,102 @@ function SummaryTab() {
         <PencilSquareIcon className="ms-1 h-4 w-4" />
       </button>
     </AppPage>
+  );
+}
+
+function ForYouFeed({
+  medicationCount,
+  conditionCount,
+  immunizationCount,
+  allergyCount,
+  pinnedCount,
+}: {
+  medicationCount: number;
+  conditionCount: number;
+  immunizationCount: number;
+  allergyCount: number;
+  pinnedCount: number;
+}) {
+  const { t } = useInterfaceLanguage();
+  const items = [
+    pinnedCount > 0
+      ? {
+          label: 'Today',
+          title: `${pinnedCount} bookmarked record${pinnedCount === 1 ? '' : 's'}`,
+          description: 'Review the records you marked as important.',
+          route: AppRoutes.Summary,
+        }
+      : undefined,
+    medicationCount > 0
+      ? {
+          label: 'For you',
+          title: `${medicationCount} medication record${medicationCount === 1 ? '' : 's'}`,
+          description: 'Check medication details and source context.',
+          route: AppRoutes.Medications,
+        }
+      : undefined,
+    allergyCount > 0 || conditionCount > 0
+      ? {
+          label: 'For review',
+          title: `${allergyCount + conditionCount} allergy or condition record${
+            allergyCount + conditionCount === 1 ? '' : 's'
+          }`,
+          description: 'Keep key clinical summary items current.',
+          route: AppRoutes.Problems,
+        }
+      : undefined,
+    immunizationCount > 0
+      ? {
+          label: 'Recently available',
+          title: `${immunizationCount} immunization record${
+            immunizationCount === 1 ? '' : 's'
+          }`,
+          description: 'Review vaccine history in your summary.',
+          route: AppRoutes.Summary,
+        }
+      : undefined,
+  ].filter((item): item is NonNullable<typeof item> => Boolean(item));
+
+  if (items.length === 0) return null;
+
+  return (
+    <section className="col-span-6 mb-4 rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className="text-base font-semibold text-gray-900">
+            {t('For you')}
+          </h2>
+          <p className="text-sm text-gray-600">
+            {t('Recent and useful record areas to review next.')}
+          </p>
+        </div>
+        <Link
+          to={AppRoutes.Timeline}
+          className="text-sm font-semibold text-primary-700 hover:text-primary-900"
+        >
+          {t('Open timeline')}
+        </Link>
+      </div>
+      <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {items.map((item) => (
+          <Link
+            key={`${item.label}-${item.title}`}
+            to={item.route}
+            className="rounded-md border border-gray-200 p-3 hover:border-primary-300 hover:bg-primary-50"
+          >
+            <div className="text-xs font-semibold uppercase tracking-wide text-primary-700">
+              {t(item.label)}
+            </div>
+            <div className="mt-1 text-sm font-semibold text-gray-900">
+              {t(item.title)}
+            </div>
+            <div className="mt-1 text-xs text-gray-600">
+              {t(item.description)}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
 

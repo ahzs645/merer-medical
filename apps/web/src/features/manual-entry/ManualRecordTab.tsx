@@ -8,6 +8,7 @@ import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvi
 import { useUser } from '../../app/providers/UserProvider';
 import { AppPage } from '../../shared/components/AppPage';
 import { GenericBanner } from '../../shared/components/GenericBanner';
+import { StylizedSelect } from '../../shared/components/StylizedSelect';
 import uuid4 from '../../shared/utils/UUIDUtils';
 import { Routes as AppRoutes } from '../../Routes';
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
@@ -53,6 +54,7 @@ import {
   LIBRE_CONNECTION_LOCATION,
   parseLibreViewFile,
 } from '../diabetes/libreView';
+import { appendAuditLog } from '../audit/auditLog';
 
 const MANUAL_CONNECTION_LOCATION = 'manual://local';
 
@@ -71,7 +73,7 @@ type ManualRecordKind =
   | 'device';
 
 type ClinicalManualRecordKind = Exclude<ManualRecordKind, 'device'>;
-type DeviceImportKind = 'freestyle_libre';
+type DeviceImportKind = 'manual_reading' | 'freestyle_libre';
 type ManualSpecialty = 'general' | 'dental' | 'optometry';
 type DentalEntryKind =
   | 'cleaning'
@@ -280,6 +282,7 @@ const optometryEntryTypes: Array<{
 const toothSurfaces = ['M', 'O', 'I', 'D', 'B', 'F', 'L'];
 
 const deviceImportTypes: Array<{ value: DeviceImportKind; label: string }> = [
+  { value: 'manual_reading', label: 'Manual reading' },
   { value: 'freestyle_libre', label: 'FreeStyle Libre' },
 ];
 
@@ -315,6 +318,40 @@ const quickTemplates: ManualTemplate[] = [
   },
   {
     label: 'Blood glucose',
+    kind: 'lab',
+    title: 'Blood glucose',
+    unit: 'mg/dL',
+  },
+];
+
+const deviceReadingTemplates: ManualTemplate[] = [
+  {
+    label: 'Blood pressure cuff',
+    kind: 'vital',
+    title: 'Blood pressure',
+    unit: 'mmHg',
+  },
+  {
+    label: 'Pulse oximeter SpO2',
+    kind: 'vital',
+    title: 'Oxygen saturation',
+    unit: '%',
+  },
+  {
+    label: 'Pulse oximeter pulse',
+    kind: 'vital',
+    title: 'Heart rate',
+    unit: 'bpm',
+  },
+  {
+    label: 'Thermometer',
+    kind: 'vital',
+    title: 'Body temperature',
+    unit: '°C',
+  },
+  { label: 'Scale', kind: 'vital', title: 'Body weight', unit: 'kg' },
+  {
+    label: 'Glucose meter',
     kind: 'lab',
     title: 'Blood glucose',
     unit: 'mg/dL',
@@ -399,7 +436,7 @@ export function ManualRecordTab() {
   const [imagingAccessionId, setImagingAccessionId] = useState('');
   const [imagingStudyId, setImagingStudyId] = useState('');
   const [deviceImportType, setDeviceImportType] =
-    useState<DeviceImportKind>('freestyle_libre');
+    useState<DeviceImportKind>('manual_reading');
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(today);
   const [notes, setNotes] = useState('');
@@ -436,6 +473,8 @@ export function ManualRecordTab() {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const isEditing = !!recordId;
   const isDeviceImportType = recordType === 'device';
+  const isManualDeviceReadingType =
+    isDeviceImportType && deviceImportType === 'manual_reading';
   const isLibreImportType =
     isDeviceImportType && deviceImportType === 'freestyle_libre';
   const isObservationType = recordType === 'lab' || recordType === 'vital';
@@ -897,6 +936,20 @@ export function ManualRecordTab() {
         ? await upsertClinicalDocuments(db, docs)
         : await Promise.all(docs.map((doc) => insertClinicalDocument(db, doc)));
 
+      await Promise.all(
+        savedDocs.map((doc) =>
+          appendAuditLog(db, {
+            userId: user.id,
+            actor: 'local-user',
+            action: loadedDocument ? 'record.update' : 'record.create',
+            targetId: doc.id,
+            targetType: doc.data_record.resource_type,
+            source: connection.name,
+            summary: `${loadedDocument ? 'Updated' : 'Created'} ${doc.metadata?.display_name || doc.data_record.resource_type}`,
+          }),
+        ),
+      );
+
       if (linkedFile) {
         await Promise.all(
           savedDocs.map((doc) =>
@@ -966,6 +1019,14 @@ export function ManualRecordTab() {
         }),
       );
       await upsertClinicalDocuments(db, docs);
+      await appendAuditLog(db, {
+        userId: user.id,
+        actor: 'local-user',
+        action: 'record.import',
+        targetType: 'observation',
+        source: file.name,
+        summary: `Imported ${docs.length} FreeStyle Libre readings`,
+      });
 
       notifyDispatch({
         type: 'set_notification',
@@ -1006,21 +1067,18 @@ export function ManualRecordTab() {
                 >
                   {t('Type')}
                 </label>
-                <select
+                <StylizedSelect
                   id="manual-record-type"
                   value={recordType}
-                  onChange={(event) =>
-                    setRecordType(event.target.value as ManualRecordKind)
-                  }
+                  onChange={(value) => setRecordType(value as ManualRecordKind)}
                   disabled={isEditing}
-                  className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                >
-                  {recordTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {t(type.label)}
-                    </option>
-                  ))}
-                </select>
+                  className="mt-2"
+                  buttonClassName="text-base"
+                  options={recordTypes.map((type) => ({
+                    value: type.value,
+                    label: t(type.label),
+                  }))}
+                />
               </div>
             )}
 
@@ -1034,20 +1092,19 @@ export function ManualRecordTab() {
                     >
                       {t('Section')}
                     </label>
-                    <select
+                    <StylizedSelect
                       id="manual-record-specialty"
                       value={specialty}
-                      onChange={(event) =>
-                        updateSpecialty(event.target.value as ManualSpecialty)
+                      onChange={(value) =>
+                        updateSpecialty(value as ManualSpecialty)
                       }
-                      className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                    >
-                      {specialtyOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {t(option.label)}
-                        </option>
-                      ))}
-                    </select>
+                      className="mt-2"
+                      buttonClassName="text-base"
+                      options={specialtyOptions.map((option) => ({
+                        value: option.value,
+                        label: t(option.label),
+                      }))}
+                    />
                   </div>
 
                   {specialty === 'dental' && (
@@ -1058,23 +1115,20 @@ export function ManualRecordTab() {
                       >
                         {t('Dental record')}
                       </label>
-                      <select
+                      <StylizedSelect
                         id="manual-record-dental-kind"
                         value={dentalEntryKind}
-                        onChange={(event) =>
-                          applyDentalEntryKind(
-                            event.target.value as DentalEntryKind,
-                          )
+                        onChange={(value) =>
+                          applyDentalEntryKind(value as DentalEntryKind)
                         }
                         disabled={isEditing}
-                        className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                      >
-                        {dentalEntryTypes.map((entry) => (
-                          <option key={entry.value} value={entry.value}>
-                            {t(entry.label)}
-                          </option>
-                        ))}
-                      </select>
+                        className="mt-2"
+                        buttonClassName="text-base"
+                        options={dentalEntryTypes.map((entry) => ({
+                          value: entry.value,
+                          label: t(entry.label),
+                        }))}
+                      />
                     </div>
                   )}
 
@@ -1086,23 +1140,20 @@ export function ManualRecordTab() {
                       >
                         {t('Eye-care record')}
                       </label>
-                      <select
+                      <StylizedSelect
                         id="manual-record-optometry-kind"
                         value={optometryEntryKind}
-                        onChange={(event) =>
-                          applyOptometryEntryKind(
-                            event.target.value as OptometryEntryKind,
-                          )
+                        onChange={(value) =>
+                          applyOptometryEntryKind(value as OptometryEntryKind)
                         }
                         disabled={isEditing}
-                        className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                      >
-                        {optometryEntryTypes.map((entry) => (
-                          <option key={entry.value} value={entry.value}>
-                            {t(entry.label)}
-                          </option>
-                        ))}
-                      </select>
+                        className="mt-2"
+                        buttonClassName="text-base"
+                        options={optometryEntryTypes.map((entry) => ({
+                          value: entry.value,
+                          label: t(entry.label),
+                        }))}
+                      />
                     </div>
                   )}
                 </div>
@@ -1245,18 +1296,18 @@ export function ManualRecordTab() {
                         >
                           {t('Eye')}
                         </label>
-                        <select
+                        <StylizedSelect
                           id="manual-record-eye-side"
                           value={eyeSide}
-                          onChange={(event) =>
-                            setEyeSide(event.target.value as EyeSide)
-                          }
-                          className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                        >
-                          <option value="OU">{t('OU / both')}</option>
-                          <option value="OD">{t('OD / right')}</option>
-                          <option value="OS">{t('OS / left')}</option>
-                        </select>
+                          onChange={(value) => setEyeSide(value as EyeSide)}
+                          className="mt-2"
+                          buttonClassName="text-base"
+                          options={[
+                            { value: 'OU', label: t('OU / both') },
+                            { value: 'OD', label: t('OD / right') },
+                            { value: 'OS', label: t('OS / left') },
+                          ]}
+                        />
                       </div>
                       <div className="sm:col-span-2">
                         <label
@@ -1434,20 +1485,44 @@ export function ManualRecordTab() {
                 >
                   {t('Device')}
                 </label>
-                <select
+                <StylizedSelect
                   id="manual-device-type"
                   value={deviceImportType}
-                  onChange={(event) =>
-                    setDeviceImportType(event.target.value as DeviceImportKind)
+                  onChange={(value) =>
+                    setDeviceImportType(value as DeviceImportKind)
                   }
-                  className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                >
-                  {deviceImportTypes.map((device) => (
-                    <option key={device.value} value={device.value}>
-                      {t(device.label)}
-                    </option>
-                  ))}
-                </select>
+                  className="mt-2"
+                  buttonClassName="text-base"
+                  options={deviceImportTypes.map((device) => ({
+                    value: device.value,
+                    label: t(device.label),
+                  }))}
+                />
+
+                {isManualDeviceReadingType && (
+                  <div className="mt-4">
+                    <p className="block text-sm font-semibold text-gray-900">
+                      {t('Device reading templates')}
+                    </p>
+                    <p className="mt-1 text-sm text-gray-600">
+                      {t(
+                        'Choose a common home-device reading. The form will switch to the matching vital or lab entry.',
+                      )}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {deviceReadingTemplates.map((template) => (
+                        <button
+                          key={template.label}
+                          type="button"
+                          onClick={() => applyTemplate(template)}
+                          className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100"
+                        >
+                          {t(template.label)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {isLibreImportType && (
                   <div className="mt-4">
@@ -1584,21 +1659,21 @@ export function ManualRecordTab() {
                       >
                         {t('Value type')}
                       </label>
-                      <select
+                      <StylizedSelect
                         id="manual-record-value-kind"
                         value={valueKind}
-                        onChange={(event) =>
-                          setValueKind(
-                            event.target.value as ManualObservationValueKind,
-                          )
+                        onChange={(value) =>
+                          setValueKind(value as ManualObservationValueKind)
                         }
-                        className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                      >
-                        <option value="quantity">{t('Quantity')}</option>
-                        <option value="string">{t('Text')}</option>
-                        <option value="coded">{t('Coded')}</option>
-                        <option value="absent">{t('Absent')}</option>
-                      </select>
+                        className="mt-2"
+                        buttonClassName="text-base"
+                        options={[
+                          { value: 'quantity', label: t('Quantity') },
+                          { value: 'string', label: t('Text') },
+                          { value: 'coded', label: t('Coded') },
+                          { value: 'absent', label: t('Absent') },
+                        ]}
+                      />
                     </div>
 
                     <div>
@@ -1608,19 +1683,21 @@ export function ManualRecordTab() {
                       >
                         {t('Comparator')}
                       </label>
-                      <select
+                      <StylizedSelect
                         id="manual-record-comparator"
                         value={comparator}
                         disabled={valueKind !== 'quantity'}
-                        onChange={(event) => setComparator(event.target.value)}
-                        className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 disabled:bg-gray-100 disabled:text-gray-400"
-                      >
-                        <option value="">=</option>
-                        <option value="<">&lt;</option>
-                        <option value="<=">&lt;=</option>
-                        <option value=">">&gt;</option>
-                        <option value=">=">&gt;=</option>
-                      </select>
+                        onChange={setComparator}
+                        className="mt-2"
+                        buttonClassName="text-base"
+                        options={[
+                          { value: '', label: '=' },
+                          { value: '<', label: '<' },
+                          { value: '<=', label: '<=' },
+                          { value: '>', label: '>' },
+                          { value: '>=', label: '>=' },
+                        ]}
+                      />
                     </div>
 
                     <div>
@@ -1631,24 +1708,26 @@ export function ManualRecordTab() {
                         {t('Value')}
                       </label>
                       {valueKind === 'absent' ? (
-                        <select
+                        <StylizedSelect
                           id="manual-record-value"
                           value={absentReason}
-                          onChange={(event) =>
+                          onChange={(value) =>
                             setAbsentReason(
-                              event.target
-                                .value as ManualObservationAbsentReason,
+                              value as ManualObservationAbsentReason,
                             )
                           }
-                          className="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                        >
-                          <option value="pending">{t('Pending')}</option>
-                          <option value="not-performed">
-                            {t('Not performed')}
-                          </option>
-                          <option value="unknown">{t('Unknown')}</option>
-                          <option value="not-applicable">{t('N/A')}</option>
-                        </select>
+                          className="mt-2"
+                          buttonClassName="text-base"
+                          options={[
+                            { value: 'pending', label: t('Pending') },
+                            {
+                              value: 'not-performed',
+                              label: t('Not performed'),
+                            },
+                            { value: 'unknown', label: t('Unknown') },
+                            { value: 'not-applicable', label: t('N/A') },
+                          ]}
+                        />
                       ) : (
                         <input
                           id="manual-record-value"
@@ -1972,6 +2051,18 @@ export function ManualRecordTab() {
                     )}
                   </button>
                 </div>
+              </div>
+            )}
+
+            {isDeviceImportType && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => navigate(AppRoutes.Timeline)}
+                  className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
+                >
+                  {t('Cancel')}
+                </button>
               </div>
             )}
           </form>
@@ -2406,6 +2497,17 @@ function buildClinicalDocument({
       manual_subtype: specialtyDetails?.subtype,
       manual_specialty_details: specialtyDetails,
       manual_imaging_details: imagingDetails,
+      source_name: 'Manual entry',
+      source_type: 'manual',
+      source_location: 'manual://local',
+      retrieved_at: new Date().toISOString(),
+      entry_method: recordType === 'document' ? 'file-import' : 'manual-entry',
+      original_filename: fileName || undefined,
+      mapping_confidence: recordType === 'document' ? 'source' : 'manual',
+      provenance_notes:
+        recordType === 'document'
+          ? 'Original file preserved as a local document record.'
+          : undefined,
     },
   };
 }

@@ -182,6 +182,18 @@ export interface ClinicalDocument<T = unknown> extends BaseRecord {
       accessionId?: string;
       studyId?: string;
     };
+    sourceName?: string;
+    sourceType?: string;
+    sourceLocation?: string;
+    retrievedAt?: string;
+    entryMethod?:
+      | 'portal-sync'
+      | 'manual-entry'
+      | 'file-import'
+      | 'device-import';
+    originalFilename?: string;
+    mappingConfidence?: 'source' | 'mapped' | 'manual' | 'unknown';
+    provenanceNotes?: string;
   };
 }
 
@@ -215,6 +227,18 @@ export interface SummaryPagePreferences extends BaseRecord {
   cards: Array<{ id: string; visible: boolean; order: number }>;
 }
 
+export type WorkflowRecordKind =
+  | 'audit-log-entry'
+  | 'care-task'
+  | 'tracker-entry'
+  | 'sharing-state';
+
+export interface WorkflowRecord<TPayload = unknown> extends BaseRecord {
+  userId: AppId;
+  kind: WorkflowRecordKind;
+  payload: TPayload;
+}
+
 export const ALL_TABLES = [
   'users',
   'user_preferences',
@@ -223,6 +247,7 @@ export const ALL_TABLES = [
   'attachments',
   'instance_config',
   'summary_page_preferences',
+  'workflow_records',
 ] as const;
 
 export type TableName = (typeof ALL_TABLES)[number];
@@ -241,4 +266,6 @@ export type RecordOf<T extends TableName> = T extends 'users'
             ? InstanceConfig
             : T extends 'summary_page_preferences'
               ? SummaryPagePreferences
-              : never;
+              : T extends 'workflow_records'
+                ? WorkflowRecord
+                : never;

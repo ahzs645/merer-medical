@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { useDebounceCallback } from '@react-hook/debounce';
 import { BundleEntry, FhirResource } from 'fhir/r2';
@@ -10,7 +10,11 @@ import { useUser } from '../../../app/providers/UserProvider';
 import { useVectors } from '../../vectors';
 import { DatabaseCollections } from '../../../app/providers/DatabaseCollections';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
-import { QueryStatus, RecordsByDate } from '../types';
+import {
+  QueryStatus,
+  RecordsByDate,
+  TimelineRecordTypeFilter,
+} from '../types';
 import {
   fetchRecords,
   fetchRecordsWithVectorSearch,
@@ -24,6 +28,7 @@ export async function fetchRawRecords(
   user_id: string,
   offset: number,
   limit: number,
+  typeFilter: TimelineRecordTypeFilter = 'all',
 ): Promise<ClinicalDocument<BundleEntry<FhirResource>>[]> {
   const selector: MangoQuerySelector<ClinicalDocument<unknown>> = {
     user_id: user_id,
@@ -32,6 +37,10 @@ export async function fetchRawRecords(
     },
     'metadata.date': { $nin: [null, undefined, ''] },
   };
+
+  if (typeFilter !== 'all') {
+    selector['data_record.resource_type'] = typeFilter;
+  }
 
   const docs = await db.clinical_documents
     .find({
@@ -72,6 +81,41 @@ export function groupRecordsByDate(
   }
 
   return grouped;
+}
+
+export async function fetchTimelineDateKeys(
+  db: RxDatabase<DatabaseCollections>,
+  user_id: string,
+  typeFilter: TimelineRecordTypeFilter = 'all',
+): Promise<string[]> {
+  const selector: MangoQuerySelector<ClinicalDocument<unknown>> = {
+    user_id: user_id,
+    'data_record.resource_type': {
+      $nin: ['patient', 'provenance'],
+    },
+    'metadata.date': { $nin: [null, undefined, ''] },
+  };
+
+  if (typeFilter !== 'all') {
+    selector['data_record.resource_type'] = typeFilter;
+  }
+
+  const docs = await db.clinical_documents
+    .find({
+      selector,
+      sort: [{ 'metadata.date': 'desc' }],
+    })
+    .exec();
+
+  const dateKeys = new Set<string>();
+  for (const doc of docs) {
+    const date = doc.get('metadata')?.date;
+    if (date) {
+      dateKeys.add(format(parseISO(date), 'yyyy-MM-dd'));
+    }
+  }
+
+  return [...dateKeys];
 }
 
 export function mergeRecordsByDate(
@@ -123,6 +167,7 @@ export async function fetchRecordsUntilCompleteDays(
   timeoutMs: number = 3000,
   onPartialResults?: PartialResultsCallback,
   emitPartialBatches = false,
+  typeFilter: TimelineRecordTypeFilter = 'all',
 ): Promise<{
   records: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]>;
   hasMore: boolean;
@@ -145,6 +190,7 @@ export async function fetchRecordsUntilCompleteDays(
       user_id,
       offset,
       GROUPED_VIEW_BATCH_SIZE,
+      typeFilter,
     );
     const batchDuration = Date.now() - batchStartTime;
     const elapsed = Date.now() - startTime;
@@ -266,7 +312,13 @@ export async function fetchRecordsUntilCompleteDays(
     }
 
     if (hasEnoughDays) {
-      const checkBatch = await fetchRawRecords(db, user_id, offset, 1);
+      const checkBatch = await fetchRawRecords(
+        db,
+        user_id,
+        offset,
+        1,
+        typeFilter,
+      );
       if (checkBatch.length === 0) {
         console.debug(
           '[fetchRecordsUntilCompleteDays] exiting: no more records after exit check',
@@ -468,9 +520,14 @@ async function executeGroupedQuery(
   minCompleteDays: number,
   offset: number,
   loadMore: boolean,
+  typeFilter: TimelineRecordTypeFilter,
   dispatch: React.Dispatch<QueryAction>,
 ) {
-  console.debug('useRecordQuery: grouped view', { offset, loadMore });
+  console.debug('useRecordQuery: grouped view', {
+    offset,
+    loadMore,
+    typeFilter,
+  });
 
   const result = await fetchRecordsUntilCompleteDays(
     db,
@@ -490,6 +547,7 @@ async function executeGroupedQuery(
       });
     },
     loadMore,
+    typeFilter,
   );
 
   console.debug('useRecordQuery: grouped result', {
@@ -513,6 +571,7 @@ async function executeSearchQuery(
   query: string,
   page: number,
   loadMore: boolean,
+  typeFilter: TimelineRecordTypeFilter,
   vectorSearchConfig: {
     vectorStorage: VectorStorage<DatabaseCollections> | undefined;
     enableVectorSearch: boolean | undefined;
@@ -520,9 +579,14 @@ async function executeSearchQuery(
   },
   dispatch: React.Dispatch<QueryAction>,
 ): Promise<boolean> {
-  console.debug('useRecordQuery: search query', { query, page, loadMore });
+  console.debug('useRecordQuery: search query', {
+    query,
+    page,
+    loadMore,
+    typeFilter,
+  });
 
-  let records = await fetchRecords(db, userId, query, page);
+  let records = await fetchRecords(db, userId, query, page, typeFilter);
   const hasNoResults = Object.keys(records).length === 0;
 
   if (hasNoResults && shouldFallbackToVectorSearch(vectorSearchConfig)) {
@@ -538,6 +602,7 @@ async function executeSearchQuery(
         numResults: 20,
         enableSearchAttachments: true,
         groupByDate: true,
+        typeFilter,
       })
     ).records;
 
@@ -602,6 +667,7 @@ function shouldFallbackToVectorSearch(config: {
 export function useRecordQuery(
   query: string,
   enableAISemanticSearch?: boolean,
+  typeFilter: TimelineRecordTypeFilter = 'all',
   minCompleteDays = 3,
 ): {
   data: RecordsByDate | undefined;
@@ -650,6 +716,7 @@ export function useRecordQuery(
             minCompleteDays,
             offset,
             loadMore,
+            typeFilter,
             guardedDispatch,
           );
         } else {
@@ -660,6 +727,7 @@ export function useRecordQuery(
             query,
             page,
             loadMore,
+            typeFilter,
             {
               vectorStorage,
               enableVectorSearch: experimental__use_openai_rag,
@@ -682,6 +750,7 @@ export function useRecordQuery(
       state.searchPage,
       state.status,
       minCompleteDays,
+      typeFilter,
       vectorStorage,
       experimental__use_openai_rag,
       enableAISemanticSearch,
@@ -699,7 +768,7 @@ export function useRecordQuery(
   useEffect(() => {
     dispatch({ type: 'RESET_PAGINATION' });
     execQueryRef.current(false);
-  }, [query, enableAISemanticSearch]);
+  }, [query, enableAISemanticSearch, typeFilter]);
 
   return {
     data: state.data,
@@ -708,4 +777,39 @@ export function useRecordQuery(
     loadNextPage,
     showIndividualItems,
   };
+}
+
+export function useTimelineDateKeys(
+  enabled: boolean,
+  typeFilter: TimelineRecordTypeFilter = 'all',
+): string[] | undefined {
+  const db = useRxDb();
+  const user = useUser();
+  const requestIdRef = useRef(0);
+  const [dateKeys, setDateKeys] = useState<string[] | undefined>();
+
+  useEffect(() => {
+    if (!enabled) {
+      setDateKeys(undefined);
+      return;
+    }
+
+    const requestId = ++requestIdRef.current;
+    setDateKeys(undefined);
+
+    fetchTimelineDateKeys(db, user.id, typeFilter)
+      .then((keys) => {
+        if (requestIdRef.current === requestId) {
+          setDateKeys(keys);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        if (requestIdRef.current === requestId) {
+          setDateKeys(undefined);
+        }
+      });
+  }, [db, enabled, typeFilter, user.id]);
+
+  return dateKeys;
 }

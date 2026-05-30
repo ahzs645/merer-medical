@@ -1,4 +1,10 @@
-export type LabFlag = 'normal' | 'low' | 'high' | 'borderline' | 'identity';
+export type LabFlag =
+  | 'normal'
+  | 'low'
+  | 'high'
+  | 'abnormal'
+  | 'borderline'
+  | 'identity';
 
 export type AuditStatus =
   | 'source-verified'
@@ -107,6 +113,7 @@ export interface LabEnrichment {
   referenceCitation?: LabCitation;
   referenceAgeBand?: string;
   referenceNote?: string;
+  sourceReferenceRange?: string;
   normalizedValue?: NormalizedLabValue;
   usedByPlanner: boolean;
   audit: LabAuditSummary;
@@ -136,6 +143,7 @@ export interface LabReferenceEvaluation {
   referenceCitation?: LabCitation;
   referenceAgeBand?: string;
   referenceNote?: string;
+  sourceReferenceRange?: string;
   flag: LabFlag;
   normalizedValue?: NormalizedLabValue;
   isMappedStandard: boolean;

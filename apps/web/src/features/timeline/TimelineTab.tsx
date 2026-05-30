@@ -33,22 +33,27 @@ import { TimelineSkeleton } from './components/skeletons/TimelineSkeleton';
 import { TimelineYearHeader } from './components/layout/TimelineYearHeader';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { TimelineMonthDayHeader } from './components/layout/TimelineMonthDayHeader';
-import { useRecordQuery } from './hooks/useRecordQuery';
-import { QueryStatus } from './types';
+import { useRecordQuery, useTimelineDateKeys } from './hooks/useRecordQuery';
+import { QueryStatus, TimelineRecordTypeFilter } from './types';
 
 export { QueryStatus };
 
 export function TimelineTab() {
   const user = useUser(),
     [query, setQuery] = useState(''),
+    [typeFilter, setTypeFilter] = useState<TimelineRecordTypeFilter>('all'),
     { t } = useInterfaceLanguage(),
     { experimental__use_openai_rag } = useLocalConfig(),
     vectorSyncStatus = useVectorSyncStatus(),
     enableVectorSearch =
       experimental__use_openai_rag && vectorSyncStatus === 'COMPLETE',
     { data, status, initialized, loadNextPage, showIndividualItems } =
-      useRecordQuery(query, enableVectorSearch),
-    hasNoRecords = query === '' && (!data || Object.entries(data).length === 0),
+      useRecordQuery(query, enableVectorSearch, typeFilter),
+    timelineDateKeys = useTimelineDateKeys(query === '', typeFilter),
+    hasNoRecords =
+      query === '' &&
+      typeFilter === 'all' &&
+      (!data || Object.entries(data).length === 0),
     scrollContainer = useRef<HTMLDivElement>(null),
     scrollToTop = useScrollToTop(scrollContainer),
     onScroll: UIEventHandler<HTMLDivElement> = useDebounceCallback((e) => {
@@ -176,6 +181,7 @@ export function TimelineTab() {
           <div className="flex w-full overflow-hidden">
             <JumpToPanel
               items={data}
+              dateKeys={query === '' ? timelineDateKeys : undefined}
               isLoading={false}
               activeDateKey={activeDateKey ?? Object.keys(data || {})[0]}
             />
@@ -185,7 +191,13 @@ export function TimelineTab() {
               onScroll={onScroll}
             >
               <div className="h-max w-full max-w-4xl flex-col px-4 pb-[50vh] sm:px-6 lg:px-8">
-                <SearchBar query={query} setQuery={setQuery} status={status} />
+                <SearchBar
+                  query={query}
+                  setQuery={setQuery}
+                  status={status}
+                  typeFilter={typeFilter}
+                  setTypeFilter={setTypeFilter}
+                />
                 {listItems}
                 {(Object.keys(data || {}) || []).length === 0 ? (
                   <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
@@ -197,10 +209,12 @@ export function TimelineTab() {
                         {t('No matching records')}
                       </h1>
                       <p className="mt-6 text-lg leading-7 text-gray-700">
-                        {t('No records found with query: {query}').replace(
-                          '{query}',
-                          query,
-                        )}
+                        {query
+                          ? t('No records found with query: {query}').replace(
+                              '{query}',
+                              query,
+                            )
+                          : t('No records found for this filter')}
                       </p>
                     </div>
                   </main>
@@ -312,6 +326,7 @@ export async function fetchRecordsWithVectorSearch({
   numResults = 10,
   enableSearchAttachments = false,
   groupByDate = true,
+  typeFilter = 'all',
 }: {
   db: RxDatabase<DatabaseCollections>;
   vectorStorage: VectorStorage<any>;
@@ -320,6 +335,7 @@ export async function fetchRecordsWithVectorSearch({
   numResults?: number;
   enableSearchAttachments?: boolean;
   groupByDate?: boolean;
+  typeFilter?: TimelineRecordTypeFilter;
 }): Promise<{
   records: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]>;
   idsOfMostRelatedChunksFromSemanticSearch: string[];
@@ -394,9 +410,12 @@ export async function fetchRecordsWithVectorSearch({
     .find({
       selector: {
         id: { $in: cleanedIds },
-        'data_record.resource_type': {
-          $nin: ['patient', 'provenance'],
-        },
+        'data_record.resource_type':
+          typeFilter === 'all'
+            ? {
+                $nin: ['patient', 'provenance'],
+              }
+            : typeFilter,
       },
     })
     .exec();
@@ -504,6 +523,7 @@ export async function fetchRecords(
   user_id: string,
   query?: string,
   page?: number,
+  typeFilter: TimelineRecordTypeFilter = 'all',
 ): Promise<Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]>> {
   const parsedQuery = query?.trim() === '' ? undefined : query;
   let selector: MangoQuerySelector<ClinicalDocument<unknown>> = {
@@ -518,12 +538,17 @@ export async function fetchRecords(
     },
     'metadata.date': { $nin: [null, undefined, ''] },
   };
+  if (typeFilter !== 'all') {
+    selector['data_record.resource_type'] = typeFilter;
+  }
   if (parsedQuery) {
-    selector['data_record.resource_type']['$nin'] = [
-      'patient',
-      'documentreference_attachment',
-      'provenance',
-    ];
+    if (typeFilter === 'all') {
+      selector['data_record.resource_type']['$nin'] = [
+        'patient',
+        'documentreference_attachment',
+        'provenance',
+      ];
+    }
     selector = {
       ...selector,
       'metadata.display_name': { $regex: `.*${parsedQuery}.*`, $options: 'si' },

@@ -29,7 +29,7 @@ export function DentalTab() {
           <ToothChartPanel recordsByTooth={recordsByTooth} />
           <OrthodonticPanel records={records} />
           <DentalCleaningHistoryPanel records={records} />
-          <DentalScanPreview />
+          <DentalScanPreview imaging={imaging} />
           <div className="grid gap-4 lg:grid-cols-2">
             <DentalRecordsPanel records={records} />
             <DentalImagingPanel items={imaging} />

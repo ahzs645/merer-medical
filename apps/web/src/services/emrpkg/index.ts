@@ -24,6 +24,7 @@ export const RXDB_COLLECTIONS_IN_PACKAGE = [
   'connection_documents',
   'clinical_documents',
   'summary_page_preferences',
+  'workflow_records',
   'instance_config',
   'uspstf_recommendation_documents',
   'vector_storage',
@@ -36,6 +37,13 @@ export interface ExportEmrpkgOptions {
   appVersion?: string;
   /** Encrypt using a passkey (WebAuthn PRF) instead of a passphrase. */
   useWebauthn?: boolean;
+  exportNotes?: {
+    scope?: 'full' | 'visit';
+    userId?: string;
+    includeProvenance?: boolean;
+    includeAttachments?: boolean;
+    includeAuditTrail?: boolean;
+  };
 }
 
 export interface ImportEmrpkgOptions {
@@ -61,7 +69,12 @@ export async function exportEmrpkgFromRxDb(
     const collection = db[name as keyof DatabaseCollections];
     if (!collection) continue;
     const docs = await collection.find().exec();
-    const rows = docs.map((d) => d.toJSON());
+    const rows = applyExportOptions(
+      name,
+      docs.map((d) => d.toJSON()),
+      opts,
+    );
+    if (rows.length === 0 && shouldOmitEmptyExportTable(name, opts)) continue;
     counts[name] = rows.length;
     tableFiles[name] = strToU8(JSON.stringify(rows));
   }
@@ -74,6 +87,7 @@ export async function exportEmrpkgFromRxDb(
       tables: Object.keys(tableFiles),
       counts,
       attachmentCount: 0,
+      exportNotes: opts.exportNotes,
     },
     tableFiles,
     attachments: {},
@@ -157,3 +171,91 @@ export async function importEmrpkgToRxDb(
 }
 
 export { inspectEmrpkg };
+
+function applyExportOptions(
+  tableName: RxDbCollectionName,
+  rows: unknown[],
+  opts: ExportEmrpkgOptions,
+): unknown[] {
+  if (opts.exportNotes?.scope === 'visit') {
+    rows = rows.filter((row) =>
+      isVisitScopedRow(row, opts.exportNotes?.userId),
+    );
+  }
+
+  if (tableName === 'workflow_records') {
+    return opts.exportNotes?.includeAuditTrail === false
+      ? rows.filter(
+          (row) => (row as { kind?: string }).kind !== 'audit-log-entry',
+        )
+      : rows;
+  }
+  if (tableName !== 'clinical_documents') return rows;
+
+  return rows
+    .filter((row) => {
+      const record = row as {
+        data_record?: { resource_type?: string };
+      };
+      const resourceType = record.data_record?.resource_type;
+      if (
+        opts.exportNotes?.includeProvenance === false &&
+        resourceType === 'provenance'
+      ) {
+        return false;
+      }
+      if (
+        opts.exportNotes?.includeAttachments === false &&
+        resourceType === 'documentreference_attachment'
+      ) {
+        return false;
+      }
+      return true;
+    })
+    .map((row) =>
+      opts.exportNotes?.includeAttachments === false
+        ? stripEmbeddedAttachmentData(row)
+        : row,
+    );
+}
+
+function shouldOmitEmptyExportTable(
+  tableName: RxDbCollectionName,
+  opts: ExportEmrpkgOptions,
+) {
+  return (
+    opts.exportNotes?.scope === 'visit' &&
+    (tableName === 'user_documents' ||
+      tableName === 'connection_documents' ||
+      tableName === 'clinical_documents' ||
+      tableName === 'workflow_records')
+  );
+}
+
+function isVisitScopedRow(row: unknown, userId?: string) {
+  if (!row || typeof row !== 'object') return true;
+  const record = row as { user_id?: string; is_selected_user?: boolean };
+  if (typeof record.user_id === 'string') {
+    return userId ? record.user_id === userId : true;
+  }
+  if ('is_selected_user' in record) {
+    return record.is_selected_user !== false;
+  }
+  return true;
+}
+
+function stripEmbeddedAttachmentData(row: unknown): unknown {
+  if (!row || typeof row !== 'object') return row;
+  const clone = JSON.parse(JSON.stringify(row)) as {
+    data_record?: { raw?: { resource?: { content?: unknown[] } } };
+  };
+  const content = clone.data_record?.raw?.resource?.content;
+  if (!Array.isArray(content)) return clone;
+
+  for (const item of content) {
+    const attachment = (item as { attachment?: { data?: unknown } })
+      ?.attachment;
+    if (attachment && 'data' in attachment) delete attachment.data;
+  }
+  return clone;
+}

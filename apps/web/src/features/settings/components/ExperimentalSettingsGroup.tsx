@@ -15,6 +15,7 @@ import {
   OLLAMA_EMBEDDING_MODELS,
   OLLAMA_RERANK_MODELS,
 } from '../../ai-chat/constants/defaults';
+import { StylizedSelect } from '../../../shared/components/StylizedSelect';
 
 export function ExperimentalSettingsGroup() {
   const {
@@ -281,17 +282,12 @@ export function ExperimentalSettingsGroup() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Chat Model
                     </label>
-                    <select
-                      className="bg-gray-50 rounded-md p-2 w-full border-none focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                    <StylizedSelect
+                      buttonClassName="border-none bg-gray-50"
                       value={ollamaModel}
-                      onChange={(e) => setOllamaModel(e.target.value)}
-                    >
-                      {OLLAMA_CHAT_MODELS.map((model) => (
-                        <option key={model.value} value={model.value}>
-                          {model.label}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={setOllamaModel}
+                      options={OLLAMA_CHAT_MODELS}
+                    />
                     <p className="text-xs text-gray-500 mt-1">
                       Select the Ollama chat model to use
                     </p>
@@ -301,17 +297,12 @@ export function ExperimentalSettingsGroup() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Embedding Model
                     </label>
-                    <select
-                      className="bg-gray-50 rounded-md p-2 w-full border-none focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                    <StylizedSelect
+                      buttonClassName="border-none bg-gray-50"
                       value={ollamaEmbeddingModel}
-                      onChange={(e) => setOllamaEmbeddingModel(e.target.value)}
-                    >
-                      {OLLAMA_EMBEDDING_MODELS.map((model) => (
-                        <option key={model.value} value={model.value}>
-                          {model.label}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={setOllamaEmbeddingModel}
+                      options={OLLAMA_EMBEDDING_MODELS}
+                    />
                     <p className="text-xs text-gray-500 mt-1">
                       The embedding model for vector search
                     </p>
@@ -321,17 +312,12 @@ export function ExperimentalSettingsGroup() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Reranking Model
                     </label>
-                    <select
-                      className="bg-gray-50 rounded-md p-2 w-full border-none focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                    <StylizedSelect
+                      buttonClassName="border-none bg-gray-50"
                       value={ollamaRerankModel}
-                      onChange={(e) => setOllamaRerankModel(e.target.value)}
-                    >
-                      {OLLAMA_RERANK_MODELS.map((model) => (
-                        <option key={model.value} value={model.value}>
-                          {model.label}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={setOllamaRerankModel}
+                      options={OLLAMA_RERANK_MODELS}
+                    />
                     <p className="text-xs text-gray-500 mt-1">
                       Optional: Specialized model for reranking search results.
                       Select "None" to disable reranking.

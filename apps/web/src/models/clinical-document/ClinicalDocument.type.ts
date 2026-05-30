@@ -77,6 +77,18 @@ export interface ClinicalDocument<T = unknown> {
       accessionId?: string;
       studyId?: string;
     };
+    source_name?: string;
+    source_type?: string;
+    source_location?: string;
+    retrieved_at?: string;
+    entry_method?:
+      | 'portal-sync'
+      | 'manual-entry'
+      | 'file-import'
+      | 'device-import';
+    original_filename?: string;
+    mapping_confidence?: 'source' | 'mapped' | 'manual' | 'unknown';
+    provenance_notes?: string;
   };
 }
 

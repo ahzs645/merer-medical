@@ -12,6 +12,7 @@ const flagStyles = {
   normal: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
   low: 'bg-amber-50 text-amber-700 ring-amber-200',
   high: 'bg-red-50 text-red-700 ring-red-200',
+  abnormal: 'bg-amber-50 text-amber-700 ring-amber-200',
   borderline: 'bg-amber-50 text-amber-700 ring-amber-200',
   identity: 'bg-gray-50 text-gray-700 ring-gray-200',
 };
@@ -49,7 +50,11 @@ export function LabEnrichmentPanel({
         <InfoTile
           icon={<ClipboardDocumentCheckIcon className="h-4 w-4" />}
           title="Source range"
-          value={enrichment.originalReferenceRange || 'Not provided'}
+          value={
+            enrichment.sourceReferenceRange ||
+            enrichment.originalReferenceRange ||
+            'Not provided'
+          }
           detail={flagComparisonLabel(enrichment)}
         />
         <InfoTile

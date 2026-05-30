@@ -1,5 +1,6 @@
 import { interfaceLanguages } from '../../../app/i18n/translations';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { StylizedSelect } from '../../../shared/components/StylizedSelect';
 
 export function InterfaceLanguageSettingsGroup() {
   const { language, setLanguage, t } = useInterfaceLanguage();
@@ -16,19 +17,15 @@ export function InterfaceLanguageSettingsGroup() {
             <span className="max-w-xl text-sm text-gray-700">
               {t('Choose the language used for menus, headings, and app copy.')}
             </span>
-            <select
+            <StylizedSelect
               value={language}
-              onChange={(event) =>
-                setLanguage(event.target.value === 'ar' ? 'ar' : 'en')
-              }
-              className="focus:border-primary-500 focus:ring-primary-500 max-w-xs rounded-md border-gray-300 text-sm"
-            >
-              {interfaceLanguages.map((item) => (
-                <option key={item.code} value={item.code}>
-                  {item.nativeLabel} ({item.label})
-                </option>
-              ))}
-            </select>
+              onChange={(value) => setLanguage(value === 'ar' ? 'ar' : 'en')}
+              className="max-w-xs"
+              options={interfaceLanguages.map((item) => ({
+                value: item.code,
+                label: `${item.nativeLabel} (${item.label})`,
+              }))}
+            />
           </label>
         </div>
       </div>

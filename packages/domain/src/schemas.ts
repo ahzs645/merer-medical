@@ -91,6 +91,18 @@ export const clinicalDocumentSchema = z.object({
           studyId: z.string().optional(),
         })
         .optional(),
+      sourceName: z.string().optional(),
+      sourceType: z.string().optional(),
+      sourceLocation: z.string().optional(),
+      retrievedAt: z.string().optional(),
+      entryMethod: z
+        .enum(['portal-sync', 'manual-entry', 'file-import', 'device-import'])
+        .optional(),
+      originalFilename: z.string().optional(),
+      mappingConfidence: z
+        .enum(['source', 'mapped', 'manual', 'unknown'])
+        .optional(),
+      provenanceNotes: z.string().optional(),
     })
     .optional(),
 });
@@ -130,6 +142,18 @@ export const summaryPagePreferencesSchema = z.object({
   ),
 });
 
+export const workflowRecordSchema = z.object({
+  ...base,
+  userId: z.string(),
+  kind: z.enum([
+    'audit-log-entry',
+    'care-task',
+    'tracker-entry',
+    'sharing-state',
+  ]),
+  payload: z.unknown(),
+});
+
 export const tableSchemas = {
   users: userSchema,
   user_preferences: userPreferencesSchema,
@@ -138,6 +162,7 @@ export const tableSchemas = {
   attachments: attachmentSchema,
   instance_config: instanceConfigSchema,
   summary_page_preferences: summaryPagePreferencesSchema,
+  workflow_records: workflowRecordSchema,
 } as const;
 
 export type TableSchemas = typeof tableSchemas;

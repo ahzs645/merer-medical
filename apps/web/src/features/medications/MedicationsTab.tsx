@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
+  AllergyIntolerance,
+  BundleEntry,
+  FhirResource,
+} from 'fhir/r2';
+import {
   BeakerIcon,
   CheckCircleIcon,
   ChevronDownIcon,
@@ -7,15 +12,19 @@ import {
   ExclamationTriangleIcon,
   MagnifyingGlassIcon,
   NoSymbolIcon,
+  PlusIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { format, parseISO } from 'date-fns';
+import { Link } from 'react-router-dom';
 
+import { Routes as AppRoutes } from '../../Routes';
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
-import { EmptyRecordsPlaceholder } from '../../shared/components/EmptyRecordsPlaceholder';
+import { getFhirResource } from '../../shared/utils/fhirResource';
 import {
   normalizeMedicationDocuments,
   type MedicationReconciliationState,
@@ -66,35 +75,52 @@ const FILTERS: FilterChip[] = [
   },
 ];
 
+const ADD_MEDICATION_PATH = `${AppRoutes.AddRecord}?type=medicationstatement`;
+
 export function MedicationsTab() {
   const db = useRxDb();
   const user = useUser();
   const [items, setItems] = useState<MedicationViewItem[]>([]);
+  const [allergies, setAllergies] = useState<ClinicalDocument[]>([]);
   const [status, setStatus] = useState<'loading' | 'success'>('loading');
-  const [selectedFilter, setSelectedFilter] =
-    useState<FilterChip['id']>('all');
+  const [selectedFilter, setSelectedFilter] = useState<FilterChip['id']>('all');
   const [query, setQuery] = useState('');
+  const { t } = useInterfaceLanguage();
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchMedications() {
       setStatus('loading');
-      const docs = await db.clinical_documents
-        .find({
-          selector: {
-            user_id: user.id,
-            'data_record.resource_type': { $in: MEDICATION_RESOURCE_TYPES },
-          },
-          sort: [{ 'metadata.date': 'desc' }],
-        })
-        .exec();
+      const [docs, allergyDocs] = await Promise.all([
+        db.clinical_documents
+          .find({
+            selector: {
+              user_id: user.id,
+              'data_record.resource_type': { $in: MEDICATION_RESOURCE_TYPES },
+            },
+            sort: [{ 'metadata.date': 'desc' }],
+          })
+          .exec(),
+        db.clinical_documents
+          .find({
+            selector: {
+              user_id: user.id,
+              'data_record.resource_type': 'allergyintolerance',
+            },
+            sort: [{ 'metadata.date': 'desc' }],
+          })
+          .exec(),
+      ]);
 
       if (!isMounted) return;
       setItems(
         normalizeMedicationDocuments(
           docs.map((doc) => doc.toMutableJSON() as ClinicalDocument),
         ).map(toMedicationViewItem),
+      );
+      setAllergies(
+        allergyDocs.map((doc) => doc.toMutableJSON() as ClinicalDocument),
       );
       setStatus('success');
     }
@@ -154,14 +180,23 @@ export function MedicationsTab() {
     <AppPage
       banner={
         <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <h1 className="text-xl font-semibold text-gray-900">
-              Medications
-            </h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Reconciled prescriptions, planned therapy, stopped medications,
-              supplements, adherence, and source history.
-            </p>
+          <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">
+                Medications
+              </h1>
+              <p className="mt-1 text-sm text-gray-600">
+                Reconciled prescriptions, planned therapy, stopped medications,
+                supplements, adherence, and source history.
+              </p>
+            </div>
+            <Link
+              to={ADD_MEDICATION_PATH}
+              className="inline-flex w-fit items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+            >
+              <PlusIcon className="h-5 w-5" />
+              {t('Add medication')}
+            </Link>
           </div>
         </div>
       }
@@ -173,7 +208,7 @@ export function MedicationsTab() {
               Loading medications...
             </div>
           ) : items.length === 0 ? (
-            <EmptyRecordsPlaceholder />
+            <EmptyMedicationsState />
           ) : (
             <>
               <MedicationToolbar
@@ -183,6 +218,8 @@ export function MedicationsTab() {
                 onQueryChange={setQuery}
                 onFilterChange={setSelectedFilter}
               />
+
+              <AllergySafetyPanel allergies={allergies} />
 
               {supplementItems.length > 0 && (
                 <SupplementsPanel items={supplementItems} />
@@ -197,6 +234,33 @@ export function MedicationsTab() {
         </div>
       </div>
     </AppPage>
+  );
+}
+
+function EmptyMedicationsState() {
+  const { t } = useInterfaceLanguage();
+
+  return (
+    <div className="rounded-md bg-white p-8 text-center shadow-sm ring-1 ring-gray-200">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-700">
+        <BeakerIcon className="h-6 w-6" />
+      </div>
+      <h2 className="mt-4 text-lg font-semibold text-gray-900">
+        {t('No medications yet')}
+      </h2>
+      <p className="mx-auto mt-2 max-w-xl text-sm text-gray-600">
+        {t(
+          'Add a prescription, over-the-counter medication, or supplement directly. Connected portal records will appear here too.',
+        )}
+      </p>
+      <Link
+        to={ADD_MEDICATION_PATH}
+        className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+      >
+        <PlusIcon className="h-5 w-5" />
+        {t('Add medication')}
+      </Link>
+    </div>
   );
 }
 
@@ -251,6 +315,79 @@ function MedicationToolbar({
         })}
       </div>
     </div>
+  );
+}
+
+function AllergySafetyPanel({ allergies }: { allergies: ClinicalDocument[] }) {
+  if (allergies.length === 0) return null;
+
+  const activeAllergies = allergies
+    .map((doc) => {
+      const resource = getFhirResource<AllergyIntolerance & FhirResource>(
+        doc as ClinicalDocument<BundleEntry<AllergyIntolerance>>,
+      );
+      const status =
+        (resource as any)?.clinicalStatus?.text ||
+        (resource as any)?.status ||
+        'active';
+      return {
+        id: doc.id,
+        name:
+          (resource as any)?.code?.text ||
+          (resource as any)?.substance?.text ||
+          (resource as any)?.substance?.coding?.[0]?.display ||
+          doc.metadata?.display_name ||
+          'Allergy',
+        status,
+        reaction: ((resource as any)?.reaction || [])
+          .map((reaction: any) =>
+            [
+              reaction.manifestation?.[0]?.text,
+              reaction.severity,
+              reaction.description,
+            ]
+              .filter(Boolean)
+              .join(' - '),
+          )
+          .filter(Boolean)
+          .join('; '),
+      };
+    })
+    .filter(
+      (item) =>
+        !['inactive', 'resolved', 'entered-in-error'].includes(
+          item.status.toLowerCase(),
+        ),
+    );
+
+  if (activeAllergies.length === 0) return null;
+
+  return (
+    <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-amber-200">
+      <div className="flex items-center gap-2">
+        <ExclamationTriangleIcon className="h-5 w-5 text-amber-600" />
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-700">
+          Allergy safety review
+        </h2>
+      </div>
+      <p className="mt-2 text-sm text-gray-600">
+        Keep this list reconciled before starting, stopping, or sharing
+        medications. Imported allergies can be stale or duplicated across
+        portals.
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {activeAllergies.slice(0, 12).map((allergy) => (
+          <span
+            key={allergy.id}
+            className="rounded-md bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800"
+            title={allergy.reaction}
+          >
+            {allergy.name}
+            {allergy.reaction ? ` - ${allergy.reaction}` : ''}
+          </span>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -346,7 +483,9 @@ function MedicationCard({ item }: { item: MedicationViewItem }) {
             <ReconciliationBadge state={item.reconciliationState} />
           </div>
           <div className="mt-2 flex flex-wrap gap-2">
-            <Badge tone={statusTone(item.status)}>{humanize(item.status)}</Badge>
+            <Badge tone={statusTone(item.status)}>
+              {humanize(item.status)}
+            </Badge>
             <Badge>{humanize(item.category || item.resourceType)}</Badge>
             {item.rxNorm?.code && <Badge>RxNorm {item.rxNorm.code}</Badge>}
           </div>
@@ -373,10 +512,7 @@ function MedicationCard({ item }: { item: MedicationViewItem }) {
           <InlineFact label="Source" value={sourceLabel(item.source)} />
         )}
         {item.conditionalInstructions && (
-          <InlineFact
-            label="Condition"
-            value={item.conditionalInstructions}
-          />
+          <InlineFact label="Condition" value={item.conditionalInstructions} />
         )}
         {item.stopReason && (
           <InlineFact label="Stopped because" value={item.stopReason} />
@@ -408,7 +544,11 @@ function MedicationCard({ item }: { item: MedicationViewItem }) {
   );
 }
 
-function HistoryList({ events }: { events: MedicationTimelineItem['history'] }) {
+function HistoryList({
+  events,
+}: {
+  events: MedicationTimelineItem['history'];
+}) {
   return (
     <div>
       <h4 className="text-sm font-semibold text-gray-900">
@@ -422,9 +562,7 @@ function HistoryList({ events }: { events: MedicationTimelineItem['history'] }) 
           >
             <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary-600" />
             <div className="min-w-0">
-              <p className="text-sm font-medium text-gray-900">
-                {event.label}
-              </p>
+              <p className="text-sm font-medium text-gray-900">{event.label}</p>
               <p className="text-xs text-gray-500">{formatDate(event.date)}</p>
               {event.notes && event.notes.length > 0 && (
                 <p className="mt-1 whitespace-pre-line text-sm text-gray-700">
@@ -542,7 +680,9 @@ function ReconciliationBadge({
   return <Badge tone={tone}>{humanize(state)}</Badge>;
 }
 
-function toMedicationViewItem(item: MedicationTimelineItem): MedicationViewItem {
+function toMedicationViewItem(
+  item: MedicationTimelineItem,
+): MedicationViewItem {
   const nutritionFacts = nutritionFactsFrom(item);
   const group = classifyGroup(item, nutritionFacts);
 
@@ -607,9 +747,11 @@ function nutritionFactsFrom(item: MedicationTimelineItem): NutritionFact[] {
     if (label) facts.push({ label, value: value || 'ingredient' });
   });
 
-  const vitaminMatch = item.notes.join('\n').match(
-    /\b(vitamin\s+[a-z0-9]+|magnesium|omega-?3|zinc|calcium|iron|folate)\b[^,\n;]*/gi,
-  );
+  const vitaminMatch = item.notes
+    .join('\n')
+    .match(
+      /\b(vitamin\s+[a-z0-9]+|magnesium|omega-?3|zinc|calcium|iron|folate)\b[^,\n;]*/gi,
+    );
   vitaminMatch?.forEach((value) => {
     facts.push({ label: value.split(/\s+/).slice(0, 2).join(' '), value });
   });

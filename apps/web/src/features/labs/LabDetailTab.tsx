@@ -19,10 +19,17 @@ import {
 import { ReferenceOverlayMode } from './enrichment/types';
 import { useLabsData } from './hooks/useLabsData';
 import { groupLabs } from './utils/labGrouping';
+import { ProvenancePanel } from '../provenance/ProvenancePanel';
+import { LinkedReportList } from './components/LinkedReportList';
+import {
+  getLabGroupInsight,
+  getLabResultStatusClass,
+} from './utils/labResultDetails';
+import { StylizedSelect } from '../../shared/components/StylizedSelect';
 
 export function LabDetailTab() {
   const { labKey } = useParams<{ labKey: string }>(),
-    { labs, reportsByObservationId, status } = useLabsData();
+    { labs, reportsByObservationId, connectionsById, status } = useLabsData();
   const [enabledOverlayModes, setEnabledOverlayModes] = useState<
     ReferenceOverlayMode[]
   >(['canadian', 'original']);
@@ -34,6 +41,16 @@ export function LabDetailTab() {
     return groupedLabs.find((item) => item.key === decodedKey);
   }, [groupedLabs, labKey]);
   const latestLab = group?.labs[0];
+  const latestReports = latestLab
+    ? reportsByObservationId.get(latestLab.metadata?.id || '') || []
+    : [];
+  const latestConnection = latestLab
+    ? connectionsById.get(latestLab.connection_record_id)
+    : undefined;
+  const labInsight = useMemo(
+    () => (group ? getLabGroupInsight(group) : undefined),
+    [group],
+  );
   const referenceOverlays = useMemo(() => {
     if (!group || !latestLab) return [];
     return buildLabReferenceOverlays({ group, lab: latestLab });
@@ -101,10 +118,143 @@ export function LabDetailTab() {
                           'Unknown',
                         )}
                       </span>
+                      {labInsight?.latest.statusLabel ? (
+                        <span
+                          className={`font-semibold ${getLabResultStatusClass(
+                            labInsight.latest.status,
+                          )}`}
+                        >
+                          {labInsight.latest.statusLabel}
+                        </span>
+                      ) : null}
                     </div>
                   </div>
                 </div>
               </section>
+              {latestLab ? (
+                <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
+                  <div className="mb-3">
+                    <h2 className="text-base font-semibold text-gray-900">
+                      Source and related records
+                    </h2>
+                    <p className="mt-1 text-sm text-gray-600">
+                      Where this result came from, linked reports, and useful
+                      next places to review.
+                    </p>
+                  </div>
+                  <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.8fr)]">
+                    <ProvenancePanel
+                      document={latestLab}
+                      connection={latestConnection}
+                    />
+                    <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
+                      <h3 className="text-sm font-semibold text-gray-900">
+                        Related links
+                      </h3>
+                      <div className="mt-3 space-y-3 text-sm">
+                        <div>
+                          <div className="font-medium text-gray-500">
+                            Diagnostic reports
+                          </div>
+                          <div className="mt-1">
+                            <LinkedReportList reports={latestReports} />
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <Link
+                            to={Routes.Documents}
+                            className="rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
+                          >
+                            Documents
+                          </Link>
+                          <Link
+                            to={Routes.AuditLog}
+                            className="rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
+                          >
+                            Audit log
+                          </Link>
+                          <Link
+                            to={Routes.Sharing}
+                            className="rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
+                          >
+                            Export record
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              ) : null}
+              {labInsight ? (
+                <section className="grid gap-3 md:grid-cols-4">
+                  <LabInsightCard
+                    label="Latest result"
+                    value={labInsight.latest.value}
+                    detail={labInsight.latest.statusLabel}
+                    valueClassName={getLabResultStatusClass(
+                      labInsight.latest.status,
+                    )}
+                  />
+                  <LabInsightCard
+                    label="Flagged results"
+                    value={`${labInsight.abnormalCount}`}
+                    detail={`${labInsight.highCount} high, ${labInsight.lowCount} low`}
+                    valueClassName={
+                      labInsight.abnormalCount > 0
+                        ? 'text-red-700'
+                        : 'text-green-700'
+                    }
+                  />
+                  <LabInsightCard
+                    label="Comments"
+                    value={`${labInsight.commentedCount}`}
+                    detail="provider or source notes"
+                  />
+                  <LabInsightCard
+                    label="Reported by"
+                    value={`${labInsight.distinctPerformers.length || 0}`}
+                    detail={
+                      labInsight.distinctPerformers.slice(0, 2).join(', ') ||
+                      labInsight.latest.source ||
+                      'Unknown source'
+                    }
+                  />
+                </section>
+              ) : null}
+              {labInsight &&
+              (labInsight.latest.comments.length > 0 ||
+                labInsight.latest.performer ||
+                labInsight.latest.accessionId) ? (
+                <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
+                  <h2 className="text-base font-semibold text-gray-900">
+                    Latest result details
+                  </h2>
+                  <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
+                    <LabDetailField
+                      label="Reference"
+                      value={labInsight.latest.referenceRange}
+                    />
+                    <LabDetailField
+                      label="Performer"
+                      value={labInsight.latest.performer}
+                    />
+                    <LabDetailField
+                      label="Accession"
+                      value={labInsight.latest.accessionId}
+                    />
+                  </dl>
+                  {labInsight.latest.comments.length > 0 ? (
+                    <div className="mt-4 rounded-md bg-blue-50 p-3 text-sm text-blue-950 ring-1 ring-blue-100">
+                      <h3 className="font-semibold">Provider comments</h3>
+                      <ul className="mt-2 space-y-1">
+                        {labInsight.latest.comments.map((comment) => (
+                          <li key={comment}>{comment}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                </section>
+              ) : null}
               <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
                 <div className="flex flex-col gap-3">
                   <h2 className="text-base font-semibold text-gray-900">
@@ -113,19 +263,16 @@ export function LabDetailTab() {
                   {graphUnitOptions.length > 1 ? (
                     <label className="flex w-full max-w-xs flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
                       Normalize to
-                      <select
+                      <StylizedSelect
                         value={activeGraphUnit || ''}
-                        onChange={(event) =>
-                          setSelectedGraphUnit(event.target.value)
-                        }
-                        className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium normal-case tracking-normal text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200"
-                      >
-                        {graphUnitOptions.map((option) => (
-                          <option key={option.unit} value={option.unit}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={setSelectedGraphUnit}
+                        className="normal-case tracking-normal"
+                        buttonClassName="font-medium"
+                        options={graphUnitOptions.map((option) => ({
+                          value: option.unit,
+                          label: option.label,
+                        }))}
+                      />
                     </label>
                   ) : null}
                   <LabReferenceOverlayControls
@@ -179,5 +326,40 @@ export function LabDetailTab() {
         </div>
       </div>
     </AppPage>
+  );
+}
+
+function LabInsightCard({
+  label,
+  value,
+  detail,
+  valueClassName = 'text-gray-900',
+}: {
+  label: string;
+  value: string;
+  detail: string;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+      <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+        {label}
+      </div>
+      <div className={`mt-2 text-xl font-bold ${valueClassName}`}>{value}</div>
+      <div className="mt-1 max-h-8 overflow-hidden text-xs text-gray-600">
+        {detail}
+      </div>
+    </div>
+  );
+}
+
+function LabDetailField({ label, value }: { label: string; value?: string }) {
+  return (
+    <div>
+      <dt className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+        {label}
+      </dt>
+      <dd className="mt-1 text-gray-900">{value || 'Not recorded'}</dd>
+    </div>
   );
 }

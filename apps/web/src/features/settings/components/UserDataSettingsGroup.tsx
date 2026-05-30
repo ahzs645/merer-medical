@@ -22,6 +22,7 @@ import {
 } from '../../../services/emrpkg';
 import React from 'react';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { StylizedSelect } from '../../../shared/components/StylizedSelect';
 
 export type ImportFields = {
   backup?: FileList;
@@ -430,18 +431,18 @@ export function UserDataSettingsGroup() {
                 </button>
                 <label className="inline-flex items-center text-sm text-gray-800">
                   <span className="mr-2 font-medium">{t('Import mode')}</span>
-                  <select
+                  <StylizedSelect
                     value={emrpkgImportMode}
-                    onChange={(event) =>
-                      setEmrpkgImportMode(
-                        event.target.value as 'merge' | 'replace',
-                      )
+                    onChange={(value) =>
+                      setEmrpkgImportMode(value as 'merge' | 'replace')
                     }
-                    className="focus:ring-primary-500 focus:border-primary-500 block rounded-md border-gray-300 text-sm shadow-sm"
-                  >
-                    <option value="merge">{t('Add to this app')}</option>
-                    <option value="replace">{t('Replace everything')}</option>
-                  </select>
+                    className="min-w-44"
+                    buttonClassName="min-h-[34px] py-1.5"
+                    options={[
+                      { value: 'merge', label: t('Add to this app') },
+                      { value: 'replace', label: t('Replace everything') },
+                    ]}
+                  />
                 </label>
                 <button
                   type="button"

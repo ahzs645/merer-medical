@@ -76,7 +76,8 @@ if (!args.sourceDir || !args.output) {
   node tools/build-ahs-mychart-emrpkg.mjs \\
     --source-dir /path/to/ahs-mychart-export \\
     --output /path/to/export.emrpkg \\
-    [--json export.json] [--ccda-dir /path/to/IHE_XDM/patient-folder] \\
+    [--json export.json] [--health-summary-dir /path/to/HealthSummary] \\
+    [--ccda-dir /path/to/IHE_XDM/patient-folder] \\
     [--report /path/to/report.md]`);
   process.exit(1);
 }
@@ -87,6 +88,9 @@ const jsonPath = args.json
   : discoverSourceJson(sourceDir);
 const outputPath = resolve(args.output);
 const reportPath = args.report ? resolve(args.report) : undefined;
+const healthSummaryDir = args.healthSummaryDir
+  ? resolve(args.healthSummaryDir)
+  : discoverHealthSummaryDirectory(sourceDir);
 
 const source = JSON.parse(readFileSync(jsonPath, 'utf8'));
 const now = Date.now();
@@ -156,9 +160,17 @@ addFamilyHistory(source.medicalHistory?.familyHistory || []);
 addTestResults(source.testResults?.results || []);
 addRawExportDocument(source, jsonPath);
 addSiblingJsonDocuments(sourceDir);
+addMyHealthRecordsExports(sourceDir);
 addSourceProvenance();
-addCcdaExtractedRecords(sourceDir);
+addHealthSummaryExtractedRecords(healthSummaryDir);
+consolidateDiagnosticReports();
 addFileDocuments(sourceDir);
+if (healthSummaryDir && !isInsidePath(healthSummaryDir, sourceDir)) {
+  addFileDocuments(healthSummaryDir, {
+    baseDir: dirname(healthSummaryDir),
+    prefix: basename(healthSummaryDir),
+  });
+}
 addCompanionResourcesForLooseFiles(sourceDir);
 
 const tableFiles = {
@@ -257,8 +269,21 @@ function addVital(kind, display, loinc, item) {
       resourceType: 'Observation',
       id,
       status: 'final',
-      category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'vital-signs' }] }],
-      code: { coding: [{ system: 'http://loinc.org', code: loinc, display }], text: display },
+      category: [
+        {
+          coding: [
+            {
+              system:
+                'http://terminology.hl7.org/CodeSystem/observation-category',
+              code: 'vital-signs',
+            },
+          ],
+        },
+      ],
+      code: {
+        coding: [{ system: 'http://loinc.org', code: loinc, display }],
+        text: display,
+      },
       effectiveDateTime: normalizeDateTime(item.dateRecorded),
       valueQuantity: parsed,
       note: [{ text: `Source value: ${item.value}` }],
@@ -283,7 +308,9 @@ function addAllergyStatus(allergies) {
         clinicalStatus: { text: allergies.status },
         code: { text: allergies.status },
         patient: { reference: `Patient/${userId}` },
-        note: [{ text: 'Imported as stated allergy status from source export.' }],
+        note: [
+          { text: 'Imported as stated allergy status from source export.' },
+        ],
       },
     });
   }
@@ -330,7 +357,9 @@ function addSurgeries(surgeries) {
 function addFamilyHistory(items) {
   for (const [index, family] of items.entries()) {
     const conditions = (family.conditions || []).filter(Boolean);
-    const label = [family.relationship, conditions.join(', ')].filter(Boolean).join(': ');
+    const label = [family.relationship, conditions.join(', ')]
+      .filter(Boolean)
+      .join(': ');
     const id = stableId(`family-${index}-${JSON.stringify(family)}`);
     addClinicalDocument({
       resourceType: 'familymemberhistory',
@@ -344,8 +373,11 @@ function addFamilyHistory(items) {
         patient: { reference: `Patient/${userId}` },
         name: family.name || undefined,
         relationship: { text: family.relationship },
-        deceasedBoolean: family.status?.toLowerCase() === 'deceased' || undefined,
-        condition: conditions.map((condition) => ({ code: { text: condition } })),
+        deceasedBoolean:
+          family.status?.toLowerCase() === 'deceased' || undefined,
+        condition: conditions.map((condition) => ({
+          code: { text: condition },
+        })),
         note: [{ text: `Source status: ${family.status || 'not specified'}` }],
       },
     });
@@ -354,10 +386,21 @@ function addFamilyHistory(items) {
 
 function addTestResults(results) {
   for (const [index, result] of results.entries()) {
-    const reportId = stableId(`result-${index}-${result.name}-${result.date}-${result.collectionDate}`);
+    const reportId = stableId(
+      `result-${index}-${result.name}-${result.date}-${result.collectionDate}`,
+    );
     const resultRefs = [];
-    for (const [componentIndex, component] of (result.components || []).entries()) {
-      const obsId = stableId(`component-${index}-${componentIndex}-${component.name}-${component.value}`);
+    const contextComponents = [];
+    for (const [componentIndex, component] of (
+      result.components || []
+    ).entries()) {
+      if (isLabContextComponent(component.name)) {
+        contextComponents.push(component);
+        continue;
+      }
+      const obsId = stableId(
+        `component-${index}-${componentIndex}-${component.name}-${component.value}`,
+      );
       const loinc = labLoinc(component.name || result.name);
       resultRefs.push({ reference: `Observation/${obsId}` });
       addClinicalDocument({
@@ -373,18 +416,35 @@ function addTestResults(results) {
           code: {
             text: component.name || result.name,
             coding: loinc
-              ? [{ system: 'http://loinc.org', code: loinc, display: component.name || result.name }]
+              ? [
+                  {
+                    system: 'http://loinc.org',
+                    code: loinc,
+                    display: component.name || result.name,
+                  },
+                ]
               : undefined,
           },
-          effectiveDateTime: normalizeDateTime(result.collectionDate || result.date),
-          ...labObservationValue(component.name || result.name, component.value, component.unit),
-          referenceRange: component.referenceRange
-            ? [{ text: component.referenceRange }]
+          effectiveDateTime: normalizeDateTime(
+            result.collectionDate || result.date,
+          ),
+          ...labObservationValue(
+            component.name || result.name,
+            component.value,
+            component.unit,
+          ),
+          referenceRange: buildLabReferenceRange(
+            component.referenceRange,
+            component.unit,
+          ),
+          interpretation: component.isAbnormal
+            ? [{ text: 'abnormal' }]
             : undefined,
-          interpretation: component.isAbnormal ? [{ text: 'abnormal' }] : undefined,
           note: [
             result.name ? { text: `Panel: ${result.name}` } : undefined,
-            component.referenceRange ? { text: `Reference range: ${component.referenceRange}` } : undefined,
+            component.referenceRange
+              ? { text: `Reference range: ${component.referenceRange}` }
+              : undefined,
           ].filter(Boolean),
         },
         metadata: {
@@ -403,10 +463,17 @@ function addTestResults(results) {
         id: reportId,
         status: 'final',
         code: { text: result.name || 'Test result' },
-        effectiveDateTime: normalizeDateTime(result.collectionDate || result.date),
+        effectiveDateTime: normalizeDateTime(
+          result.collectionDate || result.date,
+        ),
         issued: normalizeDateTime(result.date),
         result: resultRefs.length ? resultRefs : undefined,
         conclusion: result.narrative || undefined,
+        note: contextComponents.length
+          ? contextComponents.map((component) => ({
+              text: `${component.name}: ${formatLabContextComponent(component)}`,
+            }))
+          : undefined,
         presentedForm: result.narrative
           ? [
               {
@@ -440,7 +507,10 @@ function addRawExportDocument(rawExport, filePath) {
           attachment: {
             contentType: 'application/json',
             title: rel,
-            data: Buffer.from(JSON.stringify(rawExport, null, 2), 'utf8').toString('base64'),
+            data: Buffer.from(
+              JSON.stringify(rawExport, null, 2),
+              'utf8',
+            ).toString('base64'),
           },
         },
       ],
@@ -485,14 +555,276 @@ function addSiblingJsonDocuments(root) {
   }
 }
 
-function addFileDocuments(root) {
+function addMyHealthRecordsExports(root) {
+  for (const file of walkFiles(root)) {
+    if (extname(file).toLowerCase() !== '.json') continue;
+    if (!/^myhealth_records_export(?: copy)?\.json$/i.test(basename(file)))
+      continue;
+    const rel = relative(root, file);
+    const exportData = JSON.parse(readFileSync(file, 'utf8'));
+    addMyHealthLabRecords(exportData, rel);
+    addMyHealthMedicationRecords(exportData, rel);
+    addMyHealthImmunizationRecords(exportData, rel);
+    addMyHealthReferralRecords(exportData, rel);
+  }
+}
+
+function addMyHealthLabRecords(exportData, sourceFile) {
+  for (const row of myHealthLabRows(exportData)) {
+    const date = row.whenDate || row.when || row.itemDate || source.exportDate;
+    const displayName = row.name || row.group || 'Lab result';
+    const isDiagnostic =
+      row.codeFamily === 'DI-status' ||
+      row.attachmentName ||
+      /^MRI|^GR |^KNEE|^US |^CT |^XR/i.test(row.group || '');
+    if (isDiagnostic) {
+      const id = stableId(
+        `myhealth-diagnostic-${row.resultUniqueId || `${row.group}-${date}`}`,
+      );
+      addClinicalDocument({
+        resourceType: 'diagnosticreport',
+        id,
+        date,
+        displayName,
+        raw: {
+          resourceType: 'DiagnosticReport',
+          id,
+          status: normalizeReportStatus(row.status),
+          code: {
+            text: displayName,
+            coding: row.code
+              ? [
+                  {
+                    system:
+                      'https://myhealthrecords.alberta.ca/codes/diagnostic-imaging',
+                    code: row.code,
+                    display: displayName,
+                  },
+                ]
+              : undefined,
+          },
+          effectiveDateTime: normalizeDateTime(date),
+          performer: row.orderBy ? [{ display: row.orderBy }] : undefined,
+          presentedForm: row.attachmentName
+            ? [
+                {
+                  contentType: 'application/pdf',
+                  title: row.attachmentName,
+                  url: row.attachmentUrl,
+                },
+              ]
+            : undefined,
+          note: myHealthNotes([
+            ['Ordered by', row.orderedBy],
+            ['Source', row.source],
+            ['Result id', row.resultUniqueId],
+          ]),
+        },
+        metadata: myHealthMetadata(sourceFile, row),
+      });
+      continue;
+    }
+
+    const existing = findClinicalDocument('observation', displayName, date);
+    if (existing) {
+      enrichExistingMyHealthObservation(existing, row, sourceFile);
+      continue;
+    }
+
+    const id = stableId(
+      `myhealth-lab-${row.resultUniqueId || `${displayName}-${date}-${row.value}`}`,
+    );
+    const loinc = normalizedLoincForMyHealthRow(row);
+    addClinicalDocument({
+      resourceType: 'observation',
+      id,
+      date,
+      displayName,
+      raw: {
+        resourceType: 'Observation',
+        id,
+        status: 'final',
+        category: [{ text: 'laboratory' }],
+        code: {
+          text: displayName,
+          coding: loinc
+            ? [
+                {
+                  system: 'http://loinc.org',
+                  code: loinc,
+                  display: displayName,
+                },
+              ]
+            : undefined,
+        },
+        effectiveDateTime: normalizeDateTime(date),
+        ...labObservationValue(
+          displayName,
+          row.rawValue || row.value,
+          row.unit,
+        ),
+        referenceRange: buildLabReferenceRange(row.range, row.unit),
+        interpretation: row.abnormal
+          ? [{ text: cleanText(row.abnormal) }]
+          : undefined,
+        note: myHealthNotes([
+          ['Panel', row.group],
+          ['Laboratory', row.lab],
+          ['Ordered by', row.orderedBy],
+          ['Source code', row.code],
+          ['Source', row.source],
+          ['Result id', row.resultUniqueId],
+        ]),
+      },
+      metadata: {
+        ...myHealthMetadata(sourceFile, row),
+        manual_specialty: 'laboratory',
+        loinc_coding: loinc ? [loinc] : undefined,
+      },
+    });
+  }
+}
+
+function addMyHealthMedicationRecords(exportData, sourceFile) {
+  const medications = Array.isArray(exportData.medications)
+    ? exportData.medications
+    : asArray(exportData.medications?.Medication);
+  for (const [index, med] of medications.entries()) {
+    const name =
+      scalar(med.name) ||
+      scalar(med.Name) ||
+      scalar(med['Generic Name']) ||
+      'Medication';
+    const date =
+      scalar(med['Date Started']) ||
+      scalar(med.dateStarted) ||
+      source.exportDate;
+    const id = stableId(
+      `myhealth-med-${index}-${name}-${date}-${scalar(med.Instructions)}`,
+    );
+    addClinicalDocument({
+      resourceType: 'medicationstatement',
+      id,
+      date,
+      displayName: name,
+      raw: {
+        resourceType: 'MedicationStatement',
+        id,
+        status: 'active',
+        medicationCodeableConcept: { text: name },
+        subject: { reference: `Patient/${userId}` },
+        effectiveDateTime: normalizeDateTime(date),
+        dosage: scalar(med.Instructions)
+          ? [{ text: scalar(med.Instructions) }]
+          : undefined,
+        note: myHealthNotes([
+          ['Generic name', scalar(med['Generic Name'])],
+          ['Source', scalar(med.Source)],
+        ]),
+      },
+      metadata: {
+        terminology_source: 'AHS MyHealth Records JSON',
+        source_file: sourceFile,
+        source_category: 'medications',
+      },
+    });
+  }
+}
+
+function addMyHealthImmunizationRecords(exportData, sourceFile) {
+  const immunizations = Array.isArray(exportData.immunizations)
+    ? exportData.immunizations
+    : asArray(exportData.immunizations?.Immunization);
+  for (const [index, immunization] of immunizations.entries()) {
+    const name =
+      scalar(immunization.name) || scalar(immunization.Name) || 'Immunization';
+    const date =
+      scalar(immunization.date) ||
+      scalar(immunization.Date) ||
+      source.exportDate;
+    const id = stableId(`myhealth-immunization-${index}-${name}-${date}`);
+    addClinicalDocument({
+      resourceType: 'immunization',
+      id,
+      date,
+      displayName: name,
+      raw: {
+        resourceType: 'Immunization',
+        id,
+        status: 'completed',
+        vaccineCode: { text: name },
+        patient: { reference: `Patient/${userId}` },
+        occurrenceDateTime: normalizeDateTime(date),
+        note: myHealthNotes([
+          ['Info', scalar(immunization.info)],
+          ['Source', scalar(immunization.source)],
+        ]),
+      },
+      metadata: {
+        terminology_source: 'AHS MyHealth Records JSON',
+        source_file: sourceFile,
+        source_category: 'immunizations',
+      },
+    });
+  }
+}
+
+function addMyHealthReferralRecords(exportData, sourceFile) {
+  for (const referral of asArray(exportData.referrals?.Referral)) {
+    const reason = scalar(referral.Reason) || 'Referral';
+    const date = scalar(referral.DateSubmitted) || source.exportDate;
+    const id = stableId(
+      `myhealth-referral-${scalar(referral.ReferralID) || reason}-${date}`,
+    );
+    addClinicalDocument({
+      resourceType: 'servicerequest',
+      id,
+      date,
+      displayName: reason,
+      raw: {
+        resourceType: 'ServiceRequest',
+        id,
+        status: normalizeServiceRequestStatus(scalar(referral.ReferralStatus)),
+        intent: 'order',
+        subject: { reference: `Patient/${userId}` },
+        code: { text: reason },
+        authoredOn: normalizeDateTime(date),
+        requester: scalar(referral.ReferredbyProviderName)
+          ? { display: scalar(referral.ReferredbyProviderName) }
+          : undefined,
+        performer: scalar(referral.ReceivingFacilityName)
+          ? [{ display: scalar(referral.ReceivingFacilityName) }]
+          : undefined,
+        note: myHealthNotes([
+          ['Referral ID', scalar(referral.ReferralID)],
+          ['Status', scalar(referral.ReferralStatus)],
+          ['Status reason', scalar(referral.ReferralStatusReason)],
+          ['Last update', scalar(referral.DisplayLastUpdateDate)],
+        ]),
+      },
+      metadata: {
+        terminology_source: 'AHS MyHealth Records JSON',
+        source_file: sourceFile,
+        source_category: 'referrals',
+      },
+    });
+  }
+}
+
+function addFileDocuments(root, { baseDir = root, prefix = '' } = {}) {
+  if (!root || !existsSync(root)) return;
   for (const file of walkFiles(root)) {
     if (basename(file).startsWith('.')) continue;
     if (file === jsonPath) continue;
-    const rel = relative(root, file);
+    const rel = prefix
+      ? join(prefix, relative(root, file))
+      : relative(baseDir, file);
     if (rel.includes(`${basename(outputPath)}`)) continue;
     const ext = extname(file).toLowerCase();
-    if (!['.pdf', '.tif', '.tiff', '.html', '.htm', '.xml', '.txt'].includes(ext)) continue;
+    if (
+      !['.pdf', '.tif', '.tiff', '.html', '.htm', '.xml', '.txt'].includes(ext)
+    )
+      continue;
     if (basename(file).toUpperCase() === 'STYLE.XSL') continue;
     const bytes = readFileSync(file);
     const id = stableId(`file-${rel}`);
@@ -545,16 +877,21 @@ function addFileDocuments(root) {
   }
 }
 
-function addCcdaExtractedRecords(root) {
+function addHealthSummaryExtractedRecords(summaryDir) {
+  if (!summaryDir || !existsSync(summaryDir)) return;
   const ccdaDir = args.ccdaDir
     ? resolve(args.ccdaDir)
-    : discoverCcdaDirectory(root);
+    : discoverCcdaDirectory(summaryDir);
+  addCcdaExtractedRecords(ccdaDir, dirname(summaryDir));
+}
+
+function addCcdaExtractedRecords(ccdaDir, baseDir = sourceDir) {
   if (!existsSync(ccdaDir)) return;
 
   for (const file of readdirSync(ccdaDir).filter((name) =>
     /^DOC\d+\.XML$/i.test(name),
   )) {
-    const rel = relative(root, join(ccdaDir, file));
+    const rel = relative(baseDir, join(ccdaDir, file));
     const xml = readFileSync(join(ccdaDir, file), 'utf8');
     const docDate = extractXmlTitle(xml)?.date || source.exportDate;
     const sections = extractCcdaSections(xml);
@@ -649,7 +986,8 @@ function addCcdaConditions(section, fallbackDate, sourceFile) {
   for (const row of rowsForSection(section)) {
     const name = row.Problem || row.Diagnosis || row[0];
     if (!isMeaningfulText(name)) continue;
-    const date = row['Noted Date'] || row['Diagnosed Date'] || row['Start Date'];
+    const date =
+      row['Noted Date'] || row['Diagnosed Date'] || row['Start Date'];
     const id = stableId(`ccda-condition-${name}-${date || ''}`);
     addClinicalDocument({
       resourceType: 'condition',
@@ -659,7 +997,9 @@ function addCcdaConditions(section, fallbackDate, sourceFile) {
       raw: {
         resourceType: 'Condition',
         id,
-        clinicalStatus: { text: section.title.includes('Resolved') ? 'resolved' : 'active' },
+        clinicalStatus: {
+          text: section.title.includes('Resolved') ? 'resolved' : 'active',
+        },
         code: { text: cleanText(name) },
         subject: { reference: `Patient/${userId}` },
         onsetDateTime: parseAnyDate(date),
@@ -679,7 +1019,9 @@ function addCcdaMedications(section, fallbackDate, sourceFile) {
     const start = row['Start Date'] || extractParentheticalDate(row[1]);
     const end = row['End Date'];
     const status = row.Status || section.title;
-    const id = stableId(`ccda-medication-${section.title}-${name}-${sig || ''}-${start || ''}`);
+    const id = stableId(
+      `ccda-medication-${section.title}-${name}-${sig || ''}-${start || ''}`,
+    );
     addClinicalDocument({
       resourceType: 'medicationstatement',
       id,
@@ -779,7 +1121,9 @@ function addCcdaEncounters(section, fallbackDate, sourceFile) {
         location: row.Department
           ? [{ location: { display: cleanText(row.Department) } }]
           : undefined,
-        reasonCode: row.Description ? [{ text: cleanText(row.Description) }] : undefined,
+        reasonCode: row.Description
+          ? [{ text: cleanText(row.Description) }]
+          : undefined,
         note: [{ text: `Extracted from ${section.title} in ${sourceFile}` }],
       },
       metadata: ccdaMetadata(sourceFile, section.title),
@@ -791,7 +1135,9 @@ function addCcdaEncounters(section, fallbackDate, sourceFile) {
 function addCcdaReasonForVisit(section, fallbackDate, sourceFile) {
   const text = sectionText(section.xml);
   if (!isMeaningfulText(text)) return;
-  const id = stableId(`ccda-reason-for-visit-${sourceFile}-${text.slice(0, 160)}`);
+  const id = stableId(
+    `ccda-reason-for-visit-${sourceFile}-${text.slice(0, 160)}`,
+  );
   addClinicalDocument({
     resourceType: 'encounter',
     id,
@@ -815,36 +1161,25 @@ function addCcdaReasonForVisit(section, fallbackDate, sourceFile) {
 function addCcdaResults(section, fallbackDate, sourceFile) {
   const rows = rowsForSection(section);
   if (section.title === 'Last Filed Vital Signs') {
-    for (const row of rows) {
-      for (const [name, value] of Object.entries(row)) {
-        if (!isMeaningfulText(value) || ['Date', 'Time'].includes(name)) continue;
-        const id = stableId(`ccda-vital-${name}-${value}-${row.Date || ''}`);
-        addClinicalDocument({
-          resourceType: 'observation',
-          id,
-          date: parseAnyDate(row.Date || row.Time) || fallbackDate,
-          displayName: cleanText(name),
-          raw: {
-            resourceType: 'Observation',
-            id,
-            status: 'final',
-            category: [{ text: 'vital-signs' }],
-            code: { text: cleanText(name) },
-            effectiveDateTime: parseAnyDate(row.Date || row.Time) || fallbackDate,
-            ...observationValue(cleanText(value), ''),
-            note: [{ text: `Extracted from ${section.title} in ${sourceFile}` }],
-          },
-          metadata: ccdaMetadata(sourceFile, section.title),
-        });
-        incrementCcdaCount('observation');
-      }
-    }
+    addCcdaVitalSigns(section, fallbackDate, sourceFile);
     return;
   }
 
   const resultItems = extractResultItems(section.xml);
   for (const result of resultItems) {
-    const id = stableId(`ccda-result-${result.title}-${result.date || ''}-${result.narrative.slice(0, 80)}`);
+    const existing = findDiagnosticReportForCcdaResult(result);
+    if (existing) {
+      mergeCcdaResultIntoDiagnosticReport(
+        existing,
+        result,
+        sourceFile,
+        section.title,
+      );
+      continue;
+    }
+    const id = stableId(
+      `ccda-result-${result.title}-${result.date || ''}-${result.narrative.slice(0, 80)}`,
+    );
     addClinicalDocument({
       resourceType: 'diagnosticreport',
       id,
@@ -884,6 +1219,62 @@ function addCcdaResults(section, fallbackDate, sourceFile) {
   }
 }
 
+function addCcdaVitalSigns(section, fallbackDate, sourceFile) {
+  for (const row of vitalRowsForSection(section)) {
+    const name = cleanText(row['Vital Sign']);
+    const reading = cleanText(row.Reading);
+    if (!isMeaningfulText(name) || !isMeaningfulText(reading)) continue;
+
+    const takenAt = parseAnyDate(row['Time Taken']) || fallbackDate;
+    const coding = vitalCoding(name);
+    const id = stableId(
+      `ccda-vital-${name}-${reading}-${row['Time Taken'] || ''}`,
+    );
+    addClinicalDocument({
+      resourceType: 'observation',
+      id,
+      date: takenAt,
+      displayName: name,
+      raw: {
+        resourceType: 'Observation',
+        id,
+        status: 'final',
+        category: [
+          {
+            coding: [
+              {
+                system:
+                  'http://terminology.hl7.org/CodeSystem/observation-category',
+                code: 'vital-signs',
+                display: 'Vital Signs',
+              },
+            ],
+            text: 'Vital Signs',
+          },
+        ],
+        code: {
+          text: name,
+          coding: coding
+            ? [{ system: 'http://loinc.org', code: coding, display: name }]
+            : undefined,
+        },
+        effectiveDateTime: takenAt,
+        ...vitalObservationValue(name, reading),
+        note: [
+          row.Comments ? { text: cleanText(row.Comments) } : undefined,
+          { text: `Extracted from ${section.title} in ${sourceFile}` },
+        ].filter(Boolean),
+      },
+      metadata: {
+        ...ccdaMetadata(sourceFile, section.title),
+        manual_specialty: 'vitals',
+        loinc_coding: coding ? [coding] : undefined,
+      },
+    });
+    incrementCcdaCount('observation');
+  }
+}
+
 function addCcdaCarePlan(section, fallbackDate, sourceFile) {
   const text = sectionText(section.xml);
   if (!isMeaningfulText(text)) return;
@@ -912,7 +1303,9 @@ function addCcdaCoverage(section, fallbackDate, sourceFile) {
   for (const [index, row] of rows.entries()) {
     const payer = row.Payer || row['Insurance'] || row['Plan'] || row[0];
     if (!isMeaningfulText(payer)) continue;
-    const id = stableId(`ccda-coverage-${payer}-${row['Policy Number'] || row[1] || index}`);
+    const id = stableId(
+      `ccda-coverage-${payer}-${row['Policy Number'] || row[1] || index}`,
+    );
     addClinicalDocument({
       resourceType: 'coverage',
       id,
@@ -925,7 +1318,9 @@ function addCcdaCoverage(section, fallbackDate, sourceFile) {
         beneficiary: { reference: `Patient/${userId}` },
         payor: [{ display: cleanText(payer) }],
         subscriberId: cleanText(row['Policy Number'] || row['Member ID'] || ''),
-        class: row.Plan ? [{ type: { text: 'plan' }, value: cleanText(row.Plan) }] : undefined,
+        class: row.Plan
+          ? [{ type: { text: 'plan' }, value: cleanText(row.Plan) }]
+          : undefined,
         text: text ? { status: 'generated', div: text } : undefined,
       },
       metadata: ccdaMetadata(sourceFile, section.title),
@@ -961,7 +1356,8 @@ function addCcdaConsent(section, fallbackDate, sourceFile) {
         {
           coding: [
             {
-              system: 'http://terminology.hl7.org/CodeSystem/consentcategorycodes',
+              system:
+                'http://terminology.hl7.org/CodeSystem/consentcategorycodes',
               code: 'acd',
               display: 'Advance Care Directive',
             },
@@ -995,13 +1391,19 @@ function addCcdaConsent(section, fallbackDate, sourceFile) {
 function addCcdaCareTeams(section, fallbackDate, sourceFile) {
   const rows = rowsForSection(section);
   if (rows.length === 0) return;
-  const id = stableId(`ccda-careteam-${sourceFile}-${sectionText(section.xml).slice(0, 120)}`);
+  const id = stableId(
+    `ccda-careteam-${sourceFile}-${sectionText(section.xml).slice(0, 120)}`,
+  );
   const participants = rows
     .map((row) => {
       const member = cleanText(row['Team Member'] || row[0]);
       if (!member) return undefined;
-      const phones = [...member.matchAll(/\d{3}-\d{3}-\d{4}(?:\s+\([^)]+\))?/g)].map((m) => m[0]);
-      const displayName = member.replace(/\d{3}-\d{3}-\d{4}(?:\s+\([^)]+\))?/g, '').trim();
+      const phones = [
+        ...member.matchAll(/\d{3}-\d{3}-\d{4}(?:\s+\([^)]+\))?/g),
+      ].map((m) => m[0]);
+      const displayName = member
+        .replace(/\d{3}-\d{3}-\d{4}(?:\s+\([^)]+\))?/g, '')
+        .trim();
       return {
         role: [
           {
@@ -1049,7 +1451,9 @@ function addCcdaSocialHistory(section, fallbackDate, sourceFile) {
   for (const row of rowsForSection(section)) {
     const entries = socialHistoryEntries(row);
     for (const entry of entries) {
-      const id = stableId(`ccda-social-${entry.name}-${entry.value}-${entry.date || ''}`);
+      const id = stableId(
+        `ccda-social-${entry.name}-${entry.value}-${entry.date || ''}`,
+      );
       addClinicalDocument({
         resourceType: 'observation',
         id,
@@ -1063,7 +1467,8 @@ function addCcdaSocialHistory(section, fallbackDate, sourceFile) {
             {
               coding: [
                 {
-                  system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+                  system:
+                    'http://terminology.hl7.org/CodeSystem/observation-category',
                   code: 'social-history',
                   display: 'Social History',
                 },
@@ -1072,7 +1477,16 @@ function addCcdaSocialHistory(section, fallbackDate, sourceFile) {
             },
           ],
           code: entry.code
-            ? { coding: [{ system: 'http://loinc.org', code: entry.code, display: entry.name }], text: entry.name }
+            ? {
+                coding: [
+                  {
+                    system: 'http://loinc.org',
+                    code: entry.code,
+                    display: entry.name,
+                  },
+                ],
+                text: entry.name,
+              }
             : { text: entry.name },
           subject: { reference: `Patient/${userId}` },
           effectiveDateTime: parseAnyDate(entry.date) || fallbackDate,
@@ -1093,7 +1507,13 @@ function addCompanionResourcesForLooseFiles(root) {
   for (const file of walkFiles(root)) {
     const rel = relative(root, file);
     const name = basename(file).toLowerCase();
-    if (name.startsWith('.') || !['.pdf', '.tif', '.tiff', '.html', '.htm'].includes(extname(file).toLowerCase())) continue;
+    if (
+      name.startsWith('.') ||
+      !['.pdf', '.tif', '.tiff', '.html', '.htm'].includes(
+        extname(file).toLowerCase(),
+      )
+    )
+      continue;
     if (rel.includes('HealthSummary/')) continue;
     const extractedText = extractLocalDocumentText(file).text;
     const extractedTextNote = extractedText
@@ -1114,7 +1534,9 @@ function addCompanionResourcesForLooseFiles(root) {
           status: 'final',
           code: { text: basename(file, extname(file)) },
           effectiveDateTime: normalizeDateTime(source.exportDate),
-          conclusion: extractedText ? compactText(extractedText, 4000) : undefined,
+          conclusion: extractedText
+            ? compactText(extractedText, 4000)
+            : undefined,
           presentedForm: [
             { contentType: mimeType(extname(file).toLowerCase()), title: rel },
             extractedText
@@ -1150,8 +1572,13 @@ function addCompanionResourcesForLooseFiles(root) {
           scope: { text: 'Procedure consent' },
           category: [{ text: 'Procedure consent' }],
           patient: { reference: `Patient/${userId}` },
-          policyText: extractedText ? compactText(extractedText, 4000) : undefined,
-          sourceAttachment: { contentType: mimeType(extname(file).toLowerCase()), title: rel },
+          policyText: extractedText
+            ? compactText(extractedText, 4000)
+            : undefined,
+          sourceAttachment: {
+            contentType: mimeType(extname(file).toLowerCase()),
+            title: rel,
+          },
         },
         metadata: { source_file: rel },
       });
@@ -1211,7 +1638,9 @@ function buildReport() {
       d.data_record.resource_type === 'observation' &&
       d.metadata?.manual_specialty === 'laboratory',
   );
-  const codedLabDocuments = labDocuments.filter((d) => d.metadata?.loinc_coding?.length);
+  const codedLabDocuments = labDocuments.filter(
+    (d) => d.metadata?.loinc_coding?.length,
+  );
   for (const doc of clinicalDocuments) {
     const type = doc.data_record.resource_type;
     resourceCounts[type] = (resourceCounts[type] || 0) + 1;
@@ -1242,10 +1671,12 @@ Source JSON: ${jsonPath}
 
 ## C-CDA extraction mix
 
-${Object.entries(ccdaResourceCounts)
-  .sort((a, b) => a[0].localeCompare(b[0]))
-  .map(([type, count]) => `- ${type}: ${count}`)
-  .join('\n') || '- none'}
+${
+  Object.entries(ccdaResourceCounts)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([type, count]) => `- ${type}: ${count}`)
+    .join('\n') || '- none'
+}
 
 ## Resource mix
 
@@ -1267,6 +1698,385 @@ ${sourceKeys.map((key) => `- ${key}`).join('\n')}
 - Family history maps to FamilyMemberHistory and has timeline display. It is not yet part of the Summary tab.
 - AHS/MyChart-specific provenance is represented as a Provenance record plus connection/source metadata, but there is still no dedicated first-class AHS connection source type in the connection UI.
 `;
+}
+
+function myHealthLabRows(exportData) {
+  const rows = [];
+  for (const item of asArray(exportData.labResults?.LabTestResultsItem)) {
+    for (const group of asArray(item.Group?.LabTestGroup)) {
+      const attachment = group.attachment?.['d5p1:PHRAttachment'];
+      for (const result of asArray(group.Results?.LabTestResult)) {
+        rows.push({
+          group: scalar(group.GroupName),
+          itemDate:
+            scalar(item.LabResultDisplayDateText) ||
+            scalar(item.LabResultDisplayDate) ||
+            scalar(item.LabResultDate),
+          orderBy: scalar(item.OrderByType),
+          orderedBy: scalar(item.OrderedByName),
+          source: scalar(item.Source),
+          lab: scalar(item.LaboratoryName) || scalar(group.LaboratoryName),
+          name:
+            scalar(result.Name) ||
+            scalar(result.ClinicalCode?.Text) ||
+            scalar(group.GroupName),
+          code: scalar(result.ClinicalCode?.Code?.Code?.Value),
+          codeFamily: scalar(result.ClinicalCode?.Code?.Code?.Family),
+          displayDate: scalar(result.DisplayDate),
+          when: scalar(result.When),
+          whenDate: scalar(result.WhenDate),
+          status: scalar(result.LabOrderStatus) || scalar(group.LabOrderStatus),
+          value:
+            scalar(result.Values?.DisplayValue) || scalar(result.Values?.Value),
+          rawValue: scalar(result.Values?.Value),
+          range: scalar(result.Values?.RangeDisplayText),
+          unit: scalar(result.Values?.UnitText),
+          abnormal: scalar(result.AbnormalityIndicator),
+          resultUniqueId: scalar(result.ResultUniqueId),
+          attachmentName: scalar(attachment?.['d5p1:Name']),
+          attachmentUrl: scalar(attachment?.['d5p1:DownloadUrl']),
+        });
+      }
+    }
+  }
+  return rows;
+}
+
+function findClinicalDocument(resourceType, displayName, date) {
+  const targetDate = dateOnly(normalizeDateTime(date));
+  const targetName = cleanText(displayName).toLowerCase();
+  return clinicalDocuments.find(
+    (doc) =>
+      doc.data_record?.resource_type === resourceType &&
+      cleanText(doc.metadata?.display_name).toLowerCase() === targetName &&
+      dateOnly(normalizeDateTime(doc.metadata?.date)) === targetDate,
+  );
+}
+
+function enrichExistingMyHealthObservation(document, row, sourceFile) {
+  const resource =
+    document.data_record.raw.resource || document.data_record.raw;
+  if (row.range && !resource.referenceRange) {
+    resource.referenceRange = buildLabReferenceRange(row.range, row.unit);
+  }
+  const loinc = normalizedLoincForMyHealthRow(row);
+  if (
+    loinc &&
+    !resource.code?.coding?.some(
+      (coding) => coding.system === 'http://loinc.org' && coding.code === loinc,
+    )
+  ) {
+    resource.code = resource.code || { text: row.name };
+    resource.code.coding = [
+      ...(resource.code.coding || []),
+      { system: 'http://loinc.org', code: loinc, display: row.name },
+    ];
+  }
+  resource.note = [
+    ...(resource.note || []),
+    ...myHealthNotes([
+      ['AHS MyHealth panel', row.group],
+      ['AHS MyHealth laboratory', row.lab],
+      ['AHS MyHealth source code', row.code],
+      ['AHS MyHealth result id', row.resultUniqueId],
+    ]),
+  ];
+  document.metadata = {
+    ...document.metadata,
+    source_file: document.metadata.source_file || sourceFile,
+    source_lab_code: row.code || document.metadata.source_lab_code,
+    source_lab_panel: row.group || document.metadata.source_lab_panel,
+    source_laboratory: row.lab || document.metadata.source_laboratory,
+    myhealth_result_unique_id:
+      row.resultUniqueId || document.metadata.myhealth_result_unique_id,
+    loinc_coding: loinc
+      ? [...new Set([...(document.metadata.loinc_coding || []), loinc])]
+      : document.metadata.loinc_coding,
+  };
+}
+
+function findDiagnosticReportForCcdaResult(result) {
+  const resultDay = dateOnly(parseAnyDate(result.date));
+  const resultName = normalizeReportName(result.title);
+  if (!resultDay || !resultName) return undefined;
+
+  return clinicalDocuments.find((doc) => {
+    if (doc.data_record?.resource_type !== 'diagnosticreport') return false;
+    const docDay = dateOnly(normalizeDateTime(doc.metadata?.date));
+    if (docDay !== resultDay) return false;
+    const docName = normalizeReportName(doc.metadata?.display_name);
+    return (
+      docName === resultName ||
+      docName.includes(resultName) ||
+      resultName.includes(docName)
+    );
+  });
+}
+
+function mergeCcdaResultIntoDiagnosticReport(
+  document,
+  result,
+  sourceFile,
+  sectionTitle,
+) {
+  const resource =
+    document.data_record.raw.resource || document.data_record.raw;
+  const title = cleanText(
+    result.title || document.metadata?.display_name || 'C-CDA result',
+  );
+  if (result.narrative && !resource.conclusion) {
+    resource.conclusion = result.narrative;
+  }
+  if (result.narrative) {
+    const presentedForm = resource.presentedForm || [];
+    const hasNarrative = presentedForm.some(
+      (form) =>
+        form.contentType === 'text/plain' &&
+        form.title === `${title} narrative`,
+    );
+    if (!hasNarrative) {
+      resource.presentedForm = [
+        ...presentedForm,
+        {
+          contentType: 'text/plain',
+          data: Buffer.from(result.narrative, 'utf8').toString('base64'),
+          title: `${title} narrative`,
+        },
+      ];
+    }
+  }
+  promoteBestPresentedTextToConclusion(resource);
+  resource.note = [
+    ...(resource.note || []),
+    ...myHealthNotes([
+      ['C-CDA source file', sourceFile],
+      ['C-CDA section', sectionTitle],
+      ['Accession', result.accession],
+    ]),
+  ];
+  document.metadata = {
+    ...document.metadata,
+    ccda_source_file: sourceFile,
+    ccda_section: sectionTitle,
+    manual_specialty:
+      document.metadata.manual_specialty ||
+      (result.modality ? 'imaging' : undefined),
+    manual_imaging_details: {
+      ...(document.metadata.manual_imaging_details || {}),
+      modality:
+        document.metadata.manual_imaging_details?.modality || result.modality,
+      studyType: document.metadata.manual_imaging_details?.studyType || title,
+      accessionId:
+        document.metadata.manual_imaging_details?.accessionId ||
+        result.accession,
+      bodySite:
+        document.metadata.manual_imaging_details?.bodySite ||
+        inferBodySite(`${result.title} ${result.narrative}`),
+    },
+  };
+}
+
+function consolidateDiagnosticReports() {
+  const groups = new Map();
+  for (const doc of clinicalDocuments) {
+    if (doc.data_record?.resource_type !== 'diagnosticreport') continue;
+    const key = diagnosticConsolidationKey(doc);
+    if (!key) continue;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(doc);
+  }
+
+  for (const docs of groups.values()) {
+    if (docs.length < 2) continue;
+    const target =
+      docs.find(
+        (doc) =>
+          doc.metadata?.terminology_source === 'AHS MyHealth Records JSON',
+      ) ||
+      docs.find((doc) =>
+        (
+          doc.data_record.raw.resource || doc.data_record.raw
+        ).presentedForm?.some((form) => form.url),
+      ) ||
+      docs[0];
+    for (const doc of docs) {
+      if (doc === target) continue;
+      mergeDiagnosticReportDocument(target, doc);
+      const index = clinicalDocuments.indexOf(doc);
+      if (index >= 0) clinicalDocuments.splice(index, 1);
+      clinicalDocumentIds.delete(doc.id);
+    }
+  }
+}
+
+function mergeDiagnosticReportDocument(target, sourceDocument) {
+  const targetResource =
+    target.data_record.raw.resource || target.data_record.raw;
+  const sourceResource =
+    sourceDocument.data_record.raw.resource || sourceDocument.data_record.raw;
+  if (
+    sourceResource.conclusion &&
+    (!targetResource.conclusion ||
+      sourceResource.conclusion.length > targetResource.conclusion.length)
+  ) {
+    targetResource.conclusion = sourceResource.conclusion;
+  }
+  targetResource.presentedForm = mergePresentedForms(
+    targetResource.presentedForm || [],
+    sourceResource.presentedForm || [],
+  );
+  promoteBestPresentedTextToConclusion(targetResource);
+  targetResource.note = mergeNotes(
+    targetResource.note || [],
+    sourceResource.note || [],
+  );
+  target.metadata = {
+    ...target.metadata,
+    ccda_source_file:
+      target.metadata.ccda_source_file ||
+      sourceDocument.metadata?.ccda_source_file ||
+      sourceDocument.metadata?.source_file,
+    ccda_section:
+      target.metadata.ccda_section ||
+      sourceDocument.metadata?.ccda_section ||
+      sourceDocument.metadata?.manual_subtype,
+    manual_specialty:
+      target.metadata.manual_specialty ||
+      sourceDocument.metadata?.manual_specialty,
+    manual_imaging_details: {
+      ...(sourceDocument.metadata?.manual_imaging_details || {}),
+      ...(target.metadata.manual_imaging_details || {}),
+    },
+  };
+}
+
+function promoteBestPresentedTextToConclusion(resource) {
+  const candidates = (resource.presentedForm || [])
+    .filter((form) => form.contentType === 'text/plain' && form.data)
+    .map((form) => Buffer.from(form.data, 'base64').toString('utf8').trim())
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+  if (
+    candidates[0] &&
+    (!resource.conclusion || candidates[0].length > resource.conclusion.length)
+  ) {
+    resource.conclusion = candidates[0];
+  }
+}
+
+function mergePresentedForms(left, right) {
+  const out = [...left];
+  for (const form of right) {
+    const key = `${form.contentType || ''}|${form.title || ''}|${form.url || ''}|${form.data ? 'data' : ''}`;
+    const exists = out.some(
+      (item) =>
+        `${item.contentType || ''}|${item.title || ''}|${item.url || ''}|${item.data ? 'data' : ''}` ===
+        key,
+    );
+    if (!exists) out.push(form);
+  }
+  return out.length ? out : undefined;
+}
+
+function mergeNotes(left, right) {
+  const seen = new Set();
+  return [...left, ...right].filter((note) => {
+    const text = note?.text;
+    if (!text || seen.has(text)) return false;
+    seen.add(text);
+    return true;
+  });
+}
+
+function diagnosticConsolidationKey(document) {
+  const date = dateOnly(normalizeDateTime(document.metadata?.date));
+  const name = document.metadata?.display_name;
+  const key = reportSemanticKey(name);
+  return date && key ? `${date}|${key}` : undefined;
+}
+
+function reportSemanticKey(value) {
+  const normalized = normalizeReportName(value);
+  const body = inferBodySite(normalized) || '';
+  const modality = inferModality(normalized) || '';
+  if (!body || !modality) return undefined;
+  const skyline = normalized.includes('skyline') ? '|skyline' : '';
+  return `${modality.toLowerCase()}|${body}${skyline}`;
+}
+
+function normalizeReportName(value) {
+  return cleanText(value)
+    .toLowerCase()
+    .replace(/\bmr knee\b/g, 'mri knee')
+    .replace(/\bus knee\b/g, 'knee us')
+    .replace(/\bof knee\b/g, 'knee')
+    .replace(/\s+-\s+(efw|jhc|rca|cchc)$/i, '')
+    .replace(/\s+-\s+final result.*$/i, '')
+    .replace(/[()]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function normalizedLoincForMyHealthRow(row) {
+  return (
+    labLoinc(row.name) ||
+    (row.codeFamily === 'Lab-Test-Results' && isLikelyLoinc(row.code)
+      ? row.code
+      : undefined)
+  );
+}
+
+function isLikelyLoinc(code) {
+  return /^\d{1,6}-\d$/.test(String(code || ''));
+}
+
+function myHealthMetadata(sourceFile, row) {
+  return {
+    terminology_source: 'AHS MyHealth Records JSON',
+    source_file: sourceFile,
+    source_category:
+      row.codeFamily === 'DI-status' || row.attachmentName
+        ? 'diagnostic-imaging'
+        : 'labs',
+    source_lab_code: row.code,
+    source_lab_panel: row.group,
+    source_laboratory: row.lab,
+    myhealth_result_unique_id: row.resultUniqueId,
+  };
+}
+
+function myHealthNotes(pairs) {
+  return pairs
+    .filter(([, value]) => value !== undefined && value !== '')
+    .map(([label, value]) => ({ text: `${label}: ${value}` }));
+}
+
+function asArray(value) {
+  const item = scalar(value);
+  if (item === undefined) return [];
+  return Array.isArray(item) ? item : [item];
+}
+
+function scalar(value) {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value !== 'object') return value;
+  if (Array.isArray(value)) return value;
+  if (value['@attributes']?.['i:nil'] === 'true') return undefined;
+  if (Object.keys(value).length === 0) return undefined;
+  return value;
+}
+
+function normalizeReportStatus(status) {
+  return cleanText(status).toLowerCase().includes('final')
+    ? 'final'
+    : 'unknown';
+}
+
+function normalizeServiceRequestStatus(status) {
+  const label = cleanText(status).toLowerCase();
+  if (label.includes('cancel')) return 'revoked';
+  if (label.includes('complete')) return 'completed';
+  return 'active';
 }
 
 function parseArgs(argv) {
@@ -1319,20 +2129,45 @@ function discoverSourceJson(root) {
   return scored[0].file;
 }
 
+function discoverHealthSummaryDirectory(root) {
+  const direct = join(root, 'HealthSummary');
+  if (existsSync(direct)) return direct;
+
+  const candidates = walkDirectories(root)
+    .filter((dir) => basename(dir).toLowerCase() === 'healthsummary')
+    .map((dir) => ({
+      dir,
+      docCount: countCcdaDocs(discoverCcdaDirectory(dir)),
+    }));
+
+  candidates.sort(
+    (a, b) => b.docCount - a.docCount || a.dir.localeCompare(b.dir),
+  );
+  return candidates[0]?.dir;
+}
+
 function discoverCcdaDirectory(root) {
-  const explicit = join(root, 'HealthSummary', 'IHE_XDM');
+  const explicit =
+    basename(root).toLowerCase() === 'healthsummary'
+      ? join(root, 'IHE_XDM')
+      : join(root, 'HealthSummary', 'IHE_XDM');
   const searchRoot = existsSync(explicit) ? explicit : root;
   const candidates = [];
 
   for (const dir of walkDirectories(searchRoot)) {
-    const docCount = readdirSync(dir).filter((name) =>
-      /^DOC\d+\.XML$/i.test(name),
-    ).length;
+    const docCount = countCcdaDocs(dir);
     if (docCount > 0) candidates.push({ dir, docCount });
   }
 
-  candidates.sort((a, b) => b.docCount - a.docCount || a.dir.localeCompare(b.dir));
+  candidates.sort(
+    (a, b) => b.docCount - a.docCount || a.dir.localeCompare(b.dir),
+  );
   return candidates[0]?.dir || join(root, 'HealthSummary', 'IHE_XDM');
+}
+
+function countCcdaDocs(dir) {
+  if (!dir || !existsSync(dir)) return 0;
+  return readdirSync(dir).filter((name) => /^DOC\d+\.XML$/i.test(name)).length;
 }
 
 function walkDirectories(dir) {
@@ -1343,6 +2178,11 @@ function walkDirectories(dir) {
     if (statSync(p).isDirectory()) out.push(...walkDirectories(p));
   }
   return out;
+}
+
+function isInsidePath(child, parent) {
+  const rel = relative(parent, child);
+  return rel === '' || (!!rel && !rel.startsWith('..') && !rel.startsWith('/'));
 }
 
 function stableId(value) {
@@ -1357,7 +2197,22 @@ function parseDate(value) {
   }
   if (/^\d{1,2}\/[A-Za-z]{3}\/\d{4}$/.test(value)) {
     const [day, mon, year] = value.split('/');
-    const month = String(['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].indexOf(mon.toLowerCase()) + 1).padStart(2, '0');
+    const month = String(
+      [
+        'jan',
+        'feb',
+        'mar',
+        'apr',
+        'may',
+        'jun',
+        'jul',
+        'aug',
+        'sep',
+        'oct',
+        'nov',
+        'dec',
+      ].indexOf(mon.toLowerCase()) + 1,
+    ).padStart(2, '0');
     return `${year}-${month}-${day.padStart(2, '0')}T00:00:00.000Z`;
   }
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return `${value}T00:00:00.000Z`;
@@ -1380,7 +2235,9 @@ function normalizeGender(value) {
 }
 
 function parseQuantity(value) {
-  const match = String(value).trim().match(/^(-?\d+(?:\.\d+)?)\s*(.*)$/);
+  const match = String(value)
+    .trim()
+    .match(/^(-?\d+(?:\.\d+)?)\s*(.*)$/);
   if (!match) return { value: undefined, unit: String(value) };
   return {
     value: Number(match[1]),
@@ -1395,12 +2252,64 @@ function observationValue(value, unit) {
   if (parsed.value !== undefined && !Number.isNaN(parsed.value)) {
     return { valueQuantity: parsed };
   }
-  return { valueString: value === undefined || value === null ? '' : String(value) };
+  return {
+    valueString: value === undefined || value === null ? '' : String(value),
+  };
+}
+
+function vitalObservationValue(name, reading) {
+  const label = cleanText(name).toLowerCase();
+  const value = cleanText(reading);
+  const bp = value.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
+  if (bp && label.includes('blood pressure')) {
+    return {
+      component: [
+        {
+          code: {
+            coding: [
+              {
+                system: 'http://loinc.org',
+                code: '8480-6',
+                display: 'Systolic blood pressure',
+              },
+            ],
+            text: 'Systolic blood pressure',
+          },
+          valueQuantity: {
+            value: Number(bp[1]),
+            unit: 'mmHg',
+            system: 'http://unitsofmeasure.org',
+            code: 'mm[Hg]',
+          },
+        },
+        {
+          code: {
+            coding: [
+              {
+                system: 'http://loinc.org',
+                code: '8462-4',
+                display: 'Diastolic blood pressure',
+              },
+            ],
+            text: 'Diastolic blood pressure',
+          },
+          valueQuantity: {
+            value: Number(bp[2]),
+            unit: 'mmHg',
+            system: 'http://unitsofmeasure.org',
+            code: 'mm[Hg]',
+          },
+        },
+      ],
+    };
+  }
+  return observationValue(value.replace(/(\d)%$/, '$1 %'), '');
 }
 
 function labObservationValue(name, value, unit) {
   const label = cleanText(name).toLowerCase();
-  const stringValue = value === undefined || value === null ? '' : String(value).trim();
+  const stringValue =
+    value === undefined || value === null ? '' : String(value).trim();
   if (label.includes('dose date')) {
     return { valueString: normalizeSplitDateValue(value, unit) || stringValue };
   }
@@ -1413,8 +2322,130 @@ function labObservationValue(name, value, unit) {
   return observationValue(value, unit);
 }
 
+function buildLabReferenceRange(rangeText, unit) {
+  const text = cleanText(rangeText);
+  if (!text) return undefined;
+
+  const parsed = parseLabReferenceRange(text);
+  return [
+    {
+      text,
+      low:
+        parsed?.low !== undefined
+          ? { value: parsed.low, unit: parsed.unit || unit || undefined }
+          : undefined,
+      high:
+        parsed?.high !== undefined
+          ? { value: parsed.high, unit: parsed.unit || unit || undefined }
+          : undefined,
+      extension: buildReferenceRangeExtensions(parsed),
+    },
+  ];
+}
+
+function parseLabReferenceRange(rangeText) {
+  const normalized = cleanText(rangeText)
+    .replace(/[≤]/g, '<=')
+    .replace(/[≥]/g, '>=')
+    .replace(/[–—]/g, '-')
+    .replace(/,/g, '');
+  const number = '(-?\\d+(?:\\.\\d+)?)';
+  const unitMatch = normalized.match(
+    new RegExp(
+      `${number}\\s*(?:-|to|<=|<|>=|>)?\\s*${number}?\\s*([^\\d<>=\\-]+)?$`,
+      'i',
+    ),
+  );
+  const unit =
+    cleanText(unitMatch?.[3]).replace(/^[()]+|[()]+$/g, '') || undefined;
+
+  const lteMatch = normalized.match(new RegExp(`^(<=|<)\\s*${number}`));
+  if (lteMatch?.[1] && lteMatch[2]) {
+    return {
+      high: Number(lteMatch[2]),
+      unit,
+      upperBoundExclusive: lteMatch[1] === '<',
+    };
+  }
+
+  const gteMatch = normalized.match(new RegExp(`^(>=|>)\\s*${number}`));
+  if (gteMatch?.[1] && gteMatch[2]) {
+    return {
+      low: Number(gteMatch[2]),
+      unit,
+      lowerBoundExclusive: gteMatch[1] === '>',
+    };
+  }
+
+  const rangeMatch = normalized.match(
+    new RegExp(`${number}\\s*(?:-|to)\\s*${number}`, 'i'),
+  );
+  if (rangeMatch?.[1] && rangeMatch[2]) {
+    return {
+      low: Number(rangeMatch[1]),
+      high: Number(rangeMatch[2]),
+      unit,
+      lowerBoundExclusive: false,
+      upperBoundExclusive: false,
+    };
+  }
+
+  return undefined;
+}
+
+function buildReferenceRangeExtensions(parsed) {
+  if (!parsed) return undefined;
+  const extensions = [
+    parsed.lowerBoundExclusive !== undefined
+      ? {
+          url: 'https://meremedical.co/fhir/StructureDefinition/reference-range-lower-bound-exclusive',
+          valueBoolean: parsed.lowerBoundExclusive,
+        }
+      : undefined,
+    parsed.upperBoundExclusive !== undefined
+      ? {
+          url: 'https://meremedical.co/fhir/StructureDefinition/reference-range-upper-bound-exclusive',
+          valueBoolean: parsed.upperBoundExclusive,
+        }
+      : undefined,
+  ].filter(Boolean);
+  return extensions.length ? extensions : undefined;
+}
+
+function isLabContextComponent(name) {
+  const label = cleanText(name).toLowerCase();
+  return [
+    'hours fasting',
+    'lithium dose date',
+    'lithium dose time',
+    'time taken',
+  ].includes(label);
+}
+
+function formatLabContextComponent(component) {
+  const label = cleanText(component.name).toLowerCase();
+  const value =
+    component.value === undefined || component.value === null
+      ? ''
+      : String(component.value).trim();
+  const unit =
+    component.unit === undefined || component.unit === null
+      ? ''
+      : String(component.unit).trim();
+  if (label.includes('dose date')) {
+    return (
+      normalizeSplitDateValue(value, unit) ||
+      [value, unit].filter(Boolean).join(' ')
+    );
+  }
+  if (label.includes('dose time')) {
+    return normalizeTimeValue(value) || value;
+  }
+  return [value, unit].filter(Boolean).join(' ');
+}
+
 function normalizeSplitDateValue(value, unit) {
-  const date = `${value || ''}${unit || ''}`;
+  const date = `${value || ''}${unit || ''}`.replace(/\s+/g, '');
   return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : undefined;
 }
 
@@ -1448,7 +2479,12 @@ function extractLocalDocumentText(file) {
     }
   } catch (error) {
     return {
-      method: ext === '.pdf' ? 'pdftotext' : ['.tif', '.tiff'].includes(ext) ? 'tesseract' : 'html-text',
+      method:
+        ext === '.pdf'
+          ? 'pdftotext'
+          : ['.tif', '.tiff'].includes(ext)
+            ? 'tesseract'
+            : 'html-text',
       error: error.message,
     };
   }
@@ -1490,7 +2526,9 @@ function cleanExtractedText(text) {
 
 function compactText(text, limit) {
   const cleaned = cleanExtractedText(text) || '';
-  return cleaned.length > limit ? `${cleaned.slice(0, limit - 20).trim()}\n[truncated]` : cleaned;
+  return cleaned.length > limit
+    ? `${cleaned.slice(0, limit - 20).trim()}\n[truncated]`
+    : cleaned;
 }
 
 function labLoinc(name) {
@@ -1499,6 +2537,20 @@ function labLoinc(name) {
     if (normalized === label.toLowerCase()) return code;
   }
   return undefined;
+}
+
+function vitalCoding(name) {
+  const normalized = cleanText(name).toLowerCase();
+  return {
+    'blood pressure': '85354-9',
+    pulse: '8867-4',
+    temperature: '8310-5',
+    'respiratory rate': '9279-1',
+    'oxygen saturation': '2708-6',
+    weight: '29463-7',
+    height: '8302-2',
+    'body mass index': '39156-5',
+  }[normalized];
 }
 
 function socialHistoryEntries(row) {
@@ -1527,7 +2579,11 @@ function socialHistoryEntries(row) {
       date: row['Date Recorded'],
     });
   }
-  if (isMeaningfulText(row[0]) && isMeaningfulText(row[1]) && entries.length === 0) {
+  if (
+    isMeaningfulText(row[0]) &&
+    isMeaningfulText(row[1]) &&
+    entries.length === 0
+  ) {
     entries.push({ name: row[0], value: row[1], date: row[2] });
   }
   return entries.filter((entry) => isMeaningfulText(entry.value));
@@ -1545,16 +2601,18 @@ function walkFiles(dir) {
 }
 
 function mimeType(ext) {
-  return {
-    '.pdf': 'application/pdf',
-    '.tif': 'image/tiff',
-    '.tiff': 'image/tiff',
-    '.html': 'text/html',
-    '.htm': 'text/html',
-    '.xml': 'application/xml',
-    '.txt': 'text/plain',
-    '.json': 'application/json',
-  }[ext] || 'application/octet-stream';
+  return (
+    {
+      '.pdf': 'application/pdf',
+      '.tif': 'image/tiff',
+      '.tiff': 'image/tiff',
+      '.html': 'text/html',
+      '.htm': 'text/html',
+      '.xml': 'application/xml',
+      '.txt': 'text/plain',
+      '.json': 'application/json',
+    }[ext] || 'application/octet-stream'
+  );
 }
 
 function extractXmlTitle(xml) {
@@ -1595,6 +2653,21 @@ function rowsForSection(section) {
     .filter((row) => Object.values(row).some(isMeaningfulText));
 }
 
+function vitalRowsForSection(section) {
+  const textXml =
+    section.xml.match(/<text\b[^>]*>([\s\S]*?)<\/text>/)?.[1] || section.xml;
+  const firstTable = textXml.match(/<table\b[\s\S]*?<\/table>/)?.[0] || '';
+  const tableRows = [...firstTable.matchAll(/<tr\b[\s\S]*?<\/tr>/g)].map(
+    (match) => extractCells(match[0]),
+  );
+  if (tableRows.length <= 1) return [];
+  const headers = tableRows[0].map((cell) => cell.text);
+  return tableRows
+    .slice(1)
+    .map((cells) => rowFromCells(headers, cells))
+    .filter((row) => Object.values(row).some(isMeaningfulText));
+}
+
 function extractCells(rowXml) {
   return [...rowXml.matchAll(/<t[hd]\b[^>]*>([\s\S]*?)<\/t[hd]>/g)].map(
     (match) => ({
@@ -1616,8 +2689,9 @@ function rowFromCells(headers, cells) {
 
 function itemToRow(itemXml) {
   const bold = cleanText(
-    itemXml.match(/<content\b[^>]*styleCode="Bold"[^>]*>([\s\S]*?)<\/content>/)
-      ?.[1] || '',
+    itemXml.match(
+      /<content\b[^>]*styleCode="Bold"[^>]*>([\s\S]*?)<\/content>/,
+    )?.[1] || '',
   );
   const text = cleanText(itemXml);
   const row = { 0: bold || text };
@@ -1650,10 +2724,12 @@ function extractResultItems(sectionXml) {
           'C-CDA result',
       );
       const narrative = cleanText(
-        itemXml.match(/<paragraph\b[^>]*Narrative[^>]*>([\s\S]*?)<\/paragraph>/)
-          ?.[1] ||
-          itemXml.match(/<td\b[^>]*styleCode="xpre"[^>]*>([\s\S]*?)<\/td>/)
-            ?.[1] ||
+        itemXml.match(
+          /<paragraph\b[^>]*Narrative[^>]*>([\s\S]*?)<\/paragraph>/,
+        )?.[1] ||
+          itemXml.match(
+            /<td\b[^>]*styleCode="xpre"[^>]*>([\s\S]*?)<\/td>/,
+          )?.[1] ||
           itemXml,
       );
       return {
@@ -1708,8 +2784,17 @@ function isMeaningfulText(value) {
 
 function parseAnyDate(value) {
   if (!value) return undefined;
-  const text = cleanText(value).replace(/\bMDT\b|\bMST\b/g, '').trim();
+  const text = cleanText(value)
+    .replace(/\bMDT\b|\bMST\b/g, '')
+    .trim();
   const first = text.split(/\s+-\s+|,/)[0].trim();
+  const dayMonthYearTime = first.match(
+    /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})/,
+  );
+  if (dayMonthYearTime) {
+    const [, day, month, year, hour, minute] = dayMonthYearTime;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute}:00.000Z`;
+  }
   const dayMonthYear = first.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (dayMonthYear) {
     const [, day, month, year] = dayMonthYear;
@@ -1719,13 +2804,17 @@ function parseAnyDate(value) {
   if (dayTextMonthYear) {
     const [, day, mon, year] = dayTextMonthYear;
     const month = monthNumber(mon);
-    return month ? `${year}-${month}-${day.padStart(2, '0')}T00:00:00.000Z` : undefined;
+    return month
+      ? `${year}-${month}-${day.padStart(2, '0')}T00:00:00.000Z`
+      : undefined;
   }
   return parseDate(first);
 }
 
 function extractParentheticalDate(value) {
-  return cleanText(value).match(/\((?:Started|Given|Performed)?\s*([^)]*\d{4}[^)]*)\)/i)?.[1];
+  return cleanText(value).match(
+    /\((?:Started|Given|Performed)?\s*([^)]*\d{4}[^)]*)\)/i,
+  )?.[1];
 }
 
 function splitDates(value) {
@@ -1736,30 +2825,61 @@ function splitDates(value) {
 }
 
 function monthNumber(mon) {
-  const index = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].indexOf(mon.toLowerCase());
+  const index = [
+    'jan',
+    'feb',
+    'mar',
+    'apr',
+    'may',
+    'jun',
+    'jul',
+    'aug',
+    'sep',
+    'oct',
+    'nov',
+    'dec',
+  ].indexOf(mon.toLowerCase());
   return index >= 0 ? String(index + 1).padStart(2, '0') : undefined;
 }
 
 function medicationStatus(status) {
   const normalized = cleanText(status).toLowerCase();
-  if (normalized.includes('active') || normalized.includes('ordered')) return 'active';
-  if (normalized.includes('completed') || normalized.includes('discharge')) return 'completed';
+  if (normalized.includes('active') || normalized.includes('ordered'))
+    return 'active';
+  if (normalized.includes('completed') || normalized.includes('discharge'))
+    return 'completed';
   return 'unknown';
 }
 
 function inferModality(text) {
   const normalized = text.toLowerCase();
-  if (/\bmri?\b/.test(normalized) || normalized.includes('magnetic resonance')) return 'MRI';
-  if (/\bct\b/.test(normalized) || normalized.includes('computed tomography')) return 'CT';
-  if (/\bus\b/.test(normalized) || normalized.includes('ultrasound')) return 'Ultrasound';
-  if (normalized.includes('x-ray') || normalized.includes('xray') || normalized.includes('radiograph')) return 'X-ray';
+  if (/\bmri?\b/.test(normalized) || normalized.includes('magnetic resonance'))
+    return 'MRI';
+  if (/\bct\b/.test(normalized) || normalized.includes('computed tomography'))
+    return 'CT';
+  if (/\bus\b/.test(normalized) || normalized.includes('ultrasound'))
+    return 'Ultrasound';
+  if (
+    /\bgr\b/.test(normalized) ||
+    normalized.includes('x-ray') ||
+    normalized.includes('xray') ||
+    normalized.includes('radiograph')
+  )
+    return 'X-ray';
   if (normalized.includes('ecg') || normalized.includes('ekg')) return 'ECG';
   return undefined;
 }
 
 function inferBodySite(text) {
   const normalized = text.toLowerCase();
-  for (const site of ['knee', 'abdomen', 'pelvis', 'chest', 'kidney', 'bladder']) {
+  for (const site of [
+    'knee',
+    'abdomen',
+    'pelvis',
+    'chest',
+    'kidney',
+    'bladder',
+  ]) {
     if (normalized.includes(site)) return site;
   }
   return undefined;
@@ -1772,7 +2892,9 @@ function parseCdaDate(value) {
 
 function collectPaths(value, prefix = '') {
   if (Array.isArray(value)) {
-    const childPaths = value.flatMap((item) => collectPaths(item, `${prefix}[]`));
+    const childPaths = value.flatMap((item) =>
+      collectPaths(item, `${prefix}[]`),
+    );
     return [prefix, ...childPaths].filter(Boolean);
   }
   if (value && typeof value === 'object') {

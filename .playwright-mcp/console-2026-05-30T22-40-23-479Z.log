@@ -1,0 +1,9 @@
+[     235ms] [LOG] Installing Service Worker @ http://127.0.0.1:4300/main.08855298d69c1e0b.js:0
+[     235ms] [LOG] Service worker installed on localhost @ http://127.0.0.1:4300/main.08855298d69c1e0b.js:0
+[     239ms] [LOG] %c Welcome to Mere! font-weight: bold;font-size: 30px;color: rgb(0, 97, 131);text-shadow:  1px 1px 0 rgb(141, 234, 255),  2px 2px 0 rgb(141, 234, 255),  3px 3px 0 rgb(121, 230, 255),  4px 4px 0 rgb(0, 197, 253),  5px 5px 0 rgb(0, 162, 213),  6px 6px 0 rgb(39, 209, 255),  7px 7px 0 rgb(35, 46, 80);margin-bottom: 4px; @ http://127.0.0.1:4300/main.08855298d69c1e0b.js:0
+[     239ms] [LOG] %c If you like to tinker, check out our GitHub repo at https://github.com/cfu288/mere-medical font-size: 15px;color: rgb(0, 97, 131);text-shadow: 2px 2px 0 rgb(39, 209, 255); margin-bottom: 4px; @ http://127.0.0.1:4300/main.08855298d69c1e0b.js:0
+[     251ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:4300/service-worker.js:0
+[     329ms] [LOG] This web app is being served cache-first by a service worker. To learn more, visit https://cra.link/PWA @ http://127.0.0.1:4300/main.08855298d69c1e0b.js:0
+[     378ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:4300/api/v1/instance-config:0
+[     378ms] [WARNING] Failed to fetch config from API: 404 @ http://127.0.0.1:4300/main.08855298d69c1e0b.js:0
+[     522ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ chrome-error://chromewebdata/:0

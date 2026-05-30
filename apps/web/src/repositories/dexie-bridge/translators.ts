@@ -246,6 +246,14 @@ export function clinicalDocumentToDomain<T>(
       manualSubtype: input.metadata?.manual_subtype,
       manualSpecialtyDetails: input.metadata?.manual_specialty_details,
       manualImagingDetails: input.metadata?.manual_imaging_details,
+      sourceName: input.metadata?.source_name,
+      sourceType: input.metadata?.source_type,
+      sourceLocation: input.metadata?.source_location,
+      retrievedAt: input.metadata?.retrieved_at,
+      entryMethod: input.metadata?.entry_method,
+      originalFilename: input.metadata?.original_filename,
+      mappingConfidence: input.metadata?.mapping_confidence,
+      provenanceNotes: input.metadata?.provenance_notes,
     },
   };
 }
@@ -278,6 +286,14 @@ export function clinicalDocumentToLegacy<T>(
       manual_subtype: input.metadata?.manualSubtype,
       manual_specialty_details: input.metadata?.manualSpecialtyDetails,
       manual_imaging_details: input.metadata?.manualImagingDetails,
+      source_name: input.metadata?.sourceName,
+      source_type: input.metadata?.sourceType,
+      source_location: input.metadata?.sourceLocation,
+      retrieved_at: input.metadata?.retrievedAt,
+      entry_method: input.metadata?.entryMethod,
+      original_filename: input.metadata?.originalFilename,
+      mapping_confidence: input.metadata?.mappingConfidence,
+      provenance_notes: input.metadata?.provenanceNotes,
     },
   };
 }

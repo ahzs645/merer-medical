@@ -7,6 +7,7 @@ import { VectorStorageDocumentCollection } from '../../models/vector-storage-doc
 import { USPSTFRecommendationDocumentCollection } from '../../models/uspstf-recommendation-document/USPSTFRecommendationDocument.collection';
 import { InstanceConfigDocumentCollection } from '../../models/instance-config/InstanceConfig.collection';
 import { NotificationCollection } from '../../models/notification/Notification.collection';
+import { WorkflowRecordCollection } from '../../models/workflow-record/WorkflowRecord.collection';
 
 export type DatabaseCollections = {
   clinical_documents: ClinicalDocumentCollection;
@@ -18,4 +19,5 @@ export type DatabaseCollections = {
   uspstf_recommendation_documents: USPSTFRecommendationDocumentCollection;
   instance_config: InstanceConfigDocumentCollection;
   notifications: NotificationCollection;
+  workflow_records: WorkflowRecordCollection;
 };

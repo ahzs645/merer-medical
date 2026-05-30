@@ -25,7 +25,7 @@ export function getEncounterClass(
     case 'FHIR.R4': {
       const resource = (document.data_record.raw as R4BundleEntry<R4Encounter>)
         ?.resource;
-      return resource?.class?.code;
+      return resource?.class?.display || resource?.class?.code;
     }
     case 'FHIR.DSTU2': {
       const resource = (

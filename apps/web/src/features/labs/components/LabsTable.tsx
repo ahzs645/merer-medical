@@ -302,6 +302,12 @@ function LabTableRow({
         </div>
         <LabReferenceRange
           range={latestReference.referenceRange}
+          sourceRange={latestReference.sourceReferenceRange}
+          label={
+            latestReference.mode === 'original'
+              ? t('Source range')
+              : t('Reference standard')
+          }
           ageBand={latestReference.referenceAgeBand}
           citation={latestReference.referenceCitation}
           note={latestReference.referenceNote}
@@ -341,6 +347,6 @@ function LabTableRow({
 
 function getFlagTextClass(flag: LabFlag): string {
   if (flag === 'high' || flag === 'low') return 'text-red-700';
-  if (flag === 'borderline') return 'text-amber-700';
+  if (flag === 'borderline' || flag === 'abnormal') return 'text-amber-700';
   return 'text-gray-900';
 }

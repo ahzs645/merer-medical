@@ -1,11 +1,11 @@
 import {
-  getInterpretationText,
+  getObservationInterpretationFlag,
+  getReferenceRangeDisplay,
   getReferenceRangeHigh,
   getReferenceRangeLow,
   getReferenceRangeString,
   getValueQuantity,
   getValueUnit,
-  isOutOfRangeResult,
 } from '../../timeline/utils/fhirpathParsers';
 import { LabDocument, LabGroup, ReportLink } from '../types';
 import {
@@ -100,6 +100,7 @@ export function buildLabEnrichment({
     referenceCitation: citation,
     referenceAgeBand: band?.label,
     referenceNote: referenceNote || undefined,
+    sourceReferenceRange: getReferenceRangeDisplay(lab),
     normalizedValue:
       value !== undefined && labId
         ? getNormalizedLabValue(labId, value, getValueUnit(lab), band?.unit)
@@ -190,6 +191,7 @@ export function buildLabReferenceEvaluation({
       mode,
       label: referenceOverlayLabels[mode],
       isMappedStandard: false,
+      sourceReferenceRange: getReferenceRangeDisplay(lab),
     };
   }
 
@@ -200,6 +202,7 @@ export function buildLabReferenceEvaluation({
       mode,
       label: referenceOverlayLabels[mode],
       isMappedStandard: false,
+      sourceReferenceRange: getReferenceRangeDisplay(lab),
     };
   }
 
@@ -228,6 +231,7 @@ export function buildLabReferenceEvaluation({
     referenceCitation: labCitations[band.citationId],
     referenceAgeBand: band.label,
     referenceNote: referenceNote || undefined,
+    sourceReferenceRange: getReferenceRangeDisplay(lab),
     flag,
     normalizedValue,
     isMappedStandard: true,
@@ -308,6 +312,7 @@ function buildOriginalReferenceEvaluation(
     mode: 'original',
     label: referenceOverlayLabels.original,
     referenceRange: originalOverlay?.display || getReferenceRangeString(lab),
+    sourceReferenceRange: getReferenceRangeDisplay(lab),
     flag,
     normalizedValue:
       value !== undefined
@@ -406,11 +411,9 @@ function evaluateFlag(
 }
 
 function getSourceFlag(lab: LabDocument): LabFlag {
-  const interpretation = getInterpretationText(lab)?.toLowerCase() || '';
-  if (interpretation.includes('low')) return 'low';
-  if (interpretation.includes('high')) return 'high';
-  if (interpretation.includes('border')) return 'borderline';
-  return isOutOfRangeResult(lab) ? 'high' : 'normal';
+  const flag = getObservationInterpretationFlag(lab);
+  if (flag === 'abnormal') return 'borderline';
+  return flag;
 }
 
 function buildAuditSummary(

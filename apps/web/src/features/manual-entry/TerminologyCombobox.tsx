@@ -16,6 +16,7 @@ import {
   TerminologyLookupMode,
   TerminologyProfile,
 } from '@mere/domain';
+import { StylizedSelect } from '../../shared/components/StylizedSelect';
 
 export function TerminologySuggestions({
   kind,
@@ -168,20 +169,20 @@ export function UnitInput({
 }) {
   if (units && units.length > 0) {
     return (
-      <select
+      <StylizedSelect
         value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="block w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-      >
-        {units.map((unitOption) => (
-          <option key={unitOption} value={unitOption}>
-            {unitOption}
-          </option>
-        ))}
-        {!units.includes(value) && value && (
-          <option value={value}>{value}</option>
-        )}
-      </select>
+        onChange={onChange}
+        options={[
+          ...units.map((unitOption) => ({
+            value: unitOption,
+            label: unitOption,
+          })),
+          ...(!units.includes(value) && value
+            ? [{ value, label: value }]
+            : []),
+        ]}
+        buttonClassName="min-h-[34px] py-1.5 pl-2 text-sm"
+      />
     );
   }
 

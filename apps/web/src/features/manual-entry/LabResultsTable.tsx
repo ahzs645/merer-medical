@@ -11,6 +11,7 @@ import {
   TerminologyProfile,
 } from '@mere/domain';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
+import { StylizedSelect } from '../../shared/components/StylizedSelect';
 
 export function LabResultsTable({
   rows,
@@ -83,57 +84,56 @@ export function LabResultsTable({
                   />
                 </td>
                 <td className="w-32 px-3 py-2 align-top">
-                  <select
+                  <StylizedSelect
                     value={row.valueKind}
-                    onChange={(event) =>
+                    onChange={(value) =>
                       onUpdateRow(row.id, {
-                        valueKind: event.target
-                          .value as ManualObservationValueKind,
+                        valueKind: value as ManualObservationValueKind,
                       })
                     }
-                    className="block w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                  >
-                    <option value="quantity">{t('Quantity')}</option>
-                    <option value="string">{t('Text')}</option>
-                    <option value="coded">{t('Coded')}</option>
-                    <option value="absent">{t('Absent')}</option>
-                  </select>
+                    options={[
+                      { value: 'quantity', label: t('Quantity') },
+                      { value: 'string', label: t('Text') },
+                      { value: 'coded', label: t('Coded') },
+                      { value: 'absent', label: t('Absent') },
+                    ]}
+                    buttonClassName="min-h-[34px] py-1.5 pl-2"
+                  />
                 </td>
                 <td className="w-24 px-3 py-2 align-top">
-                  <select
+                  <StylizedSelect
                     value={row.comparator}
                     disabled={row.valueKind !== 'quantity'}
-                    onChange={(event) =>
-                      onUpdateRow(row.id, { comparator: event.target.value })
+                    onChange={(value) =>
+                      onUpdateRow(row.id, { comparator: value })
                     }
-                    className="block w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 disabled:bg-gray-100 disabled:text-gray-400"
-                  >
-                    <option value="">=</option>
-                    <option value="<">&lt;</option>
-                    <option value="<=">&lt;=</option>
-                    <option value=">">&gt;</option>
-                    <option value=">=">&gt;=</option>
-                  </select>
+                    options={[
+                      { value: '', label: '=' },
+                      { value: '<', label: '<' },
+                      { value: '<=', label: '<=' },
+                      { value: '>', label: '>' },
+                      { value: '>=', label: '>=' },
+                    ]}
+                    buttonClassName="min-h-[34px] py-1.5 pl-2"
+                  />
                 </td>
                 <td className="w-28 px-3 py-2 align-top">
                   {row.valueKind === 'absent' ? (
-                    <select
+                    <StylizedSelect
                       value={row.absentReason}
-                      onChange={(event) =>
+                      onChange={(value) =>
                         onUpdateRow(row.id, {
-                          absentReason: event.target
-                            .value as ManualObservationAbsentReason,
+                          absentReason: value as ManualObservationAbsentReason,
                         })
                       }
-                      className="block w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                    >
-                      <option value="pending">{t('Pending')}</option>
-                      <option value="not-performed">
-                        {t('Not performed')}
-                      </option>
-                      <option value="unknown">{t('Unknown')}</option>
-                      <option value="not-applicable">{t('N/A')}</option>
-                    </select>
+                      options={[
+                        { value: 'pending', label: t('Pending') },
+                        { value: 'not-performed', label: t('Not performed') },
+                        { value: 'unknown', label: t('Unknown') },
+                        { value: 'not-applicable', label: t('N/A') },
+                      ]}
+                      buttonClassName="min-h-[34px] py-1.5 pl-2"
+                    />
                   ) : (
                     <input
                       type="text"
