@@ -16,8 +16,12 @@ import {
 } from '../utils/dentalRecords';
 import {
   buildOdontogramStatuses,
+  buildClaimSummaries,
+  buildImagingMounts,
   buildPerioOverview,
+  buildRecallItems,
   buildTreatmentPlan,
+  buildToothTimeline,
   buildWorkflowContext,
 } from '../utils/dentalClinicalModels';
 
@@ -82,19 +86,26 @@ export function useDentalData() {
         )
         .map(mapImagingDocument),
     );
-    const records = documents
+    const allDentalRecords = documents
       .filter(isDentalDocument)
-      .map(mapDentalDocument)
-      .filter((record) => record.kind !== 'image');
+      .map(mapDentalDocument);
+    const records = allDentalRecords.filter(
+      (record) => record.kind !== 'image',
+    );
     const recordsByTooth = buildRecordsByTooth(records);
+    const odontogramStatuses = buildOdontogramStatuses(recordsByTooth);
 
     return {
       records,
       imaging,
       recordsByTooth,
-      odontogramStatuses: buildOdontogramStatuses(recordsByTooth),
+      odontogramStatuses,
       treatmentPlan: buildTreatmentPlan(records),
       perioOverview: buildPerioOverview(records),
+      toothTimeline: buildToothTimeline(odontogramStatuses),
+      imagingMounts: buildImagingMounts(allDentalRecords),
+      claimSummaries: buildClaimSummaries(records),
+      recallItems: buildRecallItems(records),
       workflowContext: buildWorkflowContext(records, imaging.length),
       counts: buildDentalCounts(records, imaging),
     };

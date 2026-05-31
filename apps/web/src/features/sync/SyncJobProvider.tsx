@@ -187,7 +187,10 @@ function startSyncConnection(
   syncJobEntries: Set<string>,
   handleFetchData: (item: RxDocument<ConnectionDocument>) => void,
 ) {
-  if (item.get('source') === 'manual') {
+  if (
+    item.get('source') === 'manual' ||
+    item.get('source') === 'freestyle_libre'
+  ) {
     return;
   }
 
@@ -395,6 +398,9 @@ async function fetchMedicalRecords(
 ) {
   switch (connectionDocument.get('source') as ConnectionSources) {
     case 'manual': {
+      return [];
+    }
+    case 'freestyle_libre': {
       return [];
     }
     case 'onpatient': {

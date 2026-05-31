@@ -558,6 +558,11 @@ const ConnectionTab: React.FC = () => {
       },
       [config],
     );
+  const portalConnections = list?.filter(
+    (item) =>
+      item.get('source') !== 'manual' &&
+      item.get('source') !== 'freestyle_libre',
+  );
 
   return (
     <AppPage banner={<GenericBanner text={t('Add Connections')} />}>
@@ -573,7 +578,7 @@ const ConnectionTab: React.FC = () => {
       </div>
       <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pb-20 sm:px-6 sm:pb-6 lg:px-8">
         <ul className="grid grid-cols-1 pt-8">
-          {list?.map((item) => (
+          {portalConnections?.map((item) => (
             <ConnectionCard
               key={item.id}
               item={item}

@@ -4,6 +4,7 @@ import {
   DentalRecord,
   DentalRecordDetails,
   DentalRecordKind,
+  DentalToothSurfaceModel,
   ToothSurface,
 } from '../types';
 
@@ -135,6 +136,7 @@ export function mapDentalDocument(
     surfaces: getSurfaces(details, text),
     summary: getSummary(document, details),
     details,
+    dentalModel: buildDentalToothSurfaceModel(details, text),
   };
 }
 
@@ -373,6 +375,31 @@ function getSurfaces(
   }
 
   return [...surfaces];
+}
+
+function buildDentalToothSurfaceModel(
+  details: DentalRecordDetails | undefined,
+  text: string,
+): DentalToothSurfaceModel {
+  const teeth = getToothNumbers(details, text);
+  return {
+    numberingSystem: details?.numberingSystem || 'universal',
+    dentition: details?.dentition,
+    teeth,
+    surfaces: getSurfaces(details, text),
+    quadrant: details?.dentalQuadrant,
+    arch: details?.dentalArch,
+    status: details?.dentalStatus,
+    source:
+      details?.sourceSystem || details?.sourceTable || details?.sourceId
+        ? {
+            system: details.sourceSystem || 'manual',
+            table: details.sourceTable,
+            id: details.sourceId,
+            confidence: details.mappingConfidence || 'medium',
+          }
+        : undefined,
+  };
 }
 
 function addToothList(teeth: Set<string>, value?: string) {

@@ -30,9 +30,46 @@ export function PerioOverviewPanel({ overview }: { overview: PerioOverview }) {
         </div>
       )}
       {overview.latestRecord ? (
-        <p className="mt-3 line-clamp-2 text-sm text-gray-700">
-          {overview.latestRecord.title}
-        </p>
+        <div className="mt-3">
+          <p className="line-clamp-2 text-sm text-gray-700">
+            {overview.latestRecord.title}
+          </p>
+          {overview.latestMeasurements.length > 0 && (
+            <div className="mt-3 grid gap-2">
+              {overview.latestMeasurements.map((measurement) => (
+                <div
+                  key={measurement.record.id}
+                  className="rounded-md bg-gray-50 p-3 text-sm text-gray-700"
+                >
+                  <p className="font-semibold text-gray-900">
+                    {measurement.date?.split('T')[0] || t('Undated')}
+                    {measurement.teeth.length > 0
+                      ? ` · ${t('Teeth')}: ${measurement.teeth.join(', ')}`
+                      : ''}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-600">
+                    {[
+                      measurement.pocketDepths &&
+                        `${t('Pockets')}: ${measurement.pocketDepths}`,
+                      measurement.recession &&
+                        `${t('Recession')}: ${measurement.recession}`,
+                      measurement.bleeding &&
+                        `${t('BOP')}: ${measurement.bleeding}`,
+                      measurement.plaque &&
+                        `${t('Plaque')}: ${measurement.plaque}`,
+                      measurement.mobility &&
+                        `${t('Mobility')}: ${measurement.mobility}`,
+                      measurement.furcation &&
+                        `${t('Furcation')}: ${measurement.furcation}`,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       ) : (
         <p className="mt-3 text-sm leading-6 text-gray-600">
           {t(

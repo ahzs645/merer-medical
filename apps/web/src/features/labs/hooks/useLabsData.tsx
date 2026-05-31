@@ -138,10 +138,17 @@ export function useLabsData() {
   };
 }
 
-function isLaboratoryObservation(lab: LabDocument) {
+export function isLaboratoryObservation(lab: LabDocument) {
   if (lab.metadata?.manual_specialty === 'laboratory') return true;
+  const raw = lab.data_record?.raw as { manual_kind?: string } | undefined;
+  if (raw?.manual_kind === 'lab') return true;
+
   const resource = getFhirResource<any>(lab);
-  const categories = Array.isArray(resource?.category) ? resource.category : [];
+  const categories = Array.isArray(resource?.category)
+    ? resource.category
+    : resource?.category
+      ? [resource.category]
+      : [];
   return categories.some((category: any) => {
     const text = String(category?.text || '').toLowerCase();
     const codes = (category?.coding || []).map((coding: any) =>

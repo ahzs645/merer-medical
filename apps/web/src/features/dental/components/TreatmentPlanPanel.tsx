@@ -31,6 +31,35 @@ export function TreatmentPlanPanel({ items }: { items: TreatmentPlanItem[] }) {
                 </div>
               </div>
               <p className="mt-1 text-sm text-gray-600">{t(item.label)}</p>
+              {[
+                item.record.details?.procedureCode &&
+                  `${t('Code')}: ${item.record.details.procedureCode}`,
+                item.record.details?.estimatedCost &&
+                  `${t('Estimate')}: ${item.record.details.estimatedCost}`,
+                item.record.details?.insuranceEstimate &&
+                  `${t('Insurance')}: ${item.record.details.insuranceEstimate}`,
+                item.record.details?.patientPortion &&
+                  `${t('Patient portion')}: ${item.record.details.patientPortion}`,
+                item.record.details?.signatureStatus &&
+                  `${t('Signature')}: ${item.record.details.signatureStatus}`,
+              ].filter(Boolean).length > 0 && (
+                <p className="mt-2 text-xs text-gray-500">
+                  {[
+                    item.record.details?.procedureCode &&
+                      `${t('Code')}: ${item.record.details.procedureCode}`,
+                    item.record.details?.estimatedCost &&
+                      `${t('Estimate')}: ${item.record.details.estimatedCost}`,
+                    item.record.details?.insuranceEstimate &&
+                      `${t('Insurance')}: ${item.record.details.insuranceEstimate}`,
+                    item.record.details?.patientPortion &&
+                      `${t('Patient portion')}: ${item.record.details.patientPortion}`,
+                    item.record.details?.signatureStatus &&
+                      `${t('Signature')}: ${item.record.details.signatureStatus}`,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </p>
+              )}
               {item.record.summary && (
                 <p className="mt-2 line-clamp-2 text-sm text-gray-700">
                   {item.record.summary}

@@ -1,6 +1,11 @@
 import {
   DentalActionLevel,
+  DentalClaimSummary,
+  DentalImagingMount,
+  DentalPerioMeasurement,
+  DentalRecallItem,
   DentalRecord,
+  DentalToothTimelineItem,
   DentalWorkflowContext,
   OdontogramToothStatus,
   PerioOverview,
@@ -116,7 +121,105 @@ export function buildPerioOverview(records: DentalRecord[]): PerioOverview {
     riskSignals: [...riskSignals],
     affectedTeeth: [...affectedTeeth].sort((a, b) => Number(a) - Number(b)),
     maintenanceRecords,
+    latestMeasurements: buildPerioMeasurements(perioRecords).slice(0, 6),
   };
+}
+
+export function buildToothTimeline(
+  statuses: OdontogramToothStatus[],
+): DentalToothTimelineItem[] {
+  return statuses.flatMap((status) =>
+    [...status.activeRecords, ...status.plannedRecords]
+      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+      .slice(0, 4)
+      .map((record) => ({
+        id: `${status.tooth}-${record.id}`,
+        tooth: status.tooth,
+        record,
+        date: record.date,
+        actionLevel: status.actionLevel,
+        label: status.label,
+      })),
+  );
+}
+
+export function buildImagingMounts(
+  records: DentalRecord[],
+): DentalImagingMount[] {
+  const imageRecords = records.filter((record) => record.kind === 'image');
+  const grouped = new Map<string, DentalRecord[]>();
+
+  for (const record of imageRecords) {
+    const key =
+      record.details?.imagingMount ||
+      record.details?.dicomStudyUid ||
+      record.details?.imagingModality ||
+      'Ungrouped dental imaging';
+    grouped.set(key, [...(grouped.get(key) || []), record]);
+  }
+
+  return [...grouped.entries()].map(([title, group]) => {
+    const first = group[0];
+    const teeth = new Set<string>();
+    group.forEach((record) =>
+      record.toothNumbers.forEach((tooth) => teeth.add(tooth)),
+    );
+
+    return {
+      id: title,
+      title,
+      modality: first.details?.imagingModality,
+      acquisitionDate: first.details?.acquisitionDate || first.date,
+      dicomStudyUid: first.details?.dicomStudyUid,
+      dicomSeriesUid: first.details?.dicomSeriesUid,
+      toothNumbers: [...teeth].sort((a, b) => Number(a) - Number(b)),
+      itemCount: group.length,
+    };
+  });
+}
+
+export function buildClaimSummaries(
+  records: DentalRecord[],
+): DentalClaimSummary[] {
+  return records
+    .filter(
+      (record) =>
+        !!record.details?.claimStatus ||
+        !!record.details?.carrierName ||
+        !!record.details?.eobAttachment ||
+        hasAnyTerm(record, ['claim', 'eob', 'benefit', 'deductible']),
+    )
+    .map((record) => ({
+      id: record.id,
+      record,
+      status: record.details?.claimStatus,
+      carrier: record.details?.carrierName,
+      plan: record.details?.planName,
+      subscriberId: record.details?.subscriberId,
+      annualMaximum: record.details?.annualMaximum,
+      deductible: record.details?.deductible,
+      patientPortion: record.details?.patientPortion,
+      eobAttachment: record.details?.eobAttachment,
+    }));
+}
+
+export function buildRecallItems(records: DentalRecord[]): DentalRecallItem[] {
+  return records
+    .filter(
+      (record) =>
+        !!record.details?.recallType ||
+        !!record.details?.recallDueDate ||
+        !!record.details?.dentalRecall ||
+        hasAnyTerm(record, ['recall', 'prophy', 'periodontal maintenance']),
+    )
+    .map((record) => ({
+      id: record.id,
+      record,
+      type: record.details?.recallType || record.details?.dentalRecall,
+      dueDate: record.details?.recallDueDate || record.details?.dentalFollowUp,
+      provider: record.details?.dentalProvider,
+      location: record.details?.dentalLocation,
+    }));
 }
 
 export function buildWorkflowContext(
@@ -146,6 +249,12 @@ export function buildWorkflowContext(
   if (imagingCount > 0) {
     nextActions.push('Link imaging to tooth-specific records');
   }
+  if (records.some((record) => record.details?.claimStatus)) {
+    nextActions.push('Review dental claims and EOBs');
+  }
+  if (records.some((record) => record.details?.recallDueDate)) {
+    nextActions.push('Confirm recall and hygiene timing');
+  }
   if (nextActions.length === 0) {
     nextActions.push('Add dental findings, plans, or imaging to build context');
   }
@@ -158,6 +267,35 @@ export function buildWorkflowContext(
     imagingCount,
     nextActions,
   };
+}
+
+function buildPerioMeasurements(
+  records: DentalRecord[],
+): DentalPerioMeasurement[] {
+  return records
+    .map((record) => ({
+      record,
+      date: record.date,
+      teeth: record.toothNumbers,
+      pocketDepths: record.details?.perioPocketDepths,
+      recession: record.details?.perioRecession,
+      bleeding: record.details?.perioBleeding,
+      plaque: record.details?.perioPlaque,
+      mobility: record.details?.perioMobility,
+      furcation: record.details?.perioFurcation,
+      suppuration: record.details?.perioSuppuration,
+    }))
+    .filter((measurement) =>
+      [
+        measurement.pocketDepths,
+        measurement.recession,
+        measurement.bleeding,
+        measurement.plaque,
+        measurement.mobility,
+        measurement.furcation,
+        measurement.suppuration,
+      ].some(Boolean),
+    );
 }
 
 function getActionLevel(

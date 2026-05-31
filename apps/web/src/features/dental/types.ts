@@ -26,6 +26,7 @@ export type DentalRecord = {
   surfaces: ToothSurface[];
   summary?: string;
   details?: DentalRecordDetails;
+  dentalModel: DentalToothSurfaceModel;
 };
 
 export type DentalActionLevel = 'watch' | 'active' | 'planned' | 'complete';
@@ -57,6 +58,65 @@ export type DentalRecordDetails = {
   overbite?: string;
   molarClass?: string;
   nextVisit?: string;
+  numberingSystem?: 'universal' | 'fdi' | 'palmer' | 'unknown';
+  sourceSystem?: string;
+  sourceTable?: string;
+  sourceId?: string;
+  mappingConfidence?: 'high' | 'medium' | 'low';
+  perioPocketDepths?: string;
+  perioRecession?: string;
+  perioBleeding?: string;
+  perioPlaque?: string;
+  perioMobility?: string;
+  perioFurcation?: string;
+  perioSuppuration?: string;
+  imagingMount?: string;
+  imagingModality?: string;
+  dicomStudyUid?: string;
+  dicomSeriesUid?: string;
+  acquisitionDate?: string;
+  treatmentStatus?: string;
+  treatmentPriority?: string;
+  estimatedCost?: string;
+  insuranceEstimate?: string;
+  patientPortion?: string;
+  signatureStatus?: string;
+  recallType?: string;
+  recallDueDate?: string;
+  claimStatus?: string;
+  carrierName?: string;
+  planName?: string;
+  subscriberId?: string;
+  annualMaximum?: string;
+  deductible?: string;
+  eobAttachment?: string;
+};
+
+export type DentalSourceMapping = {
+  system: string;
+  table?: string;
+  id?: string;
+  confidence: 'high' | 'medium' | 'low';
+};
+
+export type DentalToothSurfaceModel = {
+  numberingSystem: 'universal' | 'fdi' | 'palmer' | 'unknown';
+  dentition?: string;
+  teeth: string[];
+  surfaces: ToothSurface[];
+  quadrant?: string;
+  arch?: string;
+  status?: string;
+  source?: DentalSourceMapping;
+};
+
+export type DentalToothTimelineItem = {
+  id: string;
+  tooth: string;
+  record: DentalRecord;
+  date?: string;
+  actionLevel: DentalActionLevel;
+  label: string;
 };
 
 export type OdontogramToothStatus = {
@@ -87,6 +147,53 @@ export type PerioOverview = {
   riskSignals: string[];
   affectedTeeth: string[];
   maintenanceRecords: DentalRecord[];
+  latestMeasurements: DentalPerioMeasurement[];
+};
+
+export type DentalPerioMeasurement = {
+  record: DentalRecord;
+  date?: string;
+  teeth: string[];
+  pocketDepths?: string;
+  recession?: string;
+  bleeding?: string;
+  plaque?: string;
+  mobility?: string;
+  furcation?: string;
+  suppuration?: string;
+};
+
+export type DentalImagingMount = {
+  id: string;
+  title: string;
+  modality?: string;
+  acquisitionDate?: string;
+  dicomStudyUid?: string;
+  dicomSeriesUid?: string;
+  toothNumbers: string[];
+  itemCount: number;
+};
+
+export type DentalClaimSummary = {
+  id: string;
+  record: DentalRecord;
+  status?: string;
+  carrier?: string;
+  plan?: string;
+  subscriberId?: string;
+  annualMaximum?: string;
+  deductible?: string;
+  patientPortion?: string;
+  eobAttachment?: string;
+};
+
+export type DentalRecallItem = {
+  id: string;
+  record: DentalRecord;
+  type?: string;
+  dueDate?: string;
+  provider?: string;
+  location?: string;
 };
 
 export type DentalWorkflowContext = {
@@ -112,6 +219,10 @@ export type DentalWorkspaceData = {
   odontogramStatuses: OdontogramToothStatus[];
   treatmentPlan: TreatmentPlanItem[];
   perioOverview: PerioOverview;
+  toothTimeline: DentalToothTimelineItem[];
+  imagingMounts: DentalImagingMount[];
+  claimSummaries: DentalClaimSummary[];
+  recallItems: DentalRecallItem[];
   workflowContext: DentalWorkflowContext;
   counts: {
     conditions: number;

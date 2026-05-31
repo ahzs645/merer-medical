@@ -128,6 +128,7 @@ for (const panel of records.labPanels || []) {
           },
         },
         metadata: {
+          manual_specialty: 'laboratory',
           source_panel_id: panel.id,
           source_result_id: result.id,
         },

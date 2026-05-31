@@ -96,7 +96,9 @@ export function ConnectionCard({
     sync = useSyncJobContext(),
     syncD = useSyncJobDispatchContext(),
     syncJobEntries = new Set(Object.keys(sync)),
-    isLocalImport = item.get('source') === 'freestyle_libre',
+    isLocalImport =
+      item.get('source') === 'manual' ||
+      item.get('source') === 'freestyle_libre',
     syncing = syncJobEntries.has(item.get('id')),
     handleFetchData = useCallback(() => {
       if (isLocalImport) return;

@@ -1,7 +1,10 @@
 import { AppPage } from '../../shared/components/AppPage';
 import { DentalCleaningHistoryPanel } from './components/DentalCleaningHistoryPanel';
+import { DentalClaimsPanel } from './components/DentalClaimsPanel';
 import { DentalHeader } from './components/DentalHeader';
 import { DentalImagingPanel } from './components/DentalImagingPanel';
+import { DentalImagingMountsPanel } from './components/DentalImagingMountsPanel';
+import { DentalRecallPanel } from './components/DentalRecallPanel';
 import { DentalRecordsPanel } from './components/DentalRecordsPanel';
 import { DentalScanPreview } from './components/DentalScanPreview';
 import { DentalSurgeryPanel } from './components/DentalSurgeryPanel';
@@ -10,6 +13,7 @@ import { DentalWorkflowContextPanel } from './components/DentalWorkflowContextPa
 import { OdontogramStatusPanel } from './components/OdontogramStatusPanel';
 import { OrthodonticPanel } from './components/OrthodonticPanel';
 import { PerioOverviewPanel } from './components/PerioOverviewPanel';
+import { ToothTimelinePanel } from './components/ToothTimelinePanel';
 import { TreatmentPlanPanel } from './components/TreatmentPlanPanel';
 import { ToothChartPanel } from './components/ToothChartPanel';
 import { useDentalData } from './hooks/useDentalData';
@@ -23,6 +27,10 @@ export function DentalTab() {
     odontogramStatuses,
     treatmentPlan,
     perioOverview,
+    toothTimeline,
+    imagingMounts,
+    claimSummaries,
+    recallItems,
     workflowContext,
     counts,
     status,
@@ -43,10 +51,16 @@ export function DentalTab() {
           <DentalSummaryPanel counts={counts} />
           <ToothChartPanel recordsByTooth={recordsByTooth} />
           <OdontogramStatusPanel statuses={odontogramStatuses} />
+          <ToothTimelinePanel items={toothTimeline} />
           <div className="grid gap-4 lg:grid-cols-3">
             <TreatmentPlanPanel items={treatmentPlan} />
             <PerioOverviewPanel overview={perioOverview} />
             <DentalWorkflowContextPanel context={workflowContext} />
+          </div>
+          <div className="grid gap-4 lg:grid-cols-3">
+            <DentalImagingMountsPanel mounts={imagingMounts} />
+            <DentalClaimsPanel claims={claimSummaries} />
+            <DentalRecallPanel recalls={recallItems} />
           </div>
           <OrthodonticPanel records={records} />
           <DentalSurgeryPanel records={records} />
