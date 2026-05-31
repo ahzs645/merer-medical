@@ -107,6 +107,23 @@
       "_deleted": false
     },
     {
+      "id": "insurance-demo-connection",
+      "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+      "source": "manual",
+      "location": "demo://insurance-benefits",
+      "name": "Demo Insurance Benefits",
+      "access_token": "*****",
+      "refresh_token": "*****",
+      "last_refreshed": "2026-05-31T12:00:00.000Z",
+      "last_sync_was_error": false,
+      "last_sync_attempt": "2026-05-31T12:00:00.000Z",
+      "expires_at": 1780228800,
+      "_meta": {
+        "lwt": 1779824100000
+      },
+      "_deleted": false
+    },
+    {
       "id": "dental-demo-connection",
       "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
       "source": "manual",

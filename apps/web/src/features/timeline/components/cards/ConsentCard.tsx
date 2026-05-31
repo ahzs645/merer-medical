@@ -11,6 +11,7 @@ import { ModalHeader } from '../../../../shared/components/ModalHeader';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
 import { TimelineCardTitle } from '../TimelineCardTitle';
 import { OpenableCardIcon } from '../OpenableCardIcon';
+import { formatDisplayText } from '../../../../shared/utils/StyleUtils';
 
 export const ConsentCard = memo(function ConsentCard({
   item,
@@ -65,14 +66,22 @@ export const ConsentCard = memo(function ConsentCard({
               <DetailRow
                 label="Category"
                 value={resource?.category
-                  ?.map((category: any) => category.text || category.coding?.[0]?.display)
+                  ?.map(
+                    (category: any) =>
+                      category.text || category.coding?.[0]?.display,
+                  )
                   .filter(Boolean)
                   .join(', ')}
               />
-              <DetailRow label="Source" value={resource?.sourceAttachment?.title} />
+              <DetailRow
+                label="Source"
+                value={resource?.sourceAttachment?.title}
+              />
               {resource?.policyText && (
                 <div>
-                  <div className="mb-1 font-semibold text-gray-700">Directive text</div>
+                  <div className="mb-1 font-semibold text-gray-700">
+                    Directive text
+                  </div>
                   <p className="whitespace-pre-line rounded-md bg-gray-50 p-3 leading-6 text-gray-800">
                     {resource.policyText}
                   </p>
@@ -91,7 +100,7 @@ function DetailRow({ label, value }: { label: string; value?: string }) {
   return (
     <div className="grid grid-cols-3 gap-2">
       <div className="font-semibold text-gray-700">{label}</div>
-      <div className="col-span-2">{value}</div>
+      <div className="col-span-2">{formatDisplayText(value)}</div>
     </div>
   );
 }

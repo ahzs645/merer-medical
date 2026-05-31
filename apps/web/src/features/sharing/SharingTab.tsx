@@ -217,12 +217,12 @@ export function SharingTab() {
   return (
     <AppPage
       banner={
-        <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 lg:px-8">
+        <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
-            <h1 className="text-xl font-semibold text-gray-900">
+            <h1 className="text-2xl font-bold sm:text-3xl">
               Sharing and emergency access
             </h1>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-primary-100">
               Local emergency profile, caregiver proxies, and limited share
               grants for this user.
             </p>

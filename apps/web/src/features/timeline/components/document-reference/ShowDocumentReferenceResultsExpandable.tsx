@@ -11,6 +11,7 @@ import { CCDAStructureDefinitionKeys2_1 } from './CCDAStructureDefinitionKeys2_1
 import { DisplayCCDADocument } from './DisplayCCDADocument';
 import { parseCCDA } from './parseCCDA/parseCCDA';
 import { getFhirResource } from '../../../../shared/utils/fhirResource';
+import { formatDisplayText } from '../../../../shared/utils/StyleUtils';
 
 export const LOINC_CODE_SYSTEM = '2.16.840.1.113883.6.1';
 export const SNOMED_CT_CODE_SYSTEM = '2.16.840.1.113883.6.96';
@@ -79,7 +80,9 @@ export function ShowDocumentResultsExpandable({
           embeddedContentType.startsWith('image/') &&
           typeof embeddedRaw === 'string'
         ) {
-          setImageUrl(createBlobUrlFromBase64(embeddedRaw, embeddedContentType));
+          setImageUrl(
+            createBlobUrlFromBase64(embeddedRaw, embeddedContentType),
+          );
         } else if (
           embeddedContentType.includes('text/html') &&
           typeof embeddedRaw === 'string'
@@ -304,7 +307,9 @@ function DocumentReferenceFallback({
             <dt className="text-xs font-semibold uppercase tracking-wide text-gray-500">
               {label}
             </dt>
-            <dd className="mt-1 break-words text-sm text-gray-900">{value}</dd>
+            <dd className="mt-1 break-words text-sm text-gray-900">
+              {label === 'Status' ? formatDisplayText(value) : value}
+            </dd>
           </div>
         ))}
       </dl>

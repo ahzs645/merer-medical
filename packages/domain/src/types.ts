@@ -722,71 +722,6 @@ export interface DentalImagingRecord extends BaseRecord {
   raw?: unknown;
 }
 
-export interface DentalAppointmentRecord extends BaseRecord {
-  userId?: AppId;
-  dentalPatientProfileId: AppId;
-  demoSourceId?: AppId;
-  sourceAppointmentId: string;
-  sourceOperatoryId?: string;
-  sourceProviderId?: string;
-  sourceProviderHygienistId?: string;
-  sourceAppointmentTypeId?: string;
-  sourceScheduleOpId?: string;
-  appointmentDate?: string;
-  status?: string;
-  confirmed?: string;
-  isNewPatient?: boolean;
-  isHygiene?: boolean;
-  priority?: string;
-  note?: string;
-  procedureDescriptions?: string;
-  procedures?: Array<{
-    description?: string;
-    tooth?: string;
-    surfaces?: string[];
-  }>;
-  clinicId?: string;
-  raw?: unknown;
-}
-
-export interface DentalOperatoryRecord extends BaseRecord {
-  demoSourceId?: AppId;
-  sourceOperatoryId: string;
-  opName: string;
-  abbreviation?: string;
-  providerDentistId?: string;
-  providerHygienistId?: string;
-  isHygiene?: boolean;
-  clinicId?: string;
-  operatoryType?: string;
-  itemOrder?: number;
-  isHidden?: boolean;
-  isWebSched?: boolean;
-  isNewPatAppt?: boolean;
-  raw?: unknown;
-}
-
-export interface DentalScheduleRecord extends BaseRecord {
-  demoSourceId?: AppId;
-  sourceScheduleId: string;
-  scheduleDate?: string;
-  startTime?: string;
-  stopTime?: string;
-  providerId?: string;
-  blockoutType?: string;
-  scheduleType?: string;
-  note?: string;
-  clinicId?: string;
-  operatories: DentalScheduleOpRecord[];
-  raw?: unknown;
-}
-
-export interface DentalScheduleOpRecord {
-  sourceScheduleOpId?: string;
-  sourceOperatoryId?: string;
-  raw?: unknown;
-}
-
 export interface DentalLabCase extends BaseRecord {
   userId?: AppId;
   dentalPatientProfileId: AppId;
@@ -996,9 +931,6 @@ export const ALL_TABLES = [
   'dental_imaging_records',
   'dental_lab_cases',
   'dental_form_records',
-  'dental_appointment_records',
-  'dental_operatory_records',
-  'dental_schedule_records',
   'attachments',
   'instance_config',
   'summary_page_preferences',
@@ -1051,15 +983,9 @@ export type RecordOf<T extends TableName> = T extends 'users'
                                           ? DentalImagingRecord
                                           : T extends 'dental_lab_cases'
                                             ? DentalLabCase
-                                                : T extends 'dental_form_records'
-                                                  ? DentalFormRecord
-                                                  : T extends 'dental_appointment_records'
-                                                    ? DentalAppointmentRecord
-                                                    : T extends 'dental_operatory_records'
-                                                      ? DentalOperatoryRecord
-                                                      : T extends 'dental_schedule_records'
-                                                        ? DentalScheduleRecord
-                                                        : T extends 'attachments'
+                                            : T extends 'dental_form_records'
+                                              ? DentalFormRecord
+                                              : T extends 'attachments'
                                                 ? Attachment
                                                 : T extends 'instance_config'
                                                   ? InstanceConfig

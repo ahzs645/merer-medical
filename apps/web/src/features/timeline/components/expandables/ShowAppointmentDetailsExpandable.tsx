@@ -4,6 +4,7 @@ import { ClinicalDocument } from '../../../../models/clinical-document/ClinicalD
 import { formatFullDateWithTime } from '../../../../shared/utils/dateFormatters';
 import { Modal } from '../../../../shared/components/Modal';
 import { ModalHeader } from '../../../../shared/components/ModalHeader';
+import { formatDisplayText } from '../../../../shared/utils/StyleUtils';
 
 export function ShowAppointmentDetailsExpandable({
   item,
@@ -41,8 +42,8 @@ export function ShowAppointmentDetailsExpandable({
                   <div className="text-sm font-semibold text-gray-700">
                     Status
                   </div>
-                  <div className="col-span-2 text-sm text-gray-900 capitalize">
-                    {appointment.status}
+                  <div className="col-span-2 text-sm text-gray-900">
+                    {formatDisplayText(appointment.status)}
                   </div>
                 </div>
               )}
@@ -146,7 +147,7 @@ export function ShowAppointmentDetailsExpandable({
                           )}
                           {participant.status && (
                             <div className="text-gray-500 text-xs capitalize">
-                              {participant.status}
+                              {formatDisplayText(participant.status)}
                             </div>
                           )}
                         </div>

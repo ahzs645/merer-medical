@@ -71,11 +71,36 @@ jobs:
           mkdir -p dist/apps/web/docs
           cp -R docs/starlight/dist/. dist/apps/web/docs/
           cp dist/apps/web/index.html dist/apps/web/404.html
-          # Serve the /demo entry point with a real 200 (GitHub Pages returns
-          # 404.html with a 404 status for unknown paths). Deeper demo routes
-          # still fall back to 404.html and route client-side.
-          mkdir -p dist/apps/web/demo
-          cp dist/apps/web/index.html dist/apps/web/demo/index.html
+          # Serve demo entry points with a real 200. GitHub Pages returns
+          # 404.html with a 404 status for unknown paths, which can prevent
+          # nested demo routes from loading cleanly on direct navigation.
+          demo_routes=(
+            demo
+            demo/timeline
+            demo/records
+            demo/records/labs
+            demo/records/documents
+            demo/records/imaging
+            demo/records/medications
+            demo/records/insurance
+            demo/records/care-plans
+            demo/records/trackers
+            demo/records/problems
+            demo/records/sharing
+            demo/records/visit-prep
+            demo/records/audit-log
+            demo/records/dental
+            demo/records/optometry
+            demo/records/new
+            demo/connections
+            demo/assistant
+            demo/summary
+            demo/settings
+          )
+          for route in "${demo_routes[@]}"; do
+            mkdir -p "dist/apps/web/$route"
+            cp dist/apps/web/index.html "dist/apps/web/$route/index.html"
+          done
           mkdir -p dist/apps/web/api/v1
           printf '{}' > dist/apps/web/api/v1/instance-config
           touch dist/apps/web/.nojekyll

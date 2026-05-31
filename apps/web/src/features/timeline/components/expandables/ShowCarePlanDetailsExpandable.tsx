@@ -5,6 +5,7 @@ import { formatFullDate } from '../../../../shared/utils/dateFormatters';
 import { Modal } from '../../../../shared/components/Modal';
 import { ModalHeader } from '../../../../shared/components/ModalHeader';
 import { getFhirResource } from '../../../../shared/utils/fhirResource';
+import { formatDisplayText } from '../../../../shared/utils/StyleUtils';
 
 export function ShowCarePlanDetailsExpandable({
   item,
@@ -44,8 +45,8 @@ export function ShowCarePlanDetailsExpandable({
                   <div className="text-sm font-semibold text-gray-700">
                     Status
                   </div>
-                  <div className="col-span-2 text-sm text-gray-900 capitalize">
-                    {carePlan.status}
+                  <div className="col-span-2 text-sm text-gray-900">
+                    {formatDisplayText(carePlan.status)}
                   </div>
                 </div>
               )}
@@ -55,8 +56,8 @@ export function ShowCarePlanDetailsExpandable({
                   <div className="text-sm font-semibold text-gray-700">
                     Intent
                   </div>
-                  <div className="col-span-2 text-sm text-gray-900 capitalize">
-                    {carePlan.intent}
+                  <div className="col-span-2 text-sm text-gray-900">
+                    {formatDisplayText(carePlan.intent)}
                   </div>
                 </div>
               )}
@@ -114,8 +115,8 @@ export function ShowCarePlanDetailsExpandable({
                           activity.detail?.code?.coding?.[0]?.display ||
                           `Activity ${index + 1}`}
                         {activity.detail?.status && (
-                          <span className="ml-2 text-gray-500 capitalize">
-                            ({activity.detail.status})
+                          <span className="ml-2 text-gray-500">
+                            ({formatDisplayText(activity.detail.status)})
                           </span>
                         )}
                       </div>

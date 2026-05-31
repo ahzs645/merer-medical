@@ -4,6 +4,7 @@ import { ClinicalDocument } from '../../../../models/clinical-document/ClinicalD
 import { formatFullDate } from '../../../../shared/utils/dateFormatters';
 import { Modal } from '../../../../shared/components/Modal';
 import { ModalHeader } from '../../../../shared/components/ModalHeader';
+import { formatDisplayText } from '../../../../shared/utils/StyleUtils';
 
 export function ShowGoalDetailsExpandable({
   item,
@@ -41,8 +42,8 @@ export function ShowGoalDetailsExpandable({
                   <div className="text-sm font-semibold text-gray-700">
                     Status
                   </div>
-                  <div className="col-span-2 text-sm text-gray-900 capitalize">
-                    {goal.lifecycleStatus.replace('-', ' ')}
+                  <div className="col-span-2 text-sm text-gray-900">
+                    {formatDisplayText(goal.lifecycleStatus)}
                   </div>
                 </div>
               )}

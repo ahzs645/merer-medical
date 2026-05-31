@@ -77,20 +77,18 @@ export function MedicationsTab() {
   return (
     <AppPage
       banner={
-        <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 lg:px-8">
+        <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
           <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
-                Medications
-              </h1>
-              <p className="mt-1 text-sm text-gray-600">
+              <h1 className="text-2xl font-bold sm:text-3xl">Medications</h1>
+              <p className="mt-1 text-sm text-primary-100">
                 Reconciled prescriptions, planned therapy, stopped medications,
                 supplements, adherence, and source history.
               </p>
             </div>
             <Link
               to={ADD_MEDICATION_PATH}
-              className="inline-flex w-fit items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+              className="inline-flex w-fit items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-inset ring-primary-100 hover:bg-primary-50"
             >
               <PlusIcon className="h-5 w-5" />
               {t('Add medication')}
@@ -493,7 +491,6 @@ function MedicationCard({ item }: { item: MedicationViewItem }) {
               {humanize(item.status)}
             </Badge>
             <Badge>{humanize(item.category || item.resourceType)}</Badge>
-            {item.rxNorm?.code && <Badge>RxNorm {item.rxNorm.code}</Badge>}
           </div>
         </div>
         <div className="shrink-0 text-sm text-gray-500">
@@ -595,9 +592,6 @@ function DetailPanel({ item }: { item: MedicationViewItem }) {
       <dl className="mt-3 grid gap-3">
         {item.startDate && <Detail label="Start date" value={item.startDate} />}
         {item.stopDate && <Detail label="Stop date" value={item.stopDate} />}
-        {item.rxNorm?.system && (
-          <Detail label="Code system" value={item.rxNorm.system} />
-        )}
         <Detail label="FHIR resource" value={humanize(item.resourceType)} />
       </dl>
       {item.nutritionFacts.length > 0 && (

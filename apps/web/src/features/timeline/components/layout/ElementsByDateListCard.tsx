@@ -71,6 +71,7 @@ import { checkIfXmlIsCCDA } from '../document-reference/ShowDocumentReferenceAtt
 import { parseCCDA } from '../document-reference/parseCCDA/parseCCDA';
 import parse, { HTMLReactParserOptions, domToReact } from 'html-react-parser';
 import DOMPurify from 'dompurify';
+import { getTimelineRecordElementId } from '../../utils/timelineAnchors';
 
 const options: HTMLReactParserOptions = {
   replace(domNode) {
@@ -133,7 +134,11 @@ function DocumentListItem({
 
   return (
     <>
-      <li className="text-xs font-medium md:text-sm text-gray-900" ref={ref}>
+      <li
+        id={getTimelineRecordElementId(item.id)}
+        className="scroll-mt-24 text-xs font-medium md:text-sm text-gray-900"
+        ref={ref}
+      >
         {item.metadata?.display_name}
       </li>
       {hasLoadedDocument && hasTextData ? (
@@ -333,7 +338,9 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
       () =>
         itemList
           .filter((item) => item.data_record.resource_type === 'encounter')
-          .filter((item) => getEncounterClass(item) || getEncounterLocation(item))
+          .filter(
+            (item) => getEncounterClass(item) || getEncounterLocation(item),
+          )
           .sort((a, b) => {
             if (a.metadata?.display_name && b.metadata?.display_name) {
               return a.metadata.display_name.localeCompare(
@@ -657,7 +664,10 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
         )}
         {consents.length > 0 && (
           <div className="mb-2 ml-2">
-            <TimelineCardCategoryTitle title={'Consents'} color="text-rose-700" />
+            <TimelineCardCategoryTitle
+              title={'Consents'}
+              color="text-rose-700"
+            />
             <ul className="list-disc list-inside">
               {consents.map((item) => (
                 <li
@@ -679,7 +689,8 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
             <ul className="list-disc list-inside">
               {diagnosticReports.slice(0, 5).map((item) => (
                 <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
+                  id={getTimelineRecordElementId(item.id)}
+                  className="scroll-mt-24 text-xs font-medium md:text-sm text-gray-900"
                   key={item.id}
                 >
                   {item.metadata?.display_name

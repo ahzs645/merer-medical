@@ -6,6 +6,7 @@ import clinicalDocuments9a00c884 from './collections/clinical_documents.9a00c884
 import clinicalDocumentsA25cd905 from './collections/clinical_documents.a25cd905-d981-496b-ab08-ff1fd78b3ca8.json';
 import clinicalDocumentsDentalDemo from './collections/clinical_documents.dental-demo-connection.json';
 import clinicalDocumentsE3936774 from './collections/clinical_documents.e3936774-a661-4be0-8172-912ef5f758b7.json';
+import clinicalDocumentsInsuranceDemo from './collections/clinical_documents.insurance-demo.json';
 import clinicalDocumentsOptometryDemo from './collections/clinical_documents.optometry-demo-connection.json';
 import connectionDocuments from './collections/connection_documents.json';
 import summaryPagePreferences from './collections/summary_page_preferences.json';
@@ -21,6 +22,7 @@ const clinicalDocuments = {
     ...clinicalDocumentsA25cd905,
     ...clinicalDocumentsDentalDemo,
     ...clinicalDocumentsE3936774,
+    ...clinicalDocumentsInsuranceDemo,
     ...clinicalDocumentsOptometryDemo,
   ],
 };

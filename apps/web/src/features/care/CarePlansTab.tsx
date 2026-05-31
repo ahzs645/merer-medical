@@ -20,6 +20,7 @@ import {
 } from '../../repositories/WorkflowRecordRepository';
 import { AppPage } from '../../shared/components/AppPage';
 import { StylizedSelect } from '../../shared/components/StylizedSelect';
+import { formatDisplayText } from '../../shared/utils/StyleUtils';
 
 type CareResourceType = 'careplan' | 'goal' | 'servicerequest';
 
@@ -179,20 +180,18 @@ export function CarePlansTab() {
   return (
     <AppPage
       banner={
-        <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 lg:px-8">
+        <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
           <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
-                Care plans
-              </h1>
-              <p className="mt-1 text-sm text-gray-600">
+              <h1 className="text-2xl font-bold sm:text-3xl">Care plans</h1>
+              <p className="mt-1 text-sm text-primary-100">
                 Care plans, goals, orders, and your own checklist tasks and
                 reminders.
               </p>
             </div>
             <Link
               to={NEW_CARE_PLAN_PATH}
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-inset ring-primary-100 hover:bg-primary-50"
             >
               <PlusIcon className="h-5 w-5" />
               New care plan
@@ -398,8 +397,8 @@ function CareResourceRow({ item }: { item: CareDocument }) {
           </h3>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-600">
             {status && (
-              <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 font-medium capitalize text-gray-700">
-                {String(status).replace('-', ' ')}
+              <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 font-medium text-gray-700">
+                {formatDisplayText(status)}
               </span>
             )}
             {date && (

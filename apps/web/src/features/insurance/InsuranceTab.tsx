@@ -15,6 +15,7 @@ import { ConnectionDocument } from '../../models/connection-document/ConnectionD
 import { AppPage } from '../../shared/components/AppPage';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { formatDisplayText } from '../../shared/utils/StyleUtils';
 import { ProvenancePanel } from '../provenance/ProvenancePanel';
 
 type CoverageDocument = ClinicalDocument<BundleEntry<Coverage>>;
@@ -23,6 +24,7 @@ type InsuranceItem = {
   document: CoverageDocument;
   coverage?: Coverage;
   connection?: ConnectionDocument;
+  state: 'active' | 'inactive';
   payer: string;
   subscriberId?: string;
   relationship?: string;
@@ -70,7 +72,7 @@ export function InsuranceTab() {
       banner={
         <InsuranceHeader
           totalCount={items.length}
-          activeCount={items.filter((item) => item.coverage?.status === 'active').length}
+          activeCount={items.filter((item) => item.state === 'active').length}
           query={query}
           setQuery={setQuery}
         />
@@ -89,7 +91,9 @@ export function InsuranceTab() {
                 {t('No insurance records')}
               </h1>
               <p className="mt-2 text-sm text-gray-600">
-                {t('Coverage records from C-CDA, FHIR, or imported packages will appear here.')}
+                {t(
+                  'Coverage records from C-CDA, FHIR, or imported packages will appear here.',
+                )}
               </p>
             </div>
           ) : (
@@ -127,18 +131,20 @@ function InsuranceHeader({
   const { t } = useInterfaceLanguage();
 
   return (
-    <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">{t('Insurance')}</h1>
-          <p className="mt-1 text-sm text-gray-600">
-            {t('Health coverage, payer, member ID, plan period, and source provenance.')}
+          <h1 className="text-2xl font-bold sm:text-3xl">{t('Insurance')}</h1>
+          <p className="mt-1 text-sm text-primary-100">
+            {t(
+              'Health coverage, payer, member ID, plan period, and source provenance.',
+            )}
           </p>
           <div className="mt-3 flex flex-wrap gap-2 text-sm">
-            <span className="rounded-md bg-emerald-50 px-2.5 py-1 font-medium text-emerald-800 ring-1 ring-emerald-200">
+            <span className="rounded-md bg-white/15 px-2.5 py-1 font-medium text-white ring-1 ring-white/25">
               {activeCount} {t('active')}
             </span>
-            <span className="rounded-md bg-gray-100 px-2.5 py-1 font-medium text-gray-700 ring-1 ring-gray-200">
+            <span className="rounded-md bg-white/15 px-2.5 py-1 font-medium text-white ring-1 ring-white/25">
               {totalCount} {t('plans')}
             </span>
           </div>
@@ -149,7 +155,7 @@ function InsuranceHeader({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t('Search payer, member ID, type, or address')}
-            className="w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="w-full rounded-md border-0 bg-white py-2 pl-10 pr-3 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
           />
         </label>
       </div>
@@ -185,11 +191,7 @@ function InsurancePlanCard({
             <h2 className="truncate text-sm font-semibold text-gray-900">
               {item.payer}
             </h2>
-            {item.coverage?.status && (
-              <span className="rounded bg-emerald-50 px-2 py-0.5 text-xs font-medium capitalize text-emerald-700">
-                {item.coverage.status}
-              </span>
-            )}
+            <InsuranceStateBadge state={item.state} />
           </div>
           <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
             <Fact label="Member ID" value={item.subscriberId} />
@@ -212,11 +214,14 @@ function InsuranceDetails({ item }: { item: InsuranceItem }) {
         <div className="flex items-start gap-3">
           <BuildingOffice2Icon className="mt-0.5 h-6 w-6 text-primary-700" />
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">{item.payer}</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              {item.payer}
+            </h2>
             <p className="mt-1 text-sm text-gray-600">{item.periodLabel}</p>
           </div>
         </div>
         <dl className="mt-5 grid gap-4 sm:grid-cols-2">
+          <Detail label="Status" value={item.state} />
           <Detail label="Member ID" value={item.subscriberId} />
           <Detail label="Relationship" value={item.relationship} />
           <Detail label="Plan type" value={item.type} />
@@ -255,6 +260,19 @@ function Fact({ label, value }: { label: string; value?: string }) {
   );
 }
 
+function InsuranceStateBadge({ state }: { state: InsuranceItem['state'] }) {
+  const className =
+    state === 'active'
+      ? 'bg-emerald-50 text-emerald-700'
+      : 'bg-gray-100 text-gray-700';
+
+  return (
+    <span className={`rounded px-2 py-0.5 text-xs font-medium ${className}`}>
+      {formatDisplayText(state)}
+    </span>
+  );
+}
+
 function Detail({
   label,
   value,
@@ -268,7 +286,9 @@ function Detail({
   return (
     <div className={wide ? 'sm:col-span-2' : undefined}>
       <dt className="text-sm font-medium text-gray-500">{label}</dt>
-      <dd className="mt-1 whitespace-pre-wrap text-sm text-gray-900">{value}</dd>
+      <dd className="mt-1 whitespace-pre-wrap text-sm text-gray-900">
+        {value}
+      </dd>
     </div>
   );
 }
@@ -335,7 +355,9 @@ function toInsuranceItem(
 ): InsuranceItem {
   const coverage = getFhirResource<Coverage>(document);
   const payer =
-    coverage?.payor?.map((payor) => payor.display || payor.reference).find(Boolean) ||
+    coverage?.payor
+      ?.map((payor) => payor.display || payor.reference)
+      .find(Boolean) ||
     document.metadata?.display_name ||
     'Coverage';
   const classes = coverage?.class || [];
@@ -347,6 +369,7 @@ function toInsuranceItem(
     document,
     coverage,
     connection,
+    state: getCoverageState(coverage),
     payer,
     subscriberId: coverage?.subscriberId,
     relationship: coverage?.relationship?.text,
@@ -356,6 +379,16 @@ function toInsuranceItem(
     periodLabel,
     sourceText: coverage?.text?.div,
   };
+}
+
+function getCoverageState(coverage?: Coverage): InsuranceItem['state'] {
+  if (!coverage || coverage.status !== 'active') return 'inactive';
+  if (!coverage.period?.end) return 'active';
+
+  const end = new Date(coverage.period.end);
+  if (Number.isNaN(end.getTime())) return 'active';
+
+  return end < new Date() ? 'inactive' : 'active';
 }
 
 function formatCoveragePeriod(coverage?: Coverage) {

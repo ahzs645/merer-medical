@@ -19,8 +19,6 @@ import {
 import { ReferenceOverlayMode } from './enrichment/types';
 import { useLabsData } from './hooks/useLabsData';
 import { groupLabs } from './utils/labGrouping';
-import { ProvenancePanel } from '../provenance/ProvenancePanel';
-import { LinkedReportList } from './components/LinkedReportList';
 import {
   getLabGroupInsight,
   getLabResultStatusClass,
@@ -29,13 +27,7 @@ import { StylizedSelect } from '../../shared/components/StylizedSelect';
 
 export function LabDetailTab() {
   const { labKey } = useParams<{ labKey: string }>(),
-    {
-      labs,
-      reportsByObservationId,
-      connectionsById,
-      referenceContext,
-      status,
-    } = useLabsData();
+    { labs, reportsByObservationId, referenceContext, status } = useLabsData();
   const [enabledOverlayModes, setEnabledOverlayModes] = useState<
     ReferenceOverlayMode[]
   >(['canadian', 'original']);
@@ -47,12 +39,6 @@ export function LabDetailTab() {
     return groupedLabs.find((item) => item.key === decodedKey);
   }, [groupedLabs, labKey]);
   const latestLab = group?.labs[0];
-  const latestReports = latestLab
-    ? reportsByObservationId.get(latestLab.metadata?.id || '') || []
-    : [];
-  const latestConnection = latestLab
-    ? connectionsById.get(latestLab.connection_record_id)
-    : undefined;
   const labInsight = useMemo(
     () => (group ? getLabGroupInsight(group) : undefined),
     [group],
@@ -141,60 +127,6 @@ export function LabDetailTab() {
                   </div>
                 </div>
               </section>
-              {latestLab ? (
-                <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
-                  <div className="mb-3">
-                    <h2 className="text-base font-semibold text-gray-900">
-                      Source and related records
-                    </h2>
-                    <p className="mt-1 text-sm text-gray-600">
-                      Where this result came from, linked reports, and useful
-                      next places to review.
-                    </p>
-                  </div>
-                  <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.8fr)]">
-                    <ProvenancePanel
-                      document={latestLab}
-                      connection={latestConnection}
-                    />
-                    <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
-                      <h3 className="text-sm font-semibold text-gray-900">
-                        Related links
-                      </h3>
-                      <div className="mt-3 space-y-3 text-sm">
-                        <div>
-                          <div className="font-medium text-gray-500">
-                            Diagnostic reports
-                          </div>
-                          <div className="mt-1">
-                            <LinkedReportList reports={latestReports} />
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          <Link
-                            to={Routes.Documents}
-                            className="rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
-                          >
-                            Documents
-                          </Link>
-                          <Link
-                            to={Routes.AuditLog}
-                            className="rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
-                          >
-                            Audit log
-                          </Link>
-                          <Link
-                            to={Routes.Sharing}
-                            className="rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
-                          >
-                            Export record
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              ) : null}
               {labInsight ? (
                 <section className="grid gap-3 md:grid-cols-4">
                   <LabInsightCard

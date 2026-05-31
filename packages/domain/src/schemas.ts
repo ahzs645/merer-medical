@@ -695,78 +695,6 @@ export const dentalFeeScheduleSchema = z.object({
   raw: z.unknown().optional(),
 });
 
-export const dentalAppointmentRecordSchema = z.object({
-  ...base,
-  userId: z.string().optional(),
-  dentalPatientProfileId: z.string(),
-  demoSourceId: z.string().optional(),
-  sourceAppointmentId: z.string(),
-  sourceOperatoryId: z.string().optional(),
-  sourceProviderId: z.string().optional(),
-  sourceProviderHygienistId: z.string().optional(),
-  sourceAppointmentTypeId: z.string().optional(),
-  sourceScheduleOpId: z.string().optional(),
-  appointmentDate: z.string().optional(),
-  status: z.string().optional(),
-  confirmed: z.string().optional(),
-  isNewPatient: z.boolean().optional(),
-  isHygiene: z.boolean().optional(),
-  priority: z.string().optional(),
-  note: z.string().optional(),
-  procedureDescriptions: z.string().optional(),
-  procedures: z
-    .array(
-      z.object({
-        description: z.string().optional(),
-        tooth: z.string().optional(),
-        surfaces: z.array(z.string()).optional(),
-      }),
-    )
-    .optional(),
-  clinicId: z.string().optional(),
-  raw: z.unknown().optional(),
-});
-
-export const dentalOperatoryRecordSchema = z.object({
-  ...base,
-  demoSourceId: z.string().optional(),
-  sourceOperatoryId: z.string(),
-  opName: z.string(),
-  abbreviation: z.string().optional(),
-  providerDentistId: z.string().optional(),
-  providerHygienistId: z.string().optional(),
-  isHygiene: z.boolean().optional(),
-  clinicId: z.string().optional(),
-  operatoryType: z.string().optional(),
-  itemOrder: z.number().int().optional(),
-  isHidden: z.boolean().optional(),
-  isWebSched: z.boolean().optional(),
-  isNewPatAppt: z.boolean().optional(),
-  raw: z.unknown().optional(),
-});
-
-const dentalScheduleOpRecordSchema = z.object({
-  sourceScheduleOpId: z.string().optional(),
-  sourceOperatoryId: z.string().optional(),
-  raw: z.unknown().optional(),
-});
-
-export const dentalScheduleRecordSchema = z.object({
-  ...base,
-  demoSourceId: z.string().optional(),
-  sourceScheduleId: z.string(),
-  scheduleDate: z.string().optional(),
-  startTime: z.string().optional(),
-  stopTime: z.string().optional(),
-  providerId: z.string().optional(),
-  blockoutType: z.string().optional(),
-  scheduleType: z.string().optional(),
-  note: z.string().optional(),
-  clinicId: z.string().optional(),
-  operatories: z.array(dentalScheduleOpRecordSchema),
-  raw: z.unknown().optional(),
-});
-
 export const dentalImagingRecordSchema = z.object({
   ...base,
   userId: z.string().optional(),
@@ -954,9 +882,6 @@ export const tableSchemas = {
   dental_imaging_records: dentalImagingRecordSchema,
   dental_lab_cases: dentalLabCaseSchema,
   dental_form_records: dentalFormRecordSchema,
-  dental_appointment_records: dentalAppointmentRecordSchema,
-  dental_operatory_records: dentalOperatoryRecordSchema,
-  dental_schedule_records: dentalScheduleRecordSchema,
   attachments: attachmentSchema,
   instance_config: instanceConfigSchema,
   summary_page_preferences: summaryPagePreferencesSchema,

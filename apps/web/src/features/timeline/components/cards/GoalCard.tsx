@@ -9,6 +9,7 @@ import { memo, useState } from 'react';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
 import { OpenableCardIcon } from '../OpenableCardIcon';
 import { ShowGoalDetailsExpandable } from '../expandables/ShowGoalDetailsExpandable';
+import { formatDisplayText } from '../../../../shared/utils/StyleUtils';
 
 export const GoalCard = memo(function GoalCard({
   item,
@@ -49,9 +50,9 @@ export const GoalCard = memo(function GoalCard({
           </p>
           {goal?.lifecycleStatus && (
             <p
-              className={`truncate text-xs font-medium md:text-sm capitalize ${statusColorMap[goal.lifecycleStatus] || 'text-gray-600'}`}
+              className={`truncate text-xs font-medium md:text-sm ${statusColorMap[goal.lifecycleStatus] || 'text-gray-600'}`}
             >
-              {goal.lifecycleStatus.replace('-', ' ')}
+              {formatDisplayText(goal.lifecycleStatus)}
             </p>
           )}
           {conn?.get('name') ? (

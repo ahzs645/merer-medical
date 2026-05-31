@@ -18,6 +18,7 @@ import {
 } from '../../../../shared/utils/fhirAccessHelpers';
 import { OpenableCardIcon } from '../OpenableCardIcon';
 import { ShowEncounterDetailsExpandable } from '../expandables/ShowEncounterDetailsExpandable';
+import { formatDisplayText } from '../../../../shared/utils/StyleUtils';
 import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
 import { getManualRecordNote } from '../../../../shared/utils/manualRecordUtils';
 
@@ -49,8 +50,10 @@ export const EncounterCard = memo(function EncounterCard({
             {
               <>
                 {encounterClass && (
-                  <p className="capitalize">
-                    {encounterLocation ? `${encounterClass} - ` : encounterClass}
+                  <p>
+                    {encounterLocation
+                      ? `${formatDisplayText(encounterClass)} - `
+                      : formatDisplayText(encounterClass)}
                   </p>
                 )}
                 {encounterLocation && <p>{encounterLocation}</p>}

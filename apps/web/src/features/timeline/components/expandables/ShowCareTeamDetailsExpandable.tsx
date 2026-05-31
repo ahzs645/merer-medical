@@ -5,6 +5,7 @@ import { formatFullDate } from '../../../../shared/utils/dateFormatters';
 import { Modal } from '../../../../shared/components/Modal';
 import { ModalHeader } from '../../../../shared/components/ModalHeader';
 import { getFhirResource } from '../../../../shared/utils/fhirResource';
+import { formatDisplayText } from '../../../../shared/utils/StyleUtils';
 
 export function ShowCareTeamDetailsExpandable({
   item,
@@ -44,8 +45,8 @@ export function ShowCareTeamDetailsExpandable({
                   <div className="text-sm font-semibold text-gray-700">
                     Status
                   </div>
-                  <div className="col-span-2 text-sm text-gray-900 capitalize">
-                    {careTeam.status}
+                  <div className="col-span-2 text-sm text-gray-900">
+                    {formatDisplayText(careTeam.status)}
                   </div>
                 </div>
               )}

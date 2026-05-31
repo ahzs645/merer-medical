@@ -14,6 +14,7 @@ import {
 } from '../../../../shared/utils/fhirAccessHelpers';
 import { Modal } from '../../../../shared/components/Modal';
 import { ModalHeader } from '../../../../shared/components/ModalHeader';
+import { formatDisplayText } from '../../../../shared/utils/StyleUtils';
 
 export function ShowEncounterDetailsExpandable({
   item,
@@ -92,8 +93,8 @@ export function ShowEncounterDetailsExpandable({
                   <div className="text-sm font-semibold text-gray-700">
                     Status
                   </div>
-                  <div className="col-span-2 text-sm text-gray-900 capitalize">
-                    {encounter.status}
+                  <div className="col-span-2 text-sm text-gray-900">
+                    {formatDisplayText(encounter.status)}
                   </div>
                 </div>
               )}
@@ -103,8 +104,8 @@ export function ShowEncounterDetailsExpandable({
                   <div className="text-sm font-semibold text-gray-700">
                     Class
                   </div>
-                  <div className="col-span-2 text-sm text-gray-900 capitalize">
-                    {getEncounterClassDisplay()}
+                  <div className="col-span-2 text-sm text-gray-900">
+                    {formatDisplayText(getEncounterClassDisplay())}
                   </div>
                 </div>
               )}
@@ -264,7 +265,10 @@ export function ShowEncounterDetailsExpandable({
                           loc.location?.reference ||
                           'N/A'}
                         {loc.status && (
-                          <span className="text-gray-600"> ({loc.status})</span>
+                          <span className="text-gray-600">
+                            {' '}
+                            ({formatDisplayText(loc.status)})
+                          </span>
                         )}
                       </div>
                     ))}

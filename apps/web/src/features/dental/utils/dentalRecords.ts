@@ -8,6 +8,11 @@ import {
   ToothSurface,
 } from '../types';
 
+// Terms used to recognise a document as dental. These are matched on word
+// boundaries (see `matchesDentalTerm`), so deliberately generic words that
+// collide with other specialties (e.g. "oral", "hygiene" — which match
+// optometry notes like "lid hygiene") are intentionally excluded. Prefer
+// dental-specific phrasing such as "oral surgery" over bare "oral".
 const DENTAL_TERMS = [
   'bitewing',
   'bruxism',
@@ -18,6 +23,7 @@ const DENTAL_TERMS = [
   'dentition',
   'endodontic',
   'gingiva',
+  'gingival',
   'implant',
   'intraoral',
   'aligner',
@@ -27,10 +33,11 @@ const DENTAL_TERMS = [
   'mandible',
   'maxilla',
   'odontogram',
-  'oral',
+  'oral surgery',
   'panoramic',
   'periapical',
   'periodontal',
+  'periodontitis',
   'pulp',
   'root canal',
   'orthodontic',
@@ -40,11 +47,8 @@ const DENTAL_TERMS = [
   'overjet',
   'crossbite',
   'scaling',
-  'cleaning',
   'prophylaxis',
-  'hygiene',
-  'fluoride',
-  'recall',
+  'fluoride varnish',
   'tooth',
   'teeth',
 ];
@@ -110,15 +114,33 @@ const CLEANING_TERMS = [
 ];
 
 const SURFACE_PATTERN = /\b(MOD|MO|DO|MID|MOB|MOL|M|O|I|D|B|F|L)\b/g;
-const TOOTH_PATTERN =
-  /\b(?:tooth|teeth|#|no\.?|number)?\s*(3[0-2]|[1-2][0-9]|[1-9])\b/gi;
+
+// A tooth number is only extracted from free text when it is preceded by an
+// explicit marker ("tooth", "teeth", "#", "no.", "number"). Without this the
+// extractor treats every number 1-32 as a tooth, so aligner tray counts
+// ("trays 1 to 24") and cephalometric values ("ANB 4") become phantom teeth.
+// The captured group also allows comma / "and" / range lists so that
+// "Teeth 4, 18" and "tooth 1-4" resolve to all referenced teeth.
+const TOOTH_NUMBER = '(?:3[0-2]|[12][0-9]|[1-9])';
+const TOOTH_MARKER_PATTERN = new RegExp(
+  `(?:#|\\b(?:tooth|teeth)(?:\\s*(?:no\\.?|number))?)\\s*[:#]?\\s*(${TOOTH_NUMBER}(?:\\s*(?:,|and|&|-|–|to)\\s*${TOOTH_NUMBER})*)`,
+  'gi',
+);
+
+const dentalTermMatchers = DENTAL_TERMS.map(
+  (term) =>
+    new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i'),
+);
+
+function matchesDentalTerm(text: string): boolean {
+  return dentalTermMatchers.some((matcher) => matcher.test(text));
+}
 
 export function isDentalDocument(document: ClinicalDocument<unknown>): boolean {
   const details = getDentalDetails(document);
   if (details?.specialty === 'dental') return true;
 
-  const text = searchableText(document).toLowerCase();
-  return DENTAL_TERMS.some((term) => text.includes(term));
+  return matchesDentalTerm(searchableText(document));
 }
 
 export function mapDentalDocument(
@@ -246,13 +268,25 @@ function inferDentalKind(
 
 function extractToothNumbers(text: string): string[] {
   const teeth = new Set<string>();
-  for (const match of text.matchAll(TOOTH_PATTERN)) {
-    const tooth = Number(match[1]);
-    if (tooth >= 1 && tooth <= 32) {
-      teeth.add(`${tooth}`);
-    }
+  for (const match of text.matchAll(TOOTH_MARKER_PATTERN)) {
+    addToothRun(teeth, match[1]);
   }
   return [...teeth];
+}
+
+// Parse the number run that follows a tooth marker, e.g. "4, 18" or "1-4".
+function addToothRun(teeth: Set<string>, run: string) {
+  for (const part of run.split(/\s*(?:,|and|&)\s*/i)) {
+    const range = part.match(
+      /(3[0-2]|[12][0-9]|[1-9])\s*(?:-|–|to)\s*(3[0-2]|[12][0-9]|[1-9])/i,
+    );
+    if (range) {
+      addToothRange(teeth, `${range[1]}-${range[2]}`);
+      continue;
+    }
+    const single = part.match(/\b(3[0-2]|[12][0-9]|[1-9])\b/);
+    if (single) teeth.add(`${Number(single[1])}`);
+  }
 }
 
 function extractSurfaces(text: string): ToothSurface[] {

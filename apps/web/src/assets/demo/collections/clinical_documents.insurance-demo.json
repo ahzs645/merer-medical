@@ -1,0 +1,244 @@
+[
+  {
+    "id": "insurance-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Coverage/demo-active-medical",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "insurance-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Coverage",
+          "id": "demo-active-medical",
+          "status": "active",
+          "type": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                "code": "EHCPOL",
+                "display": "Extended healthcare"
+              }
+            ],
+            "text": "Extended health"
+          },
+          "subscriberId": "MERE-48392017",
+          "beneficiary": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "relationship": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/subscriber-relationship",
+                "code": "self",
+                "display": "Self"
+              }
+            ],
+            "text": "Self"
+          },
+          "period": {
+            "start": "2026-01-01"
+          },
+          "payor": [
+            {
+              "display": "Pacific Blue Health"
+            }
+          ],
+          "class": [
+            {
+              "type": {
+                "text": "group"
+              },
+              "value": "PBH-2048",
+              "name": "Mere Medical Employer Plan"
+            },
+            {
+              "type": {
+                "text": "plan"
+              },
+              "value": "Gold Plus"
+            },
+            {
+              "type": {
+                "text": "phone"
+              },
+              "value": "1-800-555-0134"
+            },
+            {
+              "type": {
+                "text": "address"
+              },
+              "value": "400 Wellness Ave, Vancouver, BC V6B 1A1"
+            }
+          ],
+          "network": "Preferred Care Network",
+          "order": 1,
+          "text": {
+            "status": "generated",
+            "div": "Pacific Blue Health extended health coverage is active from 2026-01-01. Member ID MERE-48392017. Group PBH-2048, Gold Plus plan."
+          }
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "coverage",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Coverage/demo-active-medical",
+      "date": "2026-01-01T00:00:00.000Z",
+      "display_name": "Pacific Blue Health - Extended Health"
+    },
+    "_meta": {
+      "lwt": 1779824100000
+    },
+    "_deleted": false
+  },
+  {
+    "id": "insurance-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Coverage/demo-active-dental",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "insurance-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Coverage",
+          "id": "demo-active-dental",
+          "status": "active",
+          "type": {
+            "text": "Dental"
+          },
+          "subscriberId": "DEN-778245",
+          "beneficiary": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "relationship": {
+            "text": "Spouse"
+          },
+          "period": {
+            "start": "2025-07-01",
+            "end": "2026-06-30"
+          },
+          "payor": [
+            {
+              "display": "NorthBridge Dental Benefits"
+            }
+          ],
+          "class": [
+            {
+              "type": {
+                "text": "group"
+              },
+              "value": "NBD-9102",
+              "name": "Family Dental"
+            },
+            {
+              "type": {
+                "text": "plan"
+              },
+              "value": "Preventive Plus"
+            },
+            {
+              "type": {
+                "text": "phone"
+              },
+              "value": "1-888-555-0198"
+            },
+            {
+              "type": {
+                "text": "address"
+              },
+              "value": "220 Bridge Street, Seattle, WA 98101"
+            }
+          ],
+          "order": 2,
+          "text": {
+            "status": "generated",
+            "div": "NorthBridge Dental Benefits coverage is active for the 2025-07-01 to 2026-06-30 plan year. Member ID DEN-778245."
+          }
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "coverage",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Coverage/demo-active-dental",
+      "date": "2025-07-01T00:00:00.000Z",
+      "display_name": "NorthBridge Dental Benefits - Preventive Plus"
+    },
+    "_meta": {
+      "lwt": 1779824100001
+    },
+    "_deleted": false
+  },
+  {
+    "id": "insurance-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Coverage/demo-inactive-previous",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "insurance-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Coverage",
+          "id": "demo-inactive-previous",
+          "status": "cancelled",
+          "type": {
+            "text": "Medical"
+          },
+          "subscriberId": "COAST-112309",
+          "beneficiary": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "relationship": {
+            "text": "Self"
+          },
+          "period": {
+            "start": "2023-01-01",
+            "end": "2024-12-31"
+          },
+          "payor": [
+            {
+              "display": "Coastal Mutual"
+            }
+          ],
+          "class": [
+            {
+              "type": {
+                "text": "group"
+              },
+              "value": "CM-6610",
+              "name": "Previous Employer Plan"
+            },
+            {
+              "type": {
+                "text": "plan"
+              },
+              "value": "Standard"
+            },
+            {
+              "type": {
+                "text": "phone"
+              },
+              "value": "1-877-555-0166"
+            }
+          ],
+          "order": 3,
+          "text": {
+            "status": "generated",
+            "div": "Coastal Mutual medical coverage ended on 2024-12-31 after an employer change. Member ID COAST-112309."
+          }
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "coverage",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Coverage/demo-inactive-previous",
+      "date": "2024-12-31T00:00:00.000Z",
+      "display_name": "Coastal Mutual - Previous Medical Plan"
+    },
+    "_meta": {
+      "lwt": 1779824100002
+    },
+    "_deleted": false
+  }
+]

@@ -4,21 +4,18 @@ import type {
   ClinicalDocument,
   ClinicalDemoSource,
   Connection,
-  DentalAppointmentRecord,
   DentalClaimRecord,
   DentalFeeSchedule,
   DentalFormRecord,
   DentalImagingRecord,
   DentalInsuranceRecord,
   DentalLabCase,
-  DentalOperatoryRecord,
   DentalOrthoRecord,
   DentalPatientProfile,
   DentalPerioExam,
   DentalProcedureRecord,
   DentalProviderRecord,
   DentalRecallRecord,
-  DentalScheduleRecord,
   DentalTerminologyCode,
   DentalTerminologySet,
   DentalToothConditionRecord,
@@ -64,9 +61,6 @@ export class MereDb extends Dexie {
   dental_imaging_records!: Table<DentalImagingRecord, string>;
   dental_lab_cases!: Table<DentalLabCase, string>;
   dental_form_records!: Table<DentalFormRecord, string>;
-  dental_appointment_records!: Table<DentalAppointmentRecord, string>;
-  dental_operatory_records!: Table<DentalOperatoryRecord, string>;
-  dental_schedule_records!: Table<DentalScheduleRecord, string>;
   attachments!: Table<Attachment, string>;
   attachment_blobs!: Table<AttachmentBlob, string>;
   instance_config!: Table<InstanceConfig, string>;

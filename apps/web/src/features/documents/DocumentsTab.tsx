@@ -23,6 +23,7 @@ import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { EmbeddedAttachmentViewer } from '../timeline/components/document-reference/EmbeddedAttachmentViewer';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { ProvenancePanel } from '../provenance/ProvenancePanel';
+import { getTimelineRecordElementId } from '../timeline/utils/timelineAnchors';
 
 type DocumentRecord = ClinicalDocument<BundleEntry<DocumentReference>>;
 type AttachmentRecord = ClinicalDocument<string | Blob>;
@@ -396,7 +397,7 @@ function DocumentItemCard({ item }: { item: DocumentItem }) {
             {item.linkedReports.map((report) => (
               <Link
                 key={report.id}
-                to={getTimelineDateLink(report.metadata?.date)}
+                to={getTimelineRecordLink(report)}
                 onClick={(event) => event.stopPropagation()}
                 className="rounded bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
               >
@@ -461,7 +462,7 @@ function RelatedLinksPanel({ item }: { item: DocumentItem }) {
   const links = [
     {
       label: 'View source in timeline',
-      to: getTimelineDateLink(item.document.metadata?.date),
+      to: getTimelineRecordLink(item.document),
     },
     {
       label: 'Open audit log',
@@ -473,7 +474,7 @@ function RelatedLinksPanel({ item }: { item: DocumentItem }) {
     },
     ...item.linkedReports.map((report) => ({
       label: report.metadata?.display_name || 'Linked report',
-      to: getTimelineDateLink(report.metadata?.date),
+      to: getTimelineRecordLink(report),
     })),
   ];
 
@@ -579,4 +580,9 @@ function getMetadataString(
 function getTimelineDateLink(date?: string): string {
   if (!date) return AppRoutes.Timeline;
   return `${AppRoutes.Timeline}#${safeFormatDate(date, 'MMM-dd-yyyy', '')}`;
+}
+
+function getTimelineRecordLink(document: ClinicalDocument<unknown>): string {
+  if (!document.id) return getTimelineDateLink(document.metadata?.date);
+  return `${AppRoutes.Timeline}#${getTimelineRecordElementId(document.id)}`;
 }

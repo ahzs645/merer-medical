@@ -17,7 +17,9 @@ export function TabButton({
   const isActive =
     route === AppRoutes.Records
       ? location.startsWith(AppRoutes.Records)
-      : location === route;
+      : route === AppRoutes.Utilities
+        ? location.startsWith(AppRoutes.Utilities)
+        : location === route;
 
   return (
     <Link

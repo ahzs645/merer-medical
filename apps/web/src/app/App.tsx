@@ -29,7 +29,13 @@ import { CarePlansTab } from '../features/care/CarePlansTab';
 import CernerRedirect from '../features/connections/oauth-callbacks/CernerRedirect';
 import ConnectionTab from '../features/connections/ConnectionTab';
 import EpicRedirect from '../features/connections/oauth-callbacks/EpicRedirect';
-import { DentalTab } from '../features/dental/DentalTab';
+import { DentalLayout } from '../features/dental/DentalLayout';
+import { DentalChartTab } from '../features/dental/tabs/DentalChartTab';
+import { DentalHygieneTab } from '../features/dental/tabs/DentalHygieneTab';
+import { DentalImagingTab } from '../features/dental/tabs/DentalImagingTab';
+import { DentalOverviewTab } from '../features/dental/tabs/DentalOverviewTab';
+import { DentalRecordsTab } from '../features/dental/tabs/DentalRecordsTab';
+import { DentalTreatmentTab } from '../features/dental/tabs/DentalTreatmentTab';
 import { DocumentsTab } from '../features/documents/DocumentsTab';
 import HealowRedirect from '../features/connections/oauth-callbacks/HealowRedirect';
 import { LabDetailTab } from '../features/labs/LabDetailTab';
@@ -48,6 +54,7 @@ import { SharingTab } from '../features/sharing/SharingTab';
 import SummaryTab from '../features/summary/SummaryTab';
 import { TimelineTab } from '../features/timeline/TimelineTab';
 import { TrackersTab } from '../features/trackers/TrackersTab';
+import { UtilitiesLayout } from '../features/utilities/UtilitiesLayout';
 import { VisitPrepTab } from '../features/visit-prep/VisitPrepTab';
 import VARedirect from '../features/connections/oauth-callbacks/VARedirect';
 import VeradigmRedirect from '../features/connections/oauth-callbacks/VeradigmRedirect';
@@ -141,20 +148,34 @@ const routes = [
             element: <ProblemsTab />,
           },
           {
-            path: 'sharing',
-            element: <SharingTab />,
-          },
-          {
-            path: 'visit-prep',
-            element: <VisitPrepTab />,
-          },
-          {
-            path: 'audit-log',
-            element: <AuditLogTab />,
-          },
-          {
             path: 'dental',
-            element: <DentalTab />,
+            element: <DentalLayout />,
+            children: [
+              {
+                index: true,
+                element: <DentalOverviewTab />,
+              },
+              {
+                path: 'chart',
+                element: <DentalChartTab />,
+              },
+              {
+                path: 'treatment',
+                element: <DentalTreatmentTab />,
+              },
+              {
+                path: 'hygiene',
+                element: <DentalHygieneTab />,
+              },
+              {
+                path: 'imaging',
+                element: <DentalImagingTab />,
+              },
+              {
+                path: 'records',
+                element: <DentalRecordsTab />,
+              },
+            ],
           },
           {
             path: 'optometry',
@@ -167,6 +188,28 @@ const routes = [
           {
             path: ':recordId/edit',
             element: <ManualRecordTab />,
+          },
+        ],
+      },
+      {
+        path: AppRoutes.Utilities,
+        element: <UtilitiesLayout />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to={AppRoutes.VisitPrep} replace />,
+          },
+          {
+            path: 'visit-prep',
+            element: <VisitPrepTab />,
+          },
+          {
+            path: 'sharing',
+            element: <SharingTab />,
+          },
+          {
+            path: 'audit-log',
+            element: <AuditLogTab />,
           },
         ],
       },
@@ -217,6 +260,18 @@ const routes = [
       {
         path: '/labs/:labKey',
         element: <LegacyLabDetailRedirect />,
+      },
+      {
+        path: '/records/visit-prep',
+        element: <Navigate to={AppRoutes.VisitPrep} replace />,
+      },
+      {
+        path: '/records/sharing',
+        element: <Navigate to={AppRoutes.Sharing} replace />,
+      },
+      {
+        path: '/records/audit-log',
+        element: <Navigate to={AppRoutes.AuditLog} replace />,
       },
       {
         path: '/imaging',

@@ -12,6 +12,7 @@ import { ShowCarePlanDetailsExpandable } from '../expandables/ShowCarePlanDetail
 import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
 import { getManualRecordNote } from '../../../../shared/utils/manualRecordUtils';
 import { getFhirResource } from '../../../../shared/utils/fhirResource';
+import { formatDisplayText } from '../../../../shared/utils/StyleUtils';
 
 export const CarePlanCard = memo(function CarePlanCard({
   item,
@@ -47,8 +48,8 @@ export const CarePlanCard = memo(function CarePlanCard({
             {formatTime(item.metadata?.date)}
           </p>
           {carePlan?.status && (
-            <p className="truncate text-xs font-medium text-gray-600 md:text-sm capitalize">
-              {carePlan.status}
+            <p className="truncate text-xs font-medium text-gray-600 md:text-sm">
+              {formatDisplayText(carePlan.status)}
             </p>
           )}
           {conn?.get('name') ? (

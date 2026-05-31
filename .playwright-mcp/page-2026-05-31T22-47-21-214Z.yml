@@ -1,0 +1,407 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - navigation "Utilities" [ref=e7]:
+        - link "Visit prep" [ref=e8] [cursor=pointer]:
+          - /url: /demo/utilities/visit-prep
+          - img [ref=e9]
+          - text: Visit prep
+        - link "Sharing" [ref=e11] [cursor=pointer]:
+          - /url: /demo/utilities/sharing
+          - img [ref=e12]
+          - text: Sharing
+        - link "Audit log" [ref=e14] [cursor=pointer]:
+          - /url: /demo/utilities/audit-log
+          - img [ref=e15]
+          - text: Audit log
+      - generic [ref=e18]:
+        - generic [ref=e20]:
+          - generic [ref=e21]:
+            - heading "Visit prep and provider packet" [level=1] [ref=e22]
+            - paragraph [ref=e23]: Printable summary generated from this user's local records with source record citations.
+          - generic [ref=e24]:
+            - button "Download packet" [ref=e25] [cursor=pointer]:
+              - img [ref=e26]
+              - text: Download packet
+            - button "Print packet" [ref=e28] [cursor=pointer]:
+              - img [ref=e29]
+              - text: Print packet
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - heading "Provider packet" [level=2] [ref=e36]
+            - paragraph [ref=e37]: John Smith | Generated 5/31/2026
+          - generic [ref=e38]:
+            - generic [ref=e39]:
+              - heading "Active problems" [level=3] [ref=e40]
+              - list [ref=e41]:
+                - listitem [ref=e42]:
+                  - generic [ref=e43]:
+                    - paragraph [ref=e44]: Mild dry eye syndrome OU
+                    - paragraph [ref=e45]: Apr 8, 2026
+                  - paragraph [ref=e46]: Active
+                  - paragraph [ref=e47]: "Type: Condition"
+                - listitem [ref=e48]:
+                  - generic [ref=e49]:
+                    - paragraph [ref=e50]: Orthodontic assessment - Class II malocclusion
+                    - paragraph [ref=e51]: Mar 12, 2026
+                  - paragraph [ref=e52]: "Type: Condition"
+                - listitem [ref=e53]:
+                  - generic [ref=e54]:
+                    - paragraph [ref=e55]: Occlusal caries on tooth 30
+                    - paragraph [ref=e56]: Feb 12, 2026
+                  - paragraph [ref=e57]: Active
+                  - paragraph [ref=e58]: "Type: Condition"
+                - listitem [ref=e59]:
+                  - generic [ref=e60]:
+                    - paragraph [ref=e61]: Cough, unspecified
+                    - paragraph [ref=e62]: Mar 27, 2021
+                  - paragraph [ref=e63]: Active | Confirmed
+                  - paragraph [ref=e64]: "Type: Condition"
+                - listitem [ref=e65]:
+                  - generic [ref=e66]:
+                    - paragraph [ref=e67]: Risk for coronary artery disease between 10% and 20% in next 10 years
+                    - paragraph [ref=e68]: Dec 30, 2020
+                  - paragraph [ref=e69]: Active | Confirmed
+                  - paragraph [ref=e70]: "Type: Condition"
+                - listitem [ref=e71]:
+                  - generic [ref=e72]:
+                    - paragraph [ref=e73]: Polycystic ovaries
+                    - paragraph [ref=e74]: Dec 30, 2020
+                  - paragraph [ref=e75]: Active | Confirmed
+                  - paragraph [ref=e76]: "Type: Condition"
+                - listitem [ref=e77]:
+                  - generic [ref=e78]:
+                    - paragraph [ref=e79]: Right upper lobe pneumonia
+                    - paragraph [ref=e80]: Nov 27, 2012
+                  - paragraph [ref=e81]: Active | Confirmed
+                  - paragraph [ref=e82]: "Type: Condition"
+                - listitem [ref=e83]:
+                  - generic [ref=e84]:
+                    - paragraph [ref=e85]: Broken arm
+                    - paragraph [ref=e86]: Nov 27, 2012
+                  - paragraph [ref=e87]: Active | Confirmed
+                  - paragraph [ref=e88]: "Type: Condition"
+            - generic [ref=e89]:
+              - heading "Current medications" [level=3] [ref=e90]
+              - list [ref=e91]:
+                - listitem [ref=e92]:
+                  - generic [ref=e93]:
+                    - paragraph [ref=e94]: BENZONATATE 100 MG CAPSULE
+                    - paragraph [ref=e95]: Dec 17, 2021
+                  - paragraph [ref=e96]: Active
+                  - paragraph [ref=e97]: "Type: Medication statement"
+                - listitem [ref=e98]:
+                  - generic [ref=e99]:
+                    - paragraph [ref=e100]: drospirenone-ethinyl estradiol 3-0.02 MG per tablet
+                    - paragraph [ref=e101]: Dec 30, 2020
+                  - paragraph [ref=e102]: Active | Take 1 Tablet By Mouth 1 (One) Time Each Day.
+                  - paragraph [ref=e103]: "Type: Medication statement"
+                - listitem [ref=e104]:
+                  - generic [ref=e105]:
+                    - paragraph [ref=e106]: amitriptyline 150 MG tablet
+                    - paragraph [ref=e107]: Dec 29, 2015
+                  - paragraph [ref=e108]: Active | Take 1 Tablet (150 Mg Total) By Mouth Every Night.
+                  - paragraph [ref=e109]: "Type: Medication statement"
+                - listitem [ref=e110]:
+                  - generic [ref=e111]:
+                    - paragraph [ref=e112]: lisinopril-hydroCHLOROthiazide 10-12.5 MG per tablet
+                    - paragraph [ref=e113]: Dec 29, 2015
+                  - paragraph [ref=e114]: Active | Take 1 Tablet By Mouth 1 (One) Time Each Day.
+                  - paragraph [ref=e115]: "Type: Medication statement"
+                - listitem [ref=e116]:
+                  - generic [ref=e117]:
+                    - paragraph [ref=e118]: rosiglitazone 2 MG tablet
+                    - paragraph [ref=e119]: Dec 29, 2015
+                  - paragraph [ref=e120]: Active | Take 1 Tablet (2 Mg Total) By Mouth 2 (Two) Times A Day.
+                  - paragraph [ref=e121]: "Type: Medication statement"
+                - listitem [ref=e122]:
+                  - generic [ref=e123]:
+                    - paragraph [ref=e124]: amphetamine-dextroamphetamine XR 15 MG 24 hr capsule
+                    - paragraph [ref=e125]: Dec 29, 2015
+                  - paragraph [ref=e126]: Active | Take 1 Capsule (15 Mg Total) By Mouth 1 (One) Time Each Day In The Morning. Do Not Crush Or Chew.
+                  - paragraph [ref=e127]: "Type: Medication statement"
+                - listitem [ref=e128]:
+                  - generic [ref=e129]:
+                    - paragraph [ref=e130]: digoxin 125 MCG tablet
+                    - paragraph [ref=e131]: Dec 29, 2015
+                  - paragraph [ref=e132]: Active | Take 1 Tablet (125 Mcg Total) By Mouth 1 (One) Time Each Day.
+                  - paragraph [ref=e133]: "Type: Medication statement"
+                - listitem [ref=e134]:
+                  - generic [ref=e135]:
+                    - paragraph [ref=e136]: lisinopril 5 MG tablet
+                    - paragraph [ref=e137]: Dec 29, 2015
+                  - paragraph [ref=e138]: Active | Take 1 Tablet (5 Mg Total) By Mouth 1 (One) Time Each Day.
+                  - paragraph [ref=e139]: "Type: Medication statement"
+            - generic [ref=e140]:
+              - heading "Allergies" [level=3] [ref=e141]
+              - list [ref=e142]:
+                - listitem [ref=e143]:
+                  - generic [ref=e144]:
+                    - paragraph [ref=e145]: LATEX
+                    - paragraph [ref=e146]: May 30, 2019
+                  - paragraph [ref=e147]: CRITL | Hives
+                  - paragraph [ref=e148]: "Type: Allergy intolerance"
+                - listitem [ref=e149]:
+                  - generic [ref=e150]:
+                    - paragraph [ref=e151]: LACTOSE
+                    - paragraph [ref=e152]: Feb 25, 2017
+                  - paragraph [ref=e153]: CRITL | GI Intolerance
+                  - paragraph [ref=e154]: "Type: Allergy intolerance"
+                - listitem [ref=e155]:
+                  - generic [ref=e156]:
+                    - paragraph [ref=e157]: SHELLFISH-DERIVED PRODUCTS
+                    - paragraph [ref=e158]: Aug 20, 2014
+                  - paragraph [ref=e159]: CRITH | Itching
+                  - paragraph [ref=e160]: "Type: Allergy intolerance"
+                - listitem [ref=e161]:
+                  - generic [ref=e162]:
+                    - paragraph [ref=e163]: PENICILLIN G
+                    - paragraph [ref=e164]: Feb 21, 2011
+                  - paragraph [ref=e165]: CRITL | Hives
+                  - paragraph [ref=e166]: "Type: Allergy intolerance"
+                - listitem [ref=e167]:
+                  - generic [ref=e168]:
+                    - paragraph [ref=e169]: STRAWBERRY EXTRACT
+                    - paragraph [ref=e170]: May 25, 2009
+                  - paragraph [ref=e171]: CRITH | Anaphylaxis
+                  - paragraph [ref=e172]: "Type: Allergy intolerance"
+                - listitem [ref=e173]:
+                  - generic [ref=e174]:
+                    - paragraph [ref=e175]: PENICILLINS
+                    - paragraph [ref=e176]: Jan 31, 2009
+                  - paragraph [ref=e177]: CRITH | Rash
+                  - paragraph [ref=e178]: "Type: Allergy intolerance"
+            - generic [ref=e179]:
+              - heading "Abnormal labs" [level=3] [ref=e180]
+              - list [ref=e181]:
+                - listitem [ref=e182]:
+                  - generic [ref=e183]:
+                    - paragraph [ref=e184]: HEMOGLOBIN A1C
+                    - paragraph [ref=e185]: Dec 31, 2022
+                  - paragraph [ref=e186]: "6.6 % | Reference: 4.8 5.6 %"
+                  - paragraph [ref=e187]: "Type: Observation"
+                - listitem [ref=e188]:
+                  - generic [ref=e189]:
+                    - paragraph [ref=e190]: VITAMIN D, 25-HYDROXY, SERUM
+                    - paragraph [ref=e191]: Dec 31, 2022
+                  - paragraph [ref=e192]: "26.6 Ng/ML | Low | Reference: 30.0 100.0 Ng/ML"
+                  - paragraph [ref=e193]: "Type: Observation"
+                - listitem [ref=e194]:
+                  - generic [ref=e195]:
+                    - paragraph [ref=e196]: A/G RATIO
+                    - paragraph [ref=e197]: Dec 31, 2022
+                  - paragraph [ref=e198]: "2.1 | High | Reference: 1.2 2.2"
+                  - paragraph [ref=e199]: "Type: Observation"
+                - listitem [ref=e200]:
+                  - generic [ref=e201]:
+                    - paragraph [ref=e202]: BR- MCHC
+                    - paragraph [ref=e203]: Jun 30, 2019
+                  - paragraph [ref=e204]: "35.6 Gm/DL | High | Reference: 29.0 35.0 Gm/DL"
+                  - paragraph [ref=e205]: "Type: Observation"
+                - listitem [ref=e206]:
+                  - generic [ref=e207]:
+                    - paragraph [ref=e208]: BR- LYMPHOCYTES %
+                    - paragraph [ref=e209]: Jun 30, 2019
+                  - paragraph [ref=e210]: "52.8 % | High | Reference: 12.0 48.0 %"
+                  - paragraph [ref=e211]: "Type: Observation"
+                - listitem [ref=e212]:
+                  - generic [ref=e213]:
+                    - paragraph [ref=e214]: VITAMIN D, 25-HYDROXY, SERUM
+                    - paragraph [ref=e215]: Jun 30, 2019
+                  - paragraph [ref=e216]: "27.3 Ng/ML | Low | Reference: 30.0 100.0 Ng/ML"
+                  - paragraph [ref=e217]: "Type: Observation"
+                - listitem [ref=e218]:
+                  - generic [ref=e219]:
+                    - paragraph [ref=e220]: BR- MCHC
+                    - paragraph [ref=e221]: May 26, 2016
+                  - paragraph [ref=e222]: "35.5 Gm/DL | High | Reference: 29.0 35.0 Gm/DL"
+                  - paragraph [ref=e223]: "Type: Observation"
+                - listitem [ref=e224]:
+                  - generic [ref=e225]:
+                    - paragraph [ref=e226]: VITAMIN D, 25-HYDROXY, SERUM
+                    - paragraph [ref=e227]: May 31, 2012
+                  - paragraph [ref=e228]: "32.2 Ng/ML | Low | Reference: 30.0 100.0 Ng/ML"
+                  - paragraph [ref=e229]: "Type: Observation"
+            - generic [ref=e230]:
+              - heading "Recent documents" [level=3] [ref=e231]
+              - list [ref=e232]:
+                - listitem [ref=e233]:
+                  - generic [ref=e234]:
+                    - paragraph [ref=e235]: Optical lens and frame order
+                    - paragraph [ref=e236]: Apr 8, 2026
+                  - paragraph [ref=e237]: Document Reference
+                  - paragraph [ref=e238]: "Type: Document reference"
+                - listitem [ref=e239]:
+                  - generic [ref=e240]:
+                    - paragraph [ref=e241]: Humphrey visual field PDF
+                    - paragraph [ref=e242]: Apr 8, 2026
+                  - paragraph [ref=e243]: Document Reference
+                  - paragraph [ref=e244]: "Type: Document reference"
+                - listitem [ref=e245]:
+                  - generic [ref=e246]:
+                    - paragraph [ref=e247]: Orthodontic informed consent and financial agreement
+                    - paragraph [ref=e248]: Mar 20, 2026
+                  - paragraph [ref=e249]: Document Reference
+                  - paragraph [ref=e250]: "Type: Document reference"
+                - listitem [ref=e251]:
+                  - generic [ref=e252]:
+                    - paragraph [ref=e253]: Orthodontic intraoral STL scan and bite registration
+                    - paragraph [ref=e254]: Mar 14, 2026
+                  - paragraph [ref=e255]: Document Reference
+                  - paragraph [ref=e256]: "Type: Document reference"
+                - listitem [ref=e257]:
+                  - generic [ref=e258]:
+                    - paragraph [ref=e259]: Dental treatment plan summary
+                    - paragraph [ref=e260]: Feb 13, 2026
+                  - paragraph [ref=e261]: Document Reference
+                  - paragraph [ref=e262]: "Type: Document reference"
+                - listitem [ref=e263]:
+                  - generic [ref=e264]:
+                    - paragraph [ref=e265]: Intraoral photo tooth 30
+                    - paragraph [ref=e266]: Feb 12, 2026
+                  - paragraph [ref=e267]: Document Reference
+                  - paragraph [ref=e268]: "Type: Document reference"
+                - listitem [ref=e269]:
+                  - generic [ref=e270]:
+                    - paragraph [ref=e271]: Intraoral scan upper/lower arches
+                    - paragraph [ref=e272]: Feb 12, 2026
+                  - paragraph [ref=e273]: Document Reference
+                  - paragraph [ref=e274]: "Type: Document reference"
+                - listitem [ref=e275]:
+                  - generic [ref=e276]:
+                    - paragraph [ref=e277]: Retinal fundus photos 2024
+                    - paragraph [ref=e278]: Apr 19, 2024
+                  - paragraph [ref=e279]: Document Reference
+                  - paragraph [ref=e280]: "Type: Document reference"
+            - generic [ref=e281]:
+              - heading "Recent imaging" [level=3] [ref=e282]
+              - list [ref=e283]:
+                - listitem [ref=e284]:
+                  - generic [ref=e285]:
+                    - paragraph [ref=e286]: Ophthalmic OCT DICOM study
+                    - paragraph [ref=e287]: Apr 8, 2026
+                  - paragraph [ref=e288]: Imaging Study
+                  - paragraph [ref=e289]: "Type: Imaging study"
+                - listitem [ref=e290]:
+                  - generic [ref=e291]:
+                    - paragraph [ref=e292]: Dental CBCT mandible/maxilla
+                    - paragraph [ref=e293]: Feb 12, 2026
+                  - paragraph [ref=e294]: Imaging Study
+                  - paragraph [ref=e295]: "Type: Imaging study"
+            - generic [ref=e296]:
+              - heading "Recent procedures" [level=3] [ref=e297]
+              - list [ref=e298]:
+                - listitem [ref=e299]:
+                  - generic [ref=e300]:
+                    - paragraph [ref=e301]: Aligner case start - trays 1 to 24
+                    - paragraph [ref=e302]: Apr 18, 2026
+                  - paragraph [ref=e303]: Procedure
+                  - paragraph [ref=e304]: "Type: Procedure"
+                - listitem [ref=e305]:
+                  - generic [ref=e306]:
+                    - paragraph [ref=e307]: OCT macula and RNFL performed
+                    - paragraph [ref=e308]: Apr 8, 2026
+                  - paragraph [ref=e309]: Procedure
+                  - paragraph [ref=e310]: "Type: Procedure"
+                - listitem [ref=e311]:
+                  - generic [ref=e312]:
+                    - paragraph [ref=e313]: Crown preparation tooth 14
+                    - paragraph [ref=e314]: Jan 20, 2026
+                  - paragraph [ref=e315]: Procedure
+                  - paragraph [ref=e316]: "Type: Procedure"
+                - listitem [ref=e317]:
+                  - generic [ref=e318]:
+                    - paragraph [ref=e319]: Retainer delivery and retention instructions
+                    - paragraph [ref=e320]: Nov 21, 2025
+                  - paragraph [ref=e321]: Procedure
+                  - paragraph [ref=e322]: "Type: Procedure"
+                - listitem [ref=e323]:
+                  - generic [ref=e324]:
+                    - paragraph [ref=e325]: Routine dental cleaning and exam
+                    - paragraph [ref=e326]: Aug 14, 2025
+                  - paragraph [ref=e327]: Procedure
+                  - paragraph [ref=e328]: "Type: Procedure"
+                - listitem [ref=e329]:
+                  - generic [ref=e330]:
+                    - paragraph [ref=e331]: Periodontal maintenance cleaning
+                    - paragraph [ref=e332]: Feb 6, 2025
+                  - paragraph [ref=e333]: Procedure
+                  - paragraph [ref=e334]: "Type: Procedure"
+                - listitem [ref=e335]:
+                  - generic [ref=e336]:
+                    - paragraph [ref=e337]: Scaling and root planing UR/LR
+                    - paragraph [ref=e338]: Sep 18, 2024
+                  - paragraph [ref=e339]: Procedure
+                  - paragraph [ref=e340]: "Type: Procedure"
+                - listitem [ref=e341]:
+                  - generic [ref=e342]:
+                    - paragraph [ref=e343]: Routine dental cleaning
+                    - paragraph [ref=e344]: Mar 21, 2024
+                  - paragraph [ref=e345]: Procedure
+                  - paragraph [ref=e346]: "Type: Procedure"
+            - generic [ref=e347]:
+              - generic [ref=e348]:
+                - generic [ref=e349]:
+                  - heading "Questions for visit" [level=3] [ref=e350]
+                  - paragraph [ref=e351]: Saved locally for this user.
+                - generic [ref=e352]:
+                  - generic [ref=e353]: Not saved yet
+                  - button "Save questions" [ref=e354] [cursor=pointer]:
+                    - img [ref=e355]
+                    - text: Save questions
+              - textbox "Add symptoms, goals, and questions to discuss." [ref=e357]
+    - generic [ref=e359]:
+      - generic [ref=e360]:
+        - img "logo" [ref=e361]
+        - link "Sharing" [ref=e362] [cursor=pointer]:
+          - /url: /demo/utilities/sharing
+          - img [ref=e363]
+        - button "Search ⌘K" [ref=e365] [cursor=pointer]:
+          - img [ref=e366]
+          - text: Search
+          - generic [ref=e368]: ⌘K
+      - link "Timeline" [ref=e369] [cursor=pointer]:
+        - /url: /demo/timeline
+        - paragraph [ref=e370]:
+          - img [ref=e371]
+        - paragraph [ref=e373]: Timeline
+      - link "Summary" [ref=e374] [cursor=pointer]:
+        - /url: /demo/summary
+        - paragraph [ref=e375]:
+          - img [ref=e376]
+        - paragraph [ref=e378]: Summary
+      - link "Records" [ref=e379] [cursor=pointer]:
+        - /url: /demo/records
+        - paragraph [ref=e380]:
+          - img [ref=e381]
+        - paragraph [ref=e383]: Records
+      - link "Utilities" [ref=e384] [cursor=pointer]:
+        - /url: /demo/utilities
+        - paragraph [ref=e385]:
+          - img [ref=e386]
+        - paragraph [ref=e388]: Utilities
+      - link "Connections" [ref=e389] [cursor=pointer]:
+        - /url: /demo/connections
+        - paragraph [ref=e390]:
+          - img [ref=e391]
+        - paragraph [ref=e393]: Connections
+      - link "Settings" [ref=e394] [cursor=pointer]:
+        - /url: /demo/settings
+        - paragraph [ref=e395]:
+          - img [ref=e396]
+        - paragraph [ref=e399]: Settings
+      - button "Notifications" [ref=e400] [cursor=pointer]:
+        - img [ref=e402]
+        - paragraph [ref=e404]: Alerts
+      - generic [ref=e408]:
+        - img "profile" [ref=e410]
+        - generic [ref=e411]:
+          - paragraph [ref=e412]: John Smith
+          - link "View details" [ref=e413] [cursor=pointer]:
+            - /url: /demo/settings
+  - generic [ref=e416]:
+    - img [ref=e418]
+    - paragraph [ref=e421]: Welcome to the Mere Medical demo! We have added some test data for you. Some features are disabled while in demo mode.
+    - button "Close" [ref=e423] [cursor=pointer]:
+      - generic [ref=e424]: Close
+      - img [ref=e425]

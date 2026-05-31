@@ -1,0 +1,7 @@
+- generic [ref=e4]:
+  - generic [ref=e11]:
+    - paragraph [ref=e12]: Hello!
+    - paragraph [ref=e13]: Your recent medical updates
+  - generic [ref=e16]:
+    - img "logo_spacer" [ref=e17]
+    - img [ref=e51]

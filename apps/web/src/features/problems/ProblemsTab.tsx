@@ -220,29 +220,29 @@ function ProblemsHeader({
   onFilterChange: (filter: FilterId) => void;
 }) {
   return (
-    <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 lg:px-8">
+    <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <ClipboardDocumentListIcon className="h-7 w-7 text-primary-700" />
-              <h1 className="text-2xl font-semibold text-gray-900">Problems</h1>
+              <ClipboardDocumentListIcon className="h-7 w-7" />
+              <h1 className="text-2xl font-bold sm:text-3xl">Problems</h1>
             </div>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-primary-100">
               {totalCount} {totalCount === 1 ? 'condition' : 'conditions'} from
               connected and manually entered records.
             </p>
           </div>
           <Link
             to={ADD_PROBLEM_PATH}
-            className="inline-flex w-fit items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+            className="inline-flex w-fit items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-inset ring-primary-100 hover:bg-primary-50"
           >
             <PlusIcon className="h-5 w-5" />
             Add problem
           </Link>
         </div>
 
-        <div className="rounded-md bg-gray-50 p-3 ring-1 ring-gray-200">
+        <div className="rounded-md bg-white/10 p-3 ring-1 ring-white/20">
           <label className="relative block">
             <span className="sr-only">Search problems</span>
             <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-2.5 h-5 w-5 text-gray-400" />

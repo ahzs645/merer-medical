@@ -10,6 +10,7 @@ import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { formatDisplayText } from '../../shared/utils/StyleUtils';
 import { formatLabValue } from '../labs/utils/labFormatters';
 import {
   getInterpretationText,
@@ -22,7 +23,6 @@ type PacketItem = {
   title: string;
   detail?: string;
   date?: string;
-  citation: string;
 };
 
 type PacketSections = {
@@ -65,6 +65,21 @@ type LooseResource = {
 type LabDocumentForFormatters = Parameters<typeof formatLabValue>[0];
 
 const RECENT_LIMIT = 8;
+const RESOURCE_TYPE_LABELS: Record<string, string> = {
+  allergyintolerance: 'Allergy intolerance',
+  diagnosticreport: 'Diagnostic report',
+  documentreference: 'Document reference',
+  documentreference_attachment: 'Document attachment',
+  imagingstudy: 'Imaging study',
+  medicationadministration: 'Medication administration',
+  medicationdispense: 'Medication dispense',
+  medicationorder: 'Medication order',
+  medicationrequest: 'Medication request',
+  medicationstatement: 'Medication statement',
+  questionnaireresponse: 'Questionnaire response',
+  servicerequest: 'Service request',
+  visionprescription: 'Vision prescription',
+};
 
 export function VisitPrepTab() {
   const db = useRxDb();
@@ -160,21 +175,20 @@ export function VisitPrepTab() {
   return (
     <AppPage
       banner={
-        <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 lg:px-8 print:hidden">
+        <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8 print:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-2xl font-bold sm:text-3xl">
                 Visit prep and provider packet
               </h1>
-              <p className="mt-1 text-sm text-gray-600">
-                Printable summary generated from this user's local records with
-                source record citations.
+              <p className="mt-1 text-sm text-primary-100">
+                Printable summary generated from this user's local records.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                className="inline-flex w-fit items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
+                className="inline-flex w-fit items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-inset ring-primary-100 hover:bg-primary-50"
                 onClick={downloadPacket}
               >
                 <DocumentArrowDownIcon className="h-5 w-5" />
@@ -182,7 +196,7 @@ export function VisitPrepTab() {
               </button>
               <button
                 type="button"
-                className="inline-flex w-fit items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+                className="inline-flex w-fit items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-inset ring-primary-100 hover:bg-primary-50"
                 onClick={() => window.print()}
               >
                 <PrinterIcon className="h-5 w-5" />
@@ -219,10 +233,7 @@ export function VisitPrepTab() {
                   items={packet.medications}
                 />
                 <PacketSection title="Allergies" items={packet.allergies} />
-                <PacketSection
-                  title="Abnormal and recent labs"
-                  items={packet.labs}
-                />
+                <PacketSection title="Abnormal labs" items={packet.labs} />
                 <PacketSection
                   title="Recent documents"
                   items={packet.documents}
@@ -329,9 +340,10 @@ function PacketSection({
                 )}
               </div>
               {item.detail && (
-                <p className="mt-1 text-sm text-gray-700">{item.detail}</p>
+                <p className="mt-1 text-sm text-gray-700">
+                  {formatDisplayText(item.detail)}
+                </p>
               )}
-              <p className="mt-1 text-xs text-gray-500">{item.citation}</p>
             </li>
           ))}
         </ul>
@@ -364,10 +376,11 @@ function buildPacket(documents: ClinicalDocument[]): PacketSections {
       .slice(0, RECENT_LIMIT)
       .map(medicationItem),
     allergies: byType(['allergyintolerance'])
+      .filter(isMeaningfulAllergy)
       .slice(0, RECENT_LIMIT)
       .map(allergyItem),
     labs: observationDocs
-      .filter((document) => isAbnormalLab(document) || isRecent(document, 180))
+      .filter(isAbnormalLab)
       .slice(0, RECENT_LIMIT)
       .map(labItem),
     documents: byType(['documentreference', 'documentreference_attachment'])
@@ -457,15 +470,19 @@ function baseItem(document: ClinicalDocument): PacketItem {
   return {
     id: document.id,
     title: document.metadata?.display_name || document.id,
-    date: document.metadata?.date,
-    citation: [
-      `Record id: ${document.id}`,
-      document.metadata?.id ? `Source id: ${document.metadata.id}` : undefined,
-      `Type: ${document.data_record.resource_type}`,
-    ]
-      .filter(Boolean)
-      .join(' | '),
+    date: formatDisplayDate(document.metadata?.date),
   };
+}
+
+function formatDisplayDate(value?: string) {
+  if (!value) return undefined;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
 function displayName(document: ClinicalDocument, fallback: string) {
@@ -504,19 +521,23 @@ function isAbnormalLab(document: ClinicalDocument) {
   );
 }
 
-function isRecent(document: ClinicalDocument, days: number) {
-  const dateValue = document.metadata?.date;
-  if (!dateValue) return false;
-  const time = new Date(dateValue).getTime();
-  if (Number.isNaN(time)) return false;
-  return Date.now() - time <= days * 24 * 60 * 60 * 1000;
+function isMeaningfulAllergy(document: ClinicalDocument) {
+  const resource = getFhirResource<LooseResource>(document);
+  const title = displayName(
+    document,
+    resource.substance?.text || resource.code?.text || '',
+  ).toLowerCase();
+
+  return !/\b(no known allergies|not on file|unknown)\b/.test(title);
 }
 
 function displayConcept(value: unknown): string | undefined {
   if (!value) return undefined;
-  if (typeof value === 'string') return value;
+  if (typeof value === 'string') return formatDisplayText(value);
   if (!isLooseConcept(value)) return undefined;
-  return value.text || value.coding?.[0]?.display || value.coding?.[0]?.code;
+  return formatDisplayText(
+    value.text || value.coding?.[0]?.display || value.coding?.[0]?.code,
+  );
 }
 
 function isLooseConcept(value: unknown): value is LooseConcept {
@@ -524,9 +545,13 @@ function isLooseConcept(value: unknown): value is LooseConcept {
 }
 
 function labelForType(type: string) {
+  if (RESOURCE_TYPE_LABELS[type]) return RESOURCE_TYPE_LABELS[type];
+
   return type
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
     .split('_')
     .join(' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
@@ -563,7 +588,7 @@ function buildPacketMarkdown({
     formatPacketSection('Active problems', packet.problems),
     formatPacketSection('Current medications', packet.medications),
     formatPacketSection('Allergies', packet.allergies),
-    formatPacketSection('Abnormal and recent labs', packet.labs),
+    formatPacketSection('Abnormal labs', packet.labs),
     formatPacketSection('Recent documents', packet.documents),
     formatPacketSection('Recent imaging', packet.imaging),
     formatPacketSection('Recent procedures', packet.procedures),
@@ -594,7 +619,6 @@ function formatPacketSection(title: string, items: PacketItem[]) {
         [
           `- ${item.title}${item.date ? ` (${item.date})` : ''}`,
           item.detail ? `  - ${item.detail}` : undefined,
-          `  - ${item.citation}`,
         ]
           .filter(Boolean)
           .join('\n'),

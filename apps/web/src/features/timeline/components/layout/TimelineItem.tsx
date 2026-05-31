@@ -50,6 +50,7 @@ import { MedicationRequestCard } from '../cards/MedicationRequestCard';
 import { ObservationCard } from '../cards/ObservationCard';
 import { ProcedureCard } from '../cards/ProcedureCard';
 import { SpecimenCard } from '../cards/SpecimenCard';
+import { getTimelineRecordElementId } from '../../utils/timelineAnchors';
 
 export const TimelineItem = memo(function TimelineItem({
   dateKey,
@@ -77,7 +78,11 @@ export const TimelineItem = memo(function TimelineItem({
         ) : (
           <>
             {itemList.map((item) => (
-              <div key={item.id}>
+              <div
+                key={item.id}
+                id={getTimelineRecordElementId(item.id)}
+                className="scroll-mt-24"
+              >
                 {item.data_record.resource_type === 'immunization' && (
                   <ImmunizationCard
                     key={item.id}

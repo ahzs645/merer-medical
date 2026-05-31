@@ -18,6 +18,7 @@ import {
   listWorkflowRecords,
   upsertWorkflowRecord,
 } from '../../repositories/WorkflowRecordRepository';
+import { formatDisplayText } from '../../shared/utils/StyleUtils';
 import { AppPage } from '../../shared/components/AppPage';
 import { StylizedSelect } from '../../shared/components/StylizedSelect';
 
@@ -146,10 +147,10 @@ export function TrackersTab() {
   return (
     <AppPage
       banner={
-        <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6 lg:px-8">
+        <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
-            <h1 className="text-xl font-semibold text-gray-900">Trackers</h1>
-            <p className="mt-1 text-sm text-gray-600">
+            <h1 className="text-2xl font-bold sm:text-3xl">Trackers</h1>
+            <p className="mt-1 text-sm text-primary-100">
               Log symptoms, vitals, mood, sleep, and activity between visits.
             </p>
           </div>
@@ -302,8 +303,8 @@ function TrackerEntryRow({
             </div>
           </div>
           <div className="mt-2 flex items-center gap-2">
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium capitalize text-gray-700">
-              {entry.kind}
+            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+              {formatDisplayText(entry.kind)}
             </span>
             <button
               type="button"

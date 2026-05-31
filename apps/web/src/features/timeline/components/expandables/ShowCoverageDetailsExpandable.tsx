@@ -5,6 +5,7 @@ import { formatFullDate } from '../../../../shared/utils/dateFormatters';
 import { Modal } from '../../../../shared/components/Modal';
 import { ModalHeader } from '../../../../shared/components/ModalHeader';
 import { getFhirResource } from '../../../../shared/utils/fhirResource';
+import { formatDisplayText } from '../../../../shared/utils/StyleUtils';
 
 export function ShowCoverageDetailsExpandable({
   item,
@@ -44,8 +45,8 @@ export function ShowCoverageDetailsExpandable({
                   <div className="text-sm font-semibold text-gray-700">
                     Status
                   </div>
-                  <div className="col-span-2 text-sm text-gray-900 capitalize">
-                    {coverage.status}
+                  <div className="col-span-2 text-sm text-gray-900">
+                    {formatDisplayText(coverage.status)}
                   </div>
                 </div>
               )}
