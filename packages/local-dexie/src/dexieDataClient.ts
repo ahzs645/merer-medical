@@ -17,6 +17,7 @@ import { createPackageCommands } from './exportImport';
 import { makeObservable } from './observable';
 import { createAttachmentCommands } from './commands/attachments';
 import { createClinicalDocumentCommands } from './commands/clinicalDocuments';
+import { createClinicalDemoCommands } from './commands/clinicalDemo';
 import { dexieLive, now } from './commands/common';
 
 export interface CreateDexieDataClientOptions {
@@ -178,6 +179,7 @@ export function createDexieDataClient(
   };
 
   const clinicalDocuments = createClinicalDocumentCommands(db);
+  const clinicalDemo = createClinicalDemoCommands(db);
   const attachments = createAttachmentCommands(db);
 
   const instanceConfig: AppDataClient['instanceConfig'] = {
@@ -345,6 +347,7 @@ export function createDexieDataClient(
     userPreferences,
     connections,
     clinicalDocuments,
+    clinicalDemo,
     attachments,
     instanceConfig,
     summaryPagePreferences,

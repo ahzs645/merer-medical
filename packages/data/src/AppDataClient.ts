@@ -4,10 +4,30 @@ import type {
   AttachmentOwnerType,
   ClinicalDocument,
   ClinicalResourceType,
+  ClinicalDemoSource,
   Connection,
   ConnectionSource,
+  DentalClaimRecord,
+  DentalInsuranceRecord,
+  DentalFeeSchedule,
+  DentalFormRecord,
+  DentalImagingRecord,
+  DentalLabCase,
+  DentalOrthoRecord,
+  DentalPatientProfile,
+  DentalPerioExam,
+  DentalProcedureRecord,
+  DentalProviderRecord,
+  DentalRecallRecord,
+  DentalTerminologyCode,
+  DentalTerminologyJurisdiction,
+  DentalTerminologySet,
+  DentalToothConditionRecord,
+  DentalToothChart,
+  DentalTreatmentPlan,
   FhirFormat,
   InstanceConfig,
+  SourceCodeSystem,
   SummaryPagePreferences,
   TableName,
   TerminologyDomain,
@@ -96,6 +116,146 @@ export interface ClinicalDocumentCommands {
   delete(id: AppId): Promise<void>;
   countByResource(userId: AppId): Promise<Record<ClinicalResourceType, number>>;
   observe(q: ClinicalDocumentQuery): Observable<ClinicalDocument[]>;
+}
+
+export interface ClinicalDemoQuery {
+  demoSourceId?: AppId;
+  userId?: AppId;
+}
+
+export interface DentalTerminologyQuery {
+  jurisdiction?: DentalTerminologyJurisdiction;
+  terminologySetId?: AppId;
+  system?: string;
+  query?: string;
+  limit?: number;
+}
+
+export interface ClinicalDemoCommands {
+  listSources(kind?: ClinicalDemoSource['kind']): Promise<ClinicalDemoSource[]>;
+  upsertSource(
+    input: Omit<ClinicalDemoSource, 'createdAt' | 'updatedAt'> & {
+      id?: AppId;
+    },
+  ): Promise<ClinicalDemoSource>;
+  listCodeSystems(demoSourceId?: AppId): Promise<SourceCodeSystem[]>;
+  upsertCodeSystems(
+    rows: Array<
+      Omit<SourceCodeSystem, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<SourceCodeSystem[]>;
+  listTerminologySets(
+    jurisdiction?: DentalTerminologyJurisdiction,
+  ): Promise<DentalTerminologySet[]>;
+  upsertTerminologySet(
+    row: Omit<DentalTerminologySet, 'createdAt' | 'updatedAt'> & {
+      id?: AppId;
+    },
+  ): Promise<DentalTerminologySet>;
+  queryTerminologyCodes(
+    q?: DentalTerminologyQuery,
+  ): Promise<DentalTerminologyCode[]>;
+  upsertTerminologyCodes(
+    rows: Array<
+      Omit<DentalTerminologyCode, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<DentalTerminologyCode[]>;
+  listProviders(demoSourceId?: AppId): Promise<DentalProviderRecord[]>;
+  upsertProviders(
+    rows: Array<
+      Omit<DentalProviderRecord, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<DentalProviderRecord[]>;
+  listDentalPatients(q?: ClinicalDemoQuery): Promise<DentalPatientProfile[]>;
+  upsertDentalPatients(
+    rows: Array<
+      Omit<DentalPatientProfile, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<DentalPatientProfile[]>;
+  listToothCharts(dentalPatientProfileId: AppId): Promise<DentalToothChart[]>;
+  upsertToothChart(
+    row: Omit<DentalToothChart, 'createdAt' | 'updatedAt'> & { id?: AppId },
+  ): Promise<DentalToothChart>;
+  listDentalProcedures(
+    dentalPatientProfileId: AppId,
+  ): Promise<DentalProcedureRecord[]>;
+  upsertDentalProcedures(
+    rows: Array<
+      Omit<DentalProcedureRecord, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<DentalProcedureRecord[]>;
+  listDentalInsurance(
+    dentalPatientProfileId: AppId,
+  ): Promise<DentalInsuranceRecord[]>;
+  upsertDentalInsurance(
+    rows: Array<
+      Omit<DentalInsuranceRecord, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<DentalInsuranceRecord[]>;
+  listClaims(dentalPatientProfileId: AppId): Promise<DentalClaimRecord[]>;
+  upsertClaims(
+    rows: Array<
+      Omit<DentalClaimRecord, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<DentalClaimRecord[]>;
+  listRecalls(dentalPatientProfileId: AppId): Promise<DentalRecallRecord[]>;
+  upsertRecalls(
+    rows: Array<
+      Omit<DentalRecallRecord, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<DentalRecallRecord[]>;
+  listOrthoRecords(dentalPatientProfileId: AppId): Promise<DentalOrthoRecord[]>;
+  upsertOrthoRecords(
+    rows: Array<
+      Omit<DentalOrthoRecord, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<DentalOrthoRecord[]>;
+  listToothConditions(
+    dentalPatientProfileId: AppId,
+  ): Promise<DentalToothConditionRecord[]>;
+  upsertToothConditions(
+    rows: Array<
+      Omit<DentalToothConditionRecord, 'createdAt' | 'updatedAt'> & {
+        id?: AppId;
+      }
+    >,
+  ): Promise<DentalToothConditionRecord[]>;
+  listPerioExams(dentalPatientProfileId: AppId): Promise<DentalPerioExam[]>;
+  upsertPerioExams(
+    rows: Array<Omit<DentalPerioExam, 'createdAt' | 'updatedAt'> & { id?: AppId }>,
+  ): Promise<DentalPerioExam[]>;
+  listTreatmentPlans(
+    dentalPatientProfileId: AppId,
+  ): Promise<DentalTreatmentPlan[]>;
+  upsertTreatmentPlans(
+    rows: Array<
+      Omit<DentalTreatmentPlan, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<DentalTreatmentPlan[]>;
+  listFeeSchedules(demoSourceId?: AppId): Promise<DentalFeeSchedule[]>;
+  upsertFeeSchedules(
+    rows: Array<
+      Omit<DentalFeeSchedule, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<DentalFeeSchedule[]>;
+  listImagingRecords(
+    dentalPatientProfileId: AppId,
+  ): Promise<DentalImagingRecord[]>;
+  upsertImagingRecords(
+    rows: Array<
+      Omit<DentalImagingRecord, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<DentalImagingRecord[]>;
+  listLabCases(dentalPatientProfileId: AppId): Promise<DentalLabCase[]>;
+  upsertLabCases(
+    rows: Array<Omit<DentalLabCase, 'createdAt' | 'updatedAt'> & { id?: AppId }>,
+  ): Promise<DentalLabCase[]>;
+  listFormRecords(q?: ClinicalDemoQuery): Promise<DentalFormRecord[]>;
+  upsertFormRecords(
+    rows: Array<
+      Omit<DentalFormRecord, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
+  ): Promise<DentalFormRecord[]>;
 }
 
 export interface AttachmentCommands {
@@ -194,6 +354,7 @@ export interface AppDataClient {
   userPreferences: UserPreferencesCommands;
   connections: ConnectionCommands;
   clinicalDocuments: ClinicalDocumentCommands;
+  clinicalDemo: ClinicalDemoCommands;
   attachments: AttachmentCommands;
   instanceConfig: InstanceConfigCommands;
   summaryPagePreferences: SummaryPagePreferencesCommands;

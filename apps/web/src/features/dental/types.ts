@@ -208,6 +208,9 @@ export type DentalWorkflowContext = {
 export type DentalTooth = {
   universal: string;
   fdi: string;
+  palmer: string;
+  name: string;
+  dentition: 'permanent' | 'deciduous';
   arch: 'upper' | 'lower';
   side: 'right' | 'left';
 };
