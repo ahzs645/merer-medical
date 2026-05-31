@@ -1,0 +1,38 @@
+---
+title: "What's New with Mere This Year"
+description: "A lot has changed behind the scenes"
+---
+
+A quick update on my life: I'm now in my fourth year of medical school, in the midst of applying for residency.
+
+I've still been working on Mere in the pockets of time I find in between rotations, studying for board exams, and residency interviews. Its incredible how much progress can be made by small and consistent updates over a long period of time. I'm excited to share the latest developments that have been brewing behind the scenes.
+
+
+
+## Things we've accomplished in 2023:
+
+## Features
+
+- Integrated multiple new data sources, including AllScripts/Veradigm, Cerner, and preliminary support for the VA.
+- Transitioned from PouchDB to Dexie for the underlying database.
+- Implemented an option to store records in LokiJS, featuring a custom encryption adapter for password-protected storage.
+- Introduced graphing for historical lab results, complete with sparklines for visual representation.
+- Enhanced the search functionality and filtering capabilities within the timeline.
+- Developed a feature to detect and visually highlight abnormal lab results.
+- Executed numerous user interface enhancements and refinements.
+- Expanded privacy settings to offer more granular control.
+- Refined the connection synchronization process to better manage failures and streamline re-authentication.
+- Integrated CCDA parsing and enriched the presentation of CCDA data within the user interface.
+
+## Infrastructure
+
+- Implemented error reporting to facilitate bug detection (available on an opt-in basis).
+- Transitioned our continuous integration and deployment (CI/CD) processes to GitHub Actions, moving away from a self-hosted Drone CI setup.
+- Adopted Calendar Versioning (CalVer) versioning system.
+- Finally added several end-to-end tests and preliminary smoke tests.
+- Began incorporating unit tests (but definitely need more).
+
+## Documentation
+
+- Enhanced the documentation for self-hosting Mere, making it more user-friendly.
+- Supplemented our documentation with detailed guides on establishing connections to various Electronic Health Records (EHR) systems.

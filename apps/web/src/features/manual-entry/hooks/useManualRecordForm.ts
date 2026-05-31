@@ -151,6 +151,28 @@ type DocumentFileFields = {
   linkedFile: LinkedAttachmentFile | null;
 };
 
+type GeneralFields = {
+  specialty: ManualSpecialty;
+  recordType: ManualRecordKind;
+  dentalEntryKind: DentalEntryKind;
+  optometryEntryKind: OptometryEntryKind;
+  deviceImportType: DeviceImportKind;
+  title: string;
+  date: string;
+  notes: string;
+  selectedTerminology?: TerminologyEntry;
+};
+
+type MedicationFields = {
+  dose: string;
+  frequency: string;
+  route: string;
+};
+
+type LabRowsFields = {
+  labRows: LabResultRow[];
+};
+
 const initialDentalFields: DentalFields = {
   toothNumber: '',
   dentalTeeth: '',
@@ -224,6 +246,16 @@ const initialDocumentFileFields: DocumentFileFields = {
   linkedFile: null,
 };
 
+const initialMedicationFields: MedicationFields = {
+  dose: '',
+  frequency: '',
+  route: '',
+};
+
+const createInitialLabRowsFields = (): LabRowsFields => ({
+  labRows: [createLabRow()],
+});
+
 export function useManualRecordForm() {
   const db = useRxDb();
   const user = useUser();
@@ -244,13 +276,49 @@ export function useManualRecordForm() {
   )
     ? (searchParams.get('type') as ManualRecordKind)
     : undefined;
-  const [specialty, setSpecialty] =
-    useState<ManualSpecialty>(requestedSpecialty);
-  const [recordType, setRecordType] = useState<ManualRecordKind>('condition');
-  const [dentalEntryKind, setDentalEntryKind] =
-    useState<DentalEntryKind>('cleaning');
-  const [optometryEntryKind, setOptometryEntryKind] =
-    useState<OptometryEntryKind>('checkup');
+  const createInitialGeneralFields = (): GeneralFields => ({
+    specialty: requestedSpecialty,
+    recordType: 'condition',
+    dentalEntryKind: 'cleaning',
+    optometryEntryKind: 'checkup',
+    deviceImportType: 'manual_reading',
+    title: '',
+    date: today,
+    notes: '',
+    selectedTerminology: undefined,
+  });
+  const [generalFields, setGeneralFields] = useReducer(
+    patchReducer<GeneralFields>,
+    undefined,
+    createInitialGeneralFields,
+  );
+  const {
+    specialty,
+    recordType,
+    dentalEntryKind,
+    optometryEntryKind,
+    deviceImportType,
+    title,
+    date,
+    notes,
+    selectedTerminology,
+  } = generalFields;
+  const setSpecialty = (specialty: ManualSpecialty) =>
+    setGeneralFields({ specialty });
+  const setRecordType = (recordType: ManualRecordKind) =>
+    setGeneralFields({ recordType });
+  const setDentalEntryKind = (dentalEntryKind: DentalEntryKind) =>
+    setGeneralFields({ dentalEntryKind });
+  const setOptometryEntryKind = (optometryEntryKind: OptometryEntryKind) =>
+    setGeneralFields({ optometryEntryKind });
+  const setDeviceImportType = (deviceImportType: DeviceImportKind) =>
+    setGeneralFields({ deviceImportType });
+  const setTitle = (title: string) => setGeneralFields({ title });
+  const setDate = (date: string) => setGeneralFields({ date });
+  const setNotes = (notes: string) => setGeneralFields({ notes });
+  const setSelectedTerminology = (
+    selectedTerminology: TerminologyEntry | undefined,
+  ) => setGeneralFields({ selectedTerminology });
   const [dentalFields, setDentalFields] = useReducer(
     patchReducer<DentalFields>,
     initialDentalFields,
@@ -394,11 +462,6 @@ export function useManualRecordForm() {
     setImagingFields({ imagingAccessionId });
   const setImagingStudyId = (imagingStudyId: string) =>
     setImagingFields({ imagingStudyId });
-  const [deviceImportType, setDeviceImportType] =
-    useState<DeviceImportKind>('manual_reading');
-  const [title, setTitle] = useState('');
-  const [date, setDate] = useState(today);
-  const [notes, setNotes] = useState('');
   const [observationFields, setObservationFields] = useReducer(
     patchReducer<ObservationFields>,
     initialObservationFields,
@@ -429,9 +492,15 @@ export function useManualRecordForm() {
     setObservationFields({ interpretation });
   const setAbsentReason = (absentReason: ManualObservationAbsentReason) =>
     setObservationFields({ absentReason });
-  const [dose, setDose] = useState('');
-  const [frequency, setFrequency] = useState('');
-  const [route, setRoute] = useState('');
+  const [medicationFields, setMedicationFields] = useReducer(
+    patchReducer<MedicationFields>,
+    initialMedicationFields,
+  );
+  const { dose, frequency, route } = medicationFields;
+  const setDose = (dose: string) => setMedicationFields({ dose });
+  const setFrequency = (frequency: string) =>
+    setMedicationFields({ frequency });
+  const setRoute = (route: string) => setMedicationFields({ route });
   const [documentFileFields, setDocumentFileFields] = useReducer(
     patchReducer<DocumentFileFields>,
     initialDocumentFileFields,
@@ -445,9 +514,18 @@ export function useManualRecordForm() {
     setDocumentFileFields({ fileData });
   const setLinkedFile = (linkedFile: LinkedAttachmentFile | null) =>
     setDocumentFileFields({ linkedFile });
-  const [selectedTerminology, setSelectedTerminology] =
-    useState<TerminologyEntry>();
-  const [labRows, setLabRows] = useState<LabResultRow[]>([createLabRow()]);
+  const [labRowsFields, setLabRowsFields] = useReducer(
+    patchReducer<LabRowsFields>,
+    undefined,
+    createInitialLabRowsFields,
+  );
+  const { labRows } = labRowsFields;
+  const setLabRows = (
+    next: LabResultRow[] | ((current: LabResultRow[]) => LabResultRow[]),
+  ) =>
+    setLabRowsFields({
+      labRows: typeof next === 'function' ? next(labRowsFields.labRows) : next,
+    });
   const [loadedDocument, setLoadedDocument] = useState<ClinicalDocument | null>(
     null,
   );
@@ -477,71 +555,18 @@ export function useManualRecordForm() {
     localConfig.terminology_remote_enabled || false;
 
   function resetFields() {
-    setTitle('');
-    setNotes('');
-    setValueKind('quantity');
-    setComparator('');
-    setValue('');
-    setUnit('');
-    setSelectedTerminology(undefined);
-    setLabRows([createLabRow()]);
-    setRangeLow('');
-    setRangeHigh('');
-    setRangeText('');
-    setInterpretation('');
-    setAbsentReason('pending');
-    setDose('');
-    setFrequency('');
-    setRoute('');
-    setFileName('');
-    setFileContentType('');
-    setFileData(undefined);
-    setLinkedFile(null);
-    setToothNumber('');
-    setDentalTeeth('');
-    setToothRange('');
-    setDentalQuadrant('');
-    setDentalArch('');
-    setDentition('');
-    setDentalStatus('');
-    setDentalSeverity('');
-    setProcedureCode('');
-    setDentalProvider('');
-    setDentalLocation('');
-    setDentalFollowUp('');
-    setDentalSurfaces([]);
-    setDentalRecall('');
-    setOrthoPhase('');
-    setOrthoArch('');
-    setOrthoAppliance('');
-    setOrthoStatus('');
-    setAlignerCurrent('');
-    setAlignerTotal('');
-    setOverjet('');
-    setOverbite('');
-    setMolarClass('');
-    setNextVisit('');
-    setEyeSide('OU');
-    setOdSphere('');
-    setOdCylinder('');
-    setOdAxis('');
-    setOdAdd('');
-    setOsSphere('');
-    setOsCylinder('');
-    setOsAxis('');
-    setOsAdd('');
-    setPd('');
-    setVisualAcuityOd('');
-    setVisualAcuityOs('');
-    setIopOd('');
-    setIopOs('');
-    setExamMethod('');
-    setImagingModality('');
-    setImagingBodySite('');
-    setImagingLaterality('');
-    setImagingStudyType('');
-    setImagingAccessionId('');
-    setImagingStudyId('');
+    setGeneralFields({
+      title: '',
+      notes: '',
+      selectedTerminology: undefined,
+    });
+    setObservationFields(initialObservationFields);
+    setMedicationFields(initialMedicationFields);
+    setDocumentFileFields(initialDocumentFileFields);
+    setDentalFields(initialDentalFields);
+    setOptometryFields(initialOptometryFields);
+    setImagingFields(initialImagingFields);
+    setLabRowsFields(createInitialLabRowsFields());
     setSubmitAttempted(false);
   }
 

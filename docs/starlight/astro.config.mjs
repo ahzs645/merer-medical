@@ -3,37 +3,58 @@ import starlight from '@astrojs/starlight';
 import mermaid from 'astro-mermaid';
 
 export default defineConfig({
-  site: 'https://meremedical.co',
+  site: 'https://emr.ahmadjalil.com',
   base: '/docs',
+  redirects: {
+    '/docs/privacy-policy': '/docs/privacy-policy/',
+  },
   integrations: [
     mermaid({
       autoTheme: true,
     }),
     starlight({
-      title: 'Mere Medical Documentation',
+      title: 'Mere Medical',
       description:
-        'Developer and implementation docs for Mere Medical architecture, data portability, portal sync, terminology, and local-first storage.',
-      social: [],
+        'Documentation for Mere Medical, a self-hosted personal health record for aggregating and exploring patient portal data.',
+      logo: {
+        src: './public/img/logo.svg',
+        alt: 'Mere Medical',
+      },
+      social: [
+        {
+          icon: 'github',
+          label: 'GitHub',
+          href: 'https://github.com/cfu288/mere-medical',
+        },
+      ],
       sidebar: [
         {
-          label: 'General',
-          autogenerate: { directory: 'general' },
+          label: 'What is Mere Medical?',
+          slug: '',
         },
         {
-          label: 'Architecture',
-          autogenerate: { directory: 'architecture' },
+          label: 'What can Mere Medical do?',
+          slug: 'features',
         },
         {
-          label: 'Data Portability',
-          autogenerate: { directory: 'data-portability' },
+          label: 'Supported Patient Portals',
+          slug: 'which-patient-portals-are-supported',
         },
         {
-          label: 'Clinical Domains',
-          autogenerate: { directory: 'clinical-domains' },
+          label: 'Installing Mere Medical as an App',
+          slug: 'install-the-app',
         },
         {
-          label: 'Operations',
-          autogenerate: { directory: 'operations' },
+          label: 'Getting Started with Self-Hosting',
+          autogenerate: { directory: 'getting-started' },
+        },
+        {
+          label: 'FAQ',
+          slug: 'faq',
+        },
+        {
+          label: 'Blog',
+          autogenerate: { directory: 'blog' },
         },
       ],
     }),

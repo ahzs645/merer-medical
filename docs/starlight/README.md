@@ -1,6 +1,6 @@
-# Mere Medical Starlight Docs
+# Mere Medical Docs
 
-This is the Astro Starlight documentation app for developer-facing Mere Medical docs.
+This is the Astro Starlight documentation app for the public Mere Medical docs deployed at `https://emr.ahmadjalil.com/docs`.
 
 ```sh
 npm run dev
