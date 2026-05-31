@@ -3,7 +3,7 @@ title: "Digging Deeper into CDS Hooks for Personal Health Records"
 description: "A proposal to supercharge your personal health record with third-party CDS hooks"
 ---
 
-This post will dive deeper into how personal health records (PHRs) can adopt the Clinical Decision Support (CDS) hooks standard to enable third-party extensibility. We're primarily focusing on CDS hooks because it is a more accessible standard for PHRs and third-party developers to adapt. For a high level context of why we care about this, please read [Part 1](/docs/blog/exploring-extensibility-with-cds-hooks).
+This post will dive deeper into how personal health records (PHRs) can adopt the Clinical Decision Support (CDS) hooks standard to enable third-party extensibility. We're primarily focusing on CDS hooks because it is a more accessible standard for PHRs and third-party developers to adapt. For a high level context of why we care about this, please read [Part 1](/docs/blog/2023-03-07-customize-mere-with-plugins/).
 
 The point of this post is to lay the groundwork and discuss how the CDS hook standard may need to be updated to handle PHR use cases. The great thing about building off a current standard like CDS hooks is that CDS hooks built for one PHR could be used for any PHR. For a deeper dive on CDS Hooks, read the [HL7 Clinical Decision Support (CDS) hooks documentation](https://cds-hooks.org/).
 

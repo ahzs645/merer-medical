@@ -1,0 +1,126 @@
+@font-face {
+  font-family: 'Lato';
+  src: url('/docs/fonts/Lato-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lato';
+  src: url('/docs/fonts/Lato-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/docs/fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --mere-primary: #006182;
+  --mere-primary-dark: #003c52;
+  --mere-primary-soft: #d8eef5;
+  --mere-accent: #7ce8c7;
+  --mere-accent-soft: #dffaf2;
+  --mere-surface: #f1f4f9;
+  --mere-ink: #102a37;
+
+  --sl-font: 'Lato', system-ui, sans-serif;
+  --sl-font-system: 'Lato', system-ui, sans-serif;
+  --sl-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --sl-color-accent-low: var(--mere-primary-soft);
+  --sl-color-accent: var(--mere-primary);
+  --sl-color-accent-high: var(--mere-primary-dark);
+  --sl-color-text-accent: var(--mere-primary);
+  --sl-color-bg-accent: var(--mere-primary);
+  --sl-color-bg-nav: rgba(255, 255, 255, 0.92);
+  --sl-color-bg-sidebar: #fbfdff;
+  --sl-color-hairline: #dbe7ee;
+  --sl-color-hairline-light: #e8f0f5;
+  --sl-color-hairline-shade: #cddce4;
+}
+
+:root[data-theme='dark'] {
+  --sl-color-accent-low: #0b3848;
+  --sl-color-accent: var(--mere-accent);
+  --sl-color-accent-high: #c9fff0;
+  --sl-color-text-accent: var(--mere-accent);
+  --sl-color-bg-accent: var(--mere-primary);
+  --sl-color-bg-nav: rgba(7, 24, 31, 0.94);
+  --sl-color-bg-sidebar: #07181f;
+  --sl-color-hairline: #164253;
+  --sl-color-hairline-light: #113746;
+  --sl-color-hairline-shade: #1d5265;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(124, 232, 199, 0.18), transparent 28rem),
+    var(--sl-color-bg);
+}
+
+.site-title,
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3 {
+  font-family: 'Montserrat', var(--sl-font);
+}
+
+.site-title {
+  color: var(--mere-primary);
+  font-weight: 800;
+}
+
+:root[data-theme='dark'] .site-title {
+  color: var(--mere-accent);
+}
+
+.header {
+  border-bottom-color: var(--sl-color-hairline-light);
+}
+
+.sl-markdown-content h2 {
+  color: var(--mere-primary);
+}
+
+:root[data-theme='dark'] .sl-markdown-content h2 {
+  color: var(--mere-accent);
+}
+
+.sl-markdown-content a:not(:where(.not-content *)) {
+  color: var(--sl-color-text-accent);
+}
+
+.sl-link-button.primary {
+  background: var(--mere-primary);
+  border-color: var(--mere-primary);
+  color: white;
+}
+
+.sl-link-button.primary:hover {
+  background: var(--mere-primary-dark);
+  border-color: var(--mere-primary-dark);
+}
+
+.starlight-aside {
+  border-radius: 0.5rem;
+}
+
+.starlight-aside--note {
+  --sl-color-asides-text-accent: var(--mere-primary);
+  border-color: var(--mere-primary);
+  background: color-mix(in srgb, var(--mere-primary-soft), transparent 35%);
+}
+
+:root[data-theme='dark'] .starlight-aside--note {
+  --sl-color-asides-text-accent: var(--mere-accent);
+  border-color: var(--mere-accent);
+  background: rgba(124, 232, 199, 0.08);
+}

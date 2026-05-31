@@ -28,4 +28,4 @@ While these standards are built with EHRs as the target clinical clients, there'
 
 Unfortunately, implementing the SMART ON FHIR standard is non-trivial and likely out-of-scope for most PHR implementations. However, PHRs could adapt the CDS hook standard (despite being a less-mature standard) - primarily due to its lower complexity to implement for both third-party developers and PHR developers.
 
-So, what would it take to adopt CDS hooks in personal health records? This post is already getting a little long, so we'll jump into more details in [Part 2](/docs/blog/exploring-extensibility-with-cds-hooks-part-2).
+So, what would it take to adopt CDS hooks in personal health records? This post is already getting a little long, so we'll jump into more details in [Part 2](/docs/blog/2023-03-17-customize-mere-with-plugins-2/).

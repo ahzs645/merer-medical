@@ -16,6 +16,7 @@ export default defineConfig({
       title: 'Mere Medical',
       description:
         'Documentation for Mere Medical, a self-hosted personal health record for aggregating and exploring patient portal data.',
+      customCss: ['./src/styles/mere-theme.css'],
       logo: {
         src: './public/img/logo.svg',
         alt: 'Mere Medical',
@@ -47,6 +48,14 @@ export default defineConfig({
         {
           label: 'Getting Started with Self-Hosting',
           autogenerate: { directory: 'getting-started' },
+        },
+        {
+          label: 'Developer Guide',
+          autogenerate: { directory: 'developers' },
+        },
+        {
+          label: 'Agent Guide',
+          autogenerate: { directory: 'agents' },
         },
         {
           label: 'FAQ',

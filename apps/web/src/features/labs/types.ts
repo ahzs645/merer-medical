@@ -14,6 +14,8 @@ export type ReportLink = {
 
 export type LabViewMode = 'TABLE' | 'GRAPH';
 
+export type LabFilterMode = 'attention' | 'planner' | 'all';
+
 export type LabGroup = {
   key: string;
   name: string;
@@ -26,4 +28,15 @@ export type LabSection = {
   title: string;
   description: string;
   groups: LabGroup[];
+};
+
+export type RecordCoverageSummary = {
+  totalRecords: number;
+  labRows: number;
+  labPanels: number;
+  medicationRecords: number;
+  encounterRecords: number;
+  imagingRecords: number;
+  diagnosticReports: number;
+  patientRecords: number;
 };

@@ -9,7 +9,11 @@ import {
   buildLabReferenceEvaluation,
   summarizeLabGroupStatus,
 } from '../enrichment/labEnrichment';
-import { LabFlag, ReferenceOverlayMode } from '../enrichment/types';
+import {
+  LabFlag,
+  ReferenceContext,
+  ReferenceOverlayMode,
+} from '../enrichment/types';
 import { LabGroup, ReportLink } from '../types';
 import { formatLabValue, getLabDetailLink } from '../utils/labFormatters';
 import { saveLabsScrollPosition } from '../utils/labsPageState';
@@ -23,12 +27,14 @@ export function LabsTable({
   title,
   description,
   referenceMode,
+  referenceContext,
 }: {
   groups: LabGroup[];
   reportsByObservationId: Map<string, ReportLink[]>;
   title?: string;
   description?: string;
   referenceMode: ReferenceOverlayMode;
+  referenceContext?: ReferenceContext;
 }) {
   const { t } = useInterfaceLanguage();
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
@@ -70,6 +76,7 @@ export function LabsTable({
             onToggle={() => toggleExpanded(group.key)}
             reportsByObservationId={reportsByObservationId}
             referenceMode={referenceMode}
+            referenceContext={referenceContext}
           />
         ))}
       </div>
@@ -92,6 +99,7 @@ export function LabsTable({
                 onToggle={() => toggleExpanded(group.key)}
                 reportsByObservationId={reportsByObservationId}
                 referenceMode={referenceMode}
+                referenceContext={referenceContext}
               />
             ))}
           </div>
@@ -107,12 +115,14 @@ function LabMobileRow({
   onToggle,
   reportsByObservationId,
   referenceMode,
+  referenceContext,
 }: {
   group: LabGroup;
   expanded: boolean;
   onToggle: () => void;
   reportsByObservationId: Map<string, ReportLink[]>;
   referenceMode: ReferenceOverlayMode;
+  referenceContext?: ReferenceContext;
 }) {
   const { t } = useInterfaceLanguage();
   const navigate = useNavigate();
@@ -121,8 +131,13 @@ function LabMobileRow({
       group,
       lab: latest,
       mode: referenceMode,
+      referenceContext,
     }),
-    statusSummary = summarizeLabGroupStatus(group, referenceMode);
+    statusSummary = summarizeLabGroupStatus(
+      group,
+      referenceMode,
+      referenceContext,
+    );
 
   function openLabDetail() {
     saveLabsScrollPosition();
@@ -221,12 +236,14 @@ function LabTableRow({
   onToggle,
   reportsByObservationId,
   referenceMode,
+  referenceContext,
 }: {
   group: LabGroup;
   expanded: boolean;
   onToggle: () => void;
   reportsByObservationId: Map<string, ReportLink[]>;
   referenceMode: ReferenceOverlayMode;
+  referenceContext?: ReferenceContext;
 }) {
   const { t } = useInterfaceLanguage();
   const navigate = useNavigate();
@@ -236,8 +253,13 @@ function LabTableRow({
       group,
       lab: latest,
       mode: referenceMode,
+      referenceContext,
     }),
-    statusSummary = summarizeLabGroupStatus(group, referenceMode);
+    statusSummary = summarizeLabGroupStatus(
+      group,
+      referenceMode,
+      referenceContext,
+    );
 
   function openLabDetail() {
     saveLabsScrollPosition();

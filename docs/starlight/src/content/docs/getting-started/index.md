@@ -14,3 +14,4 @@ Use these guides to deploy Mere Medical and configure patient portal sync.
 - [AI Features to Help you Explore your Health Data](/docs/getting-started/ai-setup/)
 - [Setting up Cerner Health Sync](/docs/getting-started/cerner-setup/)
 - [Setting up Healow Sync](/docs/getting-started/healow-setup/)
+- [Setting up VA Sync](/docs/getting-started/va-setup/)

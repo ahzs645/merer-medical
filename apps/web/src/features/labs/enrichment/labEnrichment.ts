@@ -23,15 +23,16 @@ import {
   LabReferenceEvaluation,
   LabStatusSummary,
   NormalizedLabValue,
+  ReferenceContext,
   ReferenceKind,
   ReferenceOverlayMode,
   ReferenceStandardId,
 } from './types';
 import { convertLabUnit } from './labUnitConversions';
 
-const DEFAULT_REFERENCE_CONTEXT = {
+export const DEFAULT_REFERENCE_CONTEXT: ReferenceContext = {
   ageYears: 40,
-  sex: 'unknown' as const,
+  sex: 'unknown',
 };
 
 const plannerRelevantLabIds = new Set([
@@ -69,16 +70,19 @@ export function buildLabEnrichment({
   lab,
   reports,
   standardId,
+  referenceContext,
 }: {
   group: LabGroup;
   lab: LabDocument;
   reports: ReportLink[];
   standardId: ReferenceStandardId;
+  referenceContext?: ReferenceContext;
 }): LabEnrichment {
+  const context = getReferenceContextForLab(referenceContext, lab);
   const standard = getReferenceStandard(standardId),
     labId = getLabEnrichmentId(group, lab),
     band = labId
-      ? getSelectedReferenceBand(standardId, labId, DEFAULT_REFERENCE_CONTEXT)
+      ? getSelectedReferenceBand(standardId, labId, context)
       : undefined,
     value = getValueQuantity(lab),
     sourceFlag = getSourceFlag(lab),
@@ -126,21 +130,20 @@ export function getLabEnrichmentId(
 export function buildLabReferenceOverlays({
   group,
   lab,
+  referenceContext,
 }: {
   group: LabGroup;
   lab: LabDocument;
+  referenceContext?: ReferenceContext;
 }): LabReferenceOverlay[] {
   const labId = getLabEnrichmentId(group, lab);
+  const context = getReferenceContextForLab(referenceContext, lab);
   const overlays: LabReferenceOverlay[] = [];
 
   if (labId) {
     (['canadian', 'australian', 'uk'] as ReferenceStandardId[]).forEach(
       (standardId) => {
-        const band = getSelectedReferenceBand(
-          standardId,
-          labId,
-          DEFAULT_REFERENCE_CONTEXT,
-        );
+        const band = getSelectedReferenceBand(standardId, labId, context);
         if (!band) return;
 
         overlays.push({
@@ -173,10 +176,12 @@ export function buildLabReferenceEvaluation({
   group,
   lab,
   mode,
+  referenceContext,
 }: {
   group: LabGroup;
   lab: LabDocument;
   mode: ReferenceOverlayMode;
+  referenceContext?: ReferenceContext;
 }): LabReferenceEvaluation {
   if (mode === 'original') {
     return buildOriginalReferenceEvaluation(lab);
@@ -195,7 +200,11 @@ export function buildLabReferenceEvaluation({
     };
   }
 
-  const band = getSelectedReferenceBand(mode, labId, DEFAULT_REFERENCE_CONTEXT);
+  const band = getSelectedReferenceBand(
+    mode,
+    labId,
+    getReferenceContextForLab(referenceContext, lab),
+  );
   if (!band) {
     return {
       ...buildOriginalReferenceEvaluation(lab),
@@ -241,9 +250,16 @@ export function buildLabReferenceEvaluation({
 export function summarizeLabGroupStatus(
   group: LabGroup,
   mode: ReferenceOverlayMode,
+  referenceContext?: ReferenceContext,
 ): LabStatusSummary {
   const flags = group.labs.map(
-      (lab) => buildLabReferenceEvaluation({ group, lab, mode }).flag,
+      (lab) =>
+        buildLabReferenceEvaluation({
+          group,
+          lab,
+          mode,
+          referenceContext,
+        }).flag,
     ),
     highCount = flags.filter((flag) => flag === 'high').length,
     lowCount = flags.filter((flag) => flag === 'low').length,
@@ -263,6 +279,52 @@ export function summarizeLabGroupStatus(
     abnormalCount,
     label: parts.length > 0 ? parts.join(' / ') : 'In range',
   };
+}
+
+export function isPlannerRelevantLab(group: LabGroup, lab?: LabDocument) {
+  const labId = getLabEnrichmentId(group, lab ?? group.labs[0]);
+  return labId ? plannerRelevantLabIds.has(labId) : false;
+}
+
+export function getReferenceContextForLab(
+  referenceContext: ReferenceContext | undefined,
+  lab: LabDocument,
+): ReferenceContext {
+  const ageAtCollection = calculateAgeYearsAtDate(
+    referenceContext?.birthDate,
+    lab.metadata?.date,
+  );
+
+  return {
+    ageYears:
+      ageAtCollection ??
+      referenceContext?.ageYears ??
+      DEFAULT_REFERENCE_CONTEXT.ageYears,
+    sex: referenceContext?.sex ?? DEFAULT_REFERENCE_CONTEXT.sex,
+    birthDate: referenceContext?.birthDate,
+  };
+}
+
+function calculateAgeYearsAtDate(
+  birthDate?: string,
+  collectionDate?: string,
+): number | undefined {
+  if (!birthDate || !collectionDate) return undefined;
+  const birth = new Date(`${birthDate}T00:00:00Z`);
+  const collected = new Date(`${collectionDate}T00:00:00Z`);
+  if (Number.isNaN(birth.getTime()) || Number.isNaN(collected.getTime())) {
+    return undefined;
+  }
+
+  let age = collected.getUTCFullYear() - birth.getUTCFullYear();
+  const monthDelta = collected.getUTCMonth() - birth.getUTCMonth();
+  if (
+    monthDelta < 0 ||
+    (monthDelta === 0 && collected.getUTCDate() < birth.getUTCDate())
+  ) {
+    age -= 1;
+  }
+  return age >= 0 && age < 130 ? age : undefined;
 }
 
 function getNormalizedLabValue(

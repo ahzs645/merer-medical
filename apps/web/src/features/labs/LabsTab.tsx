@@ -8,7 +8,12 @@ import { LabReferenceStandardControl } from './components/LabReferenceStandardCo
 import { LabsSkeleton } from './components/LabsSkeleton';
 import { LabsTable } from './components/LabsTable';
 import { LibreCgmPanel } from './components/LibreCgmPanel';
+import { RecordCoveragePanel } from './components/RecordCoveragePanel';
 import { ReferenceOverlayMode } from './enrichment/types';
+import {
+  buildLabReferenceEvaluation,
+  isPlannerRelevantLab,
+} from './enrichment/labEnrichment';
 import { useLabsData } from './hooks/useLabsData';
 import {
   filterLabGroups,
@@ -22,18 +27,54 @@ import {
   saveLabsQuery,
 } from './utils/labsPageState';
 import { GLUCOSE_LOINC_CODE } from '../diabetes/libreView';
+import { LabFilterMode } from './types';
 
 export function LabsTab() {
   const [query, setQuery] = useState(getSavedLabsQuery),
     [referenceMode, setReferenceMode] =
       useState<ReferenceOverlayMode>('canadian'),
+    [filterMode, setFilterMode] = useState<LabFilterMode>('attention'),
     scrollContainerRef = useRef<HTMLDivElement | null>(null),
-    { labs, reportsByObservationId, connectionsById, status } = useLabsData();
+    {
+      labs,
+      reportsByObservationId,
+      connectionsById,
+      referenceContext,
+      recordCoverage,
+      status,
+    } = useLabsData();
 
   const groupedLabs = useMemo(() => groupLabs(labs), [labs]);
   const filteredGroups = useMemo(
-    () => filterLabGroups(groupedLabs, query),
-    [groupedLabs, query],
+    () =>
+      filterLabGroups(
+        groupedLabs,
+        query,
+        filterMode,
+        referenceMode,
+        referenceContext,
+      ),
+    [filterMode, groupedLabs, query, referenceContext, referenceMode],
+  );
+  const attentionGroupCount = useMemo(
+    () =>
+      groupedLabs.filter((group) =>
+        group.labs.some((lab) =>
+          ['high', 'low', 'abnormal', 'borderline'].includes(
+            buildLabReferenceEvaluation({
+              group,
+              lab,
+              mode: referenceMode,
+              referenceContext,
+            }).flag,
+          ),
+        ),
+      ).length,
+    [groupedLabs, referenceContext, referenceMode],
+  );
+  const plannerGroupCount = useMemo(
+    () => groupedLabs.filter((group) => isPlannerRelevantLab(group)).length,
+    [groupedLabs],
   );
   const labSections = useMemo(
     () => sectionLabGroups(filteredGroups),
@@ -73,23 +114,39 @@ export function LabsTab() {
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-3 py-3 pb-24 sm:gap-4 sm:px-6 sm:py-4 lg:px-8">
             {status === 'loading' ? (
               <LabsSkeleton />
-            ) : filteredGroups.length > 0 ? (
+            ) : groupedLabs.length > 0 ? (
               <>
                 <LibreCgmPanel labs={libreLabs} />
+                <RecordCoveragePanel
+                  coverage={recordCoverage}
+                  attentionCount={attentionGroupCount}
+                  plannerCount={plannerGroupCount}
+                  visibleCount={filteredGroups.length}
+                  totalGroups={groupedLabs.length}
+                  filterMode={filterMode}
+                  setFilterMode={setFilterMode}
+                  referenceMode={referenceMode}
+                  referenceContext={referenceContext}
+                />
                 <LabReferenceStandardControl
                   selectedMode={referenceMode}
                   setSelectedMode={setReferenceMode}
                 />
-                {labSections.map((section) => (
-                  <LabsTable
-                    key={section.key}
-                    groups={section.groups}
-                    reportsByObservationId={reportsByObservationId}
-                    title={section.title}
-                    description={section.description}
-                    referenceMode={referenceMode}
-                  />
-                ))}
+                {filteredGroups.length > 0 ? (
+                  labSections.map((section) => (
+                    <LabsTable
+                      key={section.key}
+                      groups={section.groups}
+                      reportsByObservationId={reportsByObservationId}
+                      title={section.title}
+                      description={section.description}
+                      referenceMode={referenceMode}
+                      referenceContext={referenceContext}
+                    />
+                  ))
+                ) : (
+                  <LabsEmptySearch query={query || filterMode} />
+                )}
               </>
             ) : (
               <LabsEmptySearch query={query} />

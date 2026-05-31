@@ -11,7 +11,7 @@ If you're looking to get Mere up and running on your local computer, we'd recomm
 
 If you want to run Mere on an external server and already have a reverse proxy with SSL set up, you can follow these [Docker](#setting-up-with-docker) instructions or [these Docker Compose instructions](#setting-up-with-docker-compose).
 
-If you'd rather deploy to a cloud instance instead of your own computer, check out our [one click Digital Ocean deploy](/docs/deploy-to-do).
+If you'd rather deploy to a cloud instance instead of your own computer, check out our [one click Digital Ocean deploy](/docs/getting-started/deploy-to-do/).
 
 ## What you'll need
 
@@ -126,7 +126,7 @@ HEALOW_CLIENT_SECRET=
 
 `cd` into the directory of the `docker-compose.yaml` , and then run
 
-`docker compose --env-file .env up docker-compose up`
+`docker compose --env-file .env up`
 
 to start Mere Medical.
 

@@ -29,7 +29,13 @@ import { StylizedSelect } from '../../shared/components/StylizedSelect';
 
 export function LabDetailTab() {
   const { labKey } = useParams<{ labKey: string }>(),
-    { labs, reportsByObservationId, connectionsById, status } = useLabsData();
+    {
+      labs,
+      reportsByObservationId,
+      connectionsById,
+      referenceContext,
+      status,
+    } = useLabsData();
   const [enabledOverlayModes, setEnabledOverlayModes] = useState<
     ReferenceOverlayMode[]
   >(['canadian', 'original']);
@@ -53,8 +59,12 @@ export function LabDetailTab() {
   );
   const referenceOverlays = useMemo(() => {
     if (!group || !latestLab) return [];
-    return buildLabReferenceOverlays({ group, lab: latestLab });
-  }, [group, latestLab]);
+    return buildLabReferenceOverlays({
+      group,
+      lab: latestLab,
+      referenceContext,
+    });
+  }, [group, latestLab, referenceContext]);
   const graphUnitOptions = useMemo(
     () => (group ? getLabGraphUnitOptions(group, referenceOverlays) : []),
     [group, referenceOverlays],

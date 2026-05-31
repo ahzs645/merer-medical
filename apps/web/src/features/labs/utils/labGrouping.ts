@@ -1,4 +1,9 @@
-import { LabDocument, LabGroup, LabSection } from '../types';
+import { LabDocument, LabFilterMode, LabGroup, LabSection } from '../types';
+import {
+  buildLabReferenceEvaluation,
+  isPlannerRelevantLab,
+} from '../enrichment/labEnrichment';
+import { ReferenceContext, ReferenceOverlayMode } from '../enrichment/types';
 import { compareLabsByDateDesc } from './labFormatters';
 
 export function groupLabs(labs: LabDocument[]): LabGroup[] {
@@ -30,9 +35,14 @@ export function groupLabs(labs: LabDocument[]): LabGroup[] {
     .sort((a, b) => compareLabsByDateDesc(a.labs[0], b.labs[0]));
 }
 
-export function filterLabGroups(groups: LabGroup[], query: string): LabGroup[] {
+export function filterLabGroups(
+  groups: LabGroup[],
+  query: string,
+  filterMode: LabFilterMode = 'all',
+  referenceMode: ReferenceOverlayMode = 'canadian',
+  referenceContext?: ReferenceContext,
+): LabGroup[] {
   const normalizedQuery = query.trim().toLowerCase();
-  if (!normalizedQuery) return groups;
 
   return groups.filter((group) => {
     const searchable = [
@@ -42,7 +52,24 @@ export function filterLabGroups(groups: LabGroup[], query: string): LabGroup[] {
     ]
       .join(' ')
       .toLowerCase();
-    return searchable.includes(normalizedQuery);
+    const matchesQuery =
+      !normalizedQuery || searchable.includes(normalizedQuery);
+    if (!matchesQuery) return false;
+
+    if (filterMode === 'all') return true;
+    if (filterMode === 'planner') return isPlannerRelevantLab(group);
+
+    return group.labs.some((lab) => {
+      const evaluation = buildLabReferenceEvaluation({
+        group,
+        lab,
+        mode: referenceMode,
+        referenceContext,
+      });
+      return ['high', 'low', 'abnormal', 'borderline'].includes(
+        evaluation.flag,
+      );
+    });
   });
 }
 

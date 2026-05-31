@@ -28,6 +28,7 @@ export type EvidenceGrade =
 export interface ReferenceContext {
   ageYears: number;
   sex: PatientSex;
+  birthDate?: string;
 }
 
 export interface LabCitation {
