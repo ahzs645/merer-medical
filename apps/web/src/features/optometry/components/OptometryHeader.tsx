@@ -14,7 +14,7 @@ export function OptometryHeader({
   const { t } = useInterfaceLanguage();
 
   return (
-    <div className="bg-primary-700 px-4 py-5 text-white sm:px-6 lg:px-8">
+    <div className="bg-primary-800 px-4 py-5 text-white sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <div className="flex items-center gap-2">

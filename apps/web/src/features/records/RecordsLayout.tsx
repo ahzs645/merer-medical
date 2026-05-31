@@ -66,7 +66,7 @@ export function RecordsLayout() {
               className={({ isActive }) =>
                 `inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-2 text-sm font-medium sm:gap-2 sm:px-3 ${
                   isActive
-                    ? 'bg-primary-700 text-white'
+                    ? 'bg-primary-800 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`
               }

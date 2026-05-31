@@ -28,11 +28,10 @@ export function TabWrapper() {
       </div>
       <div className="flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 md:relative md:bottom-auto md:top-0 md:h-full md:w-auto">
         <div className="pb-safe md:pb-0 mx-auto flex w-full max-w-3xl justify-around md:h-full md:w-64 md:flex-col md:justify-start">
-          <img
-            src={logo}
-            className="hidden h-20 w-20 p-4 md:block"
-            alt="logo"
-          ></img>
+          <div className="hidden items-center md:flex">
+            <img src={logo} className="h-20 w-20 p-4" alt="logo"></img>
+            <CommandPalette />
+          </div>
           <TabButton
             route={AppRoutes.Timeline}
             title="Timeline"
@@ -66,7 +65,6 @@ export function TabWrapper() {
             title="Settings"
             icon={<Cog6ToothIcon />}
           />
-          <CommandPalette />
           <NotificationCenter />
           <div className="hidden md:block md:flex-1"></div>
           <div className="border-primary-700 hidden flex-shrink-0 border-t p-4 md:block">
