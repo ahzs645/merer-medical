@@ -249,14 +249,12 @@ export function CommandPalette() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mx-2 my-1 hidden items-center gap-2 rounded-md border border-primary-700 bg-primary-900/30 px-3 py-2 text-sm text-primary-100 hover:bg-primary-700 md:flex"
+        className="mx-1 my-1 hidden h-10 w-10 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700 md:flex"
         aria-expanded={open}
+        aria-label={t('Search')}
+        title={t('Search')}
       >
-        <MagnifyingGlassIcon className="h-4 w-4" />
-        {t('Search')}
-        <span className="ml-auto rounded bg-primary-950 px-1.5 py-0.5 text-xs text-primary-100">
-          ⌘K
-        </span>
+        <MagnifyingGlassIcon className="h-5 w-5" />
       </button>
 
       {open ? (

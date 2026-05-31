@@ -16,6 +16,7 @@ import {
   OLLAMA_RERANK_MODELS,
 } from '../../ai-chat/constants/defaults';
 import { StylizedSelect } from '../../../shared/components/StylizedSelect';
+import { SettingsSection } from './SettingsSection';
 
 export function ExperimentalSettingsGroup() {
   const {
@@ -74,11 +75,8 @@ export function ExperimentalSettingsGroup() {
   }
 
   return (
-    <>
-      <h1 className="py-6 text-xl font-extrabold">Experimental</h1>
-      <div className="divide-y divide-gray-200">
-        <div className="px-4 sm:px-6">
-          <ul className="mt-2 ">
+    <SettingsSection id="experimental" title="Experimental">
+      <ul>
             <Switch.Group
               id="experimental__use_rag"
               as="li"
@@ -442,8 +440,6 @@ export function ExperimentalSettingsGroup() {
               </div>
             )}
           </ul>
-        </div>
-      </div>
-    </>
+    </SettingsSection>
   );
 }

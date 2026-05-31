@@ -3,6 +3,7 @@ import {
   useUpdateLocalConfig,
 } from '../../../app/providers/LocalConfigProvider';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { SettingsSection } from './SettingsSection';
 
 export function AboutMereSettingsGroup() {
   const localConfig = useLocalConfig(),
@@ -10,8 +11,8 @@ export function AboutMereSettingsGroup() {
     updateLocalConfig = useUpdateLocalConfig();
 
   return (
-    <>
-      <div className="py-6 text-xl font-extrabold">{t('About Mere')}</div>
+    <SettingsSection id="about-mere" title={t('About Mere')}>
+      <div className="flex flex-col gap-2">
       {/* App version of MERE_APP_VERSION */}
       <div className="text-sm text-gray-800">
         {t('Version')} {MERE_APP_VERSION}
@@ -86,6 +87,7 @@ export function AboutMereSettingsGroup() {
             : t('Hide experimental features')}{' '}
         </button>
       </div>
-    </>
+      </div>
+    </SettingsSection>
   );
 }

@@ -153,3 +153,11 @@
 [  416099ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
 [  422091ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
 [  426922ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:4200/@vite/client:1034
+[ 1210948ms] TypeError: raw.fullUrl?.startsWith is not a function
+    at isManualRecord (http://127.0.0.1:4200/src/shared/utils/manualRecordUtils.ts:4:23)
+    at getManualRecordNote (http://127.0.0.1:4200/src/shared/utils/manualRecordUtils.ts:9:8)
+    at toProblemItem (http://127.0.0.1:4200/src/features/problems/ProblemsTab.tsx:617:11)
+    at http://127.0.0.1:4200/src/features/problems/ProblemsTab.tsx:174:18
+    at Array.map (<anonymous>)
+    at fetchProblems (http://127.0.0.1:4200/src/features/problems/ProblemsTab.tsx:172:23)
+[ 1533549ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:4200/demo/settings:0

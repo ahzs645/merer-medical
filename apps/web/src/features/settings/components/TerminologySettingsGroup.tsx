@@ -12,6 +12,7 @@ import {
 import { useNotificationDispatch } from '../../../app/providers/NotificationProvider';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { StylizedSelect } from '../../../shared/components/StylizedSelect';
+import { SettingsSection } from './SettingsSection';
 
 export function TerminologySettingsGroup() {
   const localConfig = useLocalConfig();
@@ -35,8 +36,7 @@ export function TerminologySettingsGroup() {
   }, []);
 
   return (
-    <>
-      <div className="py-6 text-xl font-extrabold">{t('Terminology')}</div>
+    <SettingsSection id="terminology" title={t('Terminology')}>
       <div className="grid gap-4 rounded border border-gray-200 bg-gray-50 p-4 text-sm">
         <label className="grid gap-1">
           <span className="font-semibold text-gray-900">{t('Profile')}</span>
@@ -166,6 +166,6 @@ export function TerminologySettingsGroup() {
           </div>
         </div>
       </div>
-    </>
+    </SettingsSection>
   );
 }

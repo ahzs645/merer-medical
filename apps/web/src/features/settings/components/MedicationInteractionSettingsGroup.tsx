@@ -25,6 +25,7 @@ import { MEDICATION_RESOURCE_TYPES } from '../../medications/hooks/useMedication
 import { normalizeMedicationDocuments } from '../../medications/medicationNormalizer';
 import { toMedicationViewItem } from '../../medications/medicationViewModel';
 import { MedicationInteractionHealthSummary } from './MedicationInteractionHealthSummary';
+import { SettingsSection } from './SettingsSection';
 
 export function MedicationInteractionSettingsGroup() {
   const localConfig = useLocalConfig();
@@ -70,10 +71,7 @@ export function MedicationInteractionSettingsGroup() {
   }, []);
 
   return (
-    <>
-      <div className="py-6 text-xl font-extrabold">
-        Medication safety plugins
-      </div>
+    <SettingsSection id="medication-interactions" title="Medication safety plugins">
       <div className="grid gap-4 rounded border border-gray-200 bg-gray-50 p-4 text-sm">
         <label className="flex items-start gap-3 font-medium text-gray-800">
           <input
@@ -258,6 +256,6 @@ export function MedicationInteractionSettingsGroup() {
           rxNormCacheStatus={rxNormCacheStatus}
         />
       </div>
-    </>
+    </SettingsSection>
   );
 }

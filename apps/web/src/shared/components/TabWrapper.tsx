@@ -32,15 +32,17 @@ export function TabWrapper() {
         <div className="pb-safe md:pb-0 mx-auto flex w-full max-w-3xl justify-around md:h-full md:w-64 md:flex-col md:justify-start">
           <div className="hidden items-center md:flex">
             <img src={logo} className="h-20 w-20 p-4" alt="logo"></img>
-            <Link
-              to={AppRoutes.Sharing}
-              className="mx-1 my-1 inline-flex h-10 w-10 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
-              aria-label="Sharing"
-              title="Sharing"
-            >
-              <ShareIcon className="h-5 w-5" />
-            </Link>
-            <CommandPalette />
+            <div className="ml-auto flex items-center pr-2">
+              <Link
+                to={AppRoutes.Sharing}
+                className="mx-1 my-1 inline-flex h-10 w-10 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
+                aria-label="Sharing"
+                title="Sharing"
+              >
+                <ShareIcon className="h-5 w-5" />
+              </Link>
+              <CommandPalette />
+            </div>
           </div>
           <TabButton
             route={AppRoutes.Timeline}
