@@ -149,8 +149,8 @@ function LinkUnmemo({
           }}
           className={
             active
-              ? 'font-semibold text-primary-700'
-              : 'text-slate-700 hover:text-primary-700'
+              ? 'whitespace-nowrap font-semibold text-primary-700'
+              : 'whitespace-nowrap text-slate-700 hover:text-primary-700'
           }
           to={`#${parseMonthDayYear(date)}`}
         >

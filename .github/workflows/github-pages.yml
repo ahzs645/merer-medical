@@ -36,6 +36,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install docs dependencies
+        run: npm ci --prefix docs/starlight
+
+      - name: Build docs
+        run: npm run docs:build
+
       - name: Compute Pages base href
         id: pages
         shell: bash
@@ -62,6 +68,8 @@ jobs:
       - name: Add GitHub Pages static fallbacks
         shell: bash
         run: |
+          mkdir -p dist/apps/web/docs
+          cp -R docs/starlight/dist/. dist/apps/web/docs/
           cp dist/apps/web/index.html dist/apps/web/404.html
           # Serve the /demo entry point with a real 200 (GitHub Pages returns
           # 404.html with a 404 status for unknown paths). Deeper demo routes
