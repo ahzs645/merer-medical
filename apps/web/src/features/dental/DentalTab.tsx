@@ -4,6 +4,7 @@ import { DentalHeader } from './components/DentalHeader';
 import { DentalImagingPanel } from './components/DentalImagingPanel';
 import { DentalRecordsPanel } from './components/DentalRecordsPanel';
 import { DentalScanPreview } from './components/DentalScanPreview';
+import { DentalSurgeryPanel } from './components/DentalSurgeryPanel';
 import { DentalSummaryPanel } from './components/DentalSummaryPanel';
 import { DentalWorkflowContextPanel } from './components/DentalWorkflowContextPanel';
 import { OdontogramStatusPanel } from './components/OdontogramStatusPanel';
@@ -48,6 +49,7 @@ export function DentalTab() {
             <DentalWorkflowContextPanel context={workflowContext} />
           </div>
           <OrthodonticPanel records={records} />
+          <DentalSurgeryPanel records={records} />
           <DentalCleaningHistoryPanel records={records} />
           <DentalScanPreview imaging={imaging} />
           <div className="grid gap-4 lg:grid-cols-2">

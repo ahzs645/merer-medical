@@ -32,6 +32,24 @@ test('Settings tab loads', async ({ page }) => {
   await expect(page).toHaveTitle(/Mere/);
 });
 
+test('Medication interaction settings can load bundled DDInter data', async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+
+  await page.goto('https://localhost:4200/settings');
+  await expect(page.getByText('Medication safety plugins')).toBeVisible();
+
+  await page.getByText('Load bundled DDInter data').click();
+  await expect(page.getByText(/indexed records from 8 files/)).toBeVisible({
+    timeout: 60_000,
+  });
+  await expect(page.getByText('RxNorm cache status')).toBeVisible();
+
+  await page.goto('https://localhost:4200/records/medications');
+  await expect(page).toHaveTitle(/Mere/);
+});
+
 // test('Epic add new connection flow works', async ({ page }) => {
 //   // Go to connections page
 

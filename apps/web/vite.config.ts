@@ -34,6 +34,7 @@ function copyWebAssets(): Plugin {
     '.jpeg': 'image/jpeg',
     '.jpg': 'image/jpeg',
     '.ttf': 'font/ttf',
+    '.csv': 'text/csv',
   };
 
   return {
@@ -149,7 +150,7 @@ export default defineConfig(({ command, mode }) => {
         srcDir: 'src',
         filename: 'service-worker.ts',
         injectManifest: {
-          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+          maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         },
       }),
     ],

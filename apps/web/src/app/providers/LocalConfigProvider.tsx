@@ -37,6 +37,8 @@ interface LocalConfig {
   terminology_lookup_mode?: TerminologyLookupMode;
   terminology_language?: TerminologyLanguage;
   terminology_remote_enabled?: boolean;
+  medication_interactions_enabled?: boolean;
+  medication_interactions_provider?: 'ddinter';
 }
 
 const defaultLocalConfig: LocalConfig = {
@@ -54,6 +56,8 @@ const defaultLocalConfig: LocalConfig = {
   terminology_lookup_mode: DEFAULT_TERMINOLOGY_LOOKUP_MODE,
   terminology_language: DEFAULT_TERMINOLOGY_LANGUAGE,
   terminology_remote_enabled: DEFAULT_TERMINOLOGY_REMOTE_ENABLED,
+  medication_interactions_enabled: false,
+  medication_interactions_provider: 'ddinter',
 };
 
 function getLocalConfig(): LocalConfig {
@@ -74,7 +78,7 @@ type LocalConfigProviderProps = PropsWithChildren<unknown>;
 const LocalConfigContext = React.createContext<LocalConfig>(defaultLocalConfig);
 const UpdateLocalConfigContext = React.createContext<
   (config: Partial<LocalConfig>) => void
->(() => {});
+>(() => undefined);
 
 /**
  * Helper function that allows you to get a value from the local config

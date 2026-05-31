@@ -11,7 +11,7 @@ import { UNIVERSAL_TEETH } from './dentalReferenceData';
 
 const ACTIVE_KINDS = new Set(['condition', 'finding', 'perio', 'referral']);
 const PLANNED_KINDS = new Set(['treatmentPlan']);
-const COMPLETE_KINDS = new Set(['procedure', 'cleaning']);
+const COMPLETE_KINDS = new Set(['procedure', 'cleaning', 'surgery']);
 
 const HIGH_PRIORITY_TERMS = [
   'abscess',

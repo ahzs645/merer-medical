@@ -72,6 +72,45 @@ export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
                   {record.summary}
                 </p>
               )}
+              {[
+                record.details?.orthoPhase &&
+                  `${t('Phase')}: ${record.details.orthoPhase}`,
+                record.details?.orthoArch &&
+                  `${t('Arch')}: ${record.details.orthoArch}`,
+                record.details?.orthoAppliance &&
+                  `${t('Appliance')}: ${record.details.orthoAppliance}`,
+                record.details?.orthoStatus &&
+                  `${t('Status')}: ${record.details.orthoStatus}`,
+                record.details?.alignerCurrent &&
+                  record.details?.alignerTotal &&
+                  `${t('Aligner')}: ${record.details.alignerCurrent}/${record.details.alignerTotal}`,
+                record.details?.molarClass &&
+                  `${t('Molar class')}: ${record.details.molarClass}`,
+                record.details?.nextVisit &&
+                  `${t('Next visit')}: ${record.details.nextVisit}`,
+              ].filter(Boolean).length > 0 && (
+                <p className="mt-2 text-xs text-gray-500">
+                  {[
+                    record.details?.orthoPhase &&
+                      `${t('Phase')}: ${record.details.orthoPhase}`,
+                    record.details?.orthoArch &&
+                      `${t('Arch')}: ${record.details.orthoArch}`,
+                    record.details?.orthoAppliance &&
+                      `${t('Appliance')}: ${record.details.orthoAppliance}`,
+                    record.details?.orthoStatus &&
+                      `${t('Status')}: ${record.details.orthoStatus}`,
+                    record.details?.alignerCurrent &&
+                      record.details?.alignerTotal &&
+                      `${t('Aligner')}: ${record.details.alignerCurrent}/${record.details.alignerTotal}`,
+                    record.details?.molarClass &&
+                      `${t('Molar class')}: ${record.details.molarClass}`,
+                    record.details?.nextVisit &&
+                      `${t('Next visit')}: ${record.details.nextVisit}`,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </p>
+              )}
             </article>
           ))}
         </div>

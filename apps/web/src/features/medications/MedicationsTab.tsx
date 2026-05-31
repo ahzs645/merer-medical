@@ -1,9 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import {
-  AllergyIntolerance,
-  BundleEntry,
-  FhirResource,
-} from 'fhir/r2';
+import { AllergyIntolerance, BundleEntry, FhirResource } from 'fhir/r2';
 import {
   BeakerIcon,
   CheckCircleIcon,
@@ -24,6 +20,7 @@ import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocumen
 import { AppPage } from '../../shared/components/AppPage';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { useMedicationsData } from './hooks/useMedicationsData';
+import { useMedicationInteractions } from './hooks/useMedicationInteractions';
 import {
   type MedicationReconciliationState,
   type MedicationTimelineItem,
@@ -62,6 +59,7 @@ export function MedicationsTab() {
   const { t } = useInterfaceLanguage();
   const { allergies, filteredItems, items, status, supplementItems } =
     useMedicationsData({ query, selectedFilter });
+  const medicationInteractions = useMedicationInteractions(items);
 
   const counts = useMemo(() => {
     return FILTERS.reduce(
@@ -120,6 +118,7 @@ export function MedicationsTab() {
               />
 
               <AllergySafetyPanel allergies={allergies} />
+              <MedicationInteractionPanel {...medicationInteractions} />
 
               {supplementItems.length > 0 && (
                 <SupplementsPanel items={supplementItems} />
@@ -287,6 +286,113 @@ function AllergySafetyPanel({ allergies }: { allergies: ClinicalDocument[] }) {
           </span>
         ))}
       </div>
+    </section>
+  );
+}
+
+function MedicationInteractionPanel({
+  bundleStatus,
+  enabled,
+  error,
+  interactions,
+  status,
+}: ReturnType<typeof useMedicationInteractions>) {
+  if (!enabled) return null;
+
+  return (
+    <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-amber-200">
+      <div className="flex items-center gap-2">
+        <ShieldCheckIcon className="h-5 w-5 text-amber-700" />
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-700">
+          DDInter medication interaction plugin
+        </h2>
+        <Badge tone={bundleReadinessTone(bundleStatus.readiness)}>
+          {bundleStatus.readiness}
+        </Badge>
+      </div>
+      {status === 'error' ? (
+        <p className="mt-2 text-sm text-red-700">
+          Interaction check failed: {error || 'unknown error'}
+        </p>
+      ) : !bundleStatus.installed ? (
+        <p className="mt-2 text-sm text-gray-600">
+          The plugin is enabled, but no DDInter CSV bundle is installed. Import
+          or sync the DDInter CSV files in Settings to run local interaction
+          checks.
+        </p>
+      ) : (
+        <>
+          <p className="mt-2 text-sm text-gray-600">
+            Checked against {bundleStatus.recordCount.toLocaleString()} local
+            DDInter records
+            {bundleStatus.updatedAt
+              ? ` last updated ${formatDate(bundleStatus.updatedAt)}`
+              : ''}
+            . RxNorm is used first to expand medication names when available.
+            Results are informational and should be verified by a clinician or
+            pharmacist.
+          </p>
+          <p className="mt-1 text-xs text-gray-500">
+            Source: {bundleStatus.sourceVersion || 'DDInter'} ·{' '}
+            {bundleStatus.fileCount || 0} CSV files ·{' '}
+            {bundleStatus.license || 'DDInter source terms apply'}
+          </p>
+          {bundleStatus.readiness === 'stale' && (
+            <p className="mt-2 text-sm text-amber-700">
+              This DDInter bundle may be stale. Sync the plugin in Settings
+              before relying on the current review.
+            </p>
+          )}
+          {status === 'loading' ? (
+            <p className="mt-3 text-sm text-gray-600">
+              Checking medication pairs...
+            </p>
+          ) : interactions.length === 0 ? (
+            <p className="mt-3 text-sm text-gray-600">
+              No DDInter matches found for the current medication list. This
+              only means no match was found in the installed bundle; it does not
+              mean the combination is safe or interaction-free.
+            </p>
+          ) : (
+            <div className="mt-3 grid gap-2">
+              {interactions.slice(0, 10).map((interaction) => (
+                <div
+                  key={interaction.id}
+                  className="rounded-md border border-amber-200 bg-amber-50 p-3"
+                >
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge tone={interactionSeverityTone(interaction.severity)}>
+                      {interaction.severity}
+                    </Badge>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {interaction.drugs.join(' + ')}
+                    </p>
+                  </div>
+                  {interaction.description && (
+                    <p className="mt-2 text-sm text-gray-700">
+                      {interaction.description}
+                    </p>
+                  )}
+                  {interaction.management && (
+                    <p className="mt-1 text-sm text-gray-700">
+                      Management: {interaction.management}
+                    </p>
+                  )}
+                  {interaction.provenance && (
+                    <p className="mt-2 text-xs text-gray-500">
+                      Match: {interaction.provenance.matchStrategy}; DDInter
+                      IDs:{' '}
+                      {interaction.provenance.ddinterIds
+                        ?.filter(Boolean)
+                        .join(' + ') || 'not provided'}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </section>
   );
 }
@@ -541,7 +647,7 @@ function Badge({
   tone = 'gray',
 }: {
   children: ReactNode;
-  tone?: 'gray' | 'green' | 'yellow' | 'red' | 'blue';
+  tone?: 'gray' | 'green' | 'yellow' | 'red' | 'blue' | 'amber';
 }) {
   const classes = {
     gray: 'bg-gray-100 text-gray-700',
@@ -549,6 +655,7 @@ function Badge({
     yellow: 'bg-yellow-50 text-yellow-800',
     red: 'bg-red-50 text-red-700',
     blue: 'bg-blue-50 text-blue-700',
+    amber: 'bg-amber-100 text-amber-800',
   };
 
   return (
@@ -584,6 +691,24 @@ function statusTone(status: string): 'gray' | 'green' | 'yellow' | 'red' {
   if (status === 'active') return 'green';
   if (['intended', 'on-hold', 'unknown'].includes(status)) return 'yellow';
   if (['stopped', 'entered-in-error'].includes(status)) return 'red';
+  return 'gray';
+}
+
+function interactionSeverityTone(
+  severity: string,
+): 'gray' | 'green' | 'amber' | 'red' {
+  if (severity === 'contraindicated') return 'red';
+  if (severity === 'major') return 'red';
+  if (severity === 'moderate') return 'amber';
+  if (severity === 'minor') return 'green';
+  return 'gray';
+}
+
+function bundleReadinessTone(
+  readiness?: string,
+): 'gray' | 'green' | 'amber' | 'red' {
+  if (readiness === 'installed') return 'green';
+  if (readiness === 'stale') return 'amber';
   return 'gray';
 }
 

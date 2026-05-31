@@ -15,11 +15,12 @@ export function DentalSummaryPanel({
     { label: 'Procedures', value: counts.procedures },
     { label: 'Treatment plan', value: counts.treatmentPlan },
     { label: 'Perio', value: counts.perio },
+    { label: 'Surgery', value: counts.surgery },
     { label: 'Images', value: counts.images },
   ];
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6 xl:grid-cols-9">
       {stats.map((stat) => (
         <div
           key={stat.label}

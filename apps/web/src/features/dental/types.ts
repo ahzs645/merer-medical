@@ -11,6 +11,7 @@ export type DentalRecordKind =
   | 'procedure'
   | 'treatmentPlan'
   | 'perio'
+  | 'surgery'
   | 'note'
   | 'referral'
   | 'image';
@@ -46,6 +47,16 @@ export type DentalRecordDetails = {
   dentalFollowUp?: string;
   dentalSurfaces?: string[];
   dentalRecall?: string;
+  orthoPhase?: string;
+  orthoArch?: string;
+  orthoAppliance?: string;
+  orthoStatus?: string;
+  alignerCurrent?: string;
+  alignerTotal?: string;
+  overjet?: string;
+  overbite?: string;
+  molarClass?: string;
+  nextVisit?: string;
 };
 
 export type OdontogramToothStatus = {
@@ -110,6 +121,7 @@ export type DentalWorkspaceData = {
     procedures: number;
     treatmentPlan: number;
     perio: number;
+    surgery: number;
     notes: number;
     referrals: number;
     images: number;

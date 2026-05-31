@@ -64,6 +64,17 @@ const PERIO_TERMS = [
 ];
 
 const REFERRAL_TERMS = ['referral', 'consult', 'oral surgery'];
+const SURGERY_TERMS = [
+  'bone graft',
+  'extraction',
+  'implant surgery',
+  'oral surgery',
+  'post-op',
+  'postoperative',
+  'sinus lift',
+  'surgical',
+  'wisdom tooth',
+];
 const ORTHODONTIC_TERMS = [
   'aligner',
   'angle class',
@@ -155,6 +166,7 @@ export function buildDentalCounts(
     perio: records.filter((record) => record.kind === 'perio').length,
     notes: records.filter((record) => record.kind === 'note').length,
     referrals: records.filter((record) => record.kind === 'referral').length,
+    surgery: records.filter((record) => record.kind === 'surgery').length,
     images: imaging.length,
   };
 }
@@ -179,6 +191,17 @@ function inferDentalKind(
     }
     if (subtype === 'imaging') return 'image';
     if (
+      [
+        'oralSurgeryConsult',
+        'oralSurgeryProcedure',
+        'extraction',
+        'implantSurgery',
+        'postOpSurgery',
+      ].includes(subtype)
+    ) {
+      return 'surgery';
+    }
+    if (
       subtype.startsWith('orthodontic') ||
       ['alignerCase', 'cephalometricAnalysis', 'retention'].includes(subtype)
     ) {
@@ -197,6 +220,9 @@ function inferDentalKind(
   }
   if (ORTHODONTIC_TERMS.some((term) => normalized.includes(term))) {
     return 'orthodontic';
+  }
+  if (SURGERY_TERMS.some((term) => normalized.includes(term))) {
+    return 'surgery';
   }
   if (PERIO_TERMS.some((term) => normalized.includes(term))) return 'perio';
   if (REFERRAL_TERMS.some((term) => normalized.includes(term))) {

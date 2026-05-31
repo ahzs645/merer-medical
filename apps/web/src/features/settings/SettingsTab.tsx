@@ -15,6 +15,7 @@ import { TerminologySettingsGroup } from './components/TerminologySettingsGroup'
 import { InterfaceLanguageSettingsGroup } from './components/InterfaceLanguageSettingsGroup';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { ExperimentalSettingsGroup } from './components/ExperimentalSettingsGroup';
+import { MedicationInteractionSettingsGroup } from './components/MedicationInteractionSettingsGroup';
 import { UserSwitchModal } from './components/UserSwitchModal';
 import { UserSwitchDrawer } from './components/UserSwitchDrawer';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
@@ -202,6 +203,7 @@ const SettingsTab: React.FC = () => {
         <InterfaceLanguageSettingsGroup />
         <PrivacyAndSecuritySettingsGroup />
         <TerminologySettingsGroup />
+        <MedicationInteractionSettingsGroup />
         <UserDataSettingsGroup />
         <AboutMereSettingsGroup />
         <ExperimentalSettingsGroup />

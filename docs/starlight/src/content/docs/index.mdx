@@ -1,0 +1,26 @@
+---
+title: Mere Medical Documentation
+description: Developer docs for Mere Medical's local-first health record app, portal integrations, and portable health record package format.
+---
+
+Mere Medical is a browser-first personal health record for aggregating, normalizing, and exporting health data across patient portals and portable record files.
+
+## Start here
+
+- [Project overview](./general/project-overview/) explains the app surfaces and the intended audience for these docs.
+- [Local-first architecture](./architecture/local-first-architecture/) describes the current RxDB store, the Dexie migration path, and the future Convex-shaped interface.
+- [EMR package format](./data-portability/emrpkg-format/) documents the `.emrpkg` archive format used for portable records.
+- [Serverless mode](./operations/serverless-mode/) covers running the web app without the NestJS portal callback API.
+
+## System map
+
+```mermaid
+flowchart LR
+  Web["apps/web React client"] --> Repos["Repository layer"]
+  Repos --> RxDB["RxDB legacy store"]
+  Repos --> Dexie["Dexie local store"]
+  Web --> FHIR["FHIR portal services"]
+  FHIR --> API["apps/api NestJS callbacks"]
+  Web --> Package[".emrpkg import/export"]
+  Dexie --> Package
+```
