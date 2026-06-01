@@ -9,6 +9,7 @@ import { OptometryHeader } from './components/OptometryHeader';
 import { OptometryQuickAdd } from './components/OptometryQuickAdd';
 import { OptometrySummaryPanel } from './components/OptometrySummaryPanel';
 import { PrescriptionTimelinePanel } from './components/PrescriptionTimelinePanel';
+import { SurgicalHistoryPanel } from './components/SurgicalHistoryPanel';
 import { useOptometryData } from './hooks/useOptometryData';
 
 export function OptometryTab() {
@@ -30,6 +31,7 @@ export function OptometryTab() {
           <OptometryQuickAdd />
           <CurrentPrescriptionPanel records={records} />
           <PrescriptionTimelinePanel records={records} />
+          <SurgicalHistoryPanel records={records} />
           <EyeMetricsPanel records={records} />
           <div className="grid gap-4 xl:grid-cols-2">
             <OptometryCheckupHistoryPanel records={records} />

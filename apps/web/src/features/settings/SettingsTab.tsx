@@ -185,10 +185,10 @@ const SettingsTab: React.FC = () => {
   return (
     <AppPage
       banner={<GenericBanner text={t('Settings')} />}
-      contentClassName="overflow-y-auto overscroll-contain"
+      contentClassName="overflow-y-auto overscroll-contain bg-gray-50"
     >
-      <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pt-2 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-6">
+      <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pt-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between pb-4">
           <div className="text-xl font-extrabold">{t('About Me')}</div>
           <button
             onClick={() => setShowUserSwitcher(true)}
@@ -199,7 +199,7 @@ const SettingsTab: React.FC = () => {
         </div>
       </div>
       <UserCard />
-      <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pb-20 pt-2 sm:px-6 sm:pb-6 lg:px-8">
+      <div className="mx-auto flex max-w-4xl flex-col gap-y-4 px-4 pb-20 pt-6 sm:px-6 sm:pb-6 lg:px-8">
         <InterfaceLanguageSettingsGroup />
         <PrivacyAndSecuritySettingsGroup />
         <TerminologySettingsGroup />

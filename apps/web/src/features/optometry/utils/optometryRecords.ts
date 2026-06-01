@@ -46,13 +46,34 @@ const IMAGE_TERMS = [
   'slit lamp',
 ];
 
+// Terms that mark a procedure as an eye surgery (refractive or otherwise).
+const SURGERY_TERMS = [
+  'lasik',
+  'smile',
+  'lenticule',
+  'prk',
+  'lasek',
+  'keratomileusis',
+  'refractive surgery',
+  'photorefractive',
+  'cross-linking',
+  'crosslinking',
+  'capsulotomy',
+  'vitrectomy',
+  'phaco',
+  'intraocular lens',
+  'iol implant',
+  'cataract surgery',
+];
+
 export function isOptometryDocument(
   document: ClinicalDocument<unknown>,
 ): boolean {
   const text = searchableText(document).toLowerCase();
   return (
     document.data_record.resource_type === 'visionprescription' ||
-    OPTOMETRY_TERMS.some((term) => text.includes(term))
+    OPTOMETRY_TERMS.some((term) => text.includes(term)) ||
+    SURGERY_TERMS.some((term) => text.includes(term))
   );
 }
 
@@ -105,6 +126,7 @@ export function buildOptometryCounts(
     iop: records.filter((record) => record.kind === 'iop').length,
     diagnoses: records.filter((record) => record.kind === 'diagnosis').length,
     procedures: records.filter((record) => record.kind === 'procedure').length,
+    surgeries: records.filter((record) => record.kind === 'surgery').length,
     imaging: imaging.length,
     documents: records.filter(
       (record) => record.kind === 'report' || record.kind === 'admin',
@@ -120,6 +142,15 @@ function inferKind(
   const normalized = text.toLowerCase();
 
   if (resourceType === 'visionprescription') return 'prescription';
+  const manualSubtype = (document.metadata as { manual_subtype?: string })
+    ?.manual_subtype;
+  if (manualSubtype === 'surgery') return 'surgery';
+  if (
+    (resourceType === 'procedure' || resourceType === 'servicerequest') &&
+    SURGERY_TERMS.some((term) => normalized.includes(term))
+  ) {
+    return 'surgery';
+  }
   if (normalized.includes('refraction') || normalized.includes('sphere')) {
     return 'refraction';
   }

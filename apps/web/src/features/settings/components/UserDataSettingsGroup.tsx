@@ -23,6 +23,7 @@ import {
 import React from 'react';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { StylizedSelect } from '../../../shared/components/StylizedSelect';
+import { SettingsSection } from './SettingsSection';
 
 export type ImportFields = {
   backup?: FileList;
@@ -276,290 +277,275 @@ export function UserDataSettingsGroup() {
   }, []);
 
   return (
-    <>
-      <h1 className="py-6 text-xl font-extrabold">{t('Data')}</h1>
-      <div className="divide-y divide-gray-200">
-        <div className="px-4 sm:px-6">
-          <ul className="mt-2 divide-y divide-gray-200">
-            <li className="flex items-center pb-4">
-              <div className="flex flex-1 flex-col">
-                <h2 className="text-primary-800 text-lg leading-6">
-                  {t('Export data')}
-                </h2>
-                <p className="pt-2 text-sm text-gray-800">
-                  {t(
-                    'Export all of your data in JSON format. You can use this to backup your data and can import it back if needed.',
+    <SettingsSection id="data" title={t('Data')}>
+      <ul className="divide-y divide-gray-200">
+        <li className="flex items-center pb-4">
+          <div className="flex flex-1 flex-col">
+            <h2 className="text-primary-800 text-lg leading-6">
+              {t('Export data')}
+            </h2>
+            <p className="pt-2 text-sm text-gray-800">
+              {t(
+                'Export all of your data in JSON format. You can use this to backup your data and can import it back if needed.',
+              )}
+            </p>
+          </div>
+          {!fileDownloadLink ? (
+            <button
+              type="button"
+              className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+              onClick={() => {
+                exportData(db, setFileDownloadLink).then((link) => {
+                  if (link) {
+                    clickDownloadRef.current?.click();
+                  }
+                });
+              }}
+            >
+              <p className="font-bold">{t('Start Export')}</p>
+            </button>
+          ) : (
+            <a
+              type="button"
+              className="bg-green-600 hover:bg-green-700 focus:ring-green-500 relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+              ref={clickDownloadRef}
+              target="_blank"
+              rel="noreferrer"
+              id="downloadLink"
+              download={`mere_export_${new Date().toISOString()}.json`}
+              href={fileDownloadLink}
+            >
+              {t('Download')}
+            </a>
+          )}
+        </li>
+        <li className="flex items-center py-4">
+          <div className="flex flex-1 flex-col">
+            <h2 className="text-primary-800 text-lg leading-6">
+              {t('Import data')}
+            </h2>
+            <p className="pt-2 text-sm text-gray-800">
+              {t('Import previously exported data')}
+            </p>
+          </div>
+          <form
+            ref={formref}
+            onSubmit={handleSubmit(importData)}
+            className="border-0"
+          >
+            <label className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-bold  text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2">
+              {importButtonText}
+              <input
+                type="file"
+                id="profilePhoto"
+                accept="application/json"
+                className="hidden"
+                {...register('backup', {
+                  required: true,
+                  validate: (value, formValues) => value !== undefined,
+                })}
+                aria-invalid={errors.backup ? 'true' : 'false'}
+              />
+              {errors.backup && (
+                <p className="text-red-500">{`${errors.backup?.message}`}</p>
+              )}
+            </label>
+            {file !== undefined && (
+              <button
+                type="submit"
+                disabled={backupInProgress}
+                className="relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-bold text-white shadow-sm  hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-700"
+              >
+                {backupInProgress ? (
+                  <>
+                    <p className="pr-2">{t('Importing')}</p>
+                    <ButtonLoadingSpinner />
+                  </>
+                ) : (
+                  t('Start Import')
+                )}
+              </button>
+            )}
+          </form>
+        </li>
+        {/* ── .emrpkg package import/export ──────────────────────────── */}
+        <li className="flex flex-col py-4">
+          <div className="flex flex-col">
+            <h2 className="text-primary-800 text-lg leading-6">
+              {t('Encrypted package (.emrpkg)')}
+            </h2>
+            <p className="pt-2 text-sm text-gray-800">
+              {t('Export and import your data as a single')}{' '}
+              <code className="text-xs">.emrpkg</code> file. Optionally protect
+              the file with a passphrase (AES-GCM, PBKDF2-SHA256, 600,000
+              iterations) or a passkey (WebAuthn PRF). Use this to move your
+              records between browsers or devices.
+            </p>
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <label className="inline-flex items-center text-sm text-gray-800">
+              <input
+                type="checkbox"
+                className="text-primary-600 focus:ring-primary-500 mr-2 h-4 w-4 rounded border-gray-300"
+                checked={emrpkgEncrypt}
+                onChange={(e) => setEmrpkgEncrypt(e.target.checked)}
+              />
+              {t('Encrypt export')}
+            </label>
+            {emrpkgEncrypt && (
+              <label className="inline-flex items-center text-sm text-gray-800">
+                <input
+                  type="checkbox"
+                  className="text-primary-600 focus:ring-primary-500 mr-2 h-4 w-4 rounded border-gray-300"
+                  checked={emrpkgUseWebauthn}
+                  onChange={(e) => setEmrpkgUseWebauthn(e.target.checked)}
+                />
+                {t('Use a passkey instead of a passphrase')}
+              </label>
+            )}
+            <input
+              type="password"
+              placeholder={t('Passphrase for encrypted package')}
+              disabled={emrpkgUseWebauthn}
+              className="focus:ring-primary-500 focus:border-primary-500 block w-56 rounded-md border-gray-300 text-sm shadow-sm disabled:bg-gray-100 disabled:text-gray-400"
+              value={emrpkgPassphrase}
+              onChange={(e) => setEmrpkgPassphrase(e.target.value)}
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              disabled={emrpkgBusy}
+              onClick={handleEmrpkgExport}
+              className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-bold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-500"
+            >
+              {emrpkgBusy ? (
+                <>
+                  <span className="pr-2">{t('Working')}</span>
+                  <ButtonLoadingSpinner />
+                </>
+              ) : (
+                t('Export .emrpkg')
+              )}
+            </button>
+            <label className="inline-flex items-center text-sm text-gray-800">
+              <span className="mr-2 font-medium">{t('Import mode')}</span>
+              <StylizedSelect
+                value={emrpkgImportMode}
+                onChange={(value) =>
+                  setEmrpkgImportMode(value as 'merge' | 'replace')
+                }
+                className="min-w-44"
+                buttonClassName="min-h-[34px] py-1.5"
+                options={[
+                  { value: 'merge', label: t('Add to this app') },
+                  { value: 'replace', label: t('Replace everything') },
+                ]}
+              />
+            </label>
+            <button
+              type="button"
+              disabled={emrpkgBusy}
+              onClick={() => emrpkgImportRef.current?.click()}
+              className="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-500"
+            >
+              {t('Import .emrpkg')}
+            </button>
+            <input
+              ref={emrpkgImportRef}
+              type="file"
+              accept=".emrpkg,application/octet-stream,application/zip"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleEmrpkgImport(f);
+                e.target.value = '';
+              }}
+            />
+            <a
+              ref={emrpkgDownloadRef}
+              href={emrpkgDownloadUrl || undefined}
+              download={emrpkgDownloadName || undefined}
+              className="hidden"
+            >
+              download
+            </a>
+          </div>
+        </li>
+        {/* Show storage usage  */}
+        <li className="flex items-center py-4">
+          <div className="mr-2 flex flex-1 flex-col sm:mr-4">
+            <h2 className="text-primary-800 text-lg leading-6">
+              {t('Storage usage')}
+            </h2>
+            {/* show if persistant storage is enabled */}
+            <p className="pt-2 text-sm text-gray-800">
+              {hasPersistentStorageEnabled
+                ? t('Persistent storage is enabled.')
+                : t(
+                    'Persistent storage is not enabled - data may be cleared by the browser.',
                   )}
-                </p>
+            </p>
+            {/* Progress bar */}
+            {quotaDetails.usage && quotaDetails.quota && (
+              <div className="mt-2 h-2.5 w-full rounded-full bg-gray-200 dark:bg-gray-300">
+                <div
+                  className="bg-primary-500 h-2.5 min-w-[0.625rem] rounded-full"
+                  style={{
+                    width: `${
+                      (quotaDetails.usage / quotaDetails.quota) * 100
+                    }%`,
+                  }}
+                ></div>
               </div>
-              {!fileDownloadLink ? (
+            )}
+            <p className="pt-1 text-sm text-gray-800">
+              {quotaDetails.usage && quotaDetails.quota
+                ? `You have used ${
+                    quotaDetails.usage >= 1024 * 1024 * 1024
+                      ? `${(quotaDetails.usage / 1024 / 1024 / 1024).toFixed(
+                          2,
+                        )} GB`
+                      : `${(quotaDetails.usage / 1024 / 1024).toFixed(2)} MB`
+                  } out of ${
+                    quotaDetails.quota >= 1024 * 1024 * 1024
+                      ? `${(quotaDetails.quota / 1024 / 1024 / 1024).toFixed(
+                          2,
+                        )} GB`
+                      : `${(quotaDetails.quota / 1024 / 1024).toFixed(2)} MB`
+                  } of total storage available.`
+                : 'Storage quota not available.'}
+            </p>
+          </div>
+          <div>
+            {checkIfPersistentStorageAvailable() &&
+              !hasPersistentStorageEnabled && (
                 <button
-                  type="button"
-                  className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
                   onClick={() => {
-                    exportData(db, setFileDownloadLink).then((link) => {
-                      if (link) {
-                        clickDownloadRef.current?.click();
+                    requestPersistentStorage().then((result) => {
+                      if (result) {
+                        notifyDispatch({
+                          type: 'set_notification',
+                          message: `Persistent storage is enabled.`,
+                          variant: 'success',
+                        });
+                      } else {
+                        notifyDispatch({
+                          type: 'set_notification',
+                          message: `Persistent storage cannot be enabled. Try installing Mere as a PWA to enable persistant storage.`,
+                          variant: 'error',
+                        });
                       }
+                      setHasPersistentStorageEnabled(result);
                     });
                   }}
+                  className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 relative mt-2 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-bold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
                 >
-                  <p className="font-bold">{t('Start Export')}</p>
+                  Enable
                 </button>
-              ) : (
-                <a
-                  type="button"
-                  className="bg-green-600 hover:bg-green-700 focus:ring-green-500 relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
-                  ref={clickDownloadRef}
-                  target="_blank"
-                  rel="noreferrer"
-                  id="downloadLink"
-                  download={`mere_export_${new Date().toISOString()}.json`}
-                  href={fileDownloadLink}
-                >
-                  {t('Download')}
-                </a>
               )}
-            </li>
-            <li className="flex items-center py-4">
-              <div className="flex flex-1 flex-col">
-                <h2 className="text-primary-800 text-lg leading-6">
-                  {t('Import data')}
-                </h2>
-                <p className="pt-2 text-sm text-gray-800">
-                  {t('Import previously exported data')}
-                </p>
-              </div>
-              <form
-                ref={formref}
-                onSubmit={handleSubmit(importData)}
-                className="border-0"
-              >
-                <label className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-bold  text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2">
-                  {importButtonText}
-                  <input
-                    type="file"
-                    id="profilePhoto"
-                    accept="application/json"
-                    className="hidden"
-                    {...register('backup', {
-                      required: true,
-                      validate: (value, formValues) => value !== undefined,
-                    })}
-                    aria-invalid={errors.backup ? 'true' : 'false'}
-                  />
-                  {errors.backup && (
-                    <p className="text-red-500">{`${errors.backup?.message}`}</p>
-                  )}
-                </label>
-                {file !== undefined && (
-                  <button
-                    type="submit"
-                    disabled={backupInProgress}
-                    className="relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-bold text-white shadow-sm  hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-700"
-                  >
-                    {backupInProgress ? (
-                      <>
-                        <p className="pr-2">{t('Importing')}</p>
-                        <ButtonLoadingSpinner />
-                      </>
-                    ) : (
-                      t('Start Import')
-                    )}
-                  </button>
-                )}
-              </form>
-            </li>
-            {/* ── .emrpkg package import/export ──────────────────────────── */}
-            <li className="flex flex-col py-4">
-              <div className="flex flex-col">
-                <h2 className="text-primary-800 text-lg leading-6">
-                  {t('Encrypted package (.emrpkg)')}
-                </h2>
-                <p className="pt-2 text-sm text-gray-800">
-                  {t('Export and import your data as a single')}{' '}
-                  <code className="text-xs">.emrpkg</code> file. Optionally
-                  protect the file with a passphrase (AES-GCM, PBKDF2-SHA256,
-                  600,000 iterations) or a passkey (WebAuthn PRF). Use this to
-                  move your records between browsers or devices.
-                </p>
-              </div>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <label className="inline-flex items-center text-sm text-gray-800">
-                  <input
-                    type="checkbox"
-                    className="text-primary-600 focus:ring-primary-500 mr-2 h-4 w-4 rounded border-gray-300"
-                    checked={emrpkgEncrypt}
-                    onChange={(e) => setEmrpkgEncrypt(e.target.checked)}
-                  />
-                  {t('Encrypt export')}
-                </label>
-                {emrpkgEncrypt && (
-                  <label className="inline-flex items-center text-sm text-gray-800">
-                    <input
-                      type="checkbox"
-                      className="text-primary-600 focus:ring-primary-500 mr-2 h-4 w-4 rounded border-gray-300"
-                      checked={emrpkgUseWebauthn}
-                      onChange={(e) => setEmrpkgUseWebauthn(e.target.checked)}
-                    />
-                    {t('Use a passkey instead of a passphrase')}
-                  </label>
-                )}
-                <input
-                  type="password"
-                  placeholder={t('Passphrase for encrypted package')}
-                  disabled={emrpkgUseWebauthn}
-                  className="focus:ring-primary-500 focus:border-primary-500 block w-56 rounded-md border-gray-300 text-sm shadow-sm disabled:bg-gray-100 disabled:text-gray-400"
-                  value={emrpkgPassphrase}
-                  onChange={(e) => setEmrpkgPassphrase(e.target.value)}
-                  autoComplete="new-password"
-                />
-                <button
-                  type="button"
-                  disabled={emrpkgBusy}
-                  onClick={handleEmrpkgExport}
-                  className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-bold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-500"
-                >
-                  {emrpkgBusy ? (
-                    <>
-                      <span className="pr-2">{t('Working')}</span>
-                      <ButtonLoadingSpinner />
-                    </>
-                  ) : (
-                    t('Export .emrpkg')
-                  )}
-                </button>
-                <label className="inline-flex items-center text-sm text-gray-800">
-                  <span className="mr-2 font-medium">{t('Import mode')}</span>
-                  <StylizedSelect
-                    value={emrpkgImportMode}
-                    onChange={(value) =>
-                      setEmrpkgImportMode(value as 'merge' | 'replace')
-                    }
-                    className="min-w-44"
-                    buttonClassName="min-h-[34px] py-1.5"
-                    options={[
-                      { value: 'merge', label: t('Add to this app') },
-                      { value: 'replace', label: t('Replace everything') },
-                    ]}
-                  />
-                </label>
-                <button
-                  type="button"
-                  disabled={emrpkgBusy}
-                  onClick={() => emrpkgImportRef.current?.click()}
-                  className="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-500"
-                >
-                  {t('Import .emrpkg')}
-                </button>
-                <input
-                  ref={emrpkgImportRef}
-                  type="file"
-                  accept=".emrpkg,application/octet-stream,application/zip"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) handleEmrpkgImport(f);
-                    e.target.value = '';
-                  }}
-                />
-                <a
-                  ref={emrpkgDownloadRef}
-                  href={emrpkgDownloadUrl || undefined}
-                  download={emrpkgDownloadName || undefined}
-                  className="hidden"
-                >
-                  download
-                </a>
-              </div>
-            </li>
-            {/* Show storage usage  */}
-            <li className="flex items-center py-4">
-              <div className="mr-2 flex flex-1 flex-col sm:mr-4">
-                <h2 className="text-primary-800 text-lg leading-6">
-                  {t('Storage usage')}
-                </h2>
-                {/* show if persistant storage is enabled */}
-                <p className="pt-2 text-sm text-gray-800">
-                  {hasPersistentStorageEnabled
-                    ? t('Persistent storage is enabled.')
-                    : t(
-                        'Persistent storage is not enabled - data may be cleared by the browser.',
-                      )}
-                </p>
-                {/* Progress bar */}
-                {quotaDetails.usage && quotaDetails.quota && (
-                  <div className="mt-2 h-2.5 w-full rounded-full bg-gray-200 dark:bg-gray-300">
-                    <div
-                      className="bg-primary-500 h-2.5 min-w-[0.625rem] rounded-full"
-                      style={{
-                        width: `${
-                          (quotaDetails.usage / quotaDetails.quota) * 100
-                        }%`,
-                      }}
-                    ></div>
-                  </div>
-                )}
-                <p className="pt-1 text-sm text-gray-800">
-                  {quotaDetails.usage && quotaDetails.quota
-                    ? `You have used ${
-                        quotaDetails.usage >= 1024 * 1024 * 1024
-                          ? `${(
-                              quotaDetails.usage /
-                              1024 /
-                              1024 /
-                              1024
-                            ).toFixed(2)} GB`
-                          : `${(quotaDetails.usage / 1024 / 1024).toFixed(
-                              2,
-                            )} MB`
-                      } out of ${
-                        quotaDetails.quota >= 1024 * 1024 * 1024
-                          ? `${(
-                              quotaDetails.quota /
-                              1024 /
-                              1024 /
-                              1024
-                            ).toFixed(2)} GB`
-                          : `${(quotaDetails.quota / 1024 / 1024).toFixed(
-                              2,
-                            )} MB`
-                      } of total storage available.`
-                    : 'Storage quota not available.'}
-                </p>
-              </div>
-              <div>
-                {checkIfPersistentStorageAvailable() &&
-                  !hasPersistentStorageEnabled && (
-                    <button
-                      onClick={() => {
-                        requestPersistentStorage().then((result) => {
-                          if (result) {
-                            notifyDispatch({
-                              type: 'set_notification',
-                              message: `Persistent storage is enabled.`,
-                              variant: 'success',
-                            });
-                          } else {
-                            notifyDispatch({
-                              type: 'set_notification',
-                              message: `Persistent storage cannot be enabled. Try installing Mere as a PWA to enable persistant storage.`,
-                              variant: 'error',
-                            });
-                          }
-                          setHasPersistentStorageEnabled(result);
-                        });
-                      }}
-                      className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 relative mt-2 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-bold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
-                    >
-                      Enable
-                    </button>
-                  )}
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </>
+          </div>
+        </li>
+      </ul>
+    </SettingsSection>
   );
 }

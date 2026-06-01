@@ -13,11 +13,12 @@ export function OptometrySummaryPanel({
     { label: 'Visual acuity', value: counts.visualAcuity },
     { label: 'IOP', value: counts.iop },
     { label: 'Diagnoses', value: counts.diagnoses },
+    { label: 'Surgeries', value: counts.surgeries },
     { label: 'Imaging', value: counts.imaging },
   ];
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
       {stats.map((stat) => (
         <div
           key={stat.label}

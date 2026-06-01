@@ -10,6 +10,7 @@ export type OptometryRecordKind =
   | 'iop'
   | 'diagnosis'
   | 'procedure'
+  | 'surgery'
   | 'checkup'
   | 'report'
   | 'retail'
@@ -56,6 +57,7 @@ export type OptometryWorkspaceData = {
     iop: number;
     diagnoses: number;
     procedures: number;
+    surgeries: number;
     imaging: number;
     documents: number;
   };

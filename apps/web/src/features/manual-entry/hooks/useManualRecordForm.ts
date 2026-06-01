@@ -123,6 +123,21 @@ type OptometryFields = {
   examMethod: string;
 };
 
+type SurgeryFields = {
+  surgeryType: string;
+  surgerySurgeon: string;
+  laserPlatform: string;
+  opticalZone: string;
+  ablationDepth: string;
+  flapThickness: string;
+  iolModel: string;
+  iolPower: string;
+  targetRefraction: string;
+  surgeryComplications: string;
+  surgeryOutcome: string;
+  surgeryFollowUp: string;
+};
+
 type ImagingFields = {
   imagingModality: string;
   imagingBodySite: string;
@@ -216,6 +231,21 @@ const initialOptometryFields: OptometryFields = {
   iopOd: '',
   iopOs: '',
   examMethod: '',
+};
+
+const initialSurgeryFields: SurgeryFields = {
+  surgeryType: '',
+  surgerySurgeon: '',
+  laserPlatform: '',
+  opticalZone: '',
+  ablationDepth: '',
+  flapThickness: '',
+  iolModel: '',
+  iolPower: '',
+  targetRefraction: '',
+  surgeryComplications: '',
+  surgeryOutcome: '',
+  surgeryFollowUp: '',
 };
 
 const initialImagingFields: ImagingFields = {
@@ -327,6 +357,10 @@ export function useManualRecordForm() {
     patchReducer<OptometryFields>,
     initialOptometryFields,
   );
+  const [surgeryFields, setSurgeryFields] = useReducer(
+    patchReducer<SurgeryFields>,
+    initialSurgeryFields,
+  );
   const [imagingFields, setImagingFields] = useReducer(
     patchReducer<ImagingFields>,
     initialImagingFields,
@@ -374,6 +408,20 @@ export function useManualRecordForm() {
     iopOs,
     examMethod,
   } = optometryFields;
+  const {
+    surgeryType,
+    surgerySurgeon,
+    laserPlatform,
+    opticalZone,
+    ablationDepth,
+    flapThickness,
+    iolModel,
+    iolPower,
+    targetRefraction,
+    surgeryComplications,
+    surgeryOutcome,
+    surgeryFollowUp,
+  } = surgeryFields;
   const {
     imagingModality,
     imagingBodySite,
@@ -450,6 +498,28 @@ export function useManualRecordForm() {
   const setIopOs = (iopOs: string) => setOptometryFields({ iopOs });
   const setExamMethod = (examMethod: string) =>
     setOptometryFields({ examMethod });
+  const setSurgeryType = (surgeryType: string) =>
+    setSurgeryFields({ surgeryType });
+  const setSurgerySurgeon = (surgerySurgeon: string) =>
+    setSurgeryFields({ surgerySurgeon });
+  const setLaserPlatform = (laserPlatform: string) =>
+    setSurgeryFields({ laserPlatform });
+  const setOpticalZone = (opticalZone: string) =>
+    setSurgeryFields({ opticalZone });
+  const setAblationDepth = (ablationDepth: string) =>
+    setSurgeryFields({ ablationDepth });
+  const setFlapThickness = (flapThickness: string) =>
+    setSurgeryFields({ flapThickness });
+  const setIolModel = (iolModel: string) => setSurgeryFields({ iolModel });
+  const setIolPower = (iolPower: string) => setSurgeryFields({ iolPower });
+  const setTargetRefraction = (targetRefraction: string) =>
+    setSurgeryFields({ targetRefraction });
+  const setSurgeryComplications = (surgeryComplications: string) =>
+    setSurgeryFields({ surgeryComplications });
+  const setSurgeryOutcome = (surgeryOutcome: string) =>
+    setSurgeryFields({ surgeryOutcome });
+  const setSurgeryFollowUp = (surgeryFollowUp: string) =>
+    setSurgeryFields({ surgeryFollowUp });
   const setImagingModality = (imagingModality: string) =>
     setImagingFields({ imagingModality });
   const setImagingBodySite = (imagingBodySite: string) =>
@@ -565,6 +635,7 @@ export function useManualRecordForm() {
     setDocumentFileFields(initialDocumentFileFields);
     setDentalFields(initialDentalFields);
     setOptometryFields(initialOptometryFields);
+    setSurgeryFields(initialSurgeryFields);
     setImagingFields(initialImagingFields);
     setLabRowsFields(createInitialLabRowsFields());
     setSubmitAttempted(false);
@@ -754,6 +825,18 @@ export function useManualRecordForm() {
         setIopOd(manualDetails.iopOd || '');
         setIopOs(manualDetails.iopOs || '');
         setExamMethod(manualDetails.examMethod || '');
+        setSurgeryType(manualDetails.surgeryType || '');
+        setSurgerySurgeon(manualDetails.surgerySurgeon || '');
+        setLaserPlatform(manualDetails.laserPlatform || '');
+        setOpticalZone(manualDetails.opticalZone || '');
+        setAblationDepth(manualDetails.ablationDepth || '');
+        setFlapThickness(manualDetails.flapThickness || '');
+        setIolModel(manualDetails.iolModel || '');
+        setIolPower(manualDetails.iolPower || '');
+        setTargetRefraction(manualDetails.targetRefraction || '');
+        setSurgeryComplications(manualDetails.surgeryComplications || '');
+        setSurgeryOutcome(manualDetails.surgeryOutcome || '');
+        setSurgeryFollowUp(manualDetails.surgeryFollowUp || '');
         const imagingDetails = doc.metadata?.manual_imaging_details;
         setImagingModality(imagingDetails?.modality || '');
         setImagingBodySite(imagingDetails?.bodySite || '');
@@ -891,6 +974,18 @@ export function useManualRecordForm() {
         iopOd,
         iopOs,
         examMethod,
+        surgeryType,
+        surgerySurgeon,
+        laserPlatform,
+        opticalZone,
+        ablationDepth,
+        flapThickness,
+        iolModel,
+        iolPower,
+        targetRefraction,
+        surgeryComplications,
+        surgeryOutcome,
+        surgeryFollowUp,
         imagingDetails: {
           modality: imagingModality,
           bodySite: imagingBodySite,
@@ -1182,6 +1277,30 @@ export function useManualRecordForm() {
     setIopOs,
     examMethod,
     setExamMethod,
+    surgeryType,
+    setSurgeryType,
+    surgerySurgeon,
+    setSurgerySurgeon,
+    laserPlatform,
+    setLaserPlatform,
+    opticalZone,
+    setOpticalZone,
+    ablationDepth,
+    setAblationDepth,
+    flapThickness,
+    setFlapThickness,
+    iolModel,
+    setIolModel,
+    iolPower,
+    setIolPower,
+    targetRefraction,
+    setTargetRefraction,
+    surgeryComplications,
+    setSurgeryComplications,
+    surgeryOutcome,
+    setSurgeryOutcome,
+    surgeryFollowUp,
+    setSurgeryFollowUp,
     imagingModality,
     setImagingModality,
     imagingBodySite,

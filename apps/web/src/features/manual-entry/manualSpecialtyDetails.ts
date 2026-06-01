@@ -48,6 +48,19 @@ export type ManualSpecialtyDetails = {
   iopOd?: string;
   iopOs?: string;
   examMethod?: string;
+  // Eye surgery / refractive operation-note fields.
+  surgeryType?: string;
+  surgerySurgeon?: string;
+  laserPlatform?: string;
+  opticalZone?: string;
+  ablationDepth?: string;
+  flapThickness?: string;
+  iolModel?: string;
+  iolPower?: string;
+  targetRefraction?: string;
+  surgeryComplications?: string;
+  surgeryOutcome?: string;
+  surgeryFollowUp?: string;
 };
 
 export type ManualImagingDetails = {
@@ -120,6 +133,18 @@ export function buildSpecialtyDetails(
     iopOd: params.iopOd.trim(),
     iopOs: params.iopOs.trim(),
     examMethod: params.examMethod.trim(),
+    surgeryType: params.surgeryType.trim(),
+    surgerySurgeon: params.surgerySurgeon.trim(),
+    laserPlatform: params.laserPlatform.trim(),
+    opticalZone: params.opticalZone.trim(),
+    ablationDepth: params.ablationDepth.trim(),
+    flapThickness: params.flapThickness.trim(),
+    iolModel: params.iolModel.trim(),
+    iolPower: params.iolPower.trim(),
+    targetRefraction: params.targetRefraction.trim(),
+    surgeryComplications: params.surgeryComplications.trim(),
+    surgeryOutcome: params.surgeryOutcome.trim(),
+    surgeryFollowUp: params.surgeryFollowUp.trim(),
   };
 }
 
@@ -204,6 +229,35 @@ export function appendSpecialtyNotes(
       lines.push(`OS visual acuity: ${details.visualAcuityOs}`);
     if (details.iopOd) lines.push(`OD IOP: ${details.iopOd} mmHg`);
     if (details.iopOs) lines.push(`OS IOP: ${details.iopOs} mmHg`);
+    if (details.surgeryType) lines.push(`Surgery: ${details.surgeryType}`);
+    if (details.surgerySurgeon)
+      lines.push(`Surgeon: ${details.surgerySurgeon}`);
+    if (details.laserPlatform) {
+      lines.push(`Laser platform: ${details.laserPlatform}`);
+    }
+    if (details.opticalZone) {
+      lines.push(`Optical zone: ${details.opticalZone} mm`);
+    }
+    if (details.ablationDepth) {
+      lines.push(`Ablation depth: ${details.ablationDepth} µm`);
+    }
+    if (details.flapThickness) {
+      lines.push(`Flap thickness: ${details.flapThickness} µm`);
+    }
+    if (details.iolModel) lines.push(`IOL: ${details.iolModel}`);
+    if (details.iolPower) lines.push(`IOL power: ${details.iolPower} D`);
+    if (details.targetRefraction) {
+      lines.push(`Target refraction: ${details.targetRefraction}`);
+    }
+    if (details.surgeryComplications) {
+      lines.push(`Complications: ${details.surgeryComplications}`);
+    }
+    if (details.surgeryOutcome) {
+      lines.push(`Outcome: ${details.surgeryOutcome}`);
+    }
+    if (details.surgeryFollowUp) {
+      lines.push(`Follow-up: ${details.surgeryFollowUp}`);
+    }
   }
   const structured = lines.filter(Boolean).join('\n');
   return [notes.trim(), structured].filter(Boolean).join('\n');

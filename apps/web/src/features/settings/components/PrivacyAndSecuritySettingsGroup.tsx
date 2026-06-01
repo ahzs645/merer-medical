@@ -23,6 +23,7 @@ import { ModalHeader } from '../../../shared/components/ModalHeader';
 import { CryptedIndexedDBAdapter } from 'sylviejs/storage-adapter/crypted-indexeddb-adapter';
 import { ButtonLoadingSpinner } from '../../connections/components/ButtonLoadingSpinner';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { SettingsSection } from './SettingsSection';
 
 export function PrivacyAndSecuritySettingsGroup() {
   const db = useRxDb(),
@@ -37,124 +38,117 @@ export function PrivacyAndSecuritySettingsGroup() {
 
   if (userPreferences !== undefined && rawUserPreferences !== undefined) {
     return (
-      <>
-        <h1 className="py-6 text-xl font-extrabold">Privacy and Security</h1>
-        <div className="divide-y divide-gray-200" ref={ref}>
-          <div className="px-4 sm:px-6">
-            <ul className="mt-2 divide-y divide-gray-200">
-              <Switch.Group
-                id="encrypt_database"
-                as="li"
-                className="flex flex-col pb-4"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <Switch.Label
-                      as="h2"
-                      className="text-primary-800 text-lg leading-6 "
-                      passive
-                    >
-                      Enable encrypted storage with password protection
-                    </Switch.Label>
-                    <Switch.Description className="pt-2 text-sm text-gray-800">
-                      Enable password protection of your medical records. Will
-                      require you to provide a password before accessing any
-                      medical records.
-                    </Switch.Description>
-                  </div>
-                  <Switch
-                    checked={localConfig.use_encrypted_database}
-                    onChange={async () => {
-                      if (localConfig.use_encrypted_database === false) {
-                        // If we are enabling encrypted storage, we need to set a password
-                        setShowPasswordPromptModal(true);
-                      } else {
-                        setShowDecryptConfirmModal(true);
-                      }
-                    }}
+      <SettingsSection id="privacy-and-security" title="Privacy and Security">
+        <div ref={ref}>
+          <ul className="divide-y divide-gray-200">
+            <Switch.Group
+              id="encrypt_database"
+              as="li"
+              className="flex flex-col pb-4"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <Switch.Label
+                    as="h2"
+                    className="text-primary-800 text-lg leading-6 "
+                    passive
+                  >
+                    Enable encrypted storage with password protection
+                  </Switch.Label>
+                  <Switch.Description className="pt-2 text-sm text-gray-800">
+                    Enable password protection of your medical records. Will
+                    require you to provide a password before accessing any
+                    medical records.
+                  </Switch.Description>
+                </div>
+                <Switch
+                  checked={localConfig.use_encrypted_database}
+                  onChange={async () => {
+                    if (localConfig.use_encrypted_database === false) {
+                      // If we are enabling encrypted storage, we need to set a password
+                      setShowPasswordPromptModal(true);
+                    } else {
+                      setShowDecryptConfirmModal(true);
+                    }
+                  }}
+                  className={classNames(
+                    localConfig.use_encrypted_database
+                      ? 'bg-primary-500'
+                      : 'bg-gray-200',
+                    'focus:ring-primary-500 relative ml-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
                     className={classNames(
                       localConfig.use_encrypted_database
-                        ? 'bg-primary-500'
-                        : 'bg-gray-200',
-                      'focus:ring-primary-500 relative ml-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
+                        ? 'translate-x-5'
+                        : 'translate-x-0',
+                      'inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
                     )}
+                  />
+                </Switch>
+              </div>
+            </Switch.Group>
+            <Switch.Group id="use_proxy" as="li" className="flex flex-col py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <Switch.Label
+                    as="h2"
+                    className="text-primary-800 text-lg leading-6"
+                    passive
                   >
-                    <span
-                      aria-hidden="true"
-                      className={classNames(
-                        localConfig.use_encrypted_database
-                          ? 'translate-x-5'
-                          : 'translate-x-0',
-                        'inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                      )}
-                    />
-                  </Switch>
+                    Use proxy to sync data
+                  </Switch.Label>
+                  <Switch.Description className="pt-2 text-sm text-gray-800">
+                    Some patient portals cannot communicate directly with Mere.
+                    This option enables a seperate proxy service to handle login
+                    and sync for Mere. Disabling this setting will increase
+                    privacy but can break some connections.
+                  </Switch.Description>
+                  <Switch.Description className="pt-2 text-sm text-gray-800">
+                    You should only enable this if you trust the organization
+                    hosting the app, as the proxy will be able to access all
+                    your health data.
+                  </Switch.Description>
                 </div>
-              </Switch.Group>
-              <Switch.Group
-                id="use_proxy"
-                as="li"
-                className="flex flex-col py-4"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <Switch.Label
-                      as="h2"
-                      className="text-primary-800 text-lg leading-6"
-                      passive
-                    >
-                      Use proxy to sync data
-                    </Switch.Label>
-                    <Switch.Description className="pt-2 text-sm text-gray-800">
-                      Some patient portals cannot communicate directly with
-                      Mere. This option enables a seperate proxy service to
-                      handle login and sync for Mere. Disabling this setting
-                      will increase privacy but can break some connections.
-                    </Switch.Description>
-                    <Switch.Description className="pt-2 text-sm text-gray-800">
-                      You should only enable this if you trust the organization
-                      hosting the app, as the proxy will be able to access all
-                      your health data.
-                    </Switch.Description>
-                  </div>
-                  <Switch
-                    checked={userPreferences.use_proxy}
-                    onChange={() => {
-                      if (rawUserPreferences) {
-                        rawUserPreferences.update({
-                          $set: {
-                            use_proxy: !userPreferences.use_proxy,
-                          },
-                        });
-                      } else {
-                        db.user_preferences.insert({
-                          id: uuid4(),
-                          user_id: user?.id,
-                          use_proxy: false,
-                        });
-                      }
-                    }}
+                <Switch
+                  checked={userPreferences.use_proxy}
+                  onChange={() => {
+                    if (rawUserPreferences) {
+                      rawUserPreferences.update({
+                        $set: {
+                          use_proxy: !userPreferences.use_proxy,
+                        },
+                      });
+                    } else {
+                      db.user_preferences.insert({
+                        id: uuid4(),
+                        user_id: user?.id,
+                        use_proxy: false,
+                      });
+                    }
+                  }}
+                  className={classNames(
+                    userPreferences.use_proxy
+                      ? 'bg-primary-500'
+                      : 'bg-gray-200',
+                    'focus:ring-primary-500 relative ml-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
                     className={classNames(
                       userPreferences.use_proxy
-                        ? 'bg-primary-500'
-                        : 'bg-gray-200',
-                      'focus:ring-primary-500 relative ml-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
+                        ? 'translate-x-5'
+                        : 'translate-x-0',
+                      'inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
                     )}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={classNames(
-                        userPreferences.use_proxy
-                          ? 'translate-x-5'
-                          : 'translate-x-0',
-                        'inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                      )}
-                    />
-                  </Switch>
-                </div>
-              </Switch.Group>
-            </ul>
-          </div>
+                  />
+                </Switch>
+              </div>
+            </Switch.Group>
+          </ul>
         </div>
         <DatabasePasswordModal
           toggleModal={showPasswordPrompModal}
@@ -164,7 +158,7 @@ export function PrivacyAndSecuritySettingsGroup() {
           toggleModal={showDecryptConfirmModal}
           setToggleModal={setShowDecryptConfirmModal}
         />
-      </>
+      </SettingsSection>
     );
   }
 

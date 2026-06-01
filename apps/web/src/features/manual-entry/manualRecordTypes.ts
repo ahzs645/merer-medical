@@ -49,6 +49,7 @@ export type OptometryEntryKind =
   | 'iop'
   | 'diagnosis'
   | 'procedure'
+  | 'surgery'
   | 'imaging'
   | 'retail';
 export type EyeSide = 'OD' | 'OS' | 'OU';
@@ -249,6 +250,12 @@ export const optometryEntryTypes: Array<{
     title: 'Eye procedure',
   },
   {
+    value: 'surgery',
+    label: 'Eye surgery / refractive',
+    recordType: 'procedure',
+    title: 'Eye surgery',
+  },
+  {
     value: 'imaging',
     label: 'Eye image / device report',
     recordType: 'document',
@@ -260,6 +267,19 @@ export const optometryEntryTypes: Array<{
     recordType: 'document',
     title: 'Optical order',
   },
+];
+
+// Common refractive / ocular surgery types offered in the eye-surgery entry.
+export const optometrySurgeryTypes = [
+  'LASIK',
+  'SMILE (lenticule extraction)',
+  'PRK',
+  'LASEK / Epi-LASIK',
+  'Phakic IOL / ICL',
+  'Cataract surgery + IOL',
+  'Corneal cross-linking',
+  'YAG capsulotomy',
+  'Other eye surgery',
 ];
 
 export const toothSurfaces = ['M', 'O', 'I', 'D', 'B', 'F', 'L'];

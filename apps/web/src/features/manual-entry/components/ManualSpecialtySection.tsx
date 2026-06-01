@@ -1,4 +1,5 @@
 import { StylizedSelect } from '../../../shared/components/StylizedSelect';
+import { OptometrySurgeryFields } from './OptometrySurgeryFields';
 import {
   ManualTextInput as PrescriptionInput,
   SpecialtyTextInput,
@@ -505,6 +506,10 @@ export function ManualSpecialtySection({
                 onChange={setIopOs}
               />
             </div>
+          )}
+
+          {optometryEntryKind === 'surgery' && (
+            <OptometrySurgeryFields form={form} />
           )}
         </div>
       )}

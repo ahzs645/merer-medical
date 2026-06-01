@@ -1302,5 +1302,83 @@
       "lwt": 1779824031583
     },
     "_deleted": false
+  },
+  {
+    "id": "optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|Procedure/demo-lasik-2009",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "connection_record_id": "optometry-demo-connection",
+    "data_record": {
+      "raw": {
+        "resource": {
+          "resourceType": "Procedure",
+          "id": "demo-lasik-2009",
+          "status": "completed",
+          "category": [
+            {
+              "text": "Refractive eye surgery"
+            }
+          ],
+          "code": {
+            "text": "LASIK both eyes (femtosecond)",
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "414454004",
+                "display": "Laser in situ keratomileusis"
+              }
+            ]
+          },
+          "subject": {
+            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
+          },
+          "performedDateTime": "2009-09-22T15:00:00.000Z",
+          "bodySite": [
+            {
+              "text": "OU eyes"
+            }
+          ],
+          "performer": [
+            {
+              "actor": {
+                "display": "Dr. Alan Reyes, MD"
+              }
+            }
+          ],
+          "note": [
+            {
+              "text": "Bilateral femtosecond LASIK for moderate myopia. Pre-op manifest refraction OD -5.25 / OS -4.75. Flaps created with femtosecond laser, excimer ablation uneventful. UCVA 20/20 OU at one month. Mild myopic regression over subsequent years, now managed with progressive spectacles."
+            }
+          ]
+        }
+      },
+      "format": "FHIR.R4",
+      "content_type": "application/json",
+      "resource_type": "procedure",
+      "version_history": []
+    },
+    "metadata": {
+      "id": "Procedure/demo-lasik-2009",
+      "date": "2009-09-22T15:00:00.000Z",
+      "display_name": "LASIK both eyes (2009)",
+      "manual_specialty_details": {
+        "specialty": "optometry",
+        "subtype": "surgery",
+        "eyeSide": "OU",
+        "surgeryType": "LASIK",
+        "surgerySurgeon": "Dr. Alan Reyes, MD",
+        "laserPlatform": "Femto IntraLase FS · Excimer VISX Star S4",
+        "opticalZone": "6.5",
+        "ablationDepth": "78",
+        "flapThickness": "110",
+        "targetRefraction": "plano (emmetropia)",
+        "surgeryComplications": "None",
+        "surgeryOutcome": "UCVA 20/20 OU at 1 month",
+        "surgeryFollowUp": "1 day, 1 week, 1 month, 3 months"
+      }
+    },
+    "_meta": {
+      "lwt": 1779824031583
+    },
+    "_deleted": false
   }
 ]

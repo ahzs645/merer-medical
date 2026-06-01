@@ -4,6 +4,7 @@ import {
   ClipboardDocumentListIcon,
   EyeIcon,
   PlusIcon,
+  ScissorsIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
@@ -35,6 +36,7 @@ const QUICK_ADD_ITEMS: QuickAddItem[] = [
     primary: true,
   },
   { kind: 'checkup', label: 'Eye exam', icon: ClipboardDocumentListIcon },
+  { kind: 'surgery', label: 'Surgery', icon: ScissorsIcon },
   { kind: 'refraction', label: 'Refraction', icon: BeakerIcon },
   { kind: 'visualAcuity', label: 'Visual acuity', icon: EyeIcon },
   { kind: 'iop', label: 'IOP', icon: BeakerIcon },

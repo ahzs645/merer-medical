@@ -11,9 +11,13 @@ export function OcularRecordsPanel({
 }) {
   const timeline = records.filter(
     (record) =>
-      !['prescription', 'refraction', 'visualAcuity', 'iop'].includes(
-        record.kind,
-      ) && record.kind !== 'checkup',
+      ![
+        'prescription',
+        'refraction',
+        'visualAcuity',
+        'iop',
+        'surgery',
+      ].includes(record.kind) && record.kind !== 'checkup',
   );
 
   return (

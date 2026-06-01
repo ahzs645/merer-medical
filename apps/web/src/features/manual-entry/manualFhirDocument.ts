@@ -276,7 +276,10 @@ function buildManualFhirEntry(
         specialtyDetails?.specialty === 'dental' &&
         specialtyDetails.dentalProvider
           ? [{ display: specialtyDetails.dentalProvider }]
-          : undefined,
+          : specialtyDetails?.specialty === 'optometry' &&
+              specialtyDetails.surgerySurgeon
+            ? [{ display: specialtyDetails.surgerySurgeon }]
+            : undefined,
       lensSpecification:
         recordType === 'visionprescription'
           ? buildVisionLensSpecification(specialtyDetails)

@@ -2,6 +2,7 @@ import { useLocalConfig } from '../../../app/providers/LocalConfigProvider';
 import { useDeveloperLogs } from '../../../app/providers/DeveloperLogsProvider';
 import { Console } from 'console-feed';
 import { useConfig } from '../../../app/providers/AppConfigProvider';
+import { SettingsSection } from './SettingsSection';
 
 function isConfigured(value: string | undefined): boolean {
   return !!value && !value.startsWith('$');
@@ -42,8 +43,7 @@ export function DeveloperSettingsGroup() {
   }
 
   return (
-    <>
-      <div className="py-6 text-xl font-extrabold">Developer Settings</div>
+    <SettingsSection id="developer" title="Developer Settings">
       <div className="pb-2 text-lg font-bold">Build Settings</div>
       <div className="mb-4 rounded border border-gray-200 bg-gray-50 p-4">
         <table className="w-full text-sm">
@@ -127,7 +127,7 @@ export function DeveloperSettingsGroup() {
       >
         Throw error
       </button>
-    </>
+    </SettingsSection>
   );
 }
 const LogsContainer = () => {
