@@ -9,6 +9,10 @@ import {
 } from 'react';
 import { useRxDb } from './RxDbProvider';
 import { useNotificationDispatch } from './NotificationProvider';
+import {
+  getDataClient,
+  isDexieReposEnabled,
+} from '../../repositories/dexie-bridge';
 
 export interface AppConfig {
   ONPATIENT_CLIENT_ID?: string;
@@ -41,6 +45,21 @@ type AppConfigAction =
 const INSTANCE_CONFIG_ID = 'instance_config';
 
 const emptyConfig: AppConfig = {};
+const appConfigKeys = [
+  'ONPATIENT_CLIENT_ID',
+  'EPIC_CLIENT_ID',
+  'EPIC_CLIENT_ID_DSTU2',
+  'EPIC_CLIENT_ID_R4',
+  'EPIC_SANDBOX_CLIENT_ID',
+  'EPIC_SANDBOX_CLIENT_ID_DSTU2',
+  'EPIC_SANDBOX_CLIENT_ID_R4',
+  'CERNER_CLIENT_ID',
+  'VERADIGM_CLIENT_ID',
+  'VA_CLIENT_ID',
+  'HEALOW_CLIENT_ID',
+  'HEALOW_CONFIDENTIAL_MODE',
+  'PUBLIC_URL',
+] as const satisfies readonly (keyof AppConfig)[];
 
 const initialState: AppConfigState = {
   config: emptyConfig,
@@ -64,6 +83,29 @@ function configReducer(
     default:
       return state;
   }
+}
+
+function pickAppConfig(input: AppConfig): Record<string, string | boolean> {
+  const output: Record<string, string | boolean> = {};
+  for (const key of appConfigKeys) {
+    const value = input[key];
+    if (value !== undefined) output[key] = value;
+  }
+  return output;
+}
+
+function toAppConfig(
+  input: Record<string, string | boolean> | undefined,
+): AppConfig | null {
+  if (!input) return null;
+  const output: AppConfig = {};
+  for (const key of appConfigKeys) {
+    const value = input[key];
+    if (value !== undefined) {
+      (output as Record<string, string | boolean>)[key] = value;
+    }
+  }
+  return output;
 }
 
 const AppConfigContext = createContext<AppConfigState>(initialState);
@@ -109,6 +151,12 @@ export function AppConfigProvider({
   const saveConfigToDb = useCallback(
     async (configData: AppConfig) => {
       try {
+        if (isDexieReposEnabled()) {
+          await getDataClient().instanceConfig.update({
+            apiConfig: pickAppConfig(configData),
+          });
+          return;
+        }
         await db.instance_config.upsert({
           id: INSTANCE_CONFIG_ID,
           ...configData,
@@ -123,6 +171,10 @@ export function AppConfigProvider({
 
   const loadCachedConfig = useCallback(async (): Promise<AppConfig | null> => {
     try {
+      if (isDexieReposEnabled()) {
+        const cached = await getDataClient().instanceConfig.get();
+        return toAppConfig(cached?.apiConfig);
+      }
       const cached = await db.instance_config
         .findOne(INSTANCE_CONFIG_ID)
         .exec();

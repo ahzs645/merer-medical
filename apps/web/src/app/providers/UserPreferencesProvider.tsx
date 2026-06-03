@@ -2,7 +2,6 @@ import React, {
   PropsWithChildren,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 import { RxDatabase, RxDocument } from 'rxdb';
@@ -12,6 +11,13 @@ import { UserPreferencesDocument } from '../../models/user-preferences/UserPrefe
 import { useRxDb } from './RxDbProvider';
 import { DatabaseCollections } from './DatabaseCollections';
 import { useUser } from './UserProvider';
+import {
+  getDataClient,
+  isDexieReposEnabled,
+  userPrefsToDomain,
+  userPrefsToLegacy,
+  wrapAsRxDocument,
+} from '../../repositories/dexie-bridge';
 
 // Takes a user id and returns a default user preferences document
 function createDefaultPreferences(
@@ -100,6 +106,50 @@ function fetchUserPreferences(
     });
 }
 
+async function fetchDexieUserPreferences(
+  user_id: string,
+  handleChange: (item: UserPreferencesContextType | undefined) => void,
+): Promise<void> {
+  const client = getDataClient();
+  const prefs =
+    (await client.userPreferences.getForUser(user_id)) ??
+    (await client.userPreferences.upsert(user_id, { useProxy: false }));
+
+  const legacy = userPrefsToLegacy(prefs);
+  const rawUserPreferences = wrapAsRxDocument<UserPreferencesDocument>(legacy, {
+    async update(patch) {
+      const next = await client.userPreferences.upsert(
+        user_id,
+        userPrefsToDomain({ ...legacy, ...patch }),
+      );
+      const nextLegacy = userPrefsToLegacy(next);
+      handleChange({
+        userPreferences: nextLegacy,
+        rawUserPreferences:
+          rawUserPreferences as unknown as RxDocument<UserPreferencesDocument>,
+      });
+      return nextLegacy;
+    },
+    async remove() {
+      const next = await client.userPreferences.upsert(user_id, {
+        useProxy: false,
+      });
+      const nextLegacy = userPrefsToLegacy(next);
+      handleChange({
+        userPreferences: nextLegacy,
+        rawUserPreferences:
+          rawUserPreferences as unknown as RxDocument<UserPreferencesDocument>,
+      });
+    },
+  });
+
+  handleChange({
+    userPreferences: legacy,
+    rawUserPreferences:
+      rawUserPreferences as unknown as RxDocument<UserPreferencesDocument>,
+  });
+}
+
 type UserPreferencesProviderProps = PropsWithChildren<unknown>;
 
 type UserPreferencesContextType = {
@@ -128,22 +178,29 @@ export function UserPreferencesProvider(props: UserPreferencesProviderProps) {
     ),
     [rupContext, setRupContext] = useState<
       RxDocument<UserPreferencesDocument> | undefined
-    >(),
-    hasRun = useRef(false);
+    >();
 
   useEffect(() => {
     let sub: Subscription | undefined;
+    let didCancel = false;
 
-    if (!hasRun.current) {
-      hasRun.current = true;
+    const handleChange = (item: UserPreferencesContextType | undefined) => {
+      if (didCancel) return;
+      setUpContext(item?.userPreferences);
+      setRupContext(item?.rawUserPreferences);
+    };
+
+    if (isDexieReposEnabled()) {
+      void fetchDexieUserPreferences(user.id, handleChange);
+    } else {
       createUserPreferencesIfNone(db, user.id).then(() => {
-        sub = fetchUserPreferences(db, user.id, (item) => {
-          setUpContext(item?.userPreferences);
-          setRupContext(item?.rawUserPreferences);
-        });
+        if (didCancel) return;
+        sub = fetchUserPreferences(db, user.id, handleChange);
       });
     }
+
     return () => {
+      didCancel = true;
       sub?.unsubscribe();
     };
   }, [db, user.id]);

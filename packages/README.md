@@ -83,8 +83,9 @@ The Dexie store and the `.emrpkg` format don't care which mode you're in.
 ## Wiring into the existing app
 
 The three leaf repositories — `UserRepository`, `ConnectionRepository`, and
-`ClinicalDocumentRepository` (in `apps/web/src/repositories/`) — now branch
-on a runtime flag:
+`ClinicalDocumentRepository` (in `apps/web/src/repositories/`) — plus
+`UserPreferencesProvider` and `AppConfigProvider` now branch on a runtime
+flag:
 
 ```js
 // Enable
@@ -95,9 +96,11 @@ localStorage.removeItem('mere.useDexieRepos');
 ```
 
 When the flag is on, those three repositories delegate to a Dexie-backed
-`AppDataClient` via `apps/web/src/repositories/dexie-bridge/`. When off,
-they use the existing RxDB code path unchanged. Default is off, so the app
-behaves exactly as before until you opt in.
+`AppDataClient` via `apps/web/src/repositories/dexie-bridge/`, and user
+preferences and cached app config delegate to `AppDataClient.userPreferences`
+and `AppDataClient.instanceConfig`. When off, they use the existing RxDB code
+path unchanged. Default is off, so the app behaves exactly as before until
+you opt in.
 
 ### ⚠️ Split-brain warning
 

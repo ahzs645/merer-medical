@@ -881,6 +881,7 @@ export interface Attachment extends BaseRecord {
 }
 
 export interface InstanceConfig extends BaseRecord {
+  apiConfig?: Record<string, string | boolean>;
   experimental?: Record<string, boolean>;
   tutorialCompletedAt?: number;
   setupCompletedAt?: number;

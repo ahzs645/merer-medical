@@ -43,6 +43,8 @@ per logical group.
 | `apps/web/src/repositories/UserRepository.ts`             | Flag-gated; delegates to `AppDataClient.users`. |
 | `apps/web/src/repositories/ConnectionRepository.ts`       | Flag-gated; delegates to `AppDataClient.connections`. |
 | `apps/web/src/repositories/ClinicalDocumentRepository.ts` | Flag-gated; delegates to `AppDataClient.clinicalDocuments`. |
+| `apps/web/src/app/providers/UserPreferencesProvider.tsx`  | Flag-gated; delegates to `AppDataClient.userPreferences` while preserving the RxDocument-shaped update handle. |
+| `apps/web/src/app/providers/AppConfigProvider.tsx`        | Flag-gated; stores API/client config in `AppDataClient.instanceConfig.apiConfig`. |
 | `apps/web/src/features/settings/components/UserDataSettingsGroup.tsx` | New `.emrpkg` export/import row, always uses RxDB through `apps/web/src/services/emrpkg/`. |
 
 ### Not migrated (deliberately, for now)
@@ -61,8 +63,6 @@ per logical group.
 | `apps/web/src/features/summary/SummaryTab.tsx`                 | Direct `db.clinical_documents.find(...)` queries; read-only.        |
 | `apps/web/src/features/timeline/TimelineTab.tsx`               | Same shape as summary.                                              |
 | `apps/web/src/features/timeline/hooks/useRecordQuery.tsx`      | Pageable queries; needs `clinicalDocuments.observe` with cursors.   |
-| `apps/web/src/app/providers/AppConfigProvider.tsx`             | Stores arbitrary `AppConfig` fields directly on the row; `@mere/domain`'s `InstanceConfig` doesn't model them yet. |
-| `apps/web/src/app/providers/UserPreferencesProvider.tsx`       | Tractable; not done because it's not on the critical path.          |
 | `apps/web/src/features/ai-recommendations/services/USPSTFRecommendationsGenerator.tsx` | Uses `uspstf_recommendation_documents` collection not in `@mere/domain` yet. |
 | `apps/web/src/features/settings/components/PrivacyAndSecuritySettingsGroup.tsx` | Calls `db.remove()` to wipe the database — straightforward, just not done. |
 
