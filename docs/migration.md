@@ -19,10 +19,10 @@ localStorage.setItem('mere.useDexieRepos', 'true');
 localStorage.removeItem('mere.useDexieRepos');
 ```
 
-| Flag state    | Repositories hit  | Everything else hits  |
-| ------------- | ----------------- | --------------------- |
-| off (default) | RxDB              | RxDB                  |
-| on            | Dexie             | RxDB                  |
+| Flag state    | Repositories hit | Everything else hits |
+| ------------- | ---------------- | -------------------- |
+| off (default) | RxDB             | RxDB                 |
+| on            | Dexie            | RxDB                 |
 
 When on, **the two stores will drift** for any data that's written from a
 non-repository code path (FHIR sync, vectors, etc.). Use the flag only
@@ -38,33 +38,35 @@ per logical group.
 
 ### Done
 
-| Location                                                  | What changed                                 |
-| --------------------------------------------------------- | -------------------------------------------- |
-| `apps/web/src/repositories/UserRepository.ts`             | Flag-gated; delegates to `AppDataClient.users`. |
-| `apps/web/src/repositories/ConnectionRepository.ts`       | Flag-gated; delegates to `AppDataClient.connections`. |
-| `apps/web/src/repositories/ClinicalDocumentRepository.ts` | Flag-gated; delegates to `AppDataClient.clinicalDocuments`. |
-| `apps/web/src/app/providers/UserPreferencesProvider.tsx`  | Flag-gated; delegates to `AppDataClient.userPreferences` while preserving the RxDocument-shaped update handle. |
-| `apps/web/src/app/providers/AppConfigProvider.tsx`        | Flag-gated; stores API/client config in `AppDataClient.instanceConfig.apiConfig`. |
-| `apps/web/src/features/settings/components/UserDataSettingsGroup.tsx` | New `.emrpkg` export/import row, always uses RxDB through `apps/web/src/services/emrpkg/`. |
+| Location                                                              | What changed                                                                                                   |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/repositories/UserRepository.ts`                         | Flag-gated; delegates to `AppDataClient.users`.                                                                |
+| `apps/web/src/repositories/ConnectionRepository.ts`                   | Flag-gated; delegates to `AppDataClient.connections`.                                                          |
+| `apps/web/src/repositories/ClinicalDocumentRepository.ts`             | Flag-gated; delegates to `AppDataClient.clinicalDocuments`.                                                    |
+| `apps/web/src/app/providers/UserPreferencesProvider.tsx`              | Flag-gated; delegates to `AppDataClient.userPreferences` while preserving the RxDocument-shaped update handle. |
+| `apps/web/src/app/providers/AppConfigProvider.tsx`                    | Flag-gated; stores API/client config in `AppDataClient.instanceConfig.apiConfig`.                              |
+| `apps/web/src/features/summary/hooks/useSummaryPagePreferences.tsx`   | Flag-gated; delegates to `AppDataClient.summaryPagePreferences` and maps `pinned_labs` to `pinnedLabs`.        |
+| `apps/web/src/features/timeline/components/ObservationResultRow.tsx`  | Lab pinning creates/updates Dexie summary preferences when the Dexie flag is enabled.                          |
+| `apps/web/src/features/settings/components/UserDataSettingsGroup.tsx` | New `.emrpkg` export/import row, always uses RxDB through `apps/web/src/services/emrpkg/`.                     |
 
 ### Not migrated (deliberately, for now)
 
-| Location                                                       | Why it was skipped                                                  |
-| -------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `apps/web/src/services/fhir/Epic.ts`                           | ~1000 LOC, OAuth + ingestion. Requires live Epic sandbox to validate. |
-| `apps/web/src/services/fhir/Cerner.ts`                         | Same — needs live Cerner sandbox.                                   |
-| `apps/web/src/services/fhir/Veradigm.ts`                       | Same.                                                               |
-| `apps/web/src/services/fhir/Healow.ts`                         | Same.                                                               |
-| `apps/web/src/services/fhir/VA.ts`                             | Same.                                                               |
-| `apps/web/src/services/fhir/OnPatient.ts`                      | OnPatient is deprecated upstream — verify it still works first.     |
-| `apps/web/src/features/sync/SyncJobProvider.tsx`               | Orchestrates the above; migrate after them.                         |
-| `apps/web/src/features/vectors/providers/VectorStorageProvider.tsx` | Uses a `vector_storage` RxDB collection that isn't yet in `@mere/domain`. |
-| `apps/web/src/features/vectors/providers/VectorGeneratorSyncer.tsx` | Same dependency.                                                    |
-| `apps/web/src/features/summary/SummaryTab.tsx`                 | Direct `db.clinical_documents.find(...)` queries; read-only.        |
-| `apps/web/src/features/timeline/TimelineTab.tsx`               | Same shape as summary.                                              |
-| `apps/web/src/features/timeline/hooks/useRecordQuery.tsx`      | Pageable queries; needs `clinicalDocuments.observe` with cursors.   |
-| `apps/web/src/features/ai-recommendations/services/USPSTFRecommendationsGenerator.tsx` | Uses `uspstf_recommendation_documents` collection not in `@mere/domain` yet. |
-| `apps/web/src/features/settings/components/PrivacyAndSecuritySettingsGroup.tsx` | Calls `db.remove()` to wipe the database — straightforward, just not done. |
+| Location                                                                               | Why it was skipped                                                                                             |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/services/fhir/Epic.ts`                                                   | ~1000 LOC, OAuth + ingestion. Requires live Epic sandbox to validate.                                          |
+| `apps/web/src/services/fhir/Cerner.ts`                                                 | Same — needs live Cerner sandbox.                                                                              |
+| `apps/web/src/services/fhir/Veradigm.ts`                                               | Same.                                                                                                          |
+| `apps/web/src/services/fhir/Healow.ts`                                                 | Same.                                                                                                          |
+| `apps/web/src/services/fhir/VA.ts`                                                     | Same.                                                                                                          |
+| `apps/web/src/services/fhir/OnPatient.ts`                                              | OnPatient is deprecated upstream — verify it still works first.                                                |
+| `apps/web/src/features/sync/SyncJobProvider.tsx`                                       | Orchestrates the above; migrate after them.                                                                    |
+| `apps/web/src/features/vectors/providers/VectorStorageProvider.tsx`                    | Uses a `vector_storage` RxDB collection that isn't yet in `@mere/domain`.                                      |
+| `apps/web/src/features/vectors/providers/VectorGeneratorSyncer.tsx`                    | Same dependency.                                                                                               |
+| `apps/web/src/features/summary/SummaryTab.tsx`                                         | Direct `db.clinical_documents.find(...)` queries; read-only. Pinned preference helpers are partially migrated. |
+| `apps/web/src/features/timeline/TimelineTab.tsx`                                       | Same shape as summary.                                                                                         |
+| `apps/web/src/features/timeline/hooks/useRecordQuery.tsx`                              | Pageable queries; needs `clinicalDocuments.observe` with cursors.                                              |
+| `apps/web/src/features/ai-recommendations/services/USPSTFRecommendationsGenerator.tsx` | Uses `uspstf_recommendation_documents` collection not in `@mere/domain` yet.                                   |
+| `apps/web/src/features/settings/components/PrivacyAndSecuritySettingsGroup.tsx`        | Calls `db.remove()` to wipe the database — straightforward, just not done.                                     |
 
 ## Recommended ordering for the rest
 
@@ -116,3 +118,23 @@ If you flip the flag on while still using portal sync, expect:
 The split-brain unwinds itself once all the entries in the "Not migrated"
 table above are migrated. The flag is a tool for staged rollout, not a
 production toggle.
+
+## Default-Dexie rollout blockers
+
+To make Dexie the default for the online web app, finish these groups before
+flipping the storage mode:
+
+1. Add an app-level `AppDataProvider` and explicit storage-mode config
+   (`dexie`, `rxdb`, or a guarded legacy mode). Do not use
+   `mere.useDexieRepos` as the production selector.
+2. Route `.emrpkg` import/export through the active store, including a smart
+   RxDB-shaped package importer for Dexie.
+3. Port timeline, summary, labs, documents, medications, imaging, dental, and
+   optometry read surfaces to AppDataClient-backed queries.
+4. Port portal sync and FHIR services to accept `AppDataClient` or repository
+   interfaces instead of `RxDatabase`.
+5. Add AppDataClient coverage for remaining RxDB-only domains:
+   `vector_storage`, `uspstf_recommendation_documents`, `notifications`, and
+   `workflow_records`.
+6. Add a first-run RxDB-to-Dexie migration with rollback. Do not delete RxDB
+   data automatically in the first Dexie-default release.

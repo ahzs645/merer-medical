@@ -212,20 +212,21 @@ export function createDexieDataClient(
           .first()) ?? null
       );
     },
-    async upsert(userId, cards) {
+    async upsert(userId, patch) {
       const existing = await db.summary_page_preferences
         .where('userId')
         .equals(userId)
         .first();
       const t = now();
       const next: SummaryPagePreferences = existing
-        ? { ...existing, cards, updatedAt: t }
+        ? { ...existing, ...patch, userId, updatedAt: t }
         : {
             id: createId('sumpref'),
             createdAt: t,
             updatedAt: t,
             userId,
-            cards,
+            cards: patch.cards ?? [],
+            pinnedLabs: patch.pinnedLabs,
           };
       await db.summary_page_preferences.put(next);
       return next;

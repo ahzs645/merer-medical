@@ -30,6 +30,10 @@ import { useSummaryPagePreferences } from '../../summary/hooks/useSummaryPagePre
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
 import {
+  getDataClient,
+  isDexieReposEnabled,
+} from '../../../repositories/dexie-bridge';
+import {
   getReferenceRangeLow,
   getValueQuantity,
   getValueUnit,
@@ -564,6 +568,16 @@ function useLabPinning(
           setIsPinned(!isPinned);
         });
     } else {
+      if (isDexieReposEnabled()) {
+        getDataClient()
+          .summaryPagePreferences.upsert(user.id, {
+            pinnedLabs: updatedList.filter(Boolean) as string[],
+          })
+          .then(() => {
+            setIsPinned(!isPinned);
+          });
+        return;
+      }
       db.summary_page_preferences
         .insert({
           id: uuid4(),

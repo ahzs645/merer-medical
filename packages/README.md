@@ -27,11 +27,11 @@ UI → @mere/data (AppDataClient) → @mere/local-dexie  (today)
 
 ## Packages
 
-| Package              | Purpose                                                                                |
-| -------------------- | -------------------------------------------------------------------------------------- |
-| `@mere/domain`       | Entity types, zod schemas, app-level ID helpers. No runtime dependency on storage.     |
-| `@mere/data`         | The `AppDataClient` interface + a `createDataClient(mode)` factory + React hook stubs. |
-| `@mere/local-dexie`  | Dexie schema + `DexieDataClient` implementation + ZIP import/export with encryption.   |
+| Package             | Purpose                                                                                |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| `@mere/domain`      | Entity types, zod schemas, app-level ID helpers. No runtime dependency on storage.     |
+| `@mere/data`        | The `AppDataClient` interface + a `createDataClient(mode)` factory + React hook stubs. |
+| `@mere/local-dexie` | Dexie schema + `DexieDataClient` implementation + ZIP import/export with encryption.   |
 
 ## Conventions
 
@@ -98,9 +98,10 @@ localStorage.removeItem('mere.useDexieRepos');
 When the flag is on, those three repositories delegate to a Dexie-backed
 `AppDataClient` via `apps/web/src/repositories/dexie-bridge/`, and user
 preferences and cached app config delegate to `AppDataClient.userPreferences`
-and `AppDataClient.instanceConfig`. When off, they use the existing RxDB code
-path unchanged. Default is off, so the app behaves exactly as before until
-you opt in.
+and `AppDataClient.instanceConfig`. Summary page preferences also delegate to
+`AppDataClient.summaryPagePreferences` for the migrated pinned-labs path. When
+off, they use the existing RxDB code path unchanged. Default is off, so the app
+behaves exactly as before until you opt in.
 
 ### ⚠️ Split-brain warning
 
@@ -120,6 +121,11 @@ So the flag is still intended for development of the new Dexie store and
 the `.emrpkg` flow, not for making Dexie the default store yet. The vector
 pipeline is disabled while `mere.useDexieRepos` is enabled because it still
 depends on RxDB collections.
+
+Before Dexie becomes the default for the online app, add an explicit storage
+mode/provider and migrate the remaining direct RxDB readers, portal sync,
+active-store import/export, vectors, recommendations, notifications, and
+workflow records.
 
 ### .emrpkg in the Settings UI
 

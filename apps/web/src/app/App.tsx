@@ -49,6 +49,7 @@ import OnPatientRedirect from '../features/connections/oauth-callbacks/OnPatient
 import { OptometryTab } from '../features/optometry/OptometryTab';
 import { ProblemsTab } from '../features/problems/ProblemsTab';
 import { RecordsLayout } from '../features/records/RecordsLayout';
+import { ResultsTab } from '../features/results/ResultsTab';
 import SettingsTab from '../features/settings/SettingsTab';
 import { SharingTab } from '../features/sharing/SharingTab';
 import SummaryTab from '../features/summary/SummaryTab';
@@ -109,7 +110,11 @@ const routes = [
         children: [
           {
             index: true,
-            element: <Navigate to={AppRoutes.Labs} replace />,
+            element: <Navigate to={AppRoutes.Results} replace />,
+          },
+          {
+            path: 'results',
+            element: <ResultsTab />,
           },
           {
             path: 'labs',

@@ -1,8 +1,11 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Fragment, useState } from 'react';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 
+import { Dialog, Transition } from '@headlessui/react';
 import {
   Cog6ToothIcon,
   DocumentIcon,
+  EllipsisHorizontalIcon,
   NewspaperIcon,
   PlusCircleIcon,
   QueueListIcon,
@@ -22,6 +25,7 @@ import { CommandPalette } from './CommandPalette';
 export function TabWrapper() {
   const user = useUser(),
     { experimental__use_openai_rag } = useLocalConfig();
+  const [moreOpen, setMoreOpen] = useState(false);
 
   return (
     <div className="mobile-full-height flex min-h-0 flex-col max-w-[100vw] overflow-hidden md:flex-row-reverse">
@@ -59,30 +63,45 @@ export function TabWrapper() {
             title="Records"
             icon={<DocumentIcon />}
           />
-          <TabButton
-            route={AppRoutes.Utilities}
-            title="Utilities"
-            icon={<WrenchScrewdriverIcon />}
-          />
-          {experimental__use_openai_rag && (
+          <div className="hidden md:contents">
             <TabButton
-              route={AppRoutes.MereAIAssistant}
-              title="Mere Assistant"
-              smallTitle="Assistant"
-              icon={<SparklesIcon />}
+              route={AppRoutes.Utilities}
+              title="Utilities"
+              icon={<WrenchScrewdriverIcon />}
             />
+          </div>
+          {experimental__use_openai_rag && (
+            <div className="hidden md:contents">
+              <TabButton
+                route={AppRoutes.MereAIAssistant}
+                title="Mere Assistant"
+                smallTitle="Assistant"
+                icon={<SparklesIcon />}
+              />
+            </div>
           )}
-          <TabButton
-            route={AppRoutes.AddConnection}
-            title="Connections"
-            icon={<PlusCircleIcon />}
+          <div className="hidden md:contents">
+            <TabButton
+              route={AppRoutes.AddConnection}
+              title="Connections"
+              icon={<PlusCircleIcon />}
+            />
+          </div>
+          <div className="hidden md:contents">
+            <TabButton
+              route={AppRoutes.Settings}
+              title="Settings"
+              icon={<Cog6ToothIcon />}
+            />
+          </div>
+          <div className="hidden md:contents">
+            <NotificationCenter />
+          </div>
+          <MobileMoreButton
+            open={moreOpen}
+            setOpen={setMoreOpen}
+            showAssistant={!!experimental__use_openai_rag}
           />
-          <TabButton
-            route={AppRoutes.Settings}
-            title="Settings"
-            icon={<Cog6ToothIcon />}
-          />
-          <NotificationCenter />
           <div className="hidden md:block md:flex-1"></div>
           <div className="border-primary-700 hidden flex-shrink-0 border-t p-4 md:block">
             <div className="group block flex-shrink-0">
@@ -123,5 +142,155 @@ export function TabWrapper() {
         </div>
       </div>
     </div>
+  );
+}
+
+function MobileMoreButton({
+  open,
+  setOpen,
+  showAssistant,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  showAssistant: boolean;
+}) {
+  const location = useLocation();
+  const moreRoutes = [
+    AppRoutes.Utilities,
+    AppRoutes.MereAIAssistant,
+    AppRoutes.AddConnection,
+    AppRoutes.Settings,
+  ];
+  const isActive = moreRoutes.some((route) =>
+    route === AppRoutes.Utilities
+      ? location.pathname.startsWith(AppRoutes.Utilities)
+      : location.pathname === route,
+  );
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className={`flex w-24 flex-col items-center justify-center p-2 text-white duration-75 active:scale-90 sm:active:scale-95 md:hidden ${
+          isActive ? 'bg-gray-0 border-primary border-t-2' : ''
+        }`}
+        aria-label="More navigation"
+      >
+        <span
+          className={`h-5 w-5 text-base ${
+            isActive ? 'text-primary font-bold' : 'text-slate-800'
+          }`}
+        >
+          <EllipsisHorizontalIcon />
+        </span>
+        <span
+          className={`pt-1 text-[11px] ${
+            isActive ? 'text-primary font-bold' : 'text-slate-800'
+          }`}
+        >
+          More
+        </span>
+      </button>
+
+      <Transition.Root show={open} as={Fragment}>
+        <Dialog as="div" className="relative z-40 md:hidden" onClose={setOpen}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-200"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-150"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/30" />
+          </Transition.Child>
+
+          <div className="fixed inset-x-0 bottom-0 z-40">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-200"
+              enterFrom="translate-y-full"
+              enterTo="translate-y-0"
+              leave="ease-in duration-150"
+              leaveFrom="translate-y-0"
+              leaveTo="translate-y-full"
+            >
+              <Dialog.Panel className="pb-safe rounded-t-xl bg-white shadow-xl">
+                <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-gray-300" />
+                <Dialog.Title className="px-4 pb-2 pt-4 text-sm font-semibold text-gray-900">
+                  More
+                </Dialog.Title>
+                <div className="grid grid-cols-2 gap-2 px-3 pb-3">
+                  <MobileMoreLink
+                    route={AppRoutes.Utilities}
+                    title="Utilities"
+                    icon={<WrenchScrewdriverIcon />}
+                    onClick={() => setOpen(false)}
+                  />
+                  {showAssistant && (
+                    <MobileMoreLink
+                      route={AppRoutes.MereAIAssistant}
+                      title="Assistant"
+                      icon={<SparklesIcon />}
+                      onClick={() => setOpen(false)}
+                    />
+                  )}
+                  <MobileMoreLink
+                    route={AppRoutes.AddConnection}
+                    title="Connections"
+                    icon={<PlusCircleIcon />}
+                    onClick={() => setOpen(false)}
+                  />
+                  <MobileMoreLink
+                    route={AppRoutes.Settings}
+                    title="Settings"
+                    icon={<Cog6ToothIcon />}
+                    onClick={() => setOpen(false)}
+                  />
+                  <div className="col-span-2 [&>button]:w-full [&>button]:rounded-lg [&>button]:border [&>button]:border-gray-200 [&>button]:bg-gray-50 [&>button]:p-3 [&>button]:text-slate-800">
+                    <NotificationCenter />
+                  </div>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </Dialog>
+      </Transition.Root>
+    </>
+  );
+}
+
+function MobileMoreLink({
+  route,
+  title,
+  icon,
+  onClick,
+}: {
+  route: AppRoutes;
+  title: string;
+  icon: JSX.Element;
+  onClick: () => void;
+}) {
+  const location = useLocation();
+  const isActive =
+    route === AppRoutes.Utilities
+      ? location.pathname.startsWith(AppRoutes.Utilities)
+      : location.pathname === route;
+
+  return (
+    <Link
+      to={route}
+      onClick={onClick}
+      className={`flex items-center gap-3 rounded-lg border p-3 text-sm font-semibold ${
+        isActive
+          ? 'border-primary bg-primary-50 text-primary'
+          : 'border-gray-200 bg-gray-50 text-slate-800'
+      }`}
+    >
+      <span className="h-5 w-5 flex-shrink-0">{icon}</span>
+      <span className="min-w-0 truncate">{title}</span>
+    </Link>
   );
 }

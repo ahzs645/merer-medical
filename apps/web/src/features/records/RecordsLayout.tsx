@@ -18,6 +18,7 @@ import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvi
 import { Routes as AppRoutes } from '../../Routes';
 
 const recordTabs = [
+  { to: AppRoutes.Results, label: 'Results', icon: DocumentTextIcon },
   { to: AppRoutes.Labs, label: 'Labs', icon: BeakerIcon },
   { to: AppRoutes.Documents, label: 'Documents', icon: DocumentTextIcon },
   { to: AppRoutes.Imaging, label: 'Imaging', icon: PhotoIcon },

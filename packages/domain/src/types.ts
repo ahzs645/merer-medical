@@ -893,6 +893,7 @@ export interface InstanceConfig extends BaseRecord {
 
 export interface SummaryPagePreferences extends BaseRecord {
   userId: AppId;
+  pinnedLabs?: AppId[];
   cards: Array<{ id: string; visible: boolean; order: number }>;
 }
 

@@ -222,7 +222,9 @@ export interface ClinicalDemoCommands {
   ): Promise<DentalToothConditionRecord[]>;
   listPerioExams(dentalPatientProfileId: AppId): Promise<DentalPerioExam[]>;
   upsertPerioExams(
-    rows: Array<Omit<DentalPerioExam, 'createdAt' | 'updatedAt'> & { id?: AppId }>,
+    rows: Array<
+      Omit<DentalPerioExam, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
   ): Promise<DentalPerioExam[]>;
   listTreatmentPlans(
     dentalPatientProfileId: AppId,
@@ -248,7 +250,9 @@ export interface ClinicalDemoCommands {
   ): Promise<DentalImagingRecord[]>;
   listLabCases(dentalPatientProfileId: AppId): Promise<DentalLabCase[]>;
   upsertLabCases(
-    rows: Array<Omit<DentalLabCase, 'createdAt' | 'updatedAt'> & { id?: AppId }>,
+    rows: Array<
+      Omit<DentalLabCase, 'createdAt' | 'updatedAt'> & { id?: AppId }
+    >,
   ): Promise<DentalLabCase[]>;
   listFormRecords(q?: ClinicalDemoQuery): Promise<DentalFormRecord[]>;
   upsertFormRecords(
@@ -283,7 +287,7 @@ export interface SummaryPagePreferencesCommands {
   getForUser(userId: AppId): Promise<SummaryPagePreferences | null>;
   upsert(
     userId: AppId,
-    cards: SummaryPagePreferences['cards'],
+    patch: Partial<Omit<SummaryPagePreferences, 'id' | 'userId' | 'createdAt'>>,
   ): Promise<SummaryPagePreferences>;
 }
 

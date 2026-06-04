@@ -823,6 +823,7 @@ export const attachmentSchema = z.object({
 
 export const instanceConfigSchema = z.object({
   ...base,
+  apiConfig: z.record(z.union([z.string(), z.boolean()])).optional(),
   experimental: z.record(z.boolean()).optional(),
   tutorialCompletedAt: z.number().int().optional(),
   setupCompletedAt: z.number().int().optional(),
@@ -837,6 +838,7 @@ export const instanceConfigSchema = z.object({
 export const summaryPagePreferencesSchema = z.object({
   ...base,
   userId: z.string(),
+  pinnedLabs: z.array(z.string()).optional(),
   cards: z.array(
     z.object({
       id: z.string(),

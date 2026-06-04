@@ -46,6 +46,7 @@ import { useLocalConfig } from '../../app/providers/LocalConfigProvider';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { Link } from 'react-router-dom';
 import { Routes as AppRoutes } from '../../Routes';
+import { RecentResultsSummaryCard } from '../results/components/RecentResultsSummaryCard';
 
 function fetchMedications(
   db: RxDatabase<DatabaseCollections>,
@@ -537,6 +538,7 @@ function SummaryTab() {
           allergyCount={allergy.length}
           pinnedCount={pinned.length}
         />
+        <RecentResultsSummaryCard />
         {sortedCards.map((card) => {
           if (!card.is_visible) return null;
           switch (card.type) {
