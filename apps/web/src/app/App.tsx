@@ -22,6 +22,7 @@ import { UserProvider } from '../app/providers/UserProvider';
 import { InterfaceLanguageProvider } from '../app/providers/InterfaceLanguageProvider';
 import VectorProvider from '../features/vectors';
 import { AppConfigProvider } from '../app/providers/AppConfigProvider';
+import { AppDataProvider } from '../app/providers/AppDataProvider';
 import { TabWrapper } from '../shared/components/TabWrapper';
 import { TutorialOverlay } from '../features/tutorial/TutorialOverlay';
 import { AuditLogTab } from '../features/audit/AuditLogTab';
@@ -49,7 +50,6 @@ import OnPatientRedirect from '../features/connections/oauth-callbacks/OnPatient
 import { OptometryTab } from '../features/optometry/OptometryTab';
 import { ProblemsTab } from '../features/problems/ProblemsTab';
 import { RecordsLayout } from '../features/records/RecordsLayout';
-import { ResultsTab } from '../features/results/ResultsTab';
 import SettingsTab from '../features/settings/SettingsTab';
 import { SharingTab } from '../features/sharing/SharingTab';
 import SummaryTab from '../features/summary/SummaryTab';
@@ -73,20 +73,22 @@ export default function App() {
             <NotificationProvider>
               <UpdateAppChecker />
               <RxDbProvider>
-                <AppConfigProvider>
-                  <UserProvider>
-                    <VectorProvider>
-                      <UserPreferencesProvider>
-                        <InterfaceLanguageProvider>
-                          <SyncJobProvider>
-                            {!isDemoMode() && <TutorialOverlay />}
-                            <RouterProvider router={router} />
-                          </SyncJobProvider>
-                        </InterfaceLanguageProvider>
-                      </UserPreferencesProvider>
-                    </VectorProvider>
-                  </UserProvider>
-                </AppConfigProvider>
+                <AppDataProvider>
+                  <AppConfigProvider>
+                    <UserProvider>
+                      <VectorProvider>
+                        <UserPreferencesProvider>
+                          <InterfaceLanguageProvider>
+                            <SyncJobProvider>
+                              {!isDemoMode() && <TutorialOverlay />}
+                              <RouterProvider router={router} />
+                            </SyncJobProvider>
+                          </InterfaceLanguageProvider>
+                        </UserPreferencesProvider>
+                      </VectorProvider>
+                    </UserProvider>
+                  </AppConfigProvider>
+                </AppDataProvider>
               </RxDbProvider>
             </NotificationProvider>
           </TutorialConfigProvider>
@@ -110,11 +112,7 @@ const routes = [
         children: [
           {
             index: true,
-            element: <Navigate to={AppRoutes.Results} replace />,
-          },
-          {
-            path: 'results',
-            element: <ResultsTab />,
+            element: <Navigate to={AppRoutes.Labs} replace />,
           },
           {
             path: 'labs',

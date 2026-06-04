@@ -5,11 +5,19 @@ store with a `@mere/data` `AppDataClient` interface in front, so the
 storage layer can be swapped for Convex later without touching the UI.
 This doc tracks where we are.
 
-## Feature flag
+## Storage backend selector
 
-The migration is gated on a runtime flag in `localStorage`. The flag is
-read on every repository call, so toggling it takes effect immediately for
-new operations.
+The migration is gated by an explicit storage backend selector. The default is
+still `rxdb`. Set `VITE_MERE_STORAGE_BACKEND=dexie` at build time, or set the
+runtime development override:
+
+```js
+localStorage.setItem('mere.storageBackend', 'dexie');
+localStorage.setItem('mere.storageBackend', 'rxdb');
+localStorage.removeItem('mere.storageBackend');
+```
+
+The older repository-only flag is still supported as a development shortcut:
 
 ```js
 // Enable
@@ -24,12 +32,13 @@ localStorage.removeItem('mere.useDexieRepos');
 | off (default) | RxDB             | RxDB                 |
 | on            | Dexie            | RxDB                 |
 
-When on, **the two stores will drift** for any data that's written from a
-non-repository code path (FHIR sync, vectors, etc.). Use the flag only
-when you're not exercising portal sync or vectors in the same session.
+When Dexie mode is on, **the two stores will drift** for any data that's
+written from a non-repository code path (FHIR sync, vectors, etc.). Use Dexie
+mode only when you're not exercising portal sync or vectors in the same
+session.
 
-The flag constant is exported as `DEXIE_REPOS_FLAG` from
-`apps/web/src/repositories/dexie-bridge/`.
+The selector constants are exported as `STORAGE_BACKEND_KEY` and
+`DEXIE_REPOS_FLAG` from `apps/web/src/repositories/dexie-bridge/`.
 
 ## Status by call site
 

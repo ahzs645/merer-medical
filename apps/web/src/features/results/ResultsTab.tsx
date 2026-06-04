@@ -26,6 +26,16 @@ const defaultOverlayModes: ReferenceOverlayMode[] = ['canadian'];
 
 export function ResultsTab() {
   const { t } = useInterfaceLanguage();
+
+  return (
+    <AppPage banner={<GenericBanner text={t('Results')} />}>
+      <ResultsHubContent />
+    </AppPage>
+  );
+}
+
+export function ResultsHubContent({ className = '' }: { className?: string }) {
+  const { t } = useInterfaceLanguage();
   const [referenceMode, setReferenceMode] =
     useState<ReferenceOverlayMode>('canadian');
   const [enabledOverlayModes, setEnabledOverlayModes] =
@@ -52,8 +62,21 @@ export function ResultsTab() {
   }, [groups]);
 
   return (
-    <AppPage banner={<GenericBanner text={t('Results')} />}>
-      <div className="mx-auto flex h-full max-w-7xl flex-col gap-4 overflow-hidden px-3 py-4 sm:px-6 lg:px-8">
+    <section
+      className={`col-span-6 flex min-h-[42rem] flex-col gap-4 rounded-md bg-gray-50 p-4 shadow-sm ring-1 ring-gray-200 ${className}`}
+    >
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {t('Results')}
+          </h2>
+          <p className="text-sm text-gray-600">
+            {t('Labs, imaging, reports, and linked result documents.')}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex min-h-0 flex-1 flex-col gap-4">
         <div className="grid gap-3 sm:grid-cols-4">
           <MetricCard label="Total results" value={totals.total} />
           <MetricCard label="Labs" value={totals.labs} />
@@ -103,7 +126,7 @@ export function ResultsTab() {
           </section>
         </div>
       </div>
-    </AppPage>
+    </section>
   );
 }
 

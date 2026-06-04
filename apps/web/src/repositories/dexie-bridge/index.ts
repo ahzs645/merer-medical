@@ -12,16 +12,21 @@
  * RxDB directly via `db.connection_documents.find(...)` etc. — they do NOT
  * go through the repositories.
  *
- * When the Dexie bridge is enabled, writes from the repositories land in
- * Dexie but writes from those non-repo code paths still land in RxDB. The
- * two stores will drift. Use this flag only in development or in a
- * disconnected app build where portal sync is disabled.
+ * When Dexie mode is enabled, writes from the repositories land in Dexie but
+ * writes from those non-repo code paths still land in RxDB. The two stores
+ * will drift. Use Dexie mode only in development or in a disconnected app
+ * build where portal sync is disabled.
  *
- * Enable at runtime:    localStorage.setItem('mere.useDexieRepos', 'true')
- * Disable at runtime:   localStorage.removeItem('mere.useDexieRepos')
+ * Preferred runtime override:
+ *   localStorage.setItem('mere.storageBackend', 'dexie')
+ *   localStorage.setItem('mere.storageBackend', 'rxdb')
  *
- * The flag is read on every repository call, so flipping it takes effect
- * for new operations immediately. Any RxDocument-shim already handed out
+ * Legacy repository-only shortcut:
+ *   localStorage.setItem('mere.useDexieRepos', 'true')
+ *   localStorage.removeItem('mere.useDexieRepos')
+ *
+ * The storage backend is read on every repository call, so flipping it takes
+ * effect for new operations immediately. Any RxDocument-shim already handed out
  * keeps acting on whichever store created it.
  */
 
@@ -31,6 +36,9 @@ import { createDexieDataClient, getDb, type MereDb } from '@mere/local-dexie';
 import type { AppDataClient } from '@mere/data';
 
 export const DEXIE_REPOS_FLAG = 'mere.useDexieRepos';
+export const STORAGE_BACKEND_KEY = 'mere.storageBackend';
+
+export type StorageBackend = 'rxdb' | 'dexie';
 
 let _client: AppDataClient | null = null;
 
@@ -45,13 +53,36 @@ export function getRawDb(): MereDb {
   return getDb('mere');
 }
 
-export function isDexieReposEnabled(): boolean {
-  if (typeof globalThis.localStorage === 'undefined') return false;
+function isStorageBackend(value: unknown): value is StorageBackend {
+  return value === 'rxdb' || value === 'dexie';
+}
+
+function getLocalStorageItem(key: string): string | null {
+  if (typeof globalThis.localStorage === 'undefined') return null;
   try {
-    return globalThis.localStorage.getItem(DEXIE_REPOS_FLAG) === 'true';
+    return globalThis.localStorage.getItem(key);
   } catch {
-    return false;
+    return null;
   }
+}
+
+export function getStorageBackend(): StorageBackend {
+  const localBackend = getLocalStorageItem(STORAGE_BACKEND_KEY);
+  if (isStorageBackend(localBackend)) return localBackend;
+
+  if (getLocalStorageItem(DEXIE_REPOS_FLAG) === 'true') return 'dexie';
+
+  const configuredBackend =
+    typeof globalThis.MERE_STORAGE_BACKEND === 'string'
+      ? globalThis.MERE_STORAGE_BACKEND
+      : undefined;
+  if (isStorageBackend(configuredBackend)) return configuredBackend;
+
+  return 'rxdb';
+}
+
+export function isDexieReposEnabled(): boolean {
+  return getStorageBackend() === 'dexie';
 }
 
 /**

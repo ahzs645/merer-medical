@@ -84,18 +84,25 @@ The Dexie store and the `.emrpkg` format don't care which mode you're in.
 
 The three leaf repositories — `UserRepository`, `ConnectionRepository`, and
 `ClinicalDocumentRepository` (in `apps/web/src/repositories/`) — plus
-`UserPreferencesProvider` and `AppConfigProvider` now branch on a runtime
-flag:
+`UserPreferencesProvider` and `AppConfigProvider` now branch on the configured
+storage backend. The app default is still `rxdb`; set
+`VITE_MERE_STORAGE_BACKEND=dexie` at build time or use the local development
+override:
 
 ```js
-// Enable
-localStorage.setItem('mere.useDexieRepos', 'true');
+localStorage.setItem('mere.storageBackend', 'dexie');
+localStorage.setItem('mere.storageBackend', 'rxdb');
+localStorage.removeItem('mere.storageBackend');
+```
 
-// Disable
+The older repository-only flag is still supported as a shortcut:
+
+```js
+localStorage.setItem('mere.useDexieRepos', 'true');
 localStorage.removeItem('mere.useDexieRepos');
 ```
 
-When the flag is on, those three repositories delegate to a Dexie-backed
+When Dexie mode is on, those three repositories delegate to a Dexie-backed
 `AppDataClient` via `apps/web/src/repositories/dexie-bridge/`, and user
 preferences and cached app config delegate to `AppDataClient.userPreferences`
 and `AppDataClient.instanceConfig`. Summary page preferences also delegate to
@@ -105,7 +112,7 @@ behaves exactly as before until you opt in.
 
 ### ⚠️ Split-brain warning
 
-Some app flows still do NOT go through the repositories. With the flag on:
+Some app flows still do NOT go through the repositories. With Dexie mode on:
 
 - Reads/writes through the migrated repositories hit **Dexie**.
 - FHIR sync writes clinical documents through `ClinicalDocumentRepository`,

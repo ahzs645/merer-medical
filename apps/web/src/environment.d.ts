@@ -12,6 +12,7 @@ declare global {
   }
   var MERE_APP_VERSION: string;
   var IS_DEMO: string;
+  var MERE_STORAGE_BACKEND: 'rxdb' | 'dexie' | string;
 }
 
 export {};

@@ -124,6 +124,9 @@ export default defineConfig(({ command, mode }) => {
       global: 'globalThis',
       MERE_APP_VERSION: JSON.stringify(getAppVersion()),
       IS_DEMO: JSON.stringify(process.env['IS_DEMO'] || 'disabled'),
+      MERE_STORAGE_BACKEND: JSON.stringify(
+        process.env['VITE_MERE_STORAGE_BACKEND'] || 'rxdb',
+      ),
       'process.env.NODE_ENV': JSON.stringify(
         isProduction ? 'production' : 'development',
       ),
