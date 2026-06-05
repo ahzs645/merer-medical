@@ -625,6 +625,104 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
       'Adult pneumococcal PCV15 plus PPSV23 targets adult dose slots and completes the pneumococcal series.',
     testId: 'assertPneumococcalAdultPcv15AndPpsv23CompletesSeries',
   },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PCV21 or PCV20 and a PPSV23 are both administered for dose 1 of the Adult series on the same day, evaluate the PCV21 or PCV20 first',
+    behavior:
+      'Pneumococcal same-day duplicate handling prioritizes adult PCV20/PCV21 over PPSV23 and marks the lower-priority same-day shot duplicate.',
+    testId: 'assertPneumococcalAdultSameDayPcv20PreferredOverPpsv23',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PPSV23 and a PCV15, PCV13, PCV10 or PCV7 are both administered for dose 1 of the Adult series on the same day, evaluate the PPSV23 first',
+    behavior:
+      'Pneumococcal same-day duplicate handling prioritizes adult PPSV23 over lower-priority PCV15/13/10/7 products.',
+    testId: 'assertPneumococcalAdultSameDayPpsv23PreferredOverPcv15',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PCV21 and and other vaccine are both administered on the same day in the Adult series, evaluate the PCV21 first',
+    behavior:
+      'Pneumococcal same-day duplicate handling prioritizes PCV21 over other same-day adult pneumococcal products.',
+    testId: 'assertPneumococcalAdultSameDayPcv21Preferred',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PCV20 and and other vaccines (except PCV21) are both administered on the same day in the Adult series, evaluate the PCV20 first',
+    behavior:
+      'Pneumococcal same-day duplicate handling prioritizes PCV20 over same-day adult pneumococcal products except PCV21.',
+    testId: 'assertPneumococcalAdultSameDayPcv20PreferredOverPpsv23',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PCV15 and PCV13, PCV10 or PCV7 are both administered on the same day in the Adult series, evaluate the PCV15 first',
+    behavior:
+      'Pneumococcal same-day duplicate handling prioritizes PCV15 over same-day PCV13/10/7 products.',
+    testId: 'assertPneumococcalAdultSameDayPcv15PreferredOverPcv13',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PCV21 dose and PCV20, PPSV23, PCV15, PCV13, PCV10 or PCV7 are administered on the same day and the series is not complete, mark the PCV20 Invalid / Duplicate Shot (removing any other evaluations/reasons for that shot)',
+    behavior:
+      'Pneumococcal same-day duplicate handling invalidates the lower-priority PCV20 competitor when PCV21 is administered on the same day.',
+    testId: 'assertPneumococcalAdultSameDayPcv21Preferred',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PCV20 dose and a PPSV23, PCV15, PCV13, PCV10 or PCV7 is administered on the same day and the series is not complete, mark the PPSV23 as Invalid / Duplicate Shot (removing any other evaluations/reasons for that shot)',
+    behavior:
+      'Pneumococcal same-day duplicate handling invalidates lower-priority same-day competitors when PCV20 is preferred.',
+    testId: 'assertPneumococcalAdultSameDayPcv20PreferredOverPpsv23',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PPSV23 dose and a PCV15, PCV13, PCV10 or PCV7 is administered on the same day and the series is not complete, mark the PCV15, PCV13, PCV10 or PCV7 as Invalid / Duplicate Shot (removing any other evaluations/reasons for that shot)',
+    behavior:
+      'Pneumococcal same-day duplicate handling invalidates lower-priority same-day PCV15/13/10/7 competitors when adult PPSV23 is preferred.',
+    testId: 'assertPneumococcalAdultSameDayPpsv23PreferredOverPcv15',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PCV15 dose and a PCV13, PCV10 or PCV7 are administered on the same day and the series is not complete, mark the PCV13, PCV10 or PCV7 as Invalid / Duplicate Shot (removing any other evaluations/reasons for that shot)',
+    behavior:
+      'Pneumococcal same-day duplicate handling invalidates lower-priority same-day PCV13/10/7 competitors when PCV15 is preferred.',
+    testId: 'assertPneumococcalAdultSameDayPcv15PreferredOverPcv13',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PCV13 dose and a PCV10 are administered on the same day and the series is not complete, mark the PCV10 as Invalid / Duplicate Shot (removing any other evaluations/reasons for that shot)',
+    behavior:
+      'Pneumococcal same-day duplicate handling prioritizes PCV13 over same-day PCV10 and marks PCV10 duplicate.',
+    testId: 'assertPneumococcalSameDayPcv13PreferredOverPcv10',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PCV13 and PCV7 and shot administered >= 6/1/2010, then evaluate PCV13 as Valid and PCV7 as Invalid/Duplicate',
+    behavior:
+      'Pneumococcal same-day duplicate handling prefers PCV13 over PCV7 on or after the June 1, 2010 cutoff.',
+    testId: 'assertPneumococcalChildSameDayPcv13PreferredOverPcv7After2010',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PCV13 and PCV7 and shot administered < 6/1/2010, then evaluate PCV7 as Valid and PCV13 as Invalid/Duplicate',
+    behavior:
+      'Pneumococcal same-day duplicate handling prefers PCV7 over PCV13 before the June 1, 2010 cutoff.',
+    testId: 'assertPneumococcalChildSameDayPcv7PreferredOverPcv13Before2010',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PCV10 and PCV7 and shot administered >= 3/31/2009, then evaluate the PCV10 as Valid and the PCV7 as Invalid/Duplicate',
+    behavior:
+      'Pneumococcal same-day duplicate handling prefers PCV10 over PCV7 on or after the March 31, 2009 cutoff.',
+    testId: 'assertPneumococcalChildSameDayPcv10PreferredOverPcv7After2009',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day Pneumococcal Rule: If PCV10 and PCV7 and shot administered < 3/31/2009, then evaluate the PCV7 as Valid and the PCV10 as Invalid/Duplicate',
+    behavior:
+      'Pneumococcal same-day duplicate handling prefers PCV7 over PCV10 before the March 31, 2009 cutoff.',
+    testId: 'assertPneumococcalChildSameDayPcv7PreferredOverPcv10Before2009',
+  },
   ...[
     'Pneumococcal Adult Series: Exception 4: Set Series Dose Number to 6 (AdultSeries) if No Shots Administered and Patient >= 5y of Age at Execution Date',
     'Pneumococcal Child Series: Exception 4: Skip Dose Number to 6 (Adult Series) for Patient >= 5y at Shot Date',
@@ -758,6 +856,133 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
       'Pneumococcal child catch-up dose targeting and milestone recommendation dates are handled by pneumococcal-specific TypeScript forecast and evaluation hooks.',
     testId: 'ice-pneumococcal-rules',
   })),
+  {
+    ruleName:
+      'Pnuemo Adult Special Recommendation Rule #1: If a patient >= 50 years of age, has not completed the series, has >= 1 dose of PCV13 administered at any age, and there are no PPSV23, PCV15, PCV20, or PCV21 shots dose on record, and there is a recommendation date for the next target dose, recommend at the vaccine group level with recommendation reason code ADMINISTER_PCV20_OR_PCV21',
+    behavior:
+      'Pneumococcal adult PCV13-only histories at age 50 or older recommend at the vaccine-group level with ADMINISTER_PCV20_OR_PCV21.',
+    testId: 'assertPneumococcalAdultPcv13OnlyRecommendsPcv20OrPcv21',
+  },
+  {
+    ruleName:
+      'Pneumo Adult Special Recommendation Rule #2: If a patient >= 50y years of age, has not completed the series, has >= 1 dose of PCV13 administered at any age, >= 1 dose of PPSV23 administered at < 65 years of age, and there are no PCV15, PCV20, or PCV21 shots dose on record, and there is a recommendation date for the next target dose, recommend at the vaccine group level with recommendation reason code ADMINISTER_PCV20_OR_PCV21.',
+    behavior:
+      'Pneumococcal adult PCV13 plus PPSV23-before-65 histories at age 50 or older recommend at the vaccine-group level with ADMINISTER_PCV20_OR_PCV21.',
+    testId: 'assertPneumococcalAdultPcv13OnlyRecommendsPcv20OrPcv21',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: If a patient >= 65 years of age, has completed the series with >= 1 dose of PCV13 administered at any age, and >= 1 dose of PPSV23 administered >=65 years of age, and there are no PCV15, PCV20, or PCV21 shots on record, recommendation is Conditional with reason codes COMPLETE, CLINICAL_PATIENT_DISCRETION, and SUPPLEMENTAL_TEXT.',
+    behavior:
+      'Pneumococcal adult PCV13 plus PPSV23 at age 65 or later returns a conditional complete recommendation with clinical-discretion and supplemental-text reasons.',
+    testId: 'assertPneumococcalAdultPcv13Ppsv23At65ConditionalCompleteRecommendation',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult(PCV-PPSV Series): If no adult doses have been administered and Special Recommendation Rule 1 & Special Recommendation Rule 2 are not true, recommend at the vaccine group level with recommendation reason code is ADMINISTER_PCV15_PCV20_OR_PCV21.',
+    behavior:
+      'Pneumococcal adult patients with no adult doses recommend at the vaccine-group level with ADMINISTER_PCV15_PCV20_OR_PCV21.',
+    testId: 'assertPneumococcalAdultNoDosesRecommendsPcv15Pcv20OrPcv21',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult(PCV-PPSV Series): If dose 1 of the adult series was a PCV vaccine, and Special Recommendation Rule 1 & Special Recommendation Rule 2 are not true, recommend PPSV23 (CVX 33) with supplemental text for target dose 2 or target dose 3',
+    behavior:
+      'Pneumococcal adult PCV-first histories recommend PPSV23 CVX 33 with supplemental text for the next adult target dose.',
+    testId: 'assertPneumococcalAdultPcvThenPpsvRecommendation',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult(PPSV-PCV Series): If dose 1 of the adult series was a PPSV23 vaccine, and Special Recommendation Rule 1 & Special Recommendation Rule 2 are not true, recommend at the vaccine group level with recommendation reason code is ADMINISTER_PCV15_PCV20_OR_PCV21 for target dose 2',
+    behavior:
+      'Pneumococcal adult PPSV23-first histories recommend at the vaccine-group level with ADMINISTER_PCV15_PCV20_OR_PCV21 for the next adult target dose.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult(PPSV-PCV Series): If dose 1 of the adult series was a PPSV23 vaccine, and Special Recommendation Rule 1 & Special Recommendation Rule 2 are not true, recommend PPSV23 (CVX 33) with supplemental text for target dose 3',
+    behavior:
+      'Pneumococcal adult PPSV-PCV histories recommend PPSV23 CVX 33 with supplemental text for adult target dose 3.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: If the patient >= 19 years and < 50 years of age and the series is not complete, include supplemental text',
+    behavior:
+      'Pneumococcal adult recommendations before age 50 include pneumococcal high-risk supplemental text when adult-dose history exists.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: If the patient is < 50 years of age, received one or more valid doses in an Adult Series at < 50 years old, recommend Conditional/HIGH_RISK along with supplemental text',
+    behavior:
+      'Pneumococcal adult patients younger than age 50 with adult-dose history receive a conditional HIGH_RISK recommendation with supplemental text.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: if patient *is* >= 5yrs and < 19yrs of age, the childhood series *is not* complete and an adult dose *has not* been administered, then recommend Conditional/HIGH_RISK',
+    behavior:
+      'Pneumococcal patients age 5 through 18 without adult-dose history and incomplete child series receive a conditional HIGH_RISK recommendation.',
+    testId: 'assertPneumococcalAge5NoDosesTargetsAdultDose6At50Years',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: if patient *is* >= 5yrs and < 19yrs of age, the childhood series *is* complete, _not_ including the PCV13/PCV15/PCV20/PCV21 rule, and an adult dose *has not* been administered, then recommend Conditional/COMPLETE_HIGH_RISK',
+    behavior:
+      'Pneumococcal patients age 5 through 18 with completed child series and no adult-dose history receive a conditional COMPLETE_HIGH_RISK recommendation.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: if patient *is* >= 5yrs and < 19yrs of age, the childhood series *is* complete, including the PCV13/PCV15/PCV20/PCV21 rule, and an adult dose *has not* been administered, then recommend Conditional/COMPLETE_HIGH_RISK',
+    behavior:
+      'Pneumococcal patients age 5 through 18 with completed child series including modern PCV and no adult-dose history receive a conditional COMPLETE_HIGH_RISK recommendation.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Child: When recommending in the child series, always recommend at the vaccine group level with reason code SUPPLEMENTAL_TEXT',
+    behavior:
+      'Pneumococcal child-series recommendations are emitted at the vaccine-group level with SUPPLEMENTAL_TEXT rather than a specific vaccine product.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Child: if the patient < 2yrs, if a PPSV23 (CVX 33) shot has been given, recommended interval of 0 days from the PPSV23 to the next target dose of PCV',
+    behavior:
+      'Pneumococcal child recommendations before age 2 use a 0-day recommended interval from child PPSV23 to the next PCV target dose.',
+    testId: 'assertPneumococcalChildPpsv23Under2RecommendationInterval0Days',
+  },
+  {
+    ruleName:
+      'Pneumococcal Child: if the patient >= 2yrs and < 5 years, if a PPSV23 (CVX 33) shot has been given, recommended interval of 56 days from the PPSV23 to the next target dose of PCV',
+    behavior:
+      'Pneumococcal child recommendations from age 2 through before age 5 use a 56-day recommended interval from child PPSV23 to the next PCV target dose.',
+    testId: 'assertPneumococcalChildPpsv23Age2RecommendationInterval56Days',
+  },
+  {
+    ruleName:
+      'Pneumococcal Child Series: if patient is < 5yrs completed the Child series (including a PCV13/PCV15/PCV20/PCV21), recommend Not Recommended with reason COMPLETE_HIGH_RISK',
+    behavior:
+      'Pneumococcal completed child series with modern PCV before age 5 returns not-recommended COMPLETE_HIGH_RISK.',
+    testId: 'assertPneumococcalChildFourEffectiveDosesCompleteSeries',
+  },
+  {
+    ruleName:
+      'Pneumococcal Child Series: Recommend PCV13/PCV15/PCV20/PCV21 dose if series complete if no prior VALID PCV13, PCV15, PCV20 or PCV21 doses, is < 5 yrs of age and will be less than 5 yrs of age upon recommendation date',
+    behavior:
+      'Pneumococcal completed child series with only older PCV products recommends a modern PCV dose before age 5 when the 52-day due date remains before age 5.',
+    testId: 'assertPneumococcalChildCompleteWithoutModernPcvRecommendsModernPcv',
+  },
+  {
+    ruleName:
+      'Pneumococcal Child Series: if patient *will be* >= 5 years at the recommended due date and < 19 years and the series *is* complete but has not received a childhood PCV13/PCV15/PCV20/PCV21 dose, then recommend Conditional/HIGH_RISK',
+    behavior:
+      'Pneumococcal completed child series with only older PCV products becomes conditional HIGH_RISK when the modern-PCV due date lands at age 5 through before age 19.',
+    testId:
+      'assertPneumococcalChildCompleteWithoutModernPcvAfterAge5ConditionalHighRisk',
+  },
   {
     ruleName:
       'SeriesSelection(COVID-19 Aug2025+): Select the Seasonal 2-dose COVID-19 Series (< 2 years) if patient is < 2 years of age as of evaluation date, or patient is >= 2 years and has a shot administered in current season at < 2 years of age',

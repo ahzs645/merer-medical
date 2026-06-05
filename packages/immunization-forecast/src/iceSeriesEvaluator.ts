@@ -2742,6 +2742,25 @@ function findNextDoseMatch({
       continue;
     }
 
+    const sameDayPreferredPneumococcalDose =
+      pneumococcalRules.findSameDayPreferredPneumococcalDose({
+        series,
+        immunization,
+        availableImmunizations,
+        usedImmunizationIndexes,
+        patient,
+      });
+    if (sameDayPreferredPneumococcalDose) {
+      usedImmunizationIndexes.add(index);
+      invalidDoses.push({
+        immunization,
+        dose: effectiveDose,
+        status: 'invalid',
+        reasons: ['DUPLICATE_SAME_DAY'],
+      });
+      continue;
+    }
+
     if (
       !isImmunizationAllowedForDose(immunization, effectiveDose) &&
       !isHibBoosterVaccineAllowed({
@@ -5310,6 +5329,16 @@ function buildSeriesRecommendation({
     });
   }
 
+  if (series.vaccineGroup?.code === 'PNEUMOCOCCAL') {
+    return pneumococcalRules.buildPneumococcalRecommendation({
+      status,
+      matchedDoses,
+      nextDoseForecast,
+      evaluationDate,
+      patient,
+    });
+  }
+
   if (series.vaccineGroup?.code === 'COVID_19') {
     return buildCovid19Recommendation({
       series,
@@ -6725,7 +6754,9 @@ function applyCustomNextDoseForecast({
     return pneumococcalRules.applyPneumococcalForecastOverride({
       series,
       forecast,
+      availableImmunizations,
       matchedDoses,
+      acceptedDoses,
       evaluationDate,
       patient,
     });

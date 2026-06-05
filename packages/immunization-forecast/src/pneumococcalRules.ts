@@ -3,6 +3,7 @@ import {
   ForecastPatient,
   IceDoseRule,
   IceNextDoseForecast,
+  IceSeriesRecommendation,
   IceSeriesDefinition,
   IceSeriesDoseMatch,
 } from './types.js';
@@ -21,6 +22,16 @@ const pneumococcalPcv13Or15Or20Or21CvxCodes = new Set([
   '327',
 ]);
 const pneumococcalPpsv23OrPcv20Or21CvxCodes = new Set(['33', '216', '327']);
+const pneumococcalCvxCodes = new Set([
+  '33',
+  '100',
+  '109',
+  '133',
+  '152',
+  '215',
+  '216',
+  '327',
+]);
 
 export function pneumococcalHasCustomCompletion({
   series,
@@ -176,6 +187,47 @@ export function evaluatePneumococcalAcceptedNonAllowedDose({
   return undefined;
 }
 
+export function findSameDayPreferredPneumococcalDose({
+  series,
+  immunization,
+  availableImmunizations,
+  usedImmunizationIndexes,
+  patient,
+}: {
+  series: IceSeriesDefinition;
+  immunization: ForecastImmunization;
+  availableImmunizations: ForecastImmunization[];
+  usedImmunizationIndexes: Set<number>;
+  patient?: ForecastPatient;
+}) {
+  if (
+    series.id !== 'PNEUMOCOCCAL_SERIES' ||
+    !immunization.date ||
+    !isPneumococcalImmunization(immunization) ||
+    pneumococcalPpsv23Under19({ immunization, patient })
+  ) {
+    return undefined;
+  }
+
+  return availableImmunizations.find((candidate, candidateIndex) => {
+    if (
+      usedImmunizationIndexes.has(candidateIndex) ||
+      candidate === immunization ||
+      candidate.date !== immunization.date ||
+      !isPneumococcalImmunization(candidate) ||
+      pneumococcalPpsv23Under19({ immunization: candidate, patient })
+    ) {
+      return false;
+    }
+
+    return pneumococcalSameDayPreferred({
+      candidate,
+      current: immunization,
+      patient,
+    });
+  });
+}
+
 export function evaluatePneumococcalInvalidNonAllowedDose({
   series,
   dose,
@@ -200,6 +252,149 @@ export function evaluatePneumococcalInvalidNonAllowedDose({
   }
 
   return undefined;
+}
+
+function pneumococcalSameDayPreferred({
+  candidate,
+  current,
+  patient,
+}: {
+  candidate: ForecastImmunization;
+  current: ForecastImmunization;
+  patient?: ForecastPatient;
+}) {
+  const candidateCvx = normalizeCvx(candidate.vaccineCode);
+  const currentCvx = normalizeCvx(current.vaccineCode);
+  if (!candidateCvx || !currentCvx) return false;
+
+  if (candidateCvx === '327') return currentCvx !== '327';
+  if (currentCvx === '327') return false;
+
+  if (candidateCvx === '216') return currentCvx !== '216';
+  if (currentCvx === '216') return false;
+
+  if (
+    candidateCvx === '33' &&
+    pneumococcalAdultSameDayShot({ immunization: candidate, patient }) &&
+    ['215', '133', '152', '100'].includes(currentCvx)
+  ) {
+    return true;
+  }
+  if (
+    currentCvx === '33' &&
+    pneumococcalAdultSameDayShot({ immunization: current, patient }) &&
+    ['215', '133', '152', '100'].includes(candidateCvx)
+  ) {
+    return false;
+  }
+
+  if (
+    candidateCvx === '215' &&
+    ['133', '152', '100'].includes(currentCvx)
+  ) {
+    return true;
+  }
+  if (
+    currentCvx === '215' &&
+    ['133', '152', '100'].includes(candidateCvx)
+  ) {
+    return false;
+  }
+
+  if (candidateCvx === '133' && currentCvx === '152') return true;
+  if (candidateCvx === '152' && currentCvx === '133') return false;
+
+  if (
+    candidateCvx === '100' &&
+    currentCvx === '152' &&
+    current.date &&
+    current.date < '2009-03-31'
+  ) {
+    return true;
+  }
+  if (
+    candidateCvx === '152' &&
+    currentCvx === '100' &&
+    candidate.date &&
+    candidate.date >= '2009-03-31'
+  ) {
+    return true;
+  }
+
+  if (
+    candidateCvx === '100' &&
+    currentCvx === '133' &&
+    current.date &&
+    current.date < '2010-06-01'
+  ) {
+    return true;
+  }
+  if (
+    candidateCvx === '133' &&
+    currentCvx === '100' &&
+    candidate.date &&
+    candidate.date >= '2010-06-01'
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function pneumococcalAdultSameDayShot({
+  immunization,
+  patient,
+}: {
+  immunization: ForecastImmunization;
+  patient?: ForecastPatient;
+}) {
+  return (
+    !!patient?.birthDate &&
+    !!immunization.date &&
+    dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: immunization.date,
+      duration: '19y',
+    })
+  );
+}
+
+function pneumococcalPpsv23Under19({
+  immunization,
+  patient,
+}: {
+  immunization: ForecastImmunization;
+  patient?: ForecastPatient;
+}) {
+  return (
+    normalizeCvx(immunization.vaccineCode) === '33' &&
+    !!patient?.birthDate &&
+    !!immunization.date &&
+    !dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: immunization.date,
+      duration: '19y',
+    })
+  );
+}
+
+function pneumococcalChildPpsv23({
+  immunization,
+  patient,
+}: {
+  immunization: ForecastImmunization;
+  patient?: ForecastPatient;
+}) {
+  return (
+    normalizeCvx(immunization.vaccineCode) === '33' &&
+    !!patient?.birthDate &&
+    !!immunization.date &&
+    !dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: immunization.date,
+      duration: '5y',
+    })
+  );
 }
 
 export function evaluatePneumococcalAcceptedDose({
@@ -348,13 +543,17 @@ export function appendPneumococcalPostCompletionDoseMatches({
 export function applyPneumococcalForecastOverride({
   series,
   forecast,
+  availableImmunizations,
   matchedDoses,
+  acceptedDoses,
   evaluationDate,
   patient,
 }: {
   series: IceSeriesDefinition;
   forecast: IceNextDoseForecast;
+  availableImmunizations?: ForecastImmunization[];
   matchedDoses: IceSeriesDoseMatch[];
+  acceptedDoses?: IceSeriesDoseMatch[];
   evaluationDate: string;
   patient?: ForecastPatient;
 }) {
@@ -400,6 +599,38 @@ export function applyPneumococcalForecastOverride({
       doseNumber: 6,
       age: '50y',
     });
+  }
+
+  const latestChildPpsv23Date = latestDate(
+    [
+      ...(acceptedDoses ?? []).map((match) => match.immunization),
+      ...(availableImmunizations ?? []),
+    ]
+      .filter((immunization) => pneumococcalChildPpsv23({ immunization, patient }))
+      .map((immunization) => immunization.date)
+      .filter(isDefined),
+  );
+
+  if (latestChildPpsv23Date && forecast.dose.doseNumber <= 4) {
+    const intervalDate = dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '2y',
+    })
+      ? dateFromIceDuration({
+          startDate: latestChildPpsv23Date,
+          duration: '56d',
+        })
+      : latestChildPpsv23Date;
+
+    return {
+      ...forecast,
+      earliestRecommendedDate: laterDate(
+        forecast.earliestRecommendedDate,
+        intervalDate,
+      ),
+      recommendedDate: laterDate(forecast.recommendedDate, intervalDate),
+    };
   }
 
   const dosesBefore7Months = pneumococcalDosesBefore(
@@ -485,6 +716,289 @@ export function applyPneumococcalForecastOverride({
   return forecast;
 }
 
+export function buildPneumococcalRecommendation({
+  status,
+  matchedDoses,
+  nextDoseForecast,
+  evaluationDate,
+  patient,
+}: {
+  status: 'complete' | 'not-complete';
+  matchedDoses: IceSeriesDoseMatch[];
+  nextDoseForecast?: IceNextDoseForecast;
+  evaluationDate: string;
+  patient?: ForecastPatient;
+}): IceSeriesRecommendation | undefined {
+  if (!patient?.birthDate) return defaultPneumococcalRecommendation({ status, nextDoseForecast });
+
+  const adultValidMatches = matchedDoses.filter(
+    (match) =>
+      match.status === 'valid' &&
+      match.dose.doseNumber >= 6 &&
+      match.immunization.date,
+  );
+  const adultCvxCodes = adultValidMatches
+    .map((match) => normalizeCvx(match.immunization.vaccineCode))
+    .filter(isDefined);
+  const hasPcv13 = adultCvxCodes.includes('133');
+  const hasPcv15Or20Or21 = adultCvxCodes.some((cvx) =>
+    ['215', '216', '327'].includes(cvx),
+  );
+  const hasPpsv23 = adultCvxCodes.includes('33');
+  const hasPpsv23At65 = adultValidMatches.some(
+    (match) =>
+      normalizeCvx(match.immunization.vaccineCode) === '33' &&
+      match.immunization.date &&
+      dateMeetsMinimumDuration({
+        startDate: patient.birthDate!,
+        endDate: match.immunization.date,
+        duration: '65y',
+      }),
+  );
+  const latestAdultPcvDate = latestDate(
+    adultValidMatches
+      .filter((match) =>
+        pneumococcalPcv13Or15Or20Or21CvxCodes.has(
+          normalizeCvx(match.immunization.vaccineCode) ?? '',
+        ),
+      )
+      .map((match) => match.immunization.date)
+      .filter(isDefined),
+  );
+  const latestAdultPpsv23Date = latestDate(
+    adultValidMatches
+      .filter(
+        (match) => normalizeCvx(match.immunization.vaccineCode) === '33',
+      )
+      .map((match) => match.immunization.date)
+      .filter(isDefined),
+  );
+  const hasPpsv23Before65 = adultValidMatches.some(
+    (match) =>
+      normalizeCvx(match.immunization.vaccineCode) === '33' &&
+      match.immunization.date &&
+      !dateMeetsMinimumDuration({
+        startDate: patient.birthDate!,
+        endDate: match.immunization.date,
+        duration: '65y',
+      }),
+  );
+
+  if (status === 'complete') {
+    const childComplete = pneumococcalHasCompletedChildSeries({
+      matchedDoses,
+      birthDate: patient.birthDate,
+    });
+    const hasChildModernPcv = pneumococcalHasChildModernPcv({ matchedDoses });
+
+    if (childComplete && !hasChildModernPcv) {
+      const modernPcvRecommendationDate = dateFromIceDuration({
+        startDate: latestDoseDate(matchedDoses) ?? evaluationDate,
+        duration: '52d',
+      });
+
+      if (
+        !dateMeetsMinimumDuration({
+          startDate: patient.birthDate,
+          endDate: modernPcvRecommendationDate,
+          duration: '5y',
+        })
+      ) {
+        return {
+          status: 'recommended',
+          reasons: ['DUE'],
+          recommendedDate: modernPcvRecommendationDate,
+          earliestRecommendedDate: modernPcvRecommendationDate,
+        };
+      }
+
+      if (
+        !dateMeetsMinimumDuration({
+          startDate: patient.birthDate,
+          endDate: modernPcvRecommendationDate,
+          duration: '19y',
+        })
+      ) {
+        return {
+          status: 'conditionally-recommended',
+          reasons: ['HIGH_RISK'],
+          recommendedDate: modernPcvRecommendationDate,
+          earliestRecommendedDate: modernPcvRecommendationDate,
+        };
+      }
+    }
+
+    if (hasPcv13 && hasPpsv23At65 && !hasPcv15Or20Or21) {
+      return {
+        status: 'conditionally-recommended',
+        reasons: ['COMPLETE', 'CLINICAL_PATIENT_DISCRETION', 'SUPPLEMENTAL_TEXT'],
+        supplementalText: ['PNEUMOCOCCAL_SHARED_CLINICAL_DECISION_MAKING'],
+      };
+    }
+
+    if (
+      !dateMeetsMinimumDuration({
+        startDate: patient.birthDate,
+        endDate: evaluationDate,
+        duration: '5y',
+      }) &&
+      childComplete &&
+      hasChildModernPcv
+    ) {
+      return {
+        status: 'not-recommended',
+        reasons: ['COMPLETE_HIGH_RISK'],
+      };
+    }
+
+    return {
+      status: 'not-recommended',
+      reasons: ['COMPLETE'],
+    };
+  }
+
+  if (!nextDoseForecast) return undefined;
+
+  const recommendation: IceSeriesRecommendation = {
+    status: 'recommended',
+    reasons: ['DUE'],
+    recommendedVaccine: nextDoseForecast.recommendedVaccine,
+    earliestRecommendedDate: nextDoseForecast.earliestRecommendedDate,
+    recommendedDate: nextDoseForecast.recommendedDate,
+    overdueDate: nextDoseForecast.overdueDate,
+  };
+
+  const ageAtEvaluation = {
+    at5: dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '5y',
+    }),
+    at19: dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '19y',
+    }),
+    at50: dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '50y',
+    }),
+  };
+
+  if (nextDoseForecast.dose.doseNumber <= 5) {
+    return {
+      ...recommendation,
+      recommendedVaccine: undefined,
+      reasons: ['SUPPLEMENTAL_TEXT'],
+      supplementalText: ['PNEUMOCOCCAL_CHILD_SERIES'],
+    };
+  }
+
+  if (ageAtEvaluation.at5 && !ageAtEvaluation.at19 && adultValidMatches.length === 0) {
+    const childComplete = pneumococcalHasCompletedChildSeries({
+      matchedDoses,
+      birthDate: patient.birthDate,
+    });
+    return {
+      ...recommendation,
+      status: 'conditionally-recommended',
+      reasons: childComplete ? ['COMPLETE_HIGH_RISK'] : ['HIGH_RISK'],
+      recommendedVaccine: undefined,
+    };
+  }
+
+  if (!ageAtEvaluation.at50 && adultValidMatches.length > 0) {
+    return {
+      ...recommendation,
+      status: 'conditionally-recommended',
+      reasons: ['HIGH_RISK'],
+      supplementalText: ['PNEUMOCOCCAL_HIGH_RISK'],
+    };
+  }
+
+  if (ageAtEvaluation.at50 && hasPcv13 && !hasPcv15Or20Or21) {
+    if (!hasPpsv23 || hasPpsv23Before65) {
+      return {
+        ...recommendation,
+        recommendedVaccine: undefined,
+        reasons: ['ADMINISTER_PCV20_OR_PCV21'],
+      };
+    }
+  }
+
+  if (adultValidMatches.length === 0) {
+    return {
+      ...recommendation,
+      recommendedVaccine: undefined,
+      reasons: ['ADMINISTER_PCV15_PCV20_OR_PCV21'],
+    };
+  }
+
+  if (adultValidMatches.length === 1 && adultCvxCodes.some((cvx) => pneumococcalPcv13Or15Or20Or21CvxCodes.has(cvx))) {
+    const intervalDate = latestAdultPcvDate
+      ? dateFromIceDuration({ startDate: latestAdultPcvDate, duration: '1y' })
+      : undefined;
+    return {
+      ...recommendation,
+      recommendedVaccine: { cvx: '33', display: 'PPSV23', preferred: true },
+      earliestRecommendedDate: intervalDate ?? recommendation.earliestRecommendedDate,
+      recommendedDate: intervalDate ?? recommendation.recommendedDate,
+      reasons: ['DUE', 'SUPPLEMENTAL_TEXT'],
+      supplementalText: ['PNEUMOCOCCAL_PPSV23_AFTER_PCV'],
+    };
+  }
+
+  if (adultValidMatches.length === 1 && hasPpsv23) {
+    return {
+      ...recommendation,
+      recommendedVaccine: undefined,
+      reasons: ['ADMINISTER_PCV15_PCV20_OR_PCV21'],
+    };
+  }
+
+  if (adultValidMatches.length >= 2 && hasPpsv23) {
+    const intervalDate = latestAdultPpsv23Date
+      ? dateFromIceDuration({
+          startDate: latestAdultPpsv23Date,
+          duration: '5y',
+        })
+      : undefined;
+    return {
+      ...recommendation,
+      recommendedVaccine: { cvx: '33', display: 'PPSV23', preferred: true },
+      earliestRecommendedDate: intervalDate ?? recommendation.earliestRecommendedDate,
+      recommendedDate: intervalDate ?? recommendation.recommendedDate,
+      reasons: ['DUE', 'SUPPLEMENTAL_TEXT'],
+      supplementalText: ['PNEUMOCOCCAL_PPSV23_ADDITIONAL_DOSE'],
+    };
+  }
+
+  return recommendation;
+}
+
+function defaultPneumococcalRecommendation({
+  status,
+  nextDoseForecast,
+}: {
+  status: 'complete' | 'not-complete';
+  nextDoseForecast?: IceNextDoseForecast;
+}): IceSeriesRecommendation | undefined {
+  if (status === 'complete') {
+    return {
+      status: 'not-recommended',
+      reasons: ['COMPLETE'],
+    };
+  }
+
+  if (!nextDoseForecast) return undefined;
+
+  return {
+    status: 'recommended',
+    reasons: ['DUE'],
+  };
+}
+
 function pneumococcalHasCompletedChildSeries({
   matchedDoses,
   birthDate,
@@ -504,6 +1018,21 @@ function pneumococcalHasCompletedChildSeries({
           duration: '5y',
         }),
     ).length >= 4
+  );
+}
+
+function pneumococcalHasChildModernPcv({
+  matchedDoses,
+}: {
+  matchedDoses: IceSeriesDoseMatch[];
+}) {
+  return matchedDoses.some(
+    (match) =>
+      match.status === 'valid' &&
+      match.dose.doseNumber <= 5 &&
+      pneumococcalPcv13Or15Or20Or21CvxCodes.has(
+        normalizeCvx(match.immunization.vaccineCode) ?? '',
+      ),
   );
 }
 
@@ -780,6 +1309,12 @@ function latestDate(dates: string[]) {
   return sorted[sorted.length - 1];
 }
 
+function laterDate(left?: string, right?: string) {
+  if (!left) return right;
+  if (!right) return left;
+  return left > right ? left : right;
+}
+
 function isDefined<T>(value: T | undefined): value is T {
   return value !== undefined;
 }
@@ -788,4 +1323,8 @@ function normalizeCvx(code?: string) {
   if (!code) return undefined;
   const cvxMatch = code.match(/(?:CVX[_:-]?)?(\d{1,3})$/i);
   return cvxMatch?.[1]?.padStart(2, '0');
+}
+
+function isPneumococcalImmunization(immunization: ForecastImmunization) {
+  return pneumococcalCvxCodes.has(normalizeCvx(immunization.vaccineCode) ?? '');
 }
