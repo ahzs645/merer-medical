@@ -40,6 +40,7 @@ assertDtpFiveDoseException2CompletesWithFourDoses();
 assertDtpThreeDoseTdOnlySeriesRemainsIncomplete();
 assertDtpThreeDosePertussisDoseCompletesSeries();
 assertDtpCompletedNonPertussisSeriesRecommendsImmediateTdap();
+assertDtpCompletedPertussisSeriesRecommendsTdapSixMonthsLater();
 
 console.log('ICE DTP rule regression checks passed.');
 
@@ -388,6 +389,19 @@ function assertDtpCompletedNonPertussisSeriesRecommendsImmediateTdap() {
   assert.equal(forecast.recommendation?.recommendedVaccine?.cvx, '115');
   assert.equal(forecast.recommendation?.earliestRecommendedDate, '2024-01-01');
   assert.equal(forecast.recommendation?.recommendedDate, '2024-01-01');
+}
+
+function assertDtpCompletedPertussisSeriesRecommendsTdapSixMonthsLater() {
+  const forecast = evaluateDtp({
+    birthDate: '2020-01-01',
+    evaluationDate: '2024-04-01',
+    immunizations: fiveDoseChildhoodDtpSeries(),
+  });
+
+  assert.equal(forecast.status, 'complete');
+  assert.equal(forecast.recommendation?.recommendedVaccine?.cvx, '115');
+  assert.equal(forecast.recommendation?.earliestRecommendedDate, '2024-07-01');
+  assert.equal(forecast.recommendation?.recommendedDate, '2024-07-01');
 }
 
 function evaluateDtp({

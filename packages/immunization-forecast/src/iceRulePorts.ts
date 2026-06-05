@@ -220,6 +220,20 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     testId: 'assertDtpCompletedSeriesRecommendsAdolescentTdap',
   },
   {
+    ruleName:
+      'DTP(Any): Retract Tdap needed if patient has received his/her Adolescent Tdap dose(s)',
+    behavior:
+      'After a qualifying adolescent Tdap dose, DTP recommendations switch away from adolescent Tdap-needed state.',
+    testId: 'assertDtpAdolescentTdapAfterCompleteStartsBoosterRecommendation',
+  },
+  {
+    ruleName:
+      'DTP(Any): Retract Tdap needed if primary DTP series not complete',
+    behavior:
+      'Incomplete DTP primary series recommendations remain primary-series due/catch-up recommendations instead of adolescent Tdap-needed recommendations.',
+    testId: 'assertDtpCatchupWithoutPertussisRecommendsTdap',
+  },
+  {
     ruleName: 'DTP: Evaluate Adolescent Tdap Shot based on Age >= 10yrs',
     behavior:
       'After DTP primary-series completion, a DTaP/Tdap-family dose at age 10 or later is recorded as valid adolescent Tdap.',
@@ -230,6 +244,13 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
       'DTP: Evaluate First Adolescent Tdap Shot based on Age >= 7yrs and < 10yrs',
     behavior:
       'After DTP primary-series completion, the first qualifying Tdap-family dose from age 7 through before age 10 is recorded as valid adolescent Tdap when spacing is satisfied.',
+    testId: 'assertDtpFirstAdolescentTdapAge7To10Valid',
+  },
+  {
+    ruleName:
+      'DTP: Do not run the default Extra_Dose series rule, which would mark this First Adolescent Tdap Shot as an Extra Dose',
+    behavior:
+      'A qualifying first age 7 through before age 10 adolescent Tdap-family dose remains valid adolescent Tdap instead of being downgraded to extra dose.',
     testId: 'assertDtpFirstAdolescentTdapAge7To10Valid',
   },
   {
@@ -255,9 +276,23 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'DTP: Do not run the default Extra_Dose series rule, which would mark this Remaining Adolescent Tdap shot as an Extra Dose',
+    behavior:
+      'Remaining age 7 through before age 10 adolescent Tdap-family doses are explicitly handled by the DTP extra-dose rule path.',
+    testId: 'assertDtpRemainingAdolescentTdapAcceptedAsExtra',
+  },
+  {
+    ruleName:
       'DTP: If Patient received a Tdap Dose >= 10yrs, make note of this via IceFact of ADOLESCENT_TDAP_COMPLETED',
     behavior:
       'A valid DTP pertussis-containing dose at age 10 or later satisfies adolescent Tdap completion for recommendations.',
+    testId: 'assertDtpAdolescentTdapAfterCompleteStartsBoosterRecommendation',
+  },
+  {
+    ruleName:
+      'DTP: Do not run the default Extra_Dose series rule, which would mark this Adolescent Tdap Shot >= 10 yrs as an Extra Dose',
+    behavior:
+      'A qualifying age 10 or later adolescent Tdap-family dose remains valid adolescent Tdap instead of being downgraded to extra dose.',
     testId: 'assertDtpAdolescentTdapAfterCompleteStartsBoosterRecommendation',
   },
   {
@@ -325,6 +360,13 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'DTP: If either the 3-Dose or 5-Dose Series is Complete and an Adolescent Tdap is required, recommend Tdap at earliest & recommended interval of 6 months from last pertussis shot',
+    behavior:
+      'Completed DTP primary series with adolescent Tdap still needed and only pertussis-containing prior doses recommends Tdap 6 months after the latest pertussis dose.',
+    testId: 'assertDtpCompletedPertussisSeriesRecommendsTdapSixMonthsLater',
+  },
+  {
+    ruleName:
       'DTP: Recommend booster at earliest interval of 5y, recommended interval of 10yrs, and latest recommended interval of 10y+4w if series is complete has received a pertussis dose >= 7yrs; include recommendation reason ADMINISTER_TDAP_OR_TD and supplemental text',
     behavior:
       'Completed DTP series with adolescent Tdap switches to Tdap/Td booster recommendation metadata.',
@@ -378,6 +420,146 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     behavior:
       'DTP 3-dose series recommends Tdap CVX 115 when 3 or more valid doses have been administered with no pertussis-containing dose.',
     testId: 'assertDtpThreeDoseTdOnlySeriesRemainsIncomplete',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: If a (valid) PCV21 or PCV20 dose has been administered, the series is complete',
+    behavior:
+      'Adult pneumococcal PCV20 or PCV21 dose targets the adult dose slot and completes the pneumococcal series.',
+    testId: 'assertPneumococcalAdultPcv20CompletesSeries/assertPneumococcalAdultPcv21CompletesSeries',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: if a (valid) PCV15 dose and (valid) PPSV23 dose has been administered in the Adult series, the series is complete',
+    behavior:
+      'Adult pneumococcal PCV15 plus PPSV23 targets adult dose slots and completes the pneumococcal series.',
+    testId: 'assertPneumococcalAdultPcv15AndPpsv23CompletesSeries',
+  },
+  ...[
+    'Pneumococcal Adult Series: Exception 4: Set Series Dose Number to 6 (AdultSeries) if No Shots Administered and Patient >= 5y of Age at Execution Date',
+    'Pneumococcal Child Series: Exception 4: Skip Dose Number to 6 (Adult Series) for Patient >= 5y at Shot Date',
+    'Pneumococcal Adult Series: Set Recommendation Date to 50y and Skip Dose to dose 6 (Adult Series target dose 1) if Patient >= 5y and no prior PCV13, PCV15, PCV20 or PCV21 dose',
+    'Pneumococcal Adult: If the patient is >= 19 years of age, Skip to Target Dose 6',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'Pneumococcal adult-transition rules skip evaluation and forecasting to dose 6 for patients at or beyond the ICE age thresholds.',
+    testId: 'ice-pneumococcal-rules',
+  })),
+  ...[
+    'Pneumococcal Adult: If a PPSV23 is administered for dose 1 of the Adult series, then a PCV15, PCV20, PCV21 or PCV13 must be administered for the 2nd dose in the Adult series',
+    'Pneumococcal Adult: If a PCV15, PCV20, PCV21 or PCV13 dose is administered for dose 1 of the Adult series, then a PPSV must be administered for the 2nd dose in the Adult series',
+    'Pneumococcal Adult: A PCV20, PCV21 or PCV15 must be administered for the 3rd dose in the Adult series',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'Pneumococcal adult dose 7 and dose 8 product sequencing rules add VACCINE_NOT_ALLOWED_FOR_THIS_DOSE when products are not allowed by the prior adult dose pattern.',
+    testId: 'ice-pneumococcal-rules',
+  })),
+  {
+    ruleName:
+      'Pneumococcal Adult: If PCV13 is administered for dose 3 of the Adult series and neither a PCV15/PCV20/PCV21 dose was previously administered nor a PPSV23 dose at >= 50 yrs of age, evaluate the shot as ACCEPTED / OUTSIDE_ROUTINE_SERIES',
+    behavior:
+      'Pneumococcal adult dose 8 PCV13 is accepted as outside the routine series when there is no prior PCV15/20/21 and no PPSV23 at age 50 or later.',
+    testId: 'assertPneumococcalAdultDose8Pcv13AcceptedOutsideRoutine',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: If a PPSV23 dose was previously administered at >= 65 years of age as well as a PCV13/PCV15/PCV20/PCV21, mark the series is complete',
+    behavior:
+      'Pneumococcal adult series completes when a valid PPSV23 at age 65 or later is paired with an adult PCV dose.',
+    testId: 'assertPneumococcalAdultPpsv23At65WithPcvCompletesSeries',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult Series: Evaluate PCV7 shot (CVX 100) as Accepted with a reason code of VACCINE_NOT_ALLOWED if >= 19 years of age',
+    behavior:
+      'Pneumococcal CVX100 in the adult dose range is recorded as accepted with VACCINE_NOT_ALLOWED_FOR_THIS_DOSE once the patient is at least 5 at administration.',
+    testId: 'assertPneumococcalAdultPcv7AcceptedAtAge5',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult Series: Note that the Absolute Minimum interval from PCV7 = 0d by marking the shot Ignored if >= 19 years of age',
+    behavior:
+      'Pneumococcal adult CVX100 is accepted without consuming adult dose progress, so later adult PCV doses still target dose 6.',
+    testId: 'assertPneumococcalAdultPcv7IgnoredForDoseProgressAtAge19',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: if ACCEPTED shot administered >= 5 yrs and < 19yrs, evaluate the shot as Accepted / OUTSIDE_ROUTINE_SERIES',
+    behavior:
+      'Pneumococcal accepted adult-slot shots administered from age 5 through 18 include OUTSIDE_ROUTINE_SERIES.',
+    testId: 'assertPneumococcalAdultPcv7AcceptedAtAge5',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: If CVX 109 or CVX 152 has been evaluated as INVALID / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE in the Adult Series, remove all other reason codes and add supplemental text',
+    behavior:
+      'Pneumococcal adult CVX109 and CVX152 shots are invalid with VACCINE_NOT_ALLOWED_FOR_THIS_DOSE and the unspecified-CVX supplemental text.',
+    testId:
+      'assertPneumococcalAdultUnspecifiedCvx109InvalidWithSupplementalText/assertPneumococcalAdultUnspecifiedCvx152InvalidWithSupplementalText',
+  },
+  ...[
+    'Pneumococcal Child Series: Exception 1A: Set Series Dose Number to 2 if No Doses Administered and Patient >= 7m and < 12 Months at Execution Date',
+    'Pneumococcal Child Series: Exception 1A: Skip Dose Number to 2 for Shot Administered to Patient between >= 7m and < 12m',
+    'Pneumococcal Child Series: Exception 1B: Skip Dose Number to 3 if received Dose Administered prior to 7m and Shot being evaluated for Patient between >= 7m and < 12m',
+    'Pneumococcal Child Series: Exception 2: Set Series Dose Number to 3 if No Shots Administered and Patient >= 12m and < 24m of Age at Execution Date',
+    'Pneumococcal Child Series: Exception 2: Skip Dose Number to 3 if Patient Between >= 12m and < 24m at Shot Date and has Received <2 Doses Administered at <12m of Age at Shot Date',
+    'Pneumococcal Child Series: Exception 2: Skip Dose Number to 4 if Patient Between >= 12m and < 24m and has Received 2 Doses Administered at <12m of Age at Shot Date',
+    'Pneumococcal Child Series: Exception 3: Set Series Dose Number to 4 if No Shots Administered and Patient >= 24m and < 5y of Age at Execution Date',
+    'Pneumococcal Child Series: Exception 3: Skip Dose Number to 4 for Patient >= 24m and < 5y at Shot Date',
+    'Pneumococcal Child Series: Include Recommendation with Date 7months in 4-Dose PCV Series and TargetDose 2 if Patient is between 7and12months and Received No Doses before 7months of Age',
+    'Pneumococcal Child Series: Include Recommendation with Date 7months in 4-Dose PCV Series and TargetDose 3 if Patient is between 7and12months and Received 1 Dose before 7months of Age',
+    'Pneumococcal Child Series: Include Recommendation with Date 12months and TargetDose 3 in 4-Dose PCV Series if Patient between age 12and24months and Received <2 Doses before 12months of Age',
+    'Pneumococcal Child Series: Set Recommendation Date to 12months and TargetDose 4 in 4-Dose PCV Series and Patient between age 12and24months and Received 2 Doses before 12months of Age',
+    'Pneumococcal Child Series: Set Recommendation Date to 24months and TargetDose 4 in 4-Dose PCV Series if Patient between age 24months and 5years',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'Pneumococcal child catch-up dose targeting and milestone recommendation dates are handled by pneumococcal-specific TypeScript forecast and evaluation hooks.',
+    testId: 'ice-pneumococcal-rules',
+  })),
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Aug2025+): Select the Seasonal 2-dose COVID-19 Series (< 2 years) if patient is < 2 years of age as of evaluation date, or patient is >= 2 years and has a shot administered in current season at < 2 years of age',
+    behavior:
+      'COVID-19 Aug 2025 selection chooses the under-2 seasonal series when the patient is younger than 2 years on the evaluation date.',
+    testId: 'assertCovid19Aug2025SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Aug2025+): Select the Seasonal 1-dose COVID-19 Series (>= 2 - 64 years) if patient has no in-season shots and is >= 2 years and < 65 years as of evaluation date',
+    behavior:
+      'COVID-19 Aug 2025 selection chooses the 2-64 seasonal series when the patient is at least 2 years and younger than 65 years on the evaluation date.',
+    testId: 'assertCovid19Aug2025SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Aug2025+): Select the Seasonal 2-dose COVID-19 Series (>= 65 years) if patient has no in-season shots and is >= 65 years as of evaluation date',
+    behavior:
+      'COVID-19 Aug 2025 selection chooses the 65+ seasonal series when the patient is at least 65 years on the evaluation date.',
+    testId: 'assertCovid19Aug2025SeriesSelection',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025): If the patient is complete for the season, the recommendation is Not_Recommended/Complete_High_Risk',
+    behavior:
+      'Completed Aug 2025 COVID-19 series forecasts produce a not-recommended recommendation with COMPLETE_HIGH_RISK.',
+    testId: 'assertCovid19Aug2025CompleteRecommendation',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 2–64y/GTE65yr)->TargetDose 1: If ≥1 prior COVID-19 shot, set earliest & recommended interval to 56d',
+    behavior:
+      'For Aug 2025 2-64 and 65+ COVID-19 dose 1 forecasts, a prior COVID-19 shot sets earliest and recommended dates to 8 weeks after the most recent shot.',
+    testId: 'assertCovid19Aug2025PriorDoseInterval',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 < 2yrs Series): When a shot is recommended for this series, specifically recommend CVX 311',
+    behavior:
+      'Aug 2025 under-2 COVID-19 recommendations prefer CVX 311.',
+    testId: 'assertCovid19Aug2025Lt2RecommendsCvx311',
   },
   {
     ruleName:

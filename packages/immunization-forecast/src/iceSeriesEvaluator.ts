@@ -99,6 +99,25 @@ const polioOpvCvxCodes = new Set(['02', '182']);
 const polioMissingAntigenCvxCodes = new Set(['178', '179']);
 const rsvAdultOrUnspecifiedCvxCodes = new Set(['303', '304', '305', '314', '326']);
 const rsvInfantOrUnspecifiedCvxCodes = new Set(['304', '306', '307', '315']);
+const pneumococcalPcv20Or21CvxCodes = new Set(['216', '327']);
+const pneumococcalPcv15CvxCodes = new Set(['215']);
+const pneumococcalPpsv23CvxCodes = new Set(['33']);
+const pneumococcalPcv13Or15Or20Or21CvxCodes = new Set([
+  '133',
+  '215',
+  '216',
+  '327',
+]);
+const pneumococcalPpsv23OrPcv20Or21CvxCodes = new Set(['33', '216', '327']);
+const covid19Aug2025CvxCodes = new Set([
+  '213',
+  '309',
+  '310',
+  '311',
+  '312',
+  '313',
+  '334',
+]);
 const dtpDiphtheriaTetanusPertussisCvxCodes = new Set([
   '01',
   '20',
@@ -268,6 +287,15 @@ function selectBestForecast({
   if (vaccineGroup === 'RSV') {
     const rsvSelection = selectRsvSeries(candidates, patient, evaluationDate);
     if (rsvSelection) return rsvSelection;
+  }
+
+  if (vaccineGroup === 'COVID_19') {
+    const covidSelection = selectCovid19Series(
+      candidates,
+      patient,
+      evaluationDate,
+    );
+    if (covidSelection) return covidSelection;
   }
 
   const selected = [...candidates].sort(compareSeriesForecasts)[0];
@@ -494,6 +522,7 @@ function isSeriesComplete({
     hepAHasCustomCompletion({ series, matchedDoses, patient }) ||
     hepBHasCustomCompletion({ series, matchedDoses, patient }) ||
     polioHasCustomCompletion({ series, matchedDoses, patient }) ||
+    pneumococcalHasCustomCompletion({ series, matchedDoses, patient }) ||
     dtpHasCustomCompletion({
       series,
       matchedDoses,
@@ -501,6 +530,95 @@ function isSeriesComplete({
       evaluationDate,
     })
   );
+}
+
+function pneumococcalHasCustomCompletion({
+  series,
+  matchedDoses,
+  patient,
+}: {
+  series: IceSeriesDefinition;
+  matchedDoses: IceSeriesDoseMatch[];
+  patient?: ForecastPatient;
+}) {
+  if (series.id !== 'PNEUMOCOCCAL_SERIES' || !patient?.birthDate) return false;
+
+  const adultMatches = matchedDoses.filter(
+    (match) =>
+      match.status === 'valid' &&
+      match.dose.doseNumber >= 6 &&
+      match.immunization.date &&
+      dateMeetsMinimumDuration({
+        startDate: patient.birthDate!,
+        endDate: match.immunization.date,
+        duration: '19y',
+      }),
+  );
+
+  const adultCvxCodes = adultMatches
+    .map((match) => normalizeCvx(match.immunization.vaccineCode))
+    .filter(isDefined);
+
+  return (
+    pneumococcalHasCompletedChildSeries({ matchedDoses, birthDate: patient.birthDate }) ||
+    adultCvxCodes.some((cvx) => pneumococcalPcv20Or21CvxCodes.has(cvx)) ||
+    (adultCvxCodes.some((cvx) => pneumococcalPcv15CvxCodes.has(cvx)) &&
+      adultCvxCodes.some((cvx) => pneumococcalPpsv23CvxCodes.has(cvx))) ||
+    pneumococcalHasPpsv23At65AndAdultPcv({
+      adultMatches,
+      birthDate: patient.birthDate,
+    })
+  );
+}
+
+function pneumococcalHasCompletedChildSeries({
+  matchedDoses,
+  birthDate,
+}: {
+  matchedDoses: IceSeriesDoseMatch[];
+  birthDate: string;
+}) {
+  return (
+    matchedDoses.filter(
+      (match) =>
+        match.status === 'valid' &&
+        match.dose.doseNumber <= 4 &&
+        match.immunization.date &&
+        !dateMeetsMinimumDuration({
+          startDate: birthDate,
+          endDate: match.immunization.date,
+          duration: '5y',
+        }),
+    ).length >= 4
+  );
+}
+
+function pneumococcalHasPpsv23At65AndAdultPcv({
+  adultMatches,
+  birthDate,
+}: {
+  adultMatches: IceSeriesDoseMatch[];
+  birthDate: string;
+}) {
+  const hasPpsv23At65 = adultMatches.some(
+    (match) =>
+      pneumococcalPpsv23CvxCodes.has(
+        normalizeCvx(match.immunization.vaccineCode) ?? '',
+      ) &&
+      match.immunization.date &&
+      dateMeetsMinimumDuration({
+        startDate: birthDate,
+        endDate: match.immunization.date,
+        duration: '65y',
+      }),
+  );
+  const hasAdultPcv = adultMatches.some((match) =>
+    pneumococcalPcv13Or15Or20Or21CvxCodes.has(
+      normalizeCvx(match.immunization.vaccineCode) ?? '',
+    ),
+  );
+
+  return hasPpsv23At65 && hasAdultPcv;
 }
 
 function dtpHasCustomCompletion({
@@ -1985,6 +2103,46 @@ function selectRsvSeries(
   return markSelected(infant, 'RSV_INFANT_DEFAULT');
 }
 
+function selectCovid19Series(
+  candidates: IceSeriesForecast[],
+  patient?: ForecastPatient,
+  evaluationDate = new Date().toISOString().split('T')[0],
+) {
+  const lt2 = candidates.find(
+    (candidate) => candidate.series.id === 'COVID_19_AUG_2025_LT_2_SERIES',
+  );
+  const age2To64 = candidates.find(
+    (candidate) =>
+      candidate.series.id === 'COVID_19_AUG_2025_2_Y_TO_64_Y_SERIES',
+  );
+  const gte65 = candidates.find(
+    (candidate) => candidate.series.id === 'COVID_19_AUG_2025_GTE_65_SERIES',
+  );
+  if (!lt2 || !age2To64 || !gte65 || !patient?.birthDate) return undefined;
+
+  if (
+    dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '65y',
+    })
+  ) {
+    return markSelected(gte65, 'COVID_19_AUG_2025_AGE_65_OR_OLDER');
+  }
+
+  if (
+    dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '2y',
+    })
+  ) {
+    return markSelected(age2To64, 'COVID_19_AUG_2025_AGE_2_TO_64');
+  }
+
+  return markSelected(lt2, 'COVID_19_AUG_2025_AGE_UNDER_2');
+}
+
 function patientAgeUnder15AtEval(
   patient?: ForecastPatient,
   evaluationDate = new Date().toISOString().split('T')[0],
@@ -2688,6 +2846,7 @@ function findNextDoseMatch({
         series,
         dose: effectiveDose,
         immunization,
+        patient,
       });
       if (acceptedMatch) {
         usedImmunizationIndexes.add(index);
@@ -2916,6 +3075,51 @@ function customTargetDoseForImmunization({
   patient?: ForecastPatient;
 }) {
   if (
+    series.id === 'PNEUMOCOCCAL_SERIES' &&
+    patient?.birthDate &&
+    immunization.date
+  ) {
+    if (
+      dateMeetsMinimumDuration({
+        startDate: patient.birthDate,
+        endDate: immunization.date,
+        duration: '19y',
+      })
+    ) {
+      const adultDoseNumber = Math.min(
+        8,
+        6 +
+          matchedDoses.filter((match) => match.dose.doseNumber >= 6).length,
+      );
+      return (
+        series.doses.find((candidate) => candidate.doseNumber === adultDoseNumber) ??
+        dose
+      );
+    }
+
+    if (
+      dateMeetsMinimumDuration({
+        startDate: patient.birthDate,
+        endDate: immunization.date,
+        duration: '5y',
+      })
+    ) {
+      return series.doses.find((candidate) => candidate.doseNumber === 6) ?? dose;
+    }
+
+    const effectiveDoseNumber = pneumococcalEffectiveDoseNumber({
+      birthDate: patient.birthDate,
+      date: immunization.date,
+      matchedDoses,
+      fallbackDoseNumber: dose.doseNumber,
+    });
+    return (
+      series.doses.find((candidate) => candidate.doseNumber === effectiveDoseNumber) ??
+      dose
+    );
+  }
+
+  if (
     series.id !== 'HIB_4_DOSE_SERIES' ||
     !patient?.birthDate ||
     !immunization.date
@@ -2934,6 +3138,73 @@ function customTargetDoseForImmunization({
     series.doses.find((candidate) => candidate.doseNumber === effectiveDoseNumber) ??
     dose
   );
+}
+
+function pneumococcalEffectiveDoseNumber({
+  birthDate,
+  date,
+  matchedDoses,
+  fallbackDoseNumber,
+}: {
+  birthDate: string;
+  date: string;
+  matchedDoses: IceSeriesDoseMatch[];
+  fallbackDoseNumber: number;
+}) {
+  if (
+    dateMeetsMinimumDuration({ startDate: birthDate, endDate: date, duration: '24m' })
+  ) {
+    return Math.max(fallbackDoseNumber, 4);
+  }
+
+  if (
+    dateMeetsMinimumDuration({ startDate: birthDate, endDate: date, duration: '12m' })
+  ) {
+    const dosesBefore12Months = pneumococcalDosesBefore(
+      matchedDoses,
+      birthDate,
+      '12m',
+    );
+    return Math.max(fallbackDoseNumber, dosesBefore12Months === 2 ? 4 : 3);
+  }
+
+  if (
+    dateMeetsMinimumDuration({ startDate: birthDate, endDate: date, duration: '7m' })
+  ) {
+    const dosesBefore7Months = pneumococcalDosesBefore(
+      matchedDoses,
+      birthDate,
+      '7m',
+    );
+    return Math.max(fallbackDoseNumber, dosesBefore7Months === 1 ? 3 : 2);
+  }
+
+  return fallbackDoseNumber;
+}
+
+function pneumococcalDosesBefore(
+  matchedDoses: IceSeriesDoseMatch[],
+  birthDate: string,
+  duration: string,
+) {
+  const cutoffDate = dateFromIceDuration({ startDate: birthDate, duration });
+  return matchedDoses.filter(
+    (match) => match.immunization.date && match.immunization.date < cutoffDate,
+  ).length;
+}
+
+function pneumococcalEffectiveDosesBefore(
+  matchedDoses: IceSeriesDoseMatch[],
+  birthDate: string,
+  duration: string,
+) {
+  const cutoffDate = dateFromIceDuration({ startDate: birthDate, duration });
+  return matchedDoses.filter(
+    (match) =>
+      match.immunization.date &&
+      match.immunization.date < cutoffDate &&
+      match.dose.doseNumber < 6,
+  ).length;
 }
 
 function hibEffectiveDoseNumber({
@@ -3005,10 +3276,12 @@ function evaluateAcceptedNonAllowedDose({
   series,
   dose,
   immunization,
+  patient,
 }: {
   series: IceSeriesDefinition;
   dose: IceDoseRule;
   immunization: ForecastImmunization;
+  patient?: ForecastPatient;
 }): IceSeriesDoseMatch | undefined {
   if (
     series.vaccineGroup?.code === 'MPOX' &&
@@ -3033,6 +3306,50 @@ function evaluateAcceptedNonAllowedDose({
       dose,
       status: 'accepted',
       reasons: ['VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN'],
+    };
+  }
+
+  if (
+    series.id === 'PNEUMOCOCCAL_SERIES' &&
+    dose.doseNumber >= 6 &&
+    normalizeCvx(immunization.vaccineCode) === '100' &&
+    patient?.birthDate &&
+    immunization.date &&
+    dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: immunization.date,
+      duration: '5y',
+    })
+  ) {
+    const reasons = ['VACCINE_NOT_ALLOWED_FOR_THIS_DOSE'];
+    if (
+      !dateMeetsMinimumDuration({
+        startDate: patient.birthDate,
+        endDate: immunization.date,
+        duration: '19y',
+      })
+    ) {
+      reasons.push('OUTSIDE_ROUTINE_SERIES');
+    }
+
+    return {
+      immunization,
+      dose,
+      status: 'accepted',
+      reasons,
+    };
+  }
+
+  if (
+    series.id === 'PNEUMOCOCCAL_SERIES' &&
+    dose.doseNumber <= 4 &&
+    normalizeCvx(immunization.vaccineCode) === '33'
+  ) {
+    return {
+      immunization,
+      dose,
+      status: 'accepted',
+      reasons: ['VACCINE_NOT_PART_OF_THIS_SERIES'],
     };
   }
 
@@ -3078,6 +3395,20 @@ function evaluateInvalidNonAllowedDose({
       dose,
       status: 'invalid',
       reasons: ['VACCINE_NOT_ALLOWED_FOR_THIS_DOSE'],
+    };
+  }
+
+  if (
+    series.id === 'PNEUMOCOCCAL_SERIES' &&
+    dose.doseNumber >= 6 &&
+    ['109', '152'].includes(normalizeCvx(immunization.vaccineCode) ?? '')
+  ) {
+    return {
+      immunization,
+      dose,
+      status: 'invalid',
+      reasons: ['VACCINE_NOT_ALLOWED_FOR_THIS_DOSE'],
+      supplementalText: ['PNEUMOCOCCAL_UNSPECIFIED_CVX'],
     };
   }
 
@@ -3139,6 +3470,16 @@ function appendPostCompletionDoseMatches({
     });
   }
 
+  if (series.id === 'PNEUMOCOCCAL_SERIES' && status === 'complete') {
+    appendPneumococcalPostCompletionDoseMatches({
+      series,
+      availableImmunizations,
+      usedImmunizationIndexes,
+      acceptedDoses,
+      patient,
+    });
+  }
+
   if (series.vaccineGroup?.code !== 'MPOX' || status !== 'complete') return;
 
   const lastDose = series.doses[series.doses.length - 1];
@@ -3165,6 +3506,48 @@ function appendPostCompletionDoseMatches({
       dose: lastDose,
       status: 'accepted',
       reasons: ['EXTRA_DOSE'],
+    });
+  }
+}
+
+function appendPneumococcalPostCompletionDoseMatches({
+  series,
+  availableImmunizations,
+  usedImmunizationIndexes,
+  acceptedDoses,
+  patient,
+}: {
+  series: IceSeriesDefinition;
+  availableImmunizations: ForecastImmunization[];
+  usedImmunizationIndexes: Set<number>;
+  acceptedDoses: IceSeriesDoseMatch[];
+  patient?: ForecastPatient;
+}) {
+  if (!patient?.birthDate) return;
+
+  const childFinalDose = series.doses.find((dose) => dose.doseNumber === 4);
+  if (!childFinalDose) return;
+
+  for (const [index, immunization] of availableImmunizations.entries()) {
+    if (
+      usedImmunizationIndexes.has(index) ||
+      normalizeCvx(immunization.vaccineCode) !== '33' ||
+      !immunization.date ||
+      dateMeetsMinimumDuration({
+        startDate: patient.birthDate,
+        endDate: immunization.date,
+        duration: '5y',
+      })
+    ) {
+      continue;
+    }
+
+    usedImmunizationIndexes.add(index);
+    acceptedDoses.push({
+      immunization,
+      dose: childFinalDose,
+      status: 'accepted',
+      reasons: ['VACCINE_NOT_PART_OF_THIS_SERIES'],
     });
   }
 }
@@ -3729,6 +4112,18 @@ function evaluateAcceptedDose({
     };
   }
 
+  if (
+    series.id === 'PNEUMOCOCCAL_SERIES' &&
+    pneumococcalDose8Pcv13IsOutsideRoutine({ immunization, dose, matchedDoses, patient })
+  ) {
+    return {
+      immunization,
+      dose,
+      status: 'accepted',
+      reasons: ['OUTSIDE_ROUTINE_SERIES'],
+    };
+  }
+
   return undefined;
 }
 
@@ -4198,6 +4593,17 @@ function evaluateDoseConstraints({
     }
   }
 
+  if (series.id === 'PNEUMOCOCCAL_SERIES') {
+    for (const pneumococcalReason of evaluatePneumococcalCustomConstraints({
+      immunization,
+      dose,
+      matchedDoses,
+      patient,
+    })) {
+      addReason(reasons, pneumococcalReason);
+    }
+  }
+
   if (series.vaccineGroup?.code === 'HEP_A') {
     for (const hepAReason of evaluateHepACustomConstraints({
       dataset,
@@ -4451,6 +4857,109 @@ function evaluateHibCustomConstraints({
   }
 
   return reasons;
+}
+
+function evaluatePneumococcalCustomConstraints({
+  immunization,
+  dose,
+  matchedDoses,
+  patient,
+}: {
+  immunization: ForecastImmunization;
+  dose: IceDoseRule;
+  matchedDoses: IceSeriesDoseMatch[];
+  patient?: ForecastPatient;
+}) {
+  const reasons: string[] = [];
+  const cvx = normalizeCvx(immunization.vaccineCode);
+  if (!cvx) return reasons;
+
+  const priorAdultDose6 = matchedDoses.find(
+    (match) => match.dose.doseNumber === 6 && match.status === 'valid',
+  );
+  const priorAdultDose6Cvx = normalizeCvx(priorAdultDose6?.immunization.vaccineCode);
+
+  if (
+    dose.doseNumber === 7 &&
+    priorAdultDose6Cvx &&
+    pneumococcalPpsv23OrPcv20Or21CvxCodes.has(priorAdultDose6Cvx) &&
+    !pneumococcalPcv13Or15Or20Or21CvxCodes.has(cvx)
+  ) {
+    reasons.push('VACCINE_NOT_ALLOWED_FOR_THIS_DOSE');
+  }
+
+  if (
+    dose.doseNumber === 7 &&
+    priorAdultDose6Cvx &&
+    pneumococcalPcv13Or15Or20Or21CvxCodes.has(priorAdultDose6Cvx) &&
+    !pneumococcalPpsv23OrPcv20Or21CvxCodes.has(cvx)
+  ) {
+    reasons.push('VACCINE_NOT_ALLOWED_FOR_THIS_DOSE');
+  }
+
+  if (
+    dose.doseNumber === 8 &&
+    !pneumococcalPpsv23OrPcv20Or21CvxCodes.has(cvx) &&
+    !pneumococcalDose8Pcv13IsOutsideRoutine({
+      immunization,
+      dose,
+      matchedDoses,
+      patient,
+    })
+  ) {
+    reasons.push('VACCINE_NOT_ALLOWED_FOR_THIS_DOSE');
+  }
+
+  return reasons;
+}
+
+function pneumococcalDose8Pcv13IsOutsideRoutine({
+  immunization,
+  dose,
+  matchedDoses,
+  patient,
+}: {
+  immunization: ForecastImmunization;
+  dose: IceDoseRule;
+  matchedDoses: IceSeriesDoseMatch[];
+  patient?: ForecastPatient;
+}) {
+  const cvx = normalizeCvx(immunization.vaccineCode);
+  if (dose.doseNumber !== 8 || cvx !== '133') return false;
+
+  const hasPriorModernPcv = matchedDoses.some(
+    (match) =>
+      (match.dose.doseNumber === 6 || match.dose.doseNumber === 7) &&
+      match.status === 'valid' &&
+      (pneumococcalPcv15CvxCodes.has(
+        normalizeCvx(match.immunization.vaccineCode) ?? '',
+      ) ||
+        pneumococcalPcv20Or21CvxCodes.has(
+          normalizeCvx(match.immunization.vaccineCode) ?? '',
+        )),
+  );
+  if (hasPriorModernPcv) return false;
+
+  const birthDate = patient?.birthDate;
+  const hasPpsv23At50 = matchedDoses.some((match) => {
+    const matchCvx = normalizeCvx(match.immunization.vaccineCode);
+    if (
+      match.status !== 'valid' ||
+      matchCvx !== '33' ||
+      !match.immunization.date ||
+      !birthDate
+    ) {
+      return false;
+    }
+
+    return dateMeetsMinimumDuration({
+      startDate: birthDate,
+      endDate: match.immunization.date,
+      duration: '50y',
+    });
+  });
+
+  return !hasPpsv23At50;
 }
 
 function evaluatePolioCustomConstraint({
@@ -5104,6 +5613,14 @@ function buildSeriesRecommendation({
     });
   }
 
+  if (series.vaccineGroup?.code === 'COVID_19') {
+    return buildCovid19Recommendation({
+      series,
+      status,
+      nextDoseForecast,
+    });
+  }
+
   if (status === 'complete') return undefined;
 
   if (series.vaccineGroup?.code === 'HPV') {
@@ -5173,6 +5690,35 @@ function buildH1n1Recommendation({
         reasons: ['DUE'],
       }
     : undefined;
+}
+
+function buildCovid19Recommendation({
+  series,
+  status,
+  nextDoseForecast,
+}: {
+  series: IceSeriesDefinition;
+  status: IceSeriesForecast['status'];
+  nextDoseForecast?: IceNextDoseForecast;
+}): IceSeriesRecommendation | undefined {
+  if (series.season?.code !== 'COVID_19_AUG_2025_SEASON') return undefined;
+
+  if (status === 'complete') {
+    return {
+      status: 'not-recommended',
+      reasons: ['COMPLETE_HIGH_RISK'],
+    };
+  }
+
+  if (!nextDoseForecast) return undefined;
+
+  return {
+    status: 'recommended',
+    reasons: ['DUE'],
+    recommendedVaccine: nextDoseForecast.recommendedVaccine,
+    earliestRecommendedDate: nextDoseForecast.earliestRecommendedDate,
+    recommendedDate: nextDoseForecast.recommendedDate,
+  };
 }
 
 function buildMcvRecommendation({
@@ -6196,6 +6742,30 @@ function buildDtpRecommendation({
     };
   }
 
+  const pertussisDose = latestDtpPertussisDoseInAgeRange({
+    patient,
+    matchedDoses,
+    minimumAge: '0d',
+  });
+  if (pertussisDose?.immunization.date) {
+    const recommendedDate = dateFromIceDuration({
+      startDate: pertussisDose.immunization.date,
+      duration: '6m',
+    });
+    return {
+      status: 'recommended',
+      reasons: ['ADOLESCENT_TDAP_NEEDED'],
+      recommendedVaccine: {
+        cvx: '115',
+        display: 'Tdap',
+        preferred: true,
+      },
+      earliestRecommendedDate: recommendedDate,
+      recommendedDate,
+      supplementalText: ['ADOLESCENT_TDAP'],
+    };
+  }
+
   if (series.id !== 'DTP_5_DOSE_SERIES') return undefined;
 
   return {
@@ -6425,6 +6995,15 @@ function applyCustomNextDoseForecast({
     });
   }
 
+  if (series.vaccineGroup?.code === 'COVID_19') {
+    return applyCovid19ForecastOverride({
+      series,
+      forecast,
+      availableImmunizations,
+      matchedDoses,
+    });
+  }
+
   if (series.vaccineGroup?.code === 'POLIO') {
     return applyPolioForecastOverride({
       series,
@@ -6437,6 +7016,16 @@ function applyCustomNextDoseForecast({
 
   if (series.vaccineGroup?.code === 'HIB') {
     return applyHibForecastOverride({
+      series,
+      forecast,
+      matchedDoses,
+      evaluationDate,
+      patient,
+    });
+  }
+
+  if (series.id === 'PNEUMOCOCCAL_SERIES') {
+    return applyPneumococcalForecastOverride({
       series,
       forecast,
       matchedDoses,
@@ -6595,6 +7184,61 @@ function applyRsvForecastOverride({
     earliestRecommendedDate: adultRecommendedDate,
     recommendedDate: adultRecommendedDate,
   };
+}
+
+function applyCovid19ForecastOverride({
+  series,
+  forecast,
+  availableImmunizations,
+  matchedDoses,
+}: {
+  series: IceSeriesDefinition;
+  forecast: IceNextDoseForecast;
+  availableImmunizations: ForecastImmunization[];
+  matchedDoses: IceSeriesDoseMatch[];
+}) {
+  if (series.season?.code !== 'COVID_19_AUG_2025_SEASON') return forecast;
+
+  const priorCovidDoseDate = [...availableImmunizations]
+    .filter((immunization) => immunization.date && isCovid19Immunization(immunization))
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]?.date;
+  const priorDose8Weeks =
+    priorCovidDoseDate &&
+    dateFromIceDuration({ startDate: priorCovidDoseDate, duration: '8w' });
+  const recommendedVaccine =
+    series.id === 'COVID_19_AUG_2025_LT_2_SERIES'
+      ? series.doses
+          .find((dose) => dose.doseNumber === forecast.dose.doseNumber)
+          ?.vaccines.find((vaccine) => vaccine.cvx === '311')
+      : forecast.recommendedVaccine;
+
+  if (
+    (series.id === 'COVID_19_AUG_2025_2_Y_TO_64_Y_SERIES' ||
+      series.id === 'COVID_19_AUG_2025_GTE_65_SERIES') &&
+    forecast.dose.doseNumber === 1 &&
+    matchedDoses.length === 0 &&
+    priorDose8Weeks
+  ) {
+    return {
+      ...forecast,
+      earliestRecommendedDate: priorDose8Weeks,
+      recommendedDate: priorDose8Weeks,
+      recommendedVaccine,
+    };
+  }
+
+  return {
+    ...forecast,
+    recommendedVaccine,
+  };
+}
+
+function isCovid19Immunization(immunization: ForecastImmunization) {
+  const cvx = normalizeCvx(immunization.vaccineCode);
+  return (
+    immunization.vaccineName.toLowerCase().includes('covid') ||
+    (cvx !== undefined && covid19Aug2025CvxCodes.has(cvx))
+  );
 }
 
 function applyPolioForecastOverride({
@@ -6759,6 +7403,173 @@ function applyHibForecastOverride({
   }
 
   return forecast;
+}
+
+function applyPneumococcalForecastOverride({
+  series,
+  forecast,
+  matchedDoses,
+  evaluationDate,
+  patient,
+}: {
+  series: IceSeriesDefinition;
+  forecast: IceNextDoseForecast;
+  matchedDoses: IceSeriesDoseMatch[];
+  evaluationDate: string;
+  patient?: ForecastPatient;
+}) {
+  if (!patient?.birthDate) return forecast;
+  const patientWithBirthDate = patient as ForecastPatient & { birthDate: string };
+
+  if (
+    dateMeetsMinimumDuration({
+      startDate: patientWithBirthDate.birthDate,
+      endDate: evaluationDate,
+      duration: '19y',
+    }) &&
+    forecast.dose.doseNumber <= 5
+  ) {
+    return pneumococcalForecastAtAge({
+      series,
+      forecast,
+      patient: patientWithBirthDate,
+      doseNumber: 6,
+      age: '19y',
+    });
+  }
+
+  if (
+    dateMeetsMinimumDuration({
+      startDate: patientWithBirthDate.birthDate,
+      endDate: evaluationDate,
+      duration: '5y',
+    }) &&
+    forecast.dose.doseNumber <= 6 &&
+    !matchedDoses.some(
+      (match) =>
+        match.dose.doseNumber <= 6 &&
+        pneumococcalPcv13Or15Or20Or21CvxCodes.has(
+          normalizeCvx(match.immunization.vaccineCode) ?? '',
+        ),
+    )
+  ) {
+    return pneumococcalForecastAtAge({
+      series,
+      forecast,
+      patient: patientWithBirthDate,
+      doseNumber: 6,
+      age: '50y',
+    });
+  }
+
+  const dosesBefore7Months = pneumococcalDosesBefore(
+    matchedDoses,
+    patientWithBirthDate.birthDate,
+    '7m',
+  );
+  const dosesBefore12Months = pneumococcalDosesBefore(
+    matchedDoses,
+    patientWithBirthDate.birthDate,
+    '12m',
+  );
+  const effectiveDosesBefore24Months = pneumococcalEffectiveDosesBefore(
+    matchedDoses,
+    patientWithBirthDate.birthDate,
+    '24m',
+  );
+
+  if (
+    dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '24m',
+    }) &&
+    !dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '5y',
+    }) &&
+    effectiveDosesBefore24Months < 4
+  ) {
+    return pneumococcalForecastAtAge({
+      series,
+      forecast,
+      patient: patientWithBirthDate,
+      doseNumber: 4,
+      age: '24m',
+    });
+  }
+
+  if (
+    dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '12m',
+    }) &&
+    !dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '24m',
+    })
+  ) {
+    return pneumococcalForecastAtAge({
+      series,
+      forecast,
+      patient: patientWithBirthDate,
+      doseNumber: dosesBefore12Months === 2 ? 4 : 3,
+      age: '12m',
+    });
+  }
+
+  if (
+    dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '7m',
+    }) &&
+    !dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '12m',
+    })
+  ) {
+    return pneumococcalForecastAtAge({
+      series,
+      forecast,
+      patient: patientWithBirthDate,
+      doseNumber: dosesBefore7Months === 1 ? 3 : 2,
+      age: '7m',
+    });
+  }
+
+  return forecast;
+}
+
+function pneumococcalForecastAtAge({
+  series,
+  forecast,
+  patient,
+  doseNumber,
+  age,
+}: {
+  series: IceSeriesDefinition;
+  forecast: IceNextDoseForecast;
+  patient: ForecastPatient;
+  doseNumber: number;
+  age: string;
+}) {
+  if (!patient.birthDate) return forecast;
+
+  const dose = series.doses.find((candidate) => candidate.doseNumber === doseNumber);
+  if (!dose) return forecast;
+
+  const date = dateFromIceDuration({ startDate: patient.birthDate, duration: age });
+  return {
+    ...forecast,
+    dose,
+    earliestRecommendedDate: date,
+    recommendedDate: date,
+  };
 }
 
 function applyDtpForecastOverride({
