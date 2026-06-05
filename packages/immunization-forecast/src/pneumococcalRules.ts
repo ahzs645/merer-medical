@@ -318,12 +318,15 @@ export function appendPneumococcalPostCompletionDoseMatches({
 }) {
   if (!patient?.birthDate) return;
 
-  const lastDose = series.doses[series.doses.length - 1];
+  const childFinalDose = series.doses.find((dose) => dose.doseNumber === 4);
+  if (!childFinalDose) return;
+
   for (const [index, immunization] of availableImmunizations.entries()) {
     if (
       usedImmunizationIndexes.has(index) ||
+      normalizeCvx(immunization.vaccineCode) !== '33' ||
       !immunization.date ||
-      !dateMeetsMinimumDuration({
+      dateMeetsMinimumDuration({
         startDate: patient.birthDate,
         endDate: immunization.date,
         duration: '5y',
@@ -332,15 +335,12 @@ export function appendPneumococcalPostCompletionDoseMatches({
       continue;
     }
 
-    const cvx = normalizeCvx(immunization.vaccineCode);
-    if (!cvx || !pneumococcalPcv13Or15Or20Or21CvxCodes.has(cvx)) continue;
-
     usedImmunizationIndexes.add(index);
     acceptedDoses.push({
       immunization,
-      dose: lastDose,
+      dose: childFinalDose,
       status: 'accepted',
-      reasons: ['OUTSIDE_ROUTINE_SERIES'],
+      reasons: ['VACCINE_NOT_PART_OF_THIS_SERIES'],
     });
   }
 }

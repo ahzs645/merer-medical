@@ -24,10 +24,14 @@ assertDtpSeriesSelection();
 assertDtpSameDayPertussisPreferred();
 assertDtpSameDayNosPertussisPreferred();
 assertDtpSameDaySamePertussisClassDuplicate();
+assertDtpSameDayPostCompletionMixedPairBothValid();
+assertDtpSameDayPostCompletionSameClassPairBothValid();
+assertDtpValidTdDoseCarriesPertussisNeededSupplementalText();
 assertDtpChildRecommendationUsesDtapNos();
 assertDtpCatchupWithoutPertussisRecommendsTdap();
 assertDtpCatchupWithPertussisRecommendsTd();
 assertDtpCompletedSeriesRecommendsAdolescentTdap();
+assertDtpFiveDoseAdolescentTdapExceptionRecommendsAtAge7();
 assertDtpAdolescentTdapAfterCompleteStartsBoosterRecommendation();
 assertDtpFirstAdolescentTdapAge7To10Valid();
 assertDtpFirstAdolescentTdapAcceptedIfTooCloseToPertussis();
@@ -116,6 +120,60 @@ function assertDtpSameDaySamePertussisClassDuplicate() {
   assert.deepEqual(forecast.invalidDoses[0]?.reasons, ['DUPLICATE_SAME_DAY']);
 }
 
+function assertDtpSameDayPostCompletionMixedPairBothValid() {
+  const forecast = evaluateDtp({
+    birthDate: '2020-01-01',
+    evaluationDate: '2029-03-01',
+    immunizations: [
+      ...fiveDoseChildhoodDtpSeries(),
+      dtpDose('td-age-9', '09', '2029-01-01'),
+      dtpDose('tdap-age-9', '115', '2029-01-01'),
+    ],
+  });
+
+  assert.equal(forecast.invalidDoses.length, 0);
+  assert.equal(forecast.acceptedDoses.length, 0);
+  const sameDayMatches = forecast.matchedDoses.filter((match) =>
+    ['td-age-9', 'tdap-age-9'].includes(match.immunization.id),
+  );
+  assert.equal(sameDayMatches.length, 2);
+  assert.ok(sameDayMatches.every((match) => match.status === 'valid'));
+}
+
+function assertDtpSameDayPostCompletionSameClassPairBothValid() {
+  const forecast = evaluateDtp({
+    birthDate: '2020-01-01',
+    evaluationDate: '2029-03-01',
+    immunizations: [
+      ...fiveDoseChildhoodDtpSeries(),
+      dtpDose('tdap-age-9-a', '115', '2029-01-01'),
+      dtpDose('tdap-age-9-b', '115', '2029-01-01'),
+    ],
+  });
+
+  assert.equal(forecast.invalidDoses.length, 0);
+  assert.equal(forecast.acceptedDoses.length, 0);
+  const sameDayMatches = forecast.matchedDoses.filter((match) =>
+    ['tdap-age-9-a', 'tdap-age-9-b'].includes(match.immunization.id),
+  );
+  assert.equal(sameDayMatches.length, 2);
+  assert.ok(sameDayMatches.every((match) => match.status === 'valid'));
+}
+
+function assertDtpValidTdDoseCarriesPertussisNeededSupplementalText() {
+  const forecast = evaluateDtp({
+    birthDate: '2020-01-01',
+    evaluationDate: '2020-08-01',
+    immunizations: [dtpDose('td-dose', '09', '2020-07-01')],
+  });
+
+  assert.equal(forecast.matchedDoses[0]?.immunization.id, 'td-dose');
+  assert.equal(forecast.matchedDoses[0]?.status, 'valid');
+  assert.deepEqual(forecast.matchedDoses[0]?.supplementalText, [
+    'PERTUSSIS_NEEDED',
+  ]);
+}
+
 function assertDtpChildRecommendationUsesDtapNos() {
   const forecast = evaluateDtp({
     birthDate: '2020-01-01',
@@ -167,6 +225,29 @@ function assertDtpCompletedSeriesRecommendsAdolescentTdap() {
     'ADOLESCENT_TDAP_NEEDED',
   ]);
   assert.equal(forecast.recommendation?.recommendedVaccine?.cvx, '115');
+}
+
+function assertDtpFiveDoseAdolescentTdapExceptionRecommendsAtAge7() {
+  const forecast = evaluateDtp({
+    birthDate: '2020-01-01',
+    evaluationDate: '2024-04-01',
+    immunizations: [
+      dtpDose('dtap-1', '20', '2020-03-01'),
+      dtpDose('dtap-2', '20', '2020-05-01'),
+      dtpDose('dtap-3', '20', '2020-07-01'),
+      dtpDose('dt-4', '28', '2021-01-01'),
+      dtpDose('dt-5', '28', '2024-01-01'),
+    ],
+  });
+
+  assert.equal(forecast.status, 'complete');
+  assert.equal(forecast.recommendation?.recommendedVaccine?.cvx, '115');
+  assert.equal(forecast.recommendation?.earliestRecommendedDate, '2027-01-01');
+  assert.equal(forecast.recommendation?.recommendedDate, '2027-01-01');
+  assert.equal(forecast.recommendation?.overdueDate, '2027-01-01');
+  assert.deepEqual(forecast.recommendation?.supplementalText, [
+    'ADOLESCENT_TDAP',
+  ]);
 }
 
 function assertDtpAdolescentTdapAfterCompleteStartsBoosterRecommendation() {

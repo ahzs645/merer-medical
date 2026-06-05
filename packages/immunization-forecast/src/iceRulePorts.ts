@@ -214,6 +214,27 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'Duplicate Shots/Same Day Overview Rule #4-DTP-Pertussis (NOT Both Primary Series Doses): If neither shot is in the primary series, both are NOS, and one of them contains Pertussis and the other does not, then evaluate shot with Pertussis as Valid and evaluate the other as Invalid with a reason code of DUPLICATE_SAME_DAY',
+    behavior:
+      'DTP same-day post-primary mixed pertussis/non-pertussis shots remain valid rather than being invalidated as primary-series duplicates.',
+    testId: 'assertDtpSameDayPostCompletionMixedPairBothValid',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day DTP Rule 5a (_NOT_ BOTH Primary Series Doses): If one DTP shot is pertussis-containing vaccine and other is not pertussis-containing, but neither are primary series doses, evaluate both as Valid',
+    behavior:
+      'DTP same-day post-primary mixed pertussis/non-pertussis shots are both retained as valid.',
+    testId: 'assertDtpSameDayPostCompletionMixedPairBothValid',
+  },
+  {
+    ruleName:
+      'Duplicate Shot/Same Day DTP Rule 5b (_NOT_ BOTH Primary Series Doses): If neither shot contains pertussis or both shots contain pertussis, but neither are primary series doses, evaluate both as Valid',
+    behavior:
+      'DTP same-day post-primary shots with the same pertussis class are both retained as valid.',
+    testId: 'assertDtpSameDayPostCompletionSameClassPairBothValid',
+  },
+  {
+    ruleName:
       'DTP(Any): Note that an Adolescent Tdap is needed if primary series complete and patient has _not_ received the necessary adolescent Tdap doses',
     behavior:
       'Completed DTP 5-dose series without adolescent Tdap produces an adolescent Tdap recommendation.',
@@ -350,6 +371,34 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     behavior:
       'Completed DTP primary series with a pertussis-containing dose from age 7 through before age 10 recommends adolescent Tdap at age 11 with overdue at 13y+4w.',
     testId: 'assertDtpPertussisAge7To10RecommendsAdolescentTdapAt11',
+  },
+  {
+    ruleName:
+      'DTP: If the 5-Dose Series is Complete and the patient has NOT received a pertussis containing dose at >= 7 years and <10 years, then invoke 5-Dose Series Adolescent Tdap Exception Rules',
+    behavior:
+      'Completed DTP 5-dose histories without an age 7 through before age 10 pertussis dose evaluate the adolescent Tdap exception rules before using generic completed-series recommendation timing.',
+    testId: 'assertDtpFiveDoseAdolescentTdapExceptionRecommendsAtAge7',
+  },
+  {
+    ruleName:
+      'DTP: (Tdap 5-Dose Series Recommendation Exception Occurred)- If the 5-Dose Series is Complete and an Adolescent Tdap is required, recommend Adolescent Tdap at Earliest, Recommended & Overdue Date of 7yrs',
+    behavior:
+      'When a DTP 5-dose adolescent Tdap recommendation exception occurs, the Tdap recommendation uses age 7 for earliest, recommended, and overdue dates.',
+    testId: 'assertDtpFiveDoseAdolescentTdapExceptionRecommendsAtAge7',
+  },
+  {
+    ruleName:
+      'DTP: (Tdap 5-Dose Series Recommendation Exception A)- If patient does not have a dose of pertussis >= 4y-4d in the 5-Dose Series(Exception A), make note that the Adolescent Tdap Recommendation Exception criteria was met',
+    behavior:
+      'Completed DTP 5-dose series without a qualifying pertussis dose at or after age 4y-4d uses the adolescent Tdap exception timing.',
+    testId: 'assertDtpFiveDoseAdolescentTdapExceptionRecommendsAtAge7',
+  },
+  {
+    ruleName:
+      'DTP: (Tdap 5-Dose Series Recommendation Exception B)- If the patient DOES NOT have at least 4 doses of pertussis given at < 7 years, make note that the Adolescent Tdap Recommendation Exception criteria was met',
+    behavior:
+      'Completed DTP 5-dose series with fewer than four valid pertussis-containing doses before age 7 uses the adolescent Tdap exception timing.',
+    testId: 'assertDtpFiveDoseAdolescentTdapExceptionRecommendsAtAge7',
   },
   {
     ruleName:

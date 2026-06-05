@@ -16,6 +16,7 @@ import {
   dateFromIceDuration,
   dateMeetsMinimumDuration,
 } from './iceDuration.js';
+import * as dtpRules from './dtpRules.js';
 import * as pneumococcalRules from './pneumococcalRules.js';
 
 const zosterLegacyCvxCodes = new Set(['121', '188']);
@@ -233,7 +234,11 @@ function selectBestForecast({
   }
 
   if (vaccineGroup === 'DTP') {
-    const dtpSelection = selectDtpSeries(candidates, patient, evaluationDate);
+    const dtpSelection = dtpRules.selectDtpSeries(
+      candidates,
+      patient,
+      evaluationDate,
+    );
     if (dtpSelection) return dtpSelection;
   }
 
@@ -499,7 +504,9 @@ function isSeriesComplete({
   evaluationDate: string;
 }) {
   if (immunityEvidence.length > 0) return true;
-  if (dtpThreeDoseSeriesNeedsPertussis({ series, matchedDoses })) return false;
+  if (dtpRules.dtpThreeDoseSeriesNeedsPertussis({ series, matchedDoses })) {
+    return false;
+  }
   if (completedDoses >= series.numberOfDosesInSeries) return true;
 
   return (
@@ -518,7 +525,7 @@ function isSeriesComplete({
       matchedDoses,
       patient,
     }) ||
-    dtpHasCustomCompletion({
+    dtpRules.dtpHasCustomCompletion({
       series,
       matchedDoses,
       patient,
@@ -940,11 +947,7 @@ function compareImmunizationsForSeries(
 
   if (series.vaccineGroup?.code !== 'DTP') return 0;
 
-  const aPertussis = dtpVaccineContainsPertussis(dataset, a);
-  const bPertussis = dtpVaccineContainsPertussis(dataset, b);
-  if (aPertussis !== bPertussis) return aPertussis ? -1 : 1;
-
-  return 0;
+  return dtpRules.compareDtpImmunizationsForSeries({ dataset, series, a, b });
 }
 
 function isDtpPrimarySeriesDose(
@@ -2932,38 +2935,13 @@ function findSameDayPreferredDtpDose({
   availableImmunizations: ForecastImmunization[];
   usedImmunizationIndexes: Set<number>;
 }) {
-  if (
-    series.vaccineGroup?.code !== 'DTP' ||
-    !immunization.date ||
-    !isDtpPrimarySeriesDose(series, dose)
-  ) {
-    return undefined;
-  }
-
-  const currentPertussis = dtpVaccineContainsPertussis(dataset, immunization);
-  const currentDtp = dtpVaccineMetadata(dataset, immunization);
-  if (!currentDtp) return undefined;
-
-  return availableImmunizations.find((candidate, candidateIndex) => {
-    if (
-      usedImmunizationIndexes.has(candidateIndex) ||
-      candidate === immunization ||
-      candidate.date !== immunization.date ||
-      !isImmunizationAllowedForDose(candidate, dose)
-    ) {
-      return false;
-    }
-
-    const candidateDtp = dtpVaccineMetadata(dataset, candidate);
-    if (!candidateDtp) return false;
-
-    const candidatePertussis = dtpVaccineContainsPertussis(dataset, candidate);
-    if (candidatePertussis && !currentPertussis) return true;
-    if (candidatePertussis !== currentPertussis) return false;
-
-    return (
-      compareImmunizationsForSeries(dataset, series, candidate, immunization) < 0
-    );
+  return dtpRules.findSameDayPreferredDtpDose({
+    series,
+    dose,
+    dataset,
+    immunization,
+    availableImmunizations,
+    usedImmunizationIndexes,
   });
 }
 
@@ -3256,7 +3234,7 @@ function appendPostCompletionDoseMatches({
   }
 
   if (series.vaccineGroup?.code === 'DTP' && status === 'complete') {
-    appendDtpPostCompletionDoseMatches({
+    dtpRules.appendDtpPostCompletionDoseMatches({
       series,
       dataset,
       availableImmunizations,
@@ -3460,27 +3438,13 @@ function applyDtpThreeDosePertussisCompletion({
   usedImmunizationIndexes: Set<number>;
   matchedDoses: IceSeriesDoseMatch[];
 }) {
-  if (!dtpThreeDoseSeriesNeedsPertussis({ series, matchedDoses })) return;
-
-  const lastDose = series.doses[series.doses.length - 1];
-  for (const [index, immunization] of availableImmunizations.entries()) {
-    if (
-      usedImmunizationIndexes.has(index) ||
-      !isImmunizationAllowedForDose(immunization, lastDose) ||
-      !dtpVaccineContainsPertussis(dataset, immunization)
-    ) {
-      continue;
-    }
-
-    usedImmunizationIndexes.add(index);
-    matchedDoses.push({
-      immunization,
-      dose: lastDose,
-      status: 'valid',
-      reasons: ['PERTUSSIS_COMPLETES_3_DOSE_SERIES'],
-    });
-    return;
-  }
+  dtpRules.applyDtpThreeDosePertussisCompletion({
+    series,
+    dataset,
+    availableImmunizations,
+    usedImmunizationIndexes,
+    matchedDoses,
+  });
 }
 
 function appendHepBHeplisavAcceptedDoseMatches({
@@ -4333,7 +4297,7 @@ function evaluateDoseConstraints({
   }
 
   if (series.vaccineGroup?.code === 'DTP') {
-    const duplicateReason = evaluateDtpDuplicateSameDay({
+    const duplicateReason = dtpRules.evaluateDtpDuplicateSameDay({
       series,
       dose,
       dataset,
@@ -4828,6 +4792,14 @@ function evaluateDoseSupplementalText({
     return polioSupplementalText(immunization);
   }
 
+  if (series.vaccineGroup?.code === 'DTP') {
+    return dtpRules.evaluateDtpDoseSupplementalText({
+      series,
+      immunization,
+      reasons,
+    });
+  }
+
   if (
     series.id !== 'MPOX_2_DOSE_SERIES' ||
     dose.doseNumber !== 2 ||
@@ -5295,7 +5267,7 @@ function buildSeriesRecommendation({
   }
 
   if (series.vaccineGroup?.code === 'DTP') {
-    return buildDtpRecommendation({
+    return dtpRules.buildDtpRecommendation({
       series,
       patient,
       evaluationDate,
@@ -6727,7 +6699,7 @@ function applyCustomNextDoseForecast({
   }
 
   if (series.vaccineGroup?.code === 'DTP') {
-    return applyDtpForecastOverride({
+    return dtpRules.applyDtpForecastOverride({
       series,
       forecast,
       matchedDoses,
