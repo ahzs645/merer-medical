@@ -520,6 +520,34 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
       'Pneumococcal child PPSV23 after child completion but before age 5 is accepted as VACCINE_NOT_PART_OF_THIS_SERIES.',
     testId: 'assertPneumococcalChildCompleteExtraPpsv23AcceptedNotPartOfSeries',
   },
+  {
+    ruleName:
+      'Pneumococcal Child Series: Evaluate the minimum interval as 0 days between a PPSV23 (CVX 33) and a shot of PCV (CVX 100, 177, 133, 152, 109, 215, 216, 327) administered at < 5yrs of age',
+    behavior:
+      'Pneumococcal child PPSV23 is accepted/ignored for series progress, so a same-day PCV can still satisfy the child target dose.',
+    testId: 'assertPneumococcalChildPpsv23DoesNotBlockSameDayPcv',
+  },
+  {
+    ruleName:
+      'Pneumococcal Child Series: Evaluate extra shots before 5 yrs of age as ACCEPTED / EXTRA_DOSE',
+    behavior:
+      'Pneumococcal child shots after child completion and before age 5 are accepted as EXTRA_DOSE unless they satisfy the modern-PCV-needed exception.',
+    testId: 'assertPneumococcalChildExtraPcvAcceptedExtraDose',
+  },
+  {
+    ruleName:
+      'Pneumococcal Child Series: Evaluate PCV Shot as Valid if Patient < 5yrs, interval is >= 52 days and Series is Complete',
+    behavior:
+      'Pneumococcal child modern PCV after child completion with no prior modern PCV is valid when at least 52 days after the prior shot.',
+    testId: 'assertPneumococcalChildModernPcvNeededAfterCompletionValidAt52Days',
+  },
+  {
+    ruleName:
+      'Pneumococcal Child Series: Evaluate PCV Shot as Invalid if Patient < 5yrs, interval is < 52 days and Series is Complete',
+    behavior:
+      'Pneumococcal child modern PCV after child completion with no prior modern PCV adds BELOW_MINIMUM_INTERVAL when given before 52 days.',
+    testId: 'assertPneumococcalChildModernPcvNeededAfterCompletionInvalidBefore52Days',
+  },
   ...[
     'Pneumococcal Child Series: Exception 1A: Set Series Dose Number to 2 if No Doses Administered and Patient >= 7m and < 12 Months at Execution Date',
     'Pneumococcal Child Series: Exception 1A: Skip Dose Number to 2 for Shot Administered to Patient between >= 7m and < 12m',

@@ -38,6 +38,10 @@ assertPneumococcalAdultUnspecifiedCvx152InvalidWithSupplementalText();
 assertPneumococcalChildPpsv23AcceptedNotPartOfSeries();
 assertPneumococcalChildFourEffectiveDosesCompleteSeries();
 assertPneumococcalChildCompleteExtraPpsv23AcceptedNotPartOfSeries();
+assertPneumococcalChildPpsv23DoesNotBlockSameDayPcv();
+assertPneumococcalChildExtraPcvAcceptedExtraDose();
+assertPneumococcalChildModernPcvNeededAfterCompletionValidAt52Days();
+assertPneumococcalChildModernPcvNeededAfterCompletionInvalidBefore52Days();
 assertPneumococcalChildNoDoseAge7MonthsTargetsDose2();
 assertPneumococcalChildOneDoseBefore7MonthsTargetsDose3();
 assertPneumococcalChildNoDoseAge12MonthsTargetsDose3();
@@ -334,6 +338,84 @@ function assertPneumococcalChildCompleteExtraPpsv23AcceptedNotPartOfSeries() {
   assert.deepEqual(forecast.acceptedDoses[0]?.reasons, [
     'VACCINE_NOT_PART_OF_THIS_SERIES',
   ]);
+}
+
+function assertPneumococcalChildPpsv23DoesNotBlockSameDayPcv() {
+  const forecast = evaluatePneumococcal({
+    birthDate: '2024-01-01',
+    evaluationDate: '2024-04-01',
+    immunizations: [
+      pneumococcalDose('ppsv23-child', '33', '2024-03-01'),
+      pneumococcalDose('pcv-same-day', '133', '2024-03-01'),
+    ],
+  });
+
+  assert.equal(forecast.acceptedDoses[0]?.immunization.id, 'ppsv23-child');
+  assert.equal(forecast.matchedDoses[0]?.immunization.id, 'pcv-same-day');
+  assert.equal(forecast.matchedDoses[0]?.dose.doseNumber, 1);
+}
+
+function assertPneumococcalChildExtraPcvAcceptedExtraDose() {
+  const forecast = evaluatePneumococcal({
+    birthDate: '2020-01-01',
+    evaluationDate: '2021-07-01',
+    immunizations: [
+      pneumococcalDose('pcv1', '133', '2020-03-01'),
+      pneumococcalDose('pcv2', '133', '2020-05-01'),
+      pneumococcalDose('pcv3', '133', '2020-07-01'),
+      pneumococcalDose('pcv4', '133', '2021-01-01'),
+      pneumococcalDose('pcv-extra', '133', '2021-06-01'),
+    ],
+  });
+
+  assert.equal(forecast.status, 'complete');
+  assert.equal(forecast.completedDoses, 4);
+  assert.equal(forecast.acceptedDoses[0]?.immunization.id, 'pcv-extra');
+  assert.equal(forecast.acceptedDoses[0]?.dose.doseNumber, 5);
+  assert.deepEqual(forecast.acceptedDoses[0]?.reasons, ['EXTRA_DOSE']);
+}
+
+function assertPneumococcalChildModernPcvNeededAfterCompletionValidAt52Days() {
+  const forecast = evaluatePneumococcal({
+    birthDate: '2020-01-01',
+    evaluationDate: '2021-04-01',
+    immunizations: [
+      pneumococcalDose('pcv7-1', '100', '2020-03-01'),
+      pneumococcalDose('pcv7-2', '100', '2020-05-01'),
+      pneumococcalDose('pcv7-3', '100', '2020-07-01'),
+      pneumococcalDose('pcv7-4', '100', '2021-01-01'),
+      pneumococcalDose('pcv13-needed', '133', '2021-03-01'),
+    ],
+  });
+
+  assert.equal(forecast.status, 'complete');
+  assert.equal(forecast.completedDoses, 5);
+  assert.equal(forecast.matchedDoses[4]?.immunization.id, 'pcv13-needed');
+  assert.equal(forecast.matchedDoses[4]?.dose.doseNumber, 5);
+}
+
+function assertPneumococcalChildModernPcvNeededAfterCompletionInvalidBefore52Days() {
+  const forecast = evaluatePneumococcal({
+    birthDate: '2020-01-01',
+    evaluationDate: '2021-02-01',
+    immunizations: [
+      pneumococcalDose('pcv7-1', '100', '2020-03-01'),
+      pneumococcalDose('pcv7-2', '100', '2020-05-01'),
+      pneumococcalDose('pcv7-3', '100', '2020-07-01'),
+      pneumococcalDose('pcv7-4', '100', '2021-01-01'),
+      pneumococcalDose('pcv13-needed-too-soon', '133', '2021-01-15'),
+    ],
+  });
+
+  assert.equal(forecast.status, 'complete');
+  assert.equal(
+    forecast.invalidDoses[0]?.immunization.id,
+    'pcv13-needed-too-soon',
+  );
+  assert.equal(forecast.invalidDoses[0]?.dose.doseNumber, 5);
+  assert.ok(
+    forecast.invalidDoses[0]?.reasons.includes('BELOW_MINIMUM_INTERVAL'),
+  );
 }
 
 function assertPneumococcalChildNoDoseAge7MonthsTargetsDose2() {
