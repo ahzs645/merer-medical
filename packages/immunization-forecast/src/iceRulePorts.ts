@@ -214,6 +214,13 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'Duplicate Shots/Same Day non-DTP Rule 5a: non-DTP shots; set the 2nd shot as Invalid w/ DUPLICATE_SHOT_SAME_DAY',
+    behavior:
+      'Disease-targeted same-day duplicate shots on the same target dose keep the first processed dose valid and mark the later dose duplicate.',
+    testId: 'assertDtpSameDaySamePertussisClassDuplicate',
+  },
+  {
+    ruleName:
       'Duplicate Shots/Same Day Overview Rule #4-DTP-Pertussis (NOT Both Primary Series Doses): If neither shot is in the primary series, both are NOS, and one of them contains Pertussis and the other does not, then evaluate shot with Pertussis as Valid and evaluate the other as Invalid with a reason code of DUPLICATE_SAME_DAY',
     behavior:
       'DTP same-day post-primary mixed pertussis/non-pertussis shots remain valid rather than being invalidated as primary-series duplicates.',
