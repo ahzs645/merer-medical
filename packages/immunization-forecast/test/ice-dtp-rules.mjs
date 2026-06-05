@@ -26,7 +26,14 @@ assertDtpSameDayNosPertussisPreferred();
 assertDtpSameDaySamePertussisClassDuplicate();
 assertDtpSameDayPostCompletionMixedPairBothValid();
 assertDtpSameDayPostCompletionSameClassPairBothValid();
+assertDtpUnderAgeTdapPrimaryDoseInvalidAndIgnored();
+assertDtpUnderAgeTdDoseInvalidAndIgnored();
+assertDtpTrueDose4TdapBypassesVaccineMinimumAge();
+assertDtpTrueDose5TdapBypassesVaccineMinimumAge();
+assertDtpPertussisDoseTooSoonAfterTdGetsPartialValidityReason();
 assertDtpValidTdDoseCarriesPertussisNeededSupplementalText();
+assertDtpValidDtDoseAtOrBefore7CarriesLimitationsSupplementalText();
+assertDtpValidDtDoseAfter7CarriesLimitationsSupplementalText();
 assertDtpChildRecommendationUsesDtapNos();
 assertDtpCatchupWithoutPertussisRecommendsTdap();
 assertDtpCatchupWithPertussisRecommendsTd();
@@ -35,11 +42,14 @@ assertDtpFiveDoseAdolescentTdapExceptionRecommendsAtAge7();
 assertDtpAdolescentTdapAfterCompleteStartsBoosterRecommendation();
 assertDtpFirstAdolescentTdapAge7To10Valid();
 assertDtpFirstAdolescentTdapAcceptedIfTooCloseToPertussis();
+assertDtpFirstAdolescentTdapAge10AcceptedIfTooCloseToPertussis();
 assertDtpRemainingAdolescentTdapAcceptedAsExtra();
 assertDtpRecurringTdAfterAdolescentTdapIsValid();
 assertDtpPertussisAge7To10RecommendsAdolescentTdapAt11();
+assertDtpSixBySevenRecommendsTdapAtAge7();
 assertDtpFiveDoseException1CompletesWithThreeDoses();
 assertDtpFiveDoseException1ForecastSkipsToDose4();
+assertDtpFiveDoseException1AdministeredDoseSkipsToDose4();
 assertDtpFiveDoseException2CompletesWithFourDoses();
 assertDtpThreeDoseTdOnlySeriesRemainsIncomplete();
 assertDtpThreeDosePertussisDoseCompletesSeries();
@@ -160,17 +170,155 @@ function assertDtpSameDayPostCompletionSameClassPairBothValid() {
   assert.ok(sameDayMatches.every((match) => match.status === 'valid'));
 }
 
-function assertDtpValidTdDoseCarriesPertussisNeededSupplementalText() {
+function assertDtpUnderAgeTdapPrimaryDoseInvalidAndIgnored() {
   const forecast = evaluateDtp({
     birthDate: '2020-01-01',
     evaluationDate: '2020-08-01',
-    immunizations: [dtpDose('td-dose', '09', '2020-07-01')],
+    immunizations: [
+      dtpDose('under-age-tdap', '115', '2020-03-01'),
+      dtpDose('dtap-after-invalid-tdap', '20', '2020-04-01'),
+    ],
+  });
+
+  const invalidTdap = forecast.invalidDoses.find(
+    (match) => match.immunization.id === 'under-age-tdap',
+  );
+  assert.equal(invalidTdap?.status, 'invalid');
+  assert.deepEqual(invalidTdap?.reasons, ['INSUFFICIENT_ANTIGEN']);
+
+  const followingDtap = forecast.matchedDoses.find(
+    (match) => match.immunization.id === 'dtap-after-invalid-tdap',
+  );
+  assert.equal(followingDtap?.status, 'valid');
+  assert.equal(followingDtap?.dose.doseNumber, 1);
+}
+
+function assertDtpUnderAgeTdDoseInvalidAndIgnored() {
+  const forecast = evaluateDtp({
+    birthDate: '2020-01-01',
+    evaluationDate: '2020-08-01',
+    immunizations: [
+      dtpDose('under-age-td', '09', '2020-03-01'),
+      dtpDose('dtap-after-invalid-td', '20', '2020-04-01'),
+    ],
+  });
+
+  const invalidTd = forecast.invalidDoses.find(
+    (match) => match.immunization.id === 'under-age-td',
+  );
+  assert.equal(invalidTd?.status, 'invalid');
+  assert.deepEqual(invalidTd?.reasons, ['BELOW_MINIMUM_AGE_VACCINE']);
+
+  const followingDtap = forecast.matchedDoses.find(
+    (match) => match.immunization.id === 'dtap-after-invalid-td',
+  );
+  assert.equal(followingDtap?.status, 'valid');
+  assert.equal(followingDtap?.dose.doseNumber, 1);
+}
+
+function assertDtpTrueDose4TdapBypassesVaccineMinimumAge() {
+  const forecast = evaluateDtp({
+    birthDate: '2020-01-01',
+    evaluationDate: '2021-08-01',
+    immunizations: [
+      dtpDose('dose-1', '20', '2020-03-01'),
+      dtpDose('dose-2', '20', '2020-05-01'),
+      dtpDose('dose-3', '20', '2020-07-01'),
+      dtpDose('tdap-dose-4', '115', '2021-01-01'),
+    ],
+  });
+
+  const tdapDose4 = forecast.matchedDoses.find(
+    (match) => match.immunization.id === 'tdap-dose-4',
+  );
+  assert.equal(tdapDose4?.status, 'valid');
+  assert.equal(tdapDose4?.dose.doseNumber, 4);
+  assert.equal(
+    forecast.invalidDoses.some((match) => match.immunization.id === 'tdap-dose-4'),
+    false,
+  );
+}
+
+function assertDtpTrueDose5TdapBypassesVaccineMinimumAge() {
+  const forecast = evaluateDtp({
+    birthDate: '2020-01-01',
+    evaluationDate: '2024-08-01',
+    immunizations: [
+      dtpDose('dose-1', '20', '2020-03-01'),
+      dtpDose('dose-2', '20', '2020-05-01'),
+      dtpDose('dose-3', '20', '2020-07-01'),
+      dtpDose('dose-4', '20', '2021-01-01'),
+      dtpDose('tdap-dose-5', '115', '2024-01-01'),
+    ],
+  });
+
+  const tdapDose5 = forecast.matchedDoses.find(
+    (match) => match.immunization.id === 'tdap-dose-5',
+  );
+  assert.equal(tdapDose5?.status, 'valid');
+  assert.equal(tdapDose5?.dose.doseNumber, 5);
+  assert.equal(
+    forecast.invalidDoses.some((match) => match.immunization.id === 'tdap-dose-5'),
+    false,
+  );
+}
+
+function assertDtpPertussisDoseTooSoonAfterTdGetsPartialValidityReason() {
+  const forecast = evaluateDtp3({
+    birthDate: '2010-01-01',
+    evaluationDate: '2017-03-01',
+    immunizations: [
+      dtpDose('td-dose-1', '09', '2017-01-01'),
+      dtpDose('tdap-dose-2-too-soon', '115', '2017-01-25'),
+    ],
+  });
+
+  const tdapDose = forecast.invalidDoses.find(
+    (match) => match.immunization.id === 'tdap-dose-2-too-soon',
+  );
+  assert.equal(tdapDose?.status, 'invalid');
+  assert.deepEqual(tdapDose?.reasons, ['D_AND_T_INVALID/P_VALID']);
+}
+
+function assertDtpValidTdDoseCarriesPertussisNeededSupplementalText() {
+  const forecast = evaluateDtp({
+    birthDate: '2010-01-01',
+    evaluationDate: '2017-02-01',
+    immunizations: [dtpDose('td-dose', '09', '2017-01-01')],
   });
 
   assert.equal(forecast.matchedDoses[0]?.immunization.id, 'td-dose');
   assert.equal(forecast.matchedDoses[0]?.status, 'valid');
   assert.deepEqual(forecast.matchedDoses[0]?.supplementalText, [
     'PERTUSSIS_NEEDED',
+  ]);
+}
+
+function assertDtpValidDtDoseAtOrBefore7CarriesLimitationsSupplementalText() {
+  const forecast = evaluateDtp({
+    birthDate: '2020-01-01',
+    evaluationDate: '2020-08-01',
+    immunizations: [dtpDose('dt-dose-child', '28', '2020-07-01')],
+  });
+
+  assert.equal(forecast.matchedDoses[0]?.immunization.id, 'dt-dose-child');
+  assert.equal(forecast.matchedDoses[0]?.status, 'valid');
+  assert.deepEqual(forecast.matchedDoses[0]?.supplementalText, [
+    'DT_LIMITATIONS',
+  ]);
+}
+
+function assertDtpValidDtDoseAfter7CarriesLimitationsSupplementalText() {
+  const forecast = evaluateDtp3({
+    birthDate: '2010-01-01',
+    evaluationDate: '2020-08-01',
+    immunizations: [dtpDose('dt-dose-older', '28', '2020-07-01')],
+  });
+
+  assert.equal(forecast.matchedDoses[0]?.immunization.id, 'dt-dose-older');
+  assert.equal(forecast.matchedDoses[0]?.status, 'valid');
+  assert.deepEqual(forecast.matchedDoses[0]?.supplementalText, [
+    'DT_LIMITATIONS',
   ]);
 }
 
@@ -306,6 +454,23 @@ function assertDtpFirstAdolescentTdapAcceptedIfTooCloseToPertussis() {
   assert.deepEqual(adolescentTdap?.reasons, ['EXTRA_DOSE']);
 }
 
+function assertDtpFirstAdolescentTdapAge10AcceptedIfTooCloseToPertussis() {
+  const forecast = evaluateDtp({
+    birthDate: '2020-01-01',
+    evaluationDate: '2030-03-01',
+    immunizations: [
+      ...fiveDoseChildhoodDtpSeries({ dose5Date: '2029-12-20' }),
+      dtpDose('tdap-age-10-too-close', '115', '2030-01-01'),
+    ],
+  });
+
+  const adolescentTdap = forecast.acceptedDoses.find(
+    (match) => match.immunization.id === 'tdap-age-10-too-close',
+  );
+  assert.equal(adolescentTdap?.status, 'accepted');
+  assert.deepEqual(adolescentTdap?.reasons, ['EXTRA_DOSE']);
+}
+
 function assertDtpRemainingAdolescentTdapAcceptedAsExtra() {
   const forecast = evaluateDtp({
     birthDate: '2020-01-01',
@@ -360,6 +525,27 @@ function assertDtpPertussisAge7To10RecommendsAdolescentTdapAt11() {
   assert.equal(forecast.recommendation?.overdueDate, '2033-01-29');
 }
 
+function assertDtpSixBySevenRecommendsTdapAtAge7() {
+  const forecast = evaluateDtp({
+    birthDate: '2020-01-01',
+    evaluationDate: '2026-06-01',
+    immunizations: [
+      dtpDose('under-age-tdap-1', '115', '2020-03-01'),
+      dtpDose('under-age-tdap-2', '115', '2020-05-01'),
+      dtpDose('under-age-tdap-3', '115', '2020-07-01'),
+      dtpDose('under-age-tdap-4', '115', '2021-01-01'),
+      dtpDose('under-age-tdap-5', '115', '2022-01-01'),
+      dtpDose('under-age-tdap-6', '115', '2023-01-01'),
+    ],
+  });
+
+  assert.equal(forecast.status, 'not-complete');
+  assert.equal(forecast.invalidDoses.length, 6);
+  assert.equal(forecast.recommendation?.recommendedVaccine?.cvx, '115');
+  assert.equal(forecast.recommendation?.earliestRecommendedDate, '2027-01-01');
+  assert.equal(forecast.recommendation?.recommendedDate, '2027-01-01');
+}
+
 function assertDtpFiveDoseException1CompletesWithThreeDoses() {
   const forecast = evaluateDtp({
     birthDate: '2020-01-01',
@@ -393,6 +579,24 @@ function assertDtpFiveDoseException1ForecastSkipsToDose4() {
   assert.equal(forecast.completedDoses, 2);
   assert.equal(forecast.nextDoseForecast?.dose.doseNumber, 4);
   assert.deepEqual(forecast.recommendation?.reasons, ['DUE']);
+}
+
+function assertDtpFiveDoseException1AdministeredDoseSkipsToDose4() {
+  const forecast = evaluateDtp({
+    birthDate: '2020-01-01',
+    evaluationDate: '2027-03-01',
+    immunizations: [
+      dtpDose('dose-1', '20', '2021-01-10'),
+      dtpDose('dose-2-at-4y', '20', '2024-01-10'),
+      dtpDose('dose-3-after-7y', '20', '2027-02-01'),
+    ],
+  });
+
+  const administeredAfterAge7 = forecast.matchedDoses.find(
+    (match) => match.immunization.id === 'dose-3-after-7y',
+  );
+  assert.equal(administeredAfterAge7?.status, 'valid');
+  assert.equal(administeredAfterAge7?.dose.doseNumber, 4);
 }
 
 function assertDtpFiveDoseException2CompletesWithFourDoses() {

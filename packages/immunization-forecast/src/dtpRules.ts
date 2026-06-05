@@ -302,6 +302,88 @@ export function evaluateDtpDuplicateSameDay({
   return undefined;
 }
 
+export function evaluateDtpCustomConstraints({
+  series,
+  dose,
+  immunization,
+  patient,
+}: {
+  series: IceSeriesDefinition;
+  dose: IceDoseRule;
+  immunization: ForecastImmunization;
+  patient?: ForecastPatient;
+}) {
+  const reasons: string[] = [];
+  if (!patient?.birthDate || !immunization.date) return reasons;
+
+  const cvx = normalizeCvx(immunization.vaccineCode);
+  if (
+    series.id === 'DTP_5_DOSE_SERIES' &&
+    dose.doseNumber <= 3 &&
+    cvx === '115' &&
+    !dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: immunization.date,
+      duration: '7y-4d',
+    })
+  ) {
+    reasons.push('INSUFFICIENT_ANTIGEN');
+  }
+
+  if (
+    isTdImmunization(immunization) &&
+    !dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: immunization.date,
+      duration: '7y-4d',
+    })
+  ) {
+    reasons.push('BELOW_MINIMUM_AGE_VACCINE');
+  }
+
+  return reasons;
+}
+
+export function evaluateDtpIntervalConstraint({
+  series,
+  immunization,
+  previousMatch,
+  minimumInterval,
+  patient,
+}: {
+  series: IceSeriesDefinition;
+  immunization: ForecastImmunization;
+  previousMatch: IceSeriesDoseMatch;
+  minimumInterval?: string;
+  patient?: ForecastPatient;
+}) {
+  if (
+    series.vaccineGroup?.code !== 'DTP' ||
+    !minimumInterval ||
+    !patient?.birthDate ||
+    !immunization.date ||
+    !previousMatch.immunization.date ||
+    !dtpVaccineContainsDiphtheriaTetanusPertussisFromCvx(
+      normalizeCvx(immunization.vaccineCode),
+    ) ||
+    !isDtpDiphtheriaTetanusOnlyImmunization(previousMatch.immunization) ||
+    !dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: immunization.date,
+      duration: '7y-4d',
+    }) ||
+    dateMeetsMinimumDuration({
+      startDate: previousMatch.immunization.date,
+      endDate: immunization.date,
+      duration: minimumInterval,
+    })
+  ) {
+    return undefined;
+  }
+
+  return 'D_AND_T_INVALID/P_VALID';
+}
+
 export function applyDtpThreeDosePertussisCompletion({
   series,
   dataset,
@@ -336,6 +418,41 @@ export function applyDtpThreeDosePertussisCompletion({
     });
     return;
   }
+}
+
+export function dtpCustomTargetDoseForImmunization({
+  series,
+  dose,
+  immunization,
+  matchedDoses,
+  patient,
+}: {
+  series: IceSeriesDefinition;
+  dose: IceDoseRule;
+  immunization: ForecastImmunization;
+  matchedDoses: IceSeriesDoseMatch[];
+  patient?: ForecastPatient;
+}) {
+  if (
+    series.id !== 'DTP_5_DOSE_SERIES' ||
+    dose.doseNumber !== 3 ||
+    matchedDoses.length !== 2 ||
+    !patient?.birthDate ||
+    !immunization.date ||
+    !dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: immunization.date,
+      duration: '7y',
+    }) ||
+    !dtpFiveDoseException1SetupApplies({
+      patient,
+      matchedDoses,
+    })
+  ) {
+    return undefined;
+  }
+
+  return series.doses.find((candidate) => candidate.doseNumber === 4);
 }
 
 export function appendDtpPostCompletionDoseMatches({
@@ -457,6 +574,8 @@ export function buildDtpRecommendation({
   evaluationDate,
   status,
   matchedDoses,
+  invalidDoses,
+  acceptedDoses,
   nextDoseForecast,
 }: {
   series: IceSeriesDefinition;
@@ -464,6 +583,8 @@ export function buildDtpRecommendation({
   evaluationDate: string;
   status: IceSeriesForecast['status'];
   matchedDoses: IceSeriesDoseMatch[];
+  invalidDoses: IceSeriesDoseMatch[];
+  acceptedDoses: IceSeriesDoseMatch[];
   nextDoseForecast?: IceNextDoseForecast;
 }): IceSeriesRecommendation | undefined {
   if (status !== 'complete') {
@@ -481,6 +602,33 @@ export function buildDtpRecommendation({
     }
 
     if (!nextDoseForecast) return undefined;
+
+    if (
+      dtpSixBySevenRecommendationApplies({
+        series,
+        patient,
+        evaluationDate,
+        matchedDoses,
+        invalidDoses,
+        acceptedDoses,
+      })
+    ) {
+      const age7Date = dateFromIceDuration({
+        startDate: patient!.birthDate!,
+        duration: '7y',
+      });
+      return {
+        status: 'recommended',
+        reasons: ['DUE'],
+        recommendedVaccine: {
+          cvx: '115',
+          display: 'Tdap',
+          preferred: true,
+        },
+        earliestRecommendedDate: age7Date,
+        recommendedDate: age7Date,
+      };
+    }
 
     const recommendationDate =
       nextDoseForecast.recommendedDate ??
@@ -638,6 +786,10 @@ export function evaluateDtpDoseSupplementalText({
     return ['PERTUSSIS_NEEDED'];
   }
 
+  if (reasons.length === 0 && normalizeCvx(immunization.vaccineCode) === '28') {
+    return ['DT_LIMITATIONS'];
+  }
+
   return [];
 }
 
@@ -693,26 +845,12 @@ export function applyDtpForecastOverride({
     return age7Forecast;
   }
 
-  const dose1 = matchedDoses.find((match) => match.dose.doseNumber === 1);
-  const laterDoseAt4y = matchedDoses.find(
-    (match) =>
-      match.dose.doseNumber >= 2 &&
-      match.immunization.date &&
-      dateMeetsMinimumDuration({
-        startDate: patient.birthDate!,
-        endDate: match.immunization.date,
-        duration: '4y',
-      }),
-  );
   const dose4 = series.doses.find((dose) => dose.doseNumber === 4);
   if (
     !dose4 ||
-    !dose1?.immunization.date ||
-    !laterDoseAt4y ||
-    !dateMeetsMinimumDuration({
-      startDate: patient.birthDate,
-      endDate: dose1.immunization.date,
-      duration: '12m',
+    !dtpFiveDoseException1SetupApplies({
+      patient,
+      matchedDoses,
     })
   ) {
     return age7Forecast;
@@ -729,6 +867,72 @@ export function applyDtpForecastOverride({
   };
 
   return replacementForecast;
+}
+
+function dtpSixBySevenRecommendationApplies({
+  series,
+  patient,
+  evaluationDate,
+  matchedDoses,
+  invalidDoses,
+  acceptedDoses,
+}: {
+  series: IceSeriesDefinition;
+  patient?: ForecastPatient;
+  evaluationDate: string;
+  matchedDoses: IceSeriesDoseMatch[];
+  invalidDoses: IceSeriesDoseMatch[];
+  acceptedDoses: IceSeriesDoseMatch[];
+}) {
+  if (
+    series.id !== 'DTP_5_DOSE_SERIES' ||
+    !patient?.birthDate ||
+    dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: evaluationDate,
+      duration: '7y',
+    })
+  ) {
+    return false;
+  }
+
+  const administeredShotDates = new Set(
+    [...matchedDoses, ...invalidDoses, ...acceptedDoses]
+      .filter((match) => !match.reasons.includes('DUPLICATE_SAME_DAY'))
+      .map((match) => `${match.immunization.date ?? ''}:${match.immunization.id ?? ''}`),
+  );
+
+  return administeredShotDates.size >= 6;
+}
+
+function dtpFiveDoseException1SetupApplies({
+  patient,
+  matchedDoses,
+}: {
+  patient: ForecastPatient;
+  matchedDoses: IceSeriesDoseMatch[];
+}) {
+  const dose1 = matchedDoses.find((match) => match.dose.doseNumber === 1);
+  const laterDoseAt4y = matchedDoses.find(
+    (match) =>
+      match.dose.doseNumber >= 2 &&
+      match.immunization.date &&
+      dateMeetsMinimumDuration({
+        startDate: patient.birthDate!,
+        endDate: match.immunization.date,
+        duration: '4y',
+      }),
+  );
+
+  return (
+    !!dose1?.immunization.date &&
+    !!laterDoseAt4y &&
+    dateMeetsMinimumDuration({
+      startDate: patient.birthDate!,
+      endDate: dose1.immunization.date,
+      duration: '12m',
+    })
+  );
 }
 
 function dtpVaccineMetadata(
@@ -887,6 +1091,12 @@ function isTdImmunization(immunization: ForecastImmunization) {
   return ['09', '113', '138', '139', '196'].includes(
     normalizeCvx(immunization.vaccineCode) ?? '',
   );
+}
+
+function isDtpDiphtheriaTetanusOnlyImmunization(
+  immunization: ForecastImmunization,
+) {
+  return isTdImmunization(immunization) || normalizeCvx(immunization.vaccineCode) === '28';
 }
 
 function dtpFiveDoseAdolescentTdapExceptionApplies({

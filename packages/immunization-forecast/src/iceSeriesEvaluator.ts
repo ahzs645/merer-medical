@@ -480,6 +480,7 @@ function evaluateOneSeries(
       status,
       completedDoses,
       matchedDoses,
+      invalidDoses,
       acceptedDoses,
       nextDoseForecast,
       dataset,
@@ -3002,6 +3003,18 @@ function customTargetDoseForImmunization({
     );
   }
 
+  if (series.vaccineGroup?.code === 'DTP') {
+    return (
+      dtpRules.dtpCustomTargetDoseForImmunization({
+        series,
+        dose,
+        immunization,
+        matchedDoses,
+        patient,
+      }) ?? dose
+    );
+  }
+
   if (
     series.id !== 'HIB_4_DOSE_SERIES' ||
     !patient?.birthDate ||
@@ -4306,6 +4319,14 @@ function evaluateDoseConstraints({
     });
     if (duplicateReason) addReason(reasons, duplicateReason);
     if (duplicateReason) return reasons;
+    for (const dtpReason of dtpRules.evaluateDtpCustomConstraints({
+      series,
+      dose,
+      immunization,
+      patient,
+    })) {
+      addReason(reasons, dtpReason);
+    }
   }
 
   if (
@@ -4458,6 +4479,14 @@ function evaluateDoseConstraints({
     ) {
       addReason(reasons, 'BELOW_ABSOLUTE_MINIMUM_INTERVAL');
     }
+    const dtpIntervalReason = dtpRules.evaluateDtpIntervalConstraint({
+      series,
+      immunization,
+      previousMatch,
+      minimumInterval: interval.minimumInterval,
+      patient,
+    });
+    if (dtpIntervalReason) addReason(reasons, dtpIntervalReason);
   }
 
   const latestInvalidDose2 = [...invalidDoses]
@@ -5096,6 +5125,7 @@ function buildSeriesRecommendation({
   status,
   completedDoses,
   matchedDoses,
+  invalidDoses,
   acceptedDoses,
   nextDoseForecast,
   dataset,
@@ -5107,6 +5137,7 @@ function buildSeriesRecommendation({
   status: IceSeriesForecast['status'];
   completedDoses: number;
   matchedDoses: IceSeriesDoseMatch[];
+  invalidDoses: IceSeriesDoseMatch[];
   acceptedDoses: IceSeriesDoseMatch[];
   nextDoseForecast?: IceNextDoseForecast;
   dataset: IceDataset;
@@ -5273,6 +5304,8 @@ function buildSeriesRecommendation({
       evaluationDate,
       status,
       matchedDoses,
+      invalidDoses,
+      acceptedDoses,
       nextDoseForecast,
     });
   }

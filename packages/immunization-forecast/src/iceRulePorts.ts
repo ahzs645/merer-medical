@@ -255,6 +255,28 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     testId: 'assertDtpCatchupWithoutPertussisRecommendsTdap',
   },
   {
+    ruleName:
+      'DTP(Any): Mark that dose of pertussis has not been administered for a shot if the shot is not valid',
+    behavior:
+      'Invalid DTP shots such as under-age Tdap do not count as pertussis doses, while D_AND_T_INVALID/P_VALID is retained as the partial-pertussis-valid exception.',
+    testId:
+      'assertDtpUnderAgeTdapPrimaryDoseInvalidAndIgnored/assertDtpPertussisDoseTooSoonAfterTdGetsPartialValidityReason',
+  },
+  {
+    ruleName:
+      'DTP: Bypass absolute minimum age for vaccine check if the primary series is complete',
+    behavior:
+      'After DTP primary-series completion, DTP-family follow-up shots are evaluated through adolescent/recurring Td handling instead of primary-series vaccine minimum-age gates.',
+    testId: 'assertDtpAdolescentTdapAfterCompleteStartsBoosterRecommendation',
+  },
+  {
+    ruleName:
+      'DTP: Bypass absolute maximum age for vaccine check if the primary series is complete',
+    behavior:
+      'After DTP primary-series completion, DTP-family follow-up shots are evaluated through adolescent/recurring Td handling instead of primary-series vaccine maximum-age gates.',
+    testId: 'assertDtpRecurringTdAfterAdolescentTdapIsValid',
+  },
+  {
     ruleName: 'DTP: Evaluate Adolescent Tdap Shot based on Age >= 10yrs',
     behavior:
       'After DTP primary-series completion, a DTaP/Tdap-family dose at age 10 or later is recorded as valid adolescent Tdap.',
@@ -280,6 +302,13 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     behavior:
       'The first age 7 through before age 10 adolescent Tdap-family dose is accepted as EXTRA_DOSE when it is less than 28 days after a prior pertussis dose.',
     testId: 'assertDtpFirstAdolescentTdapAcceptedIfTooCloseToPertussis',
+  },
+  {
+    ruleName:
+      'DTP: Evaluate First Adolescent Tdap Shot >= 10yrs as Accepted / Extra_Dose if Interval of 4 weeks between Pertussis Shots is not met',
+    behavior:
+      'The first age 10 or later adolescent Tdap-family dose is accepted as EXTRA_DOSE when it is less than 28 days after a prior pertussis dose.',
+    testId: 'assertDtpFirstAdolescentTdapAge10AcceptedIfTooCloseToPertussis',
   },
   {
     ruleName:
@@ -315,6 +344,69 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     behavior:
       'A qualifying age 10 or later adolescent Tdap-family dose remains valid adolescent Tdap instead of being downgraded to extra dose.',
     testId: 'assertDtpAdolescentTdapAfterCompleteStartsBoosterRecommendation',
+  },
+  {
+    ruleName:
+      'DTP(1): A primary series dose of pertussis exists if a (valid) dose of Pertussis was administered',
+    behavior:
+      'A valid primary-series pertussis-containing DTP dose is recognized when choosing catch-up Td versus Tdap recommendations.',
+    testId: 'assertDtpCatchupWithPertussisRecommendsTd',
+  },
+  {
+    ruleName:
+      'DTP(3): A dose of pertussis exists if a (valid) dose for Adolescent Tdap was administered',
+    behavior:
+      'A valid adolescent Tdap-family dose is recognized as a pertussis dose and moves complete DTP forecasting to Tdap/Td booster recommendations.',
+    testId: 'assertDtpAdolescentTdapAfterCompleteStartsBoosterRecommendation',
+  },
+  {
+    ruleName:
+      'DTP: Absolute Minimum Vaccine Age for Tdap applies for target doses 1-3 of the 5-dose series when certain conditions are true',
+    behavior:
+      'Tdap CVX 115 given as DTP 5-dose target dose 1, 2, or 3 before age 7y-4d is invalid as INSUFFICIENT_ANTIGEN and does not advance primary-series dose matching.',
+    testId: 'assertDtpUnderAgeTdapPrimaryDoseInvalidAndIgnored',
+  },
+  {
+    ruleName:
+      'DTP: If Absolute Vaccine Minimum Age for Td is not met (7y-4d), shot should be ignored when calculating intervals',
+    behavior:
+      'Td-family doses given before age 7y-4d are invalid as BELOW_MINIMUM_AGE_VACCINE and are ignored for later DTP interval and dose matching.',
+    testId: 'assertDtpUnderAgeTdDoseInvalidAndIgnored',
+  },
+  {
+    ruleName:
+      'DTP(HistoryEvaluation): If Tdap (CVX 115) is administered as target dose 1, 2 or 3 to a patient < 7yrs-4days, shot should be ignored when calculating intervals',
+    behavior:
+      'Under-age Tdap CVX 115 on DTP 5-dose target doses 1 through 3 is invalid and ignored for later DTP interval and dose matching.',
+    testId: 'assertDtpUnderAgeTdapPrimaryDoseInvalidAndIgnored',
+  },
+  {
+    ruleName:
+      'DTP: Enforce Minimum Interval between Tdap/DTaP and Td/DT if the shot meets the minimum age',
+    behavior:
+      'A pertussis-containing DTP-family dose given after a Td/DT dose but before the minimum interval is invalidated as D_AND_T_INVALID/P_VALID when vaccine minimum age is met.',
+    testId: 'assertDtpPertussisDoseTooSoonAfterTdGetsPartialValidityReason',
+  },
+  {
+    ruleName:
+      'DTP(2): A primary series dose of pertussis exists if a shot that was evaluated as Invalid with a reason code of D_AND_T_INVALID/P_VALID',
+    behavior:
+      'DTP interval evaluation preserves the valid pertussis component by using D_AND_T_INVALID/P_VALID when a pertussis-containing dose is too soon after Td/DT.',
+    testId: 'assertDtpPertussisDoseTooSoonAfterTdGetsPartialValidityReason',
+  },
+  {
+    ruleName:
+      'DTP: Absolute Minimum Vaccine Age for Tdap does not apply for true target dose 4 or 5 of the 5-dose for 5-dose series if 5-dose Exception #1 did not occur',
+    behavior:
+      'Tdap CVX 115 on a true DTP 5-dose target dose 4 is allowed without enforcing the Tdap vaccine-level 7y-4d minimum age.',
+    testId: 'assertDtpTrueDose4TdapBypassesVaccineMinimumAge',
+  },
+  {
+    ruleName:
+      'DTP: Absolute Minimum Vaccine Age for Tdap does not apply for true target dose 4 or 5 of the 5-dose for 5-dose series if 5-dose Exception #2 did not occur',
+    behavior:
+      'Tdap CVX 115 on a true DTP 5-dose target dose 5 is allowed without enforcing the Tdap vaccine-level 7y-4d minimum age.',
+    testId: 'assertDtpTrueDose5TdapBypassesVaccineMinimumAge',
   },
   {
     ruleName:
@@ -374,6 +466,20 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'DTP: Recommend at the vaccine level in DTP series; if the patient < 7yrs, the series is not complete and the recommendation date is at >= 7yrs of age, recommend Tdap (CVX 115)',
+    behavior:
+      'Incomplete DTP recommendations whose next recommended date is at age 7 or later recommend Tdap CVX 115 even when evaluation occurs before age 7.',
+    testId: 'assertDtpSixBySevenRecommendsTdapAtAge7',
+  },
+  {
+    ruleName:
+      'DTP: (Six by Seven Rule)- Recommend next dose at age 7yrs for 5-dose series if patient < 7yrs, series is not complete and has received 6 shots',
+    behavior:
+      'DTP 5-dose patients younger than age 7 with at least six non-duplicate administered DTP shots and incomplete series are recommended at age 7.',
+    testId: 'assertDtpSixBySevenRecommendsTdapAtAge7',
+  },
+  {
+    ruleName:
       'DTP: If the 5-Dose Series is Complete and the patient has NOT received a pertussis containing dose at >= 7 years and <10 years, then invoke 5-Dose Series Adolescent Tdap Exception Rules',
     behavior:
       'Completed DTP 5-dose histories without an age 7 through before age 10 pertussis dose evaluate the adolescent Tdap exception rules before using generic completed-series recommendation timing.',
@@ -423,6 +529,27 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'If a patient is in the DTP 5-dose series and a Valid Td is administered, return the reason code SUPPLEMENTAL_TEXT and descriptive text that Pertussis is needed to complete the series',
+    behavior:
+      'Valid Td-family doses in the DTP 5-dose series carry PERTUSSIS_NEEDED supplemental text so the missing pertussis antigen is surfaced.',
+    testId: 'assertDtpValidTdDoseCarriesPertussisNeededSupplementalText',
+  },
+  {
+    ruleName:
+      'If a patient is administered a Valid DT (CVX 28) <= 7yrs, return the reason code SUPPLEMENTAL_TEXT and descriptive text indicating limitations of when DT should be administered',
+    behavior:
+      'Valid DT CVX 28 doses at or before age 7 carry DT_LIMITATIONS supplemental text.',
+    testId: 'assertDtpValidDtDoseAtOrBefore7CarriesLimitationsSupplementalText',
+  },
+  {
+    ruleName:
+      'If a patient is administered a Valid DT (CVX 28) > 7yrs, return the reason code SUPPLEMENTAL_TEXT and descriptive text indicating limitations of when DT should be administered',
+    behavior:
+      'Valid DT CVX 28 doses after age 7 carry DT_LIMITATIONS supplemental text.',
+    testId: 'assertDtpValidDtDoseAfter7CarriesLimitationsSupplementalText',
+  },
+  {
+    ruleName:
       'DTP: (5-Dose Series Exception Rule 1)- Mark the 5-Dose Series Complete if age >=7 yrs, with the first dose at >= 12m and at least 1 dose at >= 4yrs',
     behavior:
       'DTP 5-dose series is complete with 3 valid doses when dose 1 is at or after 12 months, a later dose is at or after age 4, and evaluation is at or after age 7.',
@@ -441,6 +568,13 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     behavior:
       'DTP 5-dose forecast skips recommendation from dose 3 to dose 4 for catch-up patients age 7 or older with dose 1 at or after 12 months and another dose at or after age 4.',
     testId: 'assertDtpFiveDoseException1ForecastSkipsToDose4',
+  },
+  {
+    ruleName:
+      'DTP: (5-Dose Series Exception Rule 1)- Skip Dose Number to 4 if Patient >= 7 yrs when 3rd target dose is being administered, with first dose at >= 12m and at least 1 dose at >= 4yrs',
+    behavior:
+      'DTP 5-dose evaluation retargets the administered third catch-up shot to dose 4 when the patient is at least 7, dose 1 was at or after 12 months, and a prior dose was at or after age 4.',
+    testId: 'assertDtpFiveDoseException1AdministeredDoseSkipsToDose4',
   },
   {
     ruleName:
