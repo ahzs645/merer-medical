@@ -1,0 +1,4 @@
+[submodule "vendor/ice"]
+	path = vendor/ice
+	url = https://github.com/ahzs645/ice.git
+	branch = main-v2

@@ -12,6 +12,7 @@ import {
   ClipboardDocumentListIcon,
   ExclamationCircleIcon,
   PhotoIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
@@ -25,6 +26,11 @@ const recordTabs = [
     to: AppRoutes.Medications,
     label: 'Medications',
     icon: ClipboardDocumentListIcon,
+  },
+  {
+    to: AppRoutes.Immunizations,
+    label: 'Immunizations',
+    icon: ShieldCheckIcon,
   },
   {
     to: AppRoutes.Insurance,

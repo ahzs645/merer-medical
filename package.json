@@ -156,6 +156,7 @@
     "date-fns": "^2.29.1",
     "dexie": "^4.0.7",
     "dompurify": "^3.0.8",
+    "fast-xml-parser": "^5.8.0",
     "fflate": "^0.8.2",
     "fhirpath": "^3.5.0",
     "framer-motion": "^10.16.4",
