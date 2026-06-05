@@ -499,6 +499,27 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     testId:
       'assertPneumococcalAdultUnspecifiedCvx109InvalidWithSupplementalText/assertPneumococcalAdultUnspecifiedCvx152InvalidWithSupplementalText',
   },
+  {
+    ruleName:
+      'Pneumococcal: Note completion of child series if the patient has received 4 effective doses prior to 5 years of age',
+    behavior:
+      'Pneumococcal child series completes when four valid child dose slots are satisfied before age 5.',
+    testId: 'assertPneumococcalChildFourEffectiveDosesCompleteSeries',
+  },
+  {
+    ruleName:
+      'Pneumococcal Child Series: Evaluate shot administered with an invalid vaccine as Accepted with reason code of VACCINE_NOT_PART_OF_THIS_SERIES (corollary to below; child series not complete)',
+    behavior:
+      'Pneumococcal child PPSV23 before child completion is accepted as VACCINE_NOT_PART_OF_THIS_SERIES.',
+    testId: 'assertPneumococcalChildPpsv23AcceptedNotPartOfSeries',
+  },
+  {
+    ruleName:
+      'Pneumococcal Child Series: Evaluate shot administered with an invalid vaccine as Accepted with reason code of VACCINE_NOT_PART_OF_THIS_SERIES (corollary to above; child series complete; patient < 5 yrs of age)',
+    behavior:
+      'Pneumococcal child PPSV23 after child completion but before age 5 is accepted as VACCINE_NOT_PART_OF_THIS_SERIES.',
+    testId: 'assertPneumococcalChildCompleteExtraPpsv23AcceptedNotPartOfSeries',
+  },
   ...[
     'Pneumococcal Child Series: Exception 1A: Set Series Dose Number to 2 if No Doses Administered and Patient >= 7m and < 12 Months at Execution Date',
     'Pneumococcal Child Series: Exception 1A: Skip Dose Number to 2 for Shot Administered to Patient between >= 7m and < 12m',

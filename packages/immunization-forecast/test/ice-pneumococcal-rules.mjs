@@ -35,6 +35,9 @@ assertPneumococcalAdultPcv7AcceptedAtAge5();
 assertPneumococcalAdultPcv7IgnoredForDoseProgressAtAge19();
 assertPneumococcalAdultUnspecifiedCvx109InvalidWithSupplementalText();
 assertPneumococcalAdultUnspecifiedCvx152InvalidWithSupplementalText();
+assertPneumococcalChildPpsv23AcceptedNotPartOfSeries();
+assertPneumococcalChildFourEffectiveDosesCompleteSeries();
+assertPneumococcalChildCompleteExtraPpsv23AcceptedNotPartOfSeries();
 assertPneumococcalChildNoDoseAge7MonthsTargetsDose2();
 assertPneumococcalChildOneDoseBefore7MonthsTargetsDose3();
 assertPneumococcalChildNoDoseAge12MonthsTargetsDose3();
@@ -279,6 +282,57 @@ function assertPneumococcalAdultUnspecifiedCvx152InvalidWithSupplementalText() {
   ]);
   assert.deepEqual(forecast.invalidDoses[0]?.supplementalText, [
     'PNEUMOCOCCAL_UNSPECIFIED_CVX',
+  ]);
+}
+
+function assertPneumococcalChildPpsv23AcceptedNotPartOfSeries() {
+  const forecast = evaluatePneumococcal({
+    birthDate: '2024-01-01',
+    evaluationDate: '2024-04-01',
+    immunizations: [pneumococcalDose('ppsv23-child', '33', '2024-03-01')],
+  });
+
+  assert.equal(forecast.acceptedDoses[0]?.immunization.id, 'ppsv23-child');
+  assert.equal(forecast.acceptedDoses[0]?.dose.doseNumber, 1);
+  assert.deepEqual(forecast.acceptedDoses[0]?.reasons, [
+    'VACCINE_NOT_PART_OF_THIS_SERIES',
+  ]);
+}
+
+function assertPneumococcalChildFourEffectiveDosesCompleteSeries() {
+  const forecast = evaluatePneumococcal({
+    birthDate: '2020-01-01',
+    evaluationDate: '2021-02-01',
+    immunizations: [
+      pneumococcalDose('pcv1', '133', '2020-03-01'),
+      pneumococcalDose('pcv2', '133', '2020-05-01'),
+      pneumococcalDose('pcv3', '133', '2020-07-01'),
+      pneumococcalDose('pcv4', '133', '2021-01-01'),
+    ],
+  });
+
+  assert.equal(forecast.status, 'complete');
+  assert.equal(forecast.completedDoses, 4);
+}
+
+function assertPneumococcalChildCompleteExtraPpsv23AcceptedNotPartOfSeries() {
+  const forecast = evaluatePneumococcal({
+    birthDate: '2020-01-01',
+    evaluationDate: '2021-07-01',
+    immunizations: [
+      pneumococcalDose('pcv1', '133', '2020-03-01'),
+      pneumococcalDose('pcv2', '133', '2020-05-01'),
+      pneumococcalDose('pcv3', '133', '2020-07-01'),
+      pneumococcalDose('pcv4', '133', '2021-01-01'),
+      pneumococcalDose('ppsv-extra', '33', '2021-06-01'),
+    ],
+  });
+
+  assert.equal(forecast.status, 'complete');
+  assert.equal(forecast.acceptedDoses[0]?.immunization.id, 'ppsv-extra');
+  assert.equal(forecast.acceptedDoses[0]?.dose.doseNumber, 4);
+  assert.deepEqual(forecast.acceptedDoses[0]?.reasons, [
+    'VACCINE_NOT_PART_OF_THIS_SERIES',
   ]);
 }
 
