@@ -120,6 +120,25 @@ export function pneumococcalCustomTargetDoseForImmunization({
     return series.doses.find((candidate) => candidate.doseNumber === 6);
   }
 
+  const administrationDate = immunization.date;
+
+  if (
+    !dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: administrationDate,
+      duration: '1y-4d',
+    }) &&
+    pneumococcalDosesBefore(matchedDoses, patient.birthDate, '7m') === 0 &&
+    matchedDoses.filter(
+      (match) =>
+        match.status === 'valid' &&
+        match.immunization.date &&
+        match.immunization.date < administrationDate,
+    ).length >= 2
+  ) {
+    return series.doses.find((candidate) => candidate.doseNumber === 4);
+  }
+
   const effectiveDoseNumber = pneumococcalEffectiveDoseNumber({
     birthDate: patient.birthDate,
     date: immunization.date,
@@ -252,6 +271,88 @@ export function evaluatePneumococcalInvalidNonAllowedDose({
   }
 
   return undefined;
+}
+
+export function evaluatePneumococcalSameDayCompletedChildDuplicate({
+  series,
+  immunization,
+  matchedDoses,
+  patient,
+}: {
+  series: IceSeriesDefinition;
+  immunization: ForecastImmunization;
+  matchedDoses: IceSeriesDoseMatch[];
+  patient?: ForecastPatient;
+}): IceSeriesDoseMatch | undefined {
+  if (
+    series.id !== 'PNEUMOCOCCAL_SERIES' ||
+    !patient?.birthDate ||
+    !immunization.date ||
+    !pneumococcalHasCompletedChildSeries({
+      matchedDoses,
+      birthDate: patient.birthDate,
+    })
+  ) {
+    return undefined;
+  }
+
+  const sameDayChildDose = matchedDoses.find(
+    (match) =>
+      match.status === 'valid' &&
+      match.dose.doseNumber <= 4 &&
+      match.immunization.date === immunization.date,
+  );
+  if (!sameDayChildDose) return undefined;
+
+  return {
+    immunization,
+    dose: sameDayChildDose.dose,
+    status: 'invalid',
+    reasons: ['DUPLICATE_SAME_DAY'],
+  };
+}
+
+export function evaluatePneumococcalInvalidOutsideRoutineDose({
+  series,
+  dose,
+  immunization,
+  reasons,
+  patient,
+}: {
+  series: IceSeriesDefinition;
+  dose: IceDoseRule;
+  immunization: ForecastImmunization;
+  reasons: string[];
+  patient?: ForecastPatient;
+}): IceSeriesDoseMatch | undefined {
+  if (
+    series.id !== 'PNEUMOCOCCAL_SERIES' ||
+    dose.doseNumber < 6 ||
+    !patient?.birthDate ||
+    !immunization.date ||
+    reasons.length === 0 ||
+    reasons.includes('DUPLICATE_SAME_DAY') ||
+    reasons.includes('BELOW_ABSOLUTE_MINIMUM_AGE')
+  ) {
+    return undefined;
+  }
+
+  const cvx = normalizeCvx(immunization.vaccineCode);
+  if (cvx === '109' || cvx === '152') return undefined;
+
+  const isAtLeast5 = dateMeetsMinimumDuration({
+    startDate: patient.birthDate,
+    endDate: immunization.date,
+    duration: '5y',
+  });
+  if (!isAtLeast5) return undefined;
+
+  return {
+    immunization,
+    dose,
+    status: 'accepted',
+    reasons: ['OUTSIDE_ROUTINE_SERIES'],
+  };
 }
 
 function pneumococcalSameDayPreferred({
@@ -493,6 +594,17 @@ export function evaluatePneumococcalCustomConstraints({
     })
   ) {
     reasons.push('BELOW_MINIMUM_INTERVAL');
+  }
+
+  if (
+    pneumococcalChildFinalDoseBelowMinimumAge({
+      immunization,
+      dose,
+      matchedDoses,
+      patient,
+    })
+  ) {
+    reasons.push('BELOW_ABSOLUTE_MINIMUM_AGE');
   }
 
   return reasons;
@@ -887,6 +999,29 @@ export function buildPneumococcalRecommendation({
   };
 
   if (nextDoseForecast.dose.doseNumber <= 5) {
+    const childRecommendationDate =
+      nextDoseForecast.recommendedDate ?? nextDoseForecast.earliestRecommendedDate;
+    if (
+      childRecommendationDate &&
+      dateMeetsMinimumDuration({
+        startDate: patient.birthDate,
+        endDate: childRecommendationDate,
+        duration: '5y',
+      }) &&
+      !dateMeetsMinimumDuration({
+        startDate: patient.birthDate,
+        endDate: childRecommendationDate,
+        duration: '19y',
+      })
+    ) {
+      return {
+        ...recommendation,
+        status: 'conditionally-recommended',
+        recommendedVaccine: undefined,
+        reasons: ['HIGH_RISK'],
+      };
+    }
+
     return {
       ...recommendation,
       recommendedVaccine: undefined,
@@ -1201,6 +1336,35 @@ function pneumococcalChildModernPcvNeededIntervalMet({
       endDate: immunization.date,
       duration: '52d',
     })
+  );
+}
+
+function pneumococcalChildFinalDoseBelowMinimumAge({
+  immunization,
+  dose,
+  matchedDoses,
+  patient,
+}: {
+  immunization: ForecastImmunization;
+  dose: IceDoseRule;
+  matchedDoses: IceSeriesDoseMatch[];
+  patient?: ForecastPatient;
+}) {
+  if (
+    dose.doseNumber !== 4 ||
+    !patient?.birthDate ||
+    !immunization.date ||
+    dateMeetsMinimumDuration({
+      startDate: patient.birthDate,
+      endDate: immunization.date,
+      duration: '1y-4d',
+    })
+  ) {
+    return false;
+  }
+
+  return (
+    pneumococcalDosesBefore(matchedDoses, patient.birthDate, '7m') === 0
   );
 }
 

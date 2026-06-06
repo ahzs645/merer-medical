@@ -620,6 +620,13 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'ImmunizationReferenceData: Initalize Output of Earliest and Overdue Dates for Pneumococcal Adult Series Fact Object',
+    behavior:
+      'The TypeScript forecast model initializes adult pneumococcal earliest, recommended, and overdue date fields as normal optional forecast fields; adult pneumococcal date output is enabled by default.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
       'Pneumococcal Adult: if a (valid) PCV15 dose and (valid) PPSV23 dose has been administered in the Adult series, the series is complete',
     behavior:
       'Adult pneumococcal PCV15 plus PPSV23 targets adult dose slots and completes the pneumococcal series.',
@@ -723,6 +730,20 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
       'Pneumococcal same-day duplicate handling prefers PCV7 over PCV10 before the March 31, 2009 cutoff.',
     testId: 'assertPneumococcalChildSameDayPcv7PreferredOverPcv10Before2009',
   },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day(Pneumococcal): If 2 childhood series shots are VALID and the childhood series is complete, mark the latter administered shot as Invalid / DUPLICATE_SAME_DAY',
+    behavior:
+      'Pneumococcal child same-day completion keeps the first valid child-series dose and marks the later same-day child dose invalid with DUPLICATE_SAME_DAY.',
+    testId: 'assertPneumococcalChildCompleteSameDaySecondDoseInvalidDuplicate',
+  },
+  {
+    ruleName:
+      'Duplicate Shot/Same Day Overview Abstract Pneumococcal Rule #5: Make notes if neither shot is an NOS CVX, neither shot is a combination, or both shots are a combination',
+    behavior:
+      'Pneumococcal same-day handling is implemented directly with product-pair precedence and child-completion duplicate hooks, so this ICE bookkeeping note has no separate persisted fact in TypeScript.',
+    testId: 'ice-pneumococcal-rules',
+  },
   ...[
     'Pneumococcal Adult Series: Exception 4: Set Series Dose Number to 6 (AdultSeries) if No Shots Administered and Patient >= 5y of Age at Execution Date',
     'Pneumococcal Child Series: Exception 4: Skip Dose Number to 6 (Adult Series) for Patient >= 5y at Shot Date',
@@ -781,6 +802,21 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'Pneumococcal Adult: if INVALID shot administered >= 5 yrs and < 19 yrs was not evaluated as below the minimum age for the vaccine (e.g. - PCV21), evaluate the shot as Accepted / OUTSIDE_ROUTINE_SERIES',
+    behavior:
+      'Pneumococcal invalid adult-slot shots at age 5 or later convert to accepted OUTSIDE_ROUTINE_SERIES unless the invalid reason is below minimum age, duplicate same-day, or an unspecified adult CVX.',
+    testId:
+      'assertPneumococcalAdultInvalidDoseAcceptedOutsideRoutineAt19/assertPneumococcalAge5BelowMinimumAgeStaysInvalid',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: If a shot is admininistered >= 19y in the Adult Series is Invalid and the series is not complete, mark the shot ACCEPTED / OUTSIDE_ROUTINE_SERIES',
+    behavior:
+      'Pneumococcal invalid adult-series shots at age 19 or later convert to accepted OUTSIDE_ROUTINE_SERIES when the series is incomplete, excluding duplicate same-day and unspecified adult CVX cases.',
+    testId: 'assertPneumococcalAdultInvalidDoseAcceptedOutsideRoutineAt19',
+  },
+  {
+    ruleName:
       'Pneumococcal Adult: If CVX 109 or CVX 152 has been evaluated as INVALID / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE in the Adult Series, remove all other reason codes and add supplemental text',
     behavior:
       'Pneumococcal adult CVX109 and CVX152 shots are invalid with VACCINE_NOT_ALLOWED_FOR_THIS_DOSE and the unspecified-CVX supplemental text.',
@@ -835,6 +871,13 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     behavior:
       'Pneumococcal child modern PCV after child completion with no prior modern PCV adds BELOW_MINIMUM_INTERVAL when given before 52 days.',
     testId: 'assertPneumococcalChildModernPcvNeededAfterCompletionInvalidBefore52Days',
+  },
+  {
+    ruleName:
+      'Pneumococcal Child Series: Exception 1: Evaluate Shot as Below Minimum Age for Final Dose if 4th Dose Administered < the Absolute Minimum Age (1y-4d) and Received 0 Doses Administered Prior to 7m of Age',
+    behavior:
+      'Pneumococcal child histories with no doses before age 7 months target the final catch-up dose and invalidate it as below absolute minimum age when administered before 1y-4d.',
+    testId: 'assertPneumococcalChildFinalDoseBeforeOneYearMinusFourDaysInvalid',
   },
   ...[
     'Pneumococcal Child Series: Exception 1A: Set Series Dose Number to 2 if No Doses Administered and Patient >= 7m and < 12 Months at Execution Date',
@@ -904,6 +947,48 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     behavior:
       'Pneumococcal adult PPSV-PCV histories recommend PPSV23 CVX 33 with supplemental text for adult target dose 3.',
     testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: If the output of Pneumococcal earliest and overdue dates were disabled in the settings, do not determine earliest and overdue dates (*earliestInterval* override)',
+    behavior:
+      'The TypeScript pneumococcal engine has no disable-earliest-overdue setting input; adult pneumococcal earliest and overdue date output remains enabled by default.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: If the output of Pneumococcal earliest and overdue dates were disabled in the settings, do not determine earliest and overdue dates (*latestRecommendedAgeCheck* override)',
+    behavior:
+      'The TypeScript pneumococcal engine has no disable-earliest-overdue setting input; adult pneumococcal latest/overdue date output remains enabled by default.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: If the output of Pneumococcal earliest and overdue dates were disabled in the settings, do not determine earliest and overdue dates (*latestRecommendedIntervalCheck* override)',
+    behavior:
+      'The TypeScript pneumococcal engine has no disable-earliest-overdue setting input; adult pneumococcal interval-based latest/overdue date output remains enabled by default.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: Earliest Interval of 5yrs from prior PPSV shot (or CVX 109) to the next target dose of PPSV',
+    behavior:
+      'Pneumococcal adult PPSV target-dose recommendations use the same 5-year prior-PPSV interval for earliest date output when that target path is reached.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: Recommend Recommended Interval of 1 yr from prior PCV shot to the next target dose',
+    behavior:
+      'Pneumococcal adult PCV-first PPSV recommendations set the recommended date to one year after the latest prior PCV dose.',
+    testId: 'assertPneumococcalAdultPcvThenPpsvRecommendationInterval1Year',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: Recommend Earliest Interval of 1 yr from prior PCV shot to the next target dose',
+    behavior:
+      'Pneumococcal adult PCV-first PPSV recommendations set the earliest date to one year after the latest prior PCV dose.',
+    testId: 'assertPneumococcalAdultPcvThenPpsvRecommendationInterval1Year',
   },
   {
     ruleName:
@@ -985,6 +1070,13 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'Pneumococcal Child Series: if patient **will be** >= 5 years at the recommended due date and < 19 years and the series *is not* complete, then recommend Conditional/HIGH_RISK',
+    behavior:
+      'Pneumococcal incomplete child-series forecasts become conditional HIGH_RISK when the next due date lands at age 5 through before age 19.',
+    testId: 'assertPneumococcalChildIncompleteDueAtAge5ConditionalHighRisk',
+  },
+  {
+    ruleName:
       'SeriesSelection(COVID-19 Aug2025+): Select the Seasonal 2-dose COVID-19 Series (< 2 years) if patient is < 2 years of age as of evaluation date, or patient is >= 2 years and has a shot administered in current season at < 2 years of age',
     behavior:
       'COVID-19 Aug 2025 selection chooses the under-2 seasonal series when the patient is younger than 2 years on the evaluation date.',
@@ -1006,10 +1098,246 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'SeriesSelection(COVID-19 Aug2025+): Select the Seasonal 1-dose COVID-19 Series (>= 2 - 64 years) if patient has in-season shots administered at >= 2 years and target dose 1 received at age < 65 years',
+    behavior:
+      'COVID-19 Aug 2025 selection chooses the 2-64 seasonal series when in-season target dose 1 was administered at age 2 through before age 65.',
+    testId: 'assertCovid19Aug2025SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Aug2025+): Select the Seasonal 2-dose COVID-19 Series (>= 65 years) if patient has in-season shots administered and target dose 1 received at age >= 65 years',
+    behavior:
+      'COVID-19 Aug 2025 selection chooses the 65+ seasonal series when in-season target dose 1 was administered at age 65 or older.',
+    testId: 'assertCovid19Aug2025SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Aug2025+): Select the Seasonal 2-dose COVID-19 Series (>= 65 years) if patient if dose 1 is administered to a patient that will turn 65 within 12 months of season start date',
+    behavior:
+      'COVID-19 Aug 2025 selection chooses the 65+ seasonal series when target dose 1 was given before age 65 and the patient turns 65 within 12 months of season start.',
+    testId: 'assertCovid19Aug2025Turns65Within12MonthsSwitchesToGte65',
+  },
+  {
+    ruleName:
+      'SeriesSelect(COVID-19 Sep2023/Aug2024): Catch All-- Select the Mixed Product Series if no other series applies',
+    behavior:
+      'COVID-19 Sep 2023 selection falls back to the mixed-product under-5 series when no more specific Sep 2023 selection condition applies.',
+    testId: 'assertCovid19Sep2023SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Sep2023/Aug2024): Select the Mixed Product < 5 yrs series if any doses were administered in the current season prior to 5 yrs of age, and there are a mix of products used',
+    behavior:
+      'COVID-19 Sep 2023 selection chooses the mixed-product under-5 series when current-season under-5 valid doses use mixed updated products.',
+    testId: 'assertCovid19Sep2023SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Sep2023/Aug2024 Adult Series): Do NOT select already _completed_ Sep2023/Aug2024 _Child_ series if a different, _incomplete_ Sep2023/Aug2024 _Adult_ series was previously selected and there are no doses at < 5 years of age',
+    behavior:
+      'COVID-19 Sep 2023 selection keeps the adult >=5y/Novavax routing for patients age 5 or older when no current-season valid under-5 doses are present, even if under-5 candidate series have apparent progress.',
+    testId: 'assertCovid19Sep2023SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelect(COVID-19 Sep2023/Aug2024): Select the COVID-19 Mixed Product < 5y series if patient is < 5 years of age and there are no doses on record in the current season',
+    behavior:
+      'COVID-19 Sep 2023 selection chooses the mixed-product under-5 series for patients under age 5 with no current-season doses.',
+    testId: 'assertCovid19Sep2023SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Sep2023/Aug2024): If the patient is >= 5 years of age and there are no doses on record at >= 5 years in the current season, then COVID-19 >= 5y Series applies',
+    behavior:
+      'COVID-19 Sep 2023 selection chooses the >=5y series for patients age 5 or older without current-season under-5 routing.',
+    testId: 'assertCovid19Sep2023SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelect(COVID-19 Sep2023/Aug2024): If patient is >= 5 years of age and there are no doses on record at < 5 years of age in the current season, then the COVID-19 >= 5y series',
+    behavior:
+      'COVID-19 Sep 2023 selection chooses the >=5y series for patients age 5 or older when there are no current-season valid under-5 doses.',
+    testId: 'assertCovid19Sep2023SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Sep2023/Aug2024): If the first dose administered is the Novavax vaccine at >= 12 years of age, there are no other doses after dose 1 in another series, and there are no doses in the prior season, then the Novavax 2023 Series applies',
+    behavior:
+      'COVID-19 Sep 2023 selection chooses the Novavax series when dose 1 is Novavax at age 12 or older and no later >=5y series dose supersedes it.',
+    testId: 'assertCovid19Sep2023SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Sep2023/Aug2024): If the first 2 doses is Novavax (CVX 211, CVX 311) and there are no doses in the prior seasons, then the Novavax 2023 Series applies',
+    behavior:
+      'COVID-19 Sep 2023 selection keeps the Novavax series when the first two valid current-season doses are Novavax-family products.',
+    testId: 'assertCovid19Sep2023SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Sep2023/Aug2024): If a >= 5yrs Series is completed but the previously selected Novavax Series is not, then the >= 5yr Series applies',
+    behavior:
+      'COVID-19 Sep 2023 selection switches from an incomplete Novavax candidate to the completed >=5y seasonal candidate.',
+    testId: 'assertCovid19Sep2023CompletedSeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Sep2023/Aug2024): If a Novavax 2023 Series is completed but the previously selected >= 5y Series is not, then the Novavax 2023 Series applies',
+    behavior:
+      'COVID-19 Sep 2023 selection switches from an incomplete >=5y candidate to the completed Novavax seasonal candidate.',
+    testId: 'assertCovid19Sep2023CompletedSeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Sep2023/Aug2024): Select the Mixed Product Series < 5 yrs if at least one dose (if any) in the prior season doses was administered at < 5 yrs of age, all doses (if any) in the prior season are a mix of vaccines, and all shots (if any) in the current season are a mix of 2023 vaccines',
+    behavior:
+      'COVID-19 Sep 2023 selection chooses the mixed-product under-5 series when valid under-5 doses are not all Pfizer-family or all Moderna-family products.',
+    testId: 'assertCovid19Sep2023SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Sep2023/Aug2024): Select the Pfizer < 5 yrs series if at least one dose (if any) in the prior season was administered at < 5 yrs of age, all doses (if any) in the all seasons are Pfizer vaccines:, and all shots (if any) are in the current season are a Pfizer vaccine',
+    behavior:
+      'COVID-19 Sep 2023 selection chooses the Pfizer under-5 series when all valid under-5 COVID doses are Pfizer-family products.',
+    testId: 'assertCovid19Sep2023SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Sep2023/Aug2024): Select the Moderna < 5 yrs series if at least one dose (if any) in the prior season was administered at < 5 yrs of age, all doses (if any) in the prior season are Moderna vaccines, and all shots (if any) in the current season are a Moderna vaccine',
+    behavior:
+      'COVID-19 Sep 2023 selection chooses the Moderna under-5 series when all valid under-5 COVID doses are Moderna-family products.',
+    testId: 'assertCovid19Sep2023SeriesSelection',
+  },
+  {
+    ruleName:
       'COVID-19(Aug2025): If the patient is complete for the season, the recommendation is Not_Recommended/Complete_High_Risk',
     behavior:
       'Completed Aug 2025 COVID-19 series forecasts produce a not-recommended recommendation with COMPLETE_HIGH_RISK.',
     testId: 'assertCovid19Aug2025CompleteRecommendation',
+  },
+  {
+    ruleName:
+      'ImmunizationReferenceData: Initialize COVID-19 Sep2023 Dose Number Reset Feature Fact Object',
+    behavior:
+      'The TypeScript engine does not expose ICE Java feature-fact toggles; COVID-19 result dose numbers are returned from the selected target-series match objects directly.',
+    testId: 'assertCovid19DoseNumberResultShape',
+  },
+  {
+    ruleName:
+      'ProcessResults(COVID-19): Return COVID-19 Season Evaluations - CB1 - COVID19_SEP2023_DOSE_NUMBER_RESET_DISABLED _not_ enabled - return, for each dose, the number of doses across ALL seasons if the primary series has not been completed yet',
+    behavior:
+      'COVID-19 TypeScript results return explicit target-series dose numbers on each matched dose; Dec 2020 primary-series matched doses retain their across-series dose numbering.',
+    testId: 'assertCovid19DoseNumberResultShape',
+  },
+  {
+    ruleName:
+      'ProcessResults(COVID-19): Return COVID-19 Season Evaluations - CB1 - COVID19_SEP2023_DOSE_NUMBER_RESET_DISABLED _not_ enabled - return, for each dose, the number of doses in THIS season if the primary series was completed in a previous season',
+    behavior:
+      'COVID-19 TypeScript results return explicit target-series dose numbers on each matched dose; Sep 2023 seasonal matched doses are reported with seasonal target-dose numbers.',
+    testId: 'assertCovid19DoseNumberResultShape',
+  },
+  {
+    ruleName:
+      'ProcessResults(COVID-19): Return Sept 2023 Season Evaluations - CB2 - do _not_ reset to 1 in the Sept 2023, Aug 2024, Aug 2025 or later season if COVID19_SEP2023_DOSE_NUMBER_RESET_DISABLED _is_ set',
+    behavior:
+      'COVID-19 TypeScript results are not post-processed through ICE Java dose-number reset flags; consumers receive the normalized target-series dose numbers already attached to each match.',
+    testId: 'assertCovid19DoseNumberResultShape',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Dec2020): Select the Mixed Series by default if no valid NOS shots on record',
+    behavior:
+      'COVID-19 Dec 2020 selection chooses the mixed-product series when there are no valid COVID doses on record.',
+    testId: 'assertCovid19Dec2020SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Pre-Aug25): Select already _completed_ series if a different, _incomplete_ series was previously selected',
+    behavior:
+      'COVID-19 pre-Aug 2025 selection prefers an already completed Dec 2020 series, such as a one-dose Janssen completion, over incomplete alternative COVID-19 candidate series.',
+    testId: 'assertCovid19Dec2020SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Dec2020): If the earliest, non-NOS (Valid) _dose_ was not found in the Pfizer, Moderna, Mixed Product or Janssen series (see related rules), then select the another (i.e. - WHO series) that has the earliest, non-NOS (Valid) _dose_ administered to it',
+    behavior:
+      'COVID-19 Dec 2020 selection chooses the WHO/non-FDA series that contains the earliest valid non-NOS COVID dose when FDA product-family selection does not apply.',
+    testId: 'assertCovid19Dec2020SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Dec2020): If the Janssen Series was not selected nor were all administered doses a Moderna, Pfizer or Novavax vaccine (i.e.- none of Moderna-only, Pfizer-only or Novavax-only Series are applicable), but (Valid) doses exist in the Mixed Product Series, then select the Mixed Product Series',
+    behavior:
+      'COVID-19 Dec 2020 selection chooses the mixed-product series when valid COVID doses mix product families.',
+    testId: 'assertCovid19Dec2020SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Dec2020): If all administered doses are a Moderna vaccine and the valid shot(s) are in the Moderna series, then the Moderna Series applies',
+    behavior:
+      'COVID-19 Dec 2020 selection chooses the Moderna series when all valid COVID doses are Moderna-family products.',
+    testId: 'assertCovid19Dec2020SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Dec2020): If all administered doses are a Pfizer vaccine and the valid shot(s) are in the Pfizer series, then the Pfizer Series applies',
+    behavior:
+      'COVID-19 Dec 2020 selection chooses the Pfizer series when all valid COVID doses are Pfizer-family products.',
+    testId: 'assertCovid19Dec2020SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Dec2020): If all administered doses are a Novavax vaccine and the valid shot(s) are in the Novavax series, then the Novavax Series applies',
+    behavior:
+      'COVID-19 Dec 2020 selection chooses the Novavax series when all valid COVID doses are Novavax products.',
+    testId: 'assertCovid19Dec2020SeriesSelection',
+  },
+  {
+    ruleName:
+      'SeriesSelection(COVID-19 Dec2020): If the first dose administered is the Janssen vaccine, then the Janssen Series applies',
+    behavior:
+      'COVID-19 Dec 2020 selection chooses the Janssen series when the earliest valid COVID dose is Janssen.',
+    testId: 'assertCovid19Dec2020SeriesSelection',
+  },
+  ...[
+    'COVID-19: Invoke separate agenda group for evaluation of shots in the COVID19Dec2020 Season',
+    'COVID-19: Invoke separate agenda group for evaluation of shots in the COVID19Sep2023/Aug2024 Season',
+    'COVID-19: Invoke separate agenda group for evaluation of shots in the COVID19Aug2025+ Season',
+    'COVID-19: Invoke separate agenda group for postEvaluationCheck of shots in the COVID19Dec2020 Season',
+    'COVID-19: Invoke separate agenda group for postEvaluationCheck of shots in the COVID19Sep2023/Aug2024 Season',
+    'COVID-19: Invoke separate agenda group for postEvaluationCheck of shots in the COVIDAug2025+ Season',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'COVID-19 evaluation agenda routing is represented by TypeScript vaccine-group and season-specific evaluation hooks in the series evaluator.',
+    testId: 'ice-covid19-rules',
+  })),
+  ...[
+    'COVID-19: Invoke separate agenda group for recommendations in the COVID19Dec2020 Season',
+    'COVID-19: Invoke separate agenda group for recommendations in the COVID19Sep2023/Aug2024 Season',
+    'COVID-19: Invoke separate agenda group for recommendations in the Aug2025+ Season',
+    'COVID-19: Invoke separate agenda group for post recommendation checks in the COVID19Dec2020 Season',
+    'COVID-19: Invoke separate agenda group for post recommendation checks in the COVID19Sep2023 Season',
+    'COVID-19: Invoke separate agenda group for post recommendation checks in the COVID19Aug2025 Season',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'COVID-19 recommendation agenda routing is represented by TypeScript vaccine-group and season-specific recommendation dispatch in buildSeriesRecommendation/buildCovid19Recommendation.',
+    testId: 'assertCovid19Aug2025CompleteRecommendation',
+  })),
+  {
+    ruleName:
+      'COVID-19: If a seasonal COVID-19 Series that needs forecasting is complete, and there exists another COVID-19 Season with fully specified season start date > evalTime, then recommendation is NOT_RECOMMENDED / COMPLETE',
+    behavior:
+      'Completed seasonal COVID-19 Sep 2023/Aug 2024 forecasts return not-recommended COMPLETE when a later COVID-19 season exists after the evaluation date.',
+    testId: 'assertCovid19SeasonalCompleteFutureSeasonRecommendation',
+  },
+  {
+    ruleName:
+      'COVID-19: If the recommendation is NOT_RECOMMENDED, the current season series is complete and there is not already a recommendation reason supplied, add evaluation reason COMPLETE',
+    behavior:
+      'COVID-19 completed seasonal forecasts produce explicit not-recommended COMPLETE or COMPLETE_HIGH_RISK recommendation reasons rather than leaving the reason empty.',
+    testId: 'assertCovid19SeasonalCompleteFutureSeasonRecommendation',
   },
   {
     ruleName:
@@ -1020,10 +1348,1512 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'COVID-19(Aug2025 2–64y): If the patient is >= 12 years - 8 weeks and the most recent shot was <= 12 weeks from the assessment date, include SUPPLEMENTAL_TEXT describing interval options',
+    behavior:
+      'Aug 2025 COVID-19 2-64 dose 1 recommendations include Novavax/other-product interval supplemental text when the patient is at least 12 years minus 8 weeks and the latest COVID-19 shot was within 12 weeks of evaluation.',
+    testId: 'assertCovid19Aug2025Age12RecentDoseSupplementalText',
+  },
+  {
+    ruleName:
+      'COVID-19(GTE65 Series): If the most recent shot was <= 12 weeks from the assessment date, include SUPPLEMENTAL_TEXT describing interval options',
+    behavior:
+      'Aug 2025 COVID-19 65+ dose 1 recommendations include the 65+ interval supplemental text when the latest COVID-19 shot was within 12 weeks of evaluation.',
+    testId: 'assertCovid19Aug2025Gte65RecentDoseSupplementalText',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 2–64y Series): If <19y, ≥1 pre-season valid dose and no in-season dose, recommend CONDITIONAL / HIGH_RISK and CLINICAL_PATIENT_DISCRETION',
+    behavior:
+      'Aug 2025 COVID-19 2-64 forecasts for patients under 19 with pre-season COVID-19 history and no in-season dose return conditional HIGH_RISK and CLINICAL_PATIENT_DISCRETION recommendations with forecast dates.',
+    testId: 'assertCovid19Aug2025Under19PreSeasonDoseConditionalRecommendation',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 GTE65 Series): If age >= 12y-8w, include SUPPLEMENTAL_TEXT describing interval options',
+    behavior:
+      'Aug 2025 COVID-19 65+ dose 2 recommendations include supplemental text describing the 6-month minimum and 8-to-12-week product-based interval guidance.',
+    testId: 'assertCovid19Aug2025Gte65Dose2SupplementalText',
+  },
+  {
+    ruleName:
       'COVID-19(Aug2025 < 2yrs Series): When a shot is recommended for this series, specifically recommend CVX 311',
     behavior:
       'Aug 2025 under-2 COVID-19 recommendations prefer CVX 311.',
     testId: 'assertCovid19Aug2025Lt2RecommendsCvx311',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If a prior shot for target dose 1 was evaluated as Invalid / BELOW_MINIMUM_AGE, then absolute minimum interval from that shot to the next attempt is 24 days',
+    behavior:
+      'Aug 2025 under-2 COVID-19 shots below the absolute minimum age are invalid and drive the next dose-1 attempt forecast from that invalid dose.',
+    testId: 'assertCovid19Aug2025Lt2BelowMinimumAgeNextAttempt28Days',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 < 2yrs Series): If a shot was previously administered and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES, the minimum/recommended interval from that shot to the next shot is 28 days (*recommendationIntervalCheck*)',
+    behavior:
+      'Aug 2025 under-2 COVID-19 recommendations after a below-minimum-age invalid dose set earliest and recommended dates to 28 days after that invalid shot.',
+    testId: 'assertCovid19Aug2025Lt2BelowMinimumAgeNextAttempt28Days',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series): If 0 shots in current season and exactly one prior valid CVX 311/312 before season start, skip to target dose 2',
+    behavior:
+      'Aug 2025 under-2 COVID-19 forecasts with exactly one valid pre-season Moderna CVX 311/312 dose skip target dose 1 and forecast target dose 2.',
+    testId: 'assertCovid19Aug2025Lt2PriorModernaSkipsToDose2Forecast',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series): If evaluating a shot in current season and one prior valid CVX 311/312 before season start, set current to dose 2 and skip to target dose 2',
+    behavior:
+      'Aug 2025 under-2 COVID-19 current-season shots after one valid pre-season Moderna CVX 311/312 dose are evaluated as target dose 2.',
+    testId: 'assertCovid19Aug2025Lt2PriorModernaCurrentShotTargetsDose2',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 2: If prior CVX 311/312 and prior invalid Pfizer, Novavax or Unspecified before season start and interval < 17 days, evaluate as Invalid / BELOW_MINIMUM_INTERVAL',
+    behavior:
+      'Aug 2025 under-2 COVID-19 current-season target dose 2 after one valid pre-season Moderna dose is invalid if it is less than 17 days after the latest pre-season Pfizer, Novavax, or unspecified invalid/accepted COVID-19 shot.',
+    testId:
+      'assertCovid19Aug2025Lt2PriorModernaInvalidPfizerCurrentShotBelow17DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 2: If prior CVX 311/312 and prior invalid Pfizer, Novavax or Unspecified before season start and interval >= 17 days',
+    behavior:
+      'Aug 2025 under-2 COVID-19 current-season target dose 2 after one valid pre-season Moderna dose is allowed once it is at least 17 days after the latest pre-season Pfizer, Novavax, or unspecified invalid/accepted COVID-19 shot.',
+    testId:
+      'assertCovid19Aug2025Lt2PriorModernaInvalidPfizerCurrentShotAfter17DaysValid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 2: If prior CVX 311/312 and prior is not Pfizer, Novavax or Unspecified before season start and interval < 24 days, evaluate as Invalid / BELOW_MINIMUM_INTERVAL',
+    behavior:
+      'Aug 2025 under-2 COVID-19 current-season target dose 2 after one valid pre-season Moderna dose is invalid if it is less than 24 days after the latest other pre-season invalid/accepted COVID-19 shot.',
+    testId:
+      'assertCovid19Aug2025Lt2PriorModernaInvalidOtherCurrentShotBelow24DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 2: If prior CVX 311/312 and prior invalid Pfizer, Novavax or Unspecified before season start, minimal and recommended intervals are 21 days',
+    behavior:
+      'Aug 2025 under-2 COVID-19 dose 2 forecasts after one valid pre-season Moderna dose and a later pre-season Pfizer, Novavax, or unspecified invalid/accepted COVID-19 shot use a 21-day interval from that later shot, not before season start.',
+    testId: 'assertCovid19Aug2025Lt2PriorModernaInvalidPfizerForecast21Days',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 2: If prior CVX 311/312 and prior is not Pfizer, Novavax or Unspecified before season start, minimal and recommended intervals are 28 days',
+    behavior:
+      'Aug 2025 under-2 COVID-19 dose 2 forecasts after one valid pre-season Moderna dose and a later other invalid/accepted pre-season COVID-19 shot use a 28-day interval from that later shot, not before season start.',
+    testId: 'assertCovid19Aug2025Lt2PriorModernaInvalidOtherForecast28Days',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If patient has any of CVX 208, 217, 218, 219, 300, 301, 302, 308, 309, 310, 211, 313, 213 administered prior to the season start date, then absolute minimum interval is 17 days',
+    behavior:
+      'Aug 2025 under-2 COVID-19 target dose 1 is invalid when administered less than 17 days after a pre-season Pfizer, Novavax, or unspecified invalid/accepted COVID-19 shot and no valid qualifying pre-season dose exists.',
+    testId: 'assertCovid19Aug2025Lt2InvalidPfizerOnlyCurrentShotBelow17DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If patient has any of CVX 208, 217, 218, 219, 300, 301, 302, 308, 309, 310, 211, 313, 213 administered prior to the season start date, then absolute minimum interval is 17 days mark interval override satisfied',
+    behavior:
+      'Aug 2025 under-2 COVID-19 target dose 1 is valid once administered at least 17 days after a pre-season Pfizer, Novavax, or unspecified invalid/accepted COVID-19 shot and no valid qualifying pre-season dose exists.',
+    testId: 'assertCovid19Aug2025Lt2InvalidPfizerOnlyCurrentShotAfter17DaysValid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If patient has any other invalid COVID-19 shot administered prior to the season start date, then absolute minimum interval from that shot to the next attempt is 24 days',
+    behavior:
+      'Aug 2025 under-2 COVID-19 target dose 1 is invalid when administered less than 24 days after another pre-season invalid/accepted COVID-19 shot and no valid qualifying pre-season dose exists.',
+    testId: 'assertCovid19Aug2025Lt2InvalidOtherOnlyCurrentShotBelow24DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If patient has any other invalid COVID-19 shot administered prior to the season start date, then absolute minimum interval from that shot to the next attempt is 24 days mark interval override satisfied',
+    behavior:
+      'Aug 2025 under-2 COVID-19 target dose 1 is valid once administered at least 24 days after another pre-season invalid/accepted COVID-19 shot and no valid qualifying pre-season dose exists.',
+    testId: 'assertCovid19Aug2025Lt2InvalidOtherOnlyCurrentShotAfter24DaysValid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If patient has any of CVX 208, 217, 218, 219, 300, 301, 302, 308, 309, 310, 211, 313, 213 administered prior to the season start date, then minimum and recommended intervals are 21 days',
+    behavior:
+      'Aug 2025 under-2 COVID-19 dose 1 forecasts after a pre-season Pfizer, Novavax, or unspecified invalid/accepted COVID-19 shot use a 21-day interval from that shot.',
+    testId: 'assertCovid19Aug2025Lt2InvalidPfizerOnlyForecast21Days',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If patient has any other invalid COVID-19 shot administered prior to the season start date, then minimum and recommended intervals are 28 days',
+    behavior:
+      'Aug 2025 under-2 COVID-19 dose 1 forecasts after another pre-season invalid/accepted COVID-19 shot use a 28-day interval from that shot.',
+    testId: 'assertCovid19Aug2025Lt2InvalidOtherOnlyForecast28Days',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If patient has any of CVX 213, 308, 309, 310, 313 administered prior to the season start date, then absolute minimum interval from prior Pfizer, Novavax or Unspecified shot to the next attempt is 17 days',
+    behavior:
+      'Aug 2025 under-2 COVID-19 target dose 1 is invalid when administered less than 17 days after a single valid pre-season non-Moderna Pfizer, Novavax, or unspecified COVID-19 dose.',
+    testId: 'assertCovid19Aug2025Lt2NonModernaPriorCurrentShotBelow17DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If patient has any of CVX 213, 308, 309, 310, 313 administered prior to the season start date, then absolute minimum interval from prior Pfizer, Novavax or Unspecified shot mark interval override satisfied (*doseIntervalCheck*)',
+    behavior:
+      'Aug 2025 under-2 COVID-19 target dose 1 is valid once administered at least 17 days after a single valid pre-season non-Moderna Pfizer, Novavax, or unspecified COVID-19 dose.',
+    testId: 'assertCovid19Aug2025Lt2NonModernaPriorCurrentShotAfter17DaysValid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If patient has any of CVX 213, 308, 309, 310, 313 administered prior to the season start date, then absolute minimum interval from prior other than Pfizer, Novavax or Unspecified shot to the next attempt is 24 days',
+    behavior:
+      'Aug 2025 under-2 COVID-19 target dose 1 is invalid when administered less than 24 days after a later other pre-season invalid/accepted COVID-19 shot in the one-valid-non-Moderna prior pattern.',
+    testId:
+      'assertCovid19Aug2025Lt2NonModernaPriorOtherCurrentShotBelow24DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If patient has any of CVX 213, 308, 309, 310, 313 administered prior to the season start date, then absolute minimum interval from prior other than Pfizer, Novavax or Unspecified shot mark interval override satisfied (*doseIntervalCheck*)',
+    behavior:
+      'Aug 2025 under-2 COVID-19 target dose 1 is valid once administered at least 24 days after a later other pre-season invalid/accepted COVID-19 shot in the one-valid-non-Moderna prior pattern.',
+    testId:
+      'assertCovid19Aug2025Lt2NonModernaPriorOtherCurrentShotAfter24DaysValid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If patient has any of CVX 213, 308, 309, 310, 313 administered prior to the season start date, then minimum interval from prior Pfizer, Novavax or Unspecified shot to the next attempt is 21 days',
+    behavior:
+      'Aug 2025 under-2 COVID-19 dose 1 forecasts after one valid pre-season non-Moderna Pfizer, Novavax, or unspecified COVID-19 dose use a 21-day interval from that dose.',
+    testId: 'assertCovid19Aug2025Lt2NonModernaPriorForecast21Days',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 1: If patient has any of CVX 213, 308, 309, 310, 313 administered prior to the season start date, then minimum interval from prior other than Pfizer, Novavax or Unspecified shot to the first dose is 28 days',
+    behavior:
+      'Aug 2025 under-2 COVID-19 dose 1 forecasts in the one-valid-non-Moderna prior pattern use a 28-day interval from a later other pre-season invalid/accepted COVID-19 shot.',
+    testId: 'assertCovid19Aug2025Lt2NonModernaPriorWithOtherPriorForecast28Days',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series): If 0 shots in current season and ≥2 valid pre-season doses (CVX 213,308,309,310,311,312,313), skip to target dose 2',
+    behavior:
+      'Aug 2025 under-2 COVID-19 forecasts with two or more valid qualifying pre-season doses keep the seasonal series open and forecast target dose 2.',
+    testId: 'assertCovid19Aug2025Lt2TwoPreSeasonDosesForecastDose2',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series): If evaluating a shot in current season and ≥2 valid pre-season doses exist, set current to dose 2 and skip to target dose 2',
+    behavior:
+      'Aug 2025 under-2 COVID-19 current-season shots after two or more valid qualifying pre-season doses are evaluated as target dose 2.',
+    testId: 'assertCovid19Aug2025Lt2TwoPreSeasonDosesCurrentShotTargetsDose2',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 2: If ≥2 valid pre-season doses and interval < 8w-4d, evaluate as Invalid / BELOW_MINIMUM_INTERVAL',
+    behavior:
+      'Aug 2025 under-2 COVID-19 current-season target dose 2 is invalid when it is less than 8 weeks minus 4 days after the latest qualifying pre-season dose.',
+    testId:
+      'assertCovid19Aug2025Lt2TwoPreSeasonDosesCurrentShotBelowIntervalInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 LT2y Series)-->TargetDose 2: If ≥2 valid pre-season doses, set earliest & recommended interval to 8w',
+    behavior:
+      'Aug 2025 under-2 COVID-19 dose 2 forecasts after two or more valid qualifying pre-season doses use an 8-week interval from the latest qualifying pre-season dose, not before the season start date.',
+    testId: 'assertCovid19Aug2025Lt2TwoPreSeasonDosesForecastDose2',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 2-64yrs/65+ Series): If prior is CVX 313 and current is CVX 313 for target dose 1 and interval < 17 days, evaluate as Invalid / BELOW_MINIMUM_INTERVAL (*doseIntervalCheck*)',
+    behavior:
+      'Aug 2025 COVID-19 2-64/65+ target dose 1 is invalid when CVX 313 follows prior CVX 313 by less than 17 days.',
+    testId: 'assertCovid19Aug2025AdultCvx313To313Below17DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 2-64yrs/65+ Series): If prior is CVX 313 and current is CVX 313 for target dose 1 and interval >= 17 days, mark interval override satisfied (*doseIntervalCheck*)',
+    behavior:
+      'Aug 2025 COVID-19 2-64/65+ target dose 1 permits CVX 313 after prior CVX 313 once the 17-day interval is met.',
+    testId: 'assertCovid19Aug2025AdultCvx313To313At17DaysValid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 2-64yrs/65+ Series): If prior shot is NOT CVX 313 and interval < 8w-4d to target dose 1, evaluate as Invalid / BELOW_MINIMUM_INTERVAL (*doseIntervalCheck*)',
+    behavior:
+      'Aug 2025 COVID-19 2-64/65+ target dose 1 is invalid when a non-CVX-313 prior COVID-19 shot is less than 8 weeks minus 4 days earlier.',
+    testId: 'assertCovid19Aug2025AdultNon313PriorBelow8WeeksMinus4DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 2-64yrs/65+ Series): If prior shot is NOT CVX 313 and interval >= 8w-4d to target dose 1, mark interval override satisfied (*doseIntervalCheck*)',
+    behavior:
+      'Aug 2025 COVID-19 2-64/65+ target dose 1 permits shots after a non-CVX-313 prior COVID-19 shot once the 8 weeks minus 4 days interval is met.',
+    testId: 'assertCovid19Aug2025AdultNon313PriorAt8WeeksMinus4DaysValid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 2-64yrs/65+ Series): If prior shot is CVX 313 and interval < 8w-4d to non-313 target dose 1, evaluate as Invalid / BELOW_MINIMUM_INTERVAL (*doseIntervalCheck*)',
+    behavior:
+      'Aug 2025 COVID-19 2-64/65+ non-CVX-313 target dose 1 is invalid when prior CVX 313 is less than 8 weeks minus 4 days earlier.',
+    testId: 'assertCovid19Aug2025AdultCvx313ToNon313Below8WeeksMinus4DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025 2-64yrs/65+ Series): If prior shot is CVX 313 and interval >= 8w-4d to non-313 target dose 1, mark interval override satisfied (*doseIntervalCheck*)',
+    behavior:
+      'Aug 2025 COVID-19 2-64/65+ non-CVX-313 target dose 1 permits prior CVX 313 once the 8 weeks minus 4 days interval is met.',
+    testId: 'assertCovid19Aug2025AdultCvx313ToNon313At8WeeksMinus4DaysValid',
+  },
+  {
+    ruleName:
+      'COVID-19(Aug2025): Switch from 1-Dose 2-64yrs series to 2-Dose 65+ series if dose 1 is administered to a patient that will turn 65 within 12 months of season start date',
+    behavior:
+      'Aug 2025 COVID-19 patients who receive a valid 2-64 dose 1 before turning 65 and turn 65 within 12 months of season start are selected into the 65+ two-dose series with that shot counted as dose 1.',
+    testId: 'assertCovid19Aug2025Turns65Within12MonthsSwitchesToGte65',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day (Sep2023/Aug2024 >= 5yrs): If a CVX 213 and CVX 313 are administered on the same day and both would be considered valid, evaluate the CVX 213 as valid',
+    behavior:
+      'Sep 2023/Aug 2024 COVID-19 same-day CVX 213 and CVX 313 records for patients at least 5 years old keep CVX 213 valid and mark CVX 313 invalid with DUPLICATE_SAME_DAY.',
+    testId: 'assertCovid19Sep2023Cvx213PreferredOverSameDayCvx313',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day (COVID-19): If a Janssen is administered on the same day as a Pfizer, Moderna or Novavax vaccine, evaluate the Pfizer/Moderna/Novavax shot first',
+    behavior:
+      'COVID-19 same-day records sort Janssen after Pfizer, Moderna, Novavax, and unspecified COVID-19 products so the non-Janssen shot is evaluated first.',
+    testId:
+      'assertCovid19Dec2020PfizerModernaNovavaxPreferredOverSameDayJanssen',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day (COVID-19): If shot is marked valid but another shot on the same day is marked Accepted, evaluate the non-preferred shot as Invalid with reason DUPLICATE_SAME_DAY',
+    behavior:
+      'COVID-19 same-day accepted shots on the same series dose are moved to invalid with DUPLICATE_SAME_DAY when a valid same-day shot exists.',
+    testId: 'assertCovid19AcceptedSameDayDoseBecomesInvalidDuplicate',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day (COVID-19): If one of those shots is Valid and another shot on the same day is Invalid with reason code VACCINE_NOT_ALLOWED_FOR_THIS_DOSE (and no other reason codes), replace this reason code with DUPLICATE_SAME_DAY',
+    behavior:
+      'COVID-19 invalid same-day shots with only VACCINE_NOT_ALLOWED_FOR_THIS_DOSE are converted to DUPLICATE_SAME_DAY when a valid same-dose shot exists on that date.',
+    testId: 'assertCovid19InvalidNotAllowedSameDayDoseBecomesDuplicate',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day (COVID-19): For shots prior to 10/25/2021, bypass Duplicate Shot/Same Day Processing by not setting the target dose number of the shot to be evaluated shot to the prior dose number',
+    behavior:
+      'COVID-19 Dec 2020 same-day duplicate invalidation is bypassed before 2021-10-25, preserving normal target-dose processing instead of forcing DUPLICATE_SAME_DAY.',
+    testId: 'assertCovid19Dec2020ModernaPreferredOverSameDayPfizer',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day (COVID-19): If a Moderna shot and Pfizer shot are both Valid on the same day (after 10/25/2021 as per above), mark the Moderna shot Valid and the other shot Invalid / DUPLICATE_SAME_DAY',
+    behavior:
+      'COVID-19 Dec 2020 same-day Moderna/Pfizer records after 2021-10-25 keep Moderna valid and mark Pfizer invalid with DUPLICATE_SAME_DAY.',
+    testId: 'assertCovid19Dec2020ModernaPreferredOverSameDayPfizer',
+  },
+  {
+    ruleName:
+      'Duplicate Shots/Same Day (COVID-19): If an FDA-approved vaccine and a WHO-only approved vaccine are both Valid on the same day (after 10/25/2021 as per above), mark the FDA-approved shot as Valid and the other shot Invalid / DUPLICATE_SAME_DAY',
+    behavior:
+      'COVID-19 Dec 2020 same-day FDA/WHO-only records after 2021-10-25 keep the FDA-approved shot valid and mark the WHO-only shot invalid with DUPLICATE_SAME_DAY.',
+    testId: 'assertCovid19Dec2020FdaPreferredOverSameDayWhoOnly',
+  },
+  {
+    ruleName:
+      'COVID-19(9/12/2023+): For any prior formulation administered in a COVID-19 series (excluding CVX 211), override the absolute vaccine minimum age check',
+    behavior:
+      'COVID-19 prior-formulation CVX products administered on or after 2023-09-12 are evaluated as invalid prior formulations without adding an absolute-minimum-age reason.',
+    testId: 'assertCovid19Sep2023PriorFormulationInvalidVaccineNotAllowed',
+  },
+  {
+    ruleName:
+      'COVID-19(9/12/2023+): If a prior formulation is administered (excluding CVX 211), mark the shot Invalid / VACCINE_NOT_ALLOWED (overrides VACCINE_NOT_ALLOWED_FOR_THIS_DOSE rules)',
+    behavior:
+      'COVID-19 prior-formulation CVX products administered on or after 2023-09-12 are invalid with VACCINE_NOT_ALLOWED.',
+    testId: 'assertCovid19Sep2023PriorFormulationInvalidVaccineNotAllowed',
+  },
+  {
+    ruleName:
+      'COVID-19: If a previous shot was evaluated and Not Valid due to ABOVE_MAXIMUM_AGE_VACCINE, ignore the shot when calculating intervals',
+    behavior:
+      'COVID-19 invalid prior shots with ABOVE_MAXIMUM_AGE_VACCINE are excluded from subsequent COVID-19 interval calculations.',
+    testId: 'assertCovid19AboveMaximumAgeInvalidPriorIgnoredForIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023+): Remove evaluation reason VACCINE_NOT_ALLOWED_FOR_THIS_DOSE if there are other evaluation reason codes',
+    behavior:
+      'COVID-19 shots administered on or after 2023-09-12 remove VACCINE_NOT_ALLOWED_FOR_THIS_DOSE when a stronger invalid reason is also present.',
+    testId: 'assertCovid19Sep2023NotAllowedReasonCleanup',
+  },
+  {
+    ruleName:
+      'COVID-19(9/12/2023+): If a COVID-19 shot that does not count towards U.S. vaccination is administered (for any Sept 2023+ COVID-19 Series) is < 8w-4d, evaluate the shot as Invalid',
+    behavior:
+      'Sept 2023+ COVID-19 shots after a non-counting prior COVID-19 CVX are invalid with BELOW_ABSOLUTE_MINIMUM_INTERVAL if administered before 8 weeks minus 4 days.',
+    testId:
+      'assertCovid19Sep2023NonCountingPriorBelow8WeeksMinus4DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(9/12/2023+): If a COVID-19 shot that does not count towards U.S. vaccination is administered (for any Sept 2023+ COVID-19 Series) is between 8w-4d and the series table interval, override the doseIntervalCheck',
+    behavior:
+      'Sept 2023+ COVID-19 shots after a non-counting prior COVID-19 CVX are allowed once the 8 weeks minus 4 days interval is met, even before the 8-week recommendation date.',
+    testId: 'assertCovid19Sep2023NonCountingPriorAt8WeeksMinus4DaysValid',
+  },
+  {
+    ruleName:
+      'COVID-19(9/12/2023+): For the 2023-2024 season, if the patient has >= 1 (invalid) COVID-19 shot(s) administered prior to 9/12/2023, and there are no doses on record, the absolute minimum interval from (invalid) dose 1 is 8w-4d (*doseIntervalCheck*)',
+    behavior:
+      'Sep 2023 COVID-19 dose 1 is invalid before 8 weeks minus 4 days from the latest pre-season COVID-19 shot when no valid dose is on record, and is allowed once that interval is met.',
+    testId:
+      'assertCovid19Sep2023PreSeasonPriorBelow8WeeksMinus4DaysInvalid',
+  },
+  ...[
+    'COVID-19(Sep2023/Aug2024 >= 5yrs Series): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate the shot as Invalid / BELOW_MINIMUM_INTERVAL if the absolute minimum interval of 8w-4d is not met (*doseIntervalCheck*)',
+    'COVID-19(Sep2023/Aug2024 >= 5yrs): If the absolute minimum interval from the prior season shot to the current shot is < 8w-4d, evaluate the shot as Invalid',
+    'COVID-19(Sep2023/Aug2024 Pfizer/Moderna/Mixed Product < 5yrs; Novavax Series; 2023-2024 Season): If a shot was administered prior to target dose 1 of the 2023-2024 season but has never received any (valid) doses, the absolute minimum interval from the prior shot to the current shot is 8w-4d',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'Sep 2023 COVID-19 current-season target dose 1 is invalid before 8 weeks minus 4 days from the latest prior COVID-19 shot when no valid dose is on record.',
+    testId:
+      'assertCovid19Sep2023PreSeasonPriorBelow8WeeksMinus4DaysInvalid',
+  })),
+  ...[
+    'COVID-19(Sep2023/Aug2024 >= 5yrs Series): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, evaluate the shot as Valid if the absolute minimum interval of 8w-4d is met (*doseIntervalCheck*)',
+    'COVID-19(Sep2023/Aug2024 >= 5yrs): If the absolute minimum interval from the prior season shot is administered between 8w-4d and the series table interval, evaluate the shot as Valid',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'Sep 2023 COVID-19 current-season target dose 1 is allowed once the latest prior COVID-19 shot is at least 8 weeks minus 4 days earlier, overriding longer table intervals.',
+    testId:
+      'assertCovid19Sep2023PreSeasonPriorBelow8WeeksMinus4DaysInvalid',
+  })),
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer__ < 5yrs Series): If the patient has *0* shots in the current season has *1* dose of a Pfizer COVID-19 vaccines administered prior to the current season at < 5yrs of age, skip to target dose 2',
+    behavior:
+      'Sep 2023 Pfizer under-5 forecasts with one qualifying Pfizer-family pre-season dose administered before age 5 skip target dose 1 and forecast target dose 2.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer__ < 5yrs Series): If the patient has *0* shots in the current season but has *2 or more* doses of Pfizer COVID-19 vaccines administered prior to the current season at < 5yrs of age, skip to target dose 3',
+    behavior:
+      'Sep 2023 Pfizer under-5 forecasts with two or more qualifying Pfizer-family pre-season dose dates administered before age 5 skip to target dose 3.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer__ < 5yrs Series): If the patient has shots in the current season and *1* dose of Pfizer COVI-19 vaccines administered prior to the current season start date at < 5yrs of age, dose 1 is not needed; skip to target dose 2.',
+    behavior:
+      'Sep 2023 Pfizer under-5 current-season shots after one qualifying Pfizer-family pre-season dose administered before age 5 are evaluated as target dose 2.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer__ < 5yrs Series): If the patient has shots in the current season and *2 or more* doses of COVID-19 Pfzier vaccines administered prior to the current season start date at < 5yrs of age, skip to target dose 3.',
+    behavior:
+      'Sep 2023 Pfizer under-5 current-season shots after two or more qualifying Pfizer-family pre-season dose dates administered before age 5 are evaluated as target dose 3.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Mixed Product__ < 5yrs Series): If the patient has *0* shots in the current season has *1* dose administered prior to the current season at < 5yrs of age, skip to target dose 2',
+    behavior:
+      'Sep 2023 mixed-product under-5 forecasts with one qualifying COVID-19 pre-season dose administered before age 5 skip target dose 1 and forecast target dose 2.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Mixed Product__ < 5yrs Series): If the patient has *0* shots in the current season but has *2 or more* doses administered prior to the current season at < 5yrs of age, skip to target dose 3',
+    behavior:
+      'Sep 2023 mixed-product under-5 forecasts with two or more qualifying COVID-19 pre-season dose dates administered before age 5 skip to target dose 3.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Mixed Product__ < 5yrs Series): If the patient has shots in the current season and *1* dose administered prior to the current season start date at < 5yrs of age, dose 1 is not needed; skip to target dose 2.',
+    behavior:
+      'Sep 2023 mixed-product under-5 current-season shots after one qualifying COVID-19 pre-season dose administered before age 5 are evaluated as target dose 2.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Mixed Product__ < 5yrs Series): If the patient has shots in the current season and *2 or more* doses administered prior to the current season start date at < 5yrs of age, skip to target dose 3.',
+    behavior:
+      'Sep 2023 mixed-product under-5 current-season shots after two or more qualifying COVID-19 pre-season dose dates administered before age 5 are evaluated as target dose 3.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Moderna__ < 5yrs Series): If the patient has *0* shots in the current season but *1 or more* doses of a Moderna COVID-19 vaccine administered prior to the current season start date at < 5yrs of age, skip to target dose 2',
+    behavior:
+      'Sep 2023 Moderna under-5 forecasts with at least one qualifying Moderna-family pre-season dose administered before age 5 skip target dose 1 and forecast target dose 2.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Moderna__ < 5yrs Series): if the patient has shots in the current season and *1 or more* doses of a Moderna COVID-19 vaccine administered prior to current season start date at < 5yrs of age, skip to target dose 2.',
+    behavior:
+      'Sep 2023 Moderna under-5 current-season shots after at least one qualifying Moderna-family pre-season dose administered before age 5 are evaluated as target dose 2.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer < 5yrs Series): If the patient has 1 dose of updated Sept 2023 Pfizer COVID-19 vaccine intended for patients age >= 5 years (CVX 309, CVX 310) at age >= 5 years, then the series is complete.',
+    behavior:
+      'Sep 2023 Pfizer under-5 series completes when a valid CVX309/CVX310 dose is administered at age 5 years or later.',
+    testId: 'assertCovid19Sep2023Lt5CompletionShortcuts',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Mixed Product < 5 yrs Series): If the patient has 1 dose of updated Sept 2023 Pfizer or Moderna COVID-19 vaccine intended for patients age >= 5 years (CVX 309, CVX 310, CVX 311, CVX 312) at age >= 5 years, then the series is complete',
+    behavior:
+      'Sep 2023 mixed-product under-5 series completes when a valid updated Pfizer/Moderna CVX309/310/311/312 dose is administered at age 5 years or later.',
+    testId: 'assertCovid19Sep2023Lt5CompletionShortcuts',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Mixed Product < 5 yrs Series): If the patient has >= 1 dose of COVID-19 vaccine at age < 5 years and has 1 dose of updated Novavax Sept 2023 COVID-19 vaccine (CVX 313) at age >= 5 years, then the series is complete',
+    behavior:
+      'Sep 2023 mixed-product under-5 series completes when any valid dose before age 5 is followed by a valid CVX313 dose at age 5 years or later.',
+    testId: 'assertCovid19Sep2023Lt5CompletionShortcuts',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Mixed Product < 5 yrs Series): If the patient has 2 doses of CVX 313, then the series is complete',
+    behavior:
+      'Sep 2023 mixed-product under-5 series completes after two valid CVX313 doses.',
+    testId: 'assertCovid19Sep2023Lt5CompletionShortcuts',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer < 5yrs Series): If a shot was previously administered for target dose 1 or target dose 2 and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the absolute minimum interval from that shot to this shot is 24 days',
+    behavior:
+      'Sep 2023 Pfizer under-5 retries for target dose 1 or 2 after a same-target below-minimum-age invalid dose are invalid when administered before 24 days.',
+    testId: 'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Moderna < 5yrs Series): If a shot previously administered was evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the absolute minimum interval from that shot to target dose 1 is 24 days',
+    behavior:
+      'Sep 2023 Moderna under-5 retries after a below-minimum-age invalid dose are invalid when administered before 24 days.',
+    testId: 'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Mixed Product < 5yrs Series): If a shot previously administered for target dose 1 or target dose 2 was evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES, the absolute minimum interval from that shot to target dose 1 is 24 days',
+    behavior:
+      'Sep 2023 mixed-product under-5 retries for target dose 1 or 2 after a same-target below-minimum-age invalid dose are invalid when administered before 24 days.',
+    testId: 'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines that do not count towards U.S vaccination) or a non-Pfizer updated seasonal COVID-19 vaccine is administered on or after 9/12/2023 for target dose 1 or target dose 2, the absolute minimum interval to the next dose is 24 days',
+    behavior:
+      'Sep 2023 Pfizer under-5 shots after a prior formulation or non-Pfizer updated seasonal COVID-19 shot are invalid when administered before 24 days.',
+    testId: 'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer < 5yrs Series): If a CVX 308 is administered for target dose 2 or target dose 3 in the 2023-2024 season, then there is no maximum vaccine age for CVX 308',
+    behavior:
+      'Sep 2023 Pfizer under-5 CVX308 shots targeting dose 2 or 3 are not invalidated by a vaccine maximum age check.',
+    testId: 'assertCovid19Sep2023Cvx308Dose2Dose3NoMaximumAge',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Mixed Product < 5yrs Series): If a CVX 308 is administered for target dose 2 or target dose 3 in the 2023-2024 season, then there is no maximum vaccine age for CVX 308',
+    behavior:
+      'Sep 2023 mixed-product under-5 CVX308 shots targeting dose 2 or 3 are not invalidated by a vaccine maximum age check.',
+    testId: 'assertCovid19Sep2023Cvx308Dose2Dose3NoMaximumAge',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Moderna < 5rs Series): If there are no doses in the current season but target is dose 2 (due to skip), and there were >=2 doses in a prior season, then absolute minimum interval from the prior shot to the current shot is 8w-4d',
+    behavior:
+      'Sep 2023 Moderna under-5 first current-season target dose 2 shots after two or more qualifying pre-season doses are invalid when administered before 8 weeks minus 4 days from the latest qualifying prior dose.',
+    testId: 'assertCovid19Sep2023ModernaSkipDose2PriorSeasonInterval',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023+): If CVX 211 is administered on or after 10/4/2023 (any series), mark the shot Invalid / VACCINE_NOT_ALLOWED',
+    behavior:
+      'Sep 2023 and later COVID-19 evaluations invalidate CVX211 administered on or after 2023-10-04 with VACCINE_NOT_ALLOWED.',
+    testId: 'assertCovid19Sep2023Cvx211OnOrAfterCutoffInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax__ Series): If CVX 313 was administered for dose 1 or dose 2, dose 3 is not needed. Skip to target dose 4.',
+    behavior:
+      'Sep 2023 Novavax series current shots that would target dose 3 are instead evaluated as target dose 4 when a prior valid dose 1 or dose 2 was CVX313.',
+    testId: 'assertCovid19Sep2023NovavaxCvx313SkipsDose3',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax Series): If a shot is administered before the absolute minimum age for target dose 4, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES',
+    behavior:
+      'Sep 2023 Novavax target dose 4 shots before the dose absolute minimum age are accepted as OUTSIDE_ROUTINE_SERIES.',
+    testId: 'assertCovid19Sep2023NovavaxCvx313SkipsDose3',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax Series): If a CVX 310 or CVX 311 is administered before the absolute minimum age for target dose 4 and <= the absolute maximum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES',
+    behavior:
+      'Sep 2023 Novavax CVX310/CVX311 target dose 4 shots before the dose absolute minimum age are accepted as OUTSIDE_ROUTINE_SERIES on the non-allowed-dose path.',
+    testId: 'assertCovid19Sep2023NovavaxCvx313SkipsDose3',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax Series): For the 2023-2024 season, the absolute minimum interval from dose 3 to dose 4 is 8w-4d (*doseIntervalCheck*)',
+    behavior:
+      'Sep 2023 Novavax target dose 4 shots are invalid with BELOW_ABSOLUTE_MINIMUM_INTERVAL when administered before the 2023-2024 dose-4 interval override from the most recent prior valid Novavax-series dose.',
+    testId: 'assertCovid19Sep2023NovavaxIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax Series): If a CVX 213, CVX 309, or CVX 312 is administered for target dose 2, and target dose 2 is administered < 8 weeks - 4 days from dose 1, evaluate as Invalid / Below Minimum Interval',
+    behavior:
+      'Sep 2023 Novavax CVX213/CVX309/CVX312 target dose 2 shots are invalid with BELOW_ABSOLUTE_MINIMUM_INTERVAL when given before 8 weeks minus 4 days from dose 1.',
+    testId: 'assertCovid19Sep2023NovavaxIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax Series): If a CVX 313 is administered for dose 1, then the absolute minimum age for dose 1 of the series is 5 years of age',
+    behavior:
+      'Sep 2023 Novavax CVX313 target dose 1 uses a 5-year absolute minimum age, accepting dose 1 at age 5 and invalidating it below age 5.',
+    testId: 'assertCovid19Sep2023NovavaxIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024): Always enforce absolute minimum interval of 24 days *from* any prior Moderna or CVX 213 shots (in any Series)',
+    behavior:
+      'Sep 2023 COVID-19 current doses are invalid below 24 days after a valid prior Moderna-family/CVX213 dose in the same selected series.',
+    testId: 'assertCovid19Sep2023ModernaCvx213TwentyFourDayIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024): For patients < 18y, always enforce absolute minimum interval of 24 days *to* any Moderna or CVX 213 shots (in any Series)',
+    behavior:
+      'Sep 2023 COVID-19 Moderna-family/CVX213 current doses for patients under 18 are invalid below 24 days after any valid prior dose in the same selected series.',
+    testId: 'assertCovid19Sep2023ModernaCvx213TwentyFourDayIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19: If the vaccine administered is authorized neither by the FDA nor WHO, evaluate the shot as INVALID/VACCINE_NOT_APPROVED_IN_US_OR_BY_WHO',
+    behavior:
+      'Dec 2020 COVID-19 CVX products authorized neither by FDA nor WHO are invalid with VACCINE_NOT_APPROVED_IN_US_OR_BY_WHO.',
+    testId: 'assertCovid19Dec2020NotApprovedInUsOrWhoInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19: If an FDA-approved, NOS or WHO-approved vaccine, the vaccine is not permitted be default for the Dec2020 seasonal series and there are other shots following it, and the series is not complete, evaluate it as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN',
+    behavior:
+      'Dec 2020 COVID-19 wrong-series FDA/NOS/WHO-approved products are accepted as not counted when a later COVID-19 shot exists in the same incomplete series evaluation.',
+    testId: 'assertCovid19Dec2020WrongSeriesPriorAcceptedWithLaterShot',
+  },
+  {
+    ruleName:
+      'COVID-19: If the Series is not complete and the last shot administered was a WHO-approved vaccine not authorized by the FDA, override default earliest interval rule to not fire',
+    behavior:
+      'Dec 2020 incomplete COVID-19 series whose latest valid dose is CVX213 or a WHO-only product forecast the next dose at 28 days, overriding the default earliest interval.',
+    testId: 'assertCovid19Dec2020IncompleteWhoIntervalRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the Series is not complete and the last shot administered was a WHO-approved vaccine not authorized by the FDA, override default recommendation interval rule to not fire',
+    behavior:
+      'Dec 2020 incomplete COVID-19 series whose latest valid dose is CVX213 or a WHO-only product forecast the next dose at 28 days, overriding the default recommended interval.',
+    testId: 'assertCovid19Dec2020IncompleteWhoIntervalRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If CVX 229 or CVX 230 was evaluated as Not Valid due to VACCINE_NOT_ALLOWED_FOR_THIS_DOSE in the Pfizer, Moderna or Mixed Product Series, Ignore the shot when calculating intervals',
+    behavior:
+      'Dec 2020 invalid CVX229/CVX230 doses with VACCINE_NOT_ALLOWED_FOR_THIS_DOSE are retained as invalid but excluded from subsequent COVID-19 interval calculations.',
+    testId: 'assertCovid19Dec2020BivalentInvalidPriorIgnoredForIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19: Remove evaluation reason VACCINE_NOT_ALLOWED_FOR_THIS_DOSE for shots administered before the series is complete',
+    behavior:
+      'Dec 2020 incomplete COVID-19 series remove VACCINE_NOT_ALLOWED_FOR_THIS_DOSE from the latest invalid shot, leaving the invalid evaluation with no public reason code.',
+    testId: 'assertCovid19Dec2020IncompleteNotAllowedReasonCleanup',
+  },
+  {
+    ruleName:
+      'COVID-19: If a bivalent vaccine was administered prior to 9/2/2022, evaluate the shot as Invalid / VACCINE_NOT_YET_AVAILABLE_ON_DATE_SPECIFIED',
+    behavior:
+      'Dec 2020 COVID-19 bivalent CVX products administered before 2022-09-02 are invalid with VACCINE_NOT_YET_AVAILABLE_ON_DATE_SPECIFIED.',
+    testId: 'assertCovid19Dec2020BivalentBeforeAvailabilityInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient >= 5y and < 18y of age and has completed the Moderna Series along with no extra doses, then recommend CONDITIONAL / COMPLETE_HIGH_RISK',
+    behavior:
+      'Dec 2020 Moderna completed primary series patients age 5 through before 18 with no extra doses receive a conditional COMPLETE_HIGH_RISK recommendation before 2022-09-02.',
+    testId: 'assertCovid19Dec2020PreSep2022FirstBoosterRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient >= 18y has completed the Moderna Series along with no extra doses, then recommend a booster dose at earliest/recommended age of 18y w/ earliest/recommended interval of 5 months',
+    behavior:
+      'Dec 2020 Moderna completed primary series adults with no extra doses receive a first-booster recommendation at the later of age 18 or 5 months after the primary series before 2022-09-02.',
+    testId: 'assertCovid19Dec2020PreSep2022FirstBoosterRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient >= 5y has completed the Series along with no extra doses in the Pfizer or Mixed Product series, then recommend a booster dose at earliest/recommended age of 5y w/ earliest/recommended interval of 5 months',
+    behavior:
+      'Dec 2020 Pfizer and mixed completed primary series patients age 5 or older with no extra doses receive a first-booster recommendation at the later of age 5 or 5 months after the primary series before 2022-09-02.',
+    testId: 'assertCovid19Dec2020PreSep2022FirstBoosterRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient >= 12y has completed the Janssen Series and no extra doses have been administered, then recommend the _1st_ booster dose at recommended age 12y w/ recommended interval of 8 weeks, whichever is later',
+    behavior:
+      'Dec 2020 Janssen completed primary series patients age 12 or older with no extra doses receive a first-booster recommendation at the later of age 12 or 8 weeks after the primary series before 2022-09-02.',
+    testId: 'assertCovid19Dec2020PreSep2022FirstBoosterRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient >= 12y of age and has completed the Novavax Series along with no extra doses, then recommend a booster dose at earliest/recommended age of 12y w/ earliest/recommended interval of 5 months',
+    behavior:
+      'Dec 2020 Novavax completed primary series patients age 12 or older with no extra doses receive a first-booster recommendation at the later of age 12 or 5 months after the primary series before 2022-09-02.',
+    testId: 'assertCovid19Dec2020PreSep2022FirstBoosterRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient >= 5y has completed a WHO-approved series along with no extra doses, then recommend a booster dose at earliest/recommended age of 5y w/ recommended interval of 5 months',
+    behavior:
+      'Dec 2020 WHO-approved completed primary series patients age 5 or older with no extra doses receive a first-booster recommendation at the later of age 5 or 5 months after the primary series before 2022-09-02.',
+    testId: 'assertCovid19Dec2020PreSep2022FirstBoosterRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient >= 18y and < 50y has completed the Moderna Series along with one extra dose, then recommend CONDITIONAL / COMPLETE_HIGH_RISK',
+    behavior:
+      'Dec 2020 Moderna completed primary series patients age 18 through before 50 with one extra dose receive a conditional COMPLETE_HIGH_RISK recommendation before 2022-09-02.',
+    testId: 'assertCovid19Dec2020PreSep2022OneExtraDoseRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient >= 5y and < 50 years has completed the Series along with one extra dose in the Pfizer, Mixed Product or WHO-approved series, then recommend CONDITIONAL / COMPLETE_HIGH_RISK',
+    behavior:
+      'Dec 2020 Pfizer, mixed, and WHO-approved completed primary series patients age 5 through before 50 with one extra dose receive a conditional COMPLETE_HIGH_RISK recommendation before 2022-09-02.',
+    testId: 'assertCovid19Dec2020PreSep2022OneExtraDoseRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient >= 50y has completed the Series along with one extra dose in the Pfizer, Moderna, Mixed Product or WHO-approved series, then recommend a 2nd booster dose at earliest/recommended age of 50y w/ earliest/recommended interval of 4 months',
+    behavior:
+      'Dec 2020 Pfizer, Moderna, mixed, and WHO-approved completed primary series patients age 50 or older with one extra dose receive a second-booster recommendation at the later of age 50 or 4 months after the latest valid dose before 2022-09-02.',
+    testId: 'assertCovid19Dec2020PreSep2022OneExtraDoseRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient >= 18y has completed the Janssen Series and 1 extra dose of a non-mRNA vaccine, then recommend the _2nd_ booster dose at earliest age 18y/recommended age 18y or recommended interval of 4 months, whichever is later',
+    behavior:
+      'Dec 2020 Janssen completed primary series patients age 18 or older with one non-mRNA extra dose receive a second-booster recommendation at the later of age 18 or 4 months after the latest valid dose before 2022-09-02.',
+    testId: 'assertCovid19Dec2020PreSep2022OneExtraDoseRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient >= 18y and < 50y has completed the Janssen Series and 1 extra dose of an mRNA vaccine, then recommend CONDITIONAL / COMPLETE_HIGH_RISK',
+    behavior:
+      'Dec 2020 Janssen completed primary series patients age 18 through before 50 with one mRNA extra dose receive a conditional COMPLETE_HIGH_RISK recommendation before 2022-09-02.',
+    testId: 'assertCovid19Dec2020PreSep2022OneExtraDoseRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient >= 50y has completed the Janssen Series and 1 extra dose of an mRNA vaccine, then recommend the _2nd_ booster dose at earliest age 50y/recommended age 50y or recommended interval of 4 months, whichever is later',
+    behavior:
+      'Dec 2020 Janssen completed primary series patients age 50 or older with one mRNA extra dose receive a second-booster recommendation at the later of age 50 or 4 months after the latest valid dose before 2022-09-02.',
+    testId: 'assertCovid19Dec2020PreSep2022OneExtraDoseRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is < 9/2/2022 and the patient has completed the the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series and 2 extra doses has been administered, then recommend NOT_RECOMMENDED / COMPLETE',
+    behavior:
+      'Dec 2020 Pfizer, Moderna, mixed, Janssen, and WHO-approved completed series with two extra doses before 2022-09-02 return not-recommended COMPLETE.',
+    testId: 'assertCovid19Dec2020PreSep2022TwoExtraDoseCompleteRecommendation',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is anytime (before, on, or after 9/2/2022), the patient >= 5y and < 12y has completed the Janssen Series, and 0 or 1 one extra dose has been administered, then recommend Not Recommended / COMPLETE_HIGH_RISK',
+    behavior:
+      'Dec 2020 Janssen completed series patients age 5 through before 12 with zero or one extra dose return not-recommended COMPLETE_HIGH_RISK regardless of 2022-09-02.',
+    testId: 'assertCovid19Dec2020JanssenAge5ToUnder12CompleteHighRiskRecommendation',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is >= 12/8/2022 and < 4/19/2023, the patient >= __6 months__, and has completed the __Moderna__ Series along with an additional dose and/or up to 3 extra doses, then recommend a booster dose at earliest/recommended age of 6 month & 12/8/2022 w/ earliest/recommended interval of 8 weeks',
+    behavior:
+      'Dec 2020 Moderna completed-series patients in the 2022-12-08 through before 2023-04-19 window receive a booster recommendation at the later of age 6 months, 2022-12-08, or 8 weeks after the latest valid dose when no valid extra dose exists on or after 2022-12-08.',
+    testId: 'assertCovid19Dec2020BivalentEraRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is >= 10/12/2022 and < 12/8/2022, the patient >= __5y__, and has completed the __Moderna__ Series along with an additional dose and/or up to 3 extra doses, then recommend a booster dose at earliest/recommended age of 5y & 10/12/2022 w/ earliest/recommended interval of 8 weeks',
+    behavior:
+      'Dec 2020 Moderna completed-series patients age 5 through before 12 in the 2022-10-12 through before 2022-12-08 window receive a booster recommendation at the later of age 5, 2022-10-12, or 8 weeks after the latest valid dose when no valid extra dose exists on or after 2022-10-12.',
+    testId: 'assertCovid19Dec2020BivalentEraRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is >= 10/12/2022 and < 4/19/2023, the patient >= __5y__, and has completed the __Pfizer__, __Mixed Product__ or __WHO-approved__ series along with an additional dose and/or up to 3 extra doses, then recommend a booster dose at earliest/recommended age of 5y & 10/12/2022 w/ earliest/recommended interval of 8 weeks',
+    behavior:
+      'Dec 2020 Pfizer, mixed, and WHO-approved completed-series patients age 5 through before 12 in the 2022-10-12 through before 2023-04-19 window receive a booster recommendation at the later of age 5, 2022-10-12, or 8 weeks after the latest valid dose when no valid extra dose exists on or after 2022-10-12.',
+    testId: 'assertCovid19Dec2020BivalentEraRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is >= 9/2/2022 and < 4/19/2023, the patient >= __12y__ and has completed the __Pfizer__, __Mixed Product__, __Moderna__, __Novavax__, __Janssen__ or __WHO-approved__ Series  with an additional dose and/or up to 3 extra doses, then recommend a booster dose at earliest/recommended age of 5y & 9/2/2022 w/ earliest/recommended interval of 8 weeks',
+    behavior:
+      'Dec 2020 completed-series patients age 12 or older in the 2022-09-02 through before 2023-04-19 window receive a booster recommendation at the later of age 12, 2022-09-02, or 8 weeks after the latest valid dose when no valid extra dose exists on or after 2022-09-02.',
+    testId: 'assertCovid19Dec2020BivalentEraRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If a prior booster dose was administered >= 12/8/2022 when the patient is >= __6 months__ of age in the __Moderna__ Series, the execution date is < 4/19/2023, recommend Not Recommended / COMPLETE',
+    behavior:
+      'Dec 2020 Moderna completed-series patients with a valid extra dose on or after 2022-12-08 at age 6 months or older return not-recommended COMPLETE before 2023-04-19.',
+    testId: 'assertCovid19Dec2020BivalentEraCompletionRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If a prior booster dose was administered >= 10/12/2022 when the patient is >= __5 yrs__ in the __Pfizer__ Series, and the execution date is < 3/17/2023, recommend Not Recommended / COMPLETE',
+    behavior:
+      'Dec 2020 Pfizer completed-series patients with a valid extra dose on or after 2022-10-12 at age 5 or older return not-recommended COMPLETE before 2023-03-17.',
+    testId: 'assertCovid19Dec2020BivalentEraCompletionRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If a prior booster dose was administered >= 10/12/2022 when the patient is >= __5 yrs__ in the __Mixed Product__, __Moderna__ or __WHO-approved__ series and the execution date is < 4/19/2023, recommend Not Recommended / COMPLETE',
+    behavior:
+      'Dec 2020 mixed, Moderna, and WHO-approved completed-series patients with a valid extra dose on or after 2022-10-12 at age 5 or older return not-recommended COMPLETE before 2023-04-19.',
+    testId: 'assertCovid19Dec2020BivalentEraCompletionRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If a prior booster dose was administered >= 9/2/2022 when the patient is >= 12 yrs of age in the __Pfizer__ Series, and the execution date is < 3/17/2023, recommend Not Recommended / COMPLETE',
+    behavior:
+      'Dec 2020 Pfizer completed-series patients with a valid extra dose on or after 2022-09-02 at age 12 or older return not-recommended COMPLETE before 2023-03-17.',
+    testId: 'assertCovid19Dec2020BivalentEraCompletionRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If a prior booster dose was administered >= 9/2/2022 in the __Mixed Product__, __Moderna__, Novavax, Janssen or WHO-approved Series when the patient is >= __12 yrs__ of age and the execution date is < 4/19/2023, recommend Not Recommended / COMPLETE',
+    behavior:
+      'Dec 2020 mixed, Moderna, Novavax, Janssen, and WHO-approved completed-series patients with a valid extra dose on or after 2022-09-02 at age 12 or older return not-recommended COMPLETE before 2023-04-19.',
+    testId: 'assertCovid19Dec2020BivalentEraCompletionRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is >= 4/19/2023, patient is >= 65 yrs of age and has had 2 or more prior doses with a bivalent vaccine or 2 or more doses at >= 4/19/2023, recommend Not Recommended / COMPLETE',
+    behavior:
+      'Dec 2020 completed-series patients age 65 or older with two or more valid bivalent/current-era post-completion doses return not-recommended COMPLETE on or after 2023-04-19.',
+    testId: 'assertCovid19Dec2020PostApr2023BivalentRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is >= 4/19/2023, patient is >= 65 yrs of age, and has had 1 prior dose with a bivalent vaccine or 1 prior dose at >= 4/19/2023 in the Moderna series, recommend Not Recommended / COMPLETE_HIGH_RISK',
+    behavior:
+      'Dec 2020 completed-series patients age 65 or older with one valid bivalent/current-era post-completion dose return not-recommended COMPLETE_HIGH_RISK on or after 2023-04-19.',
+    testId: 'assertCovid19Dec2020PostApr2023BivalentRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is >= 4/19/2023, patient is < 65 years of age and has had at least 1 prior dose with a bivalent vaccine or at least 1 dose administered at >= 4/19/2023, recommend Not Recommended / COMPLETE',
+    behavior:
+      'Dec 2020 completed-series patients younger than 65 with at least one valid bivalent/current-era post-completion dose return not-recommended COMPLETE on or after 2023-04-19.',
+    testId: 'assertCovid19Dec2020PostApr2023BivalentRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is >= 4/19/2023 for the Mixed Product, Moderna, Janssen or Novavax COVID-19 series, the patient has not had any bivalent doses or any doses administered at >= 4/19/2023, recommend a bivalent vaccine at age 6 months and recommended interval of 8 weeks along with recommendation reason ADMINISTER_COVID19_BIVALENT_VACCINE',
+    behavior:
+      'Dec 2020 mixed, Moderna, Janssen, and Novavax completed-series patients with no bivalent/current-era post-completion dose receive an updated bivalent recommendation at the later of age 6 months, 2023-04-19, or 8 weeks after the latest valid dose.',
+    testId: 'assertCovid19Dec2020PostApr2023BivalentRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the execution date is >= 4/19/2023 for the Pfizer COVID-19 series, the patient is >= 5 yrs of age, and has not had any bivalent doses or any doses administered at >= 4/19/2023, recommend a bivalent vaccine at age 6 months and recommended interval of 8 weeks along with recommendation reason ADMINISTER_COVID19_BIVALENT_VACCINE',
+    behavior:
+      'Dec 2020 Pfizer completed-series patients age 5 or older with no bivalent/current-era post-completion dose receive an updated bivalent recommendation at the later of age 6 months, 2022-09-02, or 8 weeks after the latest valid dose.',
+    testId: 'assertCovid19Dec2020PostApr2023BivalentRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the child < 5 years of age completes the Pfizer series, the execution date is >= 3/17/2023, and neither a bivalent vaccine dose has been administered nor a dose administered >= 4/19/2023, recommend at the vaccine group level with recommended interval of 8 weeks or on 3/17/2023, whichever is latest, along with recommended reason ADMINISTER_COVID19_BIVALENT_VACCINE',
+    behavior:
+      'Dec 2020 Pfizer completed-series patients younger than 5 with no bivalent/current-era dose receive an updated bivalent recommendation at the later of age 6 months, 2023-03-17, or 8 weeks after the latest valid dose.',
+    testId: 'assertCovid19Dec2020PostApr2023BivalentRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If a dose is recommended in the Pfizer series for patient < 5 years and the execution date is >= 3/17/2023, add the recommendation reason ADMINISTER_COVID19_BIVALENT_VACCINE',
+    behavior:
+      'Dec 2020 Pfizer completed-series patients younger than 5 on or after 2023-03-17 receive ADMINISTER_COVID19_BIVALENT_VACCINE when a post-completion bivalent dose is recommended.',
+    testId: 'assertCovid19Dec2020PostApr2023BivalentRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If a dose is recommended in the Pfizer series for patient >= 5 years and the execution date is >= 3/17/2023 and < 4/19/2023, add the recommendation reason BOOSTER_DOSE',
+    behavior:
+      'Dec 2020 Pfizer completed-series patients age 5 or older in the 2023-03-17 through before 2023-04-19 window receive BOOSTER_DOSE when a booster dose is recommended.',
+    testId: 'assertCovid19Dec2020BivalentEraRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If a dose is recommended in the Pfizer, Mixed Product, Moderna, Janssen or Novavax series and the execution date is >= 4/19/2023, add the recommendation reason ADMINISTER_COVID19_BIVALENT_VACCINE',
+    behavior:
+      'Dec 2020 Pfizer, mixed, Moderna, Janssen, and Novavax completed-series patients on or after 2023-04-19 receive ADMINISTER_COVID19_BIVALENT_VACCINE when a post-completion bivalent dose is recommended.',
+    testId: 'assertCovid19Dec2020PostApr2023BivalentRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If a dose is recommended in the Pfizer series, the series is complete and the execution date is < 3/17/2023, add the recommendation reason BOOSTER_DOSE',
+    behavior:
+      'Dec 2020 Pfizer completed-series patients before 2023-03-17 receive BOOSTER_DOSE when a booster dose is recommended.',
+    testId: 'assertCovid19Dec2020PreSep2022FirstBoosterRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If a dose is recommended in the Moderna, Mixed Product, Janssen, Novavax or FDA-authorized/WHO series, the series is complete and the execution date is < 4/19/2023, add the recommendation reason BOOSTER_DOSE',
+    behavior:
+      'Dec 2020 Moderna, mixed, Janssen, Novavax, and WHO-approved completed-series patients before 2023-04-19 receive BOOSTER_DOSE when a booster dose is recommended.',
+    testId: 'assertCovid19Dec2020PreSep2022FirstBoosterRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If Pfizer, Moderna, Mixed Product, Janssen or FDA-authorized/WHO Series is complete and a dose is NOT_RECOMMENDED (i.e. - 2 or more doses for Janseen; 3 or more doses for Pfizer/Moderna), add the recommendation reason to COMPLETE',
+    behavior:
+      'Dec 2020 completed-series patients with no recommended next dose return not-recommended COMPLETE unless a specific high-risk completion reason applies.',
+    testId: 'assertCovid19Dec2020PreSep2022TwoExtraDoseCompleteRecommendation',
+  },
+  {
+    ruleName:
+      "COVID-19: If the patient has no doses on record and is >= 6 months, recommend on today's date",
+    behavior:
+      'Dec 2020 COVID-19 patients with no COVID-19 doses and age at least 6 months receive a due recommendation on the evaluation date.',
+    testId: 'assertCovid19Dec2020NoDoseRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the patient has no doses on record and is < 6 months old, recommend at 6 months of age',
+    behavior:
+      'Dec 2020 COVID-19 patients with no COVID-19 doses and age under 6 months receive a due recommendation dated at age 6 months.',
+    testId: 'assertCovid19Dec2020NoDoseRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Moderna < 5yrs Series): If the next recommended dose is at > 6m and < 12y of age, recommend Moderna 6m-11y (CVX 311) at the vaccine level',
+    behavior:
+      'Sep 2023 Moderna child-series recommendations before age 12 include CVX 311 as the recommended vaccine.',
+    testId: 'assertCovid19Sep2023RecommendationProducts',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Moderna < 5yrs Series): If the next recommended dose is at >= 12y of age, recommend Moderna 12y (CVX 312) at the vaccine level',
+    behavior:
+      'Sep 2023 Moderna child-series recommendations at age 12 or older include CVX 312 as the recommended vaccine.',
+    testId: 'assertCovid19Sep2023RecommendationProducts',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer < 5yrs Series): If the next recommended dose is at >= 6m and < 5y of age, recommend Pfizer 6m-5y (CVX 308) at the vaccine level',
+    behavior:
+      'Sep 2023 Pfizer child-series recommendations before age 5 include CVX 308 as the recommended vaccine.',
+    testId: 'assertCovid19Sep2023RecommendationProducts',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer < 5yrs Series): If the next recommended dose is at >= 5y and < 12y of age, recommend Pfizer 5-11y (CVX 310) at the vaccine level',
+    behavior:
+      'Sep 2023 Pfizer child-series recommendations from age 5 through before 12 include CVX 310 as the recommended vaccine.',
+    testId: 'assertCovid19Sep2023RecommendationProducts',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer < 5yrs Series): If the next recommended dose is at >= 12y of age, recommend Pfizer 12y+ (CVX 309) at the vaccine level',
+    behavior:
+      'Sep 2023 Pfizer child-series recommendations at age 12 or older include CVX 309 as the recommended vaccine.',
+    testId: 'assertCovid19Sep2023RecommendationProducts',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024): If the patient is >= 5 years as of the recommended date or the evaluation date, and either the recommendation date or the evaluation date is >= 8 weeks from the last administered COVID-19 shot, recommend at the vaccine group level',
+    behavior:
+      'Sep 2023 age-5-or-older series recommendations are emitted at vaccine-group level without a product-specific recommended vaccine.',
+    testId: 'assertCovid19Sep2023RecommendationProducts',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024): If there are no shots administered, set the earliest age to the latter of age 6 months or the current season start date (*earliestAgeCheck*)',
+    behavior:
+      'Sep 2023 no-dose recommendations use the existing next-dose forecast date, which is no earlier than age 6 months and the season start.',
+    testId: 'assertCovid19Sep2023RecommendationProducts',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024): If there are no shots administered, set the latest recommended age to the latter of age 6 months or the current season start date (*latestRecommendedAgeCheck*)',
+    behavior:
+      'Sep 2023 no-dose recommendation dates use the existing next-dose forecast recommendation date, which is no earlier than age 6 months and the season start.',
+    testId: 'assertCovid19Sep2023RecommendationProducts',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024): If a prior formulation that does not count towards U.S. vaccination is administered on or after 9/12/2023 (for any Sept 2023 onward COVID-19 Series), recommend earliest & recommended interval of 8 weeks to the next dose',
+    behavior:
+      'Sep 2023 recommendation intervals after non-counting prior COVID-19 shots are based on the custom prior-shot interval rather than routine table ages.',
+    testId: 'assertCovid19Sep2023NonCountingPriorAt8WeeksMinus4DaysValid',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024): For the 2023-2024 season, the minimum interval and recommended interval from invalid shot prior to 9/12/2023 are 8w (*earliestIntevalCheck*)',
+    behavior:
+      'Sep 2023 recommendations with only a prior-season COVID-19 shot use an 8-week interval from the prior shot for earliest and recommended dates.',
+    testId: 'assertCovid19Sep2023PreSeasonPriorBelow8WeeksMinus4DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs): For the 2023-2024 season, the minimum interval and recommended interval from dose 1 to dose 2 are, respectively, to 4m and 4m (*earliestIntevalCheck*)',
+    behavior:
+      'Sep 2023 age-5-or-older series dose-2 recommendations use a 4-month interval from dose 1 for earliest and recommended dates.',
+    testId: 'assertCovid19Sep2023Gte5Dose1ToDose2Interval',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs): The recommended age of dose 2 is the latter of age 65 years or 2/28/2024 (*recommendationAgeCheck*)',
+    behavior:
+      'Sep 2023 age-5-or-older target dose 2 forecast dates are no earlier than age 65 years and 2024-02-28.',
+    testId: 'assertCovid19Sep2023Gte5Dose1ToDose2Interval',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs): If there are no shots administered, set the earliest age to the latter of age 65 years or 2/28/2024 (*earliestAgeCheck*)',
+    behavior:
+      'Sep 2023 age-5-or-older target dose 2 earliest dates are no earlier than age 65 years and 2024-02-28.',
+    testId: 'assertCovid19Sep2023Gte5Dose1ToDose2Interval',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5ys): If the recommendation date for dose 2 is >= 1 year from the evaluation date, recommendation is NOT_RECOMMENDED / COMPLETE',
+    behavior:
+      'Sep 2023 age-5-or-older target dose 2 recommendations at least one year after evaluation are converted to NOT_RECOMMENDED with COMPLETE reason.',
+    testId: 'assertCovid19Sep2023Gte5Dose1ToDose2Interval',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on record prior to dose 1, the recommended earliest & recommended interval is 8w from target dose 1 to the next target dose IF none of the exceptions apply (*earliestIntervalCheck*)',
+    behavior:
+      'Sep 2023 age-5-or-older series dose-1 recommendations with prior COVID-19 history use an 8-week interval from the latest prior-season COVID-19 shot when no exception applies.',
+    testId: 'assertCovid19Sep2023PreSeasonPriorBelow8WeeksMinus4DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs): If 8 weeks from the last administered shot elapsed prior to the patient turning 5 years of age, set earliest and recommended age for target dose 1 to the season start date (*earliestAgeCheck*)',
+    behavior:
+      'Sep 2023 age-5-or-older series dose-1 recommendations use the later of the prior-shot interval, age 5, and season start.',
+    testId: 'assertCovid19Sep2023PreSeasonPriorBelow8WeeksMinus4DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs): If there are no shots in the current season but there are shots in the prior season, set the earlest and recommended age date to the latter of age 6 months or the season start date (*earliestAgeCheck*)',
+    behavior:
+      'Sep 2023 age-5-or-older forecasts with only prior-season COVID-19 shots set recommendation dates from the prior-season interval while respecting season and age gates.',
+    testId: 'assertCovid19Sep2023PreSeasonPriorBelow8WeeksMinus4DaysInvalid',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs)->TargetDose 1/Exception 2: activation-group extension => If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, and there are no prior doses on record, the earliest interval from that shot to target dose 1 is 28 days',
+    behavior:
+      'Sep 2023 age-5-through-under-12 CVX313 accepted dose-1 exceptions forecast the next target dose 1 attempt 28 days after that accepted CVX313.',
+    testId: 'assertCovid19Sep2023Cvx313Age5ToUnder12AcceptedException',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs)->TargetDose 1/Exception 2: If the patient is < 12y as of the evaluation date and the recommended due date, and the most recent shot was COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, return recommended reason code ADMINISTER_mRNA_VACCINE',
+    behavior:
+      'Sep 2023 age-5-through-under-12 CVX313 accepted dose-1 exceptions recommend ADMINISTER_mRNA_VACCINE for the next target dose 1 attempt.',
+    testId: 'assertCovid19Sep2023Cvx313Age5ToUnder12AcceptedException',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs)->TargetDose 1/Exception 3: There are no other shots administered after the CVX 211; _also_ override default earliestIntervalCheck',
+    behavior:
+      'Sep 2023 pre-2023-10-04 CVX211 accepted exceptions forecast the next target dose 1 attempt 28 days after that accepted CVX211.',
+    testId: 'assertCovid19Sep2023Cvx211AcceptedException',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 __Pfizer__ < 5yrs Series): if the patient has 1 dose of a prior or current Pfizer vaccine formulation administered prior to the season start date at < 5yrs of age, set the recommendation dose number to 2',
+    behavior:
+      'Sep 2023 Pfizer under-5 forecasts with one qualifying Pfizer-family prior-season dose skip target dose 1, recommend target dose 2, and date it from the prior-season interval.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 __Pfizer__ < 5yrs Series): if the patient has >= 2 doses of a prior or current Pfizer formulation administered prior to the season start date at < 5yrs of age, set the recommendation dose number to 3',
+    behavior:
+      'Sep 2023 Pfizer under-5 forecasts with two or more qualifying Pfizer-family prior-season doses skip to target dose 3 and date it from the latest prior-season dose interval.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 __Mixed Product__ < 5yrs Series): if the patient has 1 dose of a prior or current (any) formulation administered prior to the season start date at < 5yrs of age, set the recommendation dose number to 2',
+    behavior:
+      'Sep 2023 mixed-product under-5 forecasts with one qualifying prior-season COVID-19 dose skip target dose 1, recommend target dose 2, and date it from the prior-season interval.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 __Mixed Product__ < 5yrs Series): if the patient has >= 2 doses of a prior (any) formulation administered prior to the season start date at < 5yrs of age, set the recommendation dose number to 3',
+    behavior:
+      'Sep 2023 mixed-product under-5 forecasts with two or more qualifying prior-season COVID-19 doses skip to target dose 3 and date it from the latest prior-season dose interval.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 __Moderna__ < 5yrs Series): if the patient has >= 1 doses of a priori Moderna formulation administered prior to the season start date at < 5yrs of age, set the recommendation dose number to 2',
+    behavior:
+      'Sep 2023 Moderna under-5 forecasts with qualifying Moderna-family prior-season doses skip target dose 1, recommend target dose 2, and date it from the prior-season interval.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer/Moderna/Mixed Product < 5yrs Series): For target dose 1 of the current series\' season: no shots have been administered in the current season but there have been shots administered in a prior season. Enforce the earliest/recommended recommendation interval for the current series dose from the most recent shot in the prior season',
+    behavior:
+      'Sep 2023 under-5 forecasts with no current-season COVID-19 shots but prior-season COVID-19 history use an 8-week interval from the latest prior-season shot for earliest and recommended dates.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer/Moderna/Mixed Product < 5yrs Series): For target dose > 1: If no shots have been administered in the current season. Enforce the earliest/recommended recommendation interval for the current series dose from the most recent shot in a previous season',
+    behavior:
+      'Sep 2023 under-5 skipped target-dose forecasts with no current-season COVID-19 shots use an 8-week interval from the latest prior-season shot for earliest and recommended dates.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 __Moderna__ < 5yrs Series): For target dose > 1: If 2 or more doses of the prior Moderna vaccine formulation were administered in the prior season, earliest/recommended interval to the next dose is 8 weeks',
+    behavior:
+      'Sep 2023 Moderna under-5 skipped target-dose forecasts use an 8-week interval from the latest prior Moderna-family season dose.',
+    testId: 'assertCovid19Sep2023Lt5PriorSeasonDosesSkipTargetDose',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines that do not count towards US vaccination) or a non-Pfizer updated seasonal COVID-19 vaccine is administered as target dose 1 or target dose 2, the minimum/recommended interval to the next dose is 28 days(*earliestIntervalCheck*)',
+    behavior:
+      'Sep 2023 Pfizer under-5 retry recommendations after a non-Pfizer or prior-formulation current-season attempt use a 28-day interval.',
+    testId: 'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer < 5yrs Series): If a shot was previously administered for target dose 1 or target dose 2 and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the minimum/recommended interval from that shot to the next shot is 28 days (*earliestIntervalCheck*)',
+    behavior:
+      'Sep 2023 Pfizer under-5 retry recommendations after an invalid below-minimum-age current-season attempt use a 28-day interval.',
+    testId: 'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Moderna < 5yrs Series): If a shot was previously administered for target dose 1 or target dose 2 and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the minimum/recommended interval from that shot to the next shot is 28 days (*earliestIntervalCheck*)',
+    behavior:
+      'Sep 2023 Moderna under-5 retry recommendations after an invalid below-minimum-age current-season attempt use a 28-day interval.',
+    testId: 'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Mixed Product < 5yrs Series): If a shot was previously administered for target dose 1 or target dose 2 and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the minimum/recommended interval from that shot to the next shot is 28 days (*earliestIntervalCheck*)',
+    behavior:
+      'Sep 2023 mixed-product under-5 retry recommendations after an invalid below-minimum-age current-season attempt use a 28-day interval.',
+    testId: 'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Mixed Product < 5yrs Series): If the most recent shot administered was a Novavax (CVX 313) to a patient age >= 6m-4d and < 5 yrs and the series is not complete, return recommended reason code ADMINISTER_mRNA_VACCINE',
+    behavior:
+      'Sep 2023 mixed-product under-5 forecasts after a Novavax CVX313 attempt before age 5 recommend ADMINISTER_mRNA_VACCINE.',
+    testId: 'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Pfizer/Moderna/Mixed Product < 5yrs): For target dose 1 of the current series\' season: shot(s) have been administered in the current season and there are also shots in a prior season but none of them are (valid) doses. Recommend earliest/recommended/overdue interval of 8w from the most recent shot in the previous season',
+    behavior:
+      'Sep 2023 under-5 forecasts with current-season attempts, prior-season COVID-19 history, and no valid in-season doses use an 8-week interval from the latest prior-season shot.',
+    testId: 'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax Series): For the 2023-2024 season, the minimum interval and recommended interval from dose 3 to dose 4 are, respectively, to 4m and 4m (*earliestIntevalCheck*)',
+    behavior:
+      'Sep 2023 Novavax target dose 4 recommendations use a 4-month interval from the latest valid prior dose.',
+    testId: 'assertCovid19Sep2023NovavaxIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax Series): For the 2023-2024 season, the minimum interval and recommended interval from dose 3 to dose 4 are, respectively, to 4m and 4m (*recommendationIntervalCheck*)',
+    behavior:
+      'Sep 2023 Novavax target dose 4 recommendations use a 4-month interval from the latest valid prior dose.',
+    testId: 'assertCovid19Sep2023NovavaxIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax Series):activation-group extension => If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs, recommend earliest/recommended interval of 4 weeks from dose 1',
+    behavior:
+      'Sep 2023 Novavax CVX313 dose 1 administered at age 5 through under 12y-4d forecasts dose 2 at a 4-week interval.',
+    testId: 'assertCovid19Sep2023NovavaxIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax Series): If a CVX 313 is administered as (valid) dose 1 to a patient >= 5 yrs and < 12 yrs-4 days, recommend earliest/recommended interval of 4 weeks from dose 1',
+    behavior:
+      'Sep 2023 Novavax CVX313 dose 1 administered at age 5 through under 12y-4d forecasts dose 2 at a 4-week interval.',
+    testId: 'assertCovid19Sep2023NovavaxIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax Series): If the patient is < 12 years as of the evaluation date and is < 12 years at the recommended due date), return recommended reason code ADMINISTER_mRNA_VACCINE.',
+    behavior:
+      'Sep 2023 Novavax recommendations for patients under age 12 at evaluation and recommendation date use ADMINISTER_mRNA_VACCINE.',
+    testId: 'assertCovid19Sep2023NovavaxIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax Series): For target dose 4, the earliest & recommended date is the latter of the calculated forecast date or 2/28/2024',
+    behavior:
+      'Sep 2023 Novavax target dose 4 forecast dates are no earlier than 2024-02-28.',
+    testId: 'assertCovid19Sep2023NovavaxIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 Novavax Series): If the recommendation date for dose 4 is >= 1 year from the evaluation date, recommendation is NOT_RECOMMENDED / COMPLETE',
+    behavior:
+      'Sep 2023 Novavax target dose 4 recommendations at least one year after evaluation are converted to NOT_RECOMMENDED with COMPLETE reason.',
+    testId: 'assertCovid19Sep2023NovavaxIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 __Novavax__ Series): If CVX 313 was administered for dose 1 or dose 2, dose 3 is not needed. Skip to target dose 4',
+    behavior:
+      'Sep 2023 Novavax forecasts skip target dose 3 and forecast target dose 4 when CVX313 was administered for dose 1 or 2.',
+    testId: 'assertCovid19Sep2023NovavaxCvx313SkipsDose3',
+  },
+  {
+    ruleName:
+      'COVID-19: If dose 1 was administered at >= 6 yrs of age and and the execution date >= 4/19/2023, override default earliest interval and recommend earliest interval of 8 weeks',
+    behavior:
+      'Dec 2020 Moderna incomplete-series patients whose latest valid dose was administered at age 6 or older and evaluated on or after 2023-04-19 receive an 8-week earliest recommendation interval.',
+    testId: 'assertCovid19Dec2020PostApr2023IncompleteIntervalRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If dose 1 was administered at >= 6 yrs of age and and the execution date >= 4/19/2023, override default recommended interval and recommend recommended interval of 8 weeks',
+    behavior:
+      'Dec 2020 Moderna incomplete-series patients whose latest valid dose was administered at age 6 or older and evaluated on or after 2023-04-19 receive an 8-week recommended interval.',
+    testId: 'assertCovid19Dec2020PostApr2023IncompleteIntervalRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If dose 1 was administered at >= 5 yrs of age and and the execution date >= 4/19/2023, override default earliest interval and recommend earliest interval of 8 weeks',
+    behavior:
+      'Dec 2020 Pfizer and mixed incomplete-series patients whose latest valid dose was administered at age 5 or older and evaluated on or after 2023-04-19 receive an 8-week earliest recommendation interval.',
+    testId: 'assertCovid19Dec2020PostApr2023IncompleteIntervalRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If dose 1 was administered at >= 5 yrs of age and and the execution date >= 4/19/2023, override default recommended interval and recommend recommended interval of 8 weeks',
+    behavior:
+      'Dec 2020 Pfizer and mixed incomplete-series patients whose latest valid dose was administered at age 5 or older and evaluated on or after 2023-04-19 receive an 8-week recommended interval.',
+    testId: 'assertCovid19Dec2020PostApr2023IncompleteIntervalRecommendations',
+  },
+  {
+    ruleName:
+      'COVID-19: If the series is complete, override allowable vaccine check, as the allowable vaccines for additional and booster doses are verified by each rule',
+    behavior:
+      'COVID-19 Dec 2020 completed-series histories route unused COVID-19 shots through post-completion additional/booster eligibility checks instead of primary-series allowable-vaccine gates.',
+    testId: 'assertCovid19Dec2020PreBivalentAdditionalBoosterPermissions',
+  },
+  {
+    ruleName:
+      'COVID-19: If the shot administration date is < 9/2/2022 and at >= 5 yrs and < 18 yrs of age for an Additional Dose is administered in the __Moderna Series__, the shot is permitted',
+    behavior:
+      'COVID-19 Dec 2020 Moderna completed-series patients age 5 through before 18 may have one pre-2022-09-02 additional dose recorded as valid.',
+    testId: 'assertCovid19Dec2020PreBivalentAdditionalBoosterPermissions',
+  },
+  {
+    ruleName:
+      'COVID-19: If the shot administration date is < 9/2/2022 and at >= 18 yrs and < 50 yrs of age for an Additional Dose and/or 1st Booster Dose is administered in the __Moderna Series__, the shot is permitted',
+    behavior:
+      'COVID-19 Dec 2020 Moderna completed-series patients age 18 through before 50 may have up to two pre-2022-09-02 post-completion doses recorded as valid.',
+    testId: 'assertCovid19Dec2020PreBivalentAdditionalBoosterPermissions',
+  },
+  {
+    ruleName:
+      'COVID-19: If the shot administration date < 9/2/2022 and at >= 5 yrs and < 50 yrs of age for an Additional Dose and/or 1st Booster Dose in the __Pfizer, Mixed Product, Janssen or Series not authorized by the FDA but authorized by the WHO__, the shot is permitted',
+    behavior:
+      'COVID-19 Dec 2020 Pfizer, mixed, Janssen, Novavax, and WHO-authorized completed-series patients age 5 through before 50 may have up to two pre-2022-09-02 post-completion doses recorded as valid.',
+    testId: 'assertCovid19Dec2020PreBivalentAdditionalBoosterPermissions',
+  },
+  {
+    ruleName:
+      'COVID-19: If the shot administration date is < 9/2/2022 and at >= 50 yrs of age for an Additional Dose, 1st Booster Dose or 2nd Booster Dose in the __Pfizer, Moderna, Mixed Product, Janssen, Novavax or Series not authorized by the FDA but authorized by the WHO__, the shot is permitted',
+    behavior:
+      'COVID-19 Dec 2020 completed-series patients age 50 or older may have up to three pre-2022-09-02 post-completion doses recorded as valid.',
+    testId: 'assertCovid19Dec2020PreBivalentAdditionalBoosterPermissions',
+  },
+  {
+    ruleName:
+      'COVID-19: If the shot administration date >= 9/2/2022 and at >= 5 yrs of age and an Additional (monovalent) Dose is administered in the __Pfizer, Moderna, Mixed Product, Janssen or Series not authorized by the FDA but authorized by the WHO__, the shot is permitted',
+    behavior:
+      'COVID-19 Dec 2020 completed-series patients age 5 or older may have one monovalent post-completion dose on or after 2022-09-02 recorded as valid.',
+    testId: 'assertCovid19Dec2020PostBivalentAdditionalBoosterPermissions',
+  },
+  {
+    ruleName:
+      'COVID-19: If the shot administration date is >= 9/2/2022 at >= 12 yr of age and have had an Additional Dose and/or 3 Booster Doses is administered in the __Pfizer, Moderna, Mixed Product, Janssen, Novavax or WHO-approved Series__, with not more than 1 booster after 9/2/2022, the shot is permitted',
+    behavior:
+      'COVID-19 Dec 2020 completed-series patients age 12 or older may have one post-2022-09-02 booster before 2023-04-19 recorded as valid.',
+    testId: 'assertCovid19Dec2020PostBivalentAdditionalBoosterPermissions',
+  },
+  {
+    ruleName:
+      'COVID-19: If the shot administration date is >= 10/12/2022 at >= 5 yr of age and have had an Additional Dose and/or 3 Booster Doses is administered in the __Pfizer, Moderna, Mixed Product, Janssen, Novavax or WHO-approved Series__, with not more than 1 booster after 9/2/2022, the shot is permitted',
+    behavior:
+      'COVID-19 Dec 2020 completed-series patients age 5 or older may have one post-2022-10-12 booster before 2023-04-19 recorded as valid.',
+    testId: 'assertCovid19Dec2020PostBivalentAdditionalBoosterPermissions',
+  },
+  {
+    ruleName:
+      'COVID-19: If the shot administration date is >= 12/8/2022 at >= 6 months of age and have had an Additional Dose and/or 3 Booster Doses is administered in the __Moderna Series__, with not more than 1 booster after 9/2/2022, the shot is permitted',
+    behavior:
+      'COVID-19 Dec 2020 Moderna completed-series patients age 6 months or older may have one post-2022-12-08 booster before 2023-04-19 recorded as valid.',
+    testId: 'assertCovid19Dec2020PostBivalentAdditionalBoosterPermissions',
+  },
+  {
+    ruleName:
+      'COVID-19: Supplemental Text- If an additional and/or 1st booster dose is administered < 4/19/2023 to an already completed __Janssen Series or Novavax Series__ < 8 weeks after prior dose, include supplemental text that follows guidelines regarding minimum ages/intervals',
+    behavior:
+      'COVID-19 Dec 2020 Janssen and Novavax first post-completion doses before 2023-04-19 carry COVID19_MIN_INTERVAL_8W_1ST_BOOSTER supplemental text when less than 8 weeks after the prior valid COVID-19 dose.',
+    testId: 'assertCovid19Dec2020PostCompletionIntervalSupplementalText',
+  },
+  {
+    ruleName:
+      'COVID-19: Supplemental Text- If the shot administration date is < 9/2/2022 and an additional dose and/or 1st booster dose is administered to an already completed __Pfizer, Mixed Product, Moderna or WHO  Series__ < 5 months, include supplemental text that follow guidelines regarding minimum ages/intervals',
+    behavior:
+      'COVID-19 Dec 2020 Pfizer, Moderna, mixed, and WHO-series first post-completion doses before 2022-09-02 carry COVID19_MIN_INTERVAL_5M_1ST_BOOSTER supplemental text when less than 5 months after the prior valid COVID-19 dose.',
+    testId: 'assertCovid19Dec2020PostCompletionIntervalSupplementalText',
+  },
+  {
+    ruleName:
+      'COVID-19: Supplemental Text- If the shot administration date is >= 9/2/2022 & < 4/19/2023 and that additional dose and/or 1st booster dose was administered to an already completed __Pfizer, Mixed Product, Moderna or WHO  Series__ < 8 weeks, include supplemental text that follow guidelines regarding minimum ages/intervals',
+    behavior:
+      'COVID-19 Dec 2020 first post-completion doses from 2022-09-02 through before 2023-04-19 carry COVID19_MIN_INTERVAL_8W_1ST_BOOSTER supplemental text when less than 8 weeks after the prior valid COVID-19 dose.',
+    testId: 'assertCovid19Dec2020PostCompletionIntervalSupplementalText',
+  },
+  {
+    ruleName:
+      'COVID-19: Supplemental Text- If the shot administration date is < 9/2/2022 and that 2nd booster dose was administered to an already completed __Pfizer, Moderna, Mixed Product, Janssen or WHO  Series__ < 4 months, include supplemental text that follow guidelines regarding minimum ages/intervals',
+    behavior:
+      'COVID-19 Dec 2020 second post-completion doses before 2022-09-02 carry COVID19_MIN_INTERVAL_4M_2ND_BOOSTER supplemental text when less than 4 months after the prior valid COVID-19 dose.',
+    testId: 'assertCovid19Dec2020PostCompletionIntervalSupplementalText',
+  },
+  {
+    ruleName:
+      'COVID-19: Supplemental Text- If the shot administration date is >= 9/2/2022 & < 4/19/2023 and that 2nd booster dose was administered to an already completed __Pfizer, Moderna, Mixed Product, Janssen or WHO  Series__ < 8 weeks, include supplemental text that follow guidelines regarding minimum ages/intervals',
+    behavior:
+      'COVID-19 Dec 2020 second post-completion doses from 2022-09-02 through before 2023-04-19 carry COVID19_MIN_INTERVAL_8W_2ND_BOOSTER supplemental text when less than 8 weeks after the prior valid COVID-19 dose.',
+    testId: 'assertCovid19Dec2020PostCompletionIntervalSupplementalText',
+  },
+  {
+    ruleName:
+      'COVID-19: If the 3rd booster dose is administered >= 9/2/2022 & < 4/19/2023 to an already completed __Pfizer, Moderna, Mixed Product, Janssen or WHO  Series__ < 8 weeks - 4 days, evaluate the shot as Invalid / BELOW_MINIMUM_INTERVAL',
+    behavior:
+      'COVID-19 Dec 2020 third or fourth post-completion booster attempts from 2022-09-02 through before 2023-04-19 are invalid with BELOW_MINIMUM_INTERVAL when less than 8 weeks minus 4 days after the prior valid COVID-19 dose.',
+    testId: 'assertCovid19Dec2020ThirdBoosterAndFirstBivalentIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19: If the first bivalent dose on >= 3/17/2023 after series completion was administered < 8 weeks from the prior COVID-19 shot, include supplemental text regarding an 8 week minimum interval',
+    behavior:
+      'COVID-19 Dec 2020 Pfizer first bivalent post-completion dose on or after 2023-03-17 carries COVID19_MIN_INTERVAL_8W supplemental text when less than 8 weeks after the prior valid COVID-19 dose.',
+    testId: 'assertCovid19Dec2020ThirdBoosterAndFirstBivalentIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19: If the first bivalent dose on >= 4/19/2023 after series completion was administered < 8 weeks from the prior COVID-19 shot, include supplemental text regarding an 8 week minimum interval',
+    behavior:
+      'COVID-19 Dec 2020 non-Pfizer first bivalent post-completion dose on or after 2023-04-19 carries COVID19_MIN_INTERVAL_8W supplemental text when less than 8 weeks after the prior valid COVID-19 dose.',
+    testId: 'assertCovid19Dec2020ThirdBoosterAndFirstBivalentIntervals',
+  },
+  {
+    ruleName:
+      'COVID-19: If a shot was administered to a patient >= 65 yrs of age, and if 1 bivalent dose was previously administered or, alternatively, 1 was prior dose was administered on >= 4/19/2023, evaluate the shot as Valid',
+    behavior:
+      'COVID-19 Dec 2020 patients age 65 or older may receive a second valid current-era dose on or after 2023-04-19 when exactly one prior bivalent/current-era post-completion dose exists.',
+    testId: 'assertCovid19Dec2020Age65SecondBivalentValidAndIntervalSupplemental',
+  },
+  {
+    ruleName:
+      'COVID-19: If a 2nd bivalent dose was administered to a patient >= 65 yrs of age at < 4 months from the previous shot, include supplemental text regarding a 4 month minimum intervals',
+    behavior:
+      'COVID-19 Dec 2020 age-65 second bivalent/current-era valid doses on or after 2023-04-19 carry COVID19_MIN_INTERVAL_4M supplemental text when less than 4 months after the prior valid COVID-19 dose.',
+    testId: 'assertCovid19Dec2020Age65SecondBivalentValidAndIntervalSupplemental',
+  },
+  ...[
+    'COVID-19: If the patient received a (valid) dose of _any_ vaccine allowed in the Pfizer series at >= 5 years of age on >= 4/19/2023 and the series is not complete, mark the series is complete',
+    'COVID-19: If the patient received a (valid) dose of an _applicable_ _bivalent_ vaccine (CVX 300, CVX 301) in the Pfizer series at >= 5 years of age and the series is not complete, mark the series is complete',
+    'COVID-19: If the patient received a (valid) dose _any_ vaccine allowed in the Moderna series at >= 6 years of age on >= 4/19/2023 and the series is not complete, mark the series is complete',
+    'COVID-19: If the patient received a (valid) dose of an _applicable_ _bivalent_ vaccine (CVX 229) in the Moderna series at >= 6 years of age, the series is not complete, and the execution date is >= 4/19/2023, mark the series is complete',
+    'COVID-19: If the patient received a (valid) dose of _any_ vaccine allowed in the Mixed Product series (excluding Novavax) at >= 5 years of age, the series is not complete, and the shot was administered >= 4/19/2023, mark the series is complete',
+    'COVID-19: If the patient received a (valid) dose of an _applicable_ Pfizer _bivalent_ vaccine (CVX 300, CVX 301) in the Mixed Product series at >= 5 years of age, the series is not complete, and the execution date is >= 4/19/2023, mark the series is complete',
+    'COVID-19: If the patient received a (valid) dose of _any_ Moderna vaccine allowed in the Mixed Product primary series at >= 6 years of age, the series is not complete, and the shot was administered >= 4/19/2023, mark the series is complete',
+    'COVID-19: If the patient received a (valid) dose of an _applicable_ Moderna _bivalent_ vaccine (CVX 229) in the Mixed Product primary series at >= 6 years of age, the series is not complete, and the execution date is >= 4/19/2023, mark the series is complete',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'COVID-19 Dec 2020 incomplete Pfizer, Moderna, and Mixed Product series are treated as complete when a qualifying valid current-era or bivalent dose is present at the required age threshold on or after the April 2023 policy date.',
+    testId: 'assertCovid19Dec2020PostApr2023IncompleteSeriesCompletion',
+  })),
+  ...[
+    'COVID-19: If 2 or more doses were administered >= 5 years of age in the Pfizer or Mixed Product series, then the 3rd dose is not required and the series is complete',
+    'COVID-19: If 2 doses of CVX 208, CVX 217, CVX 218, CVX 300 or CVX 301 were previously administered in the Pfizer Series or Mixed Product Series and the series is not complete, target dose 3 is not needed and the series is complete',
+    'COVID-19: If 2 doses of CVX 207, CVX 221, CVX 227, CVX 228, or CVX 229 were previously administered in the Mixed Product Series and the series is not complete, target dose 3 is not needed and the series is complete',
+    'COVID-19: If 2 or more doses of CVX 211 (Novavax) were administered in the Mixed Product series, then the 3rd dose is not required and the series is complete',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'COVID-19 Dec 2020 incomplete Pfizer and Mixed Product primary series are treated as complete after qualifying two-dose age/product patterns, so target dose 3 is not needed.',
+    testId: 'assertCovid19Dec2020TwoDoseIncompleteSeriesCompletion',
+  })),
+  {
+    ruleName:
+      'COVID-19: If CVX 212 is administered below the age of 18y-4d in the Janssen Series, override absolute vaccine minimum age check _and_ return supplemental text that the shot does not follow guidelines for minimum age',
+    behavior:
+      'COVID-19 Dec 2020 Janssen CVX 212 administered below 18y-4d removes the absolute minimum-age invalid reason and returns COVID19_MIN_AGE supplemental text.',
+    testId: 'assertCovid19Dec2020MinimumAgeOverrides',
+  },
+  {
+    ruleName:
+      'COVID-19: If a shot administered below the age of 6 months, override absolute vaccine minimum age check _and_ return supplemental text that the shot does not follow guidelines for minimum age',
+    behavior:
+      'COVID-19 Dec 2020 shots administered below age 6 months remove the absolute minimum-age invalid reason and return COVID19_MIN_AGE supplemental text.',
+    testId: 'assertCovid19Dec2020MinimumAgeOverrides',
+  },
+  {
+    ruleName:
+      'COVID-19: For patients >= 18 yrs of age, if shot in the Pfizer, Mixed Product or Moderna series is administered prior to 10/25/2021 and the series is not complete, override series interval logic',
+    behavior:
+      'COVID-19 Dec 2020 Pfizer, Moderna, and Mixed Product adult primary-series doses before 2021-10-25 bypass the default absolute minimum interval to the immediately prior dose.',
+    testId: 'assertCovid19Dec2020CustomIntervalOverrides',
+  },
+  {
+    ruleName:
+      'COVID-19: If a shot is administered in the Moderna series >= 4/19/2023 and dose 1 was administered at >= 6 years of age, the absolute minimum interval between dose 1 and dose 2 is 8 weeks- 4 days',
+    behavior:
+      'COVID-19 Dec 2020 Moderna dose 2 on or after 2023-04-19 requires an 8-week minus 4-day absolute minimum interval when dose 1 was administered at age 6 years or older.',
+    testId: 'assertCovid19Dec2020CustomIntervalOverrides',
+  },
+  {
+    ruleName:
+      'COVID-19: If a shot is administered in the Pfizer or Mixed Product series >= 4/19/2023 and dose 1 was administered at >= 5 years of age, the absolute minimum interval between dose 1 and dose 2 is 8 weeks- 4 days',
+    behavior:
+      'COVID-19 Dec 2020 Pfizer and Mixed Product dose 2 on or after 2023-04-19 require an 8-week minus 4-day absolute minimum interval when dose 1 was administered at age 5 years or older.',
+    testId: 'assertCovid19Dec2020CustomIntervalOverrides',
+  },
+  {
+    ruleName:
+      'COVID-19: If CVX 302 is administered for target dose 3 in the Pfizer series, there is no absolute maximum age for the vaccine',
+    behavior:
+      'COVID-19 Dec 2020 Pfizer CVX302 targeting dose 3 is not invalidated by a vaccine maximum age check.',
+    testId: 'assertCovid19Dec2020PfizerCvx302Dose3NoMaximumAge',
+  },
+  ...[
+    'COVID-19: For patients >= 18y, enforce absolute minimum interval of 24 days *from* any prior Moderna or CVX 213 shots (in any Series) if after 10/25/2021',
+    'COVID-19: For patients >= 18y, enforce absolute minimum interval of 24 days *to* any Moderna or CVX 213 shots (in any Series) if after 10/25/2021',
+    'COVID-19: For patients < 18y, always enforce absolute minimum interval of 24 days *from* any prior Moderna or CVX 213 shots (in any Series)',
+    'COVID-19: For patients < 18y, always enforce absolute minimum interval of 24 days *to* any prior Moderna or CVX 213 shots (in any Series)',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'COVID-19 Dec 2020 primary-series doses enforce a 24-day absolute minimum interval when either the prior dose or current dose is Moderna-family/CVX213, with adult enforcement starting on 2021-10-25 and pediatric enforcement always active.',
+    testId: 'assertCovid19Dec2020ModernaCvx213TwentyFourDayIntervals',
+  })),
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series): If dose 1 is subsequently fulfilled after a CVX 313 for target dose 1 was evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE, change the evaluation for the CVX 313 to Accepted / VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN',
+    behavior:
+      'Sep 2023 COVID-19 age-5-through-under-12 CVX313 accepted dose-1 exceptions switch to VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN after a later valid dose 1 is fulfilled.',
+    testId: 'assertCovid19Sep2023Cvx313Age5ToUnder12AcceptedException',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of CVX 313 is administered for target dose 1 to a patient age 5y and < 12y-4d, and it is the only dose on record, and the CVX 313 would otherwise be considered valid, target dose 1 is not fulfilled',
+    behavior:
+      'Sep 2023 COVID-19 CVX313 given for dose 1 at age 5 through under 12y-4d is accepted and non-counting with VACCINE_NOT_ALLOWED_FOR_THIS_DOSE.',
+    testId: 'assertCovid19Sep2023Cvx313Age5ToUnder12AcceptedException',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE and the current shot is < 24 days apart, evaluate the shot as Invalid / BELOW_MINIMUM_INTERVAL',
+    behavior:
+      'Sep 2023 COVID-19 dose 1 after the age-5-through-under-12 CVX313 accepted exception is invalid when administered less than 24 days after the accepted CVX313 dose.',
+    testId: 'assertCovid19Sep2023Cvx313Age5ToUnder12AcceptedException',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series)-->TargetDose 1/Exception 2: If a shot of CVX 313 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE and the current shot is >= 24 days apart, override default absolute minimum interval check (not BELOW_MINIMUM_INTERVAL)',
+    behavior:
+      'Sep 2023 COVID-19 dose 1 after the age-5-through-under-12 CVX313 accepted exception may fulfill dose 1 at 24 days, overriding the broader 8-week prior-COVID interval.',
+    testId: 'assertCovid19Sep2023Cvx313Age5ToUnder12AcceptedException',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series): For the 2023-2024 season, the absolute minimum interval from (invalid) dose 1 is 4m-4d (*doseIntervalCheck*)',
+    behavior:
+      'Sep 2023 COVID-19 >=5 years series current dose 1 or 2 is invalid below the 2023-2024 4-month minus 4-day interval from the latest prior evaluated target-series dose, unless a custom 24-day exception interval applies.',
+    testId: 'assertCovid19Sep2023Gte5Dose1ToDose2Interval',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series)-->TargetDose 1/Exception 3: If a CVX 211 is administered prior to 10/4/23, evaluate the shot as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES (override allowableVaccineCheck)',
+    behavior:
+      'Sep 2023 COVID-19 CVX211 administered before 2023-10-04 is accepted and non-counting with VACCINE_NOT_PART_OF_THIS_SERIES.',
+    testId: 'assertCovid19Sep2023Cvx211AcceptedException',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series)-->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES and the current shot is < 24 days apart, evaluate the shot as Invalid / BELOW_MINIMUM_INTERVAL',
+    behavior:
+      'Sep 2023 COVID-19 dose 1 after an accepted CVX211 exception is invalid when administered less than 24 days after the accepted CVX211 dose.',
+    testId: 'assertCovid19Sep2023Cvx211AcceptedException',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series)-->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES and the current shot is >= 24 days apart, do not evaluate as Invalid',
+    behavior:
+      'Sep 2023 COVID-19 dose 1 after an accepted CVX211 exception may fulfill dose 1 at 24 days, overriding the broader prior-COVID interval.',
+    testId: 'assertCovid19Sep2023Cvx211AcceptedException',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series)-->TargetDose 2: If a shot is administered before the absolute minimum age and permitted for this dose, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES',
+    behavior:
+      'Sep 2023 COVID-19 dose 2 shots permitted for the >=5 years series but administered before age 65y-4d are accepted as OUTSIDE_ROUTINE_SERIES instead of invalidating below the dose absolute minimum age.',
+    testId: 'assertCovid19Sep2023Dose2Under65AcceptedOutsideRoutine',
+  },
+  {
+    ruleName:
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series)-->TargetDose 2: If a CVX 310 or CVX 311 is administered < the series absolute minimum age for the dose and <= the CVX code absolute maximum age, evaluate as Accepted with reason code OUTSIDE_ROUTINE_SERIES',
+    behavior:
+      'Sep 2023 COVID-19 CVX310/CVX311 dose 2 shots administered before age 65y-4d are accepted as OUTSIDE_ROUTINE_SERIES on the non-allowed-dose path.',
+    testId: 'assertCovid19Sep2023Dose2Under65AcceptedOutsideRoutine',
   },
   {
     ruleName:
