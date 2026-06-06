@@ -1,7 +1,11 @@
-import { dateMeetsMinimumDuration } from './iceDuration.js';
+import {
+  dateFromIceDuration,
+  dateMeetsMinimumDuration,
+} from './iceDuration.js';
 import type {
   ForecastImmunization,
   ForecastPatient,
+  IceDoseRule,
   IceSeriesDefinition,
   IceSeriesDoseMatch,
   IceSeriesForecast,
@@ -15,6 +19,18 @@ const covid19Aug2025CvxCodes = new Set([
   '310',
   '311',
   '312',
+  '313',
+  '334',
+]);
+const covid19Aug2025Lt2PreSeasonDose2SkipCvxCodes = new Set([
+  '309',
+  '310',
+  '311',
+  '312',
+]);
+const covid19Aug2025PfizerNovavaxUnspecifiedCvxCodes = new Set([
+  '309',
+  '310',
   '313',
   '334',
 ]);
@@ -81,6 +97,178 @@ export function isCovid19Immunization(immunization: ForecastImmunization) {
   return (
     immunization.vaccineName.toLowerCase().includes('covid') ||
     (cvx !== undefined && covid19Aug2025CvxCodes.has(cvx))
+  );
+}
+
+export function covid19Aug2025Lt2PreSeasonDose2SkipMatches(
+  matchedDoses: IceSeriesDoseMatch[],
+) {
+  return matchedDoses.filter((match) => {
+    const cvx = normalizeCvx(match.immunization.vaccineCode);
+    return (
+      match.status === 'valid' &&
+      match.immunization.date &&
+      match.immunization.date < covid19Aug2025SeasonStartDate &&
+      cvx !== undefined &&
+      covid19Aug2025Lt2PreSeasonDose2SkipCvxCodes.has(cvx)
+    );
+  });
+}
+
+export function covid19Aug2025Lt2PreSeasonDose2SkipImmunizations(
+  immunizations: ForecastImmunization[],
+) {
+  return immunizations.filter((immunization) => {
+    const cvx = normalizeCvx(immunization.vaccineCode);
+    return (
+      immunization.date &&
+      immunization.date < covid19Aug2025SeasonStartDate &&
+      cvx !== undefined &&
+      covid19Aug2025Lt2PreSeasonDose2SkipCvxCodes.has(cvx) &&
+      isCovid19Immunization(immunization)
+    );
+  });
+}
+
+export function covid19Aug2025Lt2OneModernaDose(
+  immunizations: ForecastImmunization[],
+) {
+  const qualifying = covid19Aug2025Lt2PreSeasonDose2SkipImmunizations(
+    immunizations,
+  );
+  if (qualifying.length !== 1) return undefined;
+  const cvx = normalizeCvx(qualifying[0]?.vaccineCode);
+  return cvx === '311' || cvx === '312' ? qualifying[0] : undefined;
+}
+
+export function covid19Aug2025Lt2OneNonModernaDose(
+  immunizations: ForecastImmunization[],
+) {
+  const qualifying = covid19Aug2025Lt2PreSeasonDose2SkipImmunizations(
+    immunizations,
+  );
+  if (qualifying.length !== 1) return undefined;
+  const cvx = normalizeCvx(qualifying[0]?.vaccineCode);
+  return cvx !== '311' && cvx !== '312' ? qualifying[0] : undefined;
+}
+
+export function covid19Aug2025Lt2OneModernaInvalidPrior(
+  immunizations: ForecastImmunization[],
+) {
+  const modernaDose = covid19Aug2025Lt2OneModernaDose(immunizations);
+  if (!modernaDose) return [];
+  return immunizations.filter((immunization) => {
+    const cvx = normalizeCvx(immunization.vaccineCode);
+    return (
+      immunization !== modernaDose &&
+      immunization.date &&
+      immunization.date < covid19Aug2025SeasonStartDate &&
+      isCovid19Immunization(immunization) &&
+      (cvx === undefined ||
+        !covid19Aug2025Lt2PreSeasonDose2SkipCvxCodes.has(cvx))
+    );
+  });
+}
+
+export function covid19Aug2025Lt2OneModernaMostRecentInvalidPrior(
+  immunizations: ForecastImmunization[],
+) {
+  return [...covid19Aug2025Lt2OneModernaInvalidPrior(immunizations)].sort(
+    (a, b) => (b.date || '').localeCompare(a.date || ''),
+  )[0];
+}
+
+export function covid19Aug2025Lt2NoValidPreSeasonMostRecentInvalidPrior(
+  immunizations: ForecastImmunization[],
+) {
+  if (covid19Aug2025Lt2PreSeasonDose2SkipImmunizations(immunizations).length > 0) {
+    return undefined;
+  }
+  return immunizations
+    .filter((immunization) => {
+      const cvx = normalizeCvx(immunization.vaccineCode);
+      return (
+        immunization.date &&
+        immunization.date < covid19Aug2025SeasonStartDate &&
+        isCovid19Immunization(immunization) &&
+        (cvx === undefined ||
+          !covid19Aug2025Lt2PreSeasonDose2SkipCvxCodes.has(cvx))
+      );
+    })
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+}
+
+export function covid19Aug2025Lt2OneNonModernaMostRecentPrior(
+  immunizations: ForecastImmunization[],
+) {
+  const nonModernaDose = covid19Aug2025Lt2OneNonModernaDose(immunizations);
+  if (!nonModernaDose) return undefined;
+  return immunizations
+    .filter((immunization) => {
+      const cvx = normalizeCvx(immunization.vaccineCode);
+      return (
+        immunization.date &&
+        immunization.date < covid19Aug2025SeasonStartDate &&
+        isCovid19Immunization(immunization) &&
+        (immunization === nonModernaDose ||
+          cvx === undefined ||
+          !covid19Aug2025Lt2PreSeasonDose2SkipCvxCodes.has(cvx))
+      );
+    })
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+}
+
+export function covid19Aug2025PriorIsPfizerNovavaxOrUnspecified(
+  immunization: ForecastImmunization,
+) {
+  const cvx = normalizeCvx(immunization.vaccineCode);
+  return (
+    cvx !== undefined && covid19Aug2025PfizerNovavaxUnspecifiedCvxCodes.has(cvx)
+  );
+}
+
+export function covid19Aug2025Age65Date(patient?: ForecastPatient) {
+  if (!patient?.birthDate) return undefined;
+  return dateFromIceDuration({ startDate: patient.birthDate, duration: '65y' });
+}
+
+export function covid19Aug2025Turns65Within12MonthsOfSeasonStart(
+  patient?: ForecastPatient,
+) {
+  const age65Date = covid19Aug2025Age65Date(patient);
+  if (!age65Date) return false;
+
+  return (
+    covid19Aug2025SeasonStartDate < age65Date &&
+    age65Date <=
+      dateFromIceDuration({
+        startDate: covid19Aug2025SeasonStartDate,
+        duration: '12m',
+      })
+  );
+}
+
+export function isCovid19Aug2025Gte65TransitionDose1({
+  series,
+  dose,
+  immunization,
+  patient,
+}: {
+  series: IceSeriesDefinition;
+  dose: IceDoseRule;
+  immunization: ForecastImmunization;
+  patient?: ForecastPatient;
+}) {
+  const age65Date = covid19Aug2025Age65Date(patient);
+  return (
+    series.id === 'COVID_19_AUG_2025_GTE_65_SERIES' &&
+    dose.doseNumber === 1 &&
+    !!immunization.date &&
+    immunization.date >= covid19Aug2025SeasonStartDate &&
+    !!age65Date &&
+    immunization.date < age65Date &&
+    covid19Aug2025Turns65Within12MonthsOfSeasonStart(patient) &&
+    isCovid19Immunization(immunization)
   );
 }
 
