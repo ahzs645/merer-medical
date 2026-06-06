@@ -1,14 +1,32 @@
 {
   "name": "@mere/immunization-forecast",
   "version": "0.0.0",
-  "private": true,
+  "private": false,
   "description": "TypeScript immunization forecasting engine for Mere.",
   "type": "module",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "exports": {
-    ".": "./src/index.ts",
-    "./ice": "./src/ice.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./engine": {
+      "types": "./dist/engine.d.ts",
+      "import": "./dist/engine.js"
+    },
+    "./ice": {
+      "types": "./dist/ice.d.ts",
+      "import": "./dist/ice.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build"
   },
   "dependencies": {
     "date-fns": "^2.29.1",

@@ -1,4 +1,5 @@
 export { forecastImmunizations } from './forecast.js';
+export { createIceForecastEngine } from './engine.js';
 export {
   evaluateIceSeries,
   selectIceSeries,
@@ -15,6 +16,7 @@ export type {
   ForecastRecommendationStatus,
   ForecastResult,
   ForecastScheduleRule,
+  IceDataset,
   IceNextDoseForecast,
   IceSeriesDoseMatch,
   IceSeriesForecast,
@@ -22,3 +24,7 @@ export type {
   IceSelectedSeriesForecast,
   VaccineGroup,
 } from './types.js';
+export type {
+  IceForecastEngine,
+  IceForecastEngineInput,
+} from './engine.js';

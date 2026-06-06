@@ -4,8 +4,48 @@ TypeScript immunization forecasting workbench for Mere.
 
 The package has two layers:
 
-- Browser-safe forecasting exports from `@mere/immunization-forecast`.
+- Browser-safe forecasting and ICE engine exports from
+  `@mere/immunization-forecast`.
 - Node-only ICE dataset tooling from `@mere/immunization-forecast/ice`.
+
+## Package Usage
+
+The reusable engine is pure TypeScript once an `IceDataset` is provided. That
+keeps application code independent from the local ICE fork or file-system
+loader:
+
+```ts
+import { createIceForecastEngine } from '@mere/immunization-forecast';
+
+const engine = createIceForecastEngine(dataset);
+
+const forecasts = engine.evaluate({
+  patient: { birthDate: '1980-01-01' },
+  evaluationDate: '2026-06-01',
+  immunizations: [
+    {
+      id: 'hepb-1',
+      vaccineCode: '43',
+      vaccineName: 'Hep B, adult',
+      date: '2025-01-01',
+    },
+  ],
+});
+```
+
+For Mere, the package can stay in this monorepo or be mounted as a submodule.
+Consumers import the engine API and pass in a normalized ICE dataset. The
+Node-only `/ice` entry can be used by build tooling to load or export that
+dataset from the ICE fork.
+
+Build the package for standalone consumption:
+
+```sh
+npm --prefix packages/immunization-forecast run build
+```
+
+The build emits JavaScript and declaration files into
+`packages/immunization-forecast/dist`.
 
 ## ICE Dataset Import
 
@@ -105,61 +145,23 @@ node packages/immunization-forecast/test/ice-hpv-rules.mjs .
 
 ## Current Scope
 
-This is not a full ICE port yet. The first evaluator consumes imported ICE
-series definitions and performs sequential CVX allowlist matching across doses.
-It also enforces imported absolute minimum age and absolute minimum interval
-constraints, returning invalid dose reasons when a shot is too early.
-For incomplete series it computes next-dose forecast dates from imported
-age and interval constraints, using the latest applicable candidate date for
-each forecast category:
+The TypeScript ICE engine now tracks the ICE Java/Drools rule corpus through
+`iceRulePorts.ts`. The rule-port probe currently reports zero unported concrete
+rules and zero remaining abstract/meta rules.
 
-- absolute minimum
-- minimum
-- earliest recommended
-- recommended
-- overdue
+The engine consumes imported ICE series definitions and implements the TS ports
+for selection, evaluation, recommendation, seasonal handling, cross-series
+spacing, and vaccine-group-specific custom logic. It does not execute Drools at
+runtime; the Java ICE fork is the comparison/reference corpus and dataset
+source.
 
-Series selection has started with a generic progress-based fallback and an
-HPV-specific selector modeled from ICE `SeriesSelection.drl` for the 2-dose vs
-3-dose split.
+The main evaluator is intentionally being split into smaller modules:
 
-Season support has started with a resolver that selects an explicitly dated ICE
-season when present, then falls back to the default month/day window for groups
-such as influenza and RSV.
+- `dtpRules.ts`
+- `pneumococcalRules.ts`
+- `covidRules.ts`
+- `crossSeriesRules.ts`
+- `iceSeriesEvaluator.ts` as the orchestration layer
 
-Concept determination support has started with a typed `cdm.xml` importer and
-source-code lookup helper. This preserves the ICE mapping from source concepts
-such as CVX codes into OpenCDS concept codes like `VACCINE_CVX_165`.
-
-Rule-port support has started with a typed catalog of the ICE Drools/DSL corpus.
-It does not execute Drools; it inventories source files and rule metadata so TS
-ports can be tracked against the Java rule corpus.
-
-The first custom evaluation rule ports are:
-
-- ICE HPV CVX 118 male-patient rule: CVX 118 is recorded as accepted with
-  `VACCINE_NOT_LICENSED_FOR_MALES`, but is ignored for series completion and
-  later dose forecasting.
-- ICE HPV age-46 rule: HPV doses administered when the patient is at least 46
-  years old and the series is not complete are recorded as accepted with
-  `ABOVE_REC_AGE_SERIES`, but do not advance normal series completion.
-
-The first custom recommendation rule ports are HPV-specific:
-
-- Patients at least 46 years old are `not-recommended` with `TOO_OLD`.
-- Patients whose next routine recommendation date would be at least age 46 are
-  `not-recommended` with `TOO_OLD`.
-- Patients age 27 through 45 with no completed HPV doses are
-  `conditionally-recommended` with `CLINICAL_PATIENT_DISCRETION` and
-  `HPV_NOT_ROUTINE_27_THROUGH_45` supplemental text.
-- HPV 3-dose dose 3 uses the ICE custom dose-1-to-dose-3 recommendation
-  intervals: earliest `5m`, recommended `6m`, and overdue `7m+4w` if dose 1
-  was at age 15 or older, otherwise `13m+4w`.
-- HPV 3-dose dose 3 evaluation uses ICE's pre/post-2016 absolute minimum
-  interval split from dose 1: `16w-4d` for dose 3 before December 16, 2016,
-  and `5m-4d` on or after that date.
-- HPV 2-dose dose 2 repeat attempts after an invalid dose 2 must wait at least
-  `12w-4d` from the most recent invalid dose 2.
-
-Next work should broaden series selection, add seasonal rules, and port custom
-rule behavior from ICE `.dslr` files.
+Future refactors should continue this pattern by extracting additional
+vaccine-group hooks into focused modules while preserving the public engine API.

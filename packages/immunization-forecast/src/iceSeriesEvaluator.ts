@@ -16,6 +16,8 @@ import {
   dateFromIceDuration,
   dateMeetsMinimumDuration,
 } from './iceDuration.js';
+import { applyCrossSeriesForecastRules } from './crossSeriesRules.js';
+import * as covidRules from './covidRules.js';
 import * as dtpRules from './dtpRules.js';
 import * as pneumococcalRules from './pneumococcalRules.js';
 
@@ -101,15 +103,6 @@ const polioOpvCvxCodes = new Set(['02', '182']);
 const polioMissingAntigenCvxCodes = new Set(['178', '179']);
 const rsvAdultOrUnspecifiedCvxCodes = new Set(['303', '304', '305', '314', '326']);
 const rsvInfantOrUnspecifiedCvxCodes = new Set(['304', '306', '307', '315']);
-const covid19Aug2025CvxCodes = new Set([
-  '213',
-  '309',
-  '310',
-  '311',
-  '312',
-  '313',
-  '334',
-]);
 const covid19Aug2025SeasonStartDate = '2025-08-27';
 const covid19Sep2023SeasonStartDate = '2023-09-12';
 const covid19Aug2025Lt2PreSeasonDose2SkipCvxCodes = new Set([
@@ -245,13 +238,6 @@ const covid19Sep2023ModernaCvx213IntervalCvxCodes = new Set([
   '312',
 ]);
 const covid19Sep2023NovavaxCvxCodes = new Set(['211', '313']);
-const covid19JanssenCvxCodes = new Set(['212']);
-const covid19PfizerModernaNovavaxCvxCodes = new Set([
-  ...covid19PfizerCvxCodes,
-  ...covid19ModernaCvxCodes,
-  '211',
-  '213',
-]);
 const covid19FdaSameDayPreferredCvxCodes = new Set([
   '207',
   '208',
@@ -542,11 +528,11 @@ export function evaluateIceSeries(
       evaluationDate,
     ),
   );
-  return applyCrossSeriesForecastRules(
+  return applyCrossSeriesForecastRules({
     forecasts,
-    input.dataset,
+    dataset: input.dataset,
     evaluationDate,
-  );
+  });
 }
 
 export function selectIceSeries(
@@ -700,7 +686,7 @@ function selectBestForecast({
   }
 
   if (vaccineGroup === 'COVID_19') {
-    const covidSelection = selectCovid19Series(
+    const covidSelection = covidRules.selectCovid19Series(
       candidates,
       patient,
       evaluationDate,
@@ -1533,7 +1519,7 @@ function covid19Aug2025Lt2PreSeasonDose2SkipImmunizations(
       immunization.date < covid19Aug2025SeasonStartDate &&
       cvx !== undefined &&
       covid19Aug2025Lt2PreSeasonDose2SkipCvxCodes.has(cvx) &&
-      isCovid19Immunization(immunization)
+      covidRules.isCovid19Immunization(immunization)
     );
   });
 }
@@ -1565,7 +1551,7 @@ function covid19Aug2025Lt2OneModernaInvalidPrior(
       immunization !== modernaDose &&
       immunization.date &&
       immunization.date < covid19Aug2025SeasonStartDate &&
-      isCovid19Immunization(immunization) &&
+      covidRules.isCovid19Immunization(immunization) &&
       (cvx === undefined ||
         !covid19Aug2025Lt2PreSeasonDose2SkipCvxCodes.has(cvx))
     );
@@ -1592,7 +1578,7 @@ function covid19Aug2025Lt2NoValidPreSeasonMostRecentInvalidPrior(
       return (
         immunization.date &&
         immunization.date < covid19Aug2025SeasonStartDate &&
-        isCovid19Immunization(immunization) &&
+        covidRules.isCovid19Immunization(immunization) &&
         (cvx === undefined ||
           !covid19Aug2025Lt2PreSeasonDose2SkipCvxCodes.has(cvx))
       );
@@ -1611,7 +1597,7 @@ function covid19Aug2025Lt2OneNonModernaMostRecentPrior(
       return (
         immunization.date &&
         immunization.date < covid19Aug2025SeasonStartDate &&
-        isCovid19Immunization(immunization) &&
+        covidRules.isCovid19Immunization(immunization) &&
         (immunization === nonModernaDose ||
           cvx === undefined ||
           !covid19Aug2025Lt2PreSeasonDose2SkipCvxCodes.has(cvx))
@@ -1668,7 +1654,7 @@ function isCovid19Aug2025Gte65TransitionDose1({
     !!age65Date &&
     immunization.date < age65Date &&
     covid19Aug2025Turns65Within12MonthsOfSeasonStart(patient) &&
-    isCovid19Immunization(immunization)
+    covidRules.isCovid19Immunization(immunization)
   );
 }
 
@@ -2010,31 +1996,16 @@ function compareImmunizationsForSeries(
   const dateCompare = (a.date || '').localeCompare(b.date || '');
   if (dateCompare !== 0) return dateCompare;
 
-  const covidCompare = compareCovid19ImmunizationsForSeries(series, a, b);
+  const covidCompare = covidRules.compareCovid19ImmunizationsForSeries(
+    series,
+    a,
+    b,
+  );
   if (covidCompare !== 0) return covidCompare;
 
   if (series.vaccineGroup?.code !== 'DTP') return 0;
 
   return dtpRules.compareDtpImmunizationsForSeries({ dataset, series, a, b });
-}
-
-function compareCovid19ImmunizationsForSeries(
-  series: IceSeriesDefinition,
-  a: ForecastImmunization,
-  b: ForecastImmunization,
-) {
-  if (series.vaccineGroup?.code !== 'COVID_19') return 0;
-
-  const aCvx = normalizeCvx(a.vaccineCode) ?? '';
-  const bCvx = normalizeCvx(b.vaccineCode) ?? '';
-  const aIsJanssen = covid19JanssenCvxCodes.has(aCvx);
-  const bIsJanssen = covid19JanssenCvxCodes.has(bCvx);
-  const aPreferredOverJanssen = covid19PfizerModernaNovavaxCvxCodes.has(aCvx);
-  const bPreferredOverJanssen = covid19PfizerModernaNovavaxCvxCodes.has(bCvx);
-
-  if (aIsJanssen && bPreferredOverJanssen) return 1;
-  if (bIsJanssen && aPreferredOverJanssen) return -1;
-  return 0;
 }
 
 function isDtpPrimarySeriesDose(
@@ -3099,332 +3070,6 @@ function selectRsvSeries(
   return markSelected(infant, 'RSV_INFANT_DEFAULT');
 }
 
-function selectCovid19Series(
-  candidates: IceSeriesForecast[],
-  patient?: ForecastPatient,
-  evaluationDate = new Date().toISOString().split('T')[0],
-) {
-  if (evaluationDate >= covid19Aug2025SeasonStartDate) {
-    const aug2025Selection = selectCovid19Aug2025Series(
-      candidates,
-      patient,
-      evaluationDate,
-    );
-    if (aug2025Selection) return aug2025Selection;
-  }
-
-  if (evaluationDate >= covid19Sep2023SeasonStartDate) {
-    const sep2023Selection = selectCovid19Sep2023Series(
-      candidates,
-      patient,
-      evaluationDate,
-    );
-    if (sep2023Selection) return sep2023Selection;
-  }
-
-  const dec2020Selection = selectCovid19Dec2020Series(candidates);
-  if (dec2020Selection) return dec2020Selection;
-
-  return undefined;
-}
-
-function selectCovid19Aug2025Series(
-  candidates: IceSeriesForecast[],
-  patient?: ForecastPatient,
-  evaluationDate = new Date().toISOString().split('T')[0],
-) {
-  const lt2 = candidates.find(
-    (candidate) => candidate.series.id === 'COVID_19_AUG_2025_LT_2_SERIES',
-  );
-  const age2To64 = candidates.find(
-    (candidate) =>
-      candidate.series.id === 'COVID_19_AUG_2025_2_Y_TO_64_Y_SERIES',
-  );
-  const gte65 = candidates.find(
-    (candidate) => candidate.series.id === 'COVID_19_AUG_2025_GTE_65_SERIES',
-  );
-  if (!lt2 || !age2To64 || !gte65 || !patient?.birthDate) return undefined;
-
-  if (
-    dateMeetsMinimumDuration({
-      startDate: patient.birthDate,
-      endDate: evaluationDate,
-      duration: '65y',
-    })
-  ) {
-    return markSelected(gte65, 'COVID_19_AUG_2025_AGE_65_OR_OLDER');
-  }
-
-  if (covid19Aug2025Gte65TransitionDose1({ forecast: gte65, patient })) {
-    return markSelected(gte65, 'COVID_19_AUG_2025_TURNS_65_WITHIN_12_MONTHS');
-  }
-
-  if (
-    dateMeetsMinimumDuration({
-      startDate: patient.birthDate,
-      endDate: evaluationDate,
-      duration: '2y',
-    })
-  ) {
-    return markSelected(age2To64, 'COVID_19_AUG_2025_AGE_2_TO_64');
-  }
-
-  return markSelected(lt2, 'COVID_19_AUG_2025_AGE_UNDER_2');
-}
-
-function selectCovid19Sep2023Series(
-  candidates: IceSeriesForecast[],
-  patient?: ForecastPatient,
-  evaluationDate = new Date().toISOString().split('T')[0],
-) {
-  const pfizerLt5 = candidates.find(
-    (candidate) =>
-      candidate.series.id === 'COVID_19_SEP_2023_PFIZER_LT_5_Y_SERIES',
-  );
-  const modernaLt5 = candidates.find(
-    (candidate) =>
-      candidate.series.id === 'COVID_19_SEP_2023_MODERNA_LT_5_Y_SERIES',
-  );
-  const mixedLt5 = candidates.find(
-    (candidate) =>
-      candidate.series.id === 'COVID_19_SEP_2023_MIXED_PRODUCT_LT_5_Y_SERIES',
-  );
-  const gte5 = candidates.find(
-    (candidate) => candidate.series.id === 'COVID_19_SEP_2023_GTE_5_SERIES',
-  );
-  const novavax = candidates.find(
-    (candidate) => candidate.series.id === 'COVID_19_SEP_2023_NOVAVAX_SERIES',
-  );
-  if (!pfizerLt5 || !modernaLt5 || !mixedLt5 || !gte5 || !novavax) {
-    return undefined;
-  }
-
-  if (gte5.status === 'complete' && novavax.status !== 'complete') {
-    return markSelected(gte5, 'COVID_19_SEP_2023_GTE_5_COMPLETE');
-  }
-  if (novavax.status === 'complete' && gte5.status !== 'complete') {
-    return markSelected(novavax, 'COVID_19_SEP_2023_NOVAVAX_COMPLETE');
-  }
-
-  const ageAtLeast5 =
-    !!patient?.birthDate &&
-    dateMeetsMinimumDuration({
-      startDate: patient.birthDate,
-      endDate: evaluationDate,
-      duration: '5y',
-    });
-
-  if (ageAtLeast5) {
-    if (covid19Sep2023NovavaxSeriesApplies(novavax, gte5, patient)) {
-      return markSelected(novavax, 'COVID_19_SEP_2023_NOVAVAX_FIRST_DOSE');
-    }
-
-    const hasCurrentSeasonUnder5Dose = covid19Sep2023UniqueValidMatches([
-      pfizerLt5,
-      modernaLt5,
-      mixedLt5,
-    ]).some((match) =>
-      covid19Sep2023MatchAdministeredBeforeAge({
-        match,
-        patient,
-        age: '5y',
-        minDate: covid19Sep2023SeasonStartDate,
-      }),
-    );
-    if (!hasCurrentSeasonUnder5Dose) {
-      return markSelected(gte5, 'COVID_19_SEP_2023_AGE_5_OR_OLDER');
-    }
-  }
-
-  const productMatches = covid19Sep2023UniqueValidMatches([
-    pfizerLt5,
-    modernaLt5,
-    mixedLt5,
-  ]).filter((match) =>
-    covid19Sep2023MatchAdministeredBeforeAge({
-      match,
-      patient,
-      age: '5y',
-    }),
-  );
-  const productCvxCodes = productMatches
-    .map((match) => normalizeCvx(match.immunization.vaccineCode))
-    .filter(isDefined);
-
-  if (
-    productCvxCodes.length > 0 &&
-    productCvxCodes.every((cvx) =>
-      covid19Sep2023PfizerLt5PriorCvxCodes.has(cvx),
-    )
-  ) {
-    return markSelected(pfizerLt5, 'COVID_19_SEP_2023_PFIZER_LT_5_PRODUCT');
-  }
-
-  if (
-    productCvxCodes.length > 0 &&
-    productCvxCodes.every((cvx) =>
-      covid19Sep2023ModernaLt5PriorCvxCodes.has(cvx),
-    )
-  ) {
-    return markSelected(modernaLt5, 'COVID_19_SEP_2023_MODERNA_LT_5_PRODUCT');
-  }
-
-  return markSelected(mixedLt5, 'COVID_19_SEP_2023_MIXED_LT_5_DEFAULT');
-}
-
-function covid19Sep2023NovavaxSeriesApplies(
-  novavax: IceSeriesForecast,
-  gte5: IceSeriesForecast,
-  patient?: ForecastPatient,
-) {
-  if (!patient?.birthDate) return false;
-
-  const firstDose = novavax.matchedDoses.find(
-    (match) =>
-      match.status === 'valid' &&
-      match.dose.doseNumber === 1 &&
-      match.immunization.date &&
-      covid19Sep2023NovavaxCvxCodes.has(
-        normalizeCvx(match.immunization.vaccineCode) ?? '',
-      ) &&
-      dateMeetsMinimumDuration({
-        startDate: patient.birthDate!,
-        endDate: match.immunization.date,
-        duration: '12y-4d',
-      }),
-  );
-  if (!firstDose) return false;
-
-  return !gte5.matchedDoses.some(
-    (match) =>
-      match.status === 'valid' &&
-      match.immunization.date &&
-      match.immunization.date > firstDose.immunization.date!,
-  );
-}
-
-function covid19Sep2023UniqueValidMatches(
-  forecasts: IceSeriesForecast[],
-) {
-  const byImmunizationId = new Map<string, IceSeriesDoseMatch>();
-  for (const forecast of forecasts) {
-    for (const match of forecast.matchedDoses) {
-      if (match.status !== 'valid') continue;
-      const key =
-        match.immunization.id ??
-        `${match.immunization.date ?? ''}:${normalizeCvx(match.immunization.vaccineCode) ?? ''}`;
-      byImmunizationId.set(key, match);
-    }
-  }
-  return [...byImmunizationId.values()];
-}
-
-function covid19Sep2023MatchAdministeredBeforeAge({
-  match,
-  patient,
-  age,
-  minDate,
-}: {
-  match: IceSeriesDoseMatch;
-  patient?: ForecastPatient;
-  age: string;
-  minDate?: string;
-}) {
-  if (!patient?.birthDate || !match.immunization.date) return false;
-  if (minDate && match.immunization.date < minDate) return false;
-  return !dateMeetsMinimumDuration({
-    startDate: patient.birthDate,
-    endDate: match.immunization.date,
-    duration: age,
-  });
-}
-
-function selectCovid19Dec2020Series(candidates: IceSeriesForecast[]) {
-  const decCandidates = candidates.filter(
-    (candidate) => candidate.series.season?.code === 'COVID_19_DEC_2020_SEASON',
-  );
-  if (decCandidates.length === 0) return undefined;
-
-  const bySeriesId = new Map(
-    decCandidates.map((candidate) => [candidate.series.id, candidate]),
-  );
-  const mixed = bySeriesId.get('COVID_19_MIXED_PRODUCT_SERIES');
-  const pfizer = bySeriesId.get('COVID_19_PFIZER_SERIES');
-  const moderna = bySeriesId.get('COVID_19_MODERNA_SERIES');
-  const novavax = bySeriesId.get('COVID_19_NOVAVAX_2_DOSE_SERIES');
-  const janssen = bySeriesId.get('COVID_19_JANSSEN_1_DOSE_SERIES');
-  if (!mixed) return undefined;
-
-  const validMatches = covid19UniqueValidMatches(decCandidates).sort((a, b) =>
-    (a.immunization.date ?? '').localeCompare(b.immunization.date ?? ''),
-  );
-  if (validMatches.length === 0) {
-    return markSelected(mixed, 'COVID_19_DEC_2020_MIXED_DEFAULT');
-  }
-
-  const firstValid = validMatches[0];
-  const firstValidCvx = normalizeCvx(firstValid.immunization.vaccineCode) ?? '';
-  if (firstValidCvx === '212' && janssen) {
-    return markSelected(janssen, 'COVID_19_DEC_2020_JANSSEN_FIRST_DOSE');
-  }
-
-  const validCvxCodes = validMatches
-    .map((match) => normalizeCvx(match.immunization.vaccineCode))
-    .filter(isDefined);
-
-  if (
-    pfizer &&
-    validCvxCodes.every((cvx) => covid19PfizerCvxCodes.has(cvx))
-  ) {
-    return markSelected(pfizer, 'COVID_19_DEC_2020_PFIZER_PRODUCT');
-  }
-
-  if (
-    moderna &&
-    validCvxCodes.every((cvx) => covid19ModernaCvxCodes.has(cvx))
-  ) {
-    return markSelected(moderna, 'COVID_19_DEC_2020_MODERNA_PRODUCT');
-  }
-
-  if (novavax && validCvxCodes.every((cvx) => cvx === '211')) {
-    return markSelected(novavax, 'COVID_19_DEC_2020_NOVAVAX_PRODUCT');
-  }
-
-  const firstValidCandidate = decCandidates.find((candidate) =>
-    candidate.matchedDoses.some(
-      (match) =>
-        match.status === 'valid' &&
-        match.immunization.id === firstValid.immunization.id &&
-        candidate.series.id !== 'COVID_19_PFIZER_SERIES' &&
-        candidate.series.id !== 'COVID_19_MODERNA_SERIES' &&
-        candidate.series.id !== 'COVID_19_MIXED_PRODUCT_SERIES' &&
-        candidate.series.id !== 'COVID_19_JANSSEN_1_DOSE_SERIES',
-    ),
-  );
-  if (firstValidCandidate) {
-    return markSelected(
-      firstValidCandidate,
-      'COVID_19_DEC_2020_EARLIEST_NON_FDA_SERIES',
-    );
-  }
-
-  return markSelected(mixed, 'COVID_19_DEC_2020_MIXED_PRODUCT');
-}
-
-function covid19UniqueValidMatches(forecasts: IceSeriesForecast[]) {
-  const byImmunizationKey = new Map<string, IceSeriesDoseMatch>();
-  for (const forecast of forecasts) {
-    for (const match of forecast.matchedDoses) {
-      if (match.status !== 'valid') continue;
-      const key =
-        match.immunization.id ??
-        `${match.immunization.date ?? ''}:${normalizeCvx(match.immunization.vaccineCode) ?? ''}`;
-      byImmunizationKey.set(key, match);
-    }
-  }
-  return [...byImmunizationKey.values()];
-}
-
 function patientAgeUnder15AtEval(
   patient?: ForecastPatient,
   evaluationDate = new Date().toISOString().split('T')[0],
@@ -3876,245 +3521,6 @@ function compareSeriesForecasts(a: IceSeriesForecast, b: IceSeriesForecast) {
     return a.invalidDoses.length - b.invalidDoses.length;
   }
   return a.requiredDoses - b.requiredDoses;
-}
-
-function applyCrossSeriesForecastRules(
-  forecasts: IceSeriesForecast[],
-  dataset: IceDataset,
-  evaluationDate: string,
-) {
-  return applyHepATwinrixRecommendationRule(
-    applySelectAdjuvantProductRecommendationIntervalRule(
-      applyYellowFeverLiveVirusIntervalRule(forecasts, dataset),
-      dataset,
-      evaluationDate,
-    ),
-  );
-}
-
-function applySelectAdjuvantProductRecommendationIntervalRule(
-  forecasts: IceSeriesForecast[],
-  dataset: IceDataset,
-  evaluationDate: string,
-) {
-  const selectAdjuvantCvxCodes = new Set(
-    dataset.vaccines
-      .filter((vaccine) => vaccine.selectAdjuvantProduct)
-      .map((vaccine) => vaccine.cvx),
-  );
-  if (selectAdjuvantCvxCodes.size === 0) return forecasts;
-
-  const mostRecentSelectAdjuvantDate = latestDoseDate(
-    forecasts
-      .flatMap((forecast) => forecast.matchedDoses)
-      .filter((match) =>
-        selectAdjuvantCvxCodes.has(
-          normalizeCvx(match.immunization.vaccineCode) ?? '',
-        ),
-      ),
-  );
-  if (!mostRecentSelectAdjuvantDate) return forecasts;
-
-  const futureSpacingDate = dateFromIceDuration({
-    startDate: mostRecentSelectAdjuvantDate,
-    duration: '28d',
-  });
-
-  return forecasts.map((forecast) => {
-    const nextDoseForecast = forecast.nextDoseForecast;
-    if (
-      !nextDoseForecast ||
-      !forecastTargetsSelectAdjuvantProduct(
-        forecast,
-        selectAdjuvantCvxCodes,
-      )
-    ) {
-      return forecast;
-    }
-
-    const adjustedEarliestRecommendedDate =
-      adjustSelectAdjuvantRecommendationDate({
-        date: nextDoseForecast.earliestRecommendedDate,
-        mostRecentSelectAdjuvantDate,
-        futureSpacingDate,
-        evaluationDate,
-      });
-    const adjustedRecommendedDate = adjustSelectAdjuvantRecommendationDate({
-      date: nextDoseForecast.recommendedDate,
-      mostRecentSelectAdjuvantDate,
-      futureSpacingDate,
-      evaluationDate,
-    });
-
-    if (
-      adjustedEarliestRecommendedDate ===
-        nextDoseForecast.earliestRecommendedDate &&
-      adjustedRecommendedDate === nextDoseForecast.recommendedDate
-    ) {
-      return forecast;
-    }
-
-    const adjustedNextDoseForecast = {
-      ...nextDoseForecast,
-      earliestRecommendedDate: adjustedEarliestRecommendedDate,
-      recommendedDate: adjustedRecommendedDate,
-    };
-
-    return {
-      ...forecast,
-      nextDoseForecast: adjustedNextDoseForecast,
-      recommendation: forecast.recommendation
-        ? {
-            ...forecast.recommendation,
-            earliestRecommendedDate:
-              adjustedEarliestRecommendedDate ??
-              forecast.recommendation.earliestRecommendedDate,
-            recommendedDate:
-              adjustedRecommendedDate ?? forecast.recommendation.recommendedDate,
-          }
-        : forecast.recommendation,
-    };
-  });
-}
-
-function forecastTargetsSelectAdjuvantProduct(
-  forecast: IceSeriesForecast,
-  selectAdjuvantCvxCodes: Set<string>,
-) {
-  const nextDoseForecast = forecast.nextDoseForecast;
-  if (!nextDoseForecast) return false;
-
-  if (
-    nextDoseForecast.recommendedVaccine?.cvx &&
-    selectAdjuvantCvxCodes.has(nextDoseForecast.recommendedVaccine.cvx)
-  ) {
-    return true;
-  }
-
-  return nextDoseForecast.dose.vaccines.some((vaccine) =>
-    selectAdjuvantCvxCodes.has(vaccine.cvx),
-  );
-}
-
-function adjustSelectAdjuvantRecommendationDate({
-  date,
-  mostRecentSelectAdjuvantDate,
-  futureSpacingDate,
-  evaluationDate,
-}: {
-  date?: string;
-  mostRecentSelectAdjuvantDate: string;
-  futureSpacingDate: string;
-  evaluationDate: string;
-}) {
-  if (!date) return date;
-  if (
-    date < futureSpacingDate &&
-    (mostRecentSelectAdjuvantDate !== evaluationDate ||
-      date > mostRecentSelectAdjuvantDate)
-  ) {
-    return futureSpacingDate;
-  }
-  if (date < mostRecentSelectAdjuvantDate) {
-    return mostRecentSelectAdjuvantDate;
-  }
-  return date;
-}
-
-function applyYellowFeverLiveVirusIntervalRule(
-  forecasts: IceSeriesForecast[],
-  dataset: IceDataset,
-) {
-  const yellowFeverDoseDate = latestDoseDate(
-    forecasts
-      .filter(
-        (forecast) =>
-          forecast.series.vaccineGroup?.code === 'YELLOW_FEVER' &&
-          forecast.status === 'complete',
-      )
-      .flatMap((forecast) => forecast.matchedDoses),
-  );
-  if (!yellowFeverDoseDate) return forecasts;
-
-  const liveCvxCodes = new Set(
-    dataset.vaccines
-      .filter((vaccine) => vaccine.liveVirusVaccine)
-      .map((vaccine) => vaccine.cvx),
-  );
-  const adjustedEarliestDate = dateFromIceDuration({
-    startDate: yellowFeverDoseDate,
-    duration: '30d',
-  });
-
-  return forecasts.map((forecast) => {
-    if (
-      forecast.series.vaccineGroup?.code === 'YELLOW_FEVER' ||
-      forecast.series.vaccineGroup?.code === 'INFLUENZA' ||
-      (forecast.series.id === 'MPOX_2_DOSE_SERIES' &&
-        forecast.completedDoses === 1) ||
-      !forecast.nextDoseForecast?.earliestRecommendedDate ||
-      !forecast.nextDoseForecast.dose.vaccines.some((vaccine) =>
-        liveCvxCodes.has(vaccine.cvx),
-      ) ||
-      dateMeetsMinimumDuration({
-        startDate: yellowFeverDoseDate,
-        endDate: forecast.nextDoseForecast.earliestRecommendedDate,
-        duration: '30d',
-      })
-    ) {
-      return forecast;
-    }
-
-    return {
-      ...forecast,
-      nextDoseForecast: {
-        ...forecast.nextDoseForecast,
-        earliestRecommendedDate: adjustedEarliestDate,
-      },
-    };
-  });
-}
-
-function applyHepATwinrixRecommendationRule(forecasts: IceSeriesForecast[]) {
-  const hepBTwinrix = forecasts.find(
-    (forecast) =>
-      forecast.series.id === 'HEP_B_3_DOSE_TWINRIX_SERIES' &&
-      forecast.status !== 'complete' &&
-      forecast.nextDoseForecast?.recommendedDate &&
-      forecast.recommendation,
-  );
-  if (!hepBTwinrix?.nextDoseForecast?.recommendedDate) return forecasts;
-
-  return forecasts.map((forecast) => {
-    if (
-      forecast.series.id !== 'HEP_A_ADULT_3_DOSE_SERIES' ||
-      forecast.status === 'complete' ||
-      !forecast.nextDoseForecast?.recommendedDate ||
-      !forecast.recommendation ||
-      forecast.nextDoseForecast.dose.doseNumber !==
-        hepBTwinrix.nextDoseForecast?.dose.doseNumber ||
-      forecast.nextDoseForecast.recommendedDate !==
-        hepBTwinrix.nextDoseForecast.recommendedDate
-    ) {
-      return forecast;
-    }
-
-    return {
-      ...forecast,
-      recommendation: {
-        ...forecast.recommendation,
-        recommendedVaccine: {
-          cvx: '104',
-          display: 'Hep A-Hep B',
-          preferred: true,
-        },
-        supplementalText: unique([
-          ...(forecast.recommendation.supplementalText ?? []),
-          'HEP_A_3DOSE_TWINRIX_ALT_VACCINE',
-        ]),
-      },
-    };
-  });
 }
 
 function markSelected(
@@ -4863,7 +4269,7 @@ function evaluateAcceptedNonAllowedDose({
         !!candidate.date &&
         !!immunization.date &&
         candidate.date >= immunization.date &&
-        isCovid19Immunization(candidate),
+        covidRules.isCovid19Immunization(candidate),
     )
   ) {
     return {
@@ -5274,7 +4680,7 @@ function appendCovid19Dec2020PostCompletionDoseMatches({
     if (
       usedImmunizationIndexes.has(index) ||
       !immunization.date ||
-      !isCovid19Immunization(immunization) ||
+      !covidRules.isCovid19Immunization(immunization) ||
       !covid19Dec2020AdditionalBoosterCvxCodes.has(
         normalizeCvx(immunization.vaccineCode) ?? '',
       )
@@ -7771,7 +7177,7 @@ function evaluateDoseConstraints({
           (candidate) =>
             !!candidate.date &&
             candidate.date < '2023-09-12' &&
-            isCovid19Immunization(candidate),
+            covidRules.isCovid19Immunization(candidate),
         ),
         date: '2023-09-12',
         invalidDoses,
@@ -9510,7 +8916,7 @@ function covid19Sep2023RecommendationReasons({
   }
 
   const latestCovidImmunization = [...availableImmunizations]
-    .filter((immunization) => immunization.date && isCovid19Immunization(immunization))
+    .filter((immunization) => immunization.date && covidRules.isCovid19Immunization(immunization))
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
   if (
     series.id === 'COVID_19_SEP_2023_MIXED_PRODUCT_LT_5_Y_SERIES' &&
@@ -9569,7 +8975,7 @@ function covid19Sep2023RecommendationDateOverride({
   if (!patient?.birthDate) return undefined;
 
   const covidImmunizations = availableImmunizations.filter(
-    (immunization) => immunization.date && isCovid19Immunization(immunization),
+    (immunization) => immunization.date && covidRules.isCovid19Immunization(immunization),
   );
   const inSeasonCovidImmunizations = covidImmunizations.filter(
     (immunization) => immunization.date! >= covid19Sep2023SeasonStartDate,
@@ -9911,7 +9317,7 @@ function covid19Dec2020NoDoseRecommendation({
   if (
     series.season?.code !== 'COVID_19_DEC_2020_SEASON' ||
     !patient?.birthDate ||
-    availableImmunizations.some((immunization) => isCovid19Immunization(immunization))
+    availableImmunizations.some((immunization) => covidRules.isCovid19Immunization(immunization))
   ) {
     return undefined;
   }
@@ -10512,7 +9918,7 @@ function covid19Dec2020BivalentEraRecommendation({
 
 function latestCovid19ImmunizationDate(immunizations: ForecastImmunization[]) {
   return [...immunizations]
-    .filter((immunization) => immunization.date && isCovid19Immunization(immunization))
+    .filter((immunization) => immunization.date && covidRules.isCovid19Immunization(immunization))
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]?.date;
 }
 
@@ -10560,7 +9966,7 @@ function latestCovid19ImmunizationBeforeDate({
         immunization !== exclude &&
         immunization.date &&
         immunization.date < date &&
-        isCovid19Immunization(immunization) &&
+        covidRules.isCovid19Immunization(immunization) &&
         !covid19InvalidDoseIgnoredForIntervals(immunization, invalidDoses),
     )
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
@@ -10635,7 +10041,7 @@ function hasCovid19ImmunizationBeforeSeason(
     (immunization) =>
       immunization.date &&
       immunization.date < seasonStartDate &&
-      isCovid19Immunization(immunization),
+      covidRules.isCovid19Immunization(immunization),
   );
 }
 
@@ -10649,7 +10055,7 @@ function hasCovid19ImmunizationInSeason(
     (immunization) =>
       immunization.date &&
       immunization.date >= seasonStartDate &&
-      isCovid19Immunization(immunization),
+      covidRules.isCovid19Immunization(immunization),
   );
 }
 
@@ -12142,7 +11548,7 @@ function applyCovid19ForecastOverride({
   if (series.season?.code !== 'COVID_19_AUG_2025_SEASON') return forecast;
 
   const priorCovidDoseDate = [...availableImmunizations]
-    .filter((immunization) => immunization.date && isCovid19Immunization(immunization))
+    .filter((immunization) => immunization.date && covidRules.isCovid19Immunization(immunization))
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]?.date;
   const priorDose8Weeks =
     priorCovidDoseDate &&
@@ -12188,7 +11594,7 @@ function applyCovid19ForecastOverride({
       (immunization) =>
         immunization.date &&
         immunization.date >= covid19Aug2025SeasonStartDate &&
-        isCovid19Immunization(immunization),
+        covidRules.isCovid19Immunization(immunization),
     )
   ) {
     const interval = covid19Aug2025PriorIsPfizerNovavaxOrUnspecified(lt2Dose1Prior)
@@ -12221,7 +11627,7 @@ function applyCovid19ForecastOverride({
       (immunization) =>
         immunization.date &&
         immunization.date >= covid19Aug2025SeasonStartDate &&
-        isCovid19Immunization(immunization),
+        covidRules.isCovid19Immunization(immunization),
     )
   ) {
     const interval = covid19Aug2025PriorIsPfizerNovavaxOrUnspecified(
@@ -12251,7 +11657,7 @@ function applyCovid19ForecastOverride({
       (immunization) =>
         immunization.date &&
         immunization.date >= covid19Aug2025SeasonStartDate &&
-        isCovid19Immunization(immunization),
+        covidRules.isCovid19Immunization(immunization),
     )
   ) {
     const mostRecentPreSeasonDoseDate = latestImmunizationDate(
@@ -12278,14 +11684,6 @@ function applyCovid19ForecastOverride({
     ...forecast,
     recommendedVaccine,
   };
-}
-
-function isCovid19Immunization(immunization: ForecastImmunization) {
-  const cvx = normalizeCvx(immunization.vaccineCode);
-  return (
-    immunization.vaccineName.toLowerCase().includes('covid') ||
-    (cvx !== undefined && covid19Aug2025CvxCodes.has(cvx))
-  );
 }
 
 function applyPolioForecastOverride({
