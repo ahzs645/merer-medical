@@ -60,7 +60,7 @@ function assertHpvConcreteRulePortsComplete() {
       .map((rule) => rule.name)
       .join(', ')}`,
   );
-  assert.equal(coverage.abstractRules.length, 3);
+  assert.equal(coverage.abstractRules.length, 0);
 }
 
 function assertHpvCoverageSummaryComplete() {
@@ -69,7 +69,7 @@ function assertHpvCoverageSummaryComplete() {
   );
   assert.ok(hpv, 'Expected HPV rule coverage summary');
   assert.equal(hpv.concreteUnported, 0);
-  assert.equal(hpv.abstractRules, 3);
+  assert.equal(hpv.abstractRules, 0);
 }
 
 function evaluate({ seriesId, patient, immunizations, evaluationDate = '2026-06-01' }) {

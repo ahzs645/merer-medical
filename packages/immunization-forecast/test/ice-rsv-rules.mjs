@@ -44,7 +44,7 @@ function assertRsvConcreteRulePortsComplete() {
       .map((rule) => rule.name)
       .join(', ')}`,
   );
-  assert.equal(coverage.abstractRules.length, 1);
+  assert.equal(coverage.abstractRules.length, 0);
 }
 
 function assertRsvSelectionRules() {

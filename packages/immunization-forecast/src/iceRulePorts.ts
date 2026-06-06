@@ -50,6 +50,14 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'HPV (Abstract): Intervals in 2-Dose Series for Dose 2 from Dose 1',
+    behavior:
+      'HPV 2-dose dose 2 evaluation and forecast intervals are calculated from dose 1 by the TypeScript interval hooks.',
+    testId:
+      'assertHpv2DoseDose1IntervalEvaluation/assertHpv2DoseDose1IntervalForecast',
+  },
+  {
+    ruleName:
       'HPV: Set the intervals for dose 2 in the HPV 2-Dose Series from dose 1',
     behavior:
       'HPV 2-dose dose 2 forecast dates are calculated from dose 1 using the imported ICE interval constraints.',
@@ -78,6 +86,13 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'HPV (Abstract): Absolute Minimum Interval in 3-Dose Series between Doses 1 and 3 for shots before 12/16/2016',
+    behavior:
+      'HPV 3-dose pre-2016 dose 1-to-3 absolute minimum interval behavior is implemented by the date-specific interval override hook.',
+    testId: 'assertHpv3DosePre2016IntervalOverride',
+  },
+  {
+    ruleName:
       'HPV: Evaluate the Absolute Minimum Interval in 3-Dose Series between Doses 1 and 3 for shots on or after 12/16/2016, mark as Valid if Interval >= 5m-4 days',
     behavior:
       'HPV 3-dose dose 3 on or after 2016-12-16 can satisfy dose 1 interval at 5m-4d.',
@@ -88,6 +103,13 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
       'HPV: Evaluate the Absolute Minimum Interval in 3-Dose Series between Doses 1 and 3 - mark as Invalid if Interval < 5m-4 days for shots on or after 12/16/2016',
     behavior:
       'HPV 3-dose dose 3 on or after 2016-12-16 is invalid if dose 1 interval is below 5m-4d.',
+    testId: 'assertHpv3DosePre2016IntervalOverride',
+  },
+  {
+    ruleName:
+      'HPV (Abstract): Absolute Minimum Interval in 3-Dose Series between Doses 1 and 3 for shots on or after 12/16/2016',
+    behavior:
+      'HPV 3-dose post-2016 dose 1-to-3 absolute minimum interval behavior is implemented by the date-specific interval override hook.',
     testId: 'assertHpv3DosePre2016IntervalOverride',
   },
   {
@@ -242,6 +264,20 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'Duplicate Shot/Same Day Overview Abstract DTP Rule #4: Make notes if all shots are an NOS CVX and one of them contains Pertussis and the other does not',
+    behavior:
+      'DTP same-day duplicate routing records the NOS pertussis/non-pertussis distinction and applies the pertussis-preferred duplicate behavior.',
+    testId: 'assertDtpSameDayNosPertussisPreferred',
+  },
+  {
+    ruleName:
+      'Duplicate Shot/Same Day Overview Abstract DTP Rule #5: Make notes if neither shot is an NOS CVX, and neither shot is a combination or both shots are a combination',
+    behavior:
+      'DTP same-day duplicate routing records the same-class non-NOS distinction and keeps the first processed primary-series dose valid.',
+    testId: 'assertDtpSameDaySamePertussisClassDuplicate',
+  },
+  {
+    ruleName:
       'DTP(Any): Note that an Adolescent Tdap is needed if primary series complete and patient has _not_ received the necessary adolescent Tdap doses',
     behavior:
       'Completed DTP 5-dose series without adolescent Tdap produces an adolescent Tdap recommendation.',
@@ -354,6 +390,14 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'DTP(Abstract): Evaluate Adolescent Tdap Shot >= 7yrs and < 10yrs',
+    behavior:
+      'The DTP adolescent Tdap age-7-through-under-10 abstract path is implemented by the first-adolescent and remaining-adolescent Tdap handlers.',
+    testId:
+      'assertDtpFirstAdolescentTdapAge7To10Valid/assertDtpRemainingAdolescentTdapAcceptedAsExtra',
+  },
+  {
+    ruleName:
       'DTP(1): A primary series dose of pertussis exists if a (valid) dose of Pertussis was administered',
     behavior:
       'A valid primary-series pertussis-containing DTP dose is recognized when choosing catch-up Td versus Tdap recommendations.',
@@ -372,6 +416,14 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     behavior:
       'Tdap CVX 115 given as DTP 5-dose target dose 1, 2, or 3 before age 7y-4d is invalid as INSUFFICIENT_ANTIGEN and does not advance primary-series dose matching.',
     testId: 'assertDtpUnderAgeTdapPrimaryDoseInvalidAndIgnored',
+  },
+  {
+    ruleName:
+      'DTP(Abstract): Absolute Minimum Vaccine Age for Tdap check for target doses 4 or 5 of the 5-dose series',
+    behavior:
+      'Tdap CVX 115 administered for true DTP 5-dose target doses 4 or 5 bypasses the vaccine minimum-age invalidation and can satisfy the target dose.',
+    testId:
+      'assertDtpTrueDose4TdapBypassesVaccineMinimumAge/assertDtpTrueDose5TdapBypassesVaccineMinimumAge',
   },
   {
     ruleName:
@@ -825,6 +877,14 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'Pneumococcal Adult(Abstract): Evaluate shot >= 5yrs and < 19yrs Outside of any Routine Series',
+    behavior:
+      'Pneumococcal adult-slot shots administered from age 5 through 18 are evaluated through the outside-routine adult path unless a below-minimum-age exception applies.',
+    testId:
+      'assertPneumococcalAdultPcv7AcceptedAtAge5/assertPneumococcalAge5BelowMinimumAgeStaysInvalid',
+  },
+  {
+    ruleName:
       'Pneumococcal: Note completion of child series if the patient has received 4 effective doses prior to 5 years of age',
     behavior:
       'Pneumococcal child series completes when four valid child dose slots are satisfied before age 5.',
@@ -871,6 +931,14 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     behavior:
       'Pneumococcal child modern PCV after child completion with no prior modern PCV adds BELOW_MINIMUM_INTERVAL when given before 52 days.',
     testId: 'assertPneumococcalChildModernPcvNeededAfterCompletionInvalidBefore52Days',
+  },
+  {
+    ruleName:
+      'Pneumococcal(Abstract): Child Series- PCV Shot is need for patient < 5yrs where Child Series is otherwise complete but there are no prior PCV13, PCV15, PCV20 or PCV21 doses',
+    behavior:
+      'Pneumococcal child histories that otherwise complete without a modern PCV still require a PCV13/15/20/21 dose; evaluation and forecast paths both honor the modern-PCV-needed condition.',
+    testId:
+      'assertPneumococcalChildModernPcvNeededAfterCompletionValidAt52Days/assertPneumococcalChildCompleteWithoutModernPcvRecommendsModernPcv',
   },
   {
     ruleName:
@@ -957,6 +1025,13 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'Pneumococcal Adult: If the output of Pneumococcal earliest and overdue dates were disabled in the settings, do not determine earliest and overdue dates (*earliestAgeCheck* override)',
+    behavior:
+      'The TypeScript pneumococcal engine has no disable-earliest-overdue setting input; adult pneumococcal age-based earliest date output remains enabled by default.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
       'Pneumococcal Adult: If the output of Pneumococcal earliest and overdue dates were disabled in the settings, do not determine earliest and overdue dates (*latestRecommendedAgeCheck* override)',
     behavior:
       'The TypeScript pneumococcal engine has no disable-earliest-overdue setting input; adult pneumococcal latest/overdue date output remains enabled by default.',
@@ -974,6 +1049,13 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
       'Pneumococcal Adult: Earliest Interval of 5yrs from prior PPSV shot (or CVX 109) to the next target dose of PPSV',
     behavior:
       'Pneumococcal adult PPSV target-dose recommendations use the same 5-year prior-PPSV interval for earliest date output when that target path is reached.',
+    testId: 'ice-pneumococcal-rules',
+  },
+  {
+    ruleName:
+      'Pneumococcal Adult: Recommended Interval of 5yrs from prior PPSV shot (or CVX 109) to the next target dose of PPSV',
+    behavior:
+      'Pneumococcal adult PPSV target-dose recommendations use the same 5-year prior-PPSV interval for recommended date output when that target path is reached.',
     testId: 'ice-pneumococcal-rules',
   },
   {
@@ -2857,6 +2939,235 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
   },
   {
     ruleName:
+      'ProcessResults(COVID-19 Abstract): Return COVID-19 Season Evaluations - CB1 - determine if dose number should be reset to dose 1 at the beginning of the Sept 2023, Aug 2024 and Aug 2025 season start dates if COVID19_SEP2023_DOSE_NUMBER_RESET_DISABLED is _not_ set',
+    behavior:
+      'COVID-19 TypeScript results expose normalized target-series dose numbers directly, including the seasonal reset behavior represented by each selected season match.',
+    testId: 'assertCovid19DoseNumberResultShape',
+  },
+  {
+    ruleName:
+      'COVID-19(9/12/2023+ Abstract): If a COVID-19 shot that does not count towards U.S. vaccination is administered (for any Sept 2023+ COVID-19 Series), absolute minimum interval from the most recent shot to the current shot is 8w-4d',
+    behavior:
+      'Sep 2023+ COVID-19 non-counting prior shots enforce the 8-week-minus-4-day absolute minimum interval unless a narrower product exception applies.',
+    testId: 'assertCovid19Sep2023NonCountingPriorBelow8WeeksMinus4DaysInvalid',
+  },
+  ...[
+    [
+      'COVID-19(Aug2025 2-64yrs/65+ Series abstract): If prior shot is CVX 313 and current shot is CVX 313 for target dose 1, evaluate using absolute minimum interval of 17 days',
+      'assertCovid19Aug2025AdultCvx313To313Below17DaysInvalid',
+    ],
+    [
+      'COVID-19(Aug2025 2-64yrs/65+ Series Abstract): If prior shot is NOT CVX 313 and target dose 1 is being administered, evaluate using absolute minimum interval of 8w-4d',
+      'assertCovid19Aug2025AdultNon313PriorBelow8WeeksMinus4DaysInvalid',
+    ],
+    [
+      'COVID-19(Aug2025 2-64yrs/65+ Series Abstract): If prior shot is CVX 313 and non-313 target dose 1 is being administered, evaluate using absolute minimum interval of 8w-4d',
+      'assertCovid19Aug2025AdultCvx313ToNon313Below8WeeksMinus4DaysInvalid',
+    ],
+  ].map(([ruleName, testId]) => ({
+    ruleName,
+    behavior:
+      'Aug 2025 COVID-19 2-64 and 65+ target dose 1 evaluation applies the product-specific prior-dose absolute minimum interval override.',
+    testId,
+  })),
+  ...[
+    [
+      'COVID-19(Aug2025 LT2y Series abstract)-->TargetDose 1: If patient has no doses on record but >= 1 invalid shot(s) administered prior to the season start date (*IntervalCheck*)',
+      'assertCovid19Aug2025Lt2InvalidOtherOnlyCurrentShotBelow24DaysInvalid',
+    ],
+    [
+      'COVID-19(Aug2025 LT2y Series abstract)-->TargetDose 1: If patient has any of CVX 213, 308, 309, 310, 313 administered prior to the season start date (*IntervalCheck*)',
+      'assertCovid19Aug2025Lt2NonModernaPriorCurrentShotBelow17DaysInvalid',
+    ],
+    [
+      'COVID-19(Aug2025 LT2y Series abstract): Evaluating a shot in current season and exactly one prior valid CVX 311/312 before season start',
+      'assertCovid19Aug2025Lt2PriorModernaCurrentShotTargetsDose2',
+    ],
+    [
+      'COVID-19(Aug2025 LT2y Series abstract)-->TargetDose 1: If patient has no doses on record but >= 1 invalid shot(s) administered prior to the season start date (*recommendations*)',
+      'assertCovid19Aug2025Lt2InvalidOtherOnlyForecast28Days',
+    ],
+    [
+      'COVID-19(Aug2025 LT2y Series abstract)-->TargetDose 1: If patient has any of CVX 213, 308, 309, 310, 313 administered prior to the season start date (*recommendations*)',
+      'assertCovid19Aug2025Lt2NonModernaPriorForecast21Days',
+    ],
+    [
+      'COVID-19(Aug2025 LT2y Series abstract)-->TargetDose 2: If exactly one prior valid CVX 311/312 before season start (*recommendations*)',
+      'assertCovid19Aug2025Lt2PriorModernaSkipsToDose2Forecast',
+    ],
+  ].map(([ruleName, testId]) => ({
+    ruleName,
+    behavior:
+      'Aug 2025 COVID-19 under-2 abstract interval/recommendation branches are implemented by the product-specific pre-season dose and invalid-dose hooks.',
+    testId,
+  })),
+  ...[
+    [
+      'COVID-19(Abstract): Determination if additional dose and/or up to 3 booster dose(s) is permitted when administered < 4/19/2023 and >= 9/2/22 for >= 12 yrs of age, >= 10/12/2022 for >=5 yrs of age and < 12 yrs of age, or >= 12/8/2022 for >= 6 months of age in the Moderna Series',
+      'assertCovid19Dec2020PreBivalentAdditionalBoosterPermissions',
+    ],
+    [
+      'COVID-19(Administration of 1st Bivalent Dose in the Pfizer Series After Series Completion): If a shot is administered in the Pfizer series on >= 3/17/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 3/17/2023 nor any COVID-19 dose >= 4/19/2023, evaluate the shot as Valid',
+      'assertCovid19Dec2020ThirdBoosterAndFirstBivalentIntervals',
+    ],
+    [
+      'COVID-19(Administration of 1st Bivalent Dose in a non-Pfizer Series After Series Completion): If a shot is administered on >= 4/19/2023, the series is complete, and the patient has not received a dose of any bivalent vaccines < 4/19/2023 nor any COVID-19 dose >= 4/19/2023, evaluate the shot as Valid',
+      'assertCovid19Dec2020ThirdBoosterAndFirstBivalentIntervals',
+    ],
+    [
+      'COVID-19(Abstract): For any vaccine administered in a COVID-19 series, override the absolute vaccine minimum age check',
+      'assertCovid19Dec2020MinimumAgeOverrides',
+    ],
+  ].map(([ruleName, testId]) => ({
+    ruleName,
+    behavior:
+      'Dec 2020 COVID-19 abstract post-completion/minimum-age behavior is represented by the TS post-completion and minimum-age override hooks.',
+    testId,
+  })),
+  ...[
+    'COVID-19(Abstract): If the execution date is >= 9/2/2022, determine recommendation for completed the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series along with up to an additional dose and/or 3 extra doses',
+    'COVID-19(Abstract): Prior booster dose was administered in the Pfizer, Moderna, Mixed Product, Janssen or WHO-approved Series on or after 9/2/2022',
+    'COVID-19(Abstract): If the execution date is >= 3/17/2023, determine recommendation for __completed__ __Pfizer__, __Mixed Product__, __Moderna__, __Janssen__ or __Novavax__ COVID-19 Series',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'Dec 2020 COVID-19 completed-series recommendations after the bivalent/current-era policy dates are handled by the TS completed-series recommendation logic.',
+    testId: 'assertCovid19Dec2020BivalentEraRecommendations',
+  })),
+  ...[
+    [
+      'COVID-19: If the Series is not complete and the last shot administered was CVX 213 or shot not authorized by the FDA, recommend earliest and recommended interval of 28 days',
+      'assertCovid19Dec2020IncompleteWhoIntervalRecommendations',
+    ],
+    [
+      'COVID-19(Abstract): If dose 1 was administered at >= 6 yrs of age in the Moderna Series and the execution date >= 4/19/2023, recommend earliest and recommended interval of 8 weeks',
+      'assertCovid19Dec2020PostApr2023IncompleteIntervalRecommendations',
+    ],
+    [
+      'COVID-19(Abstract): If dose 1 was administered at >= 5 yrs of age in the Pfizer or Mixed Product Series and the execution date >= 4/19/2023, recommend earliest and recommended interval of 8 weeks',
+      'assertCovid19Dec2020PostApr2023IncompleteIntervalRecommendations',
+    ],
+  ].map(([ruleName, testId]) => ({
+    ruleName,
+    behavior:
+      'Dec 2020 COVID-19 incomplete-series recommendation interval abstract branches are implemented by the product/date-specific recommendation interval hooks.',
+    testId,
+  })),
+  ...[
+    [
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series Abstract): If the patient has >= 1 COVID-19 shot(s) on record prior to target dose 1, the absolute minimum interval of 8w-4d is not met IF none of the exceptions apply',
+      'assertCovid19Sep2023PreSeasonPriorBelow8WeeksMinus4DaysInvalid',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series Parent Rule): If a shot of CVX 313 is administered for target dose 1, and there are no previous doses on record, evaluate the shot as Accepted / VACCINE_NOT_ALLOWED_FOR_THIS_DOSE',
+      'assertCovid19Sep2023Cvx313Age5ToUnder12AcceptedException',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series Abstract)-->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the absolute minimum interval from that shot to target dose 1 is 24 days',
+      'assertCovid19Sep2023Cvx313Age5ToUnder12AcceptedException',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series Abstract)-->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted / VACCINE_NOT_PART_OF_THIS_SERIES, the absolute minimum interval from that shot to target dose 1 is 24 days',
+      'assertCovid19Sep2023Cvx211AcceptedException',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 >= 5yrs Series (Abstract); 2023-2024 Season): If a shot was administered prior to target dose 1 (prior season), the absolute minimum interval from the prior shot to the current shot is 8w-4d',
+      'assertCovid19Sep2023PreSeasonPriorBelow8WeeksMinus4DaysInvalid',
+    ],
+  ].map(([ruleName, testId]) => ({
+    ruleName,
+    behavior:
+      'Sep 2023/Aug 2024 COVID-19 >=5 abstract interval branches are implemented by the prior-season and exception-specific evaluation hooks.',
+    testId,
+  })),
+  ...[
+    [
+      'COVID-19(Sep2023/Aug2024 Moderna < 5yrs Series Abstract): Recommend the appropriate age-specific vaccine',
+      'assertCovid19Sep2023RecommendationProducts',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 Pfizer < 5yrs Series Abstract): Recommend the appropriate age-specific vaccine',
+      'assertCovid19Sep2023RecommendationProducts',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024): If there are no shots administered, set the earliest/recommended/overdue age to the latter of age 6 months or the current season start date (*recommendationAgeCheck*)',
+      'assertCovid19Sep2023RecommendationProducts',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024): For the 2023-2024 season, the minimum interval and recommended interval from the most recent shot prior to 9/12/2023, when there are no doses on record, are 8w (*recommendationIntervalCheck*)',
+      'assertCovid19Sep2023PreSeasonPriorBelow8WeeksMinus4DaysInvalid',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 >= 5yrs): For the 2023-2024 season, the minimum interval and recommended interval from dose 1 to dose 2 are, respectively, to 4m and 4m (*recommendationIntervalCheck*)',
+      'assertCovid19Sep2023Gte5Dose1ToDose2Interval',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 >= 5yrs): If the patient has >= 1 COVID-19 shot(s) on record prior to dose 1, the recommended earliest & recommended interval is 8w from target dose 1 to the next target dose IF none of the exceptions apply (*recommendationIntervalCheck*)',
+      'assertCovid19Sep2023Gte5Dose1ToDose2Interval',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 >= 5yrs): If the interval from the most recent shot administered >= the season start date has elapsed and the patient also turns 5 years of age >= season start date, set the recommended age for target dose 1 to the season start date (*recommendationAgeCheck*)',
+      'assertCovid19Sep2023SeriesSelection',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 >= 5yrs)->TargetDose 1: If there are no shots in the current season but there are shots in a prior season, set the earlest and recommended date for target dose 1 to the latter of age 6 months or the season start date (*recommendationAgeCheck*)',
+      'assertCovid19Sep2023PreSeasonPriorBelow8WeeksMinus4DaysInvalid',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 >= 5yrs)->TargetDose 1/Exception 2: If a previous shot of CVX 313 administered for target dose 1 was determined to be COVID19_INVALID_CVX_313_SEPT2023GTE5SERIES_OTHERWISE_WOULD_BE_CONSIDERED_VALID_FOR_TARGET_DOSE_1, the recommended interval to the next dose is 28 days',
+      'assertCovid19Sep2023Cvx313Age5ToUnder12AcceptedException',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 >= 5yrs)->TargetDose 1/Exception 3: If a shot of CVX 211 was previously administered for target dose 1 and evaluated as Accepted, the recommended interval from that shot to target dose 1 is 28 days',
+      'assertCovid19Sep2023Cvx211AcceptedException',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 >= 5yrs)->TargetDose 1/Exception 3: There are no other shots administered after the CVX 211; _also_ override default recommendationIntervalCheck',
+      'assertCovid19Sep2023Cvx211AcceptedException',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 Pfizer < 5yrs Series): If a prior formulation COVID-19 vaccine (excluding non-US vaccines that do not count towards US vaccination) or a non-Pfizer updated seasonal COVID-19 vaccine is administered on or after 9/12/2023 for target dose 1 or target dose 2, the minimum/recommended interval to the next dose is 28 days(*recommendationIntervalCheck*)',
+      'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 Pfizer < 5yrs Series): If a shot was previously administered for target dose 1 or target dose 2 and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the minimum/recommended interval from that shot to the next shot is 28 days (*recommendationIntervalCheck*)',
+      'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 Moderna < 5yrs Series): If a shot was previously administered for target dose 1 or target dose 2 and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the minimum/recommended interval from that shot to the next shot is 28 days (*recommendationIntervalCheck*)',
+      'assertCovid19Sep2023ModernaSkipDose2PriorSeasonInterval',
+    ],
+    [
+      'COVID-19(Sep2023/Aug2024 Mixed Product < 5yrs Series): If a shot was previously administered for target dose 1 or target dose 2 and evaluated as Invalid / BELOW_MINIMUM_AGE_SERIES and the series is not complete, the minimum/recommended interval from that shot to the next shot is 28 days (*recommendationIntervalCheck*)',
+      'assertCovid19Sep2023Lt5TwentyFourDayIntervals',
+    ],
+  ].map(([ruleName, testId]) => ({
+    ruleName,
+    behavior:
+      'Sep 2023/Aug 2024 COVID-19 abstract recommendation age/product/interval branches are implemented by the seasonal recommendation hooks.',
+    testId,
+  })),
+  ...[
+    [
+      'SeriesSelection(COVID-19 Aug2025+ Abstract): In Aug2025 season, determine date at which patient turns 2 and 65 years of age',
+      'assertCovid19Aug2025SeriesSelection',
+    ],
+    [
+      'SeriesSelection(COVID-19 Sep2023/Aug2024 Abstract): In Sep2023/Aug2024 seasons, determine date at which patients turns 5 years of age',
+      'assertCovid19Sep2023SeriesSelection',
+    ],
+    [
+      'SeriesSelection(COVID-19 Sep2023/Aug2024 Abstract): In Sep2023/Aug2024 seasons, determine date at which patients turns 12y-4d years of age',
+      'assertCovid19Sep2023SeriesSelection',
+    ],
+  ].map(([ruleName, testId]) => ({
+    ruleName,
+    behavior:
+      'COVID-19 seasonal series selection computes age-boundary dates directly when choosing the applicable season/age series.',
+    testId,
+  })),
+  {
+    ruleName:
       'Zoster: Evaluate CVX 187 as Invalid/Below Minimum Interval if administered CVX 187 < 52 days after CVX 121 or CVX 188',
     behavior:
       'Zoster recombinant CVX 187 is invalid if it follows legacy zoster CVX 121/188 by less than 52 days.',
@@ -3709,6 +4020,7 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     testId: 'ice-hib-rules',
   })),
   ...[
+    'Duplicate Shot/Same Day (Abstract Hep A): Make notes if the adult vaccine (CVX 52) and pediatric vaccine (CVX  83 or CVX 84) duplicate shots',
     'Duplicate Shots/Same Day (Hep A): If a pediatric vaccine is administered to an adult >= 19 years of age in the Hep A 2-dose child/adult series and there are adult-formulated vaccines administered on the same day, evaluate the adult-formulated vaccine first',
     'Duplicate Shot/Same Day (Hep A): If shot administered at >= 19 years, evalute the adult vaccine (CVX 52) Valid and pediatric vaccine (CVX 83 and/or CVX 84) Invalid / DUPLICATE_SAME_DAY',
     'Duplicate Shot/Same Day (Hep A): If shot administered at < 19 years, evaluate the pediatric vaccine (CVX 83 or CVX 84) Valid and the adult vaccine (CVX 52) as Invalid / DUPLICATE_SAME_DAY',
@@ -3727,6 +4039,8 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     'Hep A: Recommend CVX 104 (Hep A-Hep B (Twinrix)) for the Hep A 3-dose Series if in sync with Hep B 3-dose Twinrix Series',
     'Hep A: Recommend CVX 104 (Hep A-Hep B (Twinrix)) for the Hep A 4-dose Accelerated Twinrix Series',
     'Hep A: Include supplemental text for target dose 4 in the Hep A 4-dose Accelerated Twinrix Series',
+    'SeriesSelection(Hep A): Determine default series',
+    'ABSTRACT SeriesSelection(Hep A): patient is >= 18 years - 4 days when first dose is administered',
     'SeriesSelection(Hep A): Select default series if patient has not received a dose of Hep A',
     'SeriesSelection(Hep A): Select default series if patient received a dose of Hep A < 18 years - 4 days',
     'SeriesSelection(Hep A): Select default series (2-dose or 3-dose) if patient is >= 18 years - 4 days when first dose is administered',
@@ -3774,15 +4088,19 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     'Hep B: Recommend CVX 189 (Hep B adjuvanted) for the Hep B 2-dose Adult Series',
     'Hep B: Recommend CVX 104 (Hep A-Hep B (Twinrix)) for the Hep B 3-dose Twinrix Series',
     'Hep B: Recommend CVX 104 (Hep A-Hep B (Twinrix)) for the Hep B 4-dose Accelerated Twinrix Series',
+    'ABSTRACT SeriesSelection(Hep B): Determine child/adolescent series',
     'SeriesSelection(Hep B): Select already completed series that was completed on the same date and with the most doses if different completed series was previously selected',
     'SeriesSelection(Hep B): Select Hep B Child/Adolescent series if the patient is < 19 years of age when first shot was administered',
     'SeriesSelection(Hep B): Select Hep B Child/Adolescent Series if the patient is < 19 years of age, and no shots have been administered',
     'SeriesSelection(Hep B): Select the Hep B 3-dose Adult Series if the patient >= 19 years of age, and no shots have been administered',
     'SeriesSelection(Hep B): Select Hep B 3-dose Adult series if the patient is >= 19 years of age when first shot was administered ',
+    'ABSTRACT SeriesSelection(Hep B): (valid) Dose 1 is CVX 189 administered at >= 18y-4d',
     'SeriesSelection(Hep B): Select Adult 2-dose Series is patient >= 18y-4d and < 19 years of age, 1 dose, and no other doses on record',
+    'ABSTRACT SeriesSelection(Hep B): (valid) Dose 1 is CVX 189 administered at >= 18y-4d and < 19 years of age',
     'SeriesSelection(Hep B): For patient with CVX 189 dose 1 administered at >= 19 years of age, and no other doses on record, select the 2-dose Adult Series',
     'SeriesSelection(Hep B): For patient with CVX 189 dose at >= 18y-4d and < 19 years of age, and >= 1 dose and additional shots on record, select the Child/Adolescent Series if it has more doses than the Adult Series',
     'SeriesSelection(Hep B): For patient with CVX 189 at >= 18y-4d and < 19 years of age, and >= 1 dose and additional shots on record, select the 2-dose Adult Series if it has greater than or equal the number of doses as the Child/Adolescent Series',
+    'ABSTRACT SeriesSelection(Hep B): (valid) Dose 1 is CVX 189 administered at >= 18y-4d and also >= 19 years of age',
     'SeriesSelection(Hep B): For patient with CVX 189 dose 1 administered at >= 19 years of age, and >= 1 dose and additional shots on record, select the 3-dose Adult Series if it has more doses than the 2-dose Adult Series',
     'SeriesSelection(Hep B): For patient with CVX 189 dose 1 administered at >= 19 years of age, and >= 1 dose and additional shots on record, select the 2-dose Adult Series if it has greater than or equal the number of doses as the Child/Adolescent Series',
     'SeriesSelection(Hep B): Select Child/Adolescent Series if it is complete',
@@ -3790,6 +4108,7 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     'SeriesSelection(Hep B): If a shot in the Hep B 4-dose Accelerated Twinrix Series is invalid in the Hep B Child/Adolescent Series, mark any prior series doses as Accepted / VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN in the Child/Adolescent Series',
     'SeriesSelection(Hep B): Select 3-dose Adult Series if Hep B 3-dose Adult Series has fewer doses remaining to complete the series than the Hep B 4-dose Accelerated Twinrix Series',
     'SeriesSelection(Hep B): If a shot in the Hep B 4-dose Accelerated Twinrix Series is invalid in the Hep B 3-dose Adult Series, mark any prior 3-dose Series doses as Accepted / VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN in the 3-dose Series',
+    'ABSTRACT SeriesSelection(Hep B): Dose 1 is CVX 104 and patient >= 18y-4d',
     'SeriesSelection(Hep B): Select 4-dose Accelerated Twinrix Series if Hep A and Hep B doses 1 and 2 are CVX 104 are 7-24 days apart and no prior Hep A doses administered',
     'SeriesSelection(Hep B): Select Child/Adolescent Series if Hep A and Hep B doses 1 and 2 are CVX 104 and 7-24 days apart and 3 doses administered and < 19 years of age',
     'SeriesSelection(Hep B): Select 3-dose Adult Series if Hep A and Hep B doses 1 and 2 are CVX 104 and 7-24 days apart and 3 doses administered and >= 19 years of age',
@@ -3806,21 +4125,38 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     testId: 'ice-hepb-rules',
   })),
   ...[
+    'ABSTRACT SeriesSelection(MenB): Select MenB 4C 3-Dose Series if it has a (valid) dose 1 and but MenB 4C 2-Dose Series does not have a (valid) dose 1',
+    'ABSTRACT SeriesSelection(MenB): Select MenB 4C 2-Dose Series if valid dose 1',
+    'ABSTRACT SeriesSelection(MenB): Select MenB 4C 2-dose series if dose 1 is (CVX 163, CVX 328); target dose 2 (CVX 163, CVX 328) is Valid in 4C 2-dose series',
+    'ABSTRACT SeriesSelection(MenB): Select MenB 4C 3-dose series if dose 1 is (CVX 163, CVX 328) and target dose 2 (CVX 163, CVX 328) is Invalid for 4C 2-dose series but Valid for 4C 3-dose series',
+    'ABSTRACT SeriesSelection(MenB): Select MenB 4C 2-dose series if dose 1 is (CVX 163, CVX 328), target dose 2 (CVX 163, CVX 328) is Invalid in both 4C 2-dose series/3-dose series',
+    'ABSTRACT SeriesSelection(MenB): Select MenB FHbp 3-dose series if target dose 1 (CVX 162, CVX 316) is invalid for FHbp 2-dose series but valid for the FHbp 3-dose series',
+    'ABSTRACT SeriesSelection(MenB): Select MenB FHbp 2-dose series if target dose 1 (CVX 162, CVX 316) is Valid for both FHbp 2-dose series and FHbp 3-dose series',
+    'ABSTRACT SeriesSelection(MenB): Select MenB FHbp 2-dose series if dose 1 is (CVX 162, CVX 316); target dose 2 (CVX 162, CVX 316) is Valid in FHbp 2-dose series',
+    'ABSTRACT SeriesSelection(MenB): Select MenB FHbp 3-dose series if dose 1 is (CVX 162, CVX 316) and target dose 2 (CVX 162, CVX 316) is Invalid for FHbp 2-dose series but Valid for FHbp 3-dose series',
+    'ABSTRACT SeriesSelection(MenB): Select MenB FHbp 2-dose series if dose 1 is (CVX 162, CVX 316), target dose 2 (CVX 162, CVX 316) is Invalid in both FHbp 2-dose series/3-dose series',
+    'ABSTRACT SeriesSelection(MenB): Select MenB 4C 2-Dose Series _or_ MenB 4C 3-Dose Series if both (CVX 162, CVX 316) and CVX 163 present, and latest shot date administered is CVX 163',
+    'ABSTRACT SeriesSelection(MenB): Select MenB FHbp 2-Dose Series _or_ FHbp 4C 3-Dose Series if both (CVX 162, CVX 316) and CVX 163 present, and latest shot date administered is CVX 162',
+    'Duplicate Shots/Same Day(MenB Abstract): If CVX 162 or CVX 316 is administered >= 10/25/2024 and on the same day as CVX 163 or CVX 328',
     'Duplicate Shots/Same Day (MenB- Series is Complete; $td Shot is Valid): If CVX 162 or CVX 316 is administered >= 10/25/2024 on the same day as CVX 163 on a date >= 10/25/2024, and the Series is complete, evaluate the shot that completes the Series as Valid and the other shot as Invalid / DUPLICATE_SAME_DAY',
     'Duplicate Shots/Same Day (MenB- Series is Complete; $tdother Shot is Valid): If CVX 162 or CVX 316 is administered >= 10/25/2024 on the same day as a CVX 163 or CVX 328 on a date >= 10/25/2024, and the Series is complete, evaluate the shot that completes the Series as Valid and the other shot as Invalid / DUPLICATE_SAME_DAY',
     'Duplicate Shots/Same Day (MenB- Series is Not Complete): If CVX 162 or CVX 316 is administered >= 10/25/2024 on the same day as CVX 163 or CVX 328 on a date >= 10/25/2024, and neither Series complete, evaluate the shot that completes the Series as Valid and the other shot as Invalid / DUPLICATE_SAME_DAY',
     'Duplicate Shots/Same Day MeningB Rule: If CVX 162 (or CVX 316) / CVX 163 (or CVX 328) reported on same day in the 4C 2-dose Series on a date < 10/25/2024, evaluate the CVX 162 as Invalid with reason DUPLICATE_SAME_DAY',
     'Duplicate Shots/Same Day MeningB Rule: If CVX 162 (or CVX 316) / CVX 163 (or CVX 328) reported on same day in FBhp 2-dose or FBhp 3-dose Series < 10/25/2024, evaluate the CVX 163 as Invalid with reason DUPLICATE_SAME_DAY',
+    'Mening B / FHbp 2-dose series: Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot',
     'Mening B / FHbp 2-dose series: Skip interval check on ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOSE_RECENT_VACCINE_GIVEN',
     'Mening B / FBhp 2-dose series: Do not invoke default Absolute Minimum Age check for CVX 163 administered >= 10yrs-4days of age',
+    'MenB(FHbp 3-Dose Series): Evaluate CVX 163 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot',
     'MenB(FHbp 3-Dose Series): Skip interval check on ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOSE_RECENT_VACCINE_GIVEN',
     'MenB(FHbp 3-Dose Series): Regardless of the interval between dose 2 and target dose 3, if the Absolute Minimum Interval between dose 1 and target dose 3 >= 6 months-4 days, then evaluate the shot (target dose 3) as Valid',
+    'MenB(4C 2-Dose Series): Evaluate CVX 162 or CVX 316 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot',
     'MenB(4C 2-Dose Series): Skip interval check on ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOSE_RECENT_VACCINE_GIVEN',
     'MenB(4C 2-Dose Series): Do not invoke default Absolute Minimum Age check for CVX 162 or CVX 316 if administered on or after 10/25/2024 at >= 10 years-4 days of age',
     'MenB(4C 2-Dose Series): If dose 2 was administered >= 10/25/2024, the absolute minimum interval from the (valid) Dose 1 (_not_ necessarily the immediately prior shot) to target dose 2 is 6 months-4 days',
     'MenB(4C 2-Dose Series): If target dose 1 is administered < 10/25/2024, then modify DoseRule1 to the pre-10/25/2024 values as follows: (1) Absolute Minimum Age: 10y-4d; (2) Absolute Minimum Interval: 1m-4d',
     'MenB(4C 2-Dose Series): If target dose 2 is administered < 10/25/2024, then modify DoseRule1 to their pre-10/25/2024 values as follows: (i) Absolute Minimum Interval: 1m-4d',
     'MenB(4C 2-Dose Series): If dose 1 was administered < 10/25/2024, target dose 2 is CVX 163 is administered >= 10/25/2024, and the interval between the previous (unignored) shot is >= 4w-4d and < 4m-4d OR the interval from (valid) dose 1 is < 6m-4d, _switch_ to the 4C 3-dose Series',
+    'MenB(4C 3-dose Series): Evaluate CVX 162 or CVX 316 as ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOST_RECENT_VACCINE_GIVEN and Ignore Shot',
     'MenB(4C 3-dose Series): Skip interval check on ACCEPTED/VACCINE_NOT_COUNTED_BASED_ON_MOSE_RECENT_VACCINE_GIVEN',
     'MenB(4C 3-dose Series): If a shot is administered < 10/25/2024 and the series is not complete, evaluate that shot as Invalid',
     'MenB(4C 3-Dose Series): Regardless of the interval between dose 2 and target dose 3, if the Absolute Minimum Interval between dose 1 and target dose 3 >= 6 months-4 days, then evaluate dose 3 as Valid',
@@ -3836,6 +4172,7 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     'Mening B: If the patient >= 24yrs and no doses on record, recommendation is CONDITIONAL/HIGH_RISK',
     'MeningB: Recommend minimum interval & recommended interval of at 6 months between doses 1 & 3 in FHbp 3-dose Series',
     'MenB(4C 3-Dose Series): Recommend minimum & recommended interval of at 6 months between doses 1 & 3',
+    'MenB(4C 2-Dose Series): If (valid) dose 1 was >= 10/25/2024, the minimum interval & recommended interval is 6m from the (valid) dose 1 (*recommendationIntervalCheck*)',
     'MenB(4C 2-Dose Series): If the (valid) dose 1 was administered >= 10/25/2024, the minimum interval & recommended interval is 6m from the (valid) dose 1 (*earliestIntervalCheck*)',
     'MenB(4C 2-Dose Series; Target Dose 1; CRR): If no shots were administered and the evalTime < 10/25/2024, modify DoseRule1 as follows: (1) set the minimum age and recommended age to 10 years; (2) set the minimum interval and recommended interval from dose 1 to dose 2 to 1 month',
     'MenB(4C 2-Dose Series; Target Dose 1; CRR): If an (invalid) shot was 1 was administered < 10/25/2024, modify DoseRule1 as follows: (1) set the minimum age and recommended age to 10 years; (2) set the minimum interval and recommended interval from dose 1 to dose 2 to 1 month',
@@ -3845,6 +4182,25 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     behavior:
       'Meningococcal B product-family selection, same-day duplicate handling, wrong-family accepted doses, 2024 interval changes, and recommendation bands are handled by MenB-specific TypeScript engine hooks.',
     testId: 'ice-meningb-rules',
+  })),
+  ...[
+    'Duplicate Shot/Same Day (Abstract): 2 shots administered on the same day',
+    'Duplicate Shot/Same Day Overview Abstract Rule #5: Make notes if vaccines different, neither shot is an NOS CVX, neither shot is a combination, or both shots are a combination',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'Shared same-day duplicate preclassification is represented by the TypeScript duplicate-dose ordering and invalidation pass before disease-specific hooks run.',
+    testId: 'ice-dtp-rules/ice-pneumococcal-rules/ice-covid19-rules',
+  })),
+  ...[
+    'Series Display(Abstract): Determine Series Display Options Enabled',
+    'Series Display(Abstract): Determine Series Display Selection',
+    'ProcessResults: Mark Unprocessed Shots as Vaccine Not Supported',
+  ].map((ruleName) => ({
+    ruleName,
+    behavior:
+      'ICE Java process-result metadata is represented in TypeScript by returning selected series, target-dose, recommendation, and unsupported-shot metadata directly without a separate display-option agenda.',
+    testId: 'probeIceRulePorts',
   })),
   ...[
     'Duplicate Shots/Same Day Polio Rule: If one of those shots is OPV (CVX 02, 182) and the other is not, evaluate the OPV as Invalid with a reason code of DUPLICATE_SAME_DAY and evaluate the other as Valid',
@@ -3897,6 +4253,7 @@ export const IMPLEMENTED_ICE_RULE_PORTS: IceImplementedRulePort[] = [
     'RSV: If an RSV shot is administered in the Infant Series to a patient < 8 months of age outside the RSV season, the shot is Valid with reason code OUTSIDE_SEASON',
     "RSV: If a shot was administered in the current season of the RSV Infant Series but the RSV Infant Series was completed in a prior season, mark the current season's RSV Infant Series Complete",
     "RSV: If the RSV Infant Series was completed in a prior season, mark the current season's RSV Infant Series Complete",
+    'RSV(Abstract): Evaluate shot >= 8 months and < 50 years of age as Accepted / Outside of any Routine Series',
     'RSV: If shot administered >= 8 months and < 50 years was evaluated as Valid or Accepted, evaluate the shot as as Accepted / OUTSIDE_ROUTINE_SERIES',
     'RSV: If shot administered >= 8 months and < 50 years was evaluated as Invalid where the reason is not ABOVE_MAXIMUM_AGE, evaluate the shot as Accepted / OUTSIDE_ROUTINE_SERIES',
     'RSV: If shot administered was evaluated in the Adult Series as Invalid with an evaluation reason ABOVE_MAXIMUM_AGE_VACCINE and BELOW_MINIMUM_AGE_SERIES, remove the BELOW_MINIMUM_AGE_SERIES evaluation reason',
