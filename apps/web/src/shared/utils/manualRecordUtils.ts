@@ -42,11 +42,11 @@ export type ManualMedicationParts = {
 
 export function isManualRecord(item: ClinicalDocument): boolean {
   const raw = item.data_record.raw as {
-    fullUrl?: string;
+    fullUrl?: unknown;
     source_file?: string;
   };
   return (
-    raw.fullUrl?.startsWith('manual:') ||
+    (typeof raw.fullUrl === 'string' && raw.fullUrl.startsWith('manual:')) ||
     item.connection_record_id?.startsWith('c-') ||
     item.metadata?.id?.startsWith('manual:') ||
     Boolean(
@@ -126,8 +126,7 @@ export function getManualObservationInterpretation(
   const resource = getFhirResource<ManualRawResource['resource']>(item);
   return (
     resource?.interpretation?.text ||
-    resource?.interpretation?.coding?.find((coding) => coding.display)
-      ?.display
+    resource?.interpretation?.coding?.find((coding) => coding.display)?.display
   );
 }
 

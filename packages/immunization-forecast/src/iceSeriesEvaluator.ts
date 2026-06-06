@@ -530,6 +530,8 @@ export function evaluateIceSeries(
   input: IceSeriesForecastInput,
 ): IceSeriesForecast[] {
   const seriesDefinitions = filterSeriesDefinitions(input);
+  const evaluationDate =
+    input.evaluationDate ?? new Date().toISOString().split('T')[0];
 
   const forecasts = seriesDefinitions.map((series) =>
     evaluateOneSeries(
@@ -537,10 +539,14 @@ export function evaluateIceSeries(
       series,
       input.immunizations,
       input.patient,
-      input.evaluationDate,
+      evaluationDate,
     ),
   );
-  return applyCrossSeriesForecastRules(forecasts, input.dataset);
+  return applyCrossSeriesForecastRules(
+    forecasts,
+    input.dataset,
+    evaluationDate,
+  );
 }
 
 export function selectIceSeries(
@@ -3875,10 +3881,144 @@ function compareSeriesForecasts(a: IceSeriesForecast, b: IceSeriesForecast) {
 function applyCrossSeriesForecastRules(
   forecasts: IceSeriesForecast[],
   dataset: IceDataset,
+  evaluationDate: string,
 ) {
   return applyHepATwinrixRecommendationRule(
-    applyYellowFeverLiveVirusIntervalRule(forecasts, dataset),
+    applySelectAdjuvantProductRecommendationIntervalRule(
+      applyYellowFeverLiveVirusIntervalRule(forecasts, dataset),
+      dataset,
+      evaluationDate,
+    ),
   );
+}
+
+function applySelectAdjuvantProductRecommendationIntervalRule(
+  forecasts: IceSeriesForecast[],
+  dataset: IceDataset,
+  evaluationDate: string,
+) {
+  const selectAdjuvantCvxCodes = new Set(
+    dataset.vaccines
+      .filter((vaccine) => vaccine.selectAdjuvantProduct)
+      .map((vaccine) => vaccine.cvx),
+  );
+  if (selectAdjuvantCvxCodes.size === 0) return forecasts;
+
+  const mostRecentSelectAdjuvantDate = latestDoseDate(
+    forecasts
+      .flatMap((forecast) => forecast.matchedDoses)
+      .filter((match) =>
+        selectAdjuvantCvxCodes.has(
+          normalizeCvx(match.immunization.vaccineCode) ?? '',
+        ),
+      ),
+  );
+  if (!mostRecentSelectAdjuvantDate) return forecasts;
+
+  const futureSpacingDate = dateFromIceDuration({
+    startDate: mostRecentSelectAdjuvantDate,
+    duration: '28d',
+  });
+
+  return forecasts.map((forecast) => {
+    const nextDoseForecast = forecast.nextDoseForecast;
+    if (
+      !nextDoseForecast ||
+      !forecastTargetsSelectAdjuvantProduct(
+        forecast,
+        selectAdjuvantCvxCodes,
+      )
+    ) {
+      return forecast;
+    }
+
+    const adjustedEarliestRecommendedDate =
+      adjustSelectAdjuvantRecommendationDate({
+        date: nextDoseForecast.earliestRecommendedDate,
+        mostRecentSelectAdjuvantDate,
+        futureSpacingDate,
+        evaluationDate,
+      });
+    const adjustedRecommendedDate = adjustSelectAdjuvantRecommendationDate({
+      date: nextDoseForecast.recommendedDate,
+      mostRecentSelectAdjuvantDate,
+      futureSpacingDate,
+      evaluationDate,
+    });
+
+    if (
+      adjustedEarliestRecommendedDate ===
+        nextDoseForecast.earliestRecommendedDate &&
+      adjustedRecommendedDate === nextDoseForecast.recommendedDate
+    ) {
+      return forecast;
+    }
+
+    const adjustedNextDoseForecast = {
+      ...nextDoseForecast,
+      earliestRecommendedDate: adjustedEarliestRecommendedDate,
+      recommendedDate: adjustedRecommendedDate,
+    };
+
+    return {
+      ...forecast,
+      nextDoseForecast: adjustedNextDoseForecast,
+      recommendation: forecast.recommendation
+        ? {
+            ...forecast.recommendation,
+            earliestRecommendedDate:
+              adjustedEarliestRecommendedDate ??
+              forecast.recommendation.earliestRecommendedDate,
+            recommendedDate:
+              adjustedRecommendedDate ?? forecast.recommendation.recommendedDate,
+          }
+        : forecast.recommendation,
+    };
+  });
+}
+
+function forecastTargetsSelectAdjuvantProduct(
+  forecast: IceSeriesForecast,
+  selectAdjuvantCvxCodes: Set<string>,
+) {
+  const nextDoseForecast = forecast.nextDoseForecast;
+  if (!nextDoseForecast) return false;
+
+  if (
+    nextDoseForecast.recommendedVaccine?.cvx &&
+    selectAdjuvantCvxCodes.has(nextDoseForecast.recommendedVaccine.cvx)
+  ) {
+    return true;
+  }
+
+  return nextDoseForecast.dose.vaccines.some((vaccine) =>
+    selectAdjuvantCvxCodes.has(vaccine.cvx),
+  );
+}
+
+function adjustSelectAdjuvantRecommendationDate({
+  date,
+  mostRecentSelectAdjuvantDate,
+  futureSpacingDate,
+  evaluationDate,
+}: {
+  date?: string;
+  mostRecentSelectAdjuvantDate: string;
+  futureSpacingDate: string;
+  evaluationDate: string;
+}) {
+  if (!date) return date;
+  if (
+    date < futureSpacingDate &&
+    (mostRecentSelectAdjuvantDate !== evaluationDate ||
+      date > mostRecentSelectAdjuvantDate)
+  ) {
+    return futureSpacingDate;
+  }
+  if (date < mostRecentSelectAdjuvantDate) {
+    return mostRecentSelectAdjuvantDate;
+  }
+  return date;
 }
 
 function applyYellowFeverLiveVirusIntervalRule(
@@ -7188,6 +7328,9 @@ function evaluateDoseConstraints({
 }) {
   const reasons: string[] = [];
   if (!immunization.date) return ['MISSING_ADMINISTRATION_DATE'];
+  if (patient?.birthDate && immunization.date < patient.birthDate) {
+    return ['PRIOR_TO_DOB'];
+  }
 
   if (series.vaccineGroup?.code === 'MMR') {
     const duplicateReason = evaluateMmrDuplicateSameDay({
@@ -7358,6 +7501,12 @@ function evaluateDoseConstraints({
   for (const interval of dose.intervals) {
     const previousMatch = findMatchedDoseById(matchedDoses, interval);
     if (!previousMatch?.immunization.date) continue;
+    if (
+      patient?.birthDate &&
+      previousMatch.immunization.date < patient.birthDate
+    ) {
+      continue;
+    }
     if (
       meningBDose3MeetsDose1Interval({
         series,
@@ -11666,6 +11815,7 @@ function buildNextDoseForecast({
     const previousMatch = findMatchedDoseById(matchedDoses, interval);
     const previousDoseDate = previousMatch?.immunization.date;
     if (!previousDoseDate) continue;
+    if (patient?.birthDate && previousDoseDate < patient.birthDate) continue;
 
     appendCandidate(
       candidates.absoluteMinimumDate,

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { AppPage } from '../../shared/components/AppPage';
 import { ImmunizationCountry } from './types';
+import { ImmunizationByTypePanel } from './components/ImmunizationByTypePanel';
 import { ImmunizationHeader } from './components/ImmunizationHeader';
 import { ImmunizationRecommendationsPanel } from './components/ImmunizationRecommendationsPanel';
 import { ImmunizationSummaryPanel } from './components/ImmunizationSummaryPanel';
@@ -40,6 +41,7 @@ export function ImmunizationsTab() {
             onCountryChange={setCountry}
             recommendations={recommendations}
           />
+          <ImmunizationByTypePanel records={records} />
           <ImmunizationTimelinePanel records={records} />
           {status === 'loading' && (
             <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
