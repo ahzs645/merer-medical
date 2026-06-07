@@ -5,20 +5,24 @@ conformance work. These projects are not bundled into the web app runtime.
 
 ## ICE
 
-`vendor/ice` is a git submodule that points at the Mere fork of the
-Immunization Calculation Engine:
+The Immunization Calculation Engine (ICE) is **no longer vendored** in this
+repo. Its Drools ruleset has been fully ported to TypeScript in
+`@mere/immunization-forecast` (see `packages/immunization-forecast`), and the
+web app's runtime forecasting does not depend on the Java ICE runtime or its
+dataset.
 
-- Fork: https://github.com/ahzs645/ice
+- Fork: https://github.com/ahzs645/ice (branch `main-v2`)
 - Upstream: https://github.com/cdsframework/ice
 
-Use it as a reference implementation and future comparison test oracle for
-`@mere/immunization-forecast`. The TypeScript forecast engine should remain
-small, browser-friendly, and independent from the Java ICE runtime.
+The fork is kept as a reference implementation and comparison test oracle. The
+`@mere/immunization-forecast` conformance tests (`test/ice-*-rules.mjs`) load
+the ICE dataset from `vendor/ice`, so they require the submodule to be present.
 
-To initialize the submodule after cloning this repo:
+To restore ICE temporarily for re-importing datasets or running those
+conformance tests:
 
 ```sh
-git submodule update --init --recursive vendor/ice
+git submodule add -b main-v2 https://github.com/ahzs645/ice.git vendor/ice
 ```
 
 To refresh the fork from upstream:
