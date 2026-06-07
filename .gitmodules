@@ -2,3 +2,6 @@
 	path = vendor/ice
 	url = https://github.com/ahzs645/ice.git
 	branch = main-v2
+[submodule "packages/immunization-forecast"]
+	path = packages/immunization-forecast
+	url = https://github.com/ahzs645/immunization-forecast.git
