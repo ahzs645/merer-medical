@@ -2,6 +2,7 @@ import type { VaccineGroup } from '@mere/immunization-forecast';
 import { useMemo } from 'react';
 
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { safeFormatDate } from '../../../shared/utils/dateFormatters';
 import { ImmunizationRecord } from '../types';
 import { vaccineGroupLabel } from '../utils/vaccineGroupLabels';
 
@@ -51,67 +52,51 @@ export function ImmunizationByTypePanel({
   }
 
   return (
-    <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+    <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
+      <div className="flex items-baseline justify-between gap-2">
         <div>
           <h2 className="text-base font-semibold text-gray-900">
             {t('Vaccines by type')}
           </h2>
-          <p className="text-sm text-gray-600">
-            {t(
-              'One row per vaccine, with each dose in the order it was given.',
-            )}
+          <p className="mt-0.5 text-sm text-gray-600">
+            {t('Each dose in the order it was given.')}
           </p>
         </div>
-        <span className="text-xs font-semibold uppercase text-gray-500">
+        <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-400">
           {rows.length} {t('types')}
         </span>
       </div>
 
-      <div className="mt-4 overflow-x-auto">
-        <table className="w-full border-collapse text-left text-sm">
-          <thead>
-            <tr className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
-              <th className="py-2 pr-4 font-medium">{t('Vaccine')}</th>
-              <th className="py-2 pr-4 font-medium">{t('Doses')}</th>
-              <th className="py-2 font-medium">{t('Dates given')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr
-                key={row.key}
-                className="border-b border-gray-100 align-top last:border-0"
-              >
-                <th
-                  scope="row"
-                  className="py-3 pr-4 text-left font-semibold text-gray-900"
+      <ul className="mt-4 divide-y divide-gray-100">
+        {rows.map((row) => (
+          <li key={row.key} className="py-3 first:pt-0 last:pb-0">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold text-gray-900">
+                {t(row.label)}
+              </h3>
+              <span className="shrink-0 rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
+                {row.doses.length}{' '}
+                {row.doses.length === 1 ? t('dose') : t('doses')}
+              </span>
+            </div>
+            <ol className="mt-2 flex flex-wrap gap-1.5">
+              {row.doses.map((dose, index) => (
+                <li
+                  key={dose.id}
+                  className="inline-flex items-baseline gap-1.5 rounded-md bg-gray-50 px-2 py-1 text-xs ring-1 ring-inset ring-gray-200"
                 >
-                  {t(row.label)}
-                </th>
-                <td className="py-3 pr-4 text-gray-700">{row.doses.length}</td>
-                <td className="py-3">
-                  <ol className="flex flex-wrap gap-1.5">
-                    {row.doses.map((dose, index) => (
-                      <li
-                        key={dose.id}
-                        className="inline-flex items-baseline gap-1 rounded-md bg-gray-50 px-2 py-1 text-xs ring-1 ring-gray-200"
-                      >
-                        <span className="font-medium text-gray-500">
-                          {t('Dose')} {dose.doseNumber ?? index + 1}
-                        </span>
-                        <span className="text-gray-900">
-                          {dose.date?.split('T')[0] || t('Undated')}
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                  <span className="font-medium text-gray-400">
+                    {dose.doseNumber ?? index + 1}
+                  </span>
+                  <span className="font-medium text-gray-800">
+                    {safeFormatDate(dose.date, 'MMM d, yyyy', t('Undated'))}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

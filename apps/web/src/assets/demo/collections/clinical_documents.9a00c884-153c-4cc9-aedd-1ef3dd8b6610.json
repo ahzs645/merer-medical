@@ -1933,7 +1933,7 @@
           "resourceType": "Immunization",
           "id": "TCr-wUtty2Bps.55vHHm.zwB",
           "status": "completed",
-          "date": "2022-07-29",
+          "date": "2020-09-08",
           "vaccineCode": {
             "coding": [
               {
@@ -1972,7 +1972,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TCr-wUtty2Bps.55vHHm.zwB",
-      "date": "2022-07-29",
+      "date": "2020-09-08",
       "display_name": "DTaP"
     },
     "_meta": {
@@ -1997,7 +1997,7 @@
           "resourceType": "Immunization",
           "id": "TDBVH5NhV3HJW3MSXn3whqgB",
           "status": "completed",
-          "date": "2014-09-25",
+          "date": "2016-04-17",
           "vaccineCode": {
             "coding": [
               {
@@ -2036,7 +2036,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TDBVH5NhV3HJW3MSXn3whqgB",
-      "date": "2014-09-25",
+      "date": "2016-04-17",
       "display_name": "DTaP"
     },
     "_meta": {
@@ -2061,7 +2061,7 @@
           "resourceType": "Immunization",
           "id": "TFrqPLDX8FhgV9I4jy0asowB",
           "status": "completed",
-          "date": "2015-12-30",
+          "date": "2024-06-15",
           "vaccineCode": {
             "text": "Cholera"
           },
@@ -2083,7 +2083,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TFrqPLDX8FhgV9I4jy0asowB",
-      "date": "2015-12-30",
+      "date": "2024-06-15",
       "display_name": "Cholera"
     },
     "_meta": {
@@ -2108,7 +2108,7 @@
           "resourceType": "Immunization",
           "id": "TILCVdiDJI.Hb1siL38.k7gB",
           "status": "completed",
-          "date": "2020-12-31",
+          "date": "2017-04-17",
           "vaccineCode": {
             "coding": [
               {
@@ -2180,7 +2180,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TILCVdiDJI.Hb1siL38.k7gB",
-      "date": "2020-12-31",
+      "date": "2017-04-17",
       "display_name": "DTaP"
     },
     "_meta": {
@@ -2205,7 +2205,7 @@
           "resourceType": "Immunization",
           "id": "TJ1l-8wOUEwzkoQlY.iDAvwB",
           "status": "completed",
-          "date": "2015-12-30",
+          "date": "2015-12-17",
           "vaccineCode": {
             "coding": [
               {
@@ -2234,7 +2234,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TJ1l-8wOUEwzkoQlY.iDAvwB",
-      "date": "2015-12-30",
+      "date": "2015-12-17",
       "display_name": "DTP-Hib-Hep B"
     },
     "_meta": {
@@ -2259,7 +2259,7 @@
           "resourceType": "Immunization",
           "id": "TK4lPVtgcRg6CFqaRe99w5QB",
           "status": "completed",
-          "date": "2020-12-31",
+          "date": "2016-10-17",
           "vaccineCode": {
             "coding": [
               {
@@ -2331,7 +2331,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TK4lPVtgcRg6CFqaRe99w5QB",
-      "date": "2020-12-31",
+      "date": "2016-10-17",
       "display_name": "MMR"
     },
     "_meta": {
@@ -2356,7 +2356,7 @@
           "resourceType": "Immunization",
           "id": "TUsOpk4VDbbahslGF63H2EQB",
           "status": "completed",
-          "date": "2004-01-04",
+          "date": "2016-02-17",
           "vaccineCode": {
             "coding": [
               {
@@ -2395,7 +2395,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TUsOpk4VDbbahslGF63H2EQB",
-      "date": "2004-01-04",
+      "date": "2016-02-17",
       "display_name": "DTaP"
     },
     "_meta": {
@@ -2420,7 +2420,7 @@
           "resourceType": "Immunization",
           "id": "Tf2K6qrgklzmzZcnZCrJdogB",
           "status": "completed",
-          "date": "2022-07-29",
+          "date": "2020-09-08",
           "vaccineCode": {
             "coding": [
               {
@@ -2459,7 +2459,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/Tf2K6qrgklzmzZcnZCrJdogB",
-      "date": "2022-07-29",
+      "date": "2020-09-08",
       "display_name": "MMR"
     },
     "_meta": {
@@ -2484,7 +2484,7 @@
           "resourceType": "Immunization",
           "id": "TmDC1-.UM.nxsA7fJfC1xBQB",
           "status": "completed",
-          "date": "2021-08-04",
+          "date": "2019-09-09",
           "vaccineCode": {
             "coding": [
               {
@@ -2523,7 +2523,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Immunization/TmDC1-.UM.nxsA7fJfC1xBQB",
-      "date": "2021-08-04",
+      "date": "2019-09-09",
       "display_name": "DTaP"
     },
     "_meta": {

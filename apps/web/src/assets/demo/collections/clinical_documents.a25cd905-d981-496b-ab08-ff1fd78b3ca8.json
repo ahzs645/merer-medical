@@ -1126,7 +1126,7 @@
           "resourceType": "Immunization",
           "id": "T4Y80bLb1.-unx2w3Nd4NoQB",
           "status": "completed",
-          "date": "2006-08-24T11:19:50.550Z",
+          "date": "2024-10-22",
           "vaccineCode": {
             "coding": [
               {
@@ -1199,7 +1199,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/Immunization/T4Y80bLb1.-unx2w3Nd4NoQB",
-      "date": "2006-08-24T11:19:50.550Z",
+      "date": "2024-10-22",
       "display_name": "Influenza, Mdck, Quadrivalent, Preservative Free"
     },
     "_meta": {
@@ -1278,7 +1278,7 @@
           "resourceType": "Immunization",
           "id": "TSyQq6iO06FM1h2NAte6VhQB",
           "status": "completed",
-          "date": "2001-05-13",
+          "date": "2022-09-15",
           "vaccineCode": {
             "coding": [
               {
@@ -1307,7 +1307,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/Immunization/TSyQq6iO06FM1h2NAte6VhQB",
-      "date": "2001-05-13",
+      "date": "2022-09-15",
       "display_name": "Moderna Covid-19 Mrna Vaccine Im Injection"
     },
     "_meta": {
@@ -1332,7 +1332,7 @@
           "resourceType": "Immunization",
           "id": "TbBL5UuAfUES24r2QPFb-LgB",
           "status": "completed",
-          "date": "2009-02-15",
+          "date": "2021-07-12",
           "vaccineCode": {
             "coding": [
               {
@@ -1361,7 +1361,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/Immunization/TbBL5UuAfUES24r2QPFb-LgB",
-      "date": "2009-02-15",
+      "date": "2021-07-12",
       "display_name": "Tdap"
     },
     "_meta": {

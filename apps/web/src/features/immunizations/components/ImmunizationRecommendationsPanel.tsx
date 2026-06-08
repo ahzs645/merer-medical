@@ -1,15 +1,18 @@
 import { forecastCountries } from '@mere/immunization-forecast';
+import { useMemo } from 'react';
 
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { StylizedSelect } from '../../../shared/components/StylizedSelect';
+import { safeFormatDate } from '../../../shared/utils/dateFormatters';
 import { ImmunizationCountry, ImmunizationRecommendation } from '../types';
+import {
+  isActionable,
+  recommendationStatusOf,
+} from '../utils/recommendationStatus';
 
-const statusClasses: Record<ImmunizationRecommendation['status'], string> = {
-  overdue: 'bg-red-50 text-red-700 ring-red-200',
-  due: 'bg-amber-50 text-amber-700 ring-amber-200',
-  upcoming: 'bg-blue-50 text-blue-700 ring-blue-200',
-  complete: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
-  history: 'bg-gray-50 text-gray-700 ring-gray-200',
-};
+function formatDue(value: string | undefined, fallback: string) {
+  return safeFormatDate(value, 'MMM yyyy', fallback);
+}
 
 export function ImmunizationRecommendationsPanel({
   country,
@@ -22,91 +25,109 @@ export function ImmunizationRecommendationsPanel({
 }) {
   const { t } = useInterfaceLanguage();
 
+  const sorted = useMemo(
+    () =>
+      [...recommendations].sort(
+        (a, b) =>
+          recommendationStatusOf(a.status).order -
+          recommendationStatusOf(b.status).order,
+      ),
+    [recommendations],
+  );
+
+  const attention = sorted.filter((item) => isActionable(item.status)).length;
+
   return (
-    <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+    <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-base font-semibold text-gray-900">
             {t('Booster and schedule recommendations')}
           </h2>
-          <p className="text-sm text-gray-600">
-            {t('General timing checks based on the selected country schedule.')}
+          <p className="mt-0.5 text-sm text-gray-600">
+            {attention > 0
+              ? `${attention} ${t('item(s) need attention based on the selected schedule.')}`
+              : t('Everything looks up to date for the selected schedule.')}
           </p>
         </div>
-        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-          {t('Country')}
-          <select
+        <label className="flex flex-col gap-1 text-xs font-medium text-gray-600 sm:w-44">
+          {t('Country schedule')}
+          <StylizedSelect<ImmunizationCountry>
             value={country}
-            onChange={(event) =>
-              onCountryChange(event.target.value as ImmunizationCountry)
-            }
-            className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-          >
-            {forecastCountries.map((item) => (
-              <option key={item.code} value={item.code}>
-                {t(item.label)}
-              </option>
-            ))}
-          </select>
+            onChange={onCountryChange}
+            options={forecastCountries.map((item) => ({
+              value: item.code,
+              label: t(item.label),
+            }))}
+          />
         </label>
       </div>
 
-      <div className="mt-4 grid gap-3 lg:grid-cols-2">
-        {recommendations.map((recommendation) => (
-          <article
-            key={recommendation.rule.id}
-            className="rounded-md bg-gray-50 p-3 ring-1 ring-gray-200"
-          >
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {t(recommendation.rule.seriesLabel)}
-                </h3>
-                <p className="text-xs text-gray-600">
-                  {t(recommendation.rule.vaccineName)}
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {sorted.map((recommendation) => {
+          const meta = recommendationStatusOf(recommendation.status);
+          const StatusIcon = meta.icon;
+          return (
+            <article
+              key={recommendation.rule.id}
+              className={`flex flex-col rounded-lg border border-l-4 border-gray-200 bg-white p-3.5 ${meta.accent}`}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    {t(recommendation.rule.seriesLabel)}
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {t(recommendation.rule.vaccineName)}
+                  </p>
+                </div>
+                <span
+                  className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset ${meta.badge}`}
+                >
+                  <StatusIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                  {t(meta.label)}
+                </span>
+              </div>
+
+              <dl className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                <div className="rounded-md bg-gray-50 px-2 py-1.5">
+                  <dt className="font-medium text-gray-500">
+                    {t('Last dose')}
+                  </dt>
+                  <dd className="mt-0.5 font-medium text-gray-900">
+                    {safeFormatDate(
+                      recommendation.lastDoseDate,
+                      'MMM yyyy',
+                      t('None'),
+                    )}
+                  </dd>
+                </div>
+                <div className="rounded-md bg-gray-50 px-2 py-1.5">
+                  <dt className="font-medium text-gray-500">{t('Next due')}</dt>
+                  <dd className="mt-0.5 font-medium text-gray-900">
+                    {formatDue(recommendation.nextDueDate, t('Depends'))}
+                  </dd>
+                </div>
+                <div className="rounded-md bg-gray-50 px-2 py-1.5">
+                  <dt className="font-medium text-gray-500">{t('Doses')}</dt>
+                  <dd className="mt-0.5 font-medium text-gray-900">
+                    {recommendation.doseCount}
+                  </dd>
+                </div>
+              </dl>
+
+              <p className="mt-2.5 text-xs leading-5 text-gray-600">
+                {t(recommendation.reason)}
+              </p>
+              {recommendation.rule.recommendedAgeText && (
+                <p className="mt-1 text-xs leading-5 text-gray-400">
+                  {t('Recommended:')}{' '}
+                  {t(recommendation.rule.recommendedAgeText)}
                 </p>
-              </div>
-              <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ring-1 ${statusClasses[recommendation.status]}`}
-              >
-                {t(recommendation.status)}
-              </span>
-            </div>
-            <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
-              <div>
-                <dt className="font-medium text-gray-500">{t('Last dose')}</dt>
-                <dd className="text-gray-900">
-                  {recommendation.lastDoseDate?.split('T')[0] ||
-                    t('None found')}
-                </dd>
-              </div>
-              <div>
-                <dt className="font-medium text-gray-500">{t('Next due')}</dt>
-                <dd className="text-gray-900">
-                  {recommendation.nextDueDate || t('Depends')}
-                </dd>
-              </div>
-              <div>
-                <dt className="font-medium text-gray-500">{t('Doses')}</dt>
-                <dd className="text-gray-900">{recommendation.doseCount}</dd>
-              </div>
-              <div>
-                <dt className="font-medium text-gray-500">
-                  {t('Recommended')}
-                </dt>
-                <dd className="text-gray-900">
-                  {t(recommendation.rule.recommendedAgeText || 'Review')}
-                </dd>
-              </div>
-            </dl>
-            <p className="mt-2 text-xs leading-5 text-gray-600">
-              {t(recommendation.reason)}
-            </p>
-            <p className="mt-1 text-xs leading-5 text-gray-500">
-              {t(recommendation.rule.notes)}
-            </p>
-          </article>
-        ))}
+              )}
+            </article>
+          );
+        })}
       </div>
     </section>
   );

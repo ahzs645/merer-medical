@@ -31,22 +31,45 @@ export function ImmunizationsTab() {
     [records, country],
   );
 
+  const isLoading = status === 'loading';
+  const isEmpty = !isLoading && records.length === 0;
+
   return (
     <AppPage banner={<ImmunizationHeader recordCount={records.length} />}>
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          <ImmunizationSummaryPanel counts={counts} />
-          <ImmunizationRecommendationsPanel
-            country={country}
-            onCountryChange={setCountry}
-            recommendations={recommendations}
-          />
-          <ImmunizationByTypePanel records={records} />
-          <ImmunizationTimelinePanel records={records} />
-          {status === 'loading' && (
-            <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
+          {isLoading && (
+            <div className="rounded-xl bg-white p-8 text-center text-sm text-gray-500 shadow-sm ring-1 ring-gray-200">
               {t('Loading immunization records...')}
             </div>
+          )}
+
+          {!isLoading && (
+            <>
+              <ImmunizationSummaryPanel counts={counts} />
+              <ImmunizationRecommendationsPanel
+                country={country}
+                onCountryChange={setCountry}
+                recommendations={recommendations}
+              />
+              {isEmpty ? (
+                <div className="rounded-xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-200">
+                  <p className="text-sm font-medium text-gray-900">
+                    {t('No immunizations yet')}
+                  </p>
+                  <p className="mx-auto mt-1 max-w-sm text-sm text-gray-500">
+                    {t(
+                      'Immunizations will appear here once they are added manually or synced from a patient portal.',
+                    )}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+                  <ImmunizationByTypePanel records={records} />
+                  <ImmunizationTimelinePanel records={records} />
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

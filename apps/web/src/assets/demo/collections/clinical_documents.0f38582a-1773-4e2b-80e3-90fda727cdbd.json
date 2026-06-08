@@ -65,7 +65,7 @@
           "patient": {
             "reference": "Patient/1850092"
           },
-          "date": "2022-03-17T15:38:00-04:00",
+          "date": "2026-02-18",
           "site": {
             "text": "left deltoid",
             "coding": [
@@ -109,7 +109,7 @@
     },
     "metadata": {
       "id": "Immunization/912355",
-      "date": "2022-03-17T15:38:00-04:00",
+      "date": "2026-02-18",
       "display_name": "Tdap"
     },
     "_meta": {
@@ -130,7 +130,7 @@
           "patient": {
             "reference": "Patient/1850092"
           },
-          "date": "2022-03-30T15:48:00-04:00",
+          "date": "2025-11-05",
           "site": {
             "text": "left deltoid",
             "coding": [
@@ -174,7 +174,7 @@
     },
     "metadata": {
       "id": "Immunization/914691",
-      "date": "2022-03-30T15:48:00-04:00",
+      "date": "2025-11-05",
       "display_name": "Hep B, adult"
     },
     "_meta": {
@@ -195,7 +195,7 @@
           "patient": {
             "reference": "Patient/1850092"
           },
-          "date": "2022-04-28T09:30:00-04:00",
+          "date": "2025-12-10",
           "site": {
             "text": "left deltoid",
             "coding": [
@@ -239,7 +239,7 @@
     },
     "metadata": {
       "id": "Immunization/931523",
-      "date": "2022-04-28T09:30:00-04:00",
+      "date": "2025-12-10",
       "display_name": "Hep B, adult"
     },
     "_meta": {

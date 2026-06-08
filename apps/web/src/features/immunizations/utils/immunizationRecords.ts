@@ -34,9 +34,6 @@ export function buildImmunizationCounts(records: ImmunizationRecord[]) {
   return {
     total: records.length,
     vaccineTypes: new Set(records.map((record) => record.vaccineKey)).size,
-    covid: records.filter((record) => record.vaccineKey === 'covid-19').length,
-    influenza: records.filter((record) => record.vaccineKey === 'influenza')
-      .length,
     boostersTracked: records.filter((record) =>
       ['covid-19', 'influenza', 'tdap-td'].includes(record.vaccineKey),
     ).length,
