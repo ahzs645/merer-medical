@@ -3,8 +3,9 @@ import { useMemo, useState } from 'react';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { AppPage } from '../../shared/components/AppPage';
-import { ImmunizationCountry } from './types';
+import { ImmunizationCountry, ImmunizationRecord } from './types';
 import { ImmunizationByTypePanel } from './components/ImmunizationByTypePanel';
+import { ImmunizationDoseModal } from './components/ImmunizationDoseModal';
 import { ImmunizationHeader } from './components/ImmunizationHeader';
 import { ImmunizationRecommendationsPanel } from './components/ImmunizationRecommendationsPanel';
 import { ImmunizationSummaryPanel } from './components/ImmunizationSummaryPanel';
@@ -15,6 +16,9 @@ export function ImmunizationsTab() {
   const { t } = useInterfaceLanguage();
   const { records, counts, status } = useImmunizationData();
   const [country, setCountry] = useState<ImmunizationCountry>('CA');
+  const [selectedDose, setSelectedDose] = useState<ImmunizationRecord | null>(
+    null,
+  );
   const recommendations = useMemo(
     () =>
       forecastImmunizations({
@@ -65,7 +69,11 @@ export function ImmunizationsTab() {
                 </div>
               ) : (
                 <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
-                  <ImmunizationByTypePanel records={records} />
+                  <ImmunizationByTypePanel
+                    records={records}
+                    recommendations={recommendations}
+                    onSelectDose={setSelectedDose}
+                  />
                   <ImmunizationTimelinePanel records={records} />
                 </div>
               )}
@@ -73,6 +81,13 @@ export function ImmunizationsTab() {
           )}
         </div>
       </div>
+      <ImmunizationDoseModal
+        record={selectedDose ?? undefined}
+        records={records}
+        open={selectedDose !== null}
+        onClose={() => setSelectedDose(null)}
+        onSelectRecord={setSelectedDose}
+      />
     </AppPage>
   );
 }
