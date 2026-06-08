@@ -2,6 +2,7 @@ import { forecastImmunizations } from '@mere/immunization-forecast';
 import { useMemo, useState } from 'react';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
+import { useUser } from '../../app/providers/UserProvider';
 import { AppPage } from '../../shared/components/AppPage';
 import { ImmunizationCountry, ImmunizationRecord } from './types';
 import { ImmunizationByTypePanel } from './components/ImmunizationByTypePanel';
@@ -14,6 +15,7 @@ import { useImmunizationData } from './hooks/useImmunizationData';
 
 export function ImmunizationsTab() {
   const { t } = useInterfaceLanguage();
+  const user = useUser();
   const { records, counts, status } = useImmunizationData();
   const [country, setCountry] = useState<ImmunizationCountry>('CA');
   const [selectedDose, setSelectedDose] = useState<ImmunizationRecord | null>(
@@ -23,6 +25,7 @@ export function ImmunizationsTab() {
     () =>
       forecastImmunizations({
         country,
+        patient: user?.birthday ? { birthDate: user.birthday } : undefined,
         immunizations: records.map((record) => ({
           id: record.id,
           vaccineName: record.vaccineName,
@@ -32,7 +35,7 @@ export function ImmunizationsTab() {
           doseNumber: record.doseNumber,
         })),
       }).recommendations,
-    [records, country],
+    [records, country, user?.birthday],
   );
 
   const isLoading = status === 'loading';
