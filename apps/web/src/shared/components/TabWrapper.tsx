@@ -8,6 +8,7 @@ import {
   EllipsisHorizontalIcon,
   NewspaperIcon,
   PlusCircleIcon,
+  PlusIcon,
   QueueListIcon,
   ShareIcon,
   SparklesIcon,
@@ -58,11 +59,21 @@ export function TabWrapper() {
             title="Summary"
             icon={<QueueListIcon />}
           />
-          <TabButton
-            route={AppRoutes.Records}
-            title="Records"
-            icon={<DocumentIcon />}
-          />
+          <div className="flex items-center md:contents">
+            <TabButton
+              route={AppRoutes.Records}
+              title="Records"
+              icon={<DocumentIcon />}
+            />
+            <Link
+              to={AppRoutes.AddRecord}
+              aria-label="Add record"
+              title="Add record"
+              className="flex flex-col items-center justify-center self-center rounded-md p-2 text-slate-800 duration-75 active:scale-90 sm:active:scale-95 md:mr-1 md:bg-primary-700 md:p-2 md:text-white md:hover:bg-primary-600"
+            >
+              <PlusIcon className="h-6 w-6" />
+            </Link>
+          </div>
           <div className="hidden md:contents">
             <TabButton
               route={AppRoutes.Utilities}

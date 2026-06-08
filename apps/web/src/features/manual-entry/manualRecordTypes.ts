@@ -12,6 +12,7 @@ export type ManualRecordKind =
   | 'allergyintolerance'
   | 'encounter'
   | 'careplan'
+  | 'coverage'
   | 'document'
   | 'lab'
   | 'vital'
@@ -63,6 +64,7 @@ export const recordTypes: Array<{ value: ManualRecordKind; label: string }> = [
   { value: 'allergyintolerance', label: 'Allergy' },
   { value: 'encounter', label: 'Encounter' },
   { value: 'careplan', label: 'Care plan' },
+  { value: 'coverage', label: 'Insurance / coverage' },
   { value: 'document', label: 'Document / file' },
   { value: 'lab', label: 'Lab / result' },
   { value: 'vital', label: 'Vital sign' },

@@ -22,6 +22,8 @@ import { ModalHeader } from '../../shared/components/ModalHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { EmbeddedAttachmentViewer } from '../timeline/components/document-reference/EmbeddedAttachmentViewer';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { isManualRecord } from '../../shared/utils/manualRecordUtils';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { ProvenancePanel } from '../provenance/ProvenancePanel';
 import { getTimelineRecordElementId } from '../timeline/utils/timelineAnchors';
 
@@ -407,6 +409,11 @@ function DocumentItemCard({ item }: { item: DocumentItem }) {
           </div>
         )}
       </button>
+      {isManualRecord(item.document) && (
+        <div className="bg-white px-4 pb-3">
+          <ManualRecordActions item={item.document} />
+        </div>
+      )}
       <Modal open={expanded} setOpen={setExpanded}>
         <div className="flex flex-col">
           <ModalHeader

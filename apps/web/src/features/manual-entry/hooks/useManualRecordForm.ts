@@ -184,6 +184,18 @@ type MedicationFields = {
   route: string;
 };
 
+type CoverageFields = {
+  coverageMemberId: string;
+  coverageGroupNumber: string;
+  coveragePlanType: string;
+  coverageRelationship: string;
+  coverageStatus: 'active' | 'cancelled';
+  coveragePeriodStart: string;
+  coveragePeriodEnd: string;
+  coveragePhone: string;
+  coverageAddress: string;
+};
+
 type LabRowsFields = {
   labRows: LabResultRow[];
 };
@@ -282,30 +294,78 @@ const initialMedicationFields: MedicationFields = {
   route: '',
 };
 
+const initialCoverageFields: CoverageFields = {
+  coverageMemberId: '',
+  coverageGroupNumber: '',
+  coveragePlanType: '',
+  coverageRelationship: '',
+  coverageStatus: 'active',
+  coveragePeriodStart: '',
+  coveragePeriodEnd: '',
+  coveragePhone: '',
+  coverageAddress: '',
+};
+
 const createInitialLabRowsFields = (): LabRowsFields => ({
   labRows: [createLabRow()],
 });
 
-export function useManualRecordForm() {
+export type UseManualRecordFormOptions = {
+  // Edit an existing record without relying on a route param (e.g. in a modal).
+  recordId?: string;
+  // Presets that skip the guided type picker when opening the add form.
+  initialRecordType?: ManualRecordKind;
+  initialSpecialty?: ManualSpecialty;
+  initialDentalKind?: DentalEntryKind;
+  initialOptometryKind?: OptometryEntryKind;
+  initialTitle?: string;
+  // Called after a successful save/update instead of navigating to the timeline.
+  // Lets a host (modal/popup) close itself and refresh in place.
+  onComplete?: () => void;
+};
+
+export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
   const db = useRxDb();
   const user = useUser();
-  const { recordId } = useParams();
+  const params = useParams();
+  const recordId = options.recordId ?? params['recordId'];
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const localConfig = useLocalConfig();
   const notifyDispatch = useNotificationDispatch();
   const { t } = useInterfaceLanguage();
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
-  const requestedSpecialty =
+  const paramSpecialty =
     searchParams.get('specialty') === 'dental' ||
     searchParams.get('specialty') === 'optometry'
       ? (searchParams.get('specialty') as ManualSpecialty)
-      : 'general';
-  const requestedRecordType = recordTypes.some(
-    (entry) => entry.value === searchParams.get('type'),
-  )
-    ? (searchParams.get('type') as ManualRecordKind)
-    : undefined;
+      : undefined;
+  const requestedSpecialty: ManualSpecialty =
+    options.initialSpecialty ?? paramSpecialty ?? 'general';
+  const requestedRecordType =
+    options.initialRecordType ??
+    (recordTypes.some((entry) => entry.value === searchParams.get('type'))
+      ? (searchParams.get('type') as ManualRecordKind)
+      : undefined);
+  const requestedTitle =
+    options.initialTitle ?? searchParams.get('title') ?? '';
+  const requestedDental =
+    options.initialDentalKind ??
+    ((searchParams.get('dental') as DentalEntryKind | null) || undefined);
+  const requestedOptometry =
+    options.initialOptometryKind ??
+    ((searchParams.get('optometry') as OptometryEntryKind | null) || undefined);
+  // When the form is opened with a type/specialty preset (e.g. from a record
+  // tab's "Add" button or a modal), skip the guided type picker and go straight
+  // to the tailored form.
+  const hasTypePreset = !!(
+    requestedRecordType ||
+    requestedSpecialty !== 'general' ||
+    requestedDental ||
+    requestedOptometry
+  );
+  // Where to go after a successful save: the host's callback, else the timeline.
+  const complete = options.onComplete ?? (() => navigate(AppRoutes.Timeline));
   const createInitialGeneralFields = (): GeneralFields => ({
     specialty: requestedSpecialty,
     recordType: 'condition',
@@ -571,6 +631,39 @@ export function useManualRecordForm() {
   const setFrequency = (frequency: string) =>
     setMedicationFields({ frequency });
   const setRoute = (route: string) => setMedicationFields({ route });
+  const [coverageFields, setCoverageFields] = useReducer(
+    patchReducer<CoverageFields>,
+    initialCoverageFields,
+  );
+  const {
+    coverageMemberId,
+    coverageGroupNumber,
+    coveragePlanType,
+    coverageRelationship,
+    coverageStatus,
+    coveragePeriodStart,
+    coveragePeriodEnd,
+    coveragePhone,
+    coverageAddress,
+  } = coverageFields;
+  const setCoverageMemberId = (coverageMemberId: string) =>
+    setCoverageFields({ coverageMemberId });
+  const setCoverageGroupNumber = (coverageGroupNumber: string) =>
+    setCoverageFields({ coverageGroupNumber });
+  const setCoveragePlanType = (coveragePlanType: string) =>
+    setCoverageFields({ coveragePlanType });
+  const setCoverageRelationship = (coverageRelationship: string) =>
+    setCoverageFields({ coverageRelationship });
+  const setCoverageStatus = (coverageStatus: 'active' | 'cancelled') =>
+    setCoverageFields({ coverageStatus });
+  const setCoveragePeriodStart = (coveragePeriodStart: string) =>
+    setCoverageFields({ coveragePeriodStart });
+  const setCoveragePeriodEnd = (coveragePeriodEnd: string) =>
+    setCoverageFields({ coveragePeriodEnd });
+  const setCoveragePhone = (coveragePhone: string) =>
+    setCoverageFields({ coveragePhone });
+  const setCoverageAddress = (coverageAddress: string) =>
+    setCoverageFields({ coverageAddress });
   const [documentFileFields, setDocumentFileFields] = useReducer(
     patchReducer<DocumentFileFields>,
     initialDocumentFileFields,
@@ -613,6 +706,7 @@ export function useManualRecordForm() {
   const isObservationType = recordType === 'lab' || recordType === 'vital';
   const isDocumentType = recordType === 'document';
   const isMedicationType = recordType === 'medicationstatement';
+  const isCoverageType = recordType === 'coverage';
   const canLinkSourceFile = supportsClinicalDocumentAttachments();
   const completedLabRows = labRows.filter((row) => row.title.trim());
   const titleMissing =
@@ -632,6 +726,7 @@ export function useManualRecordForm() {
     });
     setObservationFields(initialObservationFields);
     setMedicationFields(initialMedicationFields);
+    setCoverageFields(initialCoverageFields);
     setDocumentFileFields(initialDocumentFileFields);
     setDentalFields(initialDentalFields);
     setOptometryFields(initialOptometryFields);
@@ -730,9 +825,6 @@ export function useManualRecordForm() {
   useEffect(() => {
     if (recordId) return;
     if (requestedSpecialty === 'dental') {
-      const requestedDental = searchParams.get(
-        'dental',
-      ) as DentalEntryKind | null;
       applyDentalEntryKind(
         requestedDental &&
           dentalEntryTypes.some((entry) => entry.value === requestedDental)
@@ -740,9 +832,6 @@ export function useManualRecordForm() {
           : 'cleaning',
       );
     } else if (requestedSpecialty === 'optometry') {
-      const requestedOptometry = searchParams.get(
-        'optometry',
-      ) as OptometryEntryKind | null;
       applyOptometryEntryKind(
         requestedOptometry &&
           optometryEntryTypes.some(
@@ -754,9 +843,8 @@ export function useManualRecordForm() {
     } else if (requestedRecordType) {
       setRecordType(requestedRecordType);
     }
-    const requestedTitle = searchParams.get('title');
     if (requestedTitle) setTitle(requestedTitle);
-    // Apply URL presets once on initial add form load.
+    // Apply presets once on initial add form load.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -894,6 +982,39 @@ export function useManualRecordForm() {
         setDose(medication.dose);
         setFrequency(medication.frequency);
         setRoute(medication.route);
+        if (doc.data_record.resource_type === 'coverage') {
+          const coverageResource = (
+            doc.data_record.raw as {
+              resource?: {
+                subscriberId?: string;
+                status?: string;
+                type?: { text?: string };
+                relationship?: { text?: string };
+                period?: { start?: string; end?: string };
+                class?: Array<{ type?: { text?: string }; value?: string }>;
+              };
+            }
+          ).resource;
+          const coverageClass = (name: string) =>
+            coverageResource?.class?.find(
+              (entry) => entry.type?.text?.toLowerCase() === name,
+            )?.value || '';
+          setCoverageMemberId(coverageResource?.subscriberId || '');
+          setCoveragePlanType(coverageResource?.type?.text || '');
+          setCoverageRelationship(coverageResource?.relationship?.text || '');
+          setCoverageStatus(
+            coverageResource?.status === 'cancelled' ? 'cancelled' : 'active',
+          );
+          setCoveragePeriodStart(
+            (coverageResource?.period?.start || '').slice(0, 10),
+          );
+          setCoveragePeriodEnd(
+            (coverageResource?.period?.end || '').slice(0, 10),
+          );
+          setCoverageGroupNumber(coverageClass('group'));
+          setCoveragePhone(coverageClass('phone'));
+          setCoverageAddress(coverageClass('address'));
+        }
         if (doc.data_record.resource_type === 'documentreference_attachment') {
           setFileName(doc.metadata?.display_name || '');
           setFileContentType(doc.data_record.content_type);
@@ -1065,6 +1186,17 @@ export function useManualRecordForm() {
                   absentReason,
                 },
                 medication: { dose, frequency, route },
+                coverage: {
+                  memberId: coverageMemberId,
+                  groupNumber: coverageGroupNumber,
+                  planType: coveragePlanType,
+                  relationship: coverageRelationship,
+                  status: coverageStatus,
+                  periodStart: coveragePeriodStart,
+                  periodEnd: coveragePeriodEnd,
+                  phone: coveragePhone,
+                  address: coverageAddress,
+                },
                 terminology: selectedTerminology,
                 loadedDocument,
               }),
@@ -1116,7 +1248,7 @@ export function useManualRecordForm() {
           : `${docs.length} record${docs.length === 1 ? '' : 's'} added`,
         variant: 'success',
       });
-      navigate(AppRoutes.Timeline);
+      complete();
     } catch (error) {
       console.error(error);
       notifyDispatch({
@@ -1191,6 +1323,7 @@ export function useManualRecordForm() {
     navigate,
     recordId,
     isEditing,
+    hasTypePreset,
     specialty,
     setSpecialty,
     recordType,
@@ -1349,6 +1482,24 @@ export function useManualRecordForm() {
     setFrequency,
     route,
     setRoute,
+    coverageMemberId,
+    setCoverageMemberId,
+    coverageGroupNumber,
+    setCoverageGroupNumber,
+    coveragePlanType,
+    setCoveragePlanType,
+    coverageRelationship,
+    setCoverageRelationship,
+    coverageStatus,
+    setCoverageStatus,
+    coveragePeriodStart,
+    setCoveragePeriodStart,
+    coveragePeriodEnd,
+    setCoveragePeriodEnd,
+    coveragePhone,
+    setCoveragePhone,
+    coverageAddress,
+    setCoverageAddress,
     fileName,
     setFileName,
     fileContentType,
@@ -1375,6 +1526,7 @@ export function useManualRecordForm() {
     isObservationType,
     isDocumentType,
     isMedicationType,
+    isCoverageType,
     canLinkSourceFile,
     completedLabRows,
     titleMissing,

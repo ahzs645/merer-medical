@@ -85,6 +85,7 @@ export function buildClinicalDocument({
   imagingDetails,
   observation,
   medication,
+  coverage,
   terminology,
   loadedDocument,
 }: {
@@ -115,6 +116,7 @@ export function buildClinicalDocument({
     frequency: string;
     route: string;
   };
+  coverage?: ManualCoverageInput;
   terminology?: TerminologyEntry;
   loadedDocument?: ClinicalDocument | null;
 }): ClinicalDocument {
@@ -134,6 +136,7 @@ export function buildClinicalDocument({
           medication,
           terminology,
           specialtyDetails,
+          coverage,
         );
 
   return {
@@ -142,7 +145,10 @@ export function buildClinicalDocument({
     user_id: userId,
     data_record: {
       raw,
-      format: recordType === 'careplan' ? 'FHIR.R4' : 'FHIR.DSTU2',
+      format:
+        recordType === 'careplan' || recordType === 'coverage'
+          ? 'FHIR.R4'
+          : 'FHIR.DSTU2',
       content_type:
         recordType === 'document'
           ? fileContentType || 'application/octet-stream'
@@ -179,6 +185,70 @@ export function buildClinicalDocument({
   };
 }
 
+export type ManualCoverageInput = {
+  memberId: string;
+  groupNumber: string;
+  planType: string;
+  relationship: string;
+  status: 'active' | 'cancelled';
+  periodStart: string;
+  periodEnd: string;
+  phone: string;
+  address: string;
+};
+
+function buildManualCoverageEntry(
+  id: string,
+  title: string,
+  notes: string,
+  coverage: ManualCoverageInput,
+) {
+  // Coverage class entries carry plan group, payer phone, and mailing address
+  // using the same text keys the Insurance tab reads back.
+  const classes = [
+    coverage.groupNumber.trim() && {
+      type: { text: 'group' },
+      value: coverage.groupNumber.trim(),
+    },
+    coverage.phone.trim() && {
+      type: { text: 'phone' },
+      value: coverage.phone.trim(),
+    },
+    coverage.address.trim() && {
+      type: { text: 'address' },
+      value: coverage.address.trim(),
+    },
+  ].filter(Boolean);
+  const start = coverage.periodStart.trim();
+  const end = coverage.periodEnd.trim();
+  return {
+    fullUrl: `manual:${id}`,
+    manual_kind: 'coverage',
+    manual_uncoded: true,
+    resource: {
+      resourceType: 'Coverage',
+      id,
+      status: coverage.status,
+      subscriberId: coverage.memberId.trim() || undefined,
+      type: coverage.planType.trim()
+        ? { text: coverage.planType.trim() }
+        : undefined,
+      relationship: coverage.relationship.trim()
+        ? { text: coverage.relationship.trim() }
+        : undefined,
+      payor: [{ display: title.trim() }],
+      period:
+        start || end
+          ? { start: start || undefined, end: end || undefined }
+          : undefined,
+      class: classes.length ? classes : undefined,
+      text: notes.trim()
+        ? { status: 'generated', div: notes.trim() }
+        : undefined,
+    },
+  };
+}
+
 function buildManualFhirEntry(
   id: string,
   recordType: ClinicalManualRecordKind,
@@ -203,7 +273,11 @@ function buildManualFhirEntry(
   },
   terminology?: TerminologyEntry,
   specialtyDetails?: ManualSpecialtyDetails,
+  coverage?: ManualCoverageInput,
 ) {
+  if (recordType === 'coverage' && coverage) {
+    return buildManualCoverageEntry(id, title, notes, coverage);
+  }
   const resourceType = toFhirResourceType(recordType);
   const observationData = observation ?? {
     valueKind: 'quantity' as ManualObservationValueKind,

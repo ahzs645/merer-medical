@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   BuildingOffice2Icon,
   IdentificationIcon,
   MagnifyingGlassIcon,
+  PlusIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { BundleEntry, Coverage } from 'fhir/r4';
@@ -16,6 +18,8 @@ import { AppPage } from '../../shared/components/AppPage';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { formatDisplayText } from '../../shared/utils/StyleUtils';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
+import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
 import { ProvenancePanel } from '../provenance/ProvenancePanel';
 
 type CoverageDocument = ClinicalDocument<BundleEntry<Coverage>>;
@@ -37,9 +41,11 @@ type InsuranceItem = {
 
 export function InsuranceTab() {
   const { t } = useInterfaceLanguage();
+  const navigate = useNavigate();
   const { items, status } = useInsuranceData();
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | undefined>();
+  const [addOpen, setAddOpen] = useState(false);
 
   const filteredItems = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -75,9 +81,16 @@ export function InsuranceTab() {
           activeCount={items.filter((item) => item.state === 'active').length}
           query={query}
           setQuery={setQuery}
+          onAdd={() => setAddOpen(true)}
         />
       }
     >
+      <ManualRecordModal
+        open={addOpen}
+        initialRecordType="coverage"
+        onClose={() => setAddOpen(false)}
+        onSaved={() => navigate(0)}
+      />
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.25fr)] lg:px-8">
           {status === 'loading' ? (
@@ -95,6 +108,14 @@ export function InsuranceTab() {
                   'Coverage records from C-CDA, FHIR, or imported packages will appear here.',
                 )}
               </p>
+              <button
+                type="button"
+                onClick={() => setAddOpen(true)}
+                className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-primary-700 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-800"
+              >
+                <PlusIcon className="h-4 w-4" />
+                {t('Add insurance')}
+              </button>
             </div>
           ) : (
             <>
@@ -122,11 +143,13 @@ function InsuranceHeader({
   activeCount,
   query,
   setQuery,
+  onAdd,
 }: {
   totalCount: number;
   activeCount: number;
   query: string;
   setQuery: (value: string) => void;
+  onAdd: () => void;
 }) {
   const { t } = useInterfaceLanguage();
 
@@ -149,15 +172,25 @@ function InsuranceHeader({
             </span>
           </div>
         </div>
-        <label className="relative w-full lg:w-96">
-          <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={t('Search payer, member ID, type, or address')}
-            className="w-full rounded-md border-0 bg-white py-2 pl-10 pr-3 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
-          />
-        </label>
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center lg:w-auto">
+          <label className="relative w-full lg:w-96">
+            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={t('Search payer, member ID, type, or address')}
+              className="w-full rounded-md border-0 bg-white py-2 pl-10 pr-3 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={onAdd}
+            className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-800 shadow-sm hover:bg-primary-50"
+          >
+            <PlusIcon className="h-4 w-4" />
+            {t('Add insurance')}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -229,6 +262,7 @@ function InsuranceDetails({ item }: { item: InsuranceItem }) {
           <Detail label="Address" value={item.address} wide />
           <Detail label="Source" value={item.connection?.name} wide />
         </dl>
+        <ManualRecordActions item={item.document} />
       </div>
 
       {item.sourceText && (

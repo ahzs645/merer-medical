@@ -12,13 +12,15 @@ import {
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { format, parseISO } from 'date-fns';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../Routes';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
+import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
 import { useMedicationsData } from './hooks/useMedicationsData';
 import { useMedicationInteractions } from './hooks/useMedicationInteractions';
 import {
@@ -56,6 +58,8 @@ const ADD_MEDICATION_PATH = `${AppRoutes.AddRecord}?type=medicationstatement`;
 export function MedicationsTab() {
   const [selectedFilter, setSelectedFilter] = useState<FilterChip['id']>('all');
   const [query, setQuery] = useState('');
+  const [addAllergyOpen, setAddAllergyOpen] = useState(false);
+  const navigate = useNavigate();
   const { t } = useInterfaceLanguage();
   const { allergies, filteredItems, items, status, supplementItems } =
     useMedicationsData({ query, selectedFilter });
@@ -86,17 +90,33 @@ export function MedicationsTab() {
                 supplements, adherence, and source history.
               </p>
             </div>
-            <Link
-              to={ADD_MEDICATION_PATH}
-              className="inline-flex w-fit items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-inset ring-primary-100 hover:bg-primary-50"
-            >
-              <PlusIcon className="h-5 w-5" />
-              {t('Add medication')}
-            </Link>
+            <div className="flex w-fit flex-wrap gap-2">
+              <Link
+                to={ADD_MEDICATION_PATH}
+                className="inline-flex w-fit items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-inset ring-primary-100 hover:bg-primary-50"
+              >
+                <PlusIcon className="h-5 w-5" />
+                {t('Add medication')}
+              </Link>
+              <button
+                type="button"
+                onClick={() => setAddAllergyOpen(true)}
+                className="inline-flex w-fit items-center gap-2 rounded-md bg-primary-700 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-primary-500 hover:bg-primary-600"
+              >
+                <PlusIcon className="h-5 w-5" />
+                {t('Add allergy')}
+              </button>
+            </div>
           </div>
         </div>
       }
     >
+      <ManualRecordModal
+        open={addAllergyOpen}
+        initialRecordType="allergyintolerance"
+        onClose={() => setAddAllergyOpen(false)}
+        onSaved={() => navigate(0)}
+      />
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'loading' ? (
@@ -543,6 +563,8 @@ function MedicationCard({ item }: { item: MedicationViewItem }) {
           <DetailPanel item={item} />
         </div>
       )}
+
+      <ManualRecordActions item={item.document} />
     </article>
   );
 }

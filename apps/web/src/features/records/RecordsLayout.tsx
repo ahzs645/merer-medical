@@ -2,10 +2,8 @@ import { NavLink, Outlet } from 'react-router-dom';
 
 import {
   BeakerIcon,
-  ChartBarIcon,
   ClipboardDocumentCheckIcon,
   DocumentTextIcon,
-  DocumentPlusIcon,
   EyeIcon,
   FaceSmileIcon,
   IdentificationIcon,
@@ -42,11 +40,9 @@ const recordTabs = [
     label: 'Care plans',
     icon: ClipboardDocumentCheckIcon,
   },
-  { to: AppRoutes.Trackers, label: 'Trackers', icon: ChartBarIcon },
   { to: AppRoutes.Problems, label: 'Problems', icon: ExclamationCircleIcon },
   { to: AppRoutes.Dental, label: 'Dental', icon: FaceSmileIcon },
   { to: AppRoutes.Optometry, label: 'Optometry', icon: EyeIcon },
-  { to: AppRoutes.AddRecord, label: 'Add record', icon: DocumentPlusIcon },
 ];
 
 export function RecordsLayout() {

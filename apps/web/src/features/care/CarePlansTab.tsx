@@ -21,6 +21,7 @@ import {
 import { AppPage } from '../../shared/components/AppPage';
 import { StylizedSelect } from '../../shared/components/StylizedSelect';
 import { formatDisplayText } from '../../shared/utils/StyleUtils';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 
 type CareResourceType = 'careplan' | 'goal' | 'servicerequest';
 
@@ -420,6 +421,7 @@ function CareResourceRow({ item }: { item: CareDocument }) {
             : resource.description.text}
         </p>
       )}
+      <ManualRecordActions item={item} />
     </article>
   );
 }

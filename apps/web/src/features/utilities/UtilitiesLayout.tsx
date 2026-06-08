@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import {
+  ChartBarIcon,
   ClockIcon,
   DocumentArrowDownIcon,
   ShareIcon,
@@ -12,6 +13,7 @@ const utilityTabs = [
   { to: AppRoutes.VisitPrep, label: 'Visit prep', icon: DocumentArrowDownIcon },
   { to: AppRoutes.Sharing, label: 'Sharing', icon: ShareIcon },
   { to: AppRoutes.AuditLog, label: 'Audit log', icon: ClockIcon },
+  { to: AppRoutes.Trackers, label: 'Trackers', icon: ChartBarIcon },
 ];
 
 export function UtilitiesLayout() {

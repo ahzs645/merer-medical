@@ -148,10 +148,6 @@ const routes = [
             element: <CarePlansTab />,
           },
           {
-            path: 'trackers',
-            element: <TrackersTab />,
-          },
-          {
             path: 'problems',
             element: <ProblemsTab />,
           },
@@ -218,6 +214,10 @@ const routes = [
           {
             path: 'audit-log',
             element: <AuditLogTab />,
+          },
+          {
+            path: 'trackers',
+            element: <TrackersTab />,
           },
         ],
       },

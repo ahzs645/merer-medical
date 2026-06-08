@@ -5,7 +5,9 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/outline';
 import { MouseEvent, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+import { ManualRecordModal } from './ManualRecordModal';
 
 import { useNotificationDispatch } from '../../app/providers/NotificationProvider';
 import { useRxDb } from '../../app/providers/RxDbProvider';
@@ -27,6 +29,7 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
   const navigate = useNavigate();
   const notifyDispatch = useNotificationDispatch();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [linkedFiles, setLinkedFiles] = useState<
     Array<{ id: string; filename?: string }>
   >([]);
@@ -141,17 +144,18 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
           </button>
         </span>
       ))}
-      <Link
-        to={AppRoutes.EditRecord.replace(
-          ':recordId',
-          encodeURIComponent(item.id),
-        )}
-        onClick={(event) => event.stopPropagation()}
+      <button
+        type="button"
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setIsEditOpen(true);
+        }}
         className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
       >
         <PencilSquareIcon className="h-4 w-4" />
         Edit
-      </Link>
+      </button>
       <button
         type="button"
         disabled={isDeleting}
@@ -161,6 +165,12 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
         <TrashIcon className="h-4 w-4" />
         {isDeleting ? 'Deleting' : 'Delete'}
       </button>
+      <ManualRecordModal
+        open={isEditOpen}
+        recordId={item.id}
+        onClose={() => setIsEditOpen(false)}
+        onSaved={() => navigate(0)}
+      />
     </div>
   );
 }

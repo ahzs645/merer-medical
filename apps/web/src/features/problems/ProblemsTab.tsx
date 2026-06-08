@@ -24,11 +24,13 @@ import { AppPage } from '../../shared/components/AppPage';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { getManualRecordNote } from '../../shared/utils/manualRecordUtils';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 
 type ProblemStatus = 'active' | 'resolved' | 'unknown';
 
 type ProblemItem = {
   id: string;
+  document: ClinicalDocument;
   name: string;
   status: ProblemStatus;
   clinicalStatus?: string;
@@ -385,6 +387,7 @@ function ProblemCard({ item }: { item: ProblemItem }) {
           {item.note}
         </p>
       )}
+      <ManualRecordActions item={item.document} />
     </article>
   );
 }
@@ -435,6 +438,7 @@ function toProblemItem(
 
   return {
     id: document.id,
+    document,
     name:
       document.metadata?.display_name ||
       firstText(resource['code']) ||
