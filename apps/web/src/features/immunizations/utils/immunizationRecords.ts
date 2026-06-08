@@ -3,6 +3,26 @@ import { inferVaccineGroup } from '@mere/immunization-forecast';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { ImmunizationRecord } from '../types';
 
+/**
+ * Only the fields we actually read off an Immunization resource. Sources mix
+ * FHIR DSTU2 and R4 (e.g. R4's `protocolApplied`), so a single FHIR type from
+ * the `fhir` package would not line up — this captures the read surface, with
+ * every field optional because portals populate them inconsistently.
+ */
+type ImmunizationResource = {
+  date?: string;
+  status?: string;
+  lotNumber?: string;
+  manufacturer?: { display?: string };
+  performer?: { display?: string };
+  vaccineCode?: {
+    text?: string;
+    coding?: Array<{ display?: string }>;
+  };
+  protocolApplied?: Array<{ doseNumberPositiveInt?: number }>;
+  note?: Array<{ text?: string }>;
+};
+
 export function mapImmunizationDocument(
   document: ClinicalDocument<unknown>,
 ): ImmunizationRecord {
@@ -50,6 +70,13 @@ function getVaccineName(document: ClinicalDocument<unknown>) {
   );
 }
 
-function getResource(document: ClinicalDocument<unknown>): any {
-  return (document.data_record as any)?.resource || document.data_record;
+function getResource(
+  document: ClinicalDocument<unknown>,
+): ImmunizationResource {
+  // Some sources nest the resource under `data_record.resource`; others store
+  // the resource as the `data_record` itself. Fall back to the latter.
+  const wrapper = document.data_record as unknown as {
+    resource?: ImmunizationResource;
+  } & ImmunizationResource;
+  return wrapper?.resource || wrapper;
 }
