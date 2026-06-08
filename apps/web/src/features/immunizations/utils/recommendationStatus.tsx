@@ -68,7 +68,9 @@ export const recommendationStatusMeta: Record<
 export function recommendationStatusOf(
   status: RecommendationStatus,
 ): RecommendationStatusMeta {
-  return recommendationStatusMeta[status] ?? recommendationStatusMeta.history;
+  return (
+    recommendationStatusMeta[status] ?? recommendationStatusMeta['history']
+  );
 }
 
 /** True for statuses the patient should act on (overdue / due). */

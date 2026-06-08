@@ -26,5 +26,5 @@ export const vaccineGroupLabels: Record<VaccineGroup, string> = {
 };
 
 export function vaccineGroupLabel(group: VaccineGroup): string {
-  return vaccineGroupLabels[group] ?? vaccineGroupLabels.unknown;
+  return vaccineGroupLabels[group] ?? vaccineGroupLabels['unknown'];
 }
