@@ -1,9 +1,13 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import {
+  ArrowDownTrayIcon,
   ChartBarIcon,
   ClockIcon,
   DocumentArrowDownIcon,
+  IdentificationIcon,
+  PresentationChartLineIcon,
   ShareIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
@@ -11,9 +15,21 @@ import { Routes as AppRoutes } from '../../Routes';
 
 const utilityTabs = [
   { to: AppRoutes.VisitPrep, label: 'Visit prep', icon: DocumentArrowDownIcon },
+  {
+    to: AppRoutes.HealthMaintenance,
+    label: 'Health maintenance',
+    icon: ShieldCheckIcon,
+  },
+  { to: AppRoutes.WalletCard, label: 'Wallet card', icon: IdentificationIcon },
+  {
+    to: AppRoutes.GrowthCharts,
+    label: 'Growth charts',
+    icon: PresentationChartLineIcon,
+  },
+  { to: AppRoutes.Trackers, label: 'Trackers', icon: ChartBarIcon },
+  { to: AppRoutes.RecordExport, label: 'Export', icon: ArrowDownTrayIcon },
   { to: AppRoutes.Sharing, label: 'Sharing', icon: ShareIcon },
   { to: AppRoutes.AuditLog, label: 'Audit log', icon: ClockIcon },
-  { to: AppRoutes.Trackers, label: 'Trackers', icon: ChartBarIcon },
 ];
 
 export function UtilitiesLayout() {

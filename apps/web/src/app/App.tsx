@@ -27,6 +27,15 @@ import { TabWrapper } from '../shared/components/TabWrapper';
 import { TutorialOverlay } from '../features/tutorial/TutorialOverlay';
 import { AuditLogTab } from '../features/audit/AuditLogTab';
 import { CarePlansTab } from '../features/care/CarePlansTab';
+import { ConditionsTab } from '../features/conditions/ConditionsTab';
+import { ConditionDetailTab } from '../features/conditions/ConditionDetailTab';
+import { GoalsTab } from '../features/goals/GoalsTab';
+import { GrowthChartsTab } from '../features/growth-charts/GrowthChartsTab';
+import { HealthMaintenanceTab } from '../features/health-maintenance/HealthMaintenanceTab';
+import { HistoriesTab } from '../features/histories/HistoriesTab';
+import { ProceduresTab } from '../features/procedures/ProceduresTab';
+import { RecordExportTab } from '../features/record-export/RecordExportTab';
+import { WalletCardTab } from '../features/wallet-card/WalletCardTab';
 import CernerRedirect from '../features/connections/oauth-callbacks/CernerRedirect';
 import ConnectionTab from '../features/connections/ConnectionTab';
 import EpicRedirect from '../features/connections/oauth-callbacks/EpicRedirect';
@@ -152,6 +161,14 @@ const routes = [
             element: <ProblemsTab />,
           },
           {
+            path: 'conditions',
+            element: <ConditionsTab />,
+          },
+          {
+            path: 'conditions/:conditionId',
+            element: <ConditionDetailTab />,
+          },
+          {
             path: 'dental',
             element: <DentalLayout />,
             children: [
@@ -186,6 +203,18 @@ const routes = [
             element: <OptometryTab />,
           },
           {
+            path: 'histories',
+            element: <HistoriesTab />,
+          },
+          {
+            path: 'goals',
+            element: <GoalsTab />,
+          },
+          {
+            path: 'procedures',
+            element: <ProceduresTab />,
+          },
+          {
             path: 'new',
             element: <ManualRecordTab />,
           },
@@ -218,6 +247,22 @@ const routes = [
           {
             path: 'trackers',
             element: <TrackersTab />,
+          },
+          {
+            path: 'health-maintenance',
+            element: <HealthMaintenanceTab />,
+          },
+          {
+            path: 'wallet-card',
+            element: <WalletCardTab />,
+          },
+          {
+            path: 'growth-charts',
+            element: <GrowthChartsTab />,
+          },
+          {
+            path: 'export',
+            element: <RecordExportTab />,
           },
         ],
       },

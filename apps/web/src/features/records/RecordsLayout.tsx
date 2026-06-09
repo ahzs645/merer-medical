@@ -6,11 +6,15 @@ import {
   DocumentTextIcon,
   EyeIcon,
   FaceSmileIcon,
+  FlagIcon,
   IdentificationIcon,
   ClipboardDocumentListIcon,
   ExclamationCircleIcon,
   PhotoIcon,
+  ScissorsIcon,
   ShieldCheckIcon,
+  Squares2X2Icon,
+  UsersIcon,
 } from '@heroicons/react/24/outline';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
@@ -41,6 +45,10 @@ const recordTabs = [
     icon: ClipboardDocumentCheckIcon,
   },
   { to: AppRoutes.Problems, label: 'Problems', icon: ExclamationCircleIcon },
+  { to: AppRoutes.Conditions, label: 'My Conditions', icon: Squares2X2Icon },
+  { to: AppRoutes.Procedures, label: 'Procedures', icon: ScissorsIcon },
+  { to: AppRoutes.Goals, label: 'Goals', icon: FlagIcon },
+  { to: AppRoutes.Histories, label: 'Histories', icon: UsersIcon },
   { to: AppRoutes.Dental, label: 'Dental', icon: FaceSmileIcon },
   { to: AppRoutes.Optometry, label: 'Optometry', icon: EyeIcon },
 ];
