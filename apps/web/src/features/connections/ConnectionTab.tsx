@@ -612,4 +612,7 @@ export interface SelectOption {
   baseUrl: string & Location;
   authUrl: string & Location;
   tokenUrl: string & Location;
+  // set on unified "Search All" results so the right login flow can be started
+  vendor?: EMRVendor;
+  fhirVersion?: 'DSTU2' | 'R4';
 }

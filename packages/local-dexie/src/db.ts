@@ -1,4 +1,5 @@
 import Dexie, { type Table } from 'dexie';
+import { migrations } from './migrations';
 import type {
   Attachment,
   ClinicalDocument,
@@ -301,6 +302,13 @@ export class MereDb extends Dexie {
         'id, packId, profile, domain, language, [profile+domain+language]',
       workflow_records: 'id, userId, kind, updatedAt, [userId+kind]',
     });
+
+    // data migrations (migrations.ts) run on top of the schema bumps above;
+    // db.version(N) returns the existing Version when N matches a stores()
+    // declaration, or creates a schema-preserving version when it doesn't
+    for (const [version, migrate] of Object.entries(migrations)) {
+      this.version(Number(version)).upgrade(migrate);
+    }
   }
 }
 

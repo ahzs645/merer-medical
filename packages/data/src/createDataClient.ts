@@ -1,19 +1,19 @@
 import type { AppDataClient } from './AppDataClient';
 
-export type DataClientMode = 'local' | 'convex';
+// 'convex' joins this union once the @mere/convex adapter exists
+// (see docs/architecture.md, Phase 2).
+export type DataClientMode = 'local';
 
 export interface CreateDataClientOptions {
   mode: DataClientMode;
-  /** Database name for the local adapter. Ignored for convex. */
+  /** Database name for the local adapter. */
   dbName?: string;
-  /** Convex deployment URL. Required when mode === 'convex'. */
-  convexUrl?: string;
 }
 
 /**
  * Factory that returns an AppDataClient. The adapter modules are imported
  * dynamically so that consumers that only ever use one mode don't bundle the
- * other. The convex adapter does not exist yet — `mode: 'convex'` throws.
+ * others.
  */
 export async function createDataClient(
   opts: CreateDataClientOptions,
@@ -24,10 +24,7 @@ export async function createDataClient(
     );
     return mod.createDexieDataClient({ dbName: opts.dbName ?? 'mere' });
   }
-  if (opts.mode === 'convex') {
-    throw new Error(
-      'Convex adapter is not implemented yet. Build it as @mere/convex implementing AppDataClient.',
-    );
-  }
-  throw new Error(`Unknown data client mode: ${opts.mode as string}`);
+  throw new Error(
+    `Unsupported data client mode: ${opts.mode as string}. Only 'local' is implemented.`,
+  );
 }

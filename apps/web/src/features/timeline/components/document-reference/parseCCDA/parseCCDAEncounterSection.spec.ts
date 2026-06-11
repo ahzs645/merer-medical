@@ -9,6 +9,34 @@ Object.defineProperty(global.self, 'crypto', {
 });
 
 describe('parseCCDAEncounterSection', () => {
+  it('resolves code display name from a reference outside the section text block', () => {
+    const parser = new DOMParser();
+    const xmlFileRaw = fs
+      .readFileSync(
+        path.join(
+          __dirname,
+          './exampleCCDA/example_encounter_code_reference_outside_text.xml',
+        ),
+      )
+      .toString();
+    const xmlDoc = parser.parseFromString(xmlFileRaw, 'text/xml');
+    const sections = xmlDoc.getElementsByTagName('section');
+
+    const results = parseCCDAEncounterSection(sections, [
+      '2.16.840.1.113883.10.20.22.2.22',
+      '2.16.840.1.113883.10.20.22.2.22.1',
+    ]);
+
+    expect(results).not.toBeNull();
+    // the encounter code has no displayName attribute and its narrative
+    // reference target is not inside the section's first <text> element,
+    // so the display name must resolve via the whole-section fallback
+    expect(results?.encounterCode?.codeId).toEqual('99213');
+    expect(results?.encounterCode?.codeDisplayName).toEqual(
+      'Office outpatient visit',
+    );
+  });
+
   it('parses encounter', () => {
     const parser = new DOMParser();
     const xmlFileRaw = fs

@@ -50,6 +50,70 @@ test('Medication interaction settings can load bundled DDInter data', async ({
   await expect(page).toHaveTitle(/Mere/);
 });
 
+test('Manual medication record can be created and shows up in the medications list', async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+
+  const medicationName = `E2E Lisinopril ${Date.now()}`;
+
+  await page.goto('https://localhost:4200/records/new?type=medicationstatement');
+
+  const skipTutorial = page.getByText('Skip Tutorial');
+  if (await skipTutorial.isVisible().catch(() => false)) {
+    await skipTutorial.click();
+  }
+
+  await page.locator('#manual-record-title').fill(medicationName);
+  await page.getByRole('button', { name: 'Save record' }).click();
+
+  // saving notifies and navigates back to the timeline
+  await expect(page.getByText('1 record added')).toBeVisible({
+    timeout: 15_000,
+  });
+
+  // the persisted record is readable from the medications list
+  await page.goto('https://localhost:4200/records/medications');
+  await expect(page.getByText(medicationName).first()).toBeVisible({
+    timeout: 15_000,
+  });
+});
+
+test('Add connection modal opens and unified search responds', async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+
+  await page.goto('https://localhost:4200/connections');
+
+  const skipTutorial = page.getByText('Skip Tutorial');
+  if (await skipTutorial.isVisible().catch(() => false)) {
+    await skipTutorial.click();
+  }
+
+  await page.getByText('Add a new connection').click();
+  await expect(
+    page.getByText('Which patient portal do you use?'),
+  ).toBeVisible();
+
+  await page.getByRole('button', { name: 'Select Search All' }).click();
+  await expect(
+    page.getByText('Select your healthcare institution to log in'),
+  ).toBeVisible();
+
+  await page.getByTitle('tenant-search-bar').fill('sandbox');
+
+  // with vendors configured the search returns options; without any
+  // configured client ids it reports no results — both prove the search
+  // round-trip works end to end
+  await expect(
+    page
+      .locator('[role="option"]')
+      .first()
+      .or(page.getByText('No results found')),
+  ).toBeVisible({ timeout: 15_000 });
+});
+
 // test('Epic add new connection flow works', async ({ page }) => {
 //   // Go to connections page
 

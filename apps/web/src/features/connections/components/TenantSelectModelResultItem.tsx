@@ -1,5 +1,6 @@
 import { Combobox } from '@headlessui/react';
 import { classNames } from '../../../shared/utils/StyleUtils';
+import type { EMRVendor, FhirVersion } from './TenantSelectModal';
 
 export function TenantSelectModelResultItem({
   id,
@@ -7,18 +8,24 @@ export function TenantSelectModelResultItem({
   baseUrl,
   tokenUrl,
   authUrl,
+  vendor,
+  fhirVersion,
+  vendorLabel,
 }: {
   id: string;
   name: string;
   baseUrl: string;
   tokenUrl: string;
   authUrl: string;
+  vendor?: EMRVendor;
+  fhirVersion?: FhirVersion;
+  vendorLabel?: string;
 }) {
   return (
     <Combobox.Option
       tabIndex={0}
       key={id}
-      value={{ id, name, baseUrl, tokenUrl, authUrl }}
+      value={{ id, name, baseUrl, tokenUrl, authUrl, vendor, fhirVersion }}
       className={({ active }) =>
         classNames(
           active ? 'bg-gray-100' : '',
@@ -36,6 +43,9 @@ export function TenantSelectModelResultItem({
           >
             {name}
           </p>
+          {vendorLabel && (
+            <p className="text-xs font-normal text-gray-500">{vendorLabel}</p>
+          )}
         </div>
       )}
     </Combobox.Option>

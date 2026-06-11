@@ -48,7 +48,8 @@ type VendorVersions = {
   veradigm: 'DSTU2';
   onpatient: 'DSTU2';
   va: 'DSTU2';
-  // TODO: 'any' only searches DSTU2 endpoints, excluding R4-only vendors like Healow
+  // 'any' hits the unified endpoint, which spans DSTU2 and R4 vendors;
+  // the DSTU2 key is only the default lookup key for getApiPath
   any: 'DSTU2';
 };
 
@@ -78,7 +79,7 @@ const vendorPaths: VendorPaths = {
     DSTU2: '/api/v1/va/tenants?',
   },
   any: {
-    DSTU2: '/api/v1/dstu2/tenants?',
+    DSTU2: '/api/v1/tenants?',
   },
 };
 
@@ -89,9 +90,29 @@ function getApiPath<V extends EMRVendor>(
   return vendorPaths[emrVendor][fhirVersion];
 }
 
+type UnifiedSearchVendor = 'EPIC' | 'CERNER' | 'VERADIGM' | 'HEALOW';
+
 export type UnifiedDSTU2Endpoint = CernerDSTU2Endpoint &
   EpicDSTU2Endpoint &
-  VeradigmDSTU2Endpoint & { vendor: EMRVendor };
+  VeradigmDSTU2Endpoint & {
+    // present on results from the unified /api/v1/tenants endpoint
+    vendor?: UnifiedSearchVendor;
+    version?: FhirVersion;
+  };
+
+const unifiedSearchVendors: Record<UnifiedSearchVendor, EMRVendor> = {
+  EPIC: 'epic',
+  CERNER: 'cerner',
+  VERADIGM: 'veradigm',
+  HEALOW: 'healow',
+};
+
+const unifiedSearchVendorLabels: Record<UnifiedSearchVendor, string> = {
+  EPIC: 'MyChart',
+  CERNER: 'Cerner',
+  VERADIGM: 'Allscripts',
+  HEALOW: 'Healow',
+};
 
 type TenantSelectState = {
   query: string;
@@ -384,16 +405,70 @@ export function TenantSelectModal({
         ((state.fhirVersion === 'R4' && epicR4SandboxOnly) ||
           (state.fhirVersion === 'DSTU2' && epicDstu2SandboxOnly));
 
-      const params: Record<string, string> = { query: state.query };
+      const isUnifiedVendorEnabled = (vendor: UnifiedSearchVendor): boolean => {
+        switch (vendor) {
+          case 'EPIC':
+            return epicR4Enabled || epicDstu2Enabled;
+          case 'CERNER':
+            return cernerEnabled;
+          case 'VERADIGM':
+            return veradigmEnabled;
+          case 'HEALOW':
+            return healowEnabled;
+        }
+      };
+
+      const isUnifiedResultEnabled = (item: UnifiedDSTU2Endpoint): boolean => {
+        // results without a vendor cannot be routed to a login flow
+        if (!item.vendor) return false;
+        if (item.vendor === 'EPIC') {
+          return item.version === 'DSTU2' ? epicDstu2Enabled : epicR4Enabled;
+        }
+        return isUnifiedVendorEnabled(item.vendor);
+      };
+
+      // The same org can appear under both DSTU2 and R4 in unified results;
+      // keep one entry, preferring the modern R4 connection
+      const dedupeUnifiedResults = (
+        items: UnifiedDSTU2Endpoint[],
+      ): UnifiedDSTU2Endpoint[] => {
+        const byVendorAndId = new Map<string, UnifiedDSTU2Endpoint>();
+        for (const item of items) {
+          const key = `${item.vendor}-${item.id}`;
+          const existing = byVendorAndId.get(key);
+          if (
+            !existing ||
+            (existing.version === 'DSTU2' && item.version === 'R4')
+          ) {
+            byVendorAndId.set(key, item);
+          }
+        }
+        return Array.from(byVendorAndId.values());
+      };
+
+      const params = new URLSearchParams({ query: state.query });
       if (epicSandboxOnly) {
-        params['sandboxOnly'] = 'true';
+        params.set('sandboxOnly', 'true');
+      }
+      if (state.emrVendor === 'any') {
+        (Object.keys(unifiedSearchVendors) as UnifiedSearchVendor[])
+          .filter(isUnifiedVendorEnabled)
+          .forEach((vendor) => params.append('vendor', vendor));
       }
 
-      fetch(config.PUBLIC_URL + apiPath + new URLSearchParams(params), {
+      fetch(config.PUBLIC_URL + apiPath + params, {
         signal: abortController.signal,
       })
         .then((x) => x.json())
-        .then((x) => dispatch({ type: 'setItems', payload: x }))
+        .then((x: UnifiedDSTU2Endpoint[]) =>
+          dispatch({
+            type: 'setItems',
+            payload:
+              state.emrVendor === 'any'
+                ? dedupeUnifiedResults(x.filter(isUnifiedResultEnabled))
+                : x,
+          }),
+        )
         .catch(() => {
           notifyDispatch({
             type: 'set_notification',
@@ -416,6 +491,11 @@ export function TenantSelectModal({
     config.PUBLIC_URL,
     epicR4SandboxOnly,
     epicDstu2SandboxOnly,
+    epicR4Enabled,
+    epicDstu2Enabled,
+    cernerEnabled,
+    veradigmEnabled,
+    healowEnabled,
   ]);
 
   return (
@@ -703,14 +783,24 @@ export function TenantSelectModal({
               <>
                 <Combobox
                   onChange={(s: SelectOption) => {
+                    const vendor = s.vendor ?? state.emrVendor;
+                    if (vendor === 'any') {
+                      notifyDispatch({
+                        type: 'set_notification',
+                        message:
+                          'Unable to determine which patient portal this health system uses',
+                        variant: 'error',
+                      });
+                      return;
+                    }
                     onClick(
                       s.baseUrl,
                       s.authUrl,
                       s.tokenUrl,
                       s.name,
                       s.id,
-                      state.emrVendor,
-                      state.fhirVersion,
+                      vendor,
+                      s.fhirVersion ?? state.fhirVersion,
                     );
                     setOpen(false);
                   }}
@@ -740,12 +830,23 @@ export function TenantSelectModal({
                     >
                       {state.items.map((item) => (
                         <MemoizedResultItem
-                          key={item.id}
+                          key={`${item.vendor ?? state.emrVendor}-${item.version ?? ''}-${item.id}`}
                           id={item.id}
                           name={item.name}
                           baseUrl={item.url}
                           tokenUrl={item.token}
                           authUrl={item.authorize}
+                          vendor={
+                            item.vendor
+                              ? unifiedSearchVendors[item.vendor]
+                              : undefined
+                          }
+                          fhirVersion={item.version}
+                          vendorLabel={
+                            state.emrVendor === 'any' && item.vendor
+                              ? unifiedSearchVendorLabels[item.vendor]
+                              : undefined
+                          }
                         />
                       ))}
                     </Combobox.Options>

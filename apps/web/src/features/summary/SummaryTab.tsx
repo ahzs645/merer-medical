@@ -31,6 +31,7 @@ import {
   SummaryPagePreferences,
   SummaryPagePreferencesCard,
 } from '../../models/summary-page-preferences/SummaryPagePreferences.type';
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import { Modal } from '../../shared/components/Modal';
 import { ModalHeader } from '../../shared/components/ModalHeader';
@@ -224,6 +225,7 @@ enum ActionTypes {
 
 type SummaryState = {
   status: ActionTypes;
+  error?: string;
   meds: ClinicalDocument<BundleEntry<MedicationStatement>>[];
   cond: ClinicalDocument<BundleEntry<Condition>>[];
   imm: ClinicalDocument<BundleEntry<Immunization>>[];
@@ -237,7 +239,7 @@ type SummaryState = {
 type SummaryActions =
   | { type: ActionTypes.IDLE }
   | { type: ActionTypes.PENDING }
-  | { type: ActionTypes.ERROR }
+  | { type: ActionTypes.ERROR; message: string }
   | {
       type: ActionTypes.COMPLETED;
       data: {
@@ -268,12 +270,14 @@ function summaryReducer(state: SummaryState, action: SummaryActions) {
       return {
         ...state,
         status: ActionTypes.PENDING,
+        error: undefined,
       };
     }
     case ActionTypes.ERROR: {
       return {
         ...state,
         status: ActionTypes.ERROR,
+        error: action.message,
       };
     }
     case ActionTypes.COMPLETED: {
@@ -443,7 +447,11 @@ function useSummaryData(): [SummaryState, React.Dispatch<SummaryActions>] {
           });
         })
         .catch((err) => {
-          reducer({ type: ActionTypes.ERROR });
+          console.error(err);
+          reducer({
+            type: ActionTypes.ERROR,
+            message: err instanceof Error ? err.message : String(err),
+          });
         });
     }
   }, [data.status, db, user.id]);
@@ -454,7 +462,18 @@ function useSummaryData(): [SummaryState, React.Dispatch<SummaryActions>] {
 function SummaryTab() {
   const { t } = useInterfaceLanguage();
   const [
-    { meds, cond, imm, careplan, allergy, pinned, cards, initialized },
+    {
+      meds,
+      cond,
+      imm,
+      careplan,
+      allergy,
+      pinned,
+      cards,
+      initialized,
+      status,
+      error,
+    },
     reducer,
   ] = useSummaryData();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -485,6 +504,27 @@ function SummaryTab() {
     },
     [reducer, sortedCards],
   );
+
+  if (status === ActionTypes.ERROR) {
+    return (
+      <AppPage banner={<GenericBanner text={t('Summary')} />}>
+        <div className="mx-auto max-w-4xl px-4 py-14 text-center lg:px-8">
+          <ExclamationCircleIcon className="mx-auto h-8 w-8 text-gray-700" />
+          <p className="mt-4 font-semibold text-gray-900">
+            {t('Unable to load your summary')}
+          </p>
+          {error && <p className="mt-2 text-sm text-gray-800">{error}</p>}
+          <button
+            type="button"
+            className="bg-primary hover:bg-primary-600 active:bg-primary-700 mt-6 rounded-lg px-6 py-3 font-bold text-white duration-75 active:scale-[98%]"
+            onClick={() => reducer({ type: ActionTypes.IDLE })}
+          >
+            {t('Try again')}
+          </button>
+        </div>
+      </AppPage>
+    );
+  }
 
   if (!initialized) {
     return (

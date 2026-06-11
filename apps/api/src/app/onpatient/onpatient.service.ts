@@ -37,12 +37,24 @@ export class OnPatientService {
   }
 
   storeTokens(tokens: OnPatientTokenResponse): string {
+    this.evictExpiredTokens();
     const sessionId = randomUUID();
     this.tokenCache.set(sessionId, {
       tokens,
       expires: Date.now() + 60_000,
     });
     return sessionId;
+  }
+
+  // entries are deleted on retrieval, but sessions that are never retrieved
+  // would otherwise accumulate forever
+  private evictExpiredTokens(): void {
+    const now = Date.now();
+    for (const [sessionId, entry] of this.tokenCache) {
+      if (entry.expires < now) {
+        this.tokenCache.delete(sessionId);
+      }
+    }
   }
 
   retrieveTokens(sessionId: string): OnPatientTokenResponse | null {

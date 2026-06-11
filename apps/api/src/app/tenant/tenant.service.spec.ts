@@ -75,6 +75,16 @@ describe('TenantService', () => {
       });
     });
 
+    it('should include Healow endpoints in R4 search', async () => {
+      const result = await service.queryR4Tenants('', ['HEALOW']);
+
+      expect(result.length).toBeGreaterThan(0);
+      result.forEach((tenant) => {
+        expect(tenant.vendor).toBe('HEALOW');
+        expect(tenant.version).toBe('R4');
+      });
+    });
+
     it('should filter by vendor for R4 endpoints', async () => {
       const result = await service.queryR4Tenants('', ['CERNER']);
 
@@ -106,6 +116,16 @@ describe('TenantService', () => {
 
       const versions = new Set(result.map((t) => t.version));
       expect(versions.size).toBeGreaterThan(0);
+    });
+
+    it('should include Healow endpoints in unified search', async () => {
+      const result = await service.queryAllTenants('', ['HEALOW']);
+
+      expect(result.length).toBeGreaterThan(0);
+      result.forEach((tenant) => {
+        expect(tenant.vendor).toBe('HEALOW');
+        expect(tenant.version).toBe('R4');
+      });
     });
 
     it('should combine DSTU2 and R4 results correctly', async () => {

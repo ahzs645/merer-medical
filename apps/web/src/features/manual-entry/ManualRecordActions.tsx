@@ -44,12 +44,19 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
       })
       .catch((error) => {
         console.error(error);
+        if (!cancelled) {
+          notifyDispatch({
+            type: 'set_notification',
+            message: `Unable to load linked files: ${(error as Error).message}`,
+            variant: 'error',
+          });
+        }
       });
 
     return () => {
       cancelled = true;
     };
-  }, [item.id]);
+  }, [item.id, notifyDispatch]);
 
   if (!isManualRecord(item)) return null;
 

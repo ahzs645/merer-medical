@@ -10,13 +10,41 @@ const ALLOWED_PROXY_HEADERS = ['accept', 'content-type', 'content-length'];
 @Injectable()
 export class ProxyService {
   private readonly logger = new Logger(ProxyService.name);
+  // endpoint lists hold thousands of entries, so lookups are precomputed:
+  // first occurrence wins within a vendor (matching the previous find()
+  // behavior), while servicesById keeps every occurrence so ambiguous
+  // vendorless lookups are still detected
+  private readonly servicesByVendor = new Map<string, Map<string, Service>>();
+  private readonly servicesById = new Map<
+    string,
+    (Service & { vendor: string })[]
+  >();
 
   constructor(
     @Inject(HTTP_PROXY) private proxy: server,
     @Inject(PROXY_MODULE_OPTIONS) private options: ProxyModuleOptions,
-  ) {}
+  ) {
+    for (const vendorServices of this.options.services || []) {
+      const isFirstGroupForVendor = !this.servicesByVendor.has(
+        vendorServices.vendor,
+      );
+      const byId = isFirstGroupForVendor
+        ? new Map<string, Service>()
+        : undefined;
+      for (const endpoint of vendorServices.endpoints) {
+        if (byId && !byId.has(endpoint.id)) {
+          byId.set(endpoint.id, endpoint);
+        }
+        const list = this.servicesById.get(endpoint.id) ?? [];
+        list.push({ vendor: vendorServices.vendor, ...endpoint });
+        this.servicesById.set(endpoint.id, list);
+      }
+      if (byId) {
+        this.servicesByVendor.set(vendorServices.vendor, byId);
+      }
+    }
+  }
 
-  // TODO: Convert endpoints arrays to Map<id, endpoint> for O(1) lookup instead of O(n) scan
   private findService(
     vendor: string | undefined,
     serviceId: string,
@@ -24,9 +52,7 @@ export class ProxyService {
     | { service: Service; error?: never }
     | { service?: never; error: { status: number; body: object } } {
     if (vendor) {
-      const vendorServices = this.options.services?.find(
-        (s) => s.vendor === vendor,
-      );
+      const vendorServices = this.servicesByVendor.get(vendor);
       if (!vendorServices) {
         return {
           error: {
@@ -35,7 +61,7 @@ export class ProxyService {
           },
         };
       }
-      const service = vendorServices.endpoints.find((e) => e.id === serviceId);
+      const service = vendorServices.get(serviceId);
       if (!service) {
         return {
           error: {
@@ -47,11 +73,7 @@ export class ProxyService {
       return { service };
     }
 
-    const matches = (this.options.services || []).flatMap((v) =>
-      v.endpoints
-        .filter((e) => e.id === serviceId)
-        .map((e) => ({ vendor: v.vendor, ...e })),
-    );
+    const matches = this.servicesById.get(serviceId) ?? [];
 
     if (matches.length === 0) {
       return {

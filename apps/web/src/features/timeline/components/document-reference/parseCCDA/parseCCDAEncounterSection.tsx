@@ -8,6 +8,22 @@ import {
 } from '../ShowDocumentReferenceAttachmentExpandable';
 import { getMatchingSections, parseDateString } from './parseCCDA';
 
+function getReferencedText(
+  referenceValue: string | null | undefined,
+  section?: Element,
+): string {
+  if (!section || !referenceValue) {
+    return '';
+  }
+  const selector = `[*|ID='${referenceValue.replace('#', '')}']`;
+  // narrative references usually resolve inside the section's <text> block,
+  // but some documents put the referenced element elsewhere in the section
+  const referencedElement =
+    section.getElementsByTagName('text')?.[0]?.querySelector(selector) ||
+    section.querySelector(selector);
+  return referencedElement?.textContent?.trim() || '';
+}
+
 function getCodeIdSystemAndDisplayName(component: Element, section?: Element) {
   let codeId =
     component?.getElementsByTagName('code')?.[0]?.getAttribute('code') || '';
@@ -15,16 +31,13 @@ function getCodeIdSystemAndDisplayName(component: Element, section?: Element) {
     component?.getElementsByTagName('code')[0].getAttribute('codeSystem') || '';
   let codeDisplayName: string =
     component?.getElementsByTagName('code')[0].getAttribute('displayName') ||
-    //TODO: if reference is not found, try to find the reference in the section
-    section
-      ?.getElementsByTagName('text')?.[0]
-      ?.querySelector(
-        `[*|ID='${component
-          ?.getElementsByTagName('code')?.[0]
-          ?.getElementsByTagName('reference')?.[0]
-          ?.getAttribute('value')
-          ?.replace('#', '')}']`,
-      )?.textContent ||
+    getReferencedText(
+      component
+        ?.getElementsByTagName('code')?.[0]
+        ?.getElementsByTagName('reference')?.[0]
+        ?.getAttribute('value'),
+      section,
+    ) ||
     component
       ?.getElementsByTagName('code')[0]
       ?.getElementsByTagName('originalText')?.[0]
@@ -284,15 +297,13 @@ function getValue(entry: Element, section: Element) {
       entry
         ?.getElementsByTagName('interpretationCode')?.[0]
         ?.getElementsByTagName('originalText')?.[0]?.innerHTML ||
-      section
-        ?.getElementsByTagName('text')?.[0]
-        ?.querySelector(
-          `[*|ID='${entry
-            ?.getElementsByTagName('value')?.[0]
-            ?.getElementsByTagName('reference')?.[0]
-            ?.getAttribute('value')
-            ?.replace('#', '')}']`,
-        )?.textContent ||
+      getReferencedText(
+        entry
+          ?.getElementsByTagName('value')?.[0]
+          ?.getElementsByTagName('reference')?.[0]
+          ?.getAttribute('value'),
+        section,
+      ) ||
       ''
     ).trim();
   }
