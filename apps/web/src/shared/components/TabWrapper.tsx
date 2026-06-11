@@ -59,7 +59,7 @@ export function TabWrapper() {
             title="Summary"
             icon={<QueueListIcon />}
           />
-          <div className="flex items-center md:contents">
+          <div className="flex items-center md:m-1 md:gap-1">
             <TabButton
               route={AppRoutes.Records}
               title="Records"
@@ -69,9 +69,9 @@ export function TabWrapper() {
               to={AppRoutes.AddRecord}
               aria-label="Add record"
               title="Add record"
-              className="flex flex-col items-center justify-center self-center rounded-md p-2 text-slate-800 duration-75 active:scale-90 sm:active:scale-95 md:mr-1 md:bg-primary-700 md:p-2 md:text-white md:hover:bg-primary-600"
+              className="flex flex-col items-center justify-center self-center rounded-md p-2 text-slate-800 duration-75 active:scale-90 sm:active:scale-95 md:inline-flex md:h-10 md:w-10 md:flex-row md:border md:border-primary-700 md:bg-primary-900/30 md:p-0 md:text-primary-100 md:hover:bg-primary-700"
             >
-              <PlusIcon className="h-6 w-6" />
+              <PlusIcon className="h-6 w-6 md:h-5 md:w-5" />
             </Link>
           </div>
           <div className="hidden md:contents">
