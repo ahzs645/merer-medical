@@ -70,6 +70,9 @@ export interface PerformRAGRequestParams {
   ollamaEndpoint?: string;
   ollamaModel?: string;
   ollamaRerankModel?: string;
+  openMedEnabled?: boolean;
+  openMedEndpoint?: string;
+  openMedDeidentifyCloudAi?: boolean;
   streamingMessageCallback?: (chunk: string) => void;
   onStatusUpdate?: (status: string) => void;
 }

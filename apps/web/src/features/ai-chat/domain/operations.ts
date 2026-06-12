@@ -20,6 +20,7 @@ export interface RAGContext {
   db: RxDatabase<DatabaseCollections>;
   vectorStorage: VectorStorage<DatabaseCollections>;
   aiProvider: AIProvider;
+  promptDeidentifier?: (text: string) => Promise<string>;
   options?: RAGOptions;
   onStatusUpdate?: (status: string) => void;
 }
@@ -124,12 +125,15 @@ export async function performRAG(context: RAGContext): Promise<RAGResult> {
   try {
     const { preparedDocs, searchConfidence } = await performRAGCommon(context);
 
+    const { query, preparedDocs: promptDocs } =
+      await maybeDeidentifyPromptInput(context, preparedDocs);
+
     onStatusUpdate?.('Generating response');
     console.log('[RAG Pipeline] Generating AI response');
     const response = await generateResponse(
-      context.query,
+      query,
       context.messages,
-      preparedDocs,
+      promptDocs,
       aiProvider,
     );
     console.log('[RAG Pipeline] AI response generation complete');
@@ -217,12 +221,15 @@ export async function performRAGWithStreaming(
   try {
     const { preparedDocs, searchConfidence } = await performRAGCommon(context);
 
+    const { query, preparedDocs: promptDocs } =
+      await maybeDeidentifyPromptInput(context, preparedDocs);
+
     onStatusUpdate?.('Generating response');
     console.log('[RAG Pipeline] Starting streaming AI response generation');
     const response = await generateStreamingResponse(
-      context.query,
+      query,
       context.messages,
-      preparedDocs,
+      promptDocs,
       aiProvider,
       onChunk,
     );
@@ -258,6 +265,45 @@ export async function performRAGWithStreaming(
         error instanceof Error ? error : new Error(String(error)),
       ),
     };
+  }
+}
+
+async function maybeDeidentifyPromptInput(
+  context: RAGContext,
+  preparedDocs: PreparedDocuments,
+): Promise<{ query: string; preparedDocs: PreparedDocuments }> {
+  if (!context.promptDeidentifier) {
+    return { query: context.query, preparedDocs };
+  }
+
+  const deidentify = context.promptDeidentifier;
+  context.onStatusUpdate?.('De-identifying context with OpenMed');
+
+  try {
+    const [query, texts] = await Promise.all([
+      deidentify(context.query),
+      Promise.all(
+        preparedDocs.texts.map(async (doc) => ({
+          ...doc,
+          text: await deidentify(doc.text),
+        })),
+      ),
+    ]);
+
+    return {
+      query,
+      preparedDocs: {
+        ...preparedDocs,
+        texts,
+      },
+    };
+  } catch (error) {
+    throw new RAGError(
+      'OpenMed de-identification failed. No medical record context was sent to the AI provider.',
+      'AI_PROVIDER',
+      true,
+      error instanceof Error ? error : new Error(String(error)),
+    );
   }
 }
 

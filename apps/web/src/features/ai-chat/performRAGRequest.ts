@@ -7,6 +7,7 @@ import { AI_DEFAULTS } from './constants/defaults';
 import { OpenAIProvider } from '../../services/ai/openai-provider';
 import { OllamaProvider } from '../../services/ai/ollama-provider';
 import { AIProvider } from '../../services/ai/types';
+import { OpenMedClient } from '../../services/openmed';
 
 import { PerformRAGRequestParams } from './types';
 
@@ -25,6 +26,24 @@ function createAIProvider(params: PerformRAGRequestParams): AIProvider {
   }
 }
 
+function createPromptDeidentifier(
+  params: PerformRAGRequestParams,
+): ((text: string) => Promise<string>) | undefined {
+  if (
+    params.aiProvider !== 'openai' ||
+    !params.openMedEnabled ||
+    !params.openMedDeidentifyCloudAi
+  ) {
+    return undefined;
+  }
+
+  const openMedClient = new OpenMedClient({
+    endpoint: params.openMedEndpoint || 'http://localhost:8000',
+  });
+
+  return (text: string) => openMedClient.deidentifyText(text);
+}
+
 export async function performRAGRequest(
   params: PerformRAGRequestParams,
 ): Promise<{ responseText: string; sourceDocs: any[] }> {
@@ -41,6 +60,7 @@ export async function performRAGRequest(
     db: params.db,
     vectorStorage: params.vectorStorage,
     aiProvider,
+    promptDeidentifier: createPromptDeidentifier(params),
     options: {
       maxDocuments: 20,
       includeRelated: true,

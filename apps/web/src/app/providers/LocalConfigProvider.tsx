@@ -33,6 +33,9 @@ interface LocalConfig {
   experimental__ollama_model?: string;
   experimental__ollama_embedding_model?: string;
   experimental__ollama_rerank_model?: string;
+  experimental__openmed_enabled?: boolean;
+  experimental__openmed_endpoint?: string;
+  experimental__openmed_deidentify_cloud_ai?: boolean;
   terminology_profile?: TerminologyProfile;
   terminology_lookup_mode?: TerminologyLookupMode;
   terminology_language?: TerminologyLanguage;
@@ -52,6 +55,9 @@ const defaultLocalConfig: LocalConfig = {
   experimental__ollama_model: AI_DEFAULTS.OLLAMA.MODEL,
   experimental__ollama_embedding_model: AI_DEFAULTS.OLLAMA.EMBEDDING_MODEL,
   experimental__ollama_rerank_model: AI_DEFAULTS.OLLAMA.RERANK_MODEL,
+  experimental__openmed_enabled: false,
+  experimental__openmed_endpoint: 'http://localhost:8000',
+  experimental__openmed_deidentify_cloud_ai: true,
   terminology_profile: DEFAULT_TERMINOLOGY_PROFILE,
   terminology_lookup_mode: DEFAULT_TERMINOLOGY_LOOKUP_MODE,
   terminology_language: DEFAULT_TERMINOLOGY_LANGUAGE,
