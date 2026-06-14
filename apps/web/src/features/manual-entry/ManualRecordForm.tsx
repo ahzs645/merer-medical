@@ -389,6 +389,7 @@ export function ManualRecordForm({
                 {!isDocumentType &&
                   recordType !== 'lab' &&
                   recordType !== 'careplan' &&
+                  recordType !== 'goal' &&
                   recordType !== 'coverage' &&
                   recordType !== 'device' &&
                   recordType !== 'document' &&
