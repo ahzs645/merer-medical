@@ -34,7 +34,7 @@ export function Modal({
           <div className="fixed inset-0 bg-gray-500 bg-opacity-50 transition-opacity" />
         </Transition.Child>
         {/* Modal */}
-        <div className="fixed inset-0 z-10 flex flex-col overflow-y-auto pt-12 sm:p-12">
+        <div className="fixed inset-0 z-10 flex flex-col overflow-y-auto pb-[calc(3rem+env(safe-area-inset-bottom))] pt-12 sm:p-12">
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
