@@ -11,6 +11,7 @@ import clinicalDocumentsOptometryDemo from './collections/clinical_documents.opt
 import clinicalDocumentsVitalsHistoryDemo from './collections/clinical_documents.vitals-history-demo.json';
 import connectionDocuments from './collections/connection_documents.json';
 import summaryPagePreferences from './collections/summary_page_preferences.json';
+import trackerWorkflowRecords from './collections/workflow_records.trackers-demo.json';
 import userDocuments from './collections/user_documents.json';
 import userPreferences from './collections/user_preferences.json';
 
@@ -29,6 +30,13 @@ const clinicalDocuments = {
   ],
 };
 
+const workflowRecords = {
+  name: 'workflow_records',
+  // schemaHash is normalized to the live schema at import time.
+  schemaHash: '',
+  docs: [...trackerWorkflowRecords],
+};
+
 const demoDump = {
   ...base,
   collections: [
@@ -37,6 +45,7 @@ const demoDump = {
     connectionDocuments,
     userDocuments,
     userPreferences,
+    workflowRecords,
   ],
 };
 

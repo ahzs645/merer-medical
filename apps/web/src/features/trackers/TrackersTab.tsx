@@ -21,26 +21,12 @@ import {
 import { formatDisplayText } from '../../shared/utils/StyleUtils';
 import { AppPage } from '../../shared/components/AppPage';
 import { StylizedSelect } from '../../shared/components/StylizedSelect';
-
-type TrackerKind = 'symptom' | 'vital' | 'mood' | 'sleep' | 'activity';
-
-type TrackerEntry = {
-  id: string;
-  kind: TrackerKind;
-  label: string;
-  value: string;
-  unit: string;
-  recordedAt: string;
-  note: string;
-};
-
-const TRACKER_KINDS: { kind: TrackerKind; label: string }[] = [
-  { kind: 'symptom', label: 'Symptom' },
-  { kind: 'vital', label: 'Vital' },
-  { kind: 'mood', label: 'Mood' },
-  { kind: 'sleep', label: 'Sleep' },
-  { kind: 'activity', label: 'Activity' },
-];
+import {
+  TRACKER_ENTRY_KIND,
+  TRACKER_KINDS,
+  type TrackerEntry,
+  type TrackerKind,
+} from './trackerTypes';
 
 function storageKey(userId: string) {
   return `mere-medical:tracker-entries:${userId}`;
@@ -66,7 +52,7 @@ export function TrackersTab() {
       const records = await listWorkflowRecords<TrackerEntry>(
         db,
         user.id,
-        'tracker-entry',
+        TRACKER_ENTRY_KIND,
       );
       if (records.length > 0) {
         if (isMounted) setEntries(records.map((record) => record.payload));
@@ -352,7 +338,7 @@ function saveTrackerEntryRecord(
   return upsertWorkflowRecord(db, {
     id: entry.id,
     user_id: userId,
-    kind: 'tracker-entry',
+    kind: TRACKER_ENTRY_KIND,
     payload: entry,
     created_at: entry.recordedAt,
   });

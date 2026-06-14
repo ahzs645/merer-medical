@@ -1,0 +1,146 @@
+[
+  {
+    "id": "tracker-demo-bp-1",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "kind": "tracker-entry",
+    "payload": {
+      "id": "tracker-demo-bp-1",
+      "kind": "vital",
+      "label": "Blood pressure",
+      "value": "122/78",
+      "unit": "mmHg",
+      "recordedAt": "2026-06-11T08:15:00.000Z",
+      "note": "Resting, before breakfast."
+    },
+    "created_at": "2026-06-11T08:15:00.000Z",
+    "updated_at": "2026-06-11T08:15:00.000Z",
+    "_meta": { "lwt": 1781165700000 },
+    "_deleted": false
+  },
+  {
+    "id": "tracker-demo-weight-1",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "kind": "tracker-entry",
+    "payload": {
+      "id": "tracker-demo-weight-1",
+      "kind": "vital",
+      "label": "Body weight",
+      "value": "72.4",
+      "unit": "kg",
+      "recordedAt": "2026-06-09T07:05:00.000Z",
+      "note": ""
+    },
+    "created_at": "2026-06-09T07:05:00.000Z",
+    "updated_at": "2026-06-09T07:05:00.000Z",
+    "_meta": { "lwt": 1780988700000 },
+    "_deleted": false
+  },
+  {
+    "id": "tracker-demo-mood-1",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "kind": "tracker-entry",
+    "payload": {
+      "id": "tracker-demo-mood-1",
+      "kind": "mood",
+      "label": "Mood",
+      "value": "Good",
+      "unit": "",
+      "recordedAt": "2026-06-08T20:30:00.000Z",
+      "note": "Felt energetic after a walk."
+    },
+    "created_at": "2026-06-08T20:30:00.000Z",
+    "updated_at": "2026-06-08T20:30:00.000Z",
+    "_meta": { "lwt": 1780950600000 },
+    "_deleted": false
+  },
+  {
+    "id": "tracker-demo-sleep-1",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "kind": "tracker-entry",
+    "payload": {
+      "id": "tracker-demo-sleep-1",
+      "kind": "sleep",
+      "label": "Sleep",
+      "value": "7.5",
+      "unit": "hrs",
+      "recordedAt": "2026-06-08T06:45:00.000Z",
+      "note": ""
+    },
+    "created_at": "2026-06-08T06:45:00.000Z",
+    "updated_at": "2026-06-08T06:45:00.000Z",
+    "_meta": { "lwt": 1780900500000 },
+    "_deleted": false
+  },
+  {
+    "id": "tracker-demo-symptom-1",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "kind": "tracker-entry",
+    "payload": {
+      "id": "tracker-demo-symptom-1",
+      "kind": "symptom",
+      "label": "Headache",
+      "value": "Mild",
+      "unit": "",
+      "recordedAt": "2026-06-05T14:20:00.000Z",
+      "note": "Resolved after water and rest."
+    },
+    "created_at": "2026-06-05T14:20:00.000Z",
+    "updated_at": "2026-06-05T14:20:00.000Z",
+    "_meta": { "lwt": 1780669200000 },
+    "_deleted": false
+  },
+  {
+    "id": "tracker-demo-activity-1",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "kind": "tracker-entry",
+    "payload": {
+      "id": "tracker-demo-activity-1",
+      "kind": "activity",
+      "label": "Steps",
+      "value": "8200",
+      "unit": "steps",
+      "recordedAt": "2026-06-04T22:00:00.000Z",
+      "note": ""
+    },
+    "created_at": "2026-06-04T22:00:00.000Z",
+    "updated_at": "2026-06-04T22:00:00.000Z",
+    "_meta": { "lwt": 1780639200000 },
+    "_deleted": false
+  },
+  {
+    "id": "tracker-demo-bp-2",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "kind": "tracker-entry",
+    "payload": {
+      "id": "tracker-demo-bp-2",
+      "kind": "vital",
+      "label": "Blood pressure",
+      "value": "128/82",
+      "unit": "mmHg",
+      "recordedAt": "2026-06-01T08:40:00.000Z",
+      "note": ""
+    },
+    "created_at": "2026-06-01T08:40:00.000Z",
+    "updated_at": "2026-06-01T08:40:00.000Z",
+    "_meta": { "lwt": 1780303200000 },
+    "_deleted": false
+  },
+  {
+    "id": "tracker-demo-mood-2",
+    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
+    "kind": "tracker-entry",
+    "payload": {
+      "id": "tracker-demo-mood-2",
+      "kind": "mood",
+      "label": "Mood",
+      "value": "Stressed",
+      "unit": "",
+      "recordedAt": "2026-05-28T19:10:00.000Z",
+      "note": "Busy week at work."
+    },
+    "created_at": "2026-05-28T19:10:00.000Z",
+    "updated_at": "2026-05-28T19:10:00.000Z",
+    "_meta": { "lwt": 1779995400000 },
+    "_deleted": false
+  }
+]

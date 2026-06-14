@@ -25,6 +25,7 @@ import { EmptyRecordsPlaceholder } from '../../shared/components/EmptyRecordsPla
 import { AppPage } from '../../shared/components/AppPage';
 import { useUser } from '../../app/providers/UserProvider';
 import { BookmarkedListCard } from './components/BookmarkedListCard';
+import { TrackersSummaryCard } from './components/TrackersSummaryCard';
 import React from 'react';
 // import { MereRecommendationsListCard } from '../features/ai-recommendations/components/MereRecommendationsListCard';
 import {
@@ -579,6 +580,7 @@ function SummaryTab() {
           pinnedCount={pinned.length}
         />
         <ResultsHubContent />
+        <TrackersSummaryCard />
         {sortedCards.map((card) => {
           if (!card.is_visible) return null;
           switch (card.type) {
