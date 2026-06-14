@@ -56,7 +56,7 @@ const defaultLocalConfig: LocalConfig = {
   experimental__ollama_embedding_model: AI_DEFAULTS.OLLAMA.EMBEDDING_MODEL,
   experimental__ollama_rerank_model: AI_DEFAULTS.OLLAMA.RERANK_MODEL,
   experimental__openmed_enabled: false,
-  experimental__openmed_endpoint: 'http://localhost:8000',
+  experimental__openmed_endpoint: 'http://localhost:8080',
   experimental__openmed_deidentify_cloud_ai: true,
   terminology_profile: DEFAULT_TERMINOLOGY_PROFILE,
   terminology_lookup_mode: DEFAULT_TERMINOLOGY_LOOKUP_MODE,

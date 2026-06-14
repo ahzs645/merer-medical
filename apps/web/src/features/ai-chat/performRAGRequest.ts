@@ -38,7 +38,7 @@ function createPromptDeidentifier(
   }
 
   const openMedClient = new OpenMedClient({
-    endpoint: params.openMedEndpoint || 'http://localhost:8000',
+    endpoint: params.openMedEndpoint || 'http://localhost:8080',
   });
 
   return (text: string) => openMedClient.deidentifyText(text);

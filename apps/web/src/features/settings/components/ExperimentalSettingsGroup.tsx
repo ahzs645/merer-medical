@@ -50,7 +50,7 @@ export function ExperimentalSettingsGroup() {
     experimental__ollama_rerank_model || '',
   );
   const [openMedEndpoint, setOpenMedEndpoint] = useState(
-    experimental__openmed_endpoint || 'http://localhost:8000',
+    experimental__openmed_endpoint || 'http://localhost:8080',
   );
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [isTestingOpenMedConnection, setIsTestingOpenMedConnection] =
@@ -437,7 +437,7 @@ export function ExperimentalSettingsGroup() {
                       <input
                         type="text"
                         className="bg-gray-50 rounded-md p-2 flex-1 border-none focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                        placeholder="http://localhost:8000"
+                        placeholder="http://localhost:8080"
                         value={openMedEndpoint}
                         onChange={(e) => setOpenMedEndpoint(e.target.value)}
                       />
