@@ -18,6 +18,8 @@ import {
 } from './enrichment/labGraphNormalization';
 import { ReferenceOverlayMode } from './enrichment/types';
 import { useLabsData } from './hooks/useLabsData';
+import { useConditionsData } from '../conditions/hooks/useConditionsData';
+import { RelatedConditionsCard } from './components/RelatedConditionsCard';
 import { groupLabs } from './utils/labGrouping';
 import {
   getLabGroupInsight,
@@ -28,6 +30,7 @@ import { StylizedSelect } from '../../shared/components/StylizedSelect';
 export function LabDetailTab() {
   const { labKey } = useParams<{ labKey: string }>(),
     { labs, reportsByObservationId, referenceContext, status } = useLabsData();
+  const { bundles: conditionBundles } = useConditionsData();
   const [enabledOverlayModes, setEnabledOverlayModes] = useState<
     ReferenceOverlayMode[]
   >(['canadian', 'original']);
@@ -39,6 +42,21 @@ export function LabDetailTab() {
     return groupedLabs.find((item) => item.key === decodedKey);
   }, [groupedLabs, labKey]);
   const latestLab = group?.labs[0];
+  const relatedConditions = useMemo(() => {
+    if (!group) return [];
+    const labIds = new Set(group.labs.map((lab) => lab.id));
+    return conditionBundles
+      .filter((bundle) =>
+        bundle.related.some(
+          (record) => record.kind === 'lab' && labIds.has(record.document.id),
+        ),
+      )
+      .map((bundle) => ({
+        id: bundle.id,
+        name: bundle.name,
+        status: bundle.status,
+      }));
+  }, [group, conditionBundles]);
   const labInsight = useMemo(
     () => (group ? getLabGroupInsight(group) : undefined),
     [group],
@@ -127,6 +145,7 @@ export function LabDetailTab() {
                   </div>
                 </div>
               </section>
+              <RelatedConditionsCard conditions={relatedConditions} />
               {labInsight ? (
                 <section className="grid gap-3 md:grid-cols-4">
                   <LabInsightCard

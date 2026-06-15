@@ -9,7 +9,9 @@ import {
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
+import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
+import { BannerAddLink } from '../../shared/components/BannerAddLink';
 import { GenericBanner } from '../../shared/components/GenericBanner';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
@@ -184,7 +186,16 @@ export function HistoriesTab() {
   const { data, status } = useHistoriesData();
 
   return (
-    <AppPage banner={<GenericBanner text="Histories" />}>
+    <AppPage
+      banner={
+        <GenericBanner
+          text="Histories"
+          action={
+            <BannerAddLink to={AppRoutes.AddRecord} label="Add history" />
+          }
+        />
+      }
+    >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-5xl gap-4 px-4 py-4 pb-24 sm:grid-cols-2 sm:px-6 lg:px-8">
           {SECTIONS.map((section) => (

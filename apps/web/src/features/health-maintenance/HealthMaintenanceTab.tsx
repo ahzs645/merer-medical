@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
-import { ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { PlusIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
+import { Routes as AppRoutes } from '../../Routes';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
 import { GenericBanner } from '../../shared/components/GenericBanner';
@@ -166,6 +168,34 @@ const STATUS_ORDER: ReminderStatus[] = [
   'complete',
 ];
 
+// Where the "Log record" action sends the user for a given rule: matching
+// vaccines, labs, or procedures so completing a reminder takes one tap.
+function addRecordTarget(rule: MaintenanceRule): string {
+  const type =
+    rule.category === 'Immunization' || rule.immunizationKeywords?.length
+      ? 'immunization'
+      : rule.labLoinc?.length
+        ? 'lab'
+        : 'procedure';
+  return `${AppRoutes.AddRecord}?type=${type}&title=${encodeURIComponent(
+    rule.title,
+  )}`;
+}
+
+function dismissedStorageKey(userId: string) {
+  return `mere-medical:hm-dismissed:${userId}`;
+}
+
+function readDismissed(userId: string): string[] {
+  try {
+    const raw = localStorage.getItem(dismissedStorageKey(userId));
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 const STATUS_META: Record<
   ReminderStatus,
   { label: string; badge: string; dot: string }
@@ -193,17 +223,52 @@ const STATUS_META: Record<
 };
 
 export function HealthMaintenanceTab() {
+  const user = useUser();
   const { reminders, status } = useReminders();
+  const [dismissed, setDismissed] = useState<string[]>([]);
+
+  useEffect(() => {
+    setDismissed(readDismissed(user.id));
+  }, [user.id]);
+
+  const persistDismissed = useCallback(
+    (next: string[]) => {
+      setDismissed(next);
+      try {
+        localStorage.setItem(
+          dismissedStorageKey(user.id),
+          JSON.stringify(next),
+        );
+      } catch {
+        // ignore storage failures (e.g. private mode)
+      }
+    },
+    [user.id],
+  );
+
+  const dismissReminder = useCallback(
+    (ruleId: string) => {
+      persistDismissed([...new Set([...dismissed, ruleId])]);
+    },
+    [dismissed, persistDismissed],
+  );
+
+  const visibleReminders = useMemo(
+    () => reminders.filter((reminder) => !dismissed.includes(reminder.rule.id)),
+    [reminders, dismissed],
+  );
 
   const grouped = useMemo(() => {
     const map = new Map<ReminderStatus, Reminder[]>();
-    reminders.forEach((reminder) => {
+    visibleReminders.forEach((reminder) => {
       const list = map.get(reminder.status) ?? [];
       list.push(reminder);
       map.set(reminder.status, list);
     });
     return map;
-  }, [reminders]);
+  }, [visibleReminders]);
+
+  const dismissedCount = reminders.length - visibleReminders.length;
 
   const actionCount =
     (grouped.get('overdue')?.length ?? 0) + (grouped.get('due')?.length ?? 0);
@@ -248,12 +313,29 @@ export function HealthMaintenanceTab() {
                         <ReminderCard
                           key={reminder.rule.id}
                           reminder={reminder}
+                          onDismiss={dismissReminder}
                         />
                       ))}
                     </div>
                   </section>
                 );
               })}
+
+              {dismissedCount > 0 && (
+                <div className="flex items-center justify-between rounded-md bg-white px-4 py-3 text-xs text-gray-500 shadow-sm ring-1 ring-gray-200">
+                  <span>
+                    {dismissedCount} item{dismissedCount === 1 ? '' : 's'}{' '}
+                    dismissed
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => persistDismissed([])}
+                    className="font-semibold text-primary-700 hover:text-primary-900"
+                  >
+                    Reset
+                  </button>
+                </div>
+              )}
 
               <p className="text-xs text-gray-400">
                 Simplified general-population guidance for demonstration —
@@ -267,8 +349,15 @@ export function HealthMaintenanceTab() {
   );
 }
 
-function ReminderCard({ reminder }: { reminder: Reminder }) {
+function ReminderCard({
+  reminder,
+  onDismiss,
+}: {
+  reminder: Reminder;
+  onDismiss: (ruleId: string) => void;
+}) {
   const meta = STATUS_META[reminder.status];
+  const actionable = reminder.status === 'overdue' || reminder.status === 'due';
   return (
     <article className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="flex items-start justify-between gap-3">
@@ -293,6 +382,24 @@ function ReminderCard({ reminder }: { reminder: Reminder }) {
         <ShieldCheckIcon className="h-4 w-4" />
         {reminder.summary}
       </p>
+      {actionable && (
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3">
+          <Link
+            to={addRecordTarget(reminder.rule)}
+            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-primary-700"
+          >
+            <PlusIcon className="h-4 w-4" />
+            Log record
+          </Link>
+          <button
+            type="button"
+            onClick={() => onDismiss(reminder.rule.id)}
+            className="rounded-md px-2.5 py-1.5 text-xs font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
     </article>
   );
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import {
   MagnifyingGlassIcon,
+  PlusIcon,
   Squares2X2Icon,
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
@@ -79,16 +80,25 @@ function ConditionsHeader({
   return (
     <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <Squares2X2Icon className="h-7 w-7" />
-            <h1 className="text-2xl font-bold sm:text-3xl">My Conditions</h1>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <Squares2X2Icon className="h-7 w-7" />
+              <h1 className="text-2xl font-bold sm:text-3xl">My Conditions</h1>
+            </div>
+            <p className="mt-1 text-sm text-primary-100">
+              {total} {total === 1 ? 'condition' : 'conditions'}, each with its
+              related medications, labs, care plans, goals and procedures pulled
+              together.
+            </p>
           </div>
-          <p className="mt-1 text-sm text-primary-100">
-            {total} {total === 1 ? 'condition' : 'conditions'}, each with its
-            related medications, labs, care plans, goals and procedures pulled
-            together.
-          </p>
+          <Link
+            to={`${AppRoutes.AddRecord}?type=condition`}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-white/15 px-3 py-2 text-sm font-semibold text-white ring-1 ring-inset ring-white/30 transition hover:bg-white/25"
+          >
+            <PlusIcon className="h-5 w-5" />
+            Add condition
+          </Link>
         </div>
         <label className="relative block rounded-md bg-white/10 p-1 ring-1 ring-white/20">
           <span className="sr-only">Search conditions</span>

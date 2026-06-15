@@ -372,6 +372,11 @@ function buildManualFhirEntry(
             ? [{ location: { display: notes.trim() } }]
             : undefined,
       title: recordType === 'careplan' ? title.trim() : undefined,
+      // Goal resources describe their target in `description` and track state
+      // in `lifecycleStatus`/`startDate` (read back by the Goals tab).
+      description: recordType === 'goal' ? { text: title.trim() } : undefined,
+      lifecycleStatus: recordType === 'goal' ? 'active' : undefined,
+      startDate: recordType === 'goal' ? date : undefined,
       valueQuantity: observationValue.valueQuantity,
       valueString: observationValue.valueString,
       valueCodeableConcept: observationValue.valueCodeableConcept,
@@ -525,6 +530,7 @@ function getClinicalResourceType(
   if (recordType === 'lab' || recordType === 'vital') return 'observation';
   if (recordType === 'document') return 'documentreference_attachment';
   if (recordType === 'visionprescription') return 'visionprescription';
+  if (recordType === 'goal') return 'goal';
   return recordType;
 }
 
@@ -538,6 +544,8 @@ function toFhirResourceType(recordType: ClinicalManualRecordKind) {
       return 'CarePlan';
     case 'visionprescription':
       return 'VisionPrescription';
+    case 'goal':
+      return 'Goal';
     case 'lab':
     case 'vital':
       return 'Observation';

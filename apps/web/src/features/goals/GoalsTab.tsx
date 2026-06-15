@@ -3,8 +3,10 @@ import { FlagIcon } from '@heroicons/react/24/outline';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
+import { Routes as AppRoutes } from '../../Routes';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
+import { BannerAddLink } from '../../shared/components/BannerAddLink';
 import { GenericBanner } from '../../shared/components/GenericBanner';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
@@ -75,7 +77,19 @@ export function GoalsTab() {
   const { items, status } = useGoals();
 
   return (
-    <AppPage banner={<GenericBanner text="Goals" />}>
+    <AppPage
+      banner={
+        <GenericBanner
+          text="Goals"
+          action={
+            <BannerAddLink
+              to={`${AppRoutes.AddRecord}?type=goal`}
+              label="Add goal"
+            />
+          }
+        />
+      }
+    >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-3xl gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'loading' ? (
