@@ -37,30 +37,44 @@ export function useOptometryData() {
   const db = useRxDb(),
     user = useUser(),
     [documents, setDocuments] = useState<ClinicalDocument<unknown>[]>([]),
-    [status, setStatus] = useState<'loading' | 'success'>('loading');
+    [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading'),
+    [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchOptometryDocuments() {
-      setStatus('loading');
+      try {
+        setStatus('loading');
+        setError(null);
 
-      const docs = await db.clinical_documents
-        .find({
-          selector: {
-            user_id: user.id,
-            'data_record.resource_type': { $in: [...OPTOMETRY_RESOURCE_TYPES] },
-          },
-          sort: [{ 'metadata.date': 'desc' }],
-        })
-        .exec();
+        const docs = await db.clinical_documents
+          .find({
+            selector: {
+              user_id: user.id,
+              'data_record.resource_type': {
+                $in: [...OPTOMETRY_RESOURCE_TYPES],
+              },
+            },
+            sort: [{ 'metadata.date': 'desc' }],
+          })
+          .exec();
 
-      if (!isMounted) return;
+        if (!isMounted) return;
 
-      setDocuments(
-        docs.map((doc) => doc.toMutableJSON() as ClinicalDocument<unknown>),
-      );
-      setStatus('success');
+        setDocuments(
+          docs.map((doc) => doc.toMutableJSON() as ClinicalDocument<unknown>),
+        );
+        setStatus('success');
+      } catch (err) {
+        if (!isMounted) return;
+        setError(
+          err instanceof Error
+            ? err
+            : new Error('Failed to load optometry records'),
+        );
+        setStatus('error');
+      }
     }
 
     fetchOptometryDocuments();
@@ -91,5 +105,5 @@ export function useOptometryData() {
     };
   }, [documents]);
 
-  return { ...optometryData, status };
+  return { ...optometryData, status, error };
 }

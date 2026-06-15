@@ -1,25 +1,27 @@
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { OptometryRecord } from '../types';
 
 const metricKinds = new Set(['refraction', 'visualAcuity', 'iop']);
 
 export function EyeMetricsPanel({ records }: { records: OptometryRecord[] }) {
+  const { t } = useInterfaceLanguage();
   const metrics = records.filter((record) => metricKinds.has(record.kind));
 
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <h2 className="text-base font-semibold text-gray-900">
-        Exam measurements
+        {t('Exam measurements')}
       </h2>
       {metrics.length > 0 ? (
         <div className="mt-3 overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead>
               <tr className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                <th className="py-2 pr-4">Date</th>
-                <th className="py-2 pr-4">Type</th>
-                <th className="py-2 pr-4">Eye</th>
-                <th className="py-2 pr-4">Title</th>
-                <th className="py-2">Values</th>
+                <th className="py-2 pr-4">{t('Date')}</th>
+                <th className="py-2 pr-4">{t('Type')}</th>
+                <th className="py-2 pr-4">{t('Eye')}</th>
+                <th className="py-2 pr-4">{t('Title')}</th>
+                <th className="py-2">{t('Values')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-gray-700">
@@ -45,8 +47,9 @@ export function EyeMetricsPanel({ records }: { records: OptometryRecord[] }) {
         </div>
       ) : (
         <p className="mt-3 text-sm leading-6 text-gray-600">
-          Visual acuity, IOP, refraction, OCT, visual field, and topography
-          metrics will appear here as eye-specific Observations.
+          {t(
+            'Visual acuity, IOP, refraction, OCT, visual field, and topography metrics will appear here as eye-specific Observations.',
+          )}
         </p>
       )}
     </section>

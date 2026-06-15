@@ -114,6 +114,21 @@ export const arabicTranslations: Record<string, string> = {
   'Imaging reports, X-rays, DICOM studies, photos, and scan files will appear here when they are synced or added.':
     'ستظهر هنا تقارير التصوير والأشعة السينية ودراسات DICOM والصور وملفات الفحص عند مزامنتها أو إضافتها.',
   'imaging or device reports': 'تقارير تصوير أو أجهزة',
+  '{count} eye-care records': '{count} سجل رعاية بصرية',
+  '{count} imaging or device reports': '{count} تقرير تصوير أو أجهزة',
+  'Exam measurements': 'قياسات الفحص',
+  Eye: 'العين',
+  Values: 'القيم',
+  Severity: 'الخطورة',
+  Code: 'الرمز',
+  Dentition: 'الإطباق',
+  'Visual acuity, IOP, refraction, OCT, visual field, and topography metrics will appear here as eye-specific Observations.':
+    'ستظهر هنا قياسات حدة الإبصار وضغط العين والانكسار وOCT والمجال البصري والتضاريس كملاحظات خاصة بالعين.',
+  'Showing {visible} of {total} records': 'عرض {visible} من {total} سجلات',
+  'Something went wrong while loading records.':
+    'حدث خطأ أثناء تحميل السجلات.',
+  'Unable to load optometry records.': 'تعذر تحميل سجلات البصريات.',
+  'Unable to load dental records.': 'تعذر تحميل سجلات الأسنان.',
   'imaging records': 'سجلات تصوير',
   'Inflammation & Immunity': 'الالتهاب والمناعة',
   'Inflammatory, autoimmune, infectious, and immune markers.':
@@ -479,6 +494,17 @@ export const arabicTranslations: Record<string, string> = {
   'Three.js is wired for STL/PLY/OBJ-style scan rendering. This demo preview uses a generated arch until uploaded scan files are stored.':
     'تم تجهيز Three.js لعرض مسوح STL/PLY/OBJ. تستخدم هذه المعاينة التجريبية قوسا مولدا حتى يتم تخزين ملفات المسح المرفوعة.',
   'Tooth chart': 'مخطط الأسنان',
+  Overview: 'نظرة عامة',
+  'Imaging & scans': 'التصوير والفحوصات',
+  'Exams & metrics': 'الفحوصات والقياسات',
+  'Surgery & procedures': 'الجراحة والإجراءات',
+  Permanent: 'دائمة',
+  Deciduous: 'لبنية',
+  Mixed: 'مختلطة',
+  'Records for tooth': 'سجلات السن',
+  'Selected tooth': 'السن المحدد',
+  'Select a tooth to view its records.': 'حدد سنا لعرض سجلاته.',
+  'No records for this tooth.': 'لا توجد سجلات لهذا السن.',
   Undated: 'بدون تاريخ',
   'Universal numbering with FDI labels, ready for surface-level findings.':
     'ترقيم عالمي مع تسميات FDI، جاهز لملاحظات أسطح الأسنان.',

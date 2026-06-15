@@ -96,6 +96,10 @@ export function mapOptometryDocument(
 
 export function filterEyeImaging(items: ImagingItem[]) {
   return items.filter((item) => {
+    // Trust the imaging mapper's specialty category (e.g. a manually tagged
+    // optometry image) even when its text lacks a hardcoded eye term.
+    if (item.categories.includes('optometry')) return true;
+
     const text = [
       item.title,
       item.summary,

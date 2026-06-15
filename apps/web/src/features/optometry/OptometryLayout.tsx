@@ -2,10 +2,10 @@ import { NavLink, Outlet } from 'react-router-dom';
 
 import {
   ChartPieIcon,
-  ClipboardDocumentCheckIcon,
+  ClipboardDocumentListIcon,
   DocumentTextIcon,
   PhotoIcon,
-  SparklesIcon,
+  ScissorsIcon,
   Squares2X2Icon,
 } from '@heroicons/react/24/outline';
 
@@ -13,36 +13,44 @@ import { AppPage } from '../../shared/components/AppPage';
 import { ErrorPanel, LoadingPanel } from '../../shared/components/StatusPanel';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { Routes as AppRoutes } from '../../Routes';
-import { DentalHeader } from './components/DentalHeader';
-import { useDentalData } from './hooks/useDentalData';
+import { OptometryHeader } from './components/OptometryHeader';
+import { useOptometryData } from './hooks/useOptometryData';
 
-const dentalTabs = [
-  { to: AppRoutes.Dental, label: 'Overview', icon: ChartPieIcon, end: true },
-  { to: AppRoutes.DentalChart, label: 'Chart & teeth', icon: Squares2X2Icon },
+const optometryTabs = [
+  { to: AppRoutes.Optometry, label: 'Overview', icon: ChartPieIcon, end: true },
   {
-    to: AppRoutes.DentalTreatment,
-    label: 'Treatment',
-    icon: ClipboardDocumentCheckIcon,
+    to: AppRoutes.OptometryPrescriptions,
+    label: 'Prescriptions',
+    icon: Squares2X2Icon,
   },
-  { to: AppRoutes.DentalHygiene, label: 'Hygiene & perio', icon: SparklesIcon },
-  { to: AppRoutes.DentalImaging, label: 'Imaging & scans', icon: PhotoIcon },
   {
-    to: AppRoutes.DentalRecords,
-    label: 'Records & claims',
+    to: AppRoutes.OptometryExams,
+    label: 'Exams & metrics',
+    icon: ClipboardDocumentListIcon,
+  },
+  {
+    to: AppRoutes.OptometrySurgery,
+    label: 'Surgery & procedures',
+    icon: ScissorsIcon,
+  },
+  { to: AppRoutes.OptometryImaging, label: 'Imaging & scans', icon: PhotoIcon },
+  {
+    to: AppRoutes.OptometryRecords,
+    label: 'Records',
     icon: DocumentTextIcon,
   },
 ];
 
-export function DentalLayout() {
+export function OptometryLayout() {
   const { t } = useInterfaceLanguage();
-  const dentalData = useDentalData();
+  const optometryData = useOptometryData();
 
   return (
     <AppPage
       banner={
-        <DentalHeader
-          recordCount={dentalData.records.length}
-          imageCount={dentalData.imaging.length}
+        <OptometryHeader
+          recordCount={optometryData.records.length}
+          imageCount={optometryData.imaging.length}
         />
       }
     >
@@ -50,9 +58,9 @@ export function DentalLayout() {
         <div className="border-b border-gray-200 bg-white px-2 sm:px-6 lg:px-8">
           <nav
             className="scrollbar-hide mx-auto flex max-w-7xl gap-1 overflow-x-auto py-2 sm:gap-2"
-            aria-label="Dental sections"
+            aria-label="Optometry sections"
           >
-            {dentalTabs.map(({ to, label, icon: Icon, end }) => (
+            {optometryTabs.map(({ to, label, icon: Icon, end }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -73,15 +81,15 @@ export function DentalLayout() {
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-            {dentalData.status === 'loading' ? (
-              <LoadingPanel text={t('Loading dental records...')} />
-            ) : dentalData.status === 'error' ? (
+            {optometryData.status === 'loading' ? (
+              <LoadingPanel text={t('Loading optometry records...')} />
+            ) : optometryData.status === 'error' ? (
               <ErrorPanel
-                error={dentalData.error}
-                text={t('Unable to load dental records.')}
+                error={optometryData.error}
+                text={t('Unable to load optometry records.')}
               />
             ) : (
-              <Outlet context={dentalData} />
+              <Outlet context={optometryData} />
             )}
           </div>
         </div>

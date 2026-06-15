@@ -14,6 +14,7 @@ export function DentalClaimsPanel({
         {t('Claims and EOBs')}
       </h2>
       {claims.length > 0 ? (
+        <>
         <div className="mt-3 grid gap-2">
           {claims.slice(0, 5).map((claim) => (
             <article key={claim.id} className="rounded-md bg-gray-50 p-3">
@@ -48,6 +49,14 @@ export function DentalClaimsPanel({
             </article>
           ))}
         </div>
+        {claims.length > 5 && (
+          <p className="mt-2 text-xs text-gray-500">
+            {t('Showing {visible} of {total} records')
+              .replace('{visible}', '5')
+              .replace('{total}', `${claims.length}`)}
+          </p>
+        )}
+        </>
       ) : (
         <p className="mt-3 text-sm leading-6 text-gray-600">
           {t(

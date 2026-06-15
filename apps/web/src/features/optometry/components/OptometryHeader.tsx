@@ -22,8 +22,12 @@ export function OptometryHeader({
             <h1 className="text-2xl font-semibold">{t('Optometry')}</h1>
           </div>
           <p className="mt-1 text-sm text-primary-100">
-            {recordCount} {t('eye-care records')} · {imageCount}{' '}
-            {t('imaging or device reports')}
+            {t('{count} eye-care records').replace('{count}', `${recordCount}`)}{' '}
+            ·{' '}
+            {t('{count} imaging or device reports').replace(
+              '{count}',
+              `${imageCount}`,
+            )}
           </p>
         </div>
         <Link
