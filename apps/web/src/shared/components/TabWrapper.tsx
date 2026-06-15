@@ -94,7 +94,7 @@ export function TabWrapper() {
           <div className="hidden md:contents">
             <TabButton
               route={AppRoutes.AddConnection}
-              title="Connections"
+              title="Sources"
               icon={<PlusCircleIcon />}
             />
           </div>
@@ -250,7 +250,7 @@ function MobileMoreButton({
                   )}
                   <MobileMoreLink
                     route={AppRoutes.AddConnection}
-                    title="Connections"
+                    title="Sources"
                     icon={<PlusCircleIcon />}
                     onClick={() => setOpen(false)}
                   />

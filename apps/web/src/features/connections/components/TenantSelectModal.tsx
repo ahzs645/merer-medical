@@ -134,12 +134,14 @@ type TenantSelectAction =
   | { type: 'hasClosedModal' }
   | { type: 'isLoadingResults'; payload: boolean };
 
+// Search-first default: the unified "Search All" flow is active immediately so
+// users land on a single search box rather than a grid of portal tiles.
 const defaultState = {
   query: '',
   items: [],
   emrVendor: 'any',
-  hasSelectedEmrVendor: false,
-  isLoadingResults: false,
+  hasSelectedEmrVendor: true,
+  isLoadingResults: true,
 } as TenantSelectState;
 
 type SourceItem = {
@@ -227,18 +229,15 @@ export function TenantSelectModal({
         case 'goBackToEMRVendorSelect':
           return defaultState;
         case 'hasClosedModal':
-          return { ...state, hasSelectedEmrVendor: false, query: '' };
+          // Reset back to the search-first "All portals" state.
+          return {
+            ...defaultState,
+          };
         default:
           return state;
       }
     },
-    {
-      query: '',
-      items: [],
-      emrVendor: 'any',
-      hasSelectedEmrVendor: false,
-      isLoadingResults: false,
-    },
+    defaultState,
   );
 
   const [vaUrl, setVaUrl] = useState<string & Location>(
@@ -369,20 +368,10 @@ export function TenantSelectModal({
     healowEnabled,
   ]);
 
-  const mainSources = useMemo(
-    () => ConnectionSources.filter((s) => s.fhirVersion !== 'DSTU2'),
-    [ConnectionSources],
-  );
-
-  const legacySources = useMemo(
-    () => ConnectionSources.filter((s) => s.fhirVersion === 'DSTU2'),
-    [ConnectionSources],
-  );
-
   useEffect(() => {
     const abortController = new AbortController();
 
-    if (state.hasSelectedEmrVendor) {
+    if (open && state.hasSelectedEmrVendor) {
       if (!config.PUBLIC_URL) {
         notifyDispatch({
           type: 'set_notification',
@@ -486,6 +475,7 @@ export function TenantSelectModal({
       abortController.abort();
     };
   }, [
+    open,
     state.emrVendor,
     state.query,
     notifyDispatch,
@@ -501,6 +491,107 @@ export function TenantSelectModal({
     healowEnabled,
   ]);
 
+  const portalChips: Array<{
+    label: string;
+    vendor: EMRVendor;
+    fhirVersion?: 'DSTU2' | 'R4';
+    enabled: boolean;
+  }> = [
+    {
+      label: 'All portals',
+      vendor: 'any',
+      fhirVersion: undefined,
+      enabled: true,
+    },
+    {
+      label: 'MyChart',
+      vendor: 'epic',
+      fhirVersion: 'R4',
+      enabled: epicR4Enabled,
+    },
+    {
+      label: 'Cerner',
+      vendor: 'cerner',
+      fhirVersion: 'R4',
+      enabled: cernerEnabled,
+    },
+    {
+      label: 'Healow',
+      vendor: 'healow',
+      fhirVersion: 'R4',
+      enabled: healowEnabled,
+    },
+    {
+      label: 'Allscripts',
+      vendor: 'veradigm',
+      fhirVersion: 'DSTU2',
+      enabled: veradigmEnabled,
+    },
+  ];
+
+  const legacyChips: Array<{
+    label: string;
+    vendor: EMRVendor;
+    fhirVersion?: 'DSTU2' | 'R4';
+    enabled: boolean;
+  }> = [
+    {
+      label: 'MyChart Legacy',
+      vendor: 'epic',
+      fhirVersion: 'DSTU2',
+      enabled: epicDstu2Enabled,
+    },
+    {
+      label: 'Cerner Legacy',
+      vendor: 'cerner',
+      fhirVersion: 'DSTU2',
+      enabled: cernerEnabled,
+    },
+  ];
+
+  const chipIsActive = (chip: {
+    vendor: EMRVendor;
+    fhirVersion?: 'DSTU2' | 'R4';
+  }) =>
+    state.emrVendor === chip.vendor &&
+    (chip.vendor === 'any' || state.fhirVersion === chip.fhirVersion);
+
+  const onpatientSource = ConnectionSources.find(
+    (s) => s.vendor === 'onpatient',
+  );
+  const vaSource = ConnectionSources.find((s) => s.vendor === 'va');
+
+  const selectChip = (chip: {
+    vendor: EMRVendor;
+    fhirVersion?: 'DSTU2' | 'R4';
+  }) =>
+    dispatch({
+      type: 'setEmrVendor',
+      payload: { vendor: chip.vendor, fhirVersion: chip.fhirVersion },
+    });
+
+  const chipClass = (active: boolean, enabled: boolean) =>
+    `whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+      !enabled
+        ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
+        : active
+          ? 'border-primary bg-primary text-white'
+          : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+    }`;
+
+  const launchHrefSource = (source?: SourceItem) => {
+    if (!source || !source.enabled || !source.href) return;
+    if (isDemoMode()) {
+      notifyDispatch({
+        type: 'set_notification',
+        message: 'Adding new connections is disabled in demo mode',
+        variant: 'error',
+      });
+      return;
+    }
+    window.location.href = source.href;
+  };
+
   return (
     <Modal
       open={open}
@@ -512,252 +603,72 @@ export function TenantSelectModal({
       flex
     >
       <>
-        {!state.hasSelectedEmrVendor ? (
+        {
           <>
             <ModalHeader
-              title={'Which patient portal do you use?'}
+              title={'Search for your hospital, clinic, or patient portal'}
               setClose={() => setOpen((x) => !x)}
             />
-            <div className="flex h-full max-h-full scroll-py-3 flex-col items-center overflow-y-scroll pt-8 sm:pt-0">
-              <ul
-                className="grid w-full grid-cols-2 gap-x-4 gap-y-8 px-4 py-8 sm:grid-cols-3 sm:gap-x-8 sm:px-4 sm:py-12" // lg:grid-cols-4 xl:gap-x-8"
-              >
-                {mainSources.map((file) => (
-                  <li key={file.source} className="relative">
-                    {file.href ? (
-                      <>
-                        <button
-                          type="button"
-                          className={
-                            file.enabled
-                              ? 'cursor-pointer text-left'
-                              : 'cursor-not-allowed text-left'
-                          }
-                          disabled={!file.enabled}
-                          onClick={() => {
-                            if (!file.enabled) return;
-                            if (isDemoMode()) {
-                              notifyDispatch({
-                                type: 'set_notification',
-                                message:
-                                  'Adding new connections is disabled in demo mode',
-                                variant: 'error',
-                              });
-                              return;
-                            }
-                            if (file.href) {
-                              window.location.href = file.href;
-                            }
-                          }}
+            <div className="px-4 pt-3">
+              <div className="flex flex-wrap items-center gap-2">
+                {portalChips
+                  .filter((chip) => chip.enabled || chip.vendor === 'any')
+                  .map((chip) => (
+                    <button
+                      key={chip.label}
+                      type="button"
+                      disabled={!chip.enabled}
+                      onClick={() => selectChip(chip)}
+                      className={chipClass(chipIsActive(chip), chip.enabled)}
+                    >
+                      {chip.label}
+                    </button>
+                  ))}
+              </div>
+              {legacyChips.some((chip) => chip.enabled) && (
+                <Disclosure as="div" className="mt-2">
+                  {({ open: legacyOpen }) => (
+                    <>
+                      <Disclosure.Button className="flex items-center gap-1 py-1 text-sm font-medium text-gray-500 hover:text-gray-700">
+                        <span>Show legacy connections</span>
+                        <svg
+                          className={`h-4 w-4 ${legacyOpen ? 'rotate-180' : ''}`}
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
                         >
-                          <div
-                            className={`aspect-h-7 aspect-w-10 focus-within:ring-primary-500 group block w-full overflow-hidden rounded-lg transition-all focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 ${
-                              file.enabled
-                                ? 'bg-primary-700 hover:bg-primary-600'
-                                : 'bg-gray-400'
-                            }`}
-                          >
-                            {file.source !== '' ? (
-                              <img
-                                src={file.source}
-                                alt={file.title}
-                                className={`pointer-events-none object-cover ${file.enabled ? 'group-hover:opacity-75' : 'opacity-50'}`}
-                              />
-                            ) : (
-                              <div className="text-primary-100 pointer-events-none flex items-center justify-center text-3xl font-bold">
-                                {file.title}
-                              </div>
-                            )}
-                            <span className="sr-only">{`Select ${file.title}`}</span>
-                          </div>
-                        </button>
-                        <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                          {file.title}
-                        </p>
-                        {!file.enabled ? (
-                          file.disabledMessage ? (
-                            <p className="block text-sm font-medium text-gray-500">
-                              {file.disabledMessage}
-                            </p>
-                          ) : (
-                            <p className="pointer-events-auto relative z-10 block text-sm font-medium text-gray-700">
-                              To enable, go to{' '}
-                              <Link
-                                className="text-primary hover:text-primary-500 w-full text-center underline"
-                                to={`${Routes.Settings}#use_proxy`}
-                                onClick={(e) => e.stopPropagation()}
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </Disclosure.Button>
+                      <Disclosure.Panel>
+                        <div className="flex flex-wrap items-center gap-2 pb-1">
+                          {legacyChips
+                            .filter((chip) => chip.enabled)
+                            .map((chip) => (
+                              <button
+                                key={chip.label}
+                                type="button"
+                                onClick={() => selectChip(chip)}
+                                className={chipClass(
+                                  chipIsActive(chip),
+                                  chip.enabled,
+                                )}
                               >
-                                the settings page
-                              </Link>{' '}
-                              and enable the <code>use proxy</code> setting.
-                            </p>
-                          )
-                        ) : (
-                          <>
-                            {file.alt && (
-                              <p className="pointer-events-none block text-sm font-medium text-gray-700">
-                                {file.alt}
-                              </p>
-                            )}
-                          </>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          className={`aspect-h-7 aspect-w-10 focus-within:ring-primary-500 group block w-full overflow-hidden rounded-lg transition-all focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 ${
-                            file.enabled
-                              ? 'bg-primary-700 hover:bg-primary-600 cursor-pointer'
-                              : 'bg-gray-400 cursor-not-allowed'
-                          }`}
-                          disabled={!file.enabled}
-                          onClick={() => {
-                            if (!file.enabled) return;
-                            if (isDemoMode()) {
-                              notifyDispatch({
-                                type: 'set_notification',
-                                message:
-                                  'Adding new connections is disabled in demo mode',
-                                variant: 'error',
-                              });
-                              return;
-                            }
-                            if (file.customHandleClick) {
-                              file.customHandleClick();
-                            } else {
-                              dispatch({
-                                type: 'setEmrVendor',
-                                payload: {
-                                  vendor: file.vendor,
-                                  fhirVersion: file.fhirVersion,
-                                },
-                              });
-                            }
-                          }}
-                        >
-                          {file.source !== '' ? (
-                            <img
-                              src={file.source}
-                              alt={file.title}
-                              className={`pointer-events-none object-cover ${file.enabled ? 'group-hover:opacity-75' : 'opacity-50'}`}
-                            />
-                          ) : (
-                            <div className="text-primary-100 pointer-events-none flex items-center justify-center text-3xl font-bold">
-                              {file.title}
-                            </div>
-                          )}
-                          <span className="sr-only">{`Select ${file.title}`}</span>
-                        </button>
-                        <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                          {file.title}
-                        </p>
-                        {!file.enabled && file.disabledMessage ? (
-                          <p className="block text-sm font-medium text-gray-500">
-                            {file.disabledMessage}
-                          </p>
-                        ) : (
-                          file.alt && (
-                            <p className="pointer-events-none block text-sm font-medium text-gray-700">
-                              {file.alt}
-                            </p>
-                          )
-                        )}
-                      </>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              <Disclosure as="div" className="w-full">
-                {({ open }) => (
-                  <>
-                    <Disclosure.Button className="flex w-full items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
-                      <span>Legacy Connections</span>
-                      <svg
-                        className={`h-4 w-4 ${open ? 'rotate-180' : ''}`}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </Disclosure.Button>
-                    <Disclosure.Panel>
-                      <ul className="grid w-full grid-cols-2 gap-x-4 gap-y-8 px-4 pb-8 sm:grid-cols-3 sm:gap-x-8 sm:px-4">
-                        {legacySources.map((file) => (
-                          <li key={file.source} className="relative">
-                            <button
-                              type="button"
-                              className={`aspect-h-7 aspect-w-10 focus-within:ring-primary-500 group block w-full overflow-hidden rounded-lg transition-all focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 ${
-                                file.enabled
-                                  ? 'bg-primary-700 hover:bg-primary-600 cursor-pointer'
-                                  : 'bg-gray-400 cursor-not-allowed'
-                              }`}
-                              disabled={!file.enabled}
-                              onClick={() => {
-                                if (!file.enabled) return;
-                                if (isDemoMode()) {
-                                  notifyDispatch({
-                                    type: 'set_notification',
-                                    message:
-                                      'Adding new connections is disabled in demo mode',
-                                    variant: 'error',
-                                  });
-                                  return;
-                                }
-                                dispatch({
-                                  type: 'setEmrVendor',
-                                  payload: {
-                                    vendor: file.vendor,
-                                    fhirVersion: file.fhirVersion,
-                                  },
-                                });
-                              }}
-                            >
-                              <img
-                                src={file.source}
-                                alt={file.title}
-                                className={`pointer-events-none object-cover ${file.enabled ? 'group-hover:opacity-75' : 'opacity-50'}`}
-                              />
-                              <span className="sr-only">{`Select ${file.title}`}</span>
-                            </button>
-                            <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
-                              {file.title}
-                            </p>
-                            {!file.enabled && file.disabledMessage ? (
-                              <p className="block text-sm font-medium text-gray-500">
-                                {file.disabledMessage}
-                              </p>
-                            ) : (
-                              file.alt && (
-                                <p className="pointer-events-none block text-sm font-medium text-gray-700">
-                                  {file.alt}
-                                </p>
-                              )
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </Disclosure.Panel>
-                  </>
-                )}
-              </Disclosure>
+                                {chip.label}
+                              </button>
+                            ))}
+                        </div>
+                      </Disclosure.Panel>
+                    </>
+                  )}
+                </Disclosure>
+              )}
             </div>
-          </>
-        ) : (
-          <>
-            <ModalHeader
-              title={`Select your healthcare institution to log in`}
-              setClose={() => setOpen((x) => !x)}
-              back={() => {
-                dispatch({ type: 'goBackToEMRVendorSelect' });
-              }}
-            />
             {state.isLoadingResults ? (
               <Combobox>
                 <Combobox.Options
@@ -868,8 +779,74 @@ export function TenantSelectModal({
                 </Combobox>
               </>
             )}
+            <div className="px-4 pb-6 pt-2">
+              {(onpatientSource?.enabled || vaSource?.enabled) && (
+                <div className="mt-2">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Other ways to connect
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {onpatientSource?.enabled && (
+                      <button
+                        type="button"
+                        onClick={() => launchHrefSource(onpatientSource)}
+                        className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      >
+                        OnPatient
+                      </button>
+                    )}
+                    {vaSource?.enabled && (
+                      <button
+                        type="button"
+                        onClick={() => launchHrefSource(vaSource)}
+                        className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      >
+                        Veterans Affairs
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+              <Disclosure as="div" className="mt-4">
+                {({ open: helpOpen }) => (
+                  <>
+                    <Disclosure.Button className="text-primary hover:text-primary-500 flex items-center gap-1 text-sm font-medium">
+                      <span>I can&apos;t find my provider</span>
+                      <svg
+                        className={`h-4 w-4 ${helpOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </Disclosure.Button>
+                    <Disclosure.Panel className="mt-2 text-sm text-gray-600">
+                      <p>
+                        Not every health system is supported, and some are only
+                        available on certain deployments. If you can&apos;t find
+                        yours, you can still add records manually or import a
+                        file.
+                      </p>
+                      <Link
+                        to={Routes.AddRecord}
+                        onClick={() => setOpen(false)}
+                        className="text-primary hover:text-primary-500 mt-1 inline-block underline"
+                      >
+                        Add records manually or import a file
+                      </Link>
+                    </Disclosure.Panel>
+                  </>
+                )}
+              </Disclosure>
+            </div>
           </>
-        )}
+        }
       </>
     </Modal>
   );

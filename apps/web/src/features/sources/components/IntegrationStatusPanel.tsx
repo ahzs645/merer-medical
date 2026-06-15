@@ -1,0 +1,166 @@
+import { Disclosure } from '@headlessui/react';
+import {
+  CheckCircleIcon,
+  ChevronDownIcon,
+  ExclamationTriangleIcon,
+  XCircleIcon,
+} from '@heroicons/react/24/outline';
+
+import { IntegrationStatus, VendorAvailability } from '../integrationStatus';
+
+type StatusTone = 'ok' | 'warn' | 'off';
+
+function StatusRow({
+  label,
+  tone,
+  detail,
+}: {
+  label: string;
+  tone: StatusTone;
+  detail?: string;
+}) {
+  const Icon =
+    tone === 'ok'
+      ? CheckCircleIcon
+      : tone === 'warn'
+        ? ExclamationTriangleIcon
+        : XCircleIcon;
+  const color =
+    tone === 'ok'
+      ? 'text-green-600'
+      : tone === 'warn'
+        ? 'text-amber-500'
+        : 'text-gray-400';
+
+  return (
+    <li className="flex items-start gap-3 py-2">
+      <Icon className={`mt-0.5 h-5 w-5 flex-shrink-0 ${color}`} />
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-gray-900">{label}</p>
+        {detail ? <p className="text-xs text-gray-500">{detail}</p> : null}
+      </div>
+    </li>
+  );
+}
+
+function vendorRow(vendor: VendorAvailability): {
+  label: string;
+  tone: StatusTone;
+  detail?: string;
+} {
+  if (!vendor.enabled) {
+    if (vendor.needsProxy) {
+      return {
+        label: vendor.label,
+        tone: 'warn',
+        detail: 'Configured, but requires the sync proxy to be enabled.',
+      };
+    }
+    return {
+      label: vendor.label,
+      tone: 'off',
+      detail: vendor.requiredEnv
+        ? `Not configured on this deployment (set ${vendor.requiredEnv}).`
+        : 'Not configured on this deployment.',
+    };
+  }
+  if (vendor.sandboxOnly) {
+    return {
+      label: vendor.label,
+      tone: 'warn',
+      detail: 'Sandbox/test access only — production credentials not set.',
+    };
+  }
+  if (vendor.confidentialMode !== undefined) {
+    return {
+      label: vendor.label,
+      tone: 'ok',
+      detail: vendor.confidentialMode
+        ? 'Available (confidential client mode).'
+        : 'Available (public client mode).',
+    };
+  }
+  return { label: vendor.label, tone: 'ok', detail: 'Available.' };
+}
+
+/**
+ * A user-friendly version of the integration/env-var status that previously
+ * only lived behind developer mode. Explains why a given portal tile may be
+ * disabled on this deployment before the user even tries to connect.
+ */
+export function IntegrationStatusPanel({
+  status,
+  defaultOpen = false,
+}: {
+  status: IntegrationStatus;
+  defaultOpen?: boolean;
+}) {
+  const vendors = [
+    status.epicR4,
+    status.epicDstu2,
+    status.cerner,
+    status.healow,
+    status.veradigm,
+    status.va,
+    status.onpatient,
+  ];
+
+  return (
+    <Disclosure defaultOpen={defaultOpen}>
+      {({ open }) => (
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+          <Disclosure.Button className="flex w-full items-center justify-between px-5 py-4 text-left">
+            <div>
+              <h3 className="text-base font-bold text-gray-900">
+                What can I connect on this deployment?
+              </h3>
+              <p className="mt-0.5 text-sm text-gray-500">
+                {status.publicUrlConfigured
+                  ? 'Check which patient portals are available before connecting.'
+                  : 'Portal sync is unavailable until a public URL is configured.'}
+              </p>
+            </div>
+            <ChevronDownIcon
+              className={`h-5 w-5 flex-shrink-0 text-gray-500 transition-transform ${
+                open ? 'rotate-180' : ''
+              }`}
+            />
+          </Disclosure.Button>
+          <Disclosure.Panel className="border-t border-gray-100 px-5 py-3">
+            <ul className="divide-y divide-gray-100">
+              <StatusRow
+                label="Public URL"
+                tone={status.publicUrlConfigured ? 'ok' : 'off'}
+                detail={
+                  status.publicUrlConfigured
+                    ? 'Configured — portals can redirect back to this app.'
+                    : 'Not set (PUBLIC_URL). Portal connections cannot complete.'
+                }
+              />
+              <StatusRow
+                label="Sync proxy"
+                tone={status.proxyEnabled ? 'warn' : 'ok'}
+                detail={
+                  status.proxyEnabled
+                    ? 'Enabled — the proxy can access your health data during sync.'
+                    : 'Disabled — connections talk directly to the health system.'
+                }
+              />
+              {vendors.map((vendor) => {
+                const row = vendorRow(vendor);
+                return (
+                  <StatusRow
+                    key={vendor.label}
+                    label={row.label}
+                    tone={row.tone}
+                    detail={row.detail}
+                  />
+                );
+              })}
+            </ul>
+          </Disclosure.Panel>
+        </div>
+      )}
+    </Disclosure>
+  );
+}
