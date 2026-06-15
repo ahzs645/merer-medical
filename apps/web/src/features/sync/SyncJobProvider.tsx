@@ -541,14 +541,14 @@ async function fetchMedicalRecords(
           config,
           connectionDocument,
           db,
-          useProxy,
+          true,
         );
         const syncJob = await Healow.syncAllRecords(
           config.PUBLIC_URL || '',
           baseUrl,
           connectionDocument.toMutableJSON() as unknown as HealowConnectionDocument,
           db,
-          useProxy,
+          true,
         );
         await updateConnectionDocumentTimestamps(
           syncJob,

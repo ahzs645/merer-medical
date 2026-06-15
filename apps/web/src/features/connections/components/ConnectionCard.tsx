@@ -259,7 +259,6 @@ export function ConnectionCard({
           ) : null}
         </div>
       </div>
-      {/* Add confirm modal before delete: Are you sure you want to remove this connection? */}
       <Modal
         open={showModal}
         setOpen={setShowModal}

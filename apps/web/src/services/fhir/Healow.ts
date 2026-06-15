@@ -605,6 +605,11 @@ export async function saveConnectionToDb({
             access_token: tokens.accessToken,
             expires_at: tokens.expiresAt,
             scope: tokens.scope,
+            location: healowBaseUrl,
+            name: healowName,
+            auth_uri: healowAuthUrl,
+            token_uri: healowTokenUrl,
+            tenant_id: healowId,
             last_sync_was_error: false,
           };
 
@@ -634,7 +639,7 @@ export async function saveConnectionToDb({
       } else {
         if (!tokens.idToken) {
           reject(
-            new Error('Connection document not found during token refresh'),
+            new Error('Error completing authentication: no ID token provided'),
           );
           return;
         }

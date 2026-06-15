@@ -24,6 +24,7 @@
 
 import * as DSTU2 from './DSTU2';
 import {
+  ConnectionDocument,
   CreateVeradigmConnectionDocument,
   VeradigmConnectionDocument,
 } from '../../models/connection-document/ConnectionDocument.type';
@@ -107,14 +108,19 @@ export async function saveConnectionToDb({
     user.id,
   );
   return new Promise((resolve, reject) => {
-    if (tokens.accessToken && user.id) {
+    if (tokens.accessToken && tokens.idToken && user.id) {
       if (doc) {
         updateConnection(db, user.id, doc.id, {
           access_token: tokens.accessToken,
           expires_at: tokens.expiresAt,
           id_token: tokens.idToken,
+          location: veradigmBaseUrl,
+          name,
+          auth_uri,
+          token_uri,
+          tenant_id: veradigmId,
           last_sync_was_error: false,
-        })
+        } as Partial<VeradigmConnectionDocument> as Partial<ConnectionDocument>)
           .then(() => {
             resolve(true);
           })
@@ -152,7 +158,9 @@ export async function saveConnectionToDb({
       }
     } else {
       reject(
-        new Error('Error completing authentication: no access token provided'),
+        new Error(
+          'Error completing authentication: no access token or ID token provided',
+        ),
       );
     }
   });

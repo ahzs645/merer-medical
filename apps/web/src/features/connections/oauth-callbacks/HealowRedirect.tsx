@@ -7,14 +7,12 @@ import { AppPage } from '../../../shared/components/AppPage';
 import { GenericBanner } from '../../../shared/components/GenericBanner';
 import { useUser } from '../../../app/providers/UserProvider';
 import { useAppConfig } from '../../../app/providers/AppConfigProvider';
-import { useUserPreferences } from '../../../app/providers/UserPreferencesProvider';
 import {
   HealowLocalStorageKeys,
   saveConnectionToDb,
 } from '../../../services/fhir/Healow';
 import { concatPath } from '../../../shared/utils/urlUtils';
 import {
-  createHealowClient,
   createHealowClientWithProxy,
   createHealowClientConfidential,
   buildHealowOAuthConfig,
@@ -40,14 +38,12 @@ function useHealowOAuthCallback() {
   const user = useUser();
   const db = useRxDb();
   const { config, isLoading } = useAppConfig();
-  const userPreferences = useUserPreferences();
   const notifyDispatch = useNotificationDispatch();
   const hasRun = useRef(false);
   const { search } = useLocation();
 
   const confidentialMode = config.HEALOW_CONFIDENTIAL_MODE || false;
   const publicUrl = config.PUBLIC_URL || '';
-  const useProxy = userPreferences?.use_proxy ?? false;
 
   const client = useMemo(() => {
     if (confidentialMode) {
@@ -56,11 +52,8 @@ function useHealowOAuthCallback() {
         refresh: concatPath(publicUrl, '/api/v1/healow/refresh'),
       });
     }
-    if (useProxy) {
-      return createHealowClientWithProxy(buildHealowProxyUrlBuilder(publicUrl));
-    }
-    return createHealowClient();
-  }, [confidentialMode, publicUrl, useProxy]);
+    return createHealowClientWithProxy(buildHealowProxyUrlBuilder(publicUrl));
+  }, [confidentialMode, publicUrl]);
 
   const { handleCallback, clearSession } = useOAuthFlow({
     client,
@@ -68,7 +61,7 @@ function useHealowOAuthCallback() {
   });
 
   useEffect(() => {
-    if (isLoading || userPreferences === undefined || hasRun.current) return;
+    if (isLoading || hasRun.current) return;
 
     const searchParams = new URLSearchParams(search);
     const errorMsg = searchParams.get('error');
@@ -191,7 +184,6 @@ function useHealowOAuthCallback() {
     isLoading,
     publicUrl,
     confidentialMode,
-    userPreferences,
     handleCallback,
     clearSession,
     navigate,

@@ -98,7 +98,7 @@ const VeradigmRedirect: React.FC = () => {
       publicUrl: config.PUBLIC_URL,
       redirectPath: Routes.VeradigmCallback,
       tenant: {
-        id: veradigmUrl,
+        id: veradigmId,
         name: veradigmName,
         authUrl: veradigmAuthUrl,
         tokenUrl: veradigmTokenUrl,

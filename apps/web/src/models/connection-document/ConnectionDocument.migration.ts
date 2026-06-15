@@ -25,4 +25,13 @@ export const ConnectionDocumentMigrations: MigrationStrategies = {
     delete (oldDoc as ConnectionDocument & { expires_in?: number }).expires_in;
     return oldDoc;
   },
+  5: function (oldDoc) {
+    if (
+      (oldDoc.source === 'epic' || oldDoc.source === 'cerner') &&
+      !oldDoc.fhir_version
+    ) {
+      oldDoc.fhir_version = 'DSTU2';
+    }
+    return oldDoc;
+  },
 };

@@ -3,7 +3,7 @@ export const connectionSchemaLiteral = {
   name: 'connection_documents',
   description:
     'Metadata used to describe a connection to an external health data provider server, usually FHIR server. Also contains OAuth metadata needed to fetch or refresh access tokens (if possible).',
-  version: 4,
+  version: 5,
   primaryKey: 'id',
   type: 'object',
   properties: {
@@ -49,6 +49,16 @@ export const connectionSchemaLiteral = {
     },
     source: {
       type: 'string',
+      enum: [
+        'epic',
+        'onpatient',
+        'cerner',
+        'veradigm',
+        'va',
+        'healow',
+        'freestyle_libre',
+        'manual',
+      ],
       description:
         'The source of the connection - epic, onpatient, cerner, etc.',
     },
@@ -89,6 +99,11 @@ export const connectionSchemaLiteral = {
     token_uri: {
       type: 'string',
       description: 'The OAuth token url',
+    },
+    fhir_version: {
+      type: 'string',
+      enum: ['DSTU2', 'R4'],
+      description: 'FHIR API version used by this connection',
     },
     id_token: {
       type: 'string',

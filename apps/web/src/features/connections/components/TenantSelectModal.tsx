@@ -469,7 +469,10 @@ export function TenantSelectModal({
                 : x,
           }),
         )
-        .catch(() => {
+        .catch((error) => {
+          if (error instanceof DOMException && error.name === 'AbortError') {
+            return;
+          }
           notifyDispatch({
             type: 'set_notification',
             message: `Unable to search for health systems`,
@@ -522,51 +525,52 @@ export function TenantSelectModal({
                 {mainSources.map((file) => (
                   <li key={file.source} className="relative">
                     {file.href ? (
-                      <div
-                        className={
-                          file.enabled ? 'cursor-pointer' : 'cursor-not-allowed'
-                        }
-                        onClick={() => {
-                          if (!file.enabled) return;
-                          if (isDemoMode()) {
-                            notifyDispatch({
-                              type: 'set_notification',
-                              message:
-                                'Adding new connections is disabled in demo mode',
-                              variant: 'error',
-                            });
-                            return;
-                          }
-                          if (file.href) {
-                            window.location.href = file.href;
-                          }
-                        }}
-                      >
-                        <div
-                          className={`aspect-h-7 aspect-w-10 focus-within:ring-primary-500 group block w-full overflow-hidden rounded-lg transition-all focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 ${
+                      <>
+                        <button
+                          type="button"
+                          className={
                             file.enabled
-                              ? 'bg-primary-700 hover:bg-primary-600'
-                              : 'bg-gray-400'
-                          }`}
+                              ? 'cursor-pointer text-left'
+                              : 'cursor-not-allowed text-left'
+                          }
+                          disabled={!file.enabled}
+                          onClick={() => {
+                            if (!file.enabled) return;
+                            if (isDemoMode()) {
+                              notifyDispatch({
+                                type: 'set_notification',
+                                message:
+                                  'Adding new connections is disabled in demo mode',
+                                variant: 'error',
+                              });
+                              return;
+                            }
+                            if (file.href) {
+                              window.location.href = file.href;
+                            }
+                          }}
                         >
-                          {file.source !== '' ? (
-                            <img
-                              src={file.source}
-                              alt={file.title}
-                              className={`pointer-events-none object-cover ${file.enabled ? 'group-hover:opacity-75' : 'opacity-50'}`}
-                            />
-                          ) : (
-                            <div className="text-primary-100 pointer-events-none flex items-center justify-center text-3xl font-bold">
-                              {file.title}
-                            </div>
-                          )}
-                          <button
-                            type="button"
-                            className="absolute inset-0 focus:outline-none"
+                          <div
+                            className={`aspect-h-7 aspect-w-10 focus-within:ring-primary-500 group block w-full overflow-hidden rounded-lg transition-all focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 ${
+                              file.enabled
+                                ? 'bg-primary-700 hover:bg-primary-600'
+                                : 'bg-gray-400'
+                            }`}
                           >
+                            {file.source !== '' ? (
+                              <img
+                                src={file.source}
+                                alt={file.title}
+                                className={`pointer-events-none object-cover ${file.enabled ? 'group-hover:opacity-75' : 'opacity-50'}`}
+                              />
+                            ) : (
+                              <div className="text-primary-100 pointer-events-none flex items-center justify-center text-3xl font-bold">
+                                {file.title}
+                              </div>
+                            )}
                             <span className="sr-only">{`Select ${file.title}`}</span>
-                          </button>
-                        </div>
+                          </div>
+                        </button>
                         <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
                           {file.title}
                         </p>
@@ -597,15 +601,17 @@ export function TenantSelectModal({
                             )}
                           </>
                         )}
-                      </div>
+                      </>
                     ) : (
                       <>
-                        <div
+                        <button
+                          type="button"
                           className={`aspect-h-7 aspect-w-10 focus-within:ring-primary-500 group block w-full overflow-hidden rounded-lg transition-all focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 ${
                             file.enabled
                               ? 'bg-primary-700 hover:bg-primary-600 cursor-pointer'
                               : 'bg-gray-400 cursor-not-allowed'
                           }`}
+                          disabled={!file.enabled}
                           onClick={() => {
                             if (!file.enabled) return;
                             if (isDemoMode()) {
@@ -641,13 +647,8 @@ export function TenantSelectModal({
                               {file.title}
                             </div>
                           )}
-                          <button
-                            type="button"
-                            className="absolute inset-0 focus:outline-none"
-                          >
-                            <span className="sr-only">{`Select ${file.title}`}</span>
-                          </button>
-                        </div>
+                          <span className="sr-only">{`Select ${file.title}`}</span>
+                        </button>
                         <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
                           {file.title}
                         </p>
@@ -690,12 +691,14 @@ export function TenantSelectModal({
                       <ul className="grid w-full grid-cols-2 gap-x-4 gap-y-8 px-4 pb-8 sm:grid-cols-3 sm:gap-x-8 sm:px-4">
                         {legacySources.map((file) => (
                           <li key={file.source} className="relative">
-                            <div
+                            <button
+                              type="button"
                               className={`aspect-h-7 aspect-w-10 focus-within:ring-primary-500 group block w-full overflow-hidden rounded-lg transition-all focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 ${
                                 file.enabled
                                   ? 'bg-primary-700 hover:bg-primary-600 cursor-pointer'
                                   : 'bg-gray-400 cursor-not-allowed'
                               }`}
+                              disabled={!file.enabled}
                               onClick={() => {
                                 if (!file.enabled) return;
                                 if (isDemoMode()) {
@@ -721,13 +724,8 @@ export function TenantSelectModal({
                                 alt={file.title}
                                 className={`pointer-events-none object-cover ${file.enabled ? 'group-hover:opacity-75' : 'opacity-50'}`}
                               />
-                              <button
-                                type="button"
-                                className="absolute inset-0 focus:outline-none"
-                              >
-                                <span className="sr-only">{`Select ${file.title}`}</span>
-                              </button>
-                            </div>
+                              <span className="sr-only">{`Select ${file.title}`}</span>
+                            </button>
                             <p className="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
                               {file.title}
                             </p>
