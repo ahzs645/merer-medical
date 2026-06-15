@@ -114,6 +114,21 @@ export const arabicTranslations: Record<string, string> = {
   'Imaging reports, X-rays, DICOM studies, photos, and scan files will appear here when they are synced or added.':
     'ستظهر هنا تقارير التصوير والأشعة السينية ودراسات DICOM والصور وملفات الفحص عند مزامنتها أو إضافتها.',
   'imaging or device reports': 'تقارير تصوير أو أجهزة',
+  '{count} eye-care records': '{count} سجل رعاية بصرية',
+  '{count} imaging or device reports': '{count} تقرير تصوير أو أجهزة',
+  'Exam measurements': 'قياسات الفحص',
+  Eye: 'العين',
+  Values: 'القيم',
+  Severity: 'الخطورة',
+  Code: 'الرمز',
+  Dentition: 'الإطباق',
+  'Visual acuity, IOP, refraction, OCT, visual field, and topography metrics will appear here as eye-specific Observations.':
+    'ستظهر هنا قياسات حدة الإبصار وضغط العين والانكسار وOCT والمجال البصري والتضاريس كملاحظات خاصة بالعين.',
+  'Showing {visible} of {total} records': 'عرض {visible} من {total} سجلات',
+  'Something went wrong while loading records.':
+    'حدث خطأ أثناء تحميل السجلات.',
+  'Unable to load optometry records.': 'تعذر تحميل سجلات البصريات.',
+  'Unable to load dental records.': 'تعذر تحميل سجلات الأسنان.',
   'imaging records': 'سجلات تصوير',
   'Inflammation & Immunity': 'الالتهاب والمناعة',
   'Inflammatory, autoimmune, infectious, and immune markers.':

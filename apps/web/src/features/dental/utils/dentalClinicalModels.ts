@@ -13,6 +13,7 @@ import {
   TreatmentPlanItem,
 } from '../types';
 import { UNIVERSAL_TEETH } from './dentalReferenceData';
+import { extractClaimFields, isClaimResourceType } from './dentalRecords';
 
 const ACTIVE_KINDS = new Set(['condition', 'finding', 'perio', 'referral']);
 const PLANNED_KINDS = new Set(['treatmentPlan']);
@@ -184,6 +185,7 @@ export function buildClaimSummaries(
   return records
     .filter(
       (record) =>
+        isClaimResourceType(record.document.data_record.resource_type) ||
         !!record.details?.claimStatus ||
         !!record.details?.carrierName ||
         !!record.details?.eobAttachment ||
@@ -192,14 +194,7 @@ export function buildClaimSummaries(
     .map((record) => ({
       id: record.id,
       record,
-      status: record.details?.claimStatus,
-      carrier: record.details?.carrierName,
-      plan: record.details?.planName,
-      subscriberId: record.details?.subscriberId,
-      annualMaximum: record.details?.annualMaximum,
-      deductible: record.details?.deductible,
-      patientPortion: record.details?.patientPortion,
-      eobAttachment: record.details?.eobAttachment,
+      ...extractClaimFields(record.document),
     }));
 }
 

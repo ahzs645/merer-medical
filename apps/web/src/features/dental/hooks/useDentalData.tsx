@@ -8,9 +8,11 @@ import {
   mapImagingDocument,
 } from '../../imaging/utils/imagingRecords';
 import {
+  DENTAL_CLAIM_RESOURCE_TYPES,
   buildDentalCounts,
   buildRecordsByTooth,
   filterDentalImaging,
+  isDentalClaimDocument,
   isDentalDocument,
   mapDentalDocument,
 } from '../utils/dentalRecords';
@@ -37,36 +39,49 @@ const DENTAL_RESOURCE_TYPES = [
   'observation',
   'procedure',
   'servicerequest',
+  ...DENTAL_CLAIM_RESOURCE_TYPES,
 ] as const;
 
 export function useDentalData() {
   const db = useRxDb(),
     user = useUser(),
     [documents, setDocuments] = useState<ClinicalDocument<unknown>[]>([]),
-    [status, setStatus] = useState<'loading' | 'success'>('loading');
+    [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading'),
+    [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchDentalDocuments() {
-      setStatus('loading');
+      try {
+        setStatus('loading');
+        setError(null);
 
-      const docs = await db.clinical_documents
-        .find({
-          selector: {
-            user_id: user.id,
-            'data_record.resource_type': { $in: [...DENTAL_RESOURCE_TYPES] },
-          },
-          sort: [{ 'metadata.date': 'desc' }],
-        })
-        .exec();
+        const docs = await db.clinical_documents
+          .find({
+            selector: {
+              user_id: user.id,
+              'data_record.resource_type': { $in: [...DENTAL_RESOURCE_TYPES] },
+            },
+            sort: [{ 'metadata.date': 'desc' }],
+          })
+          .exec();
 
-      if (!isMounted) return;
+        if (!isMounted) return;
 
-      setDocuments(
-        docs.map((doc) => doc.toMutableJSON() as ClinicalDocument<unknown>),
-      );
-      setStatus('success');
+        setDocuments(
+          docs.map((doc) => doc.toMutableJSON() as ClinicalDocument<unknown>),
+        );
+        setStatus('success');
+      } catch (err) {
+        if (!isMounted) return;
+        setError(
+          err instanceof Error
+            ? err
+            : new Error('Failed to load dental records'),
+        );
+        setStatus('error');
+      }
     }
 
     fetchDentalDocuments();
@@ -95,6 +110,19 @@ export function useDentalData() {
     const recordsByTooth = buildRecordsByTooth(records);
     const odontogramStatuses = buildOdontogramStatuses(recordsByTooth);
 
+    // Coverage / claim / EOB resources are not always recognised as dental
+    // records on their own, so collect them separately for the claims panel.
+    const seenIds = new Set(records.map((record) => record.id));
+    const claimRecords = [
+      ...records,
+      ...documents
+        .filter(
+          (document) =>
+            isDentalClaimDocument(document) && !seenIds.has(document.id),
+        )
+        .map(mapDentalDocument),
+    ];
+
     return {
       records,
       imaging,
@@ -104,12 +132,12 @@ export function useDentalData() {
       perioOverview: buildPerioOverview(records),
       toothTimeline: buildToothTimeline(odontogramStatuses),
       imagingMounts: buildImagingMounts(allDentalRecords),
-      claimSummaries: buildClaimSummaries(records),
+      claimSummaries: buildClaimSummaries(claimRecords),
       recallItems: buildRecallItems(records),
       workflowContext: buildWorkflowContext(records, imaging.length),
       counts: buildDentalCounts(records, imaging),
     };
   }, [documents]);
 
-  return { ...dentalData, status };
+  return { ...dentalData, status, error };
 }

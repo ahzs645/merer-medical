@@ -1,5 +1,6 @@
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { AppPage } from '../../shared/components/AppPage';
+import { ErrorPanel, LoadingPanel } from '../../shared/components/StatusPanel';
 import { CurrentPrescriptionPanel } from './components/CurrentPrescriptionPanel';
 import { EyeImagingPanel } from './components/EyeImagingPanel';
 import { EyeMetricsPanel } from './components/EyeMetricsPanel';
@@ -14,7 +15,7 @@ import { useOptometryData } from './hooks/useOptometryData';
 
 export function OptometryTab() {
   const { t } = useInterfaceLanguage();
-  const { records, imaging, counts, status } = useOptometryData();
+  const { records, imaging, counts, status, error } = useOptometryData();
 
   return (
     <AppPage
@@ -27,21 +28,27 @@ export function OptometryTab() {
     >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          <OptometrySummaryPanel counts={counts} />
-          <OptometryQuickAdd />
-          <CurrentPrescriptionPanel records={records} />
-          <PrescriptionTimelinePanel records={records} />
-          <SurgicalHistoryPanel records={records} />
-          <EyeMetricsPanel records={records} />
-          <div className="grid gap-4 xl:grid-cols-2">
-            <OptometryCheckupHistoryPanel records={records} />
-            <OcularRecordsPanel records={records} />
-          </div>
-          <EyeImagingPanel items={imaging} />
-          {status === 'loading' && (
-            <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
-              {t('Loading optometry records...')}
-            </div>
+          {status === 'loading' ? (
+            <LoadingPanel text={t('Loading optometry records...')} />
+          ) : status === 'error' ? (
+            <ErrorPanel
+              error={error}
+              text={t('Unable to load optometry records.')}
+            />
+          ) : (
+            <>
+              <OptometrySummaryPanel counts={counts} />
+              <OptometryQuickAdd />
+              <CurrentPrescriptionPanel records={records} />
+              <PrescriptionTimelinePanel records={records} />
+              <SurgicalHistoryPanel records={records} />
+              <EyeMetricsPanel records={records} />
+              <div className="grid gap-4 xl:grid-cols-2">
+                <OptometryCheckupHistoryPanel records={records} />
+                <OcularRecordsPanel records={records} />
+              </div>
+              <EyeImagingPanel items={imaging} />
+            </>
           )}
         </div>
       </div>

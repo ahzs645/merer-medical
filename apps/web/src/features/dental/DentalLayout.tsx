@@ -10,6 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 import { AppPage } from '../../shared/components/AppPage';
+import { ErrorPanel, LoadingPanel } from '../../shared/components/StatusPanel';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { Routes as AppRoutes } from '../../Routes';
 import { DentalHeader } from './components/DentalHeader';
@@ -72,11 +73,15 @@ export function DentalLayout() {
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-            <Outlet context={dentalData} />
-            {dentalData.status === 'loading' && (
-              <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
-                {t('Loading dental records...')}
-              </div>
+            {dentalData.status === 'loading' ? (
+              <LoadingPanel text={t('Loading dental records...')} />
+            ) : dentalData.status === 'error' ? (
+              <ErrorPanel
+                error={dentalData.error}
+                text={t('Unable to load dental records.')}
+              />
+            ) : (
+              <Outlet context={dentalData} />
             )}
           </div>
         </div>

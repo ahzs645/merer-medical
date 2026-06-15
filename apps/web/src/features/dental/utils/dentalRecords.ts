@@ -7,6 +7,14 @@ import {
   DentalToothSurfaceModel,
   ToothSurface,
 } from '../types';
+import { ALL_TEETH, findToothByNotation } from './dentalReferenceData';
+
+export const DENTAL_CLAIM_RESOURCE_TYPES = [
+  'coverage',
+  'explanationofbenefit',
+  'claim',
+  'claimresponse',
+] as const;
 
 // Terms used to recognise a document as dental. These are matched on word
 // boundaries (see `matchesDentalTerm`), so deliberately generic words that
@@ -113,7 +121,14 @@ const CLEANING_TERMS = [
   'recall',
 ];
 
-const SURFACE_PATTERN = /\b(MOD|MO|DO|MID|MOB|MOL|M|O|I|D|B|F|L)\b/g;
+// Multi-letter surface notations (MOD, MO, DO, …) are unambiguous and can be
+// extracted from free text anywhere. Single-letter surfaces (M, O, I, …) are
+// only trusted when the surrounding text is clearly about tooth surfaces,
+// otherwise notes like "Class I malocclusion" produce a phantom "I" surface.
+const SURFACE_COMBO_PATTERN = /\b(MOD|MOB|MOL|MID|MO|DO)\b/g;
+const SINGLE_SURFACE_PATTERN = /\b([MOIDBFL])\b/g;
+const SURFACE_CONTEXT_PATTERN =
+  /\b(surfaces?|tooth|teeth|restoration|filling|amalgam|composite|caries|cavity)\b/i;
 
 // A tooth number is only extracted from free text when it is preceded by an
 // explicit marker ("tooth", "teeth", "#", "no.", "number"). Without this the
@@ -197,6 +212,52 @@ export function buildDentalCounts(
 
 export function filterDentalImaging(items: ImagingItem[]) {
   return items.filter((item) => item.categories.includes('dental'));
+}
+
+export function isClaimResourceType(resourceType: string): boolean {
+  return (DENTAL_CLAIM_RESOURCE_TYPES as readonly string[]).includes(
+    resourceType,
+  );
+}
+
+// Coverage / claim / EOB documents do not always carry dental-specific terms,
+// so they may not pass `isDentalDocument`. Recognise them by resource type (or
+// manual claim metadata) so the dental claims panel can surface them.
+export function isDentalClaimDocument(
+  document: ClinicalDocument<unknown>,
+): boolean {
+  if (isClaimResourceType(document.data_record.resource_type)) return true;
+  const details = getDentalDetails(document);
+  return (
+    !!details?.claimStatus ||
+    !!details?.carrierName ||
+    !!details?.eobAttachment
+  );
+}
+
+// Pull claim/coverage fields from manual specialty details first, then fall
+// back to the underlying FHIR Coverage / ExplanationOfBenefit resource.
+export function extractClaimFields(document: ClinicalDocument<unknown>) {
+  const details = getDentalDetails(document);
+  const resource = getResource(document);
+  const planClass =
+    resource?.class?.find?.(
+      (entry: any) => entry?.type?.coding?.[0]?.code === 'plan',
+    ) || resource?.class?.[0];
+
+  return {
+    status: details?.claimStatus || resource?.status,
+    carrier:
+      details?.carrierName ||
+      resource?.insurer?.display ||
+      resource?.payor?.[0]?.display,
+    plan: details?.planName || planClass?.name || planClass?.value,
+    subscriberId: details?.subscriberId || resource?.subscriberId,
+    annualMaximum: details?.annualMaximum,
+    deductible: details?.deductible,
+    patientPortion: details?.patientPortion,
+    eobAttachment: details?.eobAttachment,
+  };
 }
 
 function inferDentalKind(
@@ -291,13 +352,20 @@ function addToothRun(teeth: Set<string>, run: string) {
 
 function extractSurfaces(text: string): ToothSurface[] {
   const surfaces = new Set<ToothSurface>();
-  for (const match of text.toUpperCase().matchAll(SURFACE_PATTERN)) {
+  const upper = text.toUpperCase();
+
+  for (const match of upper.matchAll(SURFACE_COMBO_PATTERN)) {
     for (const surface of match[1].split('')) {
-      if (['M', 'O', 'I', 'D', 'B', 'F', 'L'].includes(surface)) {
-        surfaces.add(surface as ToothSurface);
-      }
+      if (isToothSurface(surface)) surfaces.add(surface);
     }
   }
+
+  if (SURFACE_CONTEXT_PATTERN.test(text)) {
+    for (const match of upper.matchAll(SINGLE_SURFACE_PATTERN)) {
+      if (isToothSurface(match[1])) surfaces.add(match[1]);
+    }
+  }
+
   return [...surfaces];
 }
 
@@ -382,16 +450,77 @@ function getToothNumbers(
   details: DentalRecordDetails | undefined,
   text: string,
 ): string[] {
+  const numberingSystem = details?.numberingSystem;
   const teeth = new Set<string>();
-  addToothList(teeth, details?.toothNumber);
-  addToothList(teeth, details?.dentalTeeth);
+  addToothList(teeth, details?.toothNumber, numberingSystem);
+  addToothList(teeth, details?.dentalTeeth, numberingSystem);
   addToothRange(teeth, details?.toothRange);
 
   if (teeth.size === 0) {
     extractToothNumbers(text).forEach((tooth) => teeth.add(tooth));
   }
 
-  return [...teeth].sort((a, b) => Number(a) - Number(b));
+  return [...teeth].sort(compareTeeth);
+}
+
+// Records may number teeth with Universal, FDI, or Palmer notation. Normalize
+// each token to its Universal identifier so the chart, timeline, and grouping
+// logic all key off a single system. When the record declares its numbering
+// system we resolve against that field first to avoid collisions (e.g. FDI 11
+// must not be read as Universal 11).
+function normalizeTooth(
+  token: string,
+  numberingSystem?: DentalRecordDetails['numberingSystem'],
+): string | undefined {
+  const value = token.trim();
+  if (!value) return undefined;
+  const normalized = value.toUpperCase();
+
+  if (numberingSystem === 'fdi') {
+    const byFdi = ALL_TEETH.find((tooth) => tooth.fdi === normalized);
+    if (byFdi) return byFdi.universal;
+  }
+  if (numberingSystem === 'palmer') {
+    const byPalmer = ALL_TEETH.find(
+      (tooth) => tooth.palmer.toUpperCase() === normalized,
+    );
+    if (byPalmer) return byPalmer.universal;
+  }
+
+  const byUniversal = ALL_TEETH.find(
+    (tooth) => tooth.universal.toUpperCase() === normalized,
+  );
+  if (byUniversal) return byUniversal.universal;
+
+  const byNotation = findToothByNotation(value);
+  if (byNotation) return byNotation.universal;
+
+  // Fall back to a bare Universal number embedded in a noisier token (e.g.
+  // "#14" or "14MOD") to preserve the previous regex-based extraction.
+  if (numberingSystem !== 'fdi' && numberingSystem !== 'palmer') {
+    const numeric = normalized.match(/(?:3[0-2]|[12][0-9]|[1-9])/);
+    if (numeric) {
+      const universal = `${Number(numeric[0])}`;
+      if (ALL_TEETH.some((tooth) => tooth.universal === universal)) {
+        return universal;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+// Universal teeth are numbered 1-32 (permanent) and lettered A-T (deciduous).
+// Sort numeric identifiers first, then letters, so mixed dentition stays stable.
+function compareTeeth(a: string, b: string): number {
+  const numericA = Number(a);
+  const numericB = Number(b);
+  const aIsNumber = !Number.isNaN(numericA);
+  const bIsNumber = !Number.isNaN(numericB);
+  if (aIsNumber && bIsNumber) return numericA - numericB;
+  if (aIsNumber) return -1;
+  if (bIsNumber) return 1;
+  return a.localeCompare(b);
 }
 
 function getSurfaces(
@@ -436,10 +565,15 @@ function buildDentalToothSurfaceModel(
   };
 }
 
-function addToothList(teeth: Set<string>, value?: string) {
+function addToothList(
+  teeth: Set<string>,
+  value?: string,
+  numberingSystem?: DentalRecordDetails['numberingSystem'],
+) {
   if (!value) return;
-  for (const match of value.matchAll(/\b(3[0-2]|[1-2][0-9]|[1-9])\b/g)) {
-    teeth.add(`${Number(match[1])}`);
+  for (const token of value.split(/[\s,&]+/)) {
+    const normalized = normalizeTooth(token, numberingSystem);
+    if (normalized) teeth.add(normalized);
   }
 }
 

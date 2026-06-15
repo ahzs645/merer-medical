@@ -36,6 +36,9 @@ module.exports = {
       transitionProperty: {
         height: 'height',
       },
+      gridTemplateColumns: {
+        16: 'repeat(16, minmax(0, 1fr))',
+      },
       screens: {
         xs: '480px',
       },
