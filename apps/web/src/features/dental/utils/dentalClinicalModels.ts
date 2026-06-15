@@ -12,8 +12,12 @@ import {
   ToothSurface,
   TreatmentPlanItem,
 } from '../types';
-import { UNIVERSAL_TEETH } from './dentalReferenceData';
-import { extractClaimFields, isClaimResourceType } from './dentalRecords';
+import { ALL_TEETH } from './dentalReferenceData';
+import {
+  compareTeeth,
+  extractClaimFields,
+  isClaimResourceType,
+} from './dentalRecords';
 
 const ACTIVE_KINDS = new Set(['condition', 'finding', 'perio', 'referral']);
 const PLANNED_KINDS = new Set(['treatmentPlan']);
@@ -47,7 +51,9 @@ const PERIO_RISK_TERMS = [
 export function buildOdontogramStatuses(
   recordsByTooth: Map<string, DentalRecord[]>,
 ): OdontogramToothStatus[] {
-  return UNIVERSAL_TEETH.map((tooth) => {
+  // Map across the full dentition (permanent + deciduous) so paediatric tooth
+  // records surface too. Teeth without records are filtered out below.
+  return ALL_TEETH.map((tooth) => {
     const records = recordsByTooth.get(tooth.universal) || [];
     const activeRecords = records.filter((record) =>
       ACTIVE_KINDS.has(record.kind),
@@ -120,7 +126,7 @@ export function buildPerioOverview(records: DentalRecord[]): PerioOverview {
     recordCount: perioRecords.length,
     latestRecord: perioRecords[0],
     riskSignals: [...riskSignals],
-    affectedTeeth: [...affectedTeeth].sort((a, b) => Number(a) - Number(b)),
+    affectedTeeth: [...affectedTeeth].sort(compareTeeth),
     maintenanceRecords,
     latestMeasurements: buildPerioMeasurements(perioRecords).slice(0, 6),
   };
@@ -173,7 +179,7 @@ export function buildImagingMounts(
       acquisitionDate: first.details?.acquisitionDate || first.date,
       dicomStudyUid: first.details?.dicomStudyUid,
       dicomSeriesUid: first.details?.dicomSeriesUid,
-      toothNumbers: [...teeth].sort((a, b) => Number(a) - Number(b)),
+      toothNumbers: [...teeth].sort(compareTeeth),
       itemCount: group.length,
     };
   });

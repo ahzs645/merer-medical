@@ -57,7 +57,13 @@ import { MedicationsTab } from '../features/medications/MedicationsTab';
 import MereAITab from '../features/ai-chat/MereAITab';
 import { ManualRecordTab } from '../features/manual-entry/ManualRecordTab';
 import OnPatientRedirect from '../features/connections/oauth-callbacks/OnPatientRedirect';
-import { OptometryTab } from '../features/optometry/OptometryTab';
+import { OptometryLayout } from '../features/optometry/OptometryLayout';
+import { OptometryOverviewTab } from '../features/optometry/tabs/OptometryOverviewTab';
+import { OptometryPrescriptionsTab } from '../features/optometry/tabs/OptometryPrescriptionsTab';
+import { OptometryExamsTab } from '../features/optometry/tabs/OptometryExamsTab';
+import { OptometrySurgeryTab } from '../features/optometry/tabs/OptometrySurgeryTab';
+import { OptometryImagingTab } from '../features/optometry/tabs/OptometryImagingTab';
+import { OptometryRecordsTab } from '../features/optometry/tabs/OptometryRecordsTab';
 import { ProblemsTab } from '../features/problems/ProblemsTab';
 import { RecordsLayout } from '../features/records/RecordsLayout';
 import SettingsTab from '../features/settings/SettingsTab';
@@ -200,7 +206,33 @@ const routes = [
           },
           {
             path: 'optometry',
-            element: <OptometryTab />,
+            element: <OptometryLayout />,
+            children: [
+              {
+                index: true,
+                element: <OptometryOverviewTab />,
+              },
+              {
+                path: 'prescriptions',
+                element: <OptometryPrescriptionsTab />,
+              },
+              {
+                path: 'exams',
+                element: <OptometryExamsTab />,
+              },
+              {
+                path: 'surgery',
+                element: <OptometrySurgeryTab />,
+              },
+              {
+                path: 'imaging',
+                element: <OptometryImagingTab />,
+              },
+              {
+                path: 'records',
+                element: <OptometryRecordsTab />,
+              },
+            ],
           },
           {
             path: 'histories',

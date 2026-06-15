@@ -494,6 +494,17 @@ export const arabicTranslations: Record<string, string> = {
   'Three.js is wired for STL/PLY/OBJ-style scan rendering. This demo preview uses a generated arch until uploaded scan files are stored.':
     'تم تجهيز Three.js لعرض مسوح STL/PLY/OBJ. تستخدم هذه المعاينة التجريبية قوسا مولدا حتى يتم تخزين ملفات المسح المرفوعة.',
   'Tooth chart': 'مخطط الأسنان',
+  Overview: 'نظرة عامة',
+  'Imaging & scans': 'التصوير والفحوصات',
+  'Exams & metrics': 'الفحوصات والقياسات',
+  'Surgery & procedures': 'الجراحة والإجراءات',
+  Permanent: 'دائمة',
+  Deciduous: 'لبنية',
+  Mixed: 'مختلطة',
+  'Records for tooth': 'سجلات السن',
+  'Selected tooth': 'السن المحدد',
+  'Select a tooth to view its records.': 'حدد سنا لعرض سجلاته.',
+  'No records for this tooth.': 'لا توجد سجلات لهذا السن.',
   Undated: 'بدون تاريخ',
   'Universal numbering with FDI labels, ready for surface-level findings.':
     'ترقيم عالمي مع تسميات FDI، جاهز لملاحظات أسطح الأسنان.',

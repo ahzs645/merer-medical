@@ -512,7 +512,7 @@ function normalizeTooth(
 
 // Universal teeth are numbered 1-32 (permanent) and lettered A-T (deciduous).
 // Sort numeric identifiers first, then letters, so mixed dentition stays stable.
-function compareTeeth(a: string, b: string): number {
+export function compareTeeth(a: string, b: string): number {
   const numericA = Number(a);
   const numericB = Number(b);
   const aIsNumber = !Number.isNaN(numericA);
