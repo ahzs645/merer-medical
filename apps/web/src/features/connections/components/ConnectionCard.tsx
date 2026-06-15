@@ -30,6 +30,8 @@ import React from 'react';
 import { Modal } from '../../../shared/components/Modal';
 import { ModalHeader } from '../../../shared/components/ModalHeader';
 import { deleteConnectionWithCascade } from '../../../services/fhir/ConnectionService';
+import { ConnectionDetailDrawer } from '../../sources/components/ConnectionDetailDrawer';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
 function getImage(logo: ConnectionSources) {
   switch (logo) {
@@ -133,7 +135,21 @@ export function ConnectionCard({
     ]);
 
   const [showModal, setShowModal] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   const [showPeriodText, setShowPeriodText] = useState('...');
+
+  const handleFix = useCallback(async () => {
+    if (!isConfigValid(config)) {
+      notifyDispatch({
+        type: 'set_notification',
+        message: 'Configuration not loaded. Please refresh the page.',
+        variant: 'error',
+      });
+      return;
+    }
+    setTenantUrlBySource(item);
+    window.location = await getLoginUrlBySource(config, item);
+  }, [config, item, notifyDispatch]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -203,6 +219,15 @@ export function ConnectionCard({
             </p>
           )}
         </div>
+        <button
+          type="button"
+          aria-label="View source details"
+          title="View source details"
+          onClick={() => setShowDetail(true)}
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+        >
+          <InformationCircleIcon className="h-6 w-6" />
+        </button>
       </div>
       <div>
         <div className="-mt-px flex divide-x divide-gray-200">
@@ -238,19 +263,7 @@ export function ConnectionCard({
             <button
               disabled={syncing}
               className="-ml-px flex flex-initial divide-x divide-gray-800 px-4 disabled:bg-slate-50"
-              onClick={async () => {
-                if (!isConfigValid(config)) {
-                  notifyDispatch({
-                    type: 'set_notification',
-                    message:
-                      'Configuration not loaded. Please refresh the page.',
-                    variant: 'error',
-                  });
-                  return;
-                }
-                setTenantUrlBySource(item);
-                window.location = await getLoginUrlBySource(config, item);
-              }}
+              onClick={handleFix}
             >
               <div className="relative inline-flex h-full flex-initial items-center justify-center rounded-br-lg border border-transparent py-4 text-sm font-bold text-red-500 hover:text-gray-800">
                 Fix
@@ -290,6 +303,21 @@ export function ConnectionCard({
           </button>
         </div>
       </Modal>
+      <ConnectionDetailDrawer
+        item={item}
+        open={showDetail}
+        setOpen={setShowDetail}
+        useProxy={!!userPreferences?.use_proxy}
+        syncing={syncing}
+        deleting={deleting}
+        isLocalImport={isLocalImport}
+        onSync={() => handleFetchData()}
+        onFix={handleFix}
+        onDisconnect={() => {
+          setShowDetail(false);
+          removeDocument(item);
+        }}
+      />
     </li>
   );
 }

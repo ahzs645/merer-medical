@@ -1,4 +1,12 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { format, parseISO } from 'date-fns';
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  PencilSquareIcon,
+  PlusIcon,
+} from '@heroicons/react/24/outline';
 import { RxDocument } from 'rxdb';
 
 import {
@@ -36,6 +44,14 @@ import { VeradigmLocalStorageKeys } from '../../services/fhir/Veradigm';
 import { HealowLocalStorageKeys } from '../../services/fhir/Healow';
 import { Routes } from '../../Routes';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
+import { useUserPreferences } from '../../app/providers/UserPreferencesProvider';
+import { useIntegrationStatus } from '../sources/integrationStatus';
+import { IntegrationStatusPanel } from '../sources/components/IntegrationStatusPanel';
+import { ImportRecordsPanel } from '../sources/components/ImportRecordsPanel';
+import {
+  PendingConnection,
+  PreflightConnectModal,
+} from '../sources/components/PreflightConnectModal';
 
 const epicClient = createEpicClient({ signJwt });
 const cernerClient = createCernerClient();
@@ -472,55 +488,102 @@ function setTenantHealowUrl(
   localStorage.setItem(HealowLocalStorageKeys.HEALOW_ID, id);
 }
 
+/** A titled section within the Sources hub. */
+function SourcesSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mb-8">
+      <h2 className="text-xl font-extrabold text-gray-900">{title}</h2>
+      {description ? (
+        <p className="mt-1 text-sm font-medium text-gray-600">{description}</p>
+      ) : null}
+      <div className="mt-4">{children}</div>
+    </section>
+  );
+}
+
+function SyncHistoryRow({ item }: { item: RxDocument<ConnectionDocument> }) {
+  const fmt = (iso?: string) => {
+    if (!iso) return '—';
+    try {
+      return format(parseISO(iso), 'MMM d, p');
+    } catch {
+      return iso;
+    }
+  };
+  const hasError = item.get('last_sync_was_error');
+  return (
+    <tr className="border-b border-gray-100 last:border-0">
+      <td className="py-2 pr-3 text-sm font-medium text-gray-900">
+        {item.get('name')}
+      </td>
+      <td className="py-2 pr-3 text-sm text-gray-600">
+        {fmt(item.get('last_refreshed'))}
+      </td>
+      <td className="py-2 pr-3 text-sm text-gray-600">
+        {fmt(item.get('last_sync_attempt'))}
+      </td>
+      <td className="py-2 text-sm">
+        {hasError ? (
+          <span className="inline-flex items-center gap-1 text-red-600">
+            <ExclamationCircleIcon className="h-4 w-4" />
+            Error
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 text-green-600">
+            <CheckCircleIcon className="h-4 w-4" />
+            OK
+          </span>
+        )}
+      </td>
+    </tr>
+  );
+}
+
 const ConnectionTab: React.FC = () => {
   const list = useConnectionCards(),
     { t } = useInterfaceLanguage(),
     config = useConfig(),
+    userPreferences = useUserPreferences(),
+    integrationStatus = useIntegrationStatus(),
     [openSelectModal, setOpenSelectModal] = useState(false),
-    handleTogglePanel = useCallback(
-      (
-        base: string & Location,
-        auth: string & Location,
-        token: string & Location,
-        name: string,
-        id: string,
-        vendor: EMRVendor,
-        fhirVersion?: 'DSTU2' | 'R4',
-      ) => {
+    [pending, setPending] = useState<PendingConnection | null>(null),
+    [showPreflight, setShowPreflight] = useState(false),
+    commitRef = useRef<(() => void) | null>(null);
+
+  // Build the redirect action for the chosen tenant but defer running it until
+  // the user confirms on the "what will be imported?" preflight screen.
+  const requestConnect = useCallback(
+    (
+      base: string & Location,
+      auth: string & Location,
+      token: string & Location,
+      name: string,
+      id: string,
+      vendor: EMRVendor,
+      fhirVersion?: 'DSTU2' | 'R4',
+    ) => {
+      const version = fhirVersion || 'DSTU2';
+      const commit = () => {
         switch (vendor) {
           case 'epic': {
-            setTenantEpicUrl(
-              base,
-              auth,
-              token,
-              name,
-              id,
-              fhirVersion || 'DSTU2',
+            setTenantEpicUrl(base, auth, token, name, id, version);
+            initiateEpicAuth(config, base, auth, token, name, id, version).then(
+              (url) => {
+                window.location.href = url;
+              },
             );
-            setOpenSelectModal((x) => !x);
-            initiateEpicAuth(
-              config,
-              base,
-              auth,
-              token,
-              name,
-              id,
-              fhirVersion || 'DSTU2',
-            ).then((url) => {
-              window.location.href = url;
-            });
             break;
           }
           case 'cerner': {
-            setTenantCernerUrl(
-              base,
-              auth,
-              token,
-              name,
-              id,
-              fhirVersion || 'DSTU2',
-            );
-            setOpenSelectModal((x) => !x);
+            setTenantCernerUrl(base, auth, token, name, id, version);
             initiateCernerAuth(
               config,
               base,
@@ -528,7 +591,7 @@ const ConnectionTab: React.FC = () => {
               token,
               name,
               id,
-              fhirVersion || 'DSTU2',
+              version,
             ).then((url) => {
               window.location.href = url;
             });
@@ -536,7 +599,6 @@ const ConnectionTab: React.FC = () => {
           }
           case 'veradigm': {
             setTenantVeradigmUrl(base, auth, token, name, id);
-            setOpenSelectModal((x) => !x);
             initiateVeradigmAuth(config, base, auth, token, name).then(
               (url) => {
                 window.location.href = url;
@@ -546,7 +608,6 @@ const ConnectionTab: React.FC = () => {
           }
           case 'healow': {
             setTenantHealowUrl(base, auth, token, name, id);
-            setOpenSelectModal((x) => !x);
             initiateHealowAuth(config, base, auth, token, name, id).then(
               (url) => {
                 window.location.href = url;
@@ -555,50 +616,192 @@ const ConnectionTab: React.FC = () => {
             break;
           }
         }
-      },
-      [config],
-    );
+      };
+
+      commitRef.current = commit;
+      setPending({
+        vendor,
+        name,
+        fhirVersion:
+          vendor === 'veradigm' || vendor === 'healow' ? undefined : version,
+        useProxy: vendor === 'onpatient' ? true : !!userPreferences?.use_proxy,
+      });
+      setOpenSelectModal(false);
+      setShowPreflight(true);
+    },
+    [config, userPreferences?.use_proxy],
+  );
+
   const portalConnections = list?.filter(
     (item) =>
       item.get('source') !== 'manual' &&
       item.get('source') !== 'freestyle_libre',
   );
+  const deviceConnections = list?.filter(
+    (item) => item.get('source') === 'freestyle_libre',
+  );
 
   return (
-    <AppPage banner={<GenericBanner text={t('Add Connections')} />}>
-      <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pt-2 sm:px-6 lg:px-8">
-        <div className="py-6 text-xl font-extrabold">
-          {t('Connect to Patient Portal')}
+    <AppPage banner={<GenericBanner text={t('Sources')} />}>
+      <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pb-20 pt-6 sm:px-6 sm:pb-6 lg:px-8">
+        <div className="mb-6">
+          <p className="text-sm font-medium text-gray-600">
+            {t(
+              'Bring records together from patient portals, files, devices, and manual entry. Everything is stored locally on this device.',
+            )}
+          </p>
         </div>
-        <div className="text-sm font-medium text-gray-800">
-          {t(
-            'Connect to a patient portal to automatically download your most recent data.',
+
+        <div className="mb-8">
+          <IntegrationStatusPanel status={integrationStatus} />
+        </div>
+
+        <SourcesSection
+          title={t('Connected portals')}
+          description={t(
+            'Patient portals you have connected for automatic syncing.',
           )}
-        </div>
-      </div>
-      <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pb-20 sm:px-6 sm:pb-6 lg:px-8">
-        <ul className="grid grid-cols-1 pt-8">
-          {portalConnections?.map((item) => (
-            <ConnectionCard
-              key={item.id}
-              item={item}
-              baseUrl={item.get('location')}
-            />
-          ))}
-        </ul>
-        <div className="mb-4 box-border	flex w-full justify-center align-middle">
+        >
+          {portalConnections && portalConnections.length > 0 ? (
+            <ul className="grid grid-cols-1">
+              {portalConnections.map((item) => (
+                <ConnectionCard
+                  key={item.id}
+                  item={item}
+                  baseUrl={item.get('location')}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-500">
+              {t('No portals connected yet.')}
+            </p>
+          )}
           <button
-            className="bg-primary hover:bg-primary-600 active:bg-primary-700 w-full rounded-lg p-4 text-white duration-75 active:scale-[98%]"
-            onClick={() => setOpenSelectModal((x) => !x)}
+            className="bg-primary hover:bg-primary-600 active:bg-primary-700 mt-4 w-full rounded-lg p-4 text-white duration-75 active:scale-[98%]"
+            onClick={() => setOpenSelectModal(true)}
           >
-            <p className="font-bold">{t('Add a new connection')}</p>
+            <p className="font-bold">{t('Add a portal')}</p>
           </button>
-        </div>
+        </SourcesSection>
+
+        <SourcesSection
+          title={t('Devices and wearables')}
+          description={t(
+            'Continuous glucose monitors and other devices you import readings from.',
+          )}
+        >
+          {deviceConnections && deviceConnections.length > 0 ? (
+            <ul className="grid grid-cols-1">
+              {deviceConnections.map((item) => (
+                <ConnectionCard
+                  key={item.id}
+                  item={item}
+                  baseUrl={item.get('location')}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-500">
+              {t(
+                'No devices yet. Import a FreeStyle Libre export or log device readings manually.',
+              )}
+            </p>
+          )}
+        </SourcesSection>
+
+        <SourcesSection
+          title={t('Import records')}
+          description={t(
+            'Move records in and out of the app as files — useful when your provider is unsupported.',
+          )}
+        >
+          <ImportRecordsPanel />
+        </SourcesSection>
+
+        <SourcesSection
+          title={t('Add manually')}
+          description={t(
+            'Enter records by hand, including dedicated dental and optometry modes.',
+          )}
+        >
+          <div className="flex flex-wrap gap-3">
+            <Link
+              to={Routes.AddRecord}
+              className="bg-primary-600 hover:bg-primary-700 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold text-white shadow-sm"
+            >
+              <PlusIcon className="h-4 w-4" />
+              {t('Add a record')}
+            </Link>
+            <Link
+              to={Routes.Dental}
+              className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-800 shadow-sm hover:bg-gray-50"
+            >
+              <PencilSquareIcon className="h-4 w-4" />
+              {t('Dental records')}
+            </Link>
+            <Link
+              to={Routes.Optometry}
+              className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-800 shadow-sm hover:bg-gray-50"
+            >
+              <PencilSquareIcon className="h-4 w-4" />
+              {t('Optometry records')}
+            </Link>
+          </div>
+        </SourcesSection>
+
+        <SourcesSection
+          title={t('Source health / sync history')}
+          description={t(
+            'Last successful and attempted sync for every source.',
+          )}
+        >
+          {list && list.length > 0 ? (
+            <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 text-left">
+                    <th className="pb-2 pr-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      {t('Source')}
+                    </th>
+                    <th className="pb-2 pr-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      {t('Last sync')}
+                    </th>
+                    <th className="pb-2 pr-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      {t('Last attempt')}
+                    </th>
+                    <th className="pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      {t('Status')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {list.map((item) => (
+                    <SyncHistoryRow key={item.id} item={item} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-500">
+              {t('No sources yet.')}
+            </p>
+          )}
+        </SourcesSection>
       </div>
+
       <TenantSelectModal
         open={openSelectModal}
         setOpen={setOpenSelectModal}
-        onClick={handleTogglePanel}
+        onClick={requestConnect}
+      />
+      <PreflightConnectModal
+        pending={pending}
+        open={showPreflight}
+        setOpen={setShowPreflight}
+        onConfirm={() => {
+          commitRef.current?.();
+        }}
       />
     </AppPage>
   );

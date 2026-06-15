@@ -23,11 +23,11 @@ export function TutorialAddConnectionScreen({
           )}
         </p>
         <p className="mb-2">
-          {t("After you complete the tutorial, click on the 'Connections'")}{' '}
+          {t("After you complete the tutorial, click on the 'Sources'")}{' '}
           <span className="relative inline-flex w-6 px-1">
             <PlusCircleIcon className="absolute bottom-0 -mb-[2px] h-auto w-4" />
           </span>{' '}
-          {t('button to open the connections tab.')}
+          {t('button to open the Sources tab.')}
         </p>
         <p className="mb-2">
           {t(

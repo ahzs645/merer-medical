@@ -24,6 +24,7 @@ import { CryptedIndexedDBAdapter } from 'sylviejs/storage-adapter/crypted-indexe
 import { ButtonLoadingSpinner } from '../../connections/components/ButtonLoadingSpinner';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { SettingsSection } from './SettingsSection';
+import { PrivacyModesCard } from './PrivacyModesCard';
 
 export function PrivacyAndSecuritySettingsGroup() {
   const db = useRxDb(),
@@ -40,6 +41,7 @@ export function PrivacyAndSecuritySettingsGroup() {
     return (
       <SettingsSection id="privacy-and-security" title="Privacy and Security">
         <div ref={ref}>
+          <PrivacyModesCard />
           <ul className="divide-y divide-gray-200">
             <Switch.Group
               id="encrypt_database"

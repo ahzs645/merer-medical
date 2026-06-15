@@ -162,10 +162,20 @@ const COMMAND_ITEMS: CommandPaletteItem[] = [
     icon: DocumentPlusIcon,
   },
   {
-    title: 'Connections',
+    title: 'Sources',
     description: 'Connect or import health sources',
     route: AppRoutes.AddConnection,
-    keywords: ['sync', 'mychart', 'epic', 'cerner', 'healow', 'connect'],
+    keywords: [
+      'sync',
+      'mychart',
+      'epic',
+      'cerner',
+      'healow',
+      'connect',
+      'connections',
+      'import',
+      'sources',
+    ],
     icon: PlusCircleIcon,
   },
   {
