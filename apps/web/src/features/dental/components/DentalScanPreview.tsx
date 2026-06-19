@@ -28,10 +28,11 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
   const [webGlUnavailable, setWebGlUnavailable] = useState(false);
   const { t } = useInterfaceLanguage();
   const scanSources = getDentalScanSources(imaging);
+  const hasScanSources = scanSources.length > 0;
 
   useEffect(() => {
     const mount = mountRef.current;
-    if (!mount || webGlUnavailable) return;
+    if (!mount || webGlUnavailable || !hasScanSources) return;
 
     const width = mount.clientWidth || 320;
     const height = 220;
@@ -124,19 +125,25 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
         mount.removeChild(renderer.domElement);
       }
     };
-  }, [webGlUnavailable]);
+  }, [webGlUnavailable, hasScanSources]);
 
   return (
     <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-base font-semibold text-gray-900">
-            {t('Demo 3D scan placeholder')}
+            {hasScanSources
+              ? t('Detected dental scan sources')
+              : t('Dental scans')}
           </h2>
           <p className="text-sm text-gray-600">
-            {t(
-              'This generated arch is a placeholder, not a rendered patient scan. Uploaded STL, PLY, or OBJ files are listed below when available.',
-            )}
+            {hasScanSources
+              ? t(
+                  'Uploaded STL, PLY, or OBJ files are listed below. The preview is demo geometry until patient scan rendering is implemented.',
+                )
+              : t(
+                  'No dental scan source file is attached yet. Add a dental image/scan to store the source file with the record.',
+                )}
           </p>
         </div>
         <Link
@@ -146,42 +153,44 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
           {t('Add dental image/scan')}
         </Link>
       </div>
-      <div
-        ref={mountRef}
-        className="relative mt-3 h-[220px] overflow-hidden rounded-md border border-gray-200"
-      >
-        <div className="absolute left-3 top-3 z-10 rounded-md bg-white/90 px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200">
-          {t('Placeholder geometry')}
-        </div>
-        {webGlUnavailable && (
-          <div className="flex h-full items-center justify-center bg-slate-50 px-6">
-            <div className="w-full max-w-sm">
-              <div className="relative mx-auto h-28 w-64 max-w-full rounded-b-full border-b-4 border-slate-300">
-                {Array.from({ length: 10 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="absolute top-7 h-11 w-5 rounded-full bg-slate-200 ring-1 ring-slate-300"
-                    style={{
-                      left: `${12 + index * 8}%`,
-                      transform: `translateX(-50%) rotate(${(index - 4.5) * 3}deg)`,
-                    }}
-                  />
-                ))}
-                <div className="absolute left-[36%] top-7 h-11 w-5 rounded-full bg-sky-300 ring-1 ring-sky-400" />
-                <div className="absolute left-[64%] top-7 h-11 w-5 rounded-full bg-sky-300 ring-1 ring-sky-400" />
-              </div>
-              <p className="mt-4 text-center text-sm font-medium text-slate-700">
-                {t('3D preview unavailable')}
-              </p>
-              <p className="mt-1 text-center text-xs text-slate-500">
-                {t(
-                  'Showing a static placeholder because WebGL is not available in this browser.',
-                )}
-              </p>
-            </div>
+      {hasScanSources ? (
+        <div
+          ref={mountRef}
+          className="relative mt-3 h-[220px] overflow-hidden rounded-md border border-gray-200"
+        >
+          <div className="absolute left-3 top-3 z-10 rounded-md bg-white/90 px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200">
+            {t('Demo geometry')}
           </div>
-        )}
-      </div>
+          {webGlUnavailable && (
+            <div className="flex h-full items-center justify-center bg-slate-50 px-6">
+              <div className="w-full max-w-sm">
+                <div className="relative mx-auto h-28 w-64 max-w-full rounded-b-full border-b-4 border-slate-300">
+                  {Array.from({ length: 10 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="absolute top-7 h-11 w-5 rounded-full bg-slate-200 ring-1 ring-slate-300"
+                      style={{
+                        left: `${12 + index * 8}%`,
+                        transform: `translateX(-50%) rotate(${(index - 4.5) * 3}deg)`,
+                      }}
+                    />
+                  ))}
+                  <div className="absolute left-[36%] top-7 h-11 w-5 rounded-full bg-sky-300 ring-1 ring-sky-400" />
+                  <div className="absolute left-[64%] top-7 h-11 w-5 rounded-full bg-sky-300 ring-1 ring-sky-400" />
+                </div>
+                <p className="mt-4 text-center text-sm font-medium text-slate-700">
+                  {t('3D preview unavailable')}
+                </p>
+                <p className="mt-1 text-center text-xs text-slate-500">
+                  {t(
+                    'Showing a static placeholder because WebGL is not available in this browser.',
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : null}
       {scanSources.length > 0 ? (
         <div className="mt-3 rounded-md bg-slate-50 p-3">
           <p className="text-sm font-semibold text-slate-900">
@@ -210,13 +219,7 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
             )}
           </p>
         </div>
-      ) : (
-        <p className="mt-3 text-sm text-gray-600">
-          {t(
-            'No dental scan source file is attached yet. Add a dental image/scan to store the source file with the record.',
-          )}
-        </p>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -207,6 +207,18 @@ export function TenantSelectModal({
   const veradigmEnabled = isConfigured(config.VERADIGM_CLIENT_ID);
   const vaEnabled = isConfigured(config.VA_CLIENT_ID);
   const healowEnabled = isConfigured(config.HEALOW_CLIENT_ID);
+  const publicUrlConfigured = isConfigured(config.PUBLIC_URL);
+  const searchablePortalEnabled =
+    epicR4Enabled ||
+    epicDstu2Enabled ||
+    cernerEnabled ||
+    veradigmEnabled ||
+    healowEnabled;
+  const portalSearchUnavailableReason = !publicUrlConfigured
+    ? 'This browser build is running without portal API configuration. Local records still work in this browser; portal OAuth needs PUBLIC_URL and server config.'
+    : !searchablePortalEnabled
+      ? 'Portal search is not configured on this deployment. Local records still work in this browser; portal sync needs at least one portal client ID.'
+      : undefined;
 
   const [state, dispatch] = useReducer(
     (
@@ -243,6 +255,10 @@ export function TenantSelectModal({
   const [vaUrl, setVaUrl] = useState<string & Location>(
     '' as string & Location,
   );
+  const selectedEmrVendor = state.emrVendor;
+  const selectedFhirVersion = state.fhirVersion;
+  const selectedQuery = state.query;
+  const hasSelectedEmrVendor = state.hasSelectedEmrVendor;
 
   useEffect(() => {
     getVaLoginUrl(config).then((url) => {
@@ -371,28 +387,23 @@ export function TenantSelectModal({
   useEffect(() => {
     const abortController = new AbortController();
 
-    if (open && state.hasSelectedEmrVendor) {
-      if (!config.PUBLIC_URL) {
-        notifyDispatch({
-          type: 'set_notification',
-          message: 'Configuration not loaded. Please try again.',
-          variant: 'error',
-        });
+    if (open && hasSelectedEmrVendor) {
+      if (portalSearchUnavailableReason) {
         dispatch({ type: 'setItems', payload: [] });
         return;
       }
 
-      const fhirVersion = state.fhirVersion ?? 'DSTU2';
+      const fhirVersion = selectedFhirVersion ?? 'DSTU2';
       const apiPath = getApiPath(
-        state.emrVendor,
-        fhirVersion as VendorVersions[typeof state.emrVendor],
+        selectedEmrVendor,
+        fhirVersion as VendorVersions[typeof selectedEmrVendor],
       );
 
       // Epic provides separate client ids for sandbox only, we detect it here so we can provide conditional rendering later depending on which env variables are provided
       const epicSandboxOnly =
-        state.emrVendor === 'epic' &&
-        ((state.fhirVersion === 'R4' && epicR4SandboxOnly) ||
-          (state.fhirVersion === 'DSTU2' && epicDstu2SandboxOnly));
+        selectedEmrVendor === 'epic' &&
+        ((selectedFhirVersion === 'R4' && epicR4SandboxOnly) ||
+          (selectedFhirVersion === 'DSTU2' && epicDstu2SandboxOnly));
 
       const isUnifiedVendorEnabled = (vendor: UnifiedSearchVendor): boolean => {
         switch (vendor) {
@@ -435,17 +446,17 @@ export function TenantSelectModal({
         return Array.from(byVendorAndId.values());
       };
 
-      const params = new URLSearchParams({ query: state.query });
+      const params = new URLSearchParams({ query: selectedQuery });
       if (epicSandboxOnly) {
         params.set('sandboxOnly', 'true');
       }
-      if (state.emrVendor === 'any') {
+      if (selectedEmrVendor === 'any') {
         (Object.keys(unifiedSearchVendors) as UnifiedSearchVendor[])
           .filter(isUnifiedVendorEnabled)
           .forEach((vendor) => params.append('vendor', vendor));
       }
 
-      fetch(config.PUBLIC_URL + apiPath + params, {
+      fetch((config.PUBLIC_URL || '') + apiPath + params, {
         signal: abortController.signal,
       })
         .then((x) => x.json())
@@ -453,7 +464,7 @@ export function TenantSelectModal({
           dispatch({
             type: 'setItems',
             payload:
-              state.emrVendor === 'any'
+              selectedEmrVendor === 'any'
                 ? dedupeUnifiedResults(x.filter(isUnifiedResultEnabled))
                 : x,
           }),
@@ -476,12 +487,13 @@ export function TenantSelectModal({
     };
   }, [
     open,
-    state.emrVendor,
-    state.query,
+    selectedEmrVendor,
+    selectedQuery,
     notifyDispatch,
-    state.hasSelectedEmrVendor,
-    state.fhirVersion,
+    hasSelectedEmrVendor,
+    selectedFhirVersion,
     config.PUBLIC_URL,
+    portalSearchUnavailableReason,
     epicR4SandboxOnly,
     epicDstu2SandboxOnly,
     epicR4Enabled,
@@ -690,93 +702,100 @@ export function TenantSelectModal({
               </Combobox>
             ) : (
               <>
-                <Combobox
-                  onChange={(s: SelectOption) => {
-                    const vendor = s.vendor ?? state.emrVendor;
-                    if (vendor === 'any') {
-                      notifyDispatch({
-                        type: 'set_notification',
-                        message:
-                          'Unable to determine which patient portal this health system uses',
-                        variant: 'error',
-                      });
-                      return;
-                    }
-                    onClick(
-                      s.baseUrl,
-                      s.authUrl,
-                      s.tokenUrl,
-                      s.name,
-                      s.id,
-                      vendor,
-                      s.fhirVersion ?? state.fhirVersion,
-                    );
-                    setOpen(false);
-                  }}
-                >
-                  <div className="relative px-4">
-                    <MagnifyingGlassIcon
-                      className="pointer-events-none absolute left-8 top-3.5 h-5 w-5 text-gray-700"
-                      aria-hidden="true"
-                    />
-                    <Combobox.Input
-                      title="tenant-search-bar"
-                      className="focus:ring-primary-700 h-12 w-full divide-y-2 rounded-xl border-0 bg-gray-100 bg-transparent pl-11 pr-4 text-gray-800 placeholder-gray-400 hover:border-gray-200 focus:ring-2 sm:text-sm"
-                      placeholder="Search for your health system"
-                      onChange={(event) =>
-                        dispatch({
-                          type: 'setQuery',
-                          payload: event.target.value,
-                        })
+                {portalSearchUnavailableReason ? (
+                  <PortalSearchUnavailableNotice
+                    reason={portalSearchUnavailableReason}
+                    onNavigate={() => setOpen(false)}
+                  />
+                ) : (
+                  <Combobox
+                    onChange={(s: SelectOption) => {
+                      const vendor = s.vendor ?? state.emrVendor;
+                      if (vendor === 'any') {
+                        notifyDispatch({
+                          type: 'set_notification',
+                          message:
+                            'Unable to determine which patient portal this health system uses',
+                          variant: 'error',
+                        });
+                        return;
                       }
-                      autoFocus={true}
-                    />
-                  </div>
-                  {state.items.length > 0 && (
-                    <Combobox.Options
-                      static
-                      className="max-h-full scroll-py-3 overflow-y-scroll p-3 sm:max-h-96"
-                    >
-                      {state.items.map((item) => (
-                        <MemoizedResultItem
-                          key={`${item.vendor ?? state.emrVendor}-${item.version ?? ''}-${item.id}`}
-                          id={item.id}
-                          name={item.name}
-                          baseUrl={item.url}
-                          tokenUrl={item.token}
-                          authUrl={item.authorize}
-                          vendor={
-                            item.vendor
-                              ? unifiedSearchVendors[item.vendor]
-                              : undefined
-                          }
-                          fhirVersion={item.version}
-                          vendorLabel={
-                            state.emrVendor === 'any' && item.vendor
-                              ? unifiedSearchVendorLabels[item.vendor]
-                              : undefined
-                          }
-                        />
-                      ))}
-                    </Combobox.Options>
-                  )}
-                  {state.query !== '' && state.items.length === 0 && (
-                    <div className="px-6 py-14 text-center text-sm sm:px-14">
-                      <ExclamationCircleIcon
-                        type="outline"
-                        name="exclamation-circle"
-                        className="mx-auto h-6 w-6 text-gray-700"
+                      onClick(
+                        s.baseUrl,
+                        s.authUrl,
+                        s.tokenUrl,
+                        s.name,
+                        s.id,
+                        vendor,
+                        s.fhirVersion ?? state.fhirVersion,
+                      );
+                      setOpen(false);
+                    }}
+                  >
+                    <div className="relative px-4">
+                      <MagnifyingGlassIcon
+                        className="pointer-events-none absolute left-8 top-3.5 h-5 w-5 text-gray-700"
+                        aria-hidden="true"
                       />
-                      <p className="mt-4 font-semibold text-gray-900">
-                        No results found
-                      </p>
-                      <p className="mt-2 text-gray-800">
-                        No health system found for this search term. Please try
-                        again.
-                      </p>
+                      <Combobox.Input
+                        title="tenant-search-bar"
+                        className="focus:ring-primary-700 h-12 w-full divide-y-2 rounded-xl border-0 bg-gray-100 bg-transparent pl-11 pr-4 text-gray-800 placeholder-gray-400 hover:border-gray-200 focus:ring-2 sm:text-sm"
+                        placeholder="Search for your health system"
+                        onChange={(event) =>
+                          dispatch({
+                            type: 'setQuery',
+                            payload: event.target.value,
+                          })
+                        }
+                        autoFocus={true}
+                      />
                     </div>
-                  )}
-                </Combobox>
+                    {state.items.length > 0 && (
+                      <Combobox.Options
+                        static
+                        className="max-h-full scroll-py-3 overflow-y-scroll p-3 sm:max-h-96"
+                      >
+                        {state.items.map((item) => (
+                          <MemoizedResultItem
+                            key={`${item.vendor ?? state.emrVendor}-${item.version ?? ''}-${item.id}`}
+                            id={item.id}
+                            name={item.name}
+                            baseUrl={item.url}
+                            tokenUrl={item.token}
+                            authUrl={item.authorize}
+                            vendor={
+                              item.vendor
+                                ? unifiedSearchVendors[item.vendor]
+                                : undefined
+                            }
+                            fhirVersion={item.version}
+                            vendorLabel={
+                              state.emrVendor === 'any' && item.vendor
+                                ? unifiedSearchVendorLabels[item.vendor]
+                                : undefined
+                            }
+                          />
+                        ))}
+                      </Combobox.Options>
+                    )}
+                    {state.query !== '' && state.items.length === 0 && (
+                      <div className="px-6 py-14 text-center text-sm sm:px-14">
+                        <ExclamationCircleIcon
+                          type="outline"
+                          name="exclamation-circle"
+                          className="mx-auto h-6 w-6 text-gray-700"
+                        />
+                        <p className="mt-4 font-semibold text-gray-900">
+                          No results found
+                        </p>
+                        <p className="mt-2 text-gray-800">
+                          No health system found for this search term. Please
+                          try again.
+                        </p>
+                      </div>
+                    )}
+                  </Combobox>
+                )}
               </>
             )}
             <div className="px-4 pb-6 pt-2">
@@ -853,3 +872,28 @@ export function TenantSelectModal({
 }
 
 const MemoizedResultItem = memo(TenantSelectModelResultItem);
+
+function PortalSearchUnavailableNotice({
+  reason,
+  onNavigate,
+}: {
+  reason: string;
+  onNavigate: () => void;
+}) {
+  return (
+    <div className="px-6 py-12 text-center text-sm sm:px-14">
+      <ExclamationCircleIcon className="mx-auto h-7 w-7 text-gray-500" />
+      <p className="mt-4 font-semibold text-gray-900">
+        Portal search unavailable
+      </p>
+      <p className="mt-2 text-gray-700">{reason}</p>
+      <Link
+        to={Routes.AddRecord}
+        onClick={onNavigate}
+        className="text-primary hover:text-primary-500 mt-4 inline-flex font-semibold underline"
+      >
+        Add records manually or import a file
+      </Link>
+    </div>
+  );
+}

@@ -1,7 +1,7 @@
-[
-  {
-    "context": ["/api"],
+{
+  "/api": {
     "target": "https://localhost:4201",
-    "secure": false
+    "secure": false,
+    "changeOrigin": true
   }
-]
+}

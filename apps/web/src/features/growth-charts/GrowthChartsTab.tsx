@@ -80,8 +80,12 @@ export function GrowthChartsTab() {
   const [metricId, setMetricId] = useState<GrowthMetric>('height');
   const metric = METRICS.find((m) => m.id === metricId) as (typeof METRICS)[0];
 
-  const sex: 'male' | 'female' =
-    user.gender?.toLowerCase() === 'female' ? 'female' : 'male';
+  const sex =
+    user.gender?.toLowerCase() === 'female'
+      ? 'female'
+      : user.gender?.toLowerCase() === 'male'
+        ? 'male'
+        : undefined;
 
   const points = useMemo<PatientPoint[]>(() => {
     if (!user.birthday) return [];
@@ -102,8 +106,12 @@ export function GrowthChartsTab() {
       .sort((a, b) => a.age - b.age);
   }, [docs, metric, user.birthday]);
 
-  const reference = GROWTH_REFERENCE[sex][metricId];
+  const reference = sex ? GROWTH_REFERENCE[sex][metricId] : [];
   const hasBirthday = Boolean(user.birthday);
+  const hasReferenceSex = Boolean(sex);
+  const patientLabel =
+    [user.first_name, sex ? `(${sex})` : undefined].filter(Boolean).join(' ') ||
+    'Patient';
 
   return (
     <AppPage banner={<GenericBanner text="Growth Charts" />}>
@@ -111,8 +119,10 @@ export function GrowthChartsTab() {
         <div className="mx-auto w-full max-w-4xl px-4 py-4 pb-24 sm:px-6 lg:px-8">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-gray-600">
-              {[user.first_name, `(${sex})`].filter(Boolean).join(' ')} plotted
-              against approximate reference percentiles.
+              {patientLabel}
+              {sex
+                ? ' plotted against approximate reference percentiles.'
+                : ' growth measurements use approximate reference percentiles once sex/gender is set.'}
             </p>
             <div className="flex gap-1 rounded-md bg-white p-1 shadow-sm ring-1 ring-gray-200">
               {METRICS.map((m) => (
@@ -134,6 +144,8 @@ export function GrowthChartsTab() {
 
           {!hasBirthday ? (
             <Placeholder text="Add a birth date in Settings to see growth percentiles." />
+          ) : !hasReferenceSex ? (
+            <Placeholder text="Add sex/gender in Settings to choose the correct growth reference curves." />
           ) : status === 'loading' ? (
             <Placeholder text="Loading measurements…" />
           ) : (

@@ -11,7 +11,10 @@ import {
 import { ErrorBoundary } from '../shared/components/ErrorBoundary';
 import { useConsoleLogEasterEgg } from '../shared/hooks/useConsoleLogEasterEgg';
 import { DeveloperLogsProvider } from '../app/providers/DeveloperLogsProvider';
-import { LocalConfigProvider } from '../app/providers/LocalConfigProvider';
+import {
+  LocalConfigProvider,
+  useLocalConfig,
+} from '../app/providers/LocalConfigProvider';
 import { NotificationProvider } from '../app/providers/NotificationProvider';
 import { RxDbProvider } from '../app/providers/RxDbProvider';
 import { SyncJobProvider } from '../features/sync/SyncJobProvider';
@@ -24,7 +27,6 @@ import VectorProvider from '../features/vectors';
 import { AppConfigProvider } from '../app/providers/AppConfigProvider';
 import { AppDataProvider } from '../app/providers/AppDataProvider';
 import { TabWrapper } from '../shared/components/TabWrapper';
-import { TutorialOverlay } from '../features/tutorial/TutorialOverlay';
 import { AuditLogTab } from '../features/audit/AuditLogTab';
 import { CarePlansTab } from '../features/care/CarePlansTab';
 import { ConditionsTab } from '../features/conditions/ConditionsTab';
@@ -76,7 +78,7 @@ import { VisitPrepTab } from '../features/visit-prep/VisitPrepTab';
 import VARedirect from '../features/connections/oauth-callbacks/VARedirect';
 import VeradigmRedirect from '../features/connections/oauth-callbacks/VeradigmRedirect';
 import { Routes as AppRoutes } from '../Routes';
-import { getRouterBasename, isDemoMode } from '../shared/utils/demoMode';
+import { getRouterBasename } from '../shared/utils/demoMode';
 
 export default function App() {
   useConsoleLogEasterEgg();
@@ -96,7 +98,6 @@ export default function App() {
                         <UserPreferencesProvider>
                           <InterfaceLanguageProvider>
                             <SyncJobProvider>
-                              {!isDemoMode() && <TutorialOverlay />}
                               <RouterProvider router={router} />
                             </SyncJobProvider>
                           </InterfaceLanguageProvider>
@@ -304,7 +305,7 @@ const routes = [
       },
       {
         path: AppRoutes.MereAIAssistant,
-        element: <MereAITab />,
+        element: <AssistantRoute />,
       },
       {
         path: AppRoutes.Summary,
@@ -387,5 +388,14 @@ function LegacyLabDetailRedirect() {
       to={`${AppRoutes.Labs}/${encodeURIComponent(labKey || '')}`}
       replace
     />
+  );
+}
+
+function AssistantRoute() {
+  const { experimental__use_openai_rag } = useLocalConfig();
+  return experimental__use_openai_rag ? (
+    <MereAITab />
+  ) : (
+    <Navigate to={AppRoutes.Settings} replace />
   );
 }

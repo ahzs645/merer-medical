@@ -43,9 +43,7 @@ export function ImmunizationDoseModal({
   onSelectRecord: (record: ImmunizationRecord) => void;
 }) {
   const { t } = useInterfaceLanguage();
-  const connection = useConnectionDoc(
-    record?.document.connection_record_id ?? '',
-  );
+  const connection = useConnectionDoc(record?.document.connection_record_id);
 
   const provenance = useMemo(
     () =>

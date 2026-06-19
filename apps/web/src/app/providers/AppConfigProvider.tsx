@@ -116,6 +116,7 @@ export const defaultConfigFetcher: ConfigFetcher = async () => {
   try {
     const response = await fetch(
       new URL('api/v1/instance-config', document.baseURI),
+      { headers: { Accept: 'application/json' }, cache: 'no-store' },
     );
     if (!response.ok) {
       console.warn('Failed to fetch config from API:', response.status);
@@ -123,14 +124,17 @@ export const defaultConfigFetcher: ConfigFetcher = async () => {
     }
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) {
-      console.warn(
-        'Config API did not return JSON. Is the API server running?',
+      console.info(
+        'Config API unavailable; continuing with browser-local configuration.',
       );
       return null;
     }
     return await response.json();
   } catch (error) {
-    console.warn('Error fetching config from API:', error);
+    console.info(
+      'Config API unavailable; continuing with browser-local configuration.',
+      error,
+    );
     return null;
   }
 };

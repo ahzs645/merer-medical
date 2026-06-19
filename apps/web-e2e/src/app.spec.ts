@@ -57,7 +57,9 @@ test('Manual medication record can be created and shows up in the medications li
 
   const medicationName = `E2E Lisinopril ${Date.now()}`;
 
-  await page.goto('https://localhost:4200/records/new?type=medicationstatement');
+  await page.goto(
+    'https://localhost:4200/records/new?type=medicationstatement',
+  );
 
   const skipTutorial = page.getByText('Skip Tutorial');
   if (await skipTutorial.isVisible().catch(() => false)) {
@@ -91,15 +93,18 @@ test('Add connection modal opens and unified search responds', async ({
     await skipTutorial.click();
   }
 
-  await page.getByText('Add a new connection').click();
+  await page.getByText('Add a portal').click();
   await expect(
-    page.getByText('Which patient portal do you use?'),
+    page.getByText('Search for your hospital, clinic, or patient portal'),
   ).toBeVisible();
 
-  await page.getByRole('button', { name: 'Select Search All' }).click();
-  await expect(
-    page.getByText('Select your healthcare institution to log in'),
-  ).toBeVisible();
+  const unavailable = page.getByText('Portal search unavailable');
+  if (await unavailable.isVisible().catch(() => false)) {
+    await expect(
+      page.getByText('Add records manually or import a file').first(),
+    ).toBeVisible();
+    return;
+  }
 
   await page.getByTitle('tenant-search-bar').fill('sandbox');
 

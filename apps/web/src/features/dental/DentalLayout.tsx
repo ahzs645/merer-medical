@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 import {
   ChartPieIcon,
@@ -15,6 +15,7 @@ import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvi
 import { Routes as AppRoutes } from '../../Routes';
 import { DentalHeader } from './components/DentalHeader';
 import { useDentalData } from './hooks/useDentalData';
+import { ScrollableTabNav } from '../../shared/components/ScrollableTabNav';
 
 const dentalTabs = [
   { to: AppRoutes.Dental, label: 'Overview', icon: ChartPieIcon, end: true },
@@ -48,28 +49,7 @@ export function DentalLayout() {
     >
       <div className="flex h-full min-h-0 flex-col bg-gray-50">
         <div className="border-b border-gray-200 bg-white px-2 sm:px-6 lg:px-8">
-          <nav
-            className="scrollbar-hide mx-auto flex max-w-7xl gap-1 overflow-x-auto py-2 sm:gap-2"
-            aria-label="Dental sections"
-          >
-            {dentalTabs.map(({ to, label, icon: Icon, end }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={end}
-                className={({ isActive }) =>
-                  `inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-2 text-sm font-medium sm:gap-2 sm:px-3 ${
-                    isActive
-                      ? 'bg-primary-800 text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`
-                }
-              >
-                <Icon className="h-5 w-5 shrink-0" />
-                {t(label)}
-              </NavLink>
-            ))}
-          </nav>
+          <ScrollableTabNav tabs={dentalTabs} ariaLabel="Dental sections" />
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">

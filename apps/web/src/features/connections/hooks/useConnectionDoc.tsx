@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { RxDocument } from 'rxdb';
 import { ConnectionDocument } from '../../../models/connection-document/ConnectionDocument.type';
 import { useUser } from '../../../app/providers/UserProvider';
 import { useConnectionRepository } from '../../../repositories/hooks/useConnectionRepository';
 
-export function useConnectionDoc(id: string) {
+export function useConnectionDoc(id?: string | null) {
   const connectionRepository = useConnectionRepository();
   const user = useUser();
   const [conn, setConn] = useState<RxDocument<ConnectionDocument>>();
@@ -14,17 +14,22 @@ export function useConnectionDoc(id: string) {
     let cancelled = false;
 
     const fetchConn = async () => {
-      if (userId && connectionRepository) {
-        try {
-          const result = await connectionRepository.findWithDoc(userId, id);
-          if (!cancelled && result.rawConnection) {
-            setConn(result.rawConnection);
-          }
-        } catch (error) {
-          console.error('Failed to fetch connection:', error);
-          if (!cancelled) {
-            setConn(undefined);
-          }
+      if (!userId || !connectionRepository || !id) {
+        if (!cancelled) {
+          setConn(undefined);
+        }
+        return;
+      }
+
+      try {
+        const result = await connectionRepository.findWithDoc(userId, id);
+        if (!cancelled) {
+          setConn(result.rawConnection ?? undefined);
+        }
+      } catch (error) {
+        console.error('Failed to fetch connection:', error);
+        if (!cancelled) {
+          setConn(undefined);
         }
       }
     };
@@ -43,27 +48,42 @@ export function useConnectionDocs(ids: string[]) {
   const connectionRepository = useConnectionRepository();
   const user = useUser();
   const [conns, setConns] = useState<RxDocument<ConnectionDocument>[]>([]);
-  const idsSerialized = JSON.stringify(ids);
+  const normalizedIds = useMemo(
+    () => [...new Set(ids.filter((id) => id.trim() !== ''))],
+    [ids],
+  );
+  const idsSerialized = JSON.stringify(normalizedIds);
 
   const userId = user?.id;
   useEffect(() => {
     let cancelled = false;
 
     const fetchConns = async () => {
-      if (userId && connectionRepository) {
-        try {
-          const results = await connectionRepository.findWithDocsByIds(
-            userId,
-            ids,
+      if (!userId || !connectionRepository || normalizedIds.length === 0) {
+        if (!cancelled) {
+          setConns([]);
+        }
+        return;
+      }
+
+      try {
+        const results = await connectionRepository.findWithDocsByIds(
+          userId,
+          normalizedIds,
+        );
+        if (!cancelled) {
+          setConns(
+            results
+              .map((result) => result.rawConnection)
+              .filter(
+                (conn): conn is RxDocument<ConnectionDocument> => conn !== null,
+              ),
           );
-          if (!cancelled) {
-            setConns(results.map((result) => result.rawConnection));
-          }
-        } catch (error) {
-          console.error('Failed to fetch connections:', error);
-          if (!cancelled) {
-            setConns([]);
-          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch connections:', error);
+        if (!cancelled) {
+          setConns([]);
         }
       }
     };

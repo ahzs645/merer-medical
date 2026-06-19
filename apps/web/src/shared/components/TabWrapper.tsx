@@ -22,6 +22,8 @@ import { TabButton } from './TabButton';
 import { useLocalConfig } from '../../app/providers/LocalConfigProvider';
 import { NotificationCenter } from '../../features/notifications/NotificationCenter';
 import { CommandPalette } from './CommandPalette';
+import { TutorialOverlay } from '../../features/tutorial/TutorialOverlay';
+import { isDemoMode } from '../utils/demoMode';
 
 export function TabWrapper() {
   const user = useUser(),
@@ -29,7 +31,8 @@ export function TabWrapper() {
   const [moreOpen, setMoreOpen] = useState(false);
 
   return (
-    <div className="mobile-full-height flex min-h-0 flex-col max-w-[100vw] overflow-hidden md:flex-row-reverse">
+    <div className="mobile-full-height relative flex min-h-0 max-w-[100vw] flex-col overflow-hidden md:flex-row-reverse">
+      {!isDemoMode() && <TutorialOverlay />}
       <div className="min-h-0 flex-grow overflow-y-auto">
         <Outlet />
       </div>

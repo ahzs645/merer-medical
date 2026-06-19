@@ -143,11 +143,16 @@ function addMonths(date: Date, months: number): Date {
 
 export function appliesToPatient(
   rule: MaintenanceRule,
-  age: number,
-  sex: Sex,
+  age: number | undefined,
+  sex: Sex | undefined,
 ): boolean {
-  if (rule.minAge !== undefined && age < rule.minAge) return false;
-  if (rule.maxAge !== undefined && age > rule.maxAge) return false;
+  if (age === undefined) {
+    if (rule.minAge !== undefined || rule.maxAge !== undefined) return false;
+  } else {
+    if (rule.minAge !== undefined && age < rule.minAge) return false;
+    if (rule.maxAge !== undefined && age > rule.maxAge) return false;
+  }
+  if (sex === undefined && rule.sex && rule.sex !== 'any') return false;
   if (rule.sex && rule.sex !== 'any' && rule.sex !== sex) return false;
   return true;
 }

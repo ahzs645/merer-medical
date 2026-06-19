@@ -1,12 +1,13 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type ComponentType,
 } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 
@@ -14,6 +15,7 @@ export interface ScrollableTab {
   to: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
+  end?: boolean;
 }
 
 /**
@@ -30,7 +32,9 @@ export function ScrollableTabNav({
   ariaLabel: string;
 }) {
   const { t } = useInterfaceLanguage();
+  const location = useLocation();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -42,7 +46,22 @@ export function ScrollableTabNav({
     setCanScrollRight(el.scrollLeft < maxScroll - 1);
   }, []);
 
-  useEffect(() => {
+  const scrollTabIntoView = useCallback(
+    (node: HTMLAnchorElement) => {
+      const el = scrollRef.current;
+      if (!el) return;
+      const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+      const target = Math.min(
+        Math.max(0, node.offsetLeft - (el.clientWidth - node.offsetWidth) / 2),
+        maxScroll,
+      );
+      el.scrollLeft = target;
+      updateScrollState();
+    },
+    [updateScrollState],
+  );
+
+  useLayoutEffect(() => {
     updateScrollState();
     const el = scrollRef.current;
     if (!el) return;
@@ -53,6 +72,35 @@ export function ScrollableTabNav({
       window.removeEventListener('resize', updateScrollState);
     };
   }, [updateScrollState]);
+
+  useEffect(() => {
+    const pathname = location.pathname.replace(/\/+$/, '') || '/';
+    const activeTab = tabs.find((tab) => {
+      const target = tab.to.replace(/\/+$/, '') || '/';
+      if (tab.end) return pathname === target;
+      return pathname === target || pathname.startsWith(`${target}/`);
+    });
+    const findActiveNode = () =>
+      scrollRef.current?.querySelector<HTMLAnchorElement>(
+        'a[aria-current="page"]',
+      ) || (activeTab ? tabRefs.current[activeTab.to] : undefined);
+    const scrollActiveNode = () => {
+      const activeNode = findActiveNode();
+      if (activeNode) {
+        scrollTabIntoView(activeNode);
+      } else {
+        updateScrollState();
+      }
+    };
+    const frame = window.requestAnimationFrame(scrollActiveNode);
+    const scrollTimeout = window.setTimeout(scrollActiveNode, 100);
+    const stateTimeout = window.setTimeout(updateScrollState, 350);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(scrollTimeout);
+      window.clearTimeout(stateTimeout);
+    };
+  }, [location.pathname, tabs, scrollTabIntoView, updateScrollState]);
 
   const scrollBy = (delta: number) => {
     scrollRef.current?.scrollBy({ left: delta, behavior: 'smooth' });
@@ -78,10 +126,14 @@ export function ScrollableTabNav({
         className="scrollbar-hide flex gap-1 overflow-x-auto py-2 sm:gap-2"
         aria-label={ariaLabel}
       >
-        {tabs.map(({ to, label, icon: Icon }) => (
+        {tabs.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
+            ref={(node) => {
+              tabRefs.current[to] = node;
+            }}
             to={to}
+            end={end}
             className={({ isActive }) =>
               `inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-2 text-sm font-medium sm:gap-2 sm:px-3 ${
                 isActive

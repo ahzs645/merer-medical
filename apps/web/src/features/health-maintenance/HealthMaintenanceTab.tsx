@@ -52,6 +52,20 @@ function ageFromBirthday(
   return age;
 }
 
+function sexFromGender(
+  gender?: string,
+): Extract<Sex, 'male' | 'female'> | undefined {
+  const normalized = gender?.toLowerCase();
+  if (normalized === 'female') return 'female';
+  if (normalized === 'male') return 'male';
+  return undefined;
+}
+
+function joinLabels(labels: string[]): string {
+  if (labels.length <= 1) return labels[0] ?? '';
+  return `${labels.slice(0, -1).join(', ')} and ${labels[labels.length - 1]}`;
+}
+
 function useReminders() {
   const db = useRxDb();
   const user = useUser();
@@ -64,8 +78,7 @@ function useReminders() {
       setStatus('loading');
       const now = new Date();
       const age = ageFromBirthday(user.birthday, now);
-      const sex: Sex =
-        user.gender?.toLowerCase() === 'female' ? 'female' : 'male';
+      const sex = sexFromGender(user.gender);
 
       const fetch = async (rt: string) =>
         (
@@ -146,7 +159,7 @@ function useReminders() {
       };
 
       const result = MAINTENANCE_RULES.filter((rule) =>
-        appliesToPatient(rule, age ?? 99, sex),
+        appliesToPatient(rule, age, sex),
       ).map((rule) => evaluateReminder(rule, findLast(rule), now));
 
       setReminders(result);
@@ -226,6 +239,11 @@ export function HealthMaintenanceTab() {
   const user = useUser();
   const { reminders, status } = useReminders();
   const [dismissed, setDismissed] = useState<string[]>([]);
+  const missingProfileFields = [
+    user.birthday ? undefined : 'birth date',
+    sexFromGender(user.gender) ? undefined : 'sex/gender',
+  ].filter((field): field is string => Boolean(field));
+  const hasLimitedProfile = missingProfileFields.length > 0;
 
   useEffect(() => {
     setDismissed(readDismissed(user.id));
@@ -282,17 +300,33 @@ export function HealthMaintenanceTab() {
           ) : (
             <>
               <div className="rounded-md bg-white p-4 text-sm text-gray-700 shadow-sm ring-1 ring-gray-200">
-                {actionCount > 0 ? (
+                {hasLimitedProfile ? (
+                  <span>
+                    Add {joinLabels(missingProfileFields)} in{' '}
+                    <Link
+                      to={AppRoutes.Settings}
+                      className="font-semibold text-primary-700 hover:text-primary-900"
+                    >
+                      Settings
+                    </Link>{' '}
+                    to tailor age and sex-sensitive reminders. Items that need
+                    missing details are withheld.
+                  </span>
+                ) : actionCount > 0 ? (
                   <span>
                     <span className="font-semibold text-gray-900">
                       {actionCount} item{actionCount === 1 ? '' : 's'}
                     </span>{' '}
-                    may need attention based on your records, age and sex.
+                    may need attention based on your records and profile.
                   </span>
                 ) : (
                   <span>You appear up to date on tracked preventive care.</span>
                 )}
               </div>
+
+              {hasLimitedProfile && reminders.length === 0 && (
+                <Placeholder text="Add a birth date in Settings to evaluate preventive-care reminders." />
+              )}
 
               {STATUS_ORDER.map((key) => {
                 const items = grouped.get(key);

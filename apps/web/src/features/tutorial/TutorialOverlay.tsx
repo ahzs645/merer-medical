@@ -11,6 +11,8 @@ import { TutorialWelcomeScreen } from './components/TutorialWelcomeScreen';
 import { TutorialInstallPWAScreen } from './components/TutorialInstallPWAScreen';
 import { TutorialCompleteScreen } from './components/TutorialCompleteScreen';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
+import { useLocation } from 'react-router-dom';
+import { Routes as AppRoutes } from '../../Routes';
 
 export type TutorialState = {
   currentStep: number;
@@ -92,8 +94,9 @@ const isInstalledPWA = () => {
   return window.matchMedia('(display-mode: standalone)').matches;
 };
 
-const isDirectEntryPage = (pathname: string) => {
-  return pathname.replace(/\/+$/, '').endsWith('/records/new');
+const canShowTutorialOnPage = (pathname: string) => {
+  const normalized = pathname.replace(/\/+$/, '') || AppRoutes.Timeline;
+  return normalized === AppRoutes.Timeline;
 };
 
 /**
@@ -103,6 +106,7 @@ export function TutorialOverlay() {
   const tutorialConfig = useTutorialLocalStorage(),
     updateTutorialConfig = useUpdateTutorialLocalStorage(),
     { t } = useInterfaceLanguage(),
+    location = useLocation(),
     tutorialSteps = useMemo(
       () =>
         getTutorialKeysFromLocalStorage(tutorialConfig).filter((key) =>
@@ -143,7 +147,7 @@ export function TutorialOverlay() {
   }, [state.isComplete, tutorialSteps]);
 
   const activeStep = state.steps[state.currentStep];
-  const shouldHideForPage = isDirectEntryPage(window.location.pathname);
+  const shouldHideForPage = !canShowTutorialOnPage(location.pathname);
   const activeTutorialItem = (() => {
     switch (activeStep) {
       case TutorialLocalStorageKeys.WELCOME_SCREEN:

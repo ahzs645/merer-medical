@@ -82,9 +82,7 @@ export const MessageBubble = memo(function MessageBubble({
               : ''}
           </span>
         </div>
-        <p
-          className={`inline pt-2.5 ${isAiMessage ? 'text-indigo-900' : 'text-gray-900'}`}
-        >
+        <div className={`pt-2.5 ${textColorClass}`}>
           <Markdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -148,7 +146,7 @@ export const MessageBubble = memo(function MessageBubble({
           >
             {displayText}
           </Markdown>
-        </p>
+        </div>
 
         {thinkingContent && (
           <div className="mt-3 border-t border-indigo-200 pt-3">
