@@ -227,26 +227,45 @@ function useDocumentsData() {
         }),
       );
 
-      setItems(
-        documentDocs.map((doc) => {
-          const document = doc.toMutableJSON() as DocumentRecord;
-          const resource = getFhirResource<any>(document);
-          const attachmentUrl = resource?.content?.[0]?.attachment?.url;
-          const attachment = attachmentUrl
-            ? attachmentsByMetadataId.get(attachmentUrl)
-            : undefined;
-          return {
-            document,
-            attachment,
-            connection: connectionsById.get(document.connection_record_id),
-            linkedReports: reports.filter((report) =>
-              reportUsesAttachment(report, attachmentUrl),
-            ),
-            linkedRecords:
-              linkedRecordsByDocId.get(document.metadata?.id || '') || [],
-          };
-        }),
-      );
+      const referencedAttachmentIds = new Set<string>();
+      const wrappedItems = documentDocs.map((doc) => {
+        const document = doc.toMutableJSON() as DocumentRecord;
+        const resource = getFhirResource<any>(document);
+        const attachmentUrl = resource?.content?.[0]?.attachment?.url;
+        if (attachmentUrl) referencedAttachmentIds.add(attachmentUrl);
+        const attachment = attachmentUrl
+          ? attachmentsByMetadataId.get(attachmentUrl)
+          : undefined;
+        return {
+          document,
+          attachment,
+          connection: connectionsById.get(document.connection_record_id),
+          linkedReports: reports.filter((report) =>
+            reportUsesAttachment(report, attachmentUrl),
+          ),
+          linkedRecords:
+            linkedRecordsByDocId.get(document.metadata?.id || '') || [],
+        };
+      });
+
+      // Manually uploaded files are standalone `documentreference_attachment`
+      // records with no DocumentReference wrapper. Surface them as documents in
+      // their own right (skipping embedded source attachments already wrapped).
+      const standaloneItems: DocumentItem[] = attachmentDocs
+        .map((doc) => doc.toMutableJSON() as AttachmentRecord)
+        .filter(
+          (att) =>
+            att.metadata?.id && !referencedAttachmentIds.has(att.metadata.id),
+        )
+        .map((att) => ({
+          document: att as unknown as DocumentRecord,
+          attachment: att,
+          connection: connectionsById.get(att.connection_record_id),
+          linkedReports: [],
+          linkedRecords: linkedRecordsByDocId.get(att.metadata?.id || '') || [],
+        }));
+
+      setItems([...wrappedItems, ...standaloneItems]);
       setStatus('success');
     }
 

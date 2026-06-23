@@ -33,7 +33,17 @@ import {
 import { ProvenancePanel } from '../provenance/ProvenancePanel';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
+import type { ManualRecordKind } from '../manual-entry/manualRecordTypes';
 import { getTimelineRecordElementId } from '../timeline/utils/timelineAnchors';
+
+// One-tap entry points so the most common records skip the type picker.
+const QUICK_ADD: { kind: ManualRecordKind; label: string }[] = [
+  { kind: 'lab', label: 'Lab' },
+  { kind: 'medicationstatement', label: 'Medication' },
+  { kind: 'condition', label: 'Condition' },
+  { kind: 'vital', label: 'Vital' },
+  { kind: 'encounter', label: 'Encounter' },
+];
 
 // Non-measurement record types are shown as compact links grouped by kind.
 const RECORD_GROUPS: {
@@ -127,7 +137,13 @@ export function DocumentDetailTab() {
   const [query, setQuery] = useState('');
   const [abnormalOnly, setAbnormalOnly] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [addType, setAddType] = useState<ManualRecordKind | undefined>();
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const openAdd = (kind?: ManualRecordKind) => {
+    setAddType(kind);
+    setAddOpen(true);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -142,17 +158,26 @@ export function DocumentDetailTab() {
         return;
       }
       const doc = docRow.toMutableJSON() as ClinicalDocument;
+      // A manually uploaded file is itself a `documentreference_attachment`
+      // (no DocumentReference wrapper); treat it as both the document and its
+      // own embedded file so it can be viewed and have records linked to it.
+      const isAttachmentDoc =
+        doc.data_record?.resource_type === 'documentreference_attachment';
       const resource = getFhirResource<any>(doc);
-      const attachmentUrl = resource?.content?.[0]?.attachment?.url;
+      const attachmentUrl = isAttachmentDoc
+        ? doc.metadata?.id
+        : resource?.content?.[0]?.attachment?.url;
 
       const [attachmentRow, connRow, reportRows, allRows] = await Promise.all([
-        attachmentUrl
-          ? db.clinical_documents
-              .findOne({
-                selector: { user_id: user.id, 'metadata.id': attachmentUrl },
-              })
-              .exec()
-          : Promise.resolve(null),
+        isAttachmentDoc
+          ? Promise.resolve(docRow)
+          : attachmentUrl
+            ? db.clinical_documents
+                .findOne({
+                  selector: { user_id: user.id, 'metadata.id': attachmentUrl },
+                })
+                .exec()
+            : Promise.resolve(null),
         db.connection_documents
           .findOne({ selector: { id: doc.connection_record_id } })
           .exec(),
@@ -209,7 +234,11 @@ export function DocumentDetailTab() {
 
   const resource = document ? getFhirResource<any>(document) : undefined;
   const attachmentMeta = resource?.content?.[0]?.attachment;
-  const attachmentUrl: string | undefined = attachmentMeta?.url;
+  const isAttachmentDoc =
+    document?.data_record?.resource_type === 'documentreference_attachment';
+  const attachmentUrl: string | undefined = isAttachmentDoc
+    ? document?.metadata?.id
+    : attachmentMeta?.url;
   const title =
     document?.metadata?.display_name ||
     attachmentMeta?.title ||
@@ -402,24 +431,38 @@ export function DocumentDetailTab() {
                 {/* Measurements + other records */}
                 <main className="flex flex-col gap-4 lg:col-span-7">
                   {/* Add a record straight from the document, auto-linked */}
-                  <div className="flex flex-col gap-3 rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <h2 className="text-sm font-semibold text-gray-900">
-                        Records from this document
-                      </h2>
-                      <p className="mt-0.5 text-xs text-gray-600">
-                        Add a record while reading the document — it links back
-                        here automatically.
-                      </p>
+                  <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <h2 className="text-sm font-semibold text-gray-900">
+                          Records from this document
+                        </h2>
+                        <p className="mt-0.5 text-xs text-gray-600">
+                          Add a record while reading the document — it links
+                          back here automatically.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => openAdd(undefined)}
+                        className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+                      >
+                        <PlusIcon className="h-4 w-4" />
+                        Add linked record
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setAddOpen(true)}
-                      className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
-                    >
-                      <PlusIcon className="h-4 w-4" />
-                      Add linked record
-                    </button>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {QUICK_ADD.map((quick) => (
+                        <button
+                          key={quick.kind}
+                          type="button"
+                          onClick={() => openAdd(quick.kind)}
+                          className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100"
+                        >
+                          + {quick.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Measurements */}
@@ -550,8 +593,10 @@ export function DocumentDetailTab() {
               </div>
 
               <ManualRecordModal
+                key={addType || 'picker'}
                 open={addOpen}
                 onClose={() => setAddOpen(false)}
+                initialRecordType={addType}
                 linkedDocumentId={decodedId}
                 linkedAttachmentId={attachmentUrl}
                 onSaved={() => setRefreshKey((key) => key + 1)}

@@ -1268,6 +1268,26 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         return;
       }
 
+      // A freshly uploaded document opens straight to its detail page so the
+      // user can work through it (view it and add linked records) right away.
+      const uploadedDocumentId =
+        !loadedDocument && recordType === 'document'
+          ? savedDocs[0]?.metadata?.id
+          : undefined;
+      if (uploadedDocumentId) {
+        notifyDispatch({
+          type: 'set_notification',
+          message: 'Document added — opening it',
+          variant: 'success',
+        });
+        navigate(
+          `${AppRoutes.Documents}/detail/${encodeURIComponent(
+            uploadedDocumentId,
+          )}`,
+        );
+        return;
+      }
+
       notifyDispatch({
         type: 'set_notification',
         message: loadedDocument
