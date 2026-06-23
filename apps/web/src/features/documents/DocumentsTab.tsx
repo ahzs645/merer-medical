@@ -36,6 +36,7 @@ type DocumentItem = {
   attachment?: AttachmentRecord;
   connection?: ConnectionDocument;
   linkedReports: ReportRecord[];
+  linkedRecords: ClinicalDocument[];
 };
 
 type DocumentSection = {
@@ -202,43 +203,63 @@ function useDocumentsData() {
 
     async function fetchDocuments() {
       setStatus('loading');
-      const [documentDocs, attachmentDocs, reportDocs, connectionDocs] =
-        await Promise.all([
-          db.clinical_documents
-            .find({
-              selector: {
-                user_id: user.id,
-                'data_record.resource_type': 'documentreference',
-              },
-              sort: [{ 'metadata.date': 'desc' }],
-            })
-            .exec(),
-          db.clinical_documents
-            .find({
-              selector: {
-                user_id: user.id,
-                'data_record.resource_type': 'documentreference_attachment',
-              },
-            })
-            .exec(),
-          db.clinical_documents
-            .find({
-              selector: {
-                user_id: user.id,
-                'data_record.resource_type': 'diagnosticreport',
-              },
-            })
-            .exec(),
-          db.connection_documents
-            .find({
-              selector: {
-                user_id: user.id,
-              },
-            })
-            .exec(),
-        ]);
+      const [
+        documentDocs,
+        attachmentDocs,
+        reportDocs,
+        connectionDocs,
+        allDocs,
+      ] = await Promise.all([
+        db.clinical_documents
+          .find({
+            selector: {
+              user_id: user.id,
+              'data_record.resource_type': 'documentreference',
+            },
+            sort: [{ 'metadata.date': 'desc' }],
+          })
+          .exec(),
+        db.clinical_documents
+          .find({
+            selector: {
+              user_id: user.id,
+              'data_record.resource_type': 'documentreference_attachment',
+            },
+          })
+          .exec(),
+        db.clinical_documents
+          .find({
+            selector: {
+              user_id: user.id,
+              'data_record.resource_type': 'diagnosticreport',
+            },
+          })
+          .exec(),
+        db.connection_documents
+          .find({
+            selector: {
+              user_id: user.id,
+            },
+          })
+          .exec(),
+        db.clinical_documents.find({ selector: { user_id: user.id } }).exec(),
+      ]);
 
       if (!isMounted) return;
+
+      // Records that point back to a document via metadata.source_document_id,
+      // grouped by the document they reference.
+      const linkedRecordsByDocId = new Map<string, ClinicalDocument[]>();
+      for (const doc of allDocs) {
+        const record = doc.toMutableJSON() as ClinicalDocument;
+        const sourceId = (record.metadata as Record<string, unknown>)?.[
+          'source_document_id'
+        ];
+        if (typeof sourceId !== 'string' || !sourceId) continue;
+        const list = linkedRecordsByDocId.get(sourceId) ?? [];
+        list.push(record);
+        linkedRecordsByDocId.set(sourceId, list);
+      }
 
       const attachmentsByMetadataId = new Map(
         attachmentDocs.map((doc) => {
@@ -271,6 +292,8 @@ function useDocumentsData() {
             linkedReports: reports.filter((report) =>
               reportUsesAttachment(report, attachmentUrl),
             ),
+            linkedRecords:
+              linkedRecordsByDocId.get(document.metadata?.id || '') || [],
           };
         }),
       );
@@ -392,6 +415,9 @@ function DocumentItemCard({ item }: { item: DocumentItem }) {
             <span className="rounded bg-primary-50 px-2 py-1 text-primary-700">
               {item.linkedReports.length} {t('linked reports')}
             </span>
+            <span className="rounded bg-indigo-50 px-2 py-1 text-indigo-700">
+              {item.linkedRecords.length} {t('linked records')}
+            </span>
           </div>
         </div>
         {item.linkedReports.length > 0 && (
@@ -501,6 +527,29 @@ function RelatedLinksPanel({ item }: { item: DocumentItem }) {
           </Link>
         ))}
       </div>
+      {item.linkedRecords.length > 0 && (
+        <div className="mt-4">
+          <h3 className="text-sm font-semibold text-gray-900">
+            {t('Records from this document')}{' '}
+            <span className="font-normal text-gray-500">
+              ({item.linkedRecords.length})
+            </span>
+          </h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {item.linkedRecords.map((record) => (
+              <Link
+                key={record.id}
+                to={getTimelineRecordLink(record)}
+                className="rounded-md bg-gray-50 px-2.5 py-1.5 text-xs font-semibold text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
+              >
+                {record.metadata?.display_name ||
+                  record.data_record?.resource_type ||
+                  t('Record')}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
