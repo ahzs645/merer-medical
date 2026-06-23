@@ -1,3 +1,4 @@
+import { referenceOverlayModes } from '../enrichment/labEnrichment';
 import { ReferenceContext, ReferenceOverlayMode } from '../enrichment/types';
 import { LabFilterMode, RecordCoverageSummary } from '../types';
 
@@ -23,6 +24,7 @@ export function RecordCoveragePanel({
   filterMode,
   setFilterMode,
   referenceMode,
+  setReferenceMode,
   referenceContext,
 }: {
   coverage: RecordCoverageSummary;
@@ -33,6 +35,7 @@ export function RecordCoveragePanel({
   filterMode: LabFilterMode;
   setFilterMode: (mode: LabFilterMode) => void;
   referenceMode: ReferenceOverlayMode;
+  setReferenceMode: (mode: ReferenceOverlayMode) => void;
   referenceContext?: ReferenceContext;
 }) {
   return (
@@ -44,25 +47,46 @@ export function RecordCoveragePanel({
               Record coverage
             </h2>
             <p className="mt-1 text-sm text-gray-600">
-              A compact check of what is represented in this record set and how
-              the current lab view is being interpreted.
+              A compact check of what is represented in this record set. Ranges
+              and high/low status update against the selected reference
+              standard.
             </p>
           </div>
-          <div className="inline-flex w-fit rounded-md shadow-sm ring-1 ring-gray-300">
-            {(Object.keys(filterLabels) as LabFilterMode[]).map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                onClick={() => setFilterMode(mode)}
-                className={`px-3 py-1.5 text-xs font-semibold first:rounded-l-md last:rounded-r-md ${
-                  filterMode === mode
-                    ? 'bg-primary-700 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <label className="inline-flex items-center gap-2 text-xs font-semibold text-gray-700">
+              <span className="uppercase tracking-wide text-gray-500">
+                Reference
+              </span>
+              <select
+                value={referenceMode}
+                onChange={(event) =>
+                  setReferenceMode(event.target.value as ReferenceOverlayMode)
+                }
+                className="rounded-md border-gray-300 py-1.5 text-xs font-semibold text-gray-800 shadow-sm focus:border-primary-500 focus:ring-primary-500"
               >
-                {filterLabels[mode]}
-              </button>
-            ))}
+                {referenceOverlayModes.map((mode) => (
+                  <option key={mode} value={mode}>
+                    {referenceLabels[mode]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="inline-flex w-fit rounded-md shadow-sm ring-1 ring-gray-300">
+              {(Object.keys(filterLabels) as LabFilterMode[]).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setFilterMode(mode)}
+                  className={`px-3 py-1.5 text-xs font-semibold first:rounded-l-md last:rounded-r-md ${
+                    filterMode === mode
+                      ? 'bg-primary-700 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {filterLabels[mode]}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -79,10 +103,6 @@ export function RecordCoveragePanel({
           tone="warn"
         />
         <CoverageMetric label="Planner labs" value={plannerCount} />
-        <CoverageMetric
-          label="Reference"
-          value={referenceLabels[referenceMode]}
-        />
         <CoverageMetric
           label="Patient context"
           value={formatReferenceContext(referenceContext)}

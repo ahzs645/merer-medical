@@ -4,7 +4,6 @@ import { AppPage } from '../../shared/components/AppPage';
 import { EmptyRecordsPlaceholder } from '../../shared/components/EmptyRecordsPlaceholder';
 import { LabsEmptySearch } from './components/LabsEmptySearch';
 import { LabsHeader } from './components/LabsHeader';
-import { LabReferenceStandardControl } from './components/LabReferenceStandardControl';
 import { LabsSkeleton } from './components/LabsSkeleton';
 import { LabsTable } from './components/LabsTable';
 import { LibreCgmPanel } from './components/LibreCgmPanel';
@@ -126,11 +125,8 @@ export function LabsTab() {
                   filterMode={filterMode}
                   setFilterMode={setFilterMode}
                   referenceMode={referenceMode}
+                  setReferenceMode={setReferenceMode}
                   referenceContext={referenceContext}
-                />
-                <LabReferenceStandardControl
-                  selectedMode={referenceMode}
-                  setSelectedMode={setReferenceMode}
                 />
                 {filteredGroups.length > 0 ? (
                   labSections.map((section) => (

@@ -18,7 +18,6 @@ import { LabGroup, ReportLink } from '../types';
 import { formatLabValue, getLabDetailLink } from '../utils/labFormatters';
 import { saveLabsScrollPosition } from '../utils/labsPageState';
 import { LabHistoryPanel } from './LabHistoryPanel';
-import { LabReferenceRange } from './LabReferenceRange';
 import { LinkedReportList } from './LinkedReportList';
 
 export function LabsTable({
@@ -82,10 +81,9 @@ export function LabsTable({
       </div>
       <div className="hidden overflow-x-auto md:block">
         <div className="min-w-[62rem] xl:min-w-full">
-          <div className="grid grid-cols-[minmax(13rem,1.4fr)_minmax(7rem,0.65fr)_minmax(9rem,0.85fr)_minmax(8rem,0.7fr)_minmax(13rem,1.15fr)_minmax(7rem,0.65fr)] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <div className="grid grid-cols-[minmax(14rem,1.5fr)_minmax(8rem,0.8fr)_minmax(8rem,0.7fr)_minmax(13rem,1.15fr)_minmax(7rem,0.65fr)] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
             <div>{t('Lab test')}</div>
             <div>{t('Latest')}</div>
-            <div>{t('Reference')}</div>
             <div>{t('Date')}</div>
             <div>{t('Linked report')}</div>
             <div>{t('Status')}</div>
@@ -260,6 +258,28 @@ function LabTableRow({
       referenceMode,
       referenceContext,
     );
+  const referenceTooltip = [
+    latestReference.referenceRange
+      ? `${
+          latestReference.mode === 'original'
+            ? t('Source range')
+            : t('Reference standard')
+        }: ${latestReference.referenceRange}`
+      : null,
+    latestReference.referenceAgeBand
+      ? `${t('Age band')}: ${latestReference.referenceAgeBand}`
+      : null,
+    latestReference.sourceReferenceRange &&
+    latestReference.sourceReferenceRange !== latestReference.referenceRange
+      ? `${t('Source range')}: ${latestReference.sourceReferenceRange}`
+      : null,
+    latestReference.isMappedStandard === false
+      ? t('No mapped standard; using source range.')
+      : null,
+    latestReference.referenceNote || null,
+  ]
+    .filter(Boolean)
+    .join('\n');
 
   function openLabDetail() {
     saveLabsScrollPosition();
@@ -278,7 +298,7 @@ function LabTableRow({
             openLabDetail();
           }
         }}
-        className="grid w-full cursor-pointer grid-cols-[minmax(13rem,1.4fr)_minmax(7rem,0.65fr)_minmax(9rem,0.85fr)_minmax(8rem,0.7fr)_minmax(13rem,1.15fr)_minmax(7rem,0.65fr)] gap-3 px-4 py-4 text-left hover:bg-blue-50"
+        className="grid w-full cursor-pointer grid-cols-[minmax(14rem,1.5fr)_minmax(8rem,0.8fr)_minmax(8rem,0.7fr)_minmax(13rem,1.15fr)_minmax(7rem,0.65fr)] gap-3 px-4 py-4 text-left hover:bg-blue-50"
       >
         <div className="flex min-w-0 gap-3">
           <button
@@ -315,26 +335,22 @@ function LabTableRow({
             latestReference.flag,
           )}`}
         >
-          {formatLabValue(latest) || t('No value')}
+          {referenceTooltip ? (
+            <span
+              title={referenceTooltip}
+              className="cursor-help border-b border-dotted border-gray-300"
+            >
+              {formatLabValue(latest) || t('No value')}
+            </span>
+          ) : (
+            formatLabValue(latest) || t('No value')
+          )}
           {latestReference.normalizedValue?.note ? (
             <div className="mt-1 text-[11px] font-medium leading-4 text-gray-500">
               {latestReference.normalizedValue.note}
             </div>
           ) : null}
         </div>
-        <LabReferenceRange
-          range={latestReference.referenceRange}
-          sourceRange={latestReference.sourceReferenceRange}
-          label={
-            latestReference.mode === 'original'
-              ? t('Source range')
-              : t('Reference standard')
-          }
-          ageBand={latestReference.referenceAgeBand}
-          citation={latestReference.referenceCitation}
-          note={latestReference.referenceNote}
-          isMappedStandard={latestReference.isMappedStandard}
-        />
         <div className="text-sm text-gray-700">
           {safeFormatDate(latest.metadata?.date, 'PP', t('Unknown'))}
         </div>
