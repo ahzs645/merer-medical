@@ -175,6 +175,7 @@ type GeneralFields = {
   title: string;
   date: string;
   notes: string;
+  familyRelationship: string;
   selectedTerminology?: TerminologyEntry;
 };
 
@@ -375,6 +376,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     title: '',
     date: today,
     notes: '',
+    familyRelationship: '',
     selectedTerminology: undefined,
   });
   const [generalFields, setGeneralFields] = useReducer(
@@ -391,6 +393,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     title,
     date,
     notes,
+    familyRelationship,
     selectedTerminology,
   } = generalFields;
   const setSpecialty = (specialty: ManualSpecialty) =>
@@ -406,6 +409,8 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
   const setTitle = (title: string) => setGeneralFields({ title });
   const setDate = (date: string) => setGeneralFields({ date });
   const setNotes = (notes: string) => setGeneralFields({ notes });
+  const setFamilyRelationship = (familyRelationship: string) =>
+    setGeneralFields({ familyRelationship });
   const setSelectedTerminology = (
     selectedTerminology: TerminologyEntry | undefined,
   ) => setGeneralFields({ selectedTerminology });
@@ -707,6 +712,8 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
   const isDocumentType = recordType === 'document';
   const isMedicationType = recordType === 'medicationstatement';
   const isCoverageType = recordType === 'coverage';
+  const isSocialHistoryType = recordType === 'socialhistory';
+  const isFamilyHistoryType = recordType === 'familymemberhistory';
   const canLinkSourceFile = supportsClinicalDocumentAttachments();
   const completedLabRows = labRows.filter((row) => row.title.trim());
   const titleMissing =
@@ -722,6 +729,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     setGeneralFields({
       title: '',
       notes: '',
+      familyRelationship: '',
       selectedTerminology: undefined,
     });
     setObservationFields(initialObservationFields);
@@ -935,6 +943,14 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         setTitle(doc.metadata?.display_name || '');
         setDate((doc.metadata?.date || today).slice(0, 10));
         setNotes(getManualRecordNote(doc) || '');
+        if (doc.data_record.resource_type === 'familymemberhistory') {
+          const familyResource = (
+            doc.data_record.raw as {
+              resource?: { relationship?: { text?: string } };
+            }
+          ).resource;
+          setFamilyRelationship(familyResource?.relationship?.text || '');
+        }
         const observationValue = getManualObservationValue(doc);
         const rawObservation = doc.data_record.raw as {
           resource?: {
@@ -1197,6 +1213,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
                   phone: coveragePhone,
                   address: coverageAddress,
                 },
+                familyRelationship,
                 terminology: selectedTerminology,
                 loadedDocument,
               }),
@@ -1454,6 +1471,8 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     setDate,
     notes,
     setNotes,
+    familyRelationship,
+    setFamilyRelationship,
     valueKind,
     setValueKind,
     comparator,
@@ -1527,6 +1546,8 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     isDocumentType,
     isMedicationType,
     isCoverageType,
+    isSocialHistoryType,
+    isFamilyHistoryType,
     canLinkSourceFile,
     completedLabRows,
     titleMissing,

@@ -10,8 +10,10 @@ import {
   EyeIcon,
   FaceSmileIcon,
   HeartIcon,
+  HomeIcon,
   ScissorsIcon,
   ShieldCheckIcon,
+  UsersIcon,
 } from '@heroicons/react/24/outline';
 
 import type { ManualRecordFormController } from '../hooks/useManualRecordForm';
@@ -83,6 +85,24 @@ const pickerGroups: PickerGroup[] = [
         apply: (form) => {
           form.updateSpecialty('general');
           form.setRecordType('allergyintolerance');
+        },
+      },
+      {
+        label: 'Family history',
+        description: 'A relative’s condition and how they’re related to you',
+        icon: UsersIcon,
+        apply: (form) => {
+          form.updateSpecialty('general');
+          form.setRecordType('familymemberhistory');
+        },
+      },
+      {
+        label: 'Social history',
+        description: 'Smoking, alcohol, substances, occupation and lifestyle',
+        icon: HomeIcon,
+        apply: (form) => {
+          form.updateSpecialty('general');
+          form.setRecordType('socialhistory');
         },
       },
       {

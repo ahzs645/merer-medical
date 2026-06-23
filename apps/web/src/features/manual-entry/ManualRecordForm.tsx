@@ -57,6 +57,8 @@ export function ManualRecordForm({
     setDate,
     notes,
     setNotes,
+    familyRelationship,
+    setFamilyRelationship,
     selectedTerminology,
     setSelectedTerminology,
     dose,
@@ -83,6 +85,8 @@ export function ManualRecordForm({
     isDocumentType,
     isMedicationType,
     isCoverageType,
+    isSocialHistoryType,
+    isFamilyHistoryType,
     canLinkSourceFile,
     titleMissing,
     fileMissing,
@@ -360,6 +364,27 @@ export function ManualRecordForm({
 
             {isCoverageType && <ManualCoverageSection form={form} />}
 
+            {isFamilyHistoryType && (
+              <div>
+                <label
+                  htmlFor="manual-record-family-relationship"
+                  className="block text-sm font-semibold text-gray-900"
+                >
+                  {t('Relationship')}
+                </label>
+                <input
+                  id="manual-record-family-relationship"
+                  type="text"
+                  value={familyRelationship}
+                  placeholder={t('e.g. Father, Mother, Sibling, None')}
+                  onChange={(event) =>
+                    setFamilyRelationship(event.target.value)
+                  }
+                  className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                />
+              </div>
+            )}
+
             <ManualObservationSection form={form} />
 
             {!isDeviceImportType && (
@@ -368,7 +393,15 @@ export function ManualRecordForm({
                   htmlFor="manual-record-title"
                   className="block text-sm font-semibold text-gray-900"
                 >
-                  {t(isCoverageType ? 'Payer / insurer' : 'Name')}{' '}
+                  {t(
+                    isCoverageType
+                      ? 'Payer / insurer'
+                      : isFamilyHistoryType
+                        ? 'Condition / concern'
+                        : isSocialHistoryType
+                          ? 'Topic'
+                          : 'Name',
+                  )}{' '}
                   <span className="text-red-600">*</span>
                 </label>
                 <input
@@ -393,6 +426,8 @@ export function ManualRecordForm({
                   recordType !== 'coverage' &&
                   recordType !== 'device' &&
                   recordType !== 'document' &&
+                  recordType !== 'familymemberhistory' &&
+                  recordType !== 'socialhistory' &&
                   recordType !== 'visionprescription' && (
                     <TerminologySuggestions
                       kind={recordType}

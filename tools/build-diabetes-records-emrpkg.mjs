@@ -543,6 +543,232 @@ for (const encounter of records.clinicalEncounters || []) {
   );
 }
 
+for (const condition of records.conditions || []) {
+  const conditionId = stableId(`condition-${condition.id}`);
+  const conditionDate =
+    condition.onsetDate || condition.recordedDate || condition.date;
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: condition.sourceImage,
+    date: conditionDate,
+    title: condition.name,
+    provider: condition.provider,
+    audit: condition.audit,
+  });
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: conditionId,
+      resourceType: 'condition',
+      date: conditionDate,
+      displayName: condition.name,
+      raw: {
+        fullUrl: `manual:${conditionId}`,
+        manual_kind: 'condition',
+        source_image: condition.sourceImage,
+        audit: condition.audit,
+        resource: {
+          resourceType: 'Condition',
+          id: conditionId,
+          clinicalStatus: condition.clinicalStatus || 'active',
+          verificationStatus: condition.verificationStatus || 'confirmed',
+          category: condition.category
+            ? { text: condition.category }
+            : undefined,
+          code: {
+            text: condition.name,
+            coding: condition.code ? [condition.code] : undefined,
+          },
+          onsetDateTime: condition.onsetDate
+            ? atNoon(condition.onsetDate)
+            : undefined,
+          dateRecorded: condition.recordedDate
+            ? atNoon(condition.recordedDate)
+            : undefined,
+          note: buildNotes([
+            condition.provider ? `Provider: ${condition.provider}` : undefined,
+            condition.sourceImage
+              ? `Source: ${condition.sourceImage}`
+              : undefined,
+            condition.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+    }),
+  );
+}
+
+for (const allergy of records.allergies || []) {
+  const allergyId = stableId(`allergy-${allergy.id}`);
+  const allergyDate = allergy.recordedDate || allergy.date;
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: allergy.sourceImage,
+    date: allergyDate,
+    title: allergy.substance,
+    provider: allergy.provider,
+    audit: allergy.audit,
+  });
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: allergyId,
+      resourceType: 'allergyintolerance',
+      date: allergyDate,
+      displayName: allergy.substance,
+      raw: {
+        fullUrl: `manual:${allergyId}`,
+        manual_kind: 'allergyintolerance',
+        source_image: allergy.sourceImage,
+        audit: allergy.audit,
+        resource: {
+          resourceType: 'AllergyIntolerance',
+          id: allergyId,
+          status: allergy.status || 'active',
+          criticality: allergy.criticality,
+          recordedDate: allergyDate ? atNoon(allergyDate) : undefined,
+          substance: {
+            text: allergy.substance,
+            coding: allergy.code ? [allergy.code] : undefined,
+          },
+          reaction: allergy.reaction
+            ? [
+                {
+                  manifestation: [
+                    { text: allergy.reaction.manifestation || allergy.reaction },
+                  ],
+                  severity: allergy.reaction.severity,
+                },
+              ]
+            : undefined,
+          note: buildNotes([
+            allergy.provider ? `Provider: ${allergy.provider}` : undefined,
+            allergy.sourceImage ? `Source: ${allergy.sourceImage}` : undefined,
+            allergy.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+    }),
+  );
+}
+
+for (const family of records.familyHistory || []) {
+  const familyId = stableId(`family-history-${family.id}`);
+  const familyDate = family.recordedDate || family.date;
+  const familyConditions = family.conditions || (family.condition ? [family.condition] : []);
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: family.sourceImage,
+    date: familyDate,
+    title: family.relationship,
+    provider: family.provider,
+    audit: family.audit,
+  });
+  const displayName =
+    family.title ||
+    [family.relationship, familyConditions.join(', ')]
+      .filter(Boolean)
+      .join(' - ') ||
+    'Family history';
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: familyId,
+      resourceType: 'familymemberhistory',
+      date: familyDate,
+      displayName,
+      raw: {
+        fullUrl: `manual:${familyId}`,
+        manual_kind: 'familymemberhistory',
+        source_image: family.sourceImage,
+        audit: family.audit,
+        resource: {
+          resourceType: 'FamilyMemberHistory',
+          id: familyId,
+          status: 'completed',
+          date: familyDate ? atNoon(familyDate) : undefined,
+          relationship: family.relationship
+            ? { text: family.relationship }
+            : undefined,
+          deceasedBoolean:
+            typeof family.deceased === 'boolean' ? family.deceased : undefined,
+          condition: familyConditions.length
+            ? familyConditions.map((name) => ({ code: { text: name } }))
+            : undefined,
+          note: buildNotes([
+            family.provider ? `Provider: ${family.provider}` : undefined,
+            family.sourceImage ? `Source: ${family.sourceImage}` : undefined,
+            family.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+    }),
+  );
+}
+
+for (const social of records.socialHistory || []) {
+  const socialId = stableId(`social-history-${social.id}`);
+  const socialDate = social.recordedDate || social.date;
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: social.sourceImage,
+    date: socialDate,
+    title: social.topic,
+    provider: social.provider,
+    audit: social.audit,
+  });
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: socialId,
+      resourceType: 'observation',
+      date: socialDate,
+      displayName: social.topic,
+      raw: {
+        fullUrl: `manual:${socialId}`,
+        manual_kind: 'socialhistory',
+        source_image: social.sourceImage,
+        audit: social.audit,
+        resource: {
+          resourceType: 'Observation',
+          id: socialId,
+          status: 'final',
+          category: {
+            text: 'Social history',
+            coding: [
+              {
+                system:
+                  'http://terminology.hl7.org/CodeSystem/observation-category',
+                code: 'social-history',
+                display: 'Social History',
+              },
+            ],
+          },
+          code: {
+            text: social.topic,
+            coding: social.code ? [social.code] : undefined,
+          },
+          effectiveDateTime: socialDate ? atNoon(socialDate) : undefined,
+          issued: socialDate ? atNoon(socialDate) : undefined,
+          valueString: social.value,
+          note: buildNotes([
+            social.provider ? `Provider: ${social.provider}` : undefined,
+            social.sourceImage ? `Source: ${social.sourceImage}` : undefined,
+            social.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+      metadata: {
+        manual_specialty: 'social-history',
+      },
+    }),
+  );
+}
+
 function getOrCreateSourceDocument({ sourceImage, date, title, provider, audit }) {
   if (!sourceImage) return undefined;
 

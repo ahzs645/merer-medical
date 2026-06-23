@@ -86,6 +86,7 @@ export function buildClinicalDocument({
   observation,
   medication,
   coverage,
+  familyRelationship,
   terminology,
   loadedDocument,
 }: {
@@ -117,6 +118,7 @@ export function buildClinicalDocument({
     route: string;
   };
   coverage?: ManualCoverageInput;
+  familyRelationship?: string;
   terminology?: TerminologyEntry;
   loadedDocument?: ClinicalDocument | null;
 }): ClinicalDocument {
@@ -137,6 +139,7 @@ export function buildClinicalDocument({
           terminology,
           specialtyDetails,
           coverage,
+          familyRelationship,
         );
 
   return {
@@ -274,11 +277,23 @@ function buildManualFhirEntry(
   terminology?: TerminologyEntry,
   specialtyDetails?: ManualSpecialtyDetails,
   coverage?: ManualCoverageInput,
+  familyRelationship?: string,
 ) {
   if (recordType === 'coverage' && coverage) {
     return buildManualCoverageEntry(id, title, notes, coverage);
   }
+  if (recordType === 'familymemberhistory') {
+    return buildManualFamilyHistoryEntry(
+      id,
+      title,
+      notes,
+      date,
+      familyRelationship || '',
+      terminology,
+    );
+  }
   const resourceType = toFhirResourceType(recordType);
+  const isSocialHistory = recordType === 'socialhistory';
   const observationData = observation ?? {
     valueKind: 'quantity' as ManualObservationValueKind,
     comparator: '',
@@ -307,9 +322,23 @@ function buildManualFhirEntry(
     resource: {
       resourceType,
       id,
-      category: specialtyDetails?.specialty
-        ? [{ text: specialtyDetails.specialty }]
-        : undefined,
+      category: isSocialHistory
+        ? [
+            {
+              text: 'Social history',
+              coding: [
+                {
+                  system:
+                    'http://terminology.hl7.org/CodeSystem/observation-category',
+                  code: 'social-history',
+                  display: 'Social History',
+                },
+              ],
+            },
+          ]
+        : specialtyDetails?.specialty
+          ? [{ text: specialtyDetails.specialty }]
+          : undefined,
       code: {
         text: title.trim(),
         coding: terminology
@@ -423,6 +452,56 @@ function buildManualFhirEntry(
   };
 }
 
+function buildManualFamilyHistoryEntry(
+  id: string,
+  title: string,
+  notes: string,
+  date: string,
+  relationship: string,
+  terminology?: TerminologyEntry,
+) {
+  const conditionText = title.trim();
+  const relationshipText = relationship.trim();
+  const noteText = notes.trim();
+  return {
+    fullUrl: `manual:${id}`,
+    manual_kind: 'familymemberhistory',
+    manual_uncoded: !terminology,
+    terminology_profile: terminology?.profile,
+    terminology_source: terminology?.source,
+    terminology_source_version: terminology?.sourceVersion,
+    resource: {
+      resourceType: 'FamilyMemberHistory',
+      id,
+      status: 'completed',
+      date,
+      relationship: relationshipText ? { text: relationshipText } : undefined,
+      condition: conditionText
+        ? [
+            {
+              code: {
+                text: conditionText,
+                coding: terminology
+                  ? [
+                      {
+                        system: terminology.system,
+                        code: terminology.code,
+                        display: terminology.display,
+                      },
+                    ]
+                  : undefined,
+              },
+              note: noteText ? { text: noteText } : undefined,
+            },
+          ]
+        : undefined,
+      // Stored as an array so the shared manual-record note reader can surface
+      // it on the timeline card the same way it does for other manual records.
+      note: noteText ? [{ text: noteText }] : undefined,
+    },
+  };
+}
+
 function buildObservationValue(observationData: {
   valueKind: ManualObservationValueKind;
   comparator: string;
@@ -528,6 +607,7 @@ function getClinicalResourceType(
   recordType: ClinicalManualRecordKind,
 ): ClinicalDocumentResourceType {
   if (recordType === 'lab' || recordType === 'vital') return 'observation';
+  if (recordType === 'socialhistory') return 'observation';
   if (recordType === 'document') return 'documentreference_attachment';
   if (recordType === 'visionprescription') return 'visionprescription';
   if (recordType === 'goal') return 'goal';
@@ -548,7 +628,10 @@ function toFhirResourceType(recordType: ClinicalManualRecordKind) {
       return 'Goal';
     case 'lab':
     case 'vital':
+    case 'socialhistory':
       return 'Observation';
+    case 'familymemberhistory':
+      return 'FamilyMemberHistory';
     default:
       return recordType.charAt(0).toUpperCase() + recordType.slice(1);
   }

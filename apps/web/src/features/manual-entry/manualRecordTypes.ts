@@ -10,6 +10,8 @@ export type ManualRecordKind =
   | 'immunization'
   | 'procedure'
   | 'allergyintolerance'
+  | 'familymemberhistory'
+  | 'socialhistory'
   | 'encounter'
   | 'careplan'
   | 'goal'
@@ -63,6 +65,8 @@ export const recordTypes: Array<{ value: ManualRecordKind; label: string }> = [
   { value: 'immunization', label: 'Immunization' },
   { value: 'procedure', label: 'Procedure' },
   { value: 'allergyintolerance', label: 'Allergy' },
+  { value: 'familymemberhistory', label: 'Family history' },
+  { value: 'socialhistory', label: 'Social history' },
   { value: 'encounter', label: 'Encounter' },
   { value: 'careplan', label: 'Care plan' },
   { value: 'goal', label: 'Health goal' },
