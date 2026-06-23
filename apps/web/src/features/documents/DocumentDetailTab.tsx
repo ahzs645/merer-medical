@@ -123,6 +123,7 @@ export function DocumentDetailTab() {
     'loading',
   );
   const [query, setQuery] = useState('');
+  const [abnormalOnly, setAbnormalOnly] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -406,16 +407,31 @@ export function DocumentDetailTab() {
                             ({measureCount})
                           </span>
                         </h2>
-                        <label className="relative block w-full sm:w-64">
-                          <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-                          <input
-                            type="search"
-                            value={query}
-                            onChange={(event) => setQuery(event.target.value)}
-                            placeholder="Find a measurement"
-                            className="block w-full rounded-md border-0 py-1.5 pl-8 pr-3 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500"
-                          />
-                        </label>
+                        <div className="flex w-full items-center gap-2 sm:w-auto">
+                          <button
+                            type="button"
+                            onClick={() => setAbnormalOnly((v) => !v)}
+                            aria-pressed={abnormalOnly}
+                            className={`shrink-0 rounded-md border px-2.5 py-1.5 text-xs font-semibold ${
+                              abnormalOnly
+                                ? 'border-red-300 bg-red-50 text-red-700'
+                                : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50'
+                            }`}
+                          >
+                            Abnormal only
+                            {abnormalCount ? ` (${abnormalCount})` : ''}
+                          </button>
+                          <label className="relative block w-full sm:w-56">
+                            <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+                            <input
+                              type="search"
+                              value={query}
+                              onChange={(event) => setQuery(event.target.value)}
+                              placeholder="Find a measurement"
+                              className="block w-full rounded-md border-0 py-1.5 pl-8 pr-3 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500"
+                            />
+                          </label>
+                        </div>
                       </div>
 
                       {normalizedQuery ? (
@@ -425,25 +441,39 @@ export function DocumentDetailTab() {
                             {searchMatches.length === 1 ? '' : 'es'} for “
                             {query}”
                           </p>
-                          <ObservationResultsTable items={searchMatches} />
+                          <ObservationResultsTable
+                            items={searchMatches}
+                            abnormalOnly={abnormalOnly}
+                          />
                         </div>
                       ) : (
                         <div className="mt-3 flex flex-col gap-3">
-                          {panels.map(({ report, members }) => (
-                            <PanelDisclosure
-                              key={report.id}
-                              title={report.metadata?.display_name || 'Panel'}
-                              date={report.metadata?.date}
-                              members={members}
-                              to={timelineLink(report)}
-                            />
-                          ))}
-                          {otherMeasures.length > 0 && (
-                            <PanelDisclosure
-                              title="Other measurements"
-                              members={otherMeasures}
-                            />
-                          )}
+                          {panels
+                            .filter(
+                              ({ members }) =>
+                                !abnormalOnly || countAbnormal(members) > 0,
+                            )
+                            .map(({ report, members }) => (
+                              <PanelDisclosure
+                                key={report.id}
+                                title={report.metadata?.display_name || 'Panel'}
+                                date={report.metadata?.date}
+                                members={members}
+                                to={timelineLink(report)}
+                                abnormalOnly={abnormalOnly}
+                                defaultOpen={abnormalOnly}
+                              />
+                            ))}
+                          {otherMeasures.length > 0 &&
+                            (!abnormalOnly ||
+                              countAbnormal(otherMeasures) > 0) && (
+                              <PanelDisclosure
+                                title="Other measurements"
+                                members={otherMeasures}
+                                abnormalOnly={abnormalOnly}
+                                defaultOpen={abnormalOnly}
+                              />
+                            )}
                         </div>
                       )}
                     </section>
@@ -504,15 +534,19 @@ function PanelDisclosure({
   date,
   members,
   to,
+  abnormalOnly = false,
+  defaultOpen = false,
 }: {
   title: string;
   date?: string;
   members: ClinicalDocument[];
   to?: string;
+  abnormalOnly?: boolean;
+  defaultOpen?: boolean;
 }) {
   const abnormal = useMemo(() => countAbnormal(members), [members]);
   return (
-    <Disclosure>
+    <Disclosure defaultOpen={defaultOpen}>
       {({ open }) => (
         <div className="overflow-hidden rounded-md border border-gray-200">
           <Disclosure.Button className="flex w-full items-center justify-between gap-2 bg-gray-50 px-3 py-2 text-left hover:bg-gray-100">
@@ -543,7 +577,10 @@ function PanelDisclosure({
             </span>
           </Disclosure.Button>
           <Disclosure.Panel className="p-3">
-            <ObservationResultsTable items={members} />
+            <ObservationResultsTable
+              items={members}
+              abnormalOnly={abnormalOnly}
+            />
             {to && (
               <Link
                 to={to}

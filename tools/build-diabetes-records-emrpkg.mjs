@@ -77,6 +77,7 @@ for (const panel of records.labPanels || []) {
     const observationId = stableId(`lab-${panel.id}-${result.id}`);
     resultRefs.push({ reference: `Observation/${observationId}` });
     const nutritionRelevance = nutritionRelevanceForLab(result);
+    const labLoinc = labObservationCode(result.name);
     clinicalDocuments.push(
       clinicalDocument({
         id: observationId,
@@ -131,6 +132,8 @@ for (const panel of records.labPanels || []) {
           manual_specialty: 'laboratory',
           source_panel_id: panel.id,
           source_result_id: result.id,
+          loinc_coding: labLoinc ? [labLoinc.code] : [],
+          manual_uncoded: !labLoinc,
           ...sourceMeta(sourceDocument),
         },
       }),
@@ -1312,26 +1315,126 @@ function parseSemiQuantitativeValue(value, unit) {
   };
 }
 
+// Curated analyte name -> LOINC map. Codes only need to be stable and shared
+// across same-analyte results so the app can group a measure's history and draw
+// trends; standard LOINC codes are used where well established.
+const LAB_LOINC = {
+  // CBC
+  'white blood cells': ['6690-2', 'Leukocytes [#/volume] in Blood'],
+  'red blood cells': ['789-8', 'Erythrocytes [#/volume] in Blood'],
+  hemoglobin: ['718-7', 'Hemoglobin [Mass/volume] in Blood'],
+  hematocrit: ['4544-3', 'Hematocrit [Volume Fraction] of Blood'],
+  mcv: ['787-2', 'MCV'],
+  mch: ['785-6', 'MCH'],
+  mchc: ['786-4', 'MCHC'],
+  'rdw-cv': ['788-0', 'Erythrocyte distribution width [Ratio]'],
+  platelets: ['777-3', 'Platelets [#/volume] in Blood'],
+  pdw: ['32207-3', 'Platelet distribution width'],
+  mpv: ['32623-1', 'Platelet mean volume'],
+  neutrophils: ['770-8', 'Neutrophils/100 leukocytes'],
+  'neutrophils absolute': ['751-8', 'Neutrophils [#/volume] in Blood'],
+  eosinophils: ['713-8', 'Eosinophils/100 leukocytes'],
+  'eosinophils absolute': ['711-2', 'Eosinophils [#/volume] in Blood'],
+  basophils: ['706-2', 'Basophils/100 leukocytes'],
+  'basophils absolute': ['704-7', 'Basophils [#/volume] in Blood'],
+  lymphocytes: ['736-9', 'Lymphocytes/100 leukocytes'],
+  'lymphocytes absolute': ['731-0', 'Lymphocytes [#/volume] in Blood'],
+  monocytes: ['5905-5', 'Monocytes/100 leukocytes'],
+  'monocytes absolute': ['742-7', 'Monocytes [#/volume] in Blood'],
+  // Chemistry
+  creatinine: ['2160-0', 'Creatinine [Mass/volume] in Serum or Plasma'],
+  potassium: ['2823-3', 'Potassium [Moles/volume] in Serum or Plasma'],
+  sodium: ['2951-2', 'Sodium [Moles/volume] in Serum or Plasma'],
+  chloride: ['2075-0', 'Chloride [Moles/volume] in Serum or Plasma'],
+  co2: ['2028-9', 'Carbon dioxide, total [Moles/volume] in Serum or Plasma'],
+  urea: ['22664-7', 'Urea [Moles/volume] in Serum or Plasma'],
+  'anion gap': ['33037-3', 'Anion gap in Serum or Plasma'],
+  'egfr (ckd-epi)': ['62238-1', 'GFR/1.73 sq M.predicted'],
+  'total protein': ['2885-2', 'Protein [Mass/volume] in Serum or Plasma'],
+  albumin: ['1751-7', 'Albumin [Mass/volume] in Serum or Plasma'],
+  glucose: ['2345-7', 'Glucose [Mass/volume] in Serum or Plasma'],
+  calcium: ['17861-6', 'Calcium [Mass/volume] in Serum or Plasma'],
+  magnesium: ['19123-9', 'Magnesium [Mass/volume] in Serum or Plasma'],
+  'uric acid': ['3084-1', 'Urate [Mass/volume] in Serum or Plasma'],
+  ferritin: ['2276-4', 'Ferritin [Mass/volume] in Serum or Plasma'],
+  iron: ['2498-4', 'Iron [Mass/volume] in Serum or Plasma'],
+  'alt/gpt': ['1742-6', 'Alanine aminotransferase'],
+  'ast/got': ['1920-8', 'Aspartate aminotransferase'],
+  'alkaline phosphatase': ['6768-6', 'Alkaline phosphatase'],
+  ggt: ['2324-2', 'Gamma glutamyl transferase'],
+  'pancreatic amylase': ['1798-8', 'Amylase'],
+  'bilirubin total': ['1975-2', 'Bilirubin.total'],
+  'bilirubin direct': ['1968-7', 'Bilirubin.direct'],
+  'bilirubin indirect': ['1971-1', 'Bilirubin.indirect'],
+  'c-reactive protein': ['1988-5', 'C reactive protein'],
+  // Lipids
+  'total cholesterol': ['2093-3', 'Cholesterol [Mass/volume]'],
+  'hdl cholesterol': ['2085-9', 'Cholesterol in HDL'],
+  'ldl cholesterol': ['13457-7', 'Cholesterol in LDL (calc)'],
+  triglycerides: ['2571-8', 'Triglyceride [Mass/volume]'],
+  triacylglycerol: ['2571-8', 'Triglyceride [Mass/volume]'],
+  'non-hdl cholesterol': ['43396-1', 'Cholesterol non HDL [Mass/volume]'],
+  // Diabetes
+  'glycated hemoglobin hba1c': ['4548-4', 'Hemoglobin A1c/Hemoglobin.total'],
+  'glycated hemoglobin (hba1c)': ['4548-4', 'Hemoglobin A1c/Hemoglobin.total'],
+  insulin: ['20448-7', 'Insulin [Units/volume] in Serum or Plasma'],
+  'c-peptide': ['1986-9', 'C peptide [Mass/volume] in Serum or Plasma'],
+  'c - peptide': ['1986-9', 'C peptide [Mass/volume] in Serum or Plasma'],
+  // Vitamins / hormones
+  'vitamin b12': ['2132-9', 'Cobalamin (Vitamin B12)'],
+  'cyanocobalamine (vitamin b12)': ['2132-9', 'Cobalamin (Vitamin B12)'],
+  '25-hydroxyvitamin d': ['1989-3', '25-hydroxyvitamin D'],
+  tsh: ['3016-3', 'Thyrotropin [Units/volume] in Serum or Plasma'],
+  'thyroid stimulating hormone (tsh)': ['3016-3', 'Thyrotropin'],
+  'thyroid stimulating hormone': ['3016-3', 'Thyrotropin'],
+  'free thyroxine (ft4)': ['3024-7', 'Thyroxine (T4) free'],
+  'free thyroxine': ['3024-7', 'Thyroxine (T4) free'],
+  'free triiodothyronine (ft3)': ['3051-0', 'Triiodothyronine (T3) free'],
+  'free triiodothyronine': ['3051-0', 'Triiodothyronine (T3) free'],
+  estradiol: ['2243-4', 'Estradiol (E2)'],
+  prolactin: ['2842-3', 'Prolactin'],
+  'total testosterone': ['2986-8', 'Testosterone'],
+  'follicle - stimulating hormone (fsh)': ['15067-2', 'Follitropin (FSH)'],
+  'follicle-stimulating hormone (fsh)': ['15067-2', 'Follitropin (FSH)'],
+  'luteinizing hormone (lh)': ['10501-5', 'Lutropin (LH)'],
+  'luteinizing hormone': ['10501-5', 'Lutropin (LH)'],
+  'anti-thyroid peroxidase antibodies': ['8099-8', 'Thyroid peroxidase Ab'],
+  // Coagulation
+  inr: ['6301-6', 'INR in Platelet poor plasma'],
+  'quick index': ['5894-1', 'Prothrombin time (Quick)'],
+  'prothrombin time': ['5902-2', 'Prothrombin time (PT)'],
+  'activated partial thromboplastin time aptt': ['3173-2', 'aPTT'],
+  'activated partial thromboplastin time (aptt)': ['3173-2', 'aPTT'],
+  fibrinogen: ['3255-7', 'Fibrinogen [Mass/volume]'],
+  'thrombin time': ['3243-3', 'Thrombin time'],
+  // Tumour markers
+  'alpha-fetoprotein afp': ['1834-1', 'Alpha-1-Fetoprotein'],
+  'alpha-fetoprotein (afp)': ['1834-1', 'Alpha-1-Fetoprotein'],
+  'carcinoembryonic antigen cea': ['2039-6', 'Carcinoembryonic Ag'],
+  'carcinoembryonic antigen (cea)': ['2039-6', 'Carcinoembryonic Ag'],
+  'prostate-specific antigen total': ['2857-1', 'PSA [Mass/volume]'],
+  'prostate specific antigen total psa': ['2857-1', 'PSA [Mass/volume]'],
+  'prostate-specific antigen free': ['10886-0', 'PSA Free [Mass/volume]'],
+  'index of free psa': ['12841-3', 'PSA Free/PSA total'],
+  // Blood group
+  'blood type': ['883-9', 'ABO group'],
+  'rhesus (d)': ['10331-7', 'Rh type'],
+  // Urinalysis
+  'urine color': ['5778-6', 'Color of Urine'],
+  color: ['5778-6', 'Color of Urine'],
+  'urine specific gravity': ['5811-5', 'Specific gravity of Urine'],
+  'specific gravity': ['5811-5', 'Specific gravity of Urine'],
+  'reaction (ph)': ['5803-2', 'pH of Urine'],
+  ketones: ['5797-6', 'Ketones [Mass/volume] in Urine'],
+  urobilinogen: ['5818-0', 'Urobilinogen [Mass/volume] in Urine'],
+  nitrite: ['5802-4', 'Nitrite [Presence] in Urine'],
+};
+
 function labObservationCode(name) {
-  const normalized = name.toLowerCase();
-  const codes = {
-    'blood type': {
-      system: 'http://loinc.org',
-      code: '883-9',
-      display: 'ABO group',
-    },
-    'rhesus (d)': {
-      system: 'http://loinc.org',
-      code: '10331-7',
-      display: 'Rh type',
-    },
-    'c-reactive protein': {
-      system: 'http://loinc.org',
-      code: '1988-5',
-      display: 'C reactive protein',
-    },
-  };
-  return codes[normalized];
+  const normalized = name.toLowerCase().trim();
+  const hit = LAB_LOINC[normalized];
+  if (!hit) return undefined;
+  return { system: 'http://loinc.org', code: hit[0], display: hit[1] };
 }
 
 function isDiabetesTarget(result) {
