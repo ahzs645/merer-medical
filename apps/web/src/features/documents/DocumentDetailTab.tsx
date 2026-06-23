@@ -455,7 +455,7 @@ export function DocumentDetailTab() {
                             )
                             .map(({ report, members }) => (
                               <PanelDisclosure
-                                key={report.id}
+                                key={`${report.id}-${abnormalOnly}`}
                                 title={report.metadata?.display_name || 'Panel'}
                                 date={report.metadata?.date}
                                 members={members}
@@ -468,6 +468,7 @@ export function DocumentDetailTab() {
                             (!abnormalOnly ||
                               countAbnormal(otherMeasures) > 0) && (
                               <PanelDisclosure
+                                key={`other-${abnormalOnly}`}
                                 title="Other measurements"
                                 members={otherMeasures}
                                 abnormalOnly={abnormalOnly}
