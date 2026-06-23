@@ -46,11 +46,14 @@ function parseLocation(display: string): ParsedLocation {
 
     let rest = raw;
 
-    // Extract a trailing phone number, if present.
+    // Extract a trailing North-American phone number without swallowing the
+    // trailing digit of a preceding postal code (e.g. "T0E 1E0 780-852-6606").
     let phone: string | undefined;
-    const phoneMatch = rest.match(/(\+?\d[\d\s().-]{7,}\d)\s*$/);
-    if (phoneMatch) {
-      phone = phoneMatch[1].trim();
+    const phoneMatch = rest.match(
+      /(\+?1[\s.-]?)?(\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4})\s*$/,
+    );
+    if (phoneMatch && phoneMatch.index !== undefined) {
+      phone = phoneMatch[0].trim();
       rest = rest.slice(0, phoneMatch.index).trim();
     }
 

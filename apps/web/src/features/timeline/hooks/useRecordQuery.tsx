@@ -10,11 +10,7 @@ import { useUser } from '../../../app/providers/UserProvider';
 import { useVectors } from '../../vectors';
 import { DatabaseCollections } from '../../../app/providers/DatabaseCollections';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
-import {
-  QueryStatus,
-  RecordsByDate,
-  TimelineRecordTypeFilter,
-} from '../types';
+import { QueryStatus, RecordsByDate, TimelineRecordTypeFilter } from '../types';
 import {
   fetchRecords,
   fetchRecordsWithVectorSearch,
@@ -33,7 +29,16 @@ export async function fetchRawRecords(
   const selector: MangoQuerySelector<ClinicalDocument<unknown>> = {
     user_id: user_id,
     'data_record.resource_type': {
-      $nin: ['patient', 'careplan', 'provenance'],
+      // location/practitioner/organization are reference master-data surfaced in
+      // the Providers & locations directory, not timeline events.
+      $nin: [
+        'patient',
+        'careplan',
+        'provenance',
+        'location',
+        'practitioner',
+        'organization',
+      ],
     },
     'metadata.date': { $nin: [null, undefined, ''] },
   };
@@ -91,7 +96,13 @@ export async function fetchTimelineDateKeys(
   const selector: MangoQuerySelector<ClinicalDocument<unknown>> = {
     user_id: user_id,
     'data_record.resource_type': {
-      $nin: ['patient', 'provenance'],
+      $nin: [
+        'patient',
+        'provenance',
+        'location',
+        'practitioner',
+        'organization',
+      ],
     },
     'metadata.date': { $nin: [null, undefined, ''] },
   };

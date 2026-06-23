@@ -46,9 +46,13 @@ export function parseFacility(display: string): Facility {
   const raw = display.trim();
   let working = raw;
   let phone: string | undefined;
-  const phoneMatch = working.match(/(\+?\d[\d\s().-]{6,}\d)\s*$/);
-  if (phoneMatch) {
-    phone = phoneMatch[1].trim();
+  // Match a North-American phone at the end without swallowing the trailing
+  // digit of a preceding postal code (e.g. "T0E 1E0 780-852-6606").
+  const phoneMatch = working.match(
+    /(\+?1[\s.-]?)?(\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4})\s*$/,
+  );
+  if (phoneMatch && phoneMatch.index !== undefined) {
+    phone = phoneMatch[0].trim();
     working = working.slice(0, phoneMatch.index).trim();
   }
   // The address usually begins at the first standalone number (street number).
