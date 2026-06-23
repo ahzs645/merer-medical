@@ -98,6 +98,11 @@ const sourceLabel = source.exportSource || 'Alberta Health Services MyChart';
 const profileId = stableId(`ahs-mychart-${source.exportDate || jsonPath}`);
 const userId = `u-${profileId}`;
 const connectionId = `c-${profileId}`;
+// Relative path of the primary export, used as the default `source_file` so that
+// records derived from it (vitals, allergies, test results, family/surgical
+// history) can be linked back to their stored "Raw source export" document by
+// the source-document linker below.
+const primaryExportRel = relative(sourceDir, jsonPath);
 
 const user = {
   id: userId,
@@ -158,6 +163,7 @@ addAllergyStatus(source.allergies);
 addSurgeries(source.medicalHistory?.surgeries || []);
 addFamilyHistory(source.medicalHistory?.familyHistory || []);
 addTestResults(source.testResults?.results || []);
+addLetters(source.letters || []);
 addRawExportDocument(source, jsonPath);
 addSiblingJsonDocuments(sourceDir);
 addMyHealthRecordsExports(sourceDir);
@@ -172,6 +178,9 @@ if (healthSummaryDir && !isInsidePath(healthSummaryDir, sourceDir)) {
   });
 }
 addCompanionResourcesForLooseFiles(sourceDir);
+// Reconcile every record to the stored document it came from. Must run last,
+// after all records AND all source documents have been created.
+const sourceLinkCount = linkSourceDocuments();
 
 const tableFiles = {
   user_documents: strToU8(JSON.stringify([user], null, 2)),
@@ -217,6 +226,7 @@ if (reportPath) {
 
 console.log(`Wrote ${outputPath}`);
 console.log(`Clinical documents: ${clinicalDocuments.length}`);
+console.log(`Linked to source documents: ${sourceLinkCount}`);
 if (reportPath) console.log(`Wrote ${reportPath}`);
 
 function addClinicalDocument({
@@ -248,6 +258,9 @@ function addClinicalDocument({
       id: metadataId,
       date: normalizeDateTime(date),
       display_name: displayName,
+      // Default provenance pointer; per-record metadata (CCDA / MyHealth /
+      // file documents) overrides it via the spread below.
+      source_file: primaryExportRel,
       ...metadata,
     },
     _meta: { lwt: now },
@@ -347,7 +360,11 @@ function addSurgeries(surgeries) {
         id,
         status: 'unknown',
         code: { text: surgery.name },
-        performedDateTime: normalizeDateTime(surgery.date),
+        // Only assert a real performed date — never fall back to the export
+        // timestamp, which would invent a clinically misleading date.
+        performedDateTime: parseDate(surgery.date)
+          ? normalizeDateTime(surgery.date)
+          : undefined,
         subject: { reference: `Patient/${userId}` },
       },
     });
@@ -488,6 +505,108 @@ function addTestResults(results) {
   }
 }
 
+function addLetters(letters) {
+  for (const [index, letter] of letters.entries()) {
+    // The MyChart export often emits placeholder `{}` letters with no content;
+    // skip those so we don't create empty document shells.
+    const hasContent =
+      letter &&
+      typeof letter === 'object' &&
+      Object.values(letter).some(
+        (value) => value !== undefined && value !== null && value !== '',
+      );
+    if (!hasContent) continue;
+    const title =
+      letter.title || letter.subject || letter.name || `Letter ${index + 1}`;
+    const body =
+      letter.body || letter.content || letter.text || JSON.stringify(letter);
+    const date = letter.date || letter.sentDate || source.exportDate;
+    const id = stableId(`letter-${index}-${title}-${date}`);
+    addClinicalDocument({
+      resourceType: 'documentreference',
+      id,
+      date,
+      displayName: title,
+      raw: {
+        resourceType: 'DocumentReference',
+        id,
+        status: 'current',
+        type: { text: 'Letter' },
+        date: normalizeDateTime(date),
+        content: [
+          {
+            attachment: {
+              contentType: 'text/plain',
+              title,
+              data: Buffer.from(String(body), 'utf8').toString('base64'),
+            },
+          },
+        ],
+      },
+      metadata: { source_category: 'letter' },
+    });
+  }
+}
+
+/**
+ * Sets `metadata.source_document_id` on every record to the DocumentReference it
+ * was derived from, matching on the record's `source_file` / `ccda_source_file`
+ * against each document's `source_file` / attachment title/url. Mirrors the
+ * in-app backfill so newly built packages link correctly without a repair step.
+ */
+function linkSourceDocuments() {
+  const isDocument = (doc) =>
+    doc.data_record?.resource_type === 'documentreference' ||
+    doc.data_record?.resource_type === 'documentreference_attachment';
+  const base = (value) => {
+    const parts = String(value).replace(/\\/g, '/').split('/');
+    return parts[parts.length - 1] || value;
+  };
+
+  const index = new Map();
+  for (const doc of clinicalDocuments) {
+    if (!isDocument(doc)) continue;
+    const metadataId = doc.metadata?.id;
+    if (!metadataId) continue;
+    const attachment = doc.data_record?.raw?.resource?.content?.[0]?.attachment;
+    const keys = new Set();
+    for (const value of [
+      doc.metadata?.source_file,
+      attachment?.title,
+      attachment?.url,
+    ]) {
+      if (value) {
+        keys.add(value);
+        keys.add(base(value));
+      }
+    }
+    const isWrapper = doc.data_record?.resource_type === 'documentreference';
+    for (const key of keys) {
+      if (!index.has(key) || isWrapper) index.set(key, metadataId);
+    }
+  }
+
+  let linked = 0;
+  for (const doc of clinicalDocuments) {
+    if (isDocument(doc)) continue;
+    const metadata = doc.metadata || {};
+    if (metadata.source_document_id) continue;
+    const candidates = [
+      metadata.ccda_source_file,
+      metadata.source_file,
+    ].filter(Boolean);
+    let documentId;
+    for (const candidate of candidates) {
+      documentId = index.get(candidate) || index.get(base(candidate));
+      if (documentId) break;
+    }
+    if (!documentId || documentId === metadata.id) continue;
+    metadata.source_document_id = documentId;
+    linked++;
+  }
+  return linked;
+}
+
 function addRawExportDocument(rawExport, filePath) {
   const rel = relative(sourceDir, filePath);
   const id = stableId(`raw-export-${rel}`);
@@ -566,7 +685,113 @@ function addMyHealthRecordsExports(root) {
     addMyHealthMedicationRecords(exportData, rel);
     addMyHealthImmunizationRecords(exportData, rel);
     addMyHealthReferralRecords(exportData, rel);
+    addMyHealthVitalSections(exportData, rel);
   }
+}
+
+/**
+ * Captures the MyHealth `bloodPressure` / `vitalSigns` / `bloodOxygen` /
+ * `procedures` sections, which were previously dropped entirely. The exact
+ * XML→JSON shape varies, so this walks for the first array of objects in each
+ * section and emits a vital-sign Observation (or Procedure) per entry, pulling a
+ * date and the first numeric reading generically. Sections that are empty (only
+ * an `@attributes` wrapper) are skipped, so nothing is invented.
+ */
+function addMyHealthVitalSections(exportData, sourceFile) {
+  const sections = [
+    { key: 'bloodPressure', kind: 'vital', label: 'Blood pressure' },
+    { key: 'vitalSigns', kind: 'vital', label: 'Vital sign' },
+    { key: 'bloodOxygen', kind: 'vital', label: 'Blood oxygen' },
+    { key: 'procedures', kind: 'procedure', label: 'Procedure' },
+  ];
+  for (const { key, kind, label } of sections) {
+    const entries = firstObjectArray(exportData[key]);
+    if (entries.length === 0) continue;
+    for (const [index, entry] of entries.entries()) {
+      if (!entry || typeof entry !== 'object') continue;
+      const date = findFirstValue(entry, /date|when|time|recorded/i);
+      const id = stableId(`myhealth-${key}-${index}-${JSON.stringify(entry)}`);
+      if (kind === 'procedure') {
+        const name = findFirstValue(entry, /name|procedure|description/i) || label;
+        addClinicalDocument({
+          resourceType: 'procedure',
+          id,
+          date: parseAnyDate(date) || source.exportDate,
+          displayName: cleanText(String(name)),
+          raw: {
+            resourceType: 'Procedure',
+            id,
+            status: 'completed',
+            code: { text: cleanText(String(name)) },
+            subject: { reference: `Patient/${userId}` },
+            performedDateTime: parseAnyDate(date),
+            note: myHealthNotes(Object.entries(entry)),
+          },
+          metadata: { source_file: sourceFile, source_category: key },
+        });
+      } else {
+        const reading = findFirstNumeric(entry);
+        addClinicalDocument({
+          resourceType: 'observation',
+          id,
+          date: parseAnyDate(date) || source.exportDate,
+          displayName: label,
+          raw: {
+            resourceType: 'Observation',
+            id,
+            status: 'final',
+            category: [
+              {
+                coding: [
+                  {
+                    system:
+                      'http://terminology.hl7.org/CodeSystem/observation-category',
+                    code: 'vital-signs',
+                  },
+                ],
+              },
+            ],
+            code: { text: label },
+            effectiveDateTime: parseAnyDate(date),
+            valueQuantity: reading,
+            note: myHealthNotes(Object.entries(entry)),
+          },
+          metadata: { source_file: sourceFile, source_category: key },
+        });
+      }
+    }
+  }
+}
+
+/** Returns the first array-of-objects found inside an XML→JSON section. */
+function firstObjectArray(section) {
+  if (!section || typeof section !== 'object') return [];
+  for (const [key, value] of Object.entries(section)) {
+    if (key === '@attributes') continue;
+    const items = asArray(value);
+    if (items.some((item) => item && typeof item === 'object')) return items;
+  }
+  return [];
+}
+
+function findFirstValue(obj, pattern) {
+  for (const [key, value] of Object.entries(obj)) {
+    if (pattern.test(key)) {
+      const v = scalar(value);
+      if (v !== undefined && v !== '') return v;
+    }
+  }
+  return undefined;
+}
+
+function findFirstNumeric(obj) {
+  for (const value of Object.values(obj)) {
+    const v = scalar(value);
+    if (v !== undefined && v !== '' && !Number.isNaN(Number(v))) {
+      return { value: Number(v) };
+    }
+  }
+  return undefined;
 }
 
 function addMyHealthLabRecords(exportData, sourceFile) {
