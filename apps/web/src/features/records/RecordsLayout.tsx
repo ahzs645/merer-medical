@@ -2,14 +2,18 @@ import { Outlet } from 'react-router-dom';
 
 import {
   BeakerIcon,
+  BuildingOffice2Icon,
   ClipboardDocumentCheckIcon,
   DocumentTextIcon,
+  ExclamationTriangleIcon,
   EyeIcon,
   FaceSmileIcon,
   FlagIcon,
+  HeartIcon,
   IdentificationIcon,
   ClipboardDocumentListIcon,
   ExclamationCircleIcon,
+  PaperAirplaneIcon,
   PhotoIcon,
   ScissorsIcon,
   ShieldCheckIcon,
@@ -22,6 +26,7 @@ import { ScrollableTabNav } from '../../shared/components/ScrollableTabNav';
 
 const recordTabs = [
   { to: AppRoutes.Labs, label: 'Labs', icon: BeakerIcon },
+  { to: AppRoutes.Vitals, label: 'Vitals', icon: HeartIcon },
   { to: AppRoutes.Documents, label: 'Documents', icon: DocumentTextIcon },
   { to: AppRoutes.Imaging, label: 'Imaging', icon: PhotoIcon },
   {
@@ -46,9 +51,17 @@ const recordTabs = [
   },
   { to: AppRoutes.Problems, label: 'Problems', icon: ExclamationCircleIcon },
   { to: AppRoutes.Conditions, label: 'My Conditions', icon: Squares2X2Icon },
+  {
+    to: AppRoutes.Allergies,
+    label: 'Allergies',
+    icon: ExclamationTriangleIcon,
+  },
   { to: AppRoutes.Procedures, label: 'Procedures', icon: ScissorsIcon },
+  { to: AppRoutes.Encounters, label: 'Visits', icon: BuildingOffice2Icon },
+  { to: AppRoutes.Referrals, label: 'Referrals', icon: PaperAirplaneIcon },
   { to: AppRoutes.Goals, label: 'Goals', icon: FlagIcon },
   { to: AppRoutes.Histories, label: 'Histories', icon: UsersIcon },
+  { to: AppRoutes.Directory, label: 'Providers', icon: UsersIcon },
   { to: AppRoutes.Dental, label: 'Dental', icon: FaceSmileIcon },
   { to: AppRoutes.Optometry, label: 'Optometry', icon: EyeIcon },
 ];

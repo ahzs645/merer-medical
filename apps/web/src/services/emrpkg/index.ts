@@ -17,6 +17,7 @@ import { strToU8, strFromU8 } from 'fflate';
 import { packEmrpkg, unpackEmrpkg, inspectEmrpkg } from '@mere/local-dexie';
 import type { DatabaseCollections } from '../../app/providers/DatabaseCollections';
 import { createExportPrfKey, deriveImportPrfKey } from './webauthnPrf';
+import { backfillSourceDocumentLinks } from '../../repositories/sourceLinkBackfill';
 
 export const RXDB_COLLECTIONS_IN_PACKAGE = [
   'user_documents',
@@ -165,6 +166,18 @@ export async function importEmrpkgToRxDb(
       );
     }
     counts[tableName as RxDbCollectionName] = rows.length;
+  }
+
+  // Reconcile source-document links for packages whose records carry
+  // `metadata.source_file` / `ccda_source_file` (offline builders) rather than
+  // the `source_document_id` pointer the Documents↔Records UI reads. Best-effort:
+  // a failure here must not fail an otherwise-successful import.
+  if (counts['clinical_documents']) {
+    try {
+      await backfillSourceDocumentLinks(db);
+    } catch (err) {
+      console.warn('[emrpkg] source-document link backfill failed', err);
+    }
   }
 
   return { counts, unknownTables };

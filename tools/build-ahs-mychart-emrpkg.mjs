@@ -98,6 +98,11 @@ const sourceLabel = source.exportSource || 'Alberta Health Services MyChart';
 const profileId = stableId(`ahs-mychart-${source.exportDate || jsonPath}`);
 const userId = `u-${profileId}`;
 const connectionId = `c-${profileId}`;
+// Relative path of the primary export, used as the default `source_file` so that
+// records derived from it (vitals, allergies, test results, family/surgical
+// history) can be linked back to their stored "Raw source export" document by
+// the source-document linker below.
+const primaryExportRel = relative(sourceDir, jsonPath);
 
 const user = {
   id: userId,
@@ -129,6 +134,9 @@ const connection = {
 const clinicalDocuments = [];
 const clinicalDocumentIds = new Set();
 const ccdaExtractionCounts = {};
+// Per-document IHE-XDM metadata (URI basename -> { authorInstitution, typeCode,
+// typeDisplay }), populated from METADATA.XML by loadXdmMetadata().
+const xdmMetadataByName = new Map();
 
 addClinicalDocument({
   resourceType: 'patient',
@@ -158,10 +166,13 @@ addAllergyStatus(source.allergies);
 addSurgeries(source.medicalHistory?.surgeries || []);
 addFamilyHistory(source.medicalHistory?.familyHistory || []);
 addTestResults(source.testResults?.results || []);
+addLetters(source.letters || []);
 addRawExportDocument(source, jsonPath);
 addSiblingJsonDocuments(sourceDir);
 addMyHealthRecordsExports(sourceDir);
 addSourceProvenance();
+loadXdmMetadata(sourceDir);
+if (healthSummaryDir) loadXdmMetadata(healthSummaryDir);
 addHealthSummaryExtractedRecords(healthSummaryDir);
 consolidateDiagnosticReports();
 addFileDocuments(sourceDir);
@@ -172,6 +183,15 @@ if (healthSummaryDir && !isInsidePath(healthSummaryDir, sourceDir)) {
   });
 }
 addCompanionResourcesForLooseFiles(sourceDir);
+// Cross-resource linking passes — run after all records AND documents exist.
+const locationCount = materializeLocations();
+const practitionerCount = materializePractitioners();
+const encounterLinkCount = linkEncountersToResults();
+const subjectCount = backfillSubjectReferences();
+const consentCount = addSurgicalConsentRecords();
+// Reconcile every record to the stored document it came from. Must run last,
+// after all records AND all source documents have been created.
+const sourceLinkCount = linkSourceDocuments();
 
 const tableFiles = {
   user_documents: strToU8(JSON.stringify([user], null, 2)),
@@ -217,6 +237,12 @@ if (reportPath) {
 
 console.log(`Wrote ${outputPath}`);
 console.log(`Clinical documents: ${clinicalDocuments.length}`);
+console.log(`Locations materialized: ${locationCount}`);
+console.log(`Practitioners materialized: ${practitionerCount}`);
+console.log(`Results linked to encounters: ${encounterLinkCount}`);
+console.log(`Subject references added: ${subjectCount}`);
+console.log(`Surgical consent records: ${consentCount}`);
+console.log(`Linked to source documents: ${sourceLinkCount}`);
 if (reportPath) console.log(`Wrote ${reportPath}`);
 
 function addClinicalDocument({
@@ -248,6 +274,9 @@ function addClinicalDocument({
       id: metadataId,
       date: normalizeDateTime(date),
       display_name: displayName,
+      // Default provenance pointer; per-record metadata (CCDA / MyHealth /
+      // file documents) overrides it via the spread below.
+      source_file: primaryExportRel,
       ...metadata,
     },
     _meta: { lwt: now },
@@ -347,7 +376,11 @@ function addSurgeries(surgeries) {
         id,
         status: 'unknown',
         code: { text: surgery.name },
-        performedDateTime: normalizeDateTime(surgery.date),
+        // Only assert a real performed date — never fall back to the export
+        // timestamp, which would invent a clinically misleading date.
+        performedDateTime: parseDate(surgery.date)
+          ? normalizeDateTime(surgery.date)
+          : undefined,
         subject: { reference: `Patient/${userId}` },
       },
     });
@@ -488,6 +521,533 @@ function addTestResults(results) {
   }
 }
 
+function addLetters(letters) {
+  for (const [index, letter] of letters.entries()) {
+    // The MyChart export often emits placeholder `{}` letters with no content;
+    // skip those so we don't create empty document shells.
+    const hasContent =
+      letter &&
+      typeof letter === 'object' &&
+      Object.values(letter).some(
+        (value) => value !== undefined && value !== null && value !== '',
+      );
+    if (!hasContent) continue;
+    const title =
+      letter.title || letter.subject || letter.name || `Letter ${index + 1}`;
+    const body =
+      letter.body || letter.content || letter.text || JSON.stringify(letter);
+    const date = letter.date || letter.sentDate || source.exportDate;
+    const id = stableId(`letter-${index}-${title}-${date}`);
+    addClinicalDocument({
+      resourceType: 'documentreference',
+      id,
+      date,
+      displayName: title,
+      raw: {
+        resourceType: 'DocumentReference',
+        id,
+        status: 'current',
+        type: { text: 'Letter' },
+        date: normalizeDateTime(date),
+        content: [
+          {
+            attachment: {
+              contentType: 'text/plain',
+              title,
+              data: Buffer.from(String(body), 'utf8').toString('base64'),
+            },
+          },
+        ],
+      },
+      metadata: { source_category: 'letter' },
+    });
+  }
+}
+
+/**
+ * Sets `metadata.source_document_id` on every record to the DocumentReference it
+ * was derived from, matching on the record's `source_file` / `ccda_source_file`
+ * against each document's `source_file` / attachment title/url. Mirrors the
+ * in-app backfill so newly built packages link correctly without a repair step.
+ */
+function linkSourceDocuments() {
+  const isDocument = (doc) =>
+    doc.data_record?.resource_type === 'documentreference' ||
+    doc.data_record?.resource_type === 'documentreference_attachment';
+  const base = (value) => {
+    const parts = String(value).replace(/\\/g, '/').split('/');
+    return parts[parts.length - 1] || value;
+  };
+
+  const index = new Map();
+  for (const doc of clinicalDocuments) {
+    if (!isDocument(doc)) continue;
+    const metadataId = doc.metadata?.id;
+    if (!metadataId) continue;
+    const attachment = doc.data_record?.raw?.resource?.content?.[0]?.attachment;
+    const keys = new Set();
+    for (const value of [
+      doc.metadata?.source_file,
+      attachment?.title,
+      attachment?.url,
+    ]) {
+      if (value) {
+        keys.add(value);
+        keys.add(base(value));
+      }
+    }
+    const isWrapper = doc.data_record?.resource_type === 'documentreference';
+    for (const key of keys) {
+      if (!index.has(key) || isWrapper) index.set(key, metadataId);
+    }
+  }
+
+  let linked = 0;
+  for (const doc of clinicalDocuments) {
+    if (isDocument(doc)) continue;
+    const metadata = doc.metadata || {};
+    if (metadata.source_document_id) continue;
+    const candidates = [
+      metadata.ccda_source_file,
+      metadata.source_file,
+    ].filter(Boolean);
+    let documentId;
+    for (const candidate of candidates) {
+      documentId = index.get(candidate) || index.get(base(candidate));
+      if (documentId) break;
+    }
+    if (!documentId || documentId === metadata.id) continue;
+    metadata.source_document_id = documentId;
+    linked++;
+  }
+  return linked;
+}
+
+// ---------------------------------------------------------------------------
+// C-CDA / IHE-XDM document metadata
+// ---------------------------------------------------------------------------
+
+/** Richer C-CDA document info: human title, the documented service/visit date
+ * (preferred over the export-day creation time), document type code/display, and
+ * authoring institution. */
+function extractCdaInfo(xml) {
+  const title =
+    xml.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1]?.trim() || undefined;
+  const docOf =
+    xml.match(/<documentationOf[\s\S]*?<\/documentationOf>/i)?.[0] || '';
+  const serviceLow = docOf.match(/<low[^>]*value="([^"]+)"/i)?.[1];
+  const serviceHigh = docOf.match(/<high[^>]*value="([^"]+)"/i)?.[1];
+  const effective = xml.match(/<effectiveTime[^>]*value="([^"]+)"/i)?.[1];
+  const encounter =
+    xml.match(/<encompassingEncounter[\s\S]*?<\/encompassingEncounter>/i)?.[0] ||
+    '';
+  const encounterDate =
+    encounter.match(/<effectiveTime[^>]*\bvalue="([^"]+)"/i)?.[1] ||
+    encounter.match(/<low[^>]*value="([^"]+)"/i)?.[1];
+  // A per-visit summary carries an encompassing encounter (use its date); a
+  // whole-record summary has a lifetime serviceEvent range (low=DOB) — in that
+  // case use the document creation time, not the misleading range start.
+  const serviceRaw = encounterDate
+    ? encounterDate
+    : serviceLow && !serviceHigh
+      ? serviceLow
+      : effective;
+  const serviceDate = parseCdaDate(serviceRaw);
+  const codeEl = xml.match(
+    /<code[^>]*\bcode="([^"]+)"[^>]*\bdisplayName="([^"]*)"/i,
+  );
+  const author =
+    xml
+      .match(/<representedOrganization>[\s\S]*?<name[^>]*>([^<]+)<\/name>/i)?.[1]
+      ?.trim() || undefined;
+  return {
+    title,
+    serviceDate,
+    typeCode: codeEl?.[1],
+    typeDisplay: codeEl?.[2] || undefined,
+    author,
+  };
+}
+
+function formatDisplayDate(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleDateString('en-CA', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  } catch {
+    return String(iso).slice(0, 10);
+  }
+}
+
+/** Parses every METADATA.XML (IHE-XDM ebRIM) under root into xdmMetadataByName,
+ * keyed by uppercased document filename. */
+function loadXdmMetadata(root) {
+  if (!root || !existsSync(root)) return;
+  for (const file of walkFiles(root)) {
+    if (basename(file).toUpperCase() !== 'METADATA.XML') continue;
+    let xml;
+    try {
+      xml = readFileSync(file, 'utf8');
+    } catch {
+      continue;
+    }
+    const blocks = xml
+      .split(/(?=<ExtrinsicObject\b)/)
+      .filter((block) => block.startsWith('<ExtrinsicObject'));
+    for (const block of blocks) {
+      const uri = block.match(
+        /<Slot name="URI">\s*<ValueList>\s*<Value>([^<]+)<\/Value>/i,
+      )?.[1];
+      if (!uri) continue;
+      const authorInstitution = block.match(
+        /<Slot name="authorInstitution">\s*<ValueList>\s*<Value>([^<]+)<\/Value>/i,
+      )?.[1];
+      const typeCode = block.match(
+        /classificationScheme="urn:uuid:f0306f51-975f-434e-a61c-c59651d33983"[^>]*nodeRepresentation="([^"]*)"/i,
+      )?.[1];
+      xdmMetadataByName.set(basename(uri).toUpperCase(), {
+        authorInstitution: authorInstitution?.trim(),
+        typeCode,
+      });
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Cross-resource linking passes (run after all records & documents exist)
+// ---------------------------------------------------------------------------
+
+function recordsByType(type) {
+  return clinicalDocuments.filter(
+    (doc) => doc.data_record?.resource_type === type,
+  );
+}
+
+function fhirOf(doc) {
+  return doc?.data_record?.raw?.resource;
+}
+
+/** Best-effort split of a concatenated facility string into name/address/phone. */
+function parseFacilityString(display) {
+  const raw = String(display).trim();
+  let working = raw;
+  let phone;
+  // Match a North-American phone at the end without swallowing the trailing
+  // digit of a preceding postal code (e.g. "T0E 1E0 780-852-6606").
+  const phoneMatch = working.match(
+    /(\+?1[\s.-]?)?(\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4})\s*$/,
+  );
+  if (phoneMatch) {
+    phone = phoneMatch[0].trim();
+    working = working.slice(0, phoneMatch.index).trim();
+  }
+  let name = working;
+  let address;
+  const addressMatch = working.match(/\s(\d{1,6}\s+\S.*)$/);
+  if (addressMatch && addressMatch.index !== undefined) {
+    name = working.slice(0, addressMatch.index).trim();
+    address = addressMatch[1].trim();
+  }
+  return { name: name || raw, address, phone };
+}
+
+/** Creates a deduplicated Location resource per distinct encounter location
+ * string and points each Encounter.location at it via a real reference. */
+function materializeLocations() {
+  const locationIdByDisplay = new Map();
+  let created = 0;
+  for (const encounter of recordsByType('encounter')) {
+    const resource = fhirOf(encounter);
+    for (const entry of resource?.location || []) {
+      const display = entry.location?.display?.trim();
+      if (!display) continue;
+      let locationId = locationIdByDisplay.get(display);
+      if (!locationId) {
+        locationId = stableId(`location-${display}`);
+        locationIdByDisplay.set(display, locationId);
+        const parsed = parseFacilityString(display);
+        const added = addClinicalDocument({
+          resourceType: 'location',
+          id: locationId,
+          date: source.exportDate,
+          displayName: parsed.name,
+          raw: {
+            resourceType: 'Location',
+            id: locationId,
+            status: 'active',
+            name: parsed.name,
+            telecom: parsed.phone
+              ? [{ system: 'phone', value: parsed.phone }]
+              : undefined,
+            address: parsed.address ? { text: parsed.address } : undefined,
+            text: { status: 'generated', div: display },
+          },
+          metadata: { manual_specialty: 'location' },
+        });
+        if (added) created++;
+      }
+      entry.location.reference = `Location/${locationId}`;
+    }
+  }
+  return created;
+}
+
+/** Creates a deduplicated Practitioner resource per distinct provider name found
+ * on CareTeam participants and report/referral/procedure performers, and points
+ * each reference at it. */
+function materializePractitioners() {
+  const idByName = new Map();
+  let created = 0;
+  const ensure = (name, contacts) => {
+    const clean = String(name || '').trim();
+    if (!clean) return undefined;
+    const key = clean.toLowerCase();
+    let id = idByName.get(key);
+    if (!id) {
+      id = stableId(`practitioner-${key}`);
+      idByName.set(key, id);
+      const telecom = (contacts || [])
+        .filter(Boolean)
+        .map((value) => ({ value }));
+      const added = addClinicalDocument({
+        resourceType: 'practitioner',
+        id,
+        date: source.exportDate,
+        displayName: clean,
+        raw: {
+          resourceType: 'Practitioner',
+          id,
+          name: [{ text: clean }],
+          telecom: telecom.length ? telecom : undefined,
+        },
+        metadata: { manual_specialty: 'provider' },
+      });
+      if (added) created++;
+    }
+    return id;
+  };
+  const linkRef = (ref) => {
+    if (ref && ref.display && !ref.reference) {
+      const id = ensure(ref.display);
+      if (id) ref.reference = `Practitioner/${id}`;
+    }
+  };
+
+  for (const careTeam of recordsByType('careteam')) {
+    for (const participant of fhirOf(careTeam)?.participant || []) {
+      const name = participant.member?.display;
+      if (!name) continue;
+      const contacts = (participant.extension || [])
+        .map((ext) => ext.valueString)
+        .filter(Boolean);
+      const id = ensure(name, contacts);
+      if (id && participant.member && !participant.member.reference) {
+        participant.member.reference = `Practitioner/${id}`;
+      }
+    }
+  }
+  for (const report of recordsByType('diagnosticreport')) {
+    for (const performer of fhirOf(report)?.performer || []) linkRef(performer);
+  }
+  for (const request of recordsByType('servicerequest')) {
+    const resource = fhirOf(request);
+    linkRef(resource?.requester);
+    for (const performer of resource?.performer || []) linkRef(performer);
+  }
+  for (const procedure of recordsByType('procedure')) {
+    for (const performer of fhirOf(procedure)?.performer || [])
+      linkRef(performer?.actor || performer);
+  }
+  return created;
+}
+
+/** Links results/observations/procedures to the encounter from the same C-CDA
+ * document (the visit they were produced at) via a real reference. */
+function linkEncountersToResults() {
+  const groups = new Map();
+  for (const doc of clinicalDocuments) {
+    const type = doc.data_record?.resource_type;
+    if (type === 'documentreference' || type === 'documentreference_attachment')
+      continue;
+    const sourceFile = doc.metadata?.source_file;
+    const key =
+      doc.metadata?.ccda_source_file ||
+      (sourceFile && /\.xml$/i.test(sourceFile) ? sourceFile : undefined);
+    if (!key) continue;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(doc);
+  }
+
+  let linked = 0;
+  for (const docs of groups.values()) {
+    const encounters = docs.filter(
+      (doc) => doc.data_record?.resource_type === 'encounter',
+    );
+    if (encounters.length === 0) continue;
+    const pickEncounter = (recordDate) => {
+      if (encounters.length === 1) return encounters[0];
+      const day = (recordDate || '').slice(0, 10);
+      return (
+        encounters.find(
+          (enc) => (enc.metadata?.date || '').slice(0, 10) === day,
+        ) || encounters[0]
+      );
+    };
+    for (const doc of docs) {
+      const type = doc.data_record?.resource_type;
+      if (!['diagnosticreport', 'observation', 'procedure'].includes(type))
+        continue;
+      const resource = fhirOf(doc);
+      if (!resource || resource.encounter) continue;
+      const encounterId = fhirOf(pickEncounter(doc.metadata?.date))?.id;
+      if (!encounterId) continue;
+      resource.encounter = { reference: `Encounter/${encounterId}` };
+      linked++;
+    }
+  }
+  return linked;
+}
+
+/** Ensures observations and diagnostic reports carry a subject -> Patient ref. */
+function backfillSubjectReferences() {
+  let count = 0;
+  for (const doc of clinicalDocuments) {
+    const type = doc.data_record?.resource_type;
+    if (type !== 'observation' && type !== 'diagnosticreport') continue;
+    const resource = fhirOf(doc);
+    if (!resource || resource.subject) continue;
+    resource.subject = { reference: `Patient/${userId}` };
+    count++;
+  }
+  return count;
+}
+
+/** Promotes a stored surgical-consent document into a structured Consent (and a
+ * planned Procedure), linked back to the source document. */
+function addSurgicalConsentRecords() {
+  let created = 0;
+  for (const doc of recordsByType('documentreference')) {
+    const sourceFile = doc.metadata?.source_file || '';
+    const resource = fhirOf(doc);
+    const title = resource?.content?.[0]?.attachment?.title || '';
+    const haystack = `${sourceFile} ${title}`;
+    if (!/consent/i.test(haystack)) continue;
+    if (!/surg|invasive|procedure/i.test(haystack)) continue;
+
+    let text = '';
+    const textAttachment = (resource?.content || []).find(
+      (entry) => entry.attachment?.contentType === 'text/plain',
+    );
+    if (textAttachment?.attachment?.data) {
+      text = Buffer.from(textAttachment.attachment.data, 'base64').toString(
+        'utf8',
+      );
+    } else {
+      const htmlAttachment = (resource?.content || []).find((entry) =>
+        /html/i.test(entry.attachment?.contentType || ''),
+      );
+      if (htmlAttachment?.attachment?.data) {
+        text = stripHtml(
+          Buffer.from(htmlAttachment.attachment.data, 'base64').toString(
+            'utf8',
+          ),
+        );
+      }
+    }
+    text = text.replace(/\s+/g, ' ').trim();
+    if (!text) continue;
+    const procedure = extractConsentProcedure(text);
+    if (!procedure) continue;
+    const service = extractConsentService(text);
+    const docDate = doc.metadata?.date || source.exportDate;
+    const documentId = doc.metadata?.id;
+
+    const consentId = stableId(`surgical-consent-${procedure}`);
+    if (
+      addClinicalDocument({
+        resourceType: 'consent',
+        id: consentId,
+        date: docDate,
+        displayName: `Consent: ${procedure}`,
+        raw: {
+          resourceType: 'Consent',
+          id: consentId,
+          status: 'active',
+          scope: {
+            coding: [
+              {
+                system:
+                  'http://terminology.hl7.org/CodeSystem/consentscope',
+                code: 'treatment',
+              },
+            ],
+            text: 'Consent to surgery or invasive procedure',
+          },
+          category: [{ text: 'Consent to surgery or invasive procedure' }],
+          patient: { reference: `Patient/${userId}` },
+          dateTime: docDate,
+          sourceReference: documentId
+            ? { reference: `DocumentReference/${documentId}` }
+            : undefined,
+          policyText: service ? `${procedure} (Service: ${service})` : procedure,
+        },
+        metadata: {
+          source_document_id: documentId,
+          manual_subtype: 'Surgical consent',
+        },
+      })
+    )
+      created++;
+
+    const procedureId = stableId(`consented-procedure-${procedure}`);
+    if (
+      addClinicalDocument({
+        resourceType: 'procedure',
+        id: procedureId,
+        date: docDate,
+        displayName: procedure,
+        raw: {
+          resourceType: 'Procedure',
+          id: procedureId,
+          // "preparation" — consented/planned, NOT an assertion it was performed.
+          status: 'preparation',
+          code: { text: procedure },
+          subject: { reference: `Patient/${userId}` },
+          reasonCode: service ? [{ text: service }] : undefined,
+          note: [
+            {
+              text: 'Documented from a signed surgical consent form; not confirmation the procedure was performed.',
+            },
+          ],
+        },
+        metadata: {
+          source_document_id: documentId,
+          manual_subtype: 'Consented procedure',
+        },
+      })
+    )
+      created++;
+  }
+  return created;
+}
+
+function extractConsentProcedure(text) {
+  const match = text.match(
+    /Details of Surgery or Invasive Procedure\s+(.+?)\s+I confirm that the nature/i,
+  );
+  return match ? cleanText(match[1]).slice(0, 300) : undefined;
+}
+
+function extractConsentService(text) {
+  const match =
+    text.match(/([A-Z][A-Z ]*SURGERY[^.]*?)\s+will perform/i) ||
+    text.match(/([A-Z][A-Za-z ]+ - ACUTE CARE[^.]*?\))/);
+  return match ? cleanText(match[1]).slice(0, 200) : undefined;
+}
+
 function addRawExportDocument(rawExport, filePath) {
   const rel = relative(sourceDir, filePath);
   const id = stableId(`raw-export-${rel}`);
@@ -566,7 +1126,113 @@ function addMyHealthRecordsExports(root) {
     addMyHealthMedicationRecords(exportData, rel);
     addMyHealthImmunizationRecords(exportData, rel);
     addMyHealthReferralRecords(exportData, rel);
+    addMyHealthVitalSections(exportData, rel);
   }
+}
+
+/**
+ * Captures the MyHealth `bloodPressure` / `vitalSigns` / `bloodOxygen` /
+ * `procedures` sections, which were previously dropped entirely. The exact
+ * XML→JSON shape varies, so this walks for the first array of objects in each
+ * section and emits a vital-sign Observation (or Procedure) per entry, pulling a
+ * date and the first numeric reading generically. Sections that are empty (only
+ * an `@attributes` wrapper) are skipped, so nothing is invented.
+ */
+function addMyHealthVitalSections(exportData, sourceFile) {
+  const sections = [
+    { key: 'bloodPressure', kind: 'vital', label: 'Blood pressure' },
+    { key: 'vitalSigns', kind: 'vital', label: 'Vital sign' },
+    { key: 'bloodOxygen', kind: 'vital', label: 'Blood oxygen' },
+    { key: 'procedures', kind: 'procedure', label: 'Procedure' },
+  ];
+  for (const { key, kind, label } of sections) {
+    const entries = firstObjectArray(exportData[key]);
+    if (entries.length === 0) continue;
+    for (const [index, entry] of entries.entries()) {
+      if (!entry || typeof entry !== 'object') continue;
+      const date = findFirstValue(entry, /date|when|time|recorded/i);
+      const id = stableId(`myhealth-${key}-${index}-${JSON.stringify(entry)}`);
+      if (kind === 'procedure') {
+        const name = findFirstValue(entry, /name|procedure|description/i) || label;
+        addClinicalDocument({
+          resourceType: 'procedure',
+          id,
+          date: parseAnyDate(date) || source.exportDate,
+          displayName: cleanText(String(name)),
+          raw: {
+            resourceType: 'Procedure',
+            id,
+            status: 'completed',
+            code: { text: cleanText(String(name)) },
+            subject: { reference: `Patient/${userId}` },
+            performedDateTime: parseAnyDate(date),
+            note: myHealthNotes(Object.entries(entry)),
+          },
+          metadata: { source_file: sourceFile, source_category: key },
+        });
+      } else {
+        const reading = findFirstNumeric(entry);
+        addClinicalDocument({
+          resourceType: 'observation',
+          id,
+          date: parseAnyDate(date) || source.exportDate,
+          displayName: label,
+          raw: {
+            resourceType: 'Observation',
+            id,
+            status: 'final',
+            category: [
+              {
+                coding: [
+                  {
+                    system:
+                      'http://terminology.hl7.org/CodeSystem/observation-category',
+                    code: 'vital-signs',
+                  },
+                ],
+              },
+            ],
+            code: { text: label },
+            effectiveDateTime: parseAnyDate(date),
+            valueQuantity: reading,
+            note: myHealthNotes(Object.entries(entry)),
+          },
+          metadata: { source_file: sourceFile, source_category: key },
+        });
+      }
+    }
+  }
+}
+
+/** Returns the first array-of-objects found inside an XML→JSON section. */
+function firstObjectArray(section) {
+  if (!section || typeof section !== 'object') return [];
+  for (const [key, value] of Object.entries(section)) {
+    if (key === '@attributes') continue;
+    const items = asArray(value);
+    if (items.some((item) => item && typeof item === 'object')) return items;
+  }
+  return [];
+}
+
+function findFirstValue(obj, pattern) {
+  for (const [key, value] of Object.entries(obj)) {
+    if (pattern.test(key)) {
+      const v = scalar(value);
+      if (v !== undefined && v !== '') return v;
+    }
+  }
+  return undefined;
+}
+
+function findFirstNumeric(obj) {
+  for (const value of Object.values(obj)) {
+    const v = scalar(value);
+    if (v !== undefined && v !== '' && !Number.isNaN(Number(v))) {
+      return { value: Number(v) };
+    }
+  }
+  return undefined;
 }
 
 function addMyHealthLabRecords(exportData, sourceFile) {
@@ -829,9 +1495,22 @@ function addFileDocuments(root, { baseDir = root, prefix = '' } = {}) {
     const bytes = readFileSync(file);
     const id = stableId(`file-${rel}`);
     const mime = mimeType(ext);
-    const xml = ext === '.xml' ? bytes.toString('utf8') : undefined;
-    const xmlTitle = xml ? extractXmlTitle(xml) : undefined;
+    const isXml = ext === '.xml';
+    const xml = isXml ? bytes.toString('utf8') : undefined;
+    const cda = xml ? extractCdaInfo(xml) : undefined;
+    const xdm = xdmMetadataByName.get(basename(file).toUpperCase());
     const extractedText = extractLocalDocumentText(file);
+    // Date the document by the actual visit/service date when available, not the
+    // export-day creation time every C-CDA shares.
+    const docDate = cda?.serviceDate || source.exportDate;
+    const typeDisplay = cda?.typeDisplay || xdm?.typeDisplay;
+    const authorInstitution = cda?.author || xdm?.authorInstitution;
+    // Compose a navigable title: "Summary of Care — Jul 21, 2025".
+    const baseTitle = cda?.title || (isXml ? 'C-CDA document' : rel);
+    const displayName =
+      isXml && cda?.serviceDate
+        ? `${baseTitle} — ${formatDisplayDate(cda.serviceDate)}`
+        : baseTitle;
     const content = [
       {
         attachment: {
@@ -853,14 +1532,29 @@ function addFileDocuments(root, { baseDir = root, prefix = '' } = {}) {
     addClinicalDocument({
       resourceType: 'documentreference',
       id,
-      date: xmlTitle?.date || source.exportDate,
-      displayName: xmlTitle?.title || rel,
+      date: docDate,
+      displayName,
       raw: {
         resourceType: 'DocumentReference',
         id,
         status: 'current',
-        type: { text: ext === '.xml' ? 'C-CDA document' : 'Source file' },
-        date: normalizeDateTime(xmlTitle?.date || source.exportDate),
+        type: {
+          text: typeDisplay || (isXml ? 'C-CDA document' : 'Source file'),
+          coding:
+            isXml && cda?.typeCode
+              ? [
+                  {
+                    system: 'http://loinc.org',
+                    code: cda.typeCode,
+                    display: cda.typeDisplay,
+                  },
+                ]
+              : undefined,
+        },
+        date: normalizeDateTime(docDate),
+        author: authorInstitution
+          ? [{ display: authorInstitution }]
+          : undefined,
         content,
         description: extractedText.text
           ? `Local text extraction (${extractedText.method}) captured ${extractedText.text.length} characters.`
@@ -869,6 +1563,9 @@ function addFileDocuments(root, { baseDir = root, prefix = '' } = {}) {
       metadata: {
         source_file: rel,
         source_size: statSync(file).size,
+        ccda_type_code: isXml ? cda?.typeCode : undefined,
+        ccda_service_date: isXml ? cda?.serviceDate : undefined,
+        ccda_author_institution: isXml ? authorInstitution : undefined,
         local_text_extraction_method: extractedText.method,
         local_text_extraction_chars: extractedText.text?.length,
         local_text_extraction_error: extractedText.error,
@@ -893,7 +1590,10 @@ function addCcdaExtractedRecords(ccdaDir, baseDir = sourceDir) {
   )) {
     const rel = relative(baseDir, join(ccdaDir, file));
     const xml = readFileSync(join(ccdaDir, file), 'utf8');
-    const docDate = extractXmlTitle(xml)?.date || source.exportDate;
+    // Prefer the documented service/visit date over the document's creation
+    // time (the latter is the export day for every doc), so CCDA-derived records
+    // that lack their own date fall back to when the visit actually happened.
+    const docDate = extractCdaInfo(xml).serviceDate || source.exportDate;
     const sections = extractCcdaSections(xml);
 
     for (const section of sections) {

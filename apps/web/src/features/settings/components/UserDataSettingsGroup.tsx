@@ -20,6 +20,7 @@ import {
   importEmrpkgToRxDb,
   inspectEmrpkg,
 } from '../../../services/emrpkg';
+import { backfillSourceDocumentLinks } from '../../../repositories/sourceLinkBackfill';
 import React from 'react';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { StylizedSelect } from '../../../shared/components/StylizedSelect';
@@ -215,6 +216,28 @@ export function UserDataSettingsGroup() {
     },
     [db, emrpkgImportMode, emrpkgPassphrase, notifyDispatch],
   );
+
+  const handleRepairSourceLinks = useCallback(async () => {
+    setEmrpkgBusy(true);
+    try {
+      const { linked } = await backfillSourceDocumentLinks(db);
+      notifyDispatch({
+        type: 'set_notification',
+        message: linked
+          ? `Linked ${linked} record${linked === 1 ? '' : 's'} to their source documents.`
+          : `No records needed linking.`,
+        variant: 'success',
+      });
+    } catch (e) {
+      notifyDispatch({
+        type: 'set_notification',
+        message: `Repair failed: ${(e as Error).message}`,
+        variant: 'error',
+      });
+    } finally {
+      setEmrpkgBusy(false);
+    }
+  }, [db, notifyDispatch]);
 
   const importData: SubmitHandler<ImportFields> = useCallback(
     async (fields) => {
@@ -469,6 +492,17 @@ export function UserDataSettingsGroup() {
             >
               download
             </a>
+            <button
+              type="button"
+              disabled={emrpkgBusy}
+              onClick={handleRepairSourceLinks}
+              title={t(
+                'Link records imported from an offline builder to their stored source documents',
+              )}
+              className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:bg-gray-200"
+            >
+              {t('Repair source links')}
+            </button>
           </div>
         </li>
         {/* Show storage usage  */}

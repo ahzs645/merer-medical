@@ -68,6 +68,12 @@ import { OptometrySurgeryTab } from '../features/optometry/tabs/OptometrySurgery
 import { OptometryImagingTab } from '../features/optometry/tabs/OptometryImagingTab';
 import { OptometryRecordsTab } from '../features/optometry/tabs/OptometryRecordsTab';
 import { ProblemsTab } from '../features/problems/ProblemsTab';
+import { AllergiesTab } from '../features/allergies/AllergiesTab';
+import { VitalsTab } from '../features/vitals/VitalsTab';
+import { EncountersTab } from '../features/encounters/EncountersTab';
+import { ReferralsTab } from '../features/referrals/ReferralsTab';
+import { DirectoryTab } from '../features/directory/DirectoryTab';
+import { ResultsTab } from '../features/results/ResultsTab';
 import { RecordsLayout } from '../features/records/RecordsLayout';
 import SettingsTab from '../features/settings/SettingsTab';
 import { SharingTab } from '../features/sharing/SharingTab';
@@ -251,6 +257,30 @@ const routes = [
           {
             path: 'procedures',
             element: <ProceduresTab />,
+          },
+          {
+            path: 'allergies',
+            element: <AllergiesTab />,
+          },
+          {
+            path: 'vitals',
+            element: <VitalsTab />,
+          },
+          {
+            path: 'encounters',
+            element: <EncountersTab />,
+          },
+          {
+            path: 'referrals',
+            element: <ReferralsTab />,
+          },
+          {
+            path: 'directory',
+            element: <DirectoryTab />,
+          },
+          {
+            path: 'results',
+            element: <ResultsTab />,
           },
           {
             path: 'new',

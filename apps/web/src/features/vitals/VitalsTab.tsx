@@ -1,0 +1,311 @@
+import { useEffect, useMemo, useState } from 'react';
+import { HeartIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+
+import { useRxDb } from '../../app/providers/RxDbProvider';
+import { useUser } from '../../app/providers/UserProvider';
+import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
+import { AppPage } from '../../shared/components/AppPage';
+import { GenericBanner } from '../../shared/components/GenericBanner';
+import { safeFormatDate } from '../../shared/utils/dateFormatters';
+import { getFhirResource } from '../../shared/utils/fhirResource';
+
+interface Reading {
+  date?: string;
+  /** Human-readable value, e.g. "112/70 mmHg" or "96 %". */
+  text: string;
+  /** Numeric value used for the sparkline (systolic for blood pressure). */
+  numeric?: number;
+}
+
+interface VitalGroup {
+  key: string;
+  name: string;
+  unit?: string;
+  readings: Reading[];
+  latest: Reading;
+}
+
+type FhirComponent = {
+  code?: { coding?: Array<{ code?: string }>; text?: string };
+  valueQuantity?: { value?: number; unit?: string };
+};
+
+type FhirObservation = {
+  code?: { coding?: Array<{ code?: string; display?: string }>; text?: string };
+  effectiveDateTime?: string;
+  valueQuantity?: { value?: number; unit?: string };
+  valueString?: string;
+  component?: FhirComponent[];
+};
+
+/** Extracts a display value + sparkline number from a vital Observation, with
+ * special handling for blood pressure (systolic/diastolic components). */
+function readObservation(resource: FhirObservation): {
+  text: string;
+  numeric?: number;
+  unit?: string;
+} {
+  const components = resource.component || [];
+  const findComponent = (loinc: string) =>
+    components.find((c) =>
+      (c.code?.coding || []).some((coding) => coding.code === loinc),
+    )?.valueQuantity;
+  const systolic = findComponent('8480-6');
+  const diastolic = findComponent('8462-4');
+  if (systolic?.value != null || diastolic?.value != null) {
+    const unit = systolic?.unit || diastolic?.unit || 'mmHg';
+    return {
+      text: `${systolic?.value ?? '–'}/${diastolic?.value ?? '–'} ${unit}`.trim(),
+      numeric: systolic?.value,
+      unit,
+    };
+  }
+  if (resource.valueQuantity?.value != null) {
+    const { value, unit } = resource.valueQuantity;
+    return {
+      text: unit ? `${value} ${unit}` : `${value}`,
+      numeric: value,
+      unit,
+    };
+  }
+  if (resource.valueString) return { text: resource.valueString };
+  // Fall back to the first numeric component.
+  const firstComponent = components.find((c) => c.valueQuantity?.value != null);
+  if (firstComponent?.valueQuantity?.value != null) {
+    const { value, unit } = firstComponent.valueQuantity;
+    return {
+      text: unit ? `${value} ${unit}` : `${value}`,
+      numeric: value,
+      unit,
+    };
+  }
+  return { text: '—' };
+}
+
+function isVitalSign(resource: Record<string, unknown>): boolean {
+  const categories =
+    (resource['category'] as
+      | Array<{ coding?: Array<{ code?: string }> }>
+      | undefined) || [];
+  return categories.some((category) =>
+    (category.coding || []).some((coding) => coding.code === 'vital-signs'),
+  );
+}
+
+function useVitals() {
+  const db = useRxDb();
+  const user = useUser();
+  const [groups, setGroups] = useState<VitalGroup[]>([]);
+  const [status, setStatus] = useState<'loading' | 'success'>('loading');
+
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      setStatus('loading');
+      const docs = await db.clinical_documents
+        .find({
+          selector: {
+            user_id: user.id,
+            'data_record.resource_type': 'observation',
+          },
+        })
+        .exec();
+      if (!mounted) return;
+
+      const byKey = new Map<string, VitalGroup>();
+      for (const doc of docs) {
+        const d = doc.toMutableJSON() as ClinicalDocument;
+        const resource = getFhirResource<
+          FhirObservation & Record<string, unknown>
+        >(d);
+        if (!resource || !isVitalSign(resource)) continue;
+        const loinc = resource.code?.coding?.[0]?.code;
+        const name =
+          resource.code?.text ||
+          resource.code?.coding?.[0]?.display ||
+          d.metadata?.display_name ||
+          'Vital';
+        const key = loinc || name.toLowerCase();
+        const value = readObservation(resource);
+        const reading: Reading = {
+          date: resource.effectiveDateTime || d.metadata?.date,
+          text: value.text,
+          numeric: value.numeric,
+        };
+        const existing = byKey.get(key);
+        if (existing) {
+          existing.readings.push(reading);
+          if (!existing.unit) existing.unit = value.unit;
+        } else {
+          byKey.set(key, {
+            key,
+            name,
+            unit: value.unit,
+            readings: [reading],
+            latest: reading,
+          });
+        }
+      }
+
+      const list = Array.from(byKey.values());
+      for (const group of list) {
+        group.readings.sort((a, b) =>
+          (b.date || '').localeCompare(a.date || ''),
+        );
+        group.latest = group.readings[0];
+      }
+      list.sort((a, b) => a.name.localeCompare(b.name));
+      setGroups(list);
+      setStatus('success');
+    }
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [db, user.id]);
+
+  return { groups, status };
+}
+
+/** Tiny dependency-free SVG sparkline of a vital's recent numeric values. */
+function Sparkline({ readings }: { readings: Reading[] }) {
+  const points = readings
+    .filter((r) => typeof r.numeric === 'number')
+    .slice(0, 12)
+    .reverse()
+    .map((r) => r.numeric as number);
+  if (points.length < 2) return null;
+  const min = Math.min(...points);
+  const max = Math.max(...points);
+  const range = max - min || 1;
+  const width = 120;
+  const height = 32;
+  const step = width / (points.length - 1);
+  const path = points
+    .map((value, index) => {
+      const x = index * step;
+      const y = height - ((value - min) / range) * (height - 4) - 2;
+      return `${index === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      className="text-primary-500"
+      aria-hidden="true"
+    >
+      <path
+        d={path}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function VitalsTab() {
+  const { groups, status } = useVitals();
+  const [query, setQuery] = useState('');
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return groups;
+    return groups.filter((group) => group.name.toLowerCase().includes(q));
+  }, [groups, query]);
+
+  return (
+    <AppPage banner={<GenericBanner text="Vital signs" />}>
+      <div className="h-full overflow-y-auto bg-gray-50">
+        <div className="mx-auto grid w-full max-w-3xl gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
+          <label className="relative block">
+            <span className="sr-only">Search vital signs</span>
+            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search vital signs"
+              className="focus:border-primary-500 focus:ring-primary-500 h-10 w-full rounded-md border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-1"
+            />
+          </label>
+
+          {status === 'loading' ? (
+            <Placeholder text="Loading vital signs…" />
+          ) : groups.length === 0 ? (
+            <Placeholder text="No vital signs recorded yet." icon />
+          ) : filtered.length === 0 ? (
+            <Placeholder text="No vital signs match this search." />
+          ) : (
+            filtered.map((group) => (
+              <article
+                key={group.key}
+                className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="break-words text-sm font-semibold text-gray-900">
+                      {group.name}
+                    </h3>
+                    <div className="mt-1 flex items-baseline gap-2">
+                      <span className="text-primary-700 text-2xl font-bold">
+                        {group.latest.text}
+                      </span>
+                      {group.latest.date && (
+                        <span className="text-xs text-gray-500">
+                          {safeFormatDate(group.latest.date, 'PP', '')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <Sparkline readings={group.readings} />
+                </div>
+
+                {group.readings.length > 1 && (
+                  <div className="mt-3 border-t border-gray-100 pt-2">
+                    <table className="w-full text-xs text-gray-600">
+                      <tbody>
+                        {group.readings.slice(0, 6).map((reading, index) => (
+                          <tr
+                            key={index}
+                            className="border-b border-gray-50 last:border-0"
+                          >
+                            <td className="py-1 pr-2 text-gray-500">
+                              {reading.date
+                                ? safeFormatDate(reading.date, 'PP', '')
+                                : '—'}
+                            </td>
+                            <td className="py-1 text-right font-medium text-gray-800">
+                              {reading.text}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </article>
+            ))
+          )}
+        </div>
+      </div>
+    </AppPage>
+  );
+}
+
+function Placeholder({ text, icon }: { text: string; icon?: boolean }) {
+  return (
+    <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
+      {icon && (
+        <div className="bg-primary-50 text-primary-700 mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full">
+          <HeartIcon className="h-6 w-6" />
+        </div>
+      )}
+      {text}
+    </div>
+  );
+}
