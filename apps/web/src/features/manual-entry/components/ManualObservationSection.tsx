@@ -14,6 +14,7 @@ export function ManualObservationSection({
   const {
     t,
     isObservationType,
+    isSocialHistoryType,
     isDeviceImportType,
     recordType,
     isEditing,
@@ -37,7 +38,7 @@ export function ManualObservationSection({
     setInterpretation,
   } = form;
 
-  return isObservationType && !isDeviceImportType ? (
+  return (isObservationType || isSocialHistoryType) && !isDeviceImportType ? (
     <div className="grid gap-4 sm:grid-cols-2">
       {recordType === 'lab' && !isEditing && (
         <ManualLabRowsSection form={form} />

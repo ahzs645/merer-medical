@@ -138,6 +138,77 @@ describe('manual record builders', () => {
     });
   });
 
+  it('builds a manual family member history clinical document', () => {
+    const doc = buildClinicalDocument({
+      connectionId: 'conn-1',
+      userId: 'user-1',
+      recordType: 'familymemberhistory',
+      recordDate: '2024-11-26T12:00:00.000Z',
+      title: 'No family history of melanoma',
+      notes: 'Reviewed at visit',
+      fileName: '',
+      fileContentType: '',
+      familyRelationship: 'Family',
+    });
+
+    expect(doc.data_record.resource_type).toBe('familymemberhistory');
+    expect(doc.metadata.display_name).toBe('No family history of melanoma');
+    const raw = doc.data_record.raw as {
+      manual_kind: string;
+      resource: {
+        resourceType: string;
+        relationship: { text: string };
+        condition: Array<{ code: { text: string } }>;
+        note: Array<{ text: string }>;
+      };
+    };
+    expect(raw.manual_kind).toBe('familymemberhistory');
+    expect(raw.resource.resourceType).toBe('FamilyMemberHistory');
+    expect(raw.resource.relationship.text).toBe('Family');
+    expect(raw.resource.condition[0].code.text).toBe(
+      'No family history of melanoma',
+    );
+    expect(raw.resource.note[0].text).toBe('Reviewed at visit');
+  });
+
+  it('builds a manual social history observation', () => {
+    const doc = buildClinicalDocument({
+      connectionId: 'conn-1',
+      userId: 'user-1',
+      recordType: 'socialhistory',
+      recordDate: '2024-11-26T12:00:00.000Z',
+      title: 'Tobacco use',
+      notes: 'Former pipe smoker, quit',
+      fileName: '',
+      fileContentType: '',
+      observation: {
+        valueKind: 'string',
+        comparator: '',
+        value: 'Former smoker (pipe)',
+        unit: '',
+        rangeLow: '',
+        rangeHigh: '',
+        rangeText: '',
+        interpretation: '',
+        absentReason: 'pending',
+      },
+    });
+
+    expect(doc.data_record.resource_type).toBe('observation');
+    const raw = doc.data_record.raw as {
+      manual_kind: string;
+      resource: {
+        resourceType: string;
+        category: Array<{ coding: Array<{ code: string }> }>;
+        valueString: string;
+      };
+    };
+    expect(raw.manual_kind).toBe('socialhistory');
+    expect(raw.resource.resourceType).toBe('Observation');
+    expect(raw.resource.category[0].coding[0].code).toBe('social-history');
+    expect(raw.resource.valueString).toBe('Former smoker (pipe)');
+  });
+
   it('reads manual specialty details from metadata fallback', () => {
     const doc = {
       id: 'doc-1',

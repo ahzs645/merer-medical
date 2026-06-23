@@ -80,6 +80,10 @@ export interface ClinicalDocument<T = unknown> {
     source_name?: string;
     source_type?: string;
     source_location?: string;
+    // Links a record back to the source document it came from: the
+    // DocumentReference's metadata.id and the embedded attachment's metadata.id.
+    source_document_id?: string;
+    source_attachment_id?: string;
     retrieved_at?: string;
     entry_method?:
       | 'portal-sync'

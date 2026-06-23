@@ -5,6 +5,7 @@ import { formatTime } from '../../../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../../../shared/utils/fhirResource';
 import { CardBase } from '../../../connections/components/CardBase';
 import { useConnectionDoc } from '../../../connections/hooks/useConnectionDoc';
+import { ManualRecordActions } from '../../../manual-entry/ManualRecordActions';
 import { SkeletonLoadingText } from '../skeletons/SkeletonLoadingText';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
 import { TimelineCardTitle } from '../TimelineCardTitle';
@@ -49,6 +50,7 @@ export const FamilyMemberHistoryCard = memo(function FamilyMemberHistoryCard({
             {details.join(' - ')}
           </p>
         )}
+        <ManualRecordActions item={item} />
       </div>
     </CardBase>
   );

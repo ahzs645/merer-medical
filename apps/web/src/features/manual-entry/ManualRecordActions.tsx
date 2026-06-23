@@ -22,6 +22,7 @@ import {
 import { Routes as AppRoutes } from '../../Routes';
 import { deleteClinicalDocument } from '../../repositories/ClinicalDocumentRepository';
 import { isManualRecord } from '../../shared/utils/manualRecordUtils';
+import { ManualSourceDocumentLink } from './ManualSourceDocumentLink';
 
 export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
   const db = useRxDb();
@@ -151,6 +152,7 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
           </button>
         </span>
       ))}
+      <ManualSourceDocumentLink item={item} />
       <button
         type="button"
         onClick={(event) => {

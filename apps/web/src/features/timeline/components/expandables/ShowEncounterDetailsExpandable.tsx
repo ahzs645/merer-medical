@@ -67,6 +67,23 @@ export function ShowEncounterDetailsExpandable({
     .filter(Boolean)
     .join(' - ');
 
+  // Manual/transposed encounters carry the full visit note in the resource
+  // narrative (`text.div`) or `note[]`; surface it here so opening the card
+  // shows the complete note rather than only the structured fields.
+  const encounterWithNarrative = encounter as
+    | (typeof encounter & {
+        text?: { div?: string };
+        note?: Array<{ text?: string }>;
+      })
+    | undefined;
+  const encounterNarrative =
+    encounterWithNarrative?.text?.div?.trim() ||
+    encounterWithNarrative?.note
+      ?.map((entry) => entry.text)
+      .filter(Boolean)
+      .join('\n\n') ||
+    '';
+
   return (
     <Modal open={expanded} setOpen={setExpanded}>
       <div className="flex flex-col">
@@ -283,6 +300,17 @@ export function ShowEncounterDetailsExpandable({
                   </div>
                   <div className="col-span-2 text-sm text-gray-900">
                     {encounter.serviceProvider.display}
+                  </div>
+                </div>
+              )}
+
+              {encounterNarrative && (
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-sm font-semibold text-gray-700">
+                    Notes
+                  </div>
+                  <div className="col-span-2 whitespace-pre-line text-sm text-gray-900">
+                    {encounterNarrative}
                   </div>
                 </div>
               )}

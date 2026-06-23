@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ClipboardDocumentListIcon,
+  ChevronRightIcon,
   DocumentMagnifyingGlassIcon,
   DocumentPlusIcon,
   DocumentTextIcon,
   MagnifyingGlassIcon,
-  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { BundleEntry, DiagnosticReport, DocumentReference } from 'fhir/r2';
 
@@ -17,15 +16,8 @@ import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocumen
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
-import { Modal } from '../../shared/components/Modal';
-import { ModalHeader } from '../../shared/components/ModalHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
-import { EmbeddedAttachmentViewer } from '../timeline/components/document-reference/EmbeddedAttachmentViewer';
 import { getFhirResource } from '../../shared/utils/fhirResource';
-import { isManualRecord } from '../../shared/utils/manualRecordUtils';
-import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
-import { ProvenancePanel } from '../provenance/ProvenancePanel';
-import { getTimelineRecordElementId } from '../timeline/utils/timelineAnchors';
 
 type DocumentRecord = ClinicalDocument<BundleEntry<DocumentReference>>;
 type AttachmentRecord = ClinicalDocument<string | Blob>;
@@ -36,6 +28,7 @@ type DocumentItem = {
   attachment?: AttachmentRecord;
   connection?: ConnectionDocument;
   linkedReports: ReportRecord[];
+  linkedRecords: ClinicalDocument[];
 };
 
 type DocumentSection = {
@@ -91,7 +84,6 @@ export function DocumentsTab() {
             </div>
           ) : filteredItems.length > 0 ? (
             <>
-              <DocumentActionCards />
               {sections.map((section) => (
                 <DocumentSectionList key={section.key} section={section} />
               ))}
@@ -118,47 +110,6 @@ export function DocumentsTab() {
         </div>
       </div>
     </AppPage>
-  );
-}
-
-function DocumentActionCards() {
-  const { t } = useInterfaceLanguage();
-  const cards = [
-    {
-      title: 'Letters and referrals',
-      description: 'Provider letters, referral notes, and correspondence.',
-      icon: ClipboardDocumentListIcon,
-    },
-    {
-      title: 'Consents and forms',
-      description: 'Signed forms, consent documents, and uploaded PDFs.',
-      icon: ShieldCheckIcon,
-    },
-    {
-      title: 'Related records',
-      description: 'Open documents with linked reports and provenance.',
-      icon: DocumentMagnifyingGlassIcon,
-    },
-  ];
-
-  return (
-    <div className="grid gap-3 md:grid-cols-3">
-      {cards.map((card) => {
-        const Icon = card.icon;
-        return (
-          <div
-            key={card.title}
-            className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
-          >
-            <Icon className="h-6 w-6 text-primary-700" />
-            <h2 className="mt-2 text-sm font-semibold text-gray-900">
-              {t(card.title)}
-            </h2>
-            <p className="mt-1 text-sm text-gray-600">{t(card.description)}</p>
-          </div>
-        );
-      })}
-    </div>
   );
 }
 
@@ -202,43 +153,63 @@ function useDocumentsData() {
 
     async function fetchDocuments() {
       setStatus('loading');
-      const [documentDocs, attachmentDocs, reportDocs, connectionDocs] =
-        await Promise.all([
-          db.clinical_documents
-            .find({
-              selector: {
-                user_id: user.id,
-                'data_record.resource_type': 'documentreference',
-              },
-              sort: [{ 'metadata.date': 'desc' }],
-            })
-            .exec(),
-          db.clinical_documents
-            .find({
-              selector: {
-                user_id: user.id,
-                'data_record.resource_type': 'documentreference_attachment',
-              },
-            })
-            .exec(),
-          db.clinical_documents
-            .find({
-              selector: {
-                user_id: user.id,
-                'data_record.resource_type': 'diagnosticreport',
-              },
-            })
-            .exec(),
-          db.connection_documents
-            .find({
-              selector: {
-                user_id: user.id,
-              },
-            })
-            .exec(),
-        ]);
+      const [
+        documentDocs,
+        attachmentDocs,
+        reportDocs,
+        connectionDocs,
+        allDocs,
+      ] = await Promise.all([
+        db.clinical_documents
+          .find({
+            selector: {
+              user_id: user.id,
+              'data_record.resource_type': 'documentreference',
+            },
+            sort: [{ 'metadata.date': 'desc' }],
+          })
+          .exec(),
+        db.clinical_documents
+          .find({
+            selector: {
+              user_id: user.id,
+              'data_record.resource_type': 'documentreference_attachment',
+            },
+          })
+          .exec(),
+        db.clinical_documents
+          .find({
+            selector: {
+              user_id: user.id,
+              'data_record.resource_type': 'diagnosticreport',
+            },
+          })
+          .exec(),
+        db.connection_documents
+          .find({
+            selector: {
+              user_id: user.id,
+            },
+          })
+          .exec(),
+        db.clinical_documents.find({ selector: { user_id: user.id } }).exec(),
+      ]);
 
       if (!isMounted) return;
+
+      // Records that point back to a document via metadata.source_document_id,
+      // grouped by the document they reference.
+      const linkedRecordsByDocId = new Map<string, ClinicalDocument[]>();
+      for (const doc of allDocs) {
+        const record = doc.toMutableJSON() as ClinicalDocument;
+        const sourceId = (record.metadata as Record<string, unknown>)?.[
+          'source_document_id'
+        ];
+        if (typeof sourceId !== 'string' || !sourceId) continue;
+        const list = linkedRecordsByDocId.get(sourceId) ?? [];
+        list.push(record);
+        linkedRecordsByDocId.set(sourceId, list);
+      }
 
       const attachmentsByMetadataId = new Map(
         attachmentDocs.map((doc) => {
@@ -256,24 +227,45 @@ function useDocumentsData() {
         }),
       );
 
-      setItems(
-        documentDocs.map((doc) => {
-          const document = doc.toMutableJSON() as DocumentRecord;
-          const resource = getFhirResource<any>(document);
-          const attachmentUrl = resource?.content?.[0]?.attachment?.url;
-          const attachment = attachmentUrl
-            ? attachmentsByMetadataId.get(attachmentUrl)
-            : undefined;
-          return {
-            document,
-            attachment,
-            connection: connectionsById.get(document.connection_record_id),
-            linkedReports: reports.filter((report) =>
-              reportUsesAttachment(report, attachmentUrl),
-            ),
-          };
-        }),
-      );
+      const referencedAttachmentIds = new Set<string>();
+      const wrappedItems = documentDocs.map((doc) => {
+        const document = doc.toMutableJSON() as DocumentRecord;
+        const resource = getFhirResource<any>(document);
+        const attachmentUrl = resource?.content?.[0]?.attachment?.url;
+        if (attachmentUrl) referencedAttachmentIds.add(attachmentUrl);
+        const attachment = attachmentUrl
+          ? attachmentsByMetadataId.get(attachmentUrl)
+          : undefined;
+        return {
+          document,
+          attachment,
+          connection: connectionsById.get(document.connection_record_id),
+          linkedReports: reports.filter((report) =>
+            reportUsesAttachment(report, attachmentUrl),
+          ),
+          linkedRecords:
+            linkedRecordsByDocId.get(document.metadata?.id || '') || [],
+        };
+      });
+
+      // Manually uploaded files are standalone `documentreference_attachment`
+      // records with no DocumentReference wrapper. Surface them as documents in
+      // their own right (skipping embedded source attachments already wrapped).
+      const standaloneItems: DocumentItem[] = attachmentDocs
+        .map((doc) => doc.toMutableJSON() as AttachmentRecord)
+        .filter(
+          (att) =>
+            att.metadata?.id && !referencedAttachmentIds.has(att.metadata.id),
+        )
+        .map((att) => ({
+          document: att as unknown as DocumentRecord,
+          attachment: att,
+          connection: connectionsById.get(att.connection_record_id),
+          linkedReports: [],
+          linkedRecords: linkedRecordsByDocId.get(att.metadata?.id || '') || [],
+        }));
+
+      setItems([...wrappedItems, ...standaloneItems]);
       setStatus('success');
     }
 
@@ -344,164 +336,57 @@ function DocumentsHeader({
 
 function DocumentItemCard({ item }: { item: DocumentItem }) {
   const { t } = useInterfaceLanguage();
-  const [expanded, setExpanded] = useState(false);
   const attachment = item.attachment;
   const resource = getFhirResource<any>(item.document);
   const attachmentMetadata = resource?.content?.[0]?.attachment;
+  const detailLink = `${AppRoutes.Documents}/detail/${encodeURIComponent(
+    item.document.metadata?.id || item.document.id,
+  )}`;
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setExpanded(true)}
-        className="w-full bg-white p-4 text-left hover:bg-primary-50"
-      >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 text-primary-700">
-              <DocumentMagnifyingGlassIcon className="h-5 w-5 shrink-0" />
-              <h2 className="truncate text-base font-semibold">
-                {item.document.metadata?.display_name ||
-                  attachmentMetadata?.title ||
-                  t('Untitled document')}
-              </h2>
-            </div>
-            <p className="mt-1 text-sm text-gray-600">
-              {safeFormatDate(item.document.metadata?.date, 'PP', '')}
-            </p>
-            <p className="mt-1 break-words text-xs text-gray-500">
-              {attachmentMetadata?.title ||
-                getMetadataString(item.document, 'source_image')}
-            </p>
-          </div>
-          <div className="flex shrink-0 flex-wrap gap-2 text-xs font-medium">
-            <span className="rounded bg-gray-100 px-2 py-1 text-gray-700">
-              {attachment?.data_record.content_type ||
-                attachmentMetadata?.contentType ||
-                t('metadata only')}
-            </span>
-            <span
-              className={`rounded px-2 py-1 ${
-                attachment
-                  ? 'bg-emerald-50 text-emerald-700'
-                  : 'bg-amber-50 text-amber-700'
-              }`}
-            >
-              {attachment ? t('Embedded') : t('Not embedded')}
-            </span>
-            <span className="rounded bg-primary-50 px-2 py-1 text-primary-700">
-              {item.linkedReports.length} {t('linked reports')}
-            </span>
-          </div>
-        </div>
-        {item.linkedReports.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {item.linkedReports.map((report) => (
-              <Link
-                key={report.id}
-                to={getTimelineRecordLink(report)}
-                onClick={(event) => event.stopPropagation()}
-                className="rounded bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
-              >
-                {report.metadata?.display_name || t('Linked report')}
-              </Link>
-            ))}
-          </div>
-        )}
-      </button>
-      {isManualRecord(item.document) && (
-        <div className="bg-white px-4 pb-3">
-          <ManualRecordActions item={item.document} />
-        </div>
-      )}
-      <Modal open={expanded} setOpen={setExpanded}>
-        <div className="flex flex-col">
-          <ModalHeader
-            title={
-              item.document.metadata?.display_name ||
-              attachmentMetadata?.title ||
-              t('Document')
-            }
-            setClose={() => setExpanded(false)}
-          />
-          <div className="max-h-full scroll-py-3 p-3">
-            <div className="mb-3">
-              <ProvenancePanel
-                document={item.document}
-                connection={item.connection}
-              />
-            </div>
-            <RelatedLinksPanel item={item} />
-            <div className="rounded-lg border border-solid border-gray-200">
-              {attachment || attachmentMetadata?.data ? (
-                <EmbeddedAttachmentViewer
-                  attachment={{
-                    contentType:
-                      attachment?.data_record.content_type ||
-                      attachmentMetadata?.contentType,
-                    raw:
-                      attachment?.data_record.raw || attachmentMetadata?.data,
-                    title:
-                      attachmentMetadata?.title ||
-                      item.document.metadata?.display_name,
-                  }}
-                />
-              ) : (
-                <div className="space-y-3 p-4 text-sm text-gray-700">
-                  <p>
-                    {t('The source record has metadata but no embedded file.')}
-                  </p>
-                  <p className="break-words">
-                    {attachmentMetadata?.url || item.document.metadata?.id}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </Modal>
-    </>
-  );
-}
-
-function RelatedLinksPanel({ item }: { item: DocumentItem }) {
-  const { t } = useInterfaceLanguage();
-  const links = [
-    {
-      label: 'View source in timeline',
-      to: getTimelineRecordLink(item.document),
-    },
-    {
-      label: 'Open audit log',
-      to: AppRoutes.AuditLog,
-    },
-    {
-      label: 'Sharing and export',
-      to: AppRoutes.Sharing,
-    },
-    ...item.linkedReports.map((report) => ({
-      label: report.metadata?.display_name || 'Linked report',
-      to: getTimelineRecordLink(report),
-    })),
-  ];
-
-  return (
-    <section className="mb-3 rounded-md border border-gray-200 bg-white p-4">
-      <h3 className="text-sm font-semibold text-gray-900">
-        {t('Related links')}
-      </h3>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {links.map((link) => (
-          <Link
-            key={`${link.label}-${link.to}`}
-            to={link.to}
-            className="rounded-md bg-gray-50 px-2.5 py-1.5 text-xs font-semibold text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
-          >
-            {t(link.label)}
-          </Link>
-        ))}
+    <Link
+      to={detailLink}
+      className="flex items-center gap-3 bg-white px-4 py-3 hover:bg-primary-50"
+    >
+      <DocumentMagnifyingGlassIcon className="h-5 w-5 shrink-0 text-primary-700" />
+      <div className="min-w-0 flex-1">
+        <h2 className="truncate text-sm font-semibold text-gray-900">
+          {item.document.metadata?.display_name ||
+            attachmentMetadata?.title ||
+            t('Untitled document')}
+        </h2>
+        <p className="truncate text-xs text-gray-500">
+          {safeFormatDate(item.document.metadata?.date, 'PP', '')}
+          {attachmentMetadata?.title ||
+          getMetadataString(item.document, 'source_image')
+            ? ` · ${attachmentMetadata?.title || getMetadataString(item.document, 'source_image')}`
+            : ''}
+        </p>
       </div>
-    </section>
+      <div className="hidden shrink-0 items-center gap-1.5 text-xs font-medium sm:flex">
+        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-gray-600">
+          {(
+            attachment?.data_record.content_type ||
+            attachmentMetadata?.contentType ||
+            'meta'
+          )
+            .toString()
+            .replace('application/', '')
+            .replace('image/', '')}
+        </span>
+        {item.linkedReports.length > 0 && (
+          <span className="rounded bg-primary-50 px-1.5 py-0.5 text-primary-700">
+            {item.linkedReports.length} {t('reports')}
+          </span>
+        )}
+        {item.linkedRecords.length > 0 && (
+          <span className="rounded bg-indigo-50 px-1.5 py-0.5 text-indigo-700">
+            {item.linkedRecords.length} {t('records')}
+          </span>
+        )}
+      </div>
+      <ChevronRightIcon className="h-5 w-5 shrink-0 text-gray-400" />
+    </Link>
   );
 }
 
@@ -582,14 +467,4 @@ function getMetadataString(
     key
   ];
   return typeof value === 'string' ? value : undefined;
-}
-
-function getTimelineDateLink(date?: string): string {
-  if (!date) return AppRoutes.Timeline;
-  return `${AppRoutes.Timeline}#${safeFormatDate(date, 'MMM-dd-yyyy', '')}`;
-}
-
-function getTimelineRecordLink(document: ClinicalDocument<unknown>): string {
-  if (!document.id) return getTimelineDateLink(document.metadata?.date);
-  return `${AppRoutes.Timeline}#${getTimelineRecordElementId(document.id)}`;
 }

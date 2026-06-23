@@ -159,3 +159,31 @@ export async function findClinicalDocuments(
   const docs = await db.clinical_documents.find({ selector }).exec();
   return docs.map((doc) => doc.toMutableJSON() as ClinicalDocument);
 }
+
+/**
+ * Sets (or clears, when `link` is null) the source-document pointer on a record.
+ * The pointer drives the "View source" affordance on record cards and the
+ * document → linked-records view. `documentId` is the source DocumentReference's
+ * metadata.id; `attachmentId` is the embedded attachment doc's metadata.id.
+ */
+export async function setClinicalDocumentSourceLink(
+  db: RxDatabase<DatabaseCollections>,
+  userId: string,
+  recordId: string,
+  link: { documentId: string; attachmentId?: string } | null,
+): Promise<void> {
+  const doc = await getClinicalDocumentById(db, userId, recordId);
+  if (!doc) return;
+  const metadata = {
+    ...((doc.metadata as Record<string, unknown> | undefined) || {}),
+  };
+  if (link) {
+    metadata['source_document_id'] = link.documentId;
+    if (link.attachmentId) metadata['source_attachment_id'] = link.attachmentId;
+    else delete metadata['source_attachment_id'];
+  } else {
+    delete metadata['source_document_id'];
+    delete metadata['source_attachment_id'];
+  }
+  await upsertClinicalDocuments(db, [{ ...doc, metadata } as ClinicalDocument]);
+}
