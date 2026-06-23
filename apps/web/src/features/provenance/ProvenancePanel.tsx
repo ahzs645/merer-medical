@@ -20,7 +20,8 @@ export function ProvenancePanel({
     ['Source type', provenance.sourceType],
     [
       'Retrieved',
-      provenance.retrievedAt && safeFormatDate(provenance.retrievedAt, 'PP', ''),
+      provenance.retrievedAt &&
+        safeFormatDate(provenance.retrievedAt, 'PP', ''),
     ],
     [
       'Recorded',
@@ -31,7 +32,6 @@ export function ProvenancePanel({
     ['Content type', provenance.originalContentType],
     ['Mapping', provenance.mappingConfidence],
     ['Original file', provenance.originalFilename],
-    ['Record ID', document.id],
   ].filter((row): row is [string, string] => Boolean(row[1]));
 
   return (
