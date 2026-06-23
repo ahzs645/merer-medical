@@ -320,6 +320,12 @@ export type UseManualRecordFormOptions = {
   initialDentalKind?: DentalEntryKind;
   initialOptometryKind?: OptometryEntryKind;
   initialTitle?: string;
+  // When set, every record saved from this form is linked to a source
+  // document — its metadata.source_document_id / source_attachment_id are set
+  // so it shows up under that document and can open the original file. Used by
+  // the "add record from a document" flow so there is no separate link step.
+  linkedDocumentId?: string;
+  linkedAttachmentId?: string;
   // Called after a successful save/update instead of navigating to the timeline.
   // Lets a host (modal/popup) close itself and refresh in place.
   onComplete?: () => void;
@@ -1167,6 +1173,8 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
                   absentReason: row.absentReason,
                 },
                 terminology: row.terminology,
+                linkedDocumentId: options.linkedDocumentId,
+                linkedAttachmentId: options.linkedAttachmentId,
               }),
             )
           : [
@@ -1215,6 +1223,8 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
                 },
                 familyRelationship,
                 terminology: selectedTerminology,
+                linkedDocumentId: options.linkedDocumentId,
+                linkedAttachmentId: options.linkedAttachmentId,
                 loadedDocument,
               }),
             ];

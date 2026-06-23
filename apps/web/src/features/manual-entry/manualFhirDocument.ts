@@ -87,6 +87,8 @@ export function buildClinicalDocument({
   medication,
   coverage,
   familyRelationship,
+  linkedDocumentId,
+  linkedAttachmentId,
   terminology,
   loadedDocument,
 }: {
@@ -119,6 +121,8 @@ export function buildClinicalDocument({
   };
   coverage?: ManualCoverageInput;
   familyRelationship?: string;
+  linkedDocumentId?: string;
+  linkedAttachmentId?: string;
   terminology?: TerminologyEntry;
   loadedDocument?: ClinicalDocument | null;
 }): ClinicalDocument {
@@ -173,6 +177,8 @@ export function buildClinicalDocument({
       manual_subtype: specialtyDetails?.subtype,
       manual_specialty_details: specialtyDetails,
       manual_imaging_details: imagingDetails,
+      source_document_id: linkedDocumentId,
+      source_attachment_id: linkedAttachmentId,
       source_name: 'Manual entry',
       source_type: 'manual',
       source_location: 'manual://local',

@@ -13,6 +13,7 @@ import {
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
   MagnifyingGlassIcon,
+  PlusIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
 
@@ -31,6 +32,7 @@ import {
 } from '../timeline/components/ObservationResultsTable';
 import { ProvenancePanel } from '../provenance/ProvenancePanel';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
+import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
 import { getTimelineRecordElementId } from '../timeline/utils/timelineAnchors';
 
 // Non-measurement record types are shown as compact links grouped by kind.
@@ -124,6 +126,8 @@ export function DocumentDetailTab() {
   );
   const [query, setQuery] = useState('');
   const [abnormalOnly, setAbnormalOnly] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -201,10 +205,11 @@ export function DocumentDetailTab() {
     return () => {
       cancelled = true;
     };
-  }, [db, decodedId, user.id]);
+  }, [db, decodedId, user.id, refreshKey]);
 
   const resource = document ? getFhirResource<any>(document) : undefined;
   const attachmentMeta = resource?.content?.[0]?.attachment;
+  const attachmentUrl: string | undefined = attachmentMeta?.url;
   const title =
     document?.metadata?.display_name ||
     attachmentMeta?.title ||
@@ -396,6 +401,27 @@ export function DocumentDetailTab() {
 
                 {/* Measurements + other records */}
                 <main className="flex flex-col gap-4 lg:col-span-7">
+                  {/* Add a record straight from the document, auto-linked */}
+                  <div className="flex flex-col gap-3 rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h2 className="text-sm font-semibold text-gray-900">
+                        Records from this document
+                      </h2>
+                      <p className="mt-0.5 text-xs text-gray-600">
+                        Add a record while reading the document — it links back
+                        here automatically.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAddOpen(true)}
+                      className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+                    >
+                      <PlusIcon className="h-4 w-4" />
+                      Add linked record
+                    </button>
+                  </div>
+
                   {/* Measurements */}
                   {measureCount > 0 && (
                     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
@@ -522,6 +548,14 @@ export function DocumentDetailTab() {
                   )}
                 </main>
               </div>
+
+              <ManualRecordModal
+                open={addOpen}
+                onClose={() => setAddOpen(false)}
+                linkedDocumentId={decodedId}
+                linkedAttachmentId={attachmentUrl}
+                onSaved={() => setRefreshKey((key) => key + 1)}
+              />
             </>
           )}
         </div>
