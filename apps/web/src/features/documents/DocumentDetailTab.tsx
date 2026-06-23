@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Disclosure } from '@headlessui/react';
 import {
+  ArrowDownTrayIcon,
   ArrowLeftIcon,
+  ArrowTopRightOnSquareIcon,
   BeakerIcon,
   CalendarDaysIcon,
   ChevronRightIcon,
@@ -88,6 +90,21 @@ function timelineLink(doc: ClinicalDocument): string {
   if (!doc.id)
     return `${AppRoutes.Timeline}#${safeFormatDate(doc.metadata?.date, 'MMM-dd-yyyy', '')}`;
   return `${AppRoutes.Timeline}#${getTimelineRecordElementId(doc.id)}`;
+}
+
+function makeBlobUrl(raw: unknown, contentType?: string): string | undefined {
+  try {
+    if (raw instanceof Blob) return URL.createObjectURL(raw);
+    if (typeof raw !== 'string' || !raw) return undefined;
+    const bytes = atob(raw);
+    const arr = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i += 1) arr[i] = bytes.charCodeAt(i);
+    return URL.createObjectURL(
+      new Blob([arr], { type: contentType || 'application/octet-stream' }),
+    );
+  } catch {
+    return undefined;
+  }
 }
 
 export function DocumentDetailTab() {
@@ -193,6 +210,23 @@ export function DocumentDetailTab() {
     getMetaString(document || ({} as ClinicalDocument), 'source_image') ||
     'Document';
 
+  const rawBytes = attachment?.data_record.raw || attachmentMeta?.data;
+  const contentType =
+    attachment?.data_record.content_type || attachmentMeta?.contentType;
+  const openDoc = (download: boolean) => {
+    const url = makeBlobUrl(rawBytes, contentType);
+    if (!url) return;
+    if (download) {
+      const anchor = window.document.createElement('a');
+      anchor.href = url;
+      anchor.download = title || 'document';
+      anchor.click();
+    } else {
+      window.open(url, '_blank', 'noopener');
+    }
+    window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+  };
+
   // ---- Partition linked records into panels + measures + other ----
   const { panels, otherMeasures, recordGroups, measureCount, abnormalCount } =
     useMemo(() => {
@@ -259,7 +293,7 @@ export function DocumentDetailTab() {
     <AppPage
       banner={
         <div className="bg-primary-800 px-4 py-5 text-white sm:px-6 lg:px-8">
-          <div className="mx-auto flex max-w-5xl flex-col gap-3">
+          <div className="mx-auto flex max-w-7xl flex-col gap-3">
             <Link
               to={AppRoutes.Documents}
               className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-primary-100 hover:text-white"
@@ -282,7 +316,7 @@ export function DocumentDetailTab() {
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'loading' ? (
             <Placeholder text="Loading document…" />
           ) : status === 'missing' || !document ? (
@@ -301,129 +335,162 @@ export function DocumentDetailTab() {
                 <Stat label="Panels" value={panels.length} />
               </div>
 
-              {document && (
-                <div className="rounded-md bg-white p-2 shadow-sm ring-1 ring-gray-200">
-                  <ManualRecordActions item={document} />
-                </div>
-              )}
+              <div className="grid gap-4 lg:grid-cols-12">
+                {/* Document sidebar — stays beside the measurements */}
+                <aside className="lg:col-span-5">
+                  <div className="flex flex-col gap-4 lg:sticky lg:top-4">
+                    {document && (
+                      <div className="rounded-md bg-white p-2 shadow-sm ring-1 ring-gray-200">
+                        <ManualRecordActions item={document} />
+                      </div>
+                    )}
 
-              <ProvenancePanel document={document} connection={connection} />
-
-              {/* Document viewer */}
-              <section className="overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200">
-                <div className="border-b border-gray-200 px-4 py-3 text-sm font-semibold text-gray-900">
-                  Document
-                </div>
-                {attachment || attachmentMeta?.data ? (
-                  <EmbeddedAttachmentViewer
-                    attachment={{
-                      contentType:
-                        attachment?.data_record.content_type ||
-                        attachmentMeta?.contentType,
-                      raw: attachment?.data_record.raw || attachmentMeta?.data,
-                      title,
-                    }}
-                  />
-                ) : (
-                  <p className="p-4 text-sm text-gray-700">
-                    This record has metadata but no embedded file.
-                  </p>
-                )}
-              </section>
-
-              {/* Measurements */}
-              {measureCount > 0 && (
-                <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <h2 className="flex items-center gap-2 text-base font-semibold text-gray-900">
-                      <BeakerIcon className="h-5 w-5 text-primary-700" />
-                      Measurements &amp; results
-                      <span className="font-normal text-gray-500">
-                        ({measureCount})
-                      </span>
-                    </h2>
-                    <label className="relative block w-full sm:w-64">
-                      <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-                      <input
-                        type="search"
-                        value={query}
-                        onChange={(event) => setQuery(event.target.value)}
-                        placeholder="Find a measurement"
-                        className="block w-full rounded-md border-0 py-1.5 pl-8 pr-3 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500"
-                      />
-                    </label>
-                  </div>
-
-                  {normalizedQuery ? (
-                    <div className="mt-3">
-                      <p className="mb-2 text-xs font-medium text-gray-500">
-                        {searchMatches.length} match
-                        {searchMatches.length === 1 ? '' : 'es'} for “{query}”
-                      </p>
-                      <ObservationResultsTable items={searchMatches} />
-                    </div>
-                  ) : (
-                    <div className="mt-3 flex flex-col gap-3">
-                      {panels.map(({ report, members }) => (
-                        <PanelDisclosure
-                          key={report.id}
-                          title={report.metadata?.display_name || 'Panel'}
-                          date={report.metadata?.date}
-                          members={members}
-                          to={timelineLink(report)}
-                        />
-                      ))}
-                      {otherMeasures.length > 0 && (
-                        <PanelDisclosure
-                          title="Other measurements"
-                          members={otherMeasures}
-                        />
-                      )}
-                    </div>
-                  )}
-                </section>
-              )}
-
-              {/* Other linked records */}
-              {recordGroups.length > 0 && (
-                <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-                  <h2 className="text-base font-semibold text-gray-900">
-                    Other linked records
-                  </h2>
-                  <div className="mt-3 flex flex-col gap-4">
-                    {recordGroups.map((group) => {
-                      const Icon = group.icon;
-                      return (
-                        <div key={group.key}>
-                          <h3 className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
-                            <Icon className="h-4 w-4 text-gray-500" />
-                            {group.title}
-                            <span className="font-normal text-gray-500">
-                              ({group.records.length})
-                            </span>
-                          </h3>
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            {group.records.map((record) => (
-                              <Link
-                                key={record.id}
-                                to={timelineLink(record)}
-                                className="rounded-md bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
-                              >
-                                {record.metadata?.display_name ||
-                                  record.data_record?.resource_type}
-                              </Link>
-                            ))}
+                    <section className="overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200">
+                      <div className="flex items-center justify-between gap-2 border-b border-gray-200 px-4 py-2">
+                        <span className="text-sm font-semibold text-gray-900">
+                          Document
+                        </span>
+                        {rawBytes && (
+                          <div className="flex gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => openDoc(false)}
+                              className="inline-flex items-center gap-1 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-50"
+                            >
+                              <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+                              Open
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => openDoc(true)}
+                              className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                            >
+                              <ArrowDownTrayIcon className="h-4 w-4" />
+                              Download
+                            </button>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              )}
+                        )}
+                      </div>
+                      {attachment || attachmentMeta?.data ? (
+                        <EmbeddedAttachmentViewer
+                          attachment={{
+                            contentType,
+                            raw: rawBytes,
+                            title,
+                          }}
+                        />
+                      ) : (
+                        <p className="p-4 text-sm text-gray-700">
+                          This record has metadata but no embedded file.
+                        </p>
+                      )}
+                    </section>
 
-              {linked.length === 0 && (
-                <Placeholder text="Nothing is linked to this document yet." />
-              )}
+                    <ProvenancePanel
+                      document={document}
+                      connection={connection}
+                    />
+                  </div>
+                </aside>
+
+                {/* Measurements + other records */}
+                <main className="flex flex-col gap-4 lg:col-span-7">
+                  {/* Measurements */}
+                  {measureCount > 0 && (
+                    <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-900">
+                          <BeakerIcon className="h-5 w-5 text-primary-700" />
+                          Measurements &amp; results
+                          <span className="font-normal text-gray-500">
+                            ({measureCount})
+                          </span>
+                        </h2>
+                        <label className="relative block w-full sm:w-64">
+                          <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+                          <input
+                            type="search"
+                            value={query}
+                            onChange={(event) => setQuery(event.target.value)}
+                            placeholder="Find a measurement"
+                            className="block w-full rounded-md border-0 py-1.5 pl-8 pr-3 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500"
+                          />
+                        </label>
+                      </div>
+
+                      {normalizedQuery ? (
+                        <div className="mt-3">
+                          <p className="mb-2 text-xs font-medium text-gray-500">
+                            {searchMatches.length} match
+                            {searchMatches.length === 1 ? '' : 'es'} for “
+                            {query}”
+                          </p>
+                          <ObservationResultsTable items={searchMatches} />
+                        </div>
+                      ) : (
+                        <div className="mt-3 flex flex-col gap-3">
+                          {panels.map(({ report, members }) => (
+                            <PanelDisclosure
+                              key={report.id}
+                              title={report.metadata?.display_name || 'Panel'}
+                              date={report.metadata?.date}
+                              members={members}
+                              to={timelineLink(report)}
+                            />
+                          ))}
+                          {otherMeasures.length > 0 && (
+                            <PanelDisclosure
+                              title="Other measurements"
+                              members={otherMeasures}
+                            />
+                          )}
+                        </div>
+                      )}
+                    </section>
+                  )}
+
+                  {/* Other linked records */}
+                  {recordGroups.length > 0 && (
+                    <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+                      <h2 className="text-base font-semibold text-gray-900">
+                        Other linked records
+                      </h2>
+                      <div className="mt-3 flex flex-col gap-4">
+                        {recordGroups.map((group) => {
+                          const Icon = group.icon;
+                          return (
+                            <div key={group.key}>
+                              <h3 className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
+                                <Icon className="h-4 w-4 text-gray-500" />
+                                {group.title}
+                                <span className="font-normal text-gray-500">
+                                  ({group.records.length})
+                                </span>
+                              </h3>
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {group.records.map((record) => (
+                                  <Link
+                                    key={record.id}
+                                    to={timelineLink(record)}
+                                    className="rounded-md bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
+                                  >
+                                    {record.metadata?.display_name ||
+                                      record.data_record?.resource_type}
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </section>
+                  )}
+
+                  {linked.length === 0 && (
+                    <Placeholder text="Nothing is linked to this document yet." />
+                  )}
+                </main>
+              </div>
             </>
           )}
         </div>
