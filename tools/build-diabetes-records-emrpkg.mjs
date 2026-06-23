@@ -131,6 +131,7 @@ for (const panel of records.labPanels || []) {
           manual_specialty: 'laboratory',
           source_panel_id: panel.id,
           source_result_id: result.id,
+          ...sourceMeta(sourceDocument),
         },
       }),
     );
@@ -206,6 +207,7 @@ for (const panel of records.labPanels || []) {
             source_panel_id: panel.id,
             source_result_id: result.id,
             nutrition_relevance: nutritionRelevance.code,
+            ...sourceMeta(sourceDocument),
           },
         }),
       );
@@ -246,6 +248,7 @@ for (const panel of records.labPanels || []) {
           },
         },
       },
+      metadata: { ...sourceMeta(sourceDocument) },
     }),
   );
 }
@@ -321,6 +324,7 @@ for (const report of records.imagingReports || []) {
         metadata: {
           source_report_id: report.id,
           imaging_finding_category: finding.category,
+          ...sourceMeta(sourceDocument),
         },
       }),
     );
@@ -368,6 +372,7 @@ for (const report of records.imagingReports || []) {
           },
         },
       },
+      metadata: { ...sourceMeta(sourceDocument) },
     }),
   );
 }
@@ -438,6 +443,7 @@ for (const group of records.medicationPlans || []) {
             ]),
           },
         },
+        metadata: { ...sourceMeta(sourceDocument) },
       }),
     );
   }
@@ -482,6 +488,7 @@ for (const group of records.medicationPlans || []) {
             ]),
           },
         },
+        metadata: { ...sourceMeta(sourceDocument) },
       }),
     );
   }
@@ -539,6 +546,7 @@ for (const encounter of records.clinicalEncounters || []) {
           ),
         },
       },
+      metadata: { ...sourceMeta(sourceDocument) },
     }),
   );
 }
@@ -595,6 +603,7 @@ for (const condition of records.conditions || []) {
           ]),
         },
       },
+      metadata: { ...sourceMeta(sourceDocument) },
     }),
   );
 }
@@ -650,6 +659,7 @@ for (const allergy of records.allergies || []) {
           ]),
         },
       },
+      metadata: { ...sourceMeta(sourceDocument) },
     }),
   );
 }
@@ -705,6 +715,7 @@ for (const family of records.familyHistory || []) {
           ]),
         },
       },
+      metadata: { ...sourceMeta(sourceDocument) },
     }),
   );
 }
@@ -764,6 +775,7 @@ for (const social of records.socialHistory || []) {
       },
       metadata: {
         manual_specialty: 'social-history',
+        ...sourceMeta(sourceDocument),
       },
     }),
   );
@@ -1331,6 +1343,18 @@ function isDiabetesTarget(result) {
 function buildNotes(parts) {
   const text = parts.filter(Boolean).join('\n');
   return text ? [{ text }] : undefined;
+}
+
+// Pointers that let the web UI open the original source file from any record.
+// `source_attachment_id` is the metadata.id of the embedded attachment doc and
+// is only set when the source bytes were actually packaged.
+function sourceMeta(sourceDocument) {
+  if (!sourceDocument) return {};
+  const meta = { source_document_id: sourceDocument.documentReferenceId };
+  if (sourceDocument.assetPath) {
+    meta.source_attachment_id = sourceDocument.attachment.url;
+  }
+  return meta;
 }
 
 function extractImagingFindings(report) {
