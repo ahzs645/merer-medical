@@ -16,6 +16,19 @@ _Analysis of the Caleb dataset (AHS MyChart JSON, MyHealth Records XML‑JSON, t
 
 ---
 
+## 0b. What's been implemented in this branch
+
+| Workstream | Status | What shipped |
+|---|---|---|
+| **Source‑document linking (P0)** | ✅ Done | Builder now defaults `source_file`, runs a `linkSourceDocuments()` post‑pass, and stamps `source_document_id`. App runs `backfillSourceDocumentLinks()` after every `.emrpkg` import **and** via a new **Settings → Data → "Repair source links"** button, so existing packages are fixed without rebuilding. Verified end‑to‑end on your data (**802 records linked, all resolving, no self‑links**). Unit tests added. |
+| **Encounter / location / provider (P0/P1)** | ◑ Display side done | New **Visits** screen shows each encounter's parsed location + a date‑based "same‑day records" count; new **Providers & locations** directory dedupes providers (from CareTeam) and parses the mashed facility strings into name/address/phone. _Not yet:_ materialising hard FHIR refs (`Observation.encounter`, `Location`/`Practitioner` resources) in the builder — the heaviest CCDA rewrite; current associations are date/string‑based and labelled as such. |
+| **Capture dropped data (P1)** | ◑ Mostly done | Builder now captures MyChart **letters** and the previously‑dropped MyHealth **bloodPressure / vitalSigns / bloodOxygen / procedures** sections, and no longer stamps undated procedures with the export timestamp (your dental extraction is now correctly undated). _Not yet:_ parsing CCDA `METADATA.XML` for nicer document titles; promoting the surgical‑consent HTML to a structured Procedure/Consent; allergy reaction/severity enrichment. |
+| **New screens (P2)** | ✅ Done | Added data‑driven **Allergies**, **Vitals** (BP from `component[]` + sparkline trend), **Visits/Encounters**, **Referrals**, and **Providers & locations** tabs, and wired the previously‑unrouted **Results** hub. All query `clinical_documents` generically — no hardcoded data. |
+
+> Build note: a full `nx build` can't complete in this sandbox because the `@mere/immunization-forecast` git submodule isn't fetchable here (proxy 403) — a pre‑existing environment gap unrelated to these changes. Everything else was verified via `tsc`, ESLint, Jest (emrpkg + new backfill tests), and a real end‑to‑end builder run.
+
+---
+
 ## 1. What you actually have
 
 | Source file | What it really is | Richness |
