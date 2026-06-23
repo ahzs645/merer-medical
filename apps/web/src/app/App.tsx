@@ -49,6 +49,7 @@ import { DentalOverviewTab } from '../features/dental/tabs/DentalOverviewTab';
 import { DentalRecordsTab } from '../features/dental/tabs/DentalRecordsTab';
 import { DentalTreatmentTab } from '../features/dental/tabs/DentalTreatmentTab';
 import { DocumentsTab } from '../features/documents/DocumentsTab';
+import { DocumentDetailTab } from '../features/documents/DocumentDetailTab';
 import HealowRedirect from '../features/connections/oauth-callbacks/HealowRedirect';
 import { LabDetailTab } from '../features/labs/LabDetailTab';
 import { LabsTab } from '../features/labs/LabsTab';
@@ -142,6 +143,10 @@ const routes = [
           {
             path: 'documents',
             element: <DocumentsTab />,
+          },
+          {
+            path: 'documents/detail/:documentId',
+            element: <DocumentDetailTab />,
           },
           {
             path: 'imaging',
