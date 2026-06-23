@@ -1,15 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { Disclosure } from '@headlessui/react';
 import {
   ArrowLeftIcon,
   BeakerIcon,
+  CalendarDaysIcon,
+  ChevronRightIcon,
   ClipboardDocumentListIcon,
   DocumentTextIcon,
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
-  CalendarDaysIcon,
+  MagnifyingGlassIcon,
   UsersIcon,
-  Squares2X2Icon,
 } from '@heroicons/react/24/outline';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
@@ -21,32 +23,21 @@ import { AppPage } from '../../shared/components/AppPage';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { EmbeddedAttachmentViewer } from '../timeline/components/document-reference/EmbeddedAttachmentViewer';
+import {
+  ObservationResultsTable,
+  countAbnormal,
+} from '../timeline/components/ObservationResultsTable';
 import { ProvenancePanel } from '../provenance/ProvenancePanel';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { getTimelineRecordElementId } from '../timeline/utils/timelineAnchors';
 
-type LinkGroup = {
+// Non-measurement record types are shown as compact links grouped by kind.
+const RECORD_GROUPS: {
   key: string;
   title: string;
   icon: typeof BeakerIcon;
   types: string[];
-};
-
-// "Measurements & results" first so the values a document produced are front
-// and centre, then the rest of the clinical record it touches.
-const LINK_GROUPS: LinkGroup[] = [
-  {
-    key: 'measures',
-    title: 'Measurements & results',
-    icon: BeakerIcon,
-    types: ['observation'],
-  },
-  {
-    key: 'reports',
-    title: 'Reports & panels',
-    icon: DocumentTextIcon,
-    types: ['diagnosticreport'],
-  },
+}[] = [
   {
     key: 'conditions',
     title: 'Conditions',
@@ -89,6 +80,10 @@ function getMetaString(doc: ClinicalDocument, key: string): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
+function resourceId(doc: ClinicalDocument): string | undefined {
+  return getFhirResource<any>(doc)?.id;
+}
+
 function timelineLink(doc: ClinicalDocument): string {
   if (!doc.id)
     return `${AppRoutes.Timeline}#${safeFormatDate(doc.metadata?.date, 'MMM-dd-yyyy', '')}`;
@@ -110,6 +105,7 @@ export function DocumentDetailTab() {
   const [status, setStatus] = useState<'loading' | 'ready' | 'missing'>(
     'loading',
   );
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -151,14 +147,12 @@ export function DocumentDetailTab() {
       if (cancelled) return;
 
       const byId = new Map<string, ClinicalDocument>();
-      // Records that point back via metadata.source_document_id.
       for (const row of allRows) {
         const record = row.toMutableJSON() as ClinicalDocument;
         if (getMetaString(record, 'source_document_id') === decodedId) {
           byId.set(record.id, record);
         }
       }
-      // Reports that reference this document's attachment via presentedForm.
       if (attachmentUrl) {
         for (const row of reportRows) {
           const record = row.toMutableJSON() as ClinicalDocument;
@@ -199,16 +193,67 @@ export function DocumentDetailTab() {
     getMetaString(document || ({} as ClinicalDocument), 'source_image') ||
     'Document';
 
-  const groups = useMemo(() => {
-    return LINK_GROUPS.map((group) => ({
-      ...group,
-      records: linked.filter((record) =>
-        group.types.includes(record.data_record?.resource_type),
-      ),
-    })).filter((group) => group.records.length > 0);
-  }, [linked]);
-  const groupedIds = new Set(groups.flatMap((g) => g.records.map((r) => r.id)));
-  const otherRecords = linked.filter((r) => !groupedIds.has(r.id));
+  // ---- Partition linked records into panels + measures + other ----
+  const { panels, otherMeasures, recordGroups, measureCount, abnormalCount } =
+    useMemo(() => {
+      const observations = linked.filter(
+        (d) => d.data_record?.resource_type === 'observation',
+      );
+      const reports = linked.filter(
+        (d) => d.data_record?.resource_type === 'diagnosticreport',
+      );
+      const obsByResId = new Map<string, ClinicalDocument>();
+      observations.forEach((obs) => {
+        const id = resourceId(obs);
+        if (id) obsByResId.set(id, obs);
+      });
+
+      const claimed = new Set<string>();
+      const builtPanels = reports
+        .map((report) => {
+          const res = getFhirResource<any>(report);
+          const members: ClinicalDocument[] = [];
+          for (const entry of res?.result || []) {
+            const ref = entry?.reference?.split('/')?.[1];
+            const obs = ref ? obsByResId.get(ref) : undefined;
+            if (obs && !claimed.has(obs.id)) {
+              claimed.add(obs.id);
+              members.push(obs);
+            }
+          }
+          return { report, members };
+        })
+        .sort((a, b) => b.members.length - a.members.length);
+
+      const ungrouped = observations.filter((obs) => !claimed.has(obs.id));
+
+      const groups = RECORD_GROUPS.map((group) => ({
+        ...group,
+        records: linked.filter((r) =>
+          group.types.includes(r.data_record?.resource_type),
+        ),
+      })).filter((group) => group.records.length > 0);
+
+      return {
+        panels: builtPanels,
+        otherMeasures: ungrouped,
+        recordGroups: groups,
+        measureCount: observations.length,
+        abnormalCount: countAbnormal(observations),
+      };
+    }, [linked]);
+
+  const normalizedQuery = query.trim().toLowerCase();
+  const searchMatches = useMemo(() => {
+    if (!normalizedQuery) return [];
+    return linked
+      .filter((d) => d.data_record?.resource_type === 'observation')
+      .filter((d) =>
+        (d.metadata?.display_name || '')
+          .toLowerCase()
+          .includes(normalizedQuery),
+      );
+  }, [linked, normalizedQuery]);
 
   return (
     <AppPage
@@ -244,6 +289,18 @@ export function DocumentDetailTab() {
             <Placeholder text="This document could not be found." />
           ) : (
             <>
+              {/* Summary stats */}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <Stat label="Linked records" value={linked.length} />
+                <Stat label="Measurements" value={measureCount} />
+                <Stat
+                  label="Abnormal"
+                  value={abnormalCount}
+                  tone={abnormalCount > 0 ? 'danger' : 'default'}
+                />
+                <Stat label="Panels" value={panels.length} />
+              </div>
+
               {document && (
                 <div className="rounded-md bg-white p-2 shadow-sm ring-1 ring-gray-200">
                   <ManualRecordActions item={document} />
@@ -252,6 +309,7 @@ export function DocumentDetailTab() {
 
               <ProvenancePanel document={document} connection={connection} />
 
+              {/* Document viewer */}
               <section className="overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200">
                 <div className="border-b border-gray-200 px-4 py-3 text-sm font-semibold text-gray-900">
                   Document
@@ -273,21 +331,67 @@ export function DocumentDetailTab() {
                 )}
               </section>
 
-              <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-                <h2 className="flex items-center gap-2 text-base font-semibold text-gray-900">
-                  <Squares2X2Icon className="h-5 w-5 text-primary-700" />
-                  Linked records
-                  <span className="font-normal text-gray-500">
-                    ({linked.length})
-                  </span>
-                </h2>
-                {linked.length === 0 ? (
-                  <p className="mt-2 text-sm text-gray-600">
-                    Nothing is linked to this document yet.
-                  </p>
-                ) : (
+              {/* Measurements */}
+              {measureCount > 0 && (
+                <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <h2 className="flex items-center gap-2 text-base font-semibold text-gray-900">
+                      <BeakerIcon className="h-5 w-5 text-primary-700" />
+                      Measurements &amp; results
+                      <span className="font-normal text-gray-500">
+                        ({measureCount})
+                      </span>
+                    </h2>
+                    <label className="relative block w-full sm:w-64">
+                      <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+                      <input
+                        type="search"
+                        value={query}
+                        onChange={(event) => setQuery(event.target.value)}
+                        placeholder="Find a measurement"
+                        className="block w-full rounded-md border-0 py-1.5 pl-8 pr-3 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500"
+                      />
+                    </label>
+                  </div>
+
+                  {normalizedQuery ? (
+                    <div className="mt-3">
+                      <p className="mb-2 text-xs font-medium text-gray-500">
+                        {searchMatches.length} match
+                        {searchMatches.length === 1 ? '' : 'es'} for “{query}”
+                      </p>
+                      <ObservationResultsTable items={searchMatches} />
+                    </div>
+                  ) : (
+                    <div className="mt-3 flex flex-col gap-3">
+                      {panels.map(({ report, members }) => (
+                        <PanelDisclosure
+                          key={report.id}
+                          title={report.metadata?.display_name || 'Panel'}
+                          date={report.metadata?.date}
+                          members={members}
+                          to={timelineLink(report)}
+                        />
+                      ))}
+                      {otherMeasures.length > 0 && (
+                        <PanelDisclosure
+                          title="Other measurements"
+                          members={otherMeasures}
+                        />
+                      )}
+                    </div>
+                  )}
+                </section>
+              )}
+
+              {/* Other linked records */}
+              {recordGroups.length > 0 && (
+                <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+                  <h2 className="text-base font-semibold text-gray-900">
+                    Other linked records
+                  </h2>
                   <div className="mt-3 flex flex-col gap-4">
-                    {groups.map((group) => {
+                    {recordGroups.map((group) => {
                       const Icon = group.icon;
                       return (
                         <div key={group.key}>
@@ -313,33 +417,101 @@ export function DocumentDetailTab() {
                         </div>
                       );
                     })}
-                    {otherRecords.length > 0 && (
-                      <div>
-                        <h3 className="text-sm font-semibold text-gray-800">
-                          Other ({otherRecords.length})
-                        </h3>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {otherRecords.map((record) => (
-                            <Link
-                              key={record.id}
-                              to={timelineLink(record)}
-                              className="rounded-md bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 ring-1 ring-gray-200 hover:bg-primary-50 hover:text-primary-700"
-                            >
-                              {record.metadata?.display_name ||
-                                record.data_record?.resource_type}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
-                )}
-              </section>
+                </section>
+              )}
+
+              {linked.length === 0 && (
+                <Placeholder text="Nothing is linked to this document yet." />
+              )}
             </>
           )}
         </div>
       </div>
     </AppPage>
+  );
+}
+
+function PanelDisclosure({
+  title,
+  date,
+  members,
+  to,
+}: {
+  title: string;
+  date?: string;
+  members: ClinicalDocument[];
+  to?: string;
+}) {
+  const abnormal = useMemo(() => countAbnormal(members), [members]);
+  return (
+    <Disclosure>
+      {({ open }) => (
+        <div className="overflow-hidden rounded-md border border-gray-200">
+          <Disclosure.Button className="flex w-full items-center justify-between gap-2 bg-gray-50 px-3 py-2 text-left hover:bg-gray-100">
+            <span className="flex min-w-0 items-center gap-2">
+              <ChevronRightIcon
+                className={`h-4 w-4 shrink-0 text-gray-400 transition-transform ${
+                  open ? 'rotate-90' : ''
+                }`}
+              />
+              <span className="truncate text-sm font-semibold text-gray-900">
+                {title}
+              </span>
+              {date && (
+                <span className="hidden text-xs text-gray-500 sm:inline">
+                  {safeFormatDate(date, 'PP', '')}
+                </span>
+              )}
+            </span>
+            <span className="flex shrink-0 items-center gap-1.5 text-xs font-medium">
+              {abnormal > 0 && (
+                <span className="rounded bg-red-100 px-1.5 py-0.5 text-red-700">
+                  {abnormal} abnormal
+                </span>
+              )}
+              <span className="rounded bg-gray-100 px-1.5 py-0.5 text-gray-600">
+                {members.length} result{members.length === 1 ? '' : 's'}
+              </span>
+            </span>
+          </Disclosure.Button>
+          <Disclosure.Panel className="p-3">
+            <ObservationResultsTable items={members} />
+            {to && (
+              <Link
+                to={to}
+                className="mt-2 inline-block text-xs font-semibold text-primary-700 hover:text-primary-800"
+              >
+                Open panel in timeline →
+              </Link>
+            )}
+          </Disclosure.Panel>
+        </div>
+      )}
+    </Disclosure>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  tone = 'default',
+}: {
+  label: string;
+  value: number;
+  tone?: 'default' | 'danger';
+}) {
+  return (
+    <div className="rounded-md bg-white p-3 shadow-sm ring-1 ring-gray-200">
+      <p
+        className={`text-2xl font-bold ${
+          tone === 'danger' && value > 0 ? 'text-red-700' : 'text-gray-900'
+        }`}
+      >
+        {value}
+      </p>
+      <p className="text-xs font-medium text-gray-500">{label}</p>
+    </div>
   );
 }
 
