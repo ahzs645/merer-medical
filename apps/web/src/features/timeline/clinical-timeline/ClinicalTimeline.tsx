@@ -2,6 +2,7 @@ import { format } from 'date-fns';
 import {
   MouseEvent as ReactMouseEvent,
   PointerEvent as ReactPointerEvent,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -53,16 +54,18 @@ const CATEGORY_ORDER: LaneCategory[] = [
 // --------------------------------------------------------------------------
 
 function useElementWidth() {
-  const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return undefined;
-    const update = () => setWidth(Math.max(0, Math.floor(el.clientWidth)));
+  const observerRef = useRef<ResizeObserver | null>(null);
+  // Callback ref so the observer attaches whenever the node mounts — including
+  // after an early `loading` return, when a plain useEffect ref would miss it.
+  const ref = useCallback((node: HTMLDivElement | null) => {
+    observerRef.current?.disconnect();
+    if (!node) return;
+    const update = () => setWidth(Math.max(0, Math.floor(node.clientWidth)));
     update();
     const observer = new ResizeObserver(update);
-    observer.observe(el);
-    return () => observer.disconnect();
+    observer.observe(node);
+    observerRef.current = observer;
   }, []);
   return [ref, width] as const;
 }
