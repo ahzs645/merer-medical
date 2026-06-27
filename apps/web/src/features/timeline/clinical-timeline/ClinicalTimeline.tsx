@@ -101,6 +101,73 @@ function laneHeight(lane: TimelineLane, spanMs: number): number {
   return Math.max(56, 14 + rows * DURATION_ROW_H);
 }
 
+/** Categories whose packed duration lane can be split into per-item lanes. */
+const SPLITTABLE: ReadonlySet<LaneCategory> = new Set<LaneCategory>([
+  'medications',
+  'conditions',
+]);
+/** Cap how many per-item lanes a split produces; the rest fold into "Other". */
+const MAX_SPLIT_LANES = 24;
+
+function latestStart(items: DurationItem[]): number {
+  return items.reduce((max, item) => Math.max(max, item.start), -Infinity);
+}
+
+/**
+ * When a category is "expanded", replace its single packed duration lane with
+ * one lane per distinct item label. The most-recent items win the individual
+ * lanes; any overflow beyond MAX_SPLIT_LANES collapses into one "Other" lane so
+ * a large record can't explode into hundreds of rows.
+ */
+function expandLanes(
+  lanes: TimelineLane[],
+  expanded: Set<LaneCategory>,
+): TimelineLane[] {
+  const out: TimelineLane[] = [];
+  for (const lane of lanes) {
+    const splittable =
+      lane.kind === 'duration' && SPLITTABLE.has(lane.category);
+    if (!splittable || !expanded.has(lane.category) || !lane.durations) {
+      out.push(lane);
+      continue;
+    }
+    const byLabel = new Map<string, DurationItem[]>();
+    for (const item of lane.durations) {
+      const arr = byLabel.get(item.label) || [];
+      arr.push(item);
+      byLabel.set(item.label, arr);
+    }
+    const labels = [...byLabel.keys()].sort(
+      (a, b) =>
+        latestStart(byLabel.get(b) || []) - latestStart(byLabel.get(a) || []),
+    );
+    for (const label of labels.slice(0, MAX_SPLIT_LANES)) {
+      const items = byLabel.get(label) || [];
+      out.push({
+        id: `${lane.id}::${label}`,
+        title: label,
+        subtitle: items.length > 1 ? `${items.length} periods` : undefined,
+        kind: 'duration',
+        category: lane.category,
+        durations: items,
+      });
+    }
+    const rest = labels.slice(MAX_SPLIT_LANES);
+    if (rest.length > 0) {
+      const restItems = rest.flatMap((label) => byLabel.get(label) || []);
+      out.push({
+        id: `${lane.id}::__other`,
+        title: `Other (${rest.length})`,
+        subtitle: `${restItems.length} items`,
+        kind: 'duration',
+        category: lane.category,
+        durations: restItems,
+      });
+    }
+  }
+  return out;
+}
+
 // --------------------------------------------------------------------------
 
 interface TooltipSection {
@@ -118,6 +185,11 @@ export function ClinicalTimeline() {
   );
   const [hiddenLanes, setHiddenLanes] = useState<Set<string>>(new Set());
   const [showLanePicker, setShowLanePicker] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState<
+    Set<LaneCategory>
+  >(new Set());
+  const [laneOrder, setLaneOrder] = useState<string[]>([]);
+  const laneDragIndexRef = useRef<number | null>(null);
   const [hover, setHover] = useState<{
     t: number;
     px: number;
@@ -138,7 +210,9 @@ export function ClinicalTimeline() {
   const headerW = wrapWidth > 0 && wrapWidth < 560 ? HEADER_W_SM : HEADER_W;
   const contentW = Math.max(0, wrapWidth - headerW - YAXIS_W);
 
-  const visibleLanes = useMemo(
+  // Visible (unsplit) lanes — drives the cross-parameter tooltip so its grouping
+  // stays stable regardless of expand/collapse.
+  const filteredLanes = useMemo(
     () =>
       lanes.filter(
         (lane) =>
@@ -146,6 +220,27 @@ export function ClinicalTimeline() {
       ),
     [lanes, hiddenCategories, hiddenLanes],
   );
+
+  // What actually renders: per-item split applied, then user reordering.
+  const displayLanes = useMemo(
+    () => expandLanes(filteredLanes, expandedCategories),
+    [filteredLanes, expandedCategories],
+  );
+
+  const orderedLanes = useMemo(() => {
+    const rank = (id: string) => {
+      const i = laneOrder.indexOf(id);
+      return i === -1 ? Number.POSITIVE_INFINITY : i;
+    };
+    return displayLanes
+      .map((lane, naturalIndex) => ({ lane, naturalIndex }))
+      .sort((a, b) => {
+        const ra = rank(a.lane.id);
+        const rb = rank(b.lane.id);
+        return ra === rb ? a.naturalIndex - b.naturalIndex : ra - rb;
+      })
+      .map((entry) => entry.lane);
+  }, [displayLanes, laneOrder]);
 
   const span = domain ? domain[1] - domain[0] : 0;
   const xFor = (t: number) =>
@@ -238,6 +333,28 @@ export function ClinicalTimeline() {
     setHover({ t, px, clientX: e.clientX, clientY: e.clientY });
   };
 
+  // ---- Lane reorder / expand ---------------------------------------------
+  const onLaneDragStart = (index: number) => {
+    laneDragIndexRef.current = index;
+  };
+  const onLaneDrop = (index: number) => {
+    const from = laneDragIndexRef.current;
+    laneDragIndexRef.current = null;
+    if (from === null || from === index) return;
+    const ids = orderedLanes.map((lane) => lane.id);
+    const [moved] = ids.splice(from, 1);
+    ids.splice(index, 0, moved);
+    setLaneOrder(ids);
+  };
+  const toggleCategoryExpand = (category: LaneCategory, expand: boolean) => {
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      if (expand) next.add(category);
+      else next.delete(category);
+      return next;
+    });
+  };
+
   const tooltipSections = useMemo<TooltipSection[]>(() => {
     if (!hover || !domain) return [];
     const thr = (span * 26) / Math.max(1, contentW); // ~26px window
@@ -252,7 +369,7 @@ export function ClinicalTimeline() {
       rows.push({ label, value, abnormal });
       byCategory.set(category, rows);
     };
-    for (const lane of visibleLanes) {
+    for (const lane of filteredLanes) {
       if (lane.kind === 'series' && lane.series) {
         let nearest = lane.series[0];
         for (const p of lane.series) {
@@ -281,7 +398,7 @@ export function ClinicalTimeline() {
       category,
       rows: byCategory.get(category) || [],
     }));
-  }, [hover, domain, span, contentW, visibleLanes]);
+  }, [hover, domain, span, contentW, filteredLanes]);
 
   // ---- Context density ----------------------------------------------------
   const densityPath = useMemo(() => {
@@ -425,21 +542,41 @@ export function ClinicalTimeline() {
           onMouseMove={onLanesMove}
           onMouseLeave={() => setHover(null)}
         >
-          {visibleLanes.length === 0 ? (
+          {orderedLanes.length === 0 ? (
             <div className="p-8 text-center text-sm text-gray-500">
               All lanes are hidden. Re-enable a category or lane above.
             </div>
           ) : (
-            visibleLanes.map((lane) => (
-              <LaneRow
-                key={lane.id}
-                lane={lane}
-                headerW={headerW}
-                contentW={contentW}
-                xFor={xFor}
-                spanMs={spanMs}
-              />
-            ))
+            orderedLanes.map((lane, index) => {
+              const isSplit = lane.id.includes('::');
+              const splittable =
+                lane.kind === 'duration' && SPLITTABLE.has(lane.category);
+              const expandControl = isSplit
+                ? {
+                    mode: 'collapse' as const,
+                    onClick: () => toggleCategoryExpand(lane.category, false),
+                  }
+                : splittable
+                  ? {
+                      mode: 'expand' as const,
+                      onClick: () => toggleCategoryExpand(lane.category, true),
+                    }
+                  : undefined;
+              return (
+                <LaneRow
+                  key={lane.id}
+                  lane={lane}
+                  index={index}
+                  headerW={headerW}
+                  contentW={contentW}
+                  xFor={xFor}
+                  spanMs={spanMs}
+                  expandControl={expandControl}
+                  onDragStartLane={onLaneDragStart}
+                  onDropLane={onLaneDrop}
+                />
+              );
+            })
           )}
         </div>
       </div>
@@ -592,17 +729,26 @@ function ContextSelection({
 
 function LaneRow({
   lane,
+  index,
   headerW,
   contentW,
   xFor,
   spanMs,
+  expandControl,
+  onDragStartLane,
+  onDropLane,
 }: {
   lane: TimelineLane;
+  index: number;
   headerW: number;
   contentW: number;
   xFor: (t: number) => number;
   spanMs: number;
+  expandControl?: { mode: 'expand' | 'collapse'; onClick: () => void };
+  onDragStartLane: (index: number) => void;
+  onDropLane: (index: number) => void;
 }) {
+  const [dragOver, setDragOver] = useState(false);
   const height = laneHeight(lane, spanMs);
   const cleanTitle =
     lane.title.replace(/\s*\(.*?\)\s*/g, '').trim() || lane.title;
@@ -615,16 +761,50 @@ function LaneRow({
     <div className="flex border-b border-gray-100">
       <div
         style={{ width: headerW }}
-        className="flex flex-shrink-0 flex-col justify-center border-r border-gray-200 bg-gray-50 px-3 py-1"
+        draggable
+        onDragStart={() => onDragStartLane(index)}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          onDropLane(index);
+        }}
+        title="Drag to reorder"
+        className={`flex flex-shrink-0 cursor-grab flex-col justify-center border-r bg-gray-50 px-3 py-1 ${
+          dragOver ? 'border-primary-500 bg-primary-50' : 'border-gray-200'
+        }`}
       >
         <div className="flex items-center gap-1.5">
           <span
             className="inline-block h-2 w-2 flex-shrink-0 rounded-sm"
             style={{ backgroundColor: CATEGORY_COLOR[lane.category] }}
           />
-          <span className="truncate text-[11px] font-semibold uppercase leading-tight tracking-tight text-gray-800">
+          <span className="min-w-0 flex-1 truncate text-[11px] font-semibold uppercase leading-tight tracking-tight text-gray-800">
             {cleanTitle}
           </span>
+          {expandControl && (
+            <button
+              type="button"
+              draggable={false}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                expandControl.onClick();
+              }}
+              title={
+                expandControl.mode === 'expand'
+                  ? 'Split into one lane per item'
+                  : 'Collapse back into one lane'
+              }
+              className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded text-[11px] leading-none text-gray-400 hover:bg-gray-200 hover:text-gray-700"
+            >
+              {expandControl.mode === 'expand' ? '＋' : '－'}
+            </button>
+          )}
         </div>
         <div className="flex items-center gap-1.5 pl-3.5">
           {lane.subtitle && (
