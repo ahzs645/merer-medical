@@ -16,6 +16,21 @@ import {
   TimelineLane,
 } from './types';
 import { useClinicalTimelineData } from './useClinicalTimelineData';
+import { CommentModal } from './CommentModal';
+import {
+  CommentTarget,
+  commentKey,
+  dayKeyFromMs,
+  useTimelineComments,
+} from './useTimelineComments';
+
+/** Opens the comment modal for a specific data point. */
+type CommentClick = (
+  category: LaneCategory,
+  item: string,
+  t: number,
+  laneTitle: string,
+) => void;
 
 const HEADER_W = 150;
 const HEADER_W_SM = 104;
@@ -177,6 +192,10 @@ interface TooltipSection {
 
 export function ClinicalTimeline() {
   const { lanes, allTimestamps, extent, status } = useClinicalTimelineData();
+  const comments = useTimelineComments();
+  const [commentTarget, setCommentTarget] = useState<CommentTarget | null>(
+    null,
+  );
   const [wrapRef, wrapWidth] = useElementWidth();
 
   const [domain, setDomain] = useState<[number, number] | null>(null);
@@ -322,7 +341,7 @@ export function ClinicalTimeline() {
 
   // ---- Hover / unified tooltip -------------------------------------------
   const onLanesMove = (e: ReactMouseEvent<HTMLDivElement>) => {
-    if (!domain || contentW <= 0) return;
+    if (!domain || contentW <= 0 || commentTarget) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const px = e.clientX - rect.left - headerW;
     if (px < 0 || px > contentW) {
@@ -353,6 +372,26 @@ export function ClinicalTimeline() {
       else next.delete(category);
       return next;
     });
+  };
+
+  // ---- Commenting ---------------------------------------------------------
+  const openComment: CommentClick = (category, item, t, laneTitle) => {
+    setHover(null);
+    setCommentTarget({ category, item, dayKey: dayKeyFromMs(t), laneTitle });
+  };
+  const laneCommentCount = (lane: TimelineLane): number => {
+    const labels =
+      lane.kind === 'series'
+        ? [lane.title]
+        : lane.kind === 'duration'
+          ? [...new Set((lane.durations || []).map((d) => d.label))]
+          : [...new Set((lane.markers || []).map((m) => m.label))];
+    return labels.reduce(
+      (sum, label) =>
+        sum +
+        (comments.countByCategoryItem.get(`${lane.category}|${label}`) || 0),
+      0,
+    );
   };
 
   const tooltipSections = useMemo<TooltipSection[]>(() => {
@@ -574,6 +613,9 @@ export function ClinicalTimeline() {
                   expandControl={expandControl}
                   onDragStartLane={onLaneDragStart}
                   onDropLane={onLaneDrop}
+                  commentCount={laneCommentCount(lane)}
+                  keysWithComments={comments.keysWithComments}
+                  onComment={openComment}
                 />
               );
             })
@@ -653,12 +695,23 @@ export function ClinicalTimeline() {
       </div>
 
       {/* Unified tooltip */}
-      {hover && tooltipSections.length > 0 && (
+      {hover && !commentTarget && tooltipSections.length > 0 && (
         <UnifiedTooltip
           t={hover.t}
           clientX={hover.clientX}
           clientY={hover.clientY}
           sections={tooltipSections}
+        />
+      )}
+
+      {/* Point-level comments */}
+      {commentTarget && (
+        <CommentModal
+          target={commentTarget}
+          comments={comments.getComments(commentTarget)}
+          onPost={(body) => comments.addComment(commentTarget, body)}
+          onDelete={(id) => comments.deleteComment(id)}
+          onClose={() => setCommentTarget(null)}
         />
       )}
     </div>
@@ -737,6 +790,9 @@ function LaneRow({
   expandControl,
   onDragStartLane,
   onDropLane,
+  commentCount,
+  keysWithComments,
+  onComment,
 }: {
   lane: TimelineLane;
   index: number;
@@ -747,6 +803,9 @@ function LaneRow({
   expandControl?: { mode: 'expand' | 'collapse'; onClick: () => void };
   onDragStartLane: (index: number) => void;
   onDropLane: (index: number) => void;
+  commentCount: number;
+  keysWithComments: Set<string>;
+  onComment: CommentClick;
 }) {
   const [dragOver, setDragOver] = useState(false);
   const height = laneHeight(lane, spanMs);
@@ -817,6 +876,19 @@ function LaneRow({
               ⚠ {abnormalCount}
             </span>
           )}
+          {commentCount > 0 && (
+            <span className="text-primary-700 inline-flex items-center gap-0.5 rounded bg-blue-100 px-1 text-[9px] font-bold">
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="h-2.5 w-2.5"
+                aria-hidden="true"
+              >
+                <path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z" />
+              </svg>
+              {commentCount}
+            </span>
+          )}
         </div>
       </div>
       <svg width={contentW} height={height} className="flex-shrink-0 bg-white">
@@ -826,10 +898,18 @@ function LaneRow({
             contentW={contentW}
             height={height}
             xFor={xFor}
+            keysWithComments={keysWithComments}
+            onComment={onComment}
           />
         )}
         {lane.kind === 'duration' && (
-          <DurationLane lane={lane} contentW={contentW} xFor={xFor} />
+          <DurationLane
+            lane={lane}
+            contentW={contentW}
+            xFor={xFor}
+            keysWithComments={keysWithComments}
+            onComment={onComment}
+          />
         )}
         {lane.kind === 'marker' && (
           <MarkerLane
@@ -837,6 +917,8 @@ function LaneRow({
             height={height}
             xFor={xFor}
             contentW={contentW}
+            keysWithComments={keysWithComments}
+            onComment={onComment}
           />
         )}
       </svg>
@@ -871,11 +953,15 @@ function SeriesLane({
   contentW,
   height,
   xFor,
+  keysWithComments,
+  onComment,
 }: {
   lane: TimelineLane;
   contentW: number;
   height: number;
   xFor: (t: number) => number;
+  keysWithComments: Set<string>;
+  onComment: CommentClick;
 }) {
   const points = lane.series || [];
   if (points.length === 0) return null;
@@ -914,17 +1000,37 @@ function SeriesLane({
       {points.length > 1 && (
         <path d={path} fill="none" stroke={color} strokeWidth={1.75} />
       )}
-      {points.map((p, i) => (
-        <circle
-          key={i}
-          cx={xFor(p.t)}
-          cy={yFor(p.value)}
-          r={p.abnormal ? 3.75 : 3}
-          fill={p.abnormal ? '#ff3b30' : color}
-          stroke="#fff"
-          strokeWidth={1}
-        />
-      ))}
+      {points.map((p, i) => {
+        const hasComment = keysWithComments.has(
+          commentKey(lane.category, lane.title, dayKeyFromMs(p.t)),
+        );
+        return (
+          <g key={i}>
+            <circle
+              cx={xFor(p.t)}
+              cy={yFor(p.value)}
+              r={p.abnormal ? 3.75 : 3}
+              fill={p.abnormal ? '#ff3b30' : color}
+              stroke="#fff"
+              strokeWidth={1}
+              style={{ cursor: 'pointer' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onComment(lane.category, lane.title, p.t, lane.title);
+              }}
+            />
+            {hasComment && (
+              <circle
+                cx={xFor(p.t)}
+                cy={yFor(p.value) - 7}
+                r={2}
+                fill="#0071e3"
+                style={{ pointerEvents: 'none' }}
+              />
+            )}
+          </g>
+        );
+      })}
     </g>
   );
 }
@@ -962,10 +1068,14 @@ function DurationLane({
   lane,
   contentW,
   xFor,
+  keysWithComments,
+  onComment,
 }: {
   lane: TimelineLane;
   contentW: number;
   xFor: (t: number) => number;
+  keysWithComments: Set<string>;
+  onComment: CommentClick;
 }) {
   const items = lane.durations || [];
   const color = CATEGORY_COLOR[lane.category];
@@ -988,6 +1098,9 @@ function DurationLane({
         const drawEnd = Math.min(contentW, endX);
         const drawW = Math.max(2, drawEnd - drawStart);
         const showLabel = drawW > 34;
+        const hasComment = keysWithComments.has(
+          commentKey(lane.category, item.label, dayKeyFromMs(item.start)),
+        );
         return (
           <g key={i}>
             <rect
@@ -1000,7 +1113,21 @@ function DurationLane({
               fillOpacity={0.85}
               stroke="#fff"
               strokeWidth={1}
+              style={{ cursor: 'pointer' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onComment(lane.category, item.label, item.start, lane.title);
+              }}
             />
+            {hasComment && (
+              <circle
+                cx={drawStart + 2}
+                cy={y - 1}
+                r={2}
+                fill="#0071e3"
+                style={{ pointerEvents: 'none' }}
+              />
+            )}
             {showLabel && (
               <text
                 x={drawStart + 4}
@@ -1036,11 +1163,15 @@ function MarkerLane({
   height,
   xFor,
   contentW,
+  keysWithComments,
+  onComment,
 }: {
   lane: TimelineLane;
   height: number;
   xFor: (t: number) => number;
   contentW: number;
+  keysWithComments: Set<string>;
+  onComment: CommentClick;
 }) {
   const markers = lane.markers || [];
   const color = CATEGORY_COLOR[lane.category];
@@ -1058,16 +1189,34 @@ function MarkerLane({
       {markers.map((m, i) => {
         const cx = xFor(m.t);
         if (cx < -6 || cx > contentW + 6) return null;
+        const hasComment = keysWithComments.has(
+          commentKey(lane.category, m.label, dayKeyFromMs(m.t)),
+        );
         return (
-          <circle
-            key={i}
-            cx={cx}
-            cy={cy}
-            r={4}
-            fill={color}
-            stroke="#fff"
-            strokeWidth={1.25}
-          />
+          <g key={i}>
+            <circle
+              cx={cx}
+              cy={cy}
+              r={4}
+              fill={color}
+              stroke="#fff"
+              strokeWidth={1.25}
+              style={{ cursor: 'pointer' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onComment(lane.category, m.label, m.t, lane.title);
+              }}
+            />
+            {hasComment && (
+              <circle
+                cx={cx}
+                cy={cy - 8}
+                r={2}
+                fill="#0071e3"
+                style={{ pointerEvents: 'none' }}
+              />
+            )}
+          </g>
         );
       })}
     </g>

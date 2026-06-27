@@ -29,6 +29,7 @@ export const RXDB_COLLECTIONS_IN_PACKAGE = [
   'instance_config',
   'uspstf_recommendation_documents',
   'vector_storage',
+  'clinical_timeline_comments',
 ] as const;
 
 export type RxDbCollectionName = (typeof RXDB_COLLECTIONS_IN_PACKAGE)[number];

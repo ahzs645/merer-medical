@@ -44,6 +44,7 @@ import { USPSTFRecommendationDocumentSchema } from '../../models/uspstf-recommen
 import { InstanceConfigDocumentSchema } from '../../models/instance-config/InstanceConfig.collection';
 import { NotificationSchema } from '../../models/notification/Notification.collection';
 import { WorkflowRecordSchema } from '../../models/workflow-record/WorkflowRecord.collection';
+import { ClinicalTimelineCommentSchema } from '../../models/clinical-timeline-comment/ClinicalTimelineComment.collection';
 
 if (process.env.NODE_ENV === 'development') {
   addRxPlugin(RxDBDevModePlugin);
@@ -92,6 +93,9 @@ export const databaseCollections = {
   },
   workflow_records: {
     schema: WorkflowRecordSchema,
+  },
+  clinical_timeline_comments: {
+    schema: ClinicalTimelineCommentSchema,
   },
   instance_config: {
     schema: InstanceConfigDocumentSchema,

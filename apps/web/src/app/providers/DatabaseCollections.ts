@@ -8,6 +8,7 @@ import { USPSTFRecommendationDocumentCollection } from '../../models/uspstf-reco
 import { InstanceConfigDocumentCollection } from '../../models/instance-config/InstanceConfig.collection';
 import { NotificationCollection } from '../../models/notification/Notification.collection';
 import { WorkflowRecordCollection } from '../../models/workflow-record/WorkflowRecord.collection';
+import { ClinicalTimelineCommentCollection } from '../../models/clinical-timeline-comment/ClinicalTimelineComment.collection';
 
 export type DatabaseCollections = {
   clinical_documents: ClinicalDocumentCollection;
@@ -20,4 +21,5 @@ export type DatabaseCollections = {
   instance_config: InstanceConfigDocumentCollection;
   notifications: NotificationCollection;
   workflow_records: WorkflowRecordCollection;
+  clinical_timeline_comments: ClinicalTimelineCommentCollection;
 };
