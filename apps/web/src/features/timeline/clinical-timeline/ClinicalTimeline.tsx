@@ -17,6 +17,7 @@ import {
   TimelineLane,
 } from './types';
 import { useClinicalTimelineData } from './useClinicalTimelineData';
+import { LaneGroup, useLaneGroups } from './useLaneGroups';
 import { CommentModal } from './CommentModal';
 import {
   CommentTarget,
@@ -217,6 +218,8 @@ export function ClinicalTimeline() {
   >(new Set());
   const [laneOrder, setLaneOrder] = useState<string[]>([]);
   const laneDragIndexRef = useRef<number | null>(null);
+  const { groups, saveGroup, deleteGroup } = useLaneGroups();
+  const [groupName, setGroupName] = useState('');
   const [hover, setHover] = useState<{
     t: number;
     px: number;
@@ -402,6 +405,56 @@ export function ClinicalTimeline() {
     );
   };
 
+  // ---- Lane picker grouping + custom groups -------------------------------
+  const pickerSections = useMemo(() => {
+    const map = new Map<string, TimelineLane[]>();
+    for (const lane of lanes) {
+      const key =
+        lane.category === 'labs'
+          ? `Labs · ${lane.labGroup || 'Other'}`
+          : CATEGORY_LABEL[lane.category];
+      const arr = map.get(key) || [];
+      arr.push(lane);
+      map.set(key, arr);
+    }
+    return [...map.entries()].map(([label, sectionLanes]) => ({
+      label,
+      lanes: sectionLanes,
+    }));
+  }, [lanes]);
+
+  const setSectionVisible = (
+    sectionLanes: TimelineLane[],
+    visible: boolean,
+  ) => {
+    setHiddenLanes((prev) => {
+      const next = new Set(prev);
+      for (const lane of sectionLanes) {
+        if (visible) next.delete(lane.id);
+        else next.add(lane.id);
+      }
+      return next;
+    });
+  };
+
+  const saveCurrentAsGroup = () => {
+    const visibleIds = lanes
+      .filter(
+        (l) => !hiddenCategories.has(l.category) && !hiddenLanes.has(l.id),
+      )
+      .map((l) => l.id);
+    saveGroup(groupName, visibleIds);
+    setGroupName('');
+  };
+
+  const applyLaneGroup = (group: LaneGroup) => {
+    const keep = new Set(group.laneIds);
+    setHiddenCategories(new Set());
+    setHiddenLanes(
+      new Set(lanes.filter((l) => !keep.has(l.id)).map((l) => l.id)),
+    );
+  };
+
   const tooltipSections = useMemo<TooltipSection[]>(() => {
     if (!hover || !domain) return [];
     const thr = (span * 26) / Math.max(1, contentW); // ~26px window
@@ -554,37 +607,113 @@ export function ClinicalTimeline() {
       </div>
 
       {showLanePicker && (
-        <div className="max-h-44 overflow-y-auto border-b border-gray-200 bg-gray-50 px-3 py-2">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3">
-            {lanes.map((lane) => {
-              const on = !hiddenLanes.has(lane.id);
-              return (
-                <label
-                  key={lane.id}
-                  className="flex cursor-pointer items-center gap-2 text-xs text-gray-700"
+        <div className="max-h-60 overflow-y-auto border-b border-gray-200 bg-gray-50 px-3 py-2">
+          {/* Saved custom groups */}
+          {groups.length > 0 && (
+            <div className="mb-2 flex flex-wrap items-center gap-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                Groups
+              </span>
+              {groups.map((group) => (
+                <span
+                  key={group.name}
+                  className="inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white py-0.5 pl-2 pr-1 text-xs text-gray-700"
                 >
-                  <input
-                    type="checkbox"
-                    checked={on}
-                    onChange={() =>
-                      setHiddenLanes((prev) => {
-                        const next = new Set(prev);
-                        if (next.has(lane.id)) next.delete(lane.id);
-                        else next.add(lane.id);
-                        return next;
-                      })
-                    }
-                    className="h-3.5 w-3.5"
-                  />
-                  <span
-                    className="inline-block h-2 w-2 flex-shrink-0 rounded-sm"
-                    style={{ backgroundColor: CATEGORY_COLOR[lane.category] }}
-                  />
-                  <span className="truncate">{lane.title}</span>
-                </label>
-              );
-            })}
+                  <button
+                    type="button"
+                    className="hover:text-primary-600 font-medium"
+                    onClick={() => applyLaneGroup(group)}
+                  >
+                    {group.name}
+                  </button>
+                  <button
+                    type="button"
+                    className="text-gray-300 hover:text-red-500"
+                    aria-label={`Delete ${group.name}`}
+                    onClick={() => deleteGroup(group.name)}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Save current view as a named group */}
+          <div className="mb-2 flex items-center gap-1.5">
+            <input
+              value={groupName}
+              onChange={(e) => setGroupName(e.target.value)}
+              placeholder="Name this view…"
+              className="focus:border-primary-500 h-7 flex-1 rounded-md border border-gray-300 bg-white px-2 text-xs focus:outline-none"
+            />
+            <button
+              type="button"
+              disabled={!groupName.trim()}
+              onClick={saveCurrentAsGroup}
+              className="bg-primary rounded-md px-2.5 py-1 text-xs font-medium text-white disabled:bg-gray-300"
+            >
+              Save view
+            </button>
           </div>
+
+          {/* Lanes grouped by sub-category */}
+          {pickerSections.map((section) => (
+            <div key={section.label} className="mb-2 last:mb-0">
+              <div className="mb-1 flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                  {section.label}{' '}
+                  <span className="text-gray-400">
+                    ({section.lanes.length})
+                  </span>
+                </span>
+                <span className="flex items-center gap-1 text-[10px]">
+                  <button
+                    type="button"
+                    className="hover:text-primary-600 text-gray-400"
+                    onClick={() => setSectionVisible(section.lanes, true)}
+                  >
+                    All
+                  </button>
+                  <span className="text-gray-300">·</span>
+                  <button
+                    type="button"
+                    className="hover:text-primary-600 text-gray-400"
+                    onClick={() => setSectionVisible(section.lanes, false)}
+                  >
+                    None
+                  </button>
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3">
+                {section.lanes.map((lane) => (
+                  <label
+                    key={lane.id}
+                    className="flex cursor-pointer items-center gap-2 text-xs text-gray-700"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={!hiddenLanes.has(lane.id)}
+                      onChange={() =>
+                        setHiddenLanes((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(lane.id)) next.delete(lane.id);
+                          else next.add(lane.id);
+                          return next;
+                        })
+                      }
+                      className="h-3.5 w-3.5"
+                    />
+                    <span
+                      className="inline-block h-2 w-2 flex-shrink-0 rounded-sm"
+                      style={{ backgroundColor: CATEGORY_COLOR[lane.category] }}
+                    />
+                    <span className="truncate">{lane.title}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
