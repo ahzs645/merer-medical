@@ -30,6 +30,7 @@ import { TimelineYearHeader } from './components/layout/TimelineYearHeader';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { TimelineMonthDayHeader } from './components/layout/TimelineMonthDayHeader';
 import { useRecordQuery, useTimelineDateKeys } from './hooks/useRecordQuery';
+import { ClinicalTimeline } from './clinical-timeline/ClinicalTimeline';
 import { QueryStatus, TimelineRecordTypeFilter } from './types';
 import {
   checkIfDefaultDate,
@@ -46,6 +47,7 @@ export {
 
 export function TimelineTab() {
   const user = useUser(),
+    [view, setView] = useState<'cards' | 'trends'>('cards'),
     [query, setQuery] = useState(''),
     [typeFilter, setTypeFilter] = useState<TimelineRecordTypeFilter>('all'),
     { t } = useInterfaceLanguage(),
@@ -154,93 +156,133 @@ export function TimelineTab() {
         />
       }
     >
-      <Transition
-        show={
-          !initialized &&
-          (status === QueryStatus.IDLE || status === QueryStatus.LOADING)
-        }
-        enter="transition-opacity ease-in-out duration-75"
-        enterFrom="opacity-75"
-        enterTo="opacity-100"
-        leave="transition-opacity ease-in-out duration-75"
-        leaveFrom="opacity-100"
-        leaveTo="opacity-75"
-      >
-        <TimelineSkeleton />
-      </Transition>
-      <Transition
-        as="div"
-        className={'relative flex h-full'}
-        show={initialized}
-        enter="transition-opacity ease-in-out duration-75"
-        enterFrom="opacity-75"
-        enterTo="opacity-100"
-        leave="transition-opacity ease-in-out duration-75"
-        leaveFrom="opacity-100"
-        leaveTo="opacity-75"
-      >
-        {!(
-          status === QueryStatus.LOADING_MORE || status === QueryStatus.LOADING
-        ) && hasNoRecords ? (
-          <EmptyRecordsPlaceholder />
+      <div className="flex h-full w-full flex-col">
+        <div className="flex flex-shrink-0 items-center justify-center border-b border-gray-200 bg-white px-3 py-2">
+          <ViewToggle view={view} setView={setView} />
+        </div>
+        {view === 'trends' ? (
+          <div className="min-h-0 flex-1">
+            <ClinicalTimeline />
+          </div>
         ) : (
-          <div className="flex w-full overflow-hidden">
-            <JumpToPanel
-              items={data}
-              dateKeys={query === '' ? timelineDateKeys : undefined}
-              isLoading={false}
-              activeDateKey={activeDateKey ?? Object.keys(data || {})[0]}
-            />
-            <div
-              className="px-auto flex h-full max-h-full w-full justify-center overflow-y-scroll relative"
-              ref={scrollContainer}
-              onScroll={onScroll}
+          <div className="relative flex min-h-0 flex-1 flex-col">
+            <Transition
+              show={
+                !initialized &&
+                (status === QueryStatus.IDLE || status === QueryStatus.LOADING)
+              }
+              enter="transition-opacity ease-in-out duration-75"
+              enterFrom="opacity-75"
+              enterTo="opacity-100"
+              leave="transition-opacity ease-in-out duration-75"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-75"
             >
-              <div className="h-max w-full max-w-4xl flex-col px-4 pb-[50vh] sm:px-6 lg:px-8">
-                <SearchBar
-                  query={query}
-                  setQuery={setQuery}
-                  status={status}
-                  typeFilter={typeFilter}
-                  setTypeFilter={setTypeFilter}
-                />
-                {listItems}
-                {(Object.keys(data || {}) || []).length === 0 ? (
-                  <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
-                    <div className="text-center">
-                      <p className="text-base font-semibold text-primary-600">
-                        <MagnifyingGlassIcon className="h-12 w-12 mx-auto" />
-                      </p>
-                      <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-                        {t('No matching records')}
-                      </h1>
-                      <p className="mt-6 text-lg leading-7 text-gray-700">
-                        {query
-                          ? t('No records found with query: {query}').replace(
-                              '{query}',
-                              query,
-                            )
-                          : t('No records found for this filter')}
-                      </p>
+              <TimelineSkeleton />
+            </Transition>
+            <Transition
+              as="div"
+              className={'relative flex h-full'}
+              show={initialized}
+              enter="transition-opacity ease-in-out duration-75"
+              enterFrom="opacity-75"
+              enterTo="opacity-100"
+              leave="transition-opacity ease-in-out duration-75"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-75"
+            >
+              {!(
+                status === QueryStatus.LOADING_MORE ||
+                status === QueryStatus.LOADING
+              ) && hasNoRecords ? (
+                <EmptyRecordsPlaceholder />
+              ) : (
+                <div className="flex w-full overflow-hidden">
+                  <JumpToPanel
+                    items={data}
+                    dateKeys={query === '' ? timelineDateKeys : undefined}
+                    isLoading={false}
+                    activeDateKey={activeDateKey ?? Object.keys(data || {})[0]}
+                  />
+                  <div
+                    className="px-auto flex h-full max-h-full w-full justify-center overflow-y-scroll relative"
+                    ref={scrollContainer}
+                    onScroll={onScroll}
+                  >
+                    <div className="h-max w-full max-w-4xl flex-col px-4 pb-[50vh] sm:px-6 lg:px-8">
+                      <SearchBar
+                        query={query}
+                        setQuery={setQuery}
+                        status={status}
+                        typeFilter={typeFilter}
+                        setTypeFilter={setTypeFilter}
+                      />
+                      {listItems}
+                      {(Object.keys(data || {}) || []).length === 0 ? (
+                        <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
+                          <div className="text-center">
+                            <p className="text-base font-semibold text-primary-600">
+                              <MagnifyingGlassIcon className="h-12 w-12 mx-auto" />
+                            </p>
+                            <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                              {t('No matching records')}
+                            </h1>
+                            <p className="mt-6 text-lg leading-7 text-gray-700">
+                              {query
+                                ? t(
+                                    'No records found with query: {query}',
+                                  ).replace('{query}', query)
+                                : t('No records found for this filter')}
+                            </p>
+                          </div>
+                        </main>
+                      ) : null}
                     </div>
-                  </main>
-                ) : null}
-              </div>
-              <button
-                onClick={scrollToTop}
-                className={`z-40 fixed transition-all duration-200 bottom-24 right-4 md:bottom-4 md:right-8 shadow-blue-500/50 bg-primary shadow-md hover:shadow-lg active:shadow-sm rounded-full p-2 active:scale-95 hover:scale-105 ${
-                  scrollY > 100 ? 'opacity-100' : 'opacity-0'
-                }`}
-              >
-                <span className="text-white">
-                  <ArrowUpIcon className="h-6 w-6" />
-                </span>
-              </button>
-            </div>
+                    <button
+                      onClick={scrollToTop}
+                      className={`z-40 fixed transition-all duration-200 bottom-24 right-4 md:bottom-4 md:right-8 shadow-blue-500/50 bg-primary shadow-md hover:shadow-lg active:shadow-sm rounded-full p-2 active:scale-95 hover:scale-105 ${
+                        scrollY > 100 ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    >
+                      <span className="text-white">
+                        <ArrowUpIcon className="h-6 w-6" />
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </Transition>
           </div>
         )}
-      </Transition>
+      </div>
     </AppPage>
+  );
+}
+
+function ViewToggle({
+  view,
+  setView,
+}: {
+  view: 'cards' | 'trends';
+  setView: (view: 'cards' | 'trends') => void;
+}) {
+  return (
+    <div className="inline-flex rounded-lg bg-gray-100 p-0.5">
+      {(['cards', 'trends'] as const).map((value) => (
+        <button
+          key={value}
+          type="button"
+          onClick={() => setView(value)}
+          className={`rounded-md px-4 py-1 text-sm font-medium transition ${
+            view === value
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          {value === 'cards' ? 'Cards' : 'Clinical timeline'}
+        </button>
+      ))}
+    </div>
   );
 }
 
