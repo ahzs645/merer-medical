@@ -24,6 +24,8 @@ export interface SeriesPoint {
   display: string;
   /** Flagged out-of-range / abnormal by the source interpretation or ref range. */
   abnormal?: boolean;
+  /** Source result was amended/corrected after the fact (FHIR status). */
+  amended?: boolean;
 }
 
 export interface DurationItem {
@@ -58,6 +60,12 @@ export interface TimelineLane {
   refLow?: number;
   refHigh?: number;
   unit?: string;
+  /** Dates (epoch ms) where a result was cancelled / not available. */
+  missingDates?: number[];
+  /** The analyte's first reading falls in the most recent slice of the record. */
+  isNew?: boolean;
+  /** Derived lab sub-group label (Chemistry, Hematology, …) for the picker. */
+  labGroup?: string;
   /** duration lanes */
   durations?: DurationItem[];
   /** marker lanes */

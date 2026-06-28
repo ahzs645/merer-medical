@@ -38,6 +38,7 @@ interface ObsComponent {
 }
 interface FhirObservation {
   resourceType?: string;
+  status?: string;
   code?: CodeableConcept;
   category?: CodeableConcept[] | CodeableConcept;
   effectiveDateTime?: string;
@@ -47,6 +48,7 @@ interface FhirObservation {
   interpretation?: CodeableConcept[] | CodeableConcept;
   referenceRange?: ReferenceRange[];
   component?: ObsComponent[];
+  dataAbsentReason?: CodeableConcept;
 }
 interface FhirMedication {
   resourceType?: string;
@@ -156,6 +158,27 @@ interface SeriesBuilder {
   refLow?: number;
   refHigh?: number;
   points: SeriesPoint[];
+  missingDates: number[];
+}
+
+function getBuilder(
+  map: Map<string, SeriesBuilder>,
+  key: string,
+  title: string,
+  category: 'labs' | 'vitals',
+): SeriesBuilder {
+  let builder = map.get(key);
+  if (!builder) {
+    builder = {
+      id: `${category}-${key}`,
+      title,
+      category,
+      points: [],
+      missingDates: [],
+    };
+    map.set(key, builder);
+  }
+  return builder;
 }
 
 function pushSeriesLane(
@@ -169,12 +192,9 @@ function pushSeriesLane(
   abnormal: boolean,
   refLow: number | undefined,
   refHigh: number | undefined,
+  amended: boolean,
 ) {
-  let builder = map.get(key);
-  if (!builder) {
-    builder = { id: `${category}-${key}`, title, category, points: [] };
-    map.set(key, builder);
-  }
+  const builder = getBuilder(map, key, title, category);
   if (unit && !builder.unit) builder.unit = unit;
   if (refLow !== undefined && builder.refLow === undefined)
     builder.refLow = refLow;
@@ -185,7 +205,71 @@ function pushSeriesLane(
     value,
     display: unit ? `${value} ${unit}` : `${value}`,
     abnormal,
+    amended: amended || undefined,
   });
+}
+
+/** Heuristic lab sub-grouping for the picker, from the analyte name. */
+function deriveLabGroup(name: string): string {
+  const n = name.toLowerCase();
+  const has = (...words: string[]) => words.some((w) => n.includes(w));
+  if (
+    has(
+      'hemoglobin',
+      'hematocrit',
+      'leukocyte',
+      'platelet',
+      'erythrocyte',
+      'wbc',
+      'rbc',
+      'mcv',
+      'mch',
+      'neutrophil',
+      'lymphocyte',
+      'monocyte',
+      'eosinophil',
+      'basophil',
+    )
+  )
+    return 'Hematology';
+  if (has('cholesterol', 'hdl', 'ldl', 'triglyceride', 'lipid'))
+    return 'Lipids';
+  if (
+    has(
+      'alanine',
+      'aspartate',
+      'alkaline phosphatase',
+      'bilirubin',
+      'albumin',
+      'globulin',
+      'protein',
+      'a/g',
+      ' alt',
+      ' ast',
+      'ggt',
+    )
+  )
+    return 'Liver';
+  if (
+    has(
+      'creatinine',
+      'urea',
+      'egfr',
+      'e-gfr',
+      'gfr',
+      'sodium',
+      'potassium',
+      'chloride',
+      'bicarbonate',
+      'calcium',
+      'phosph',
+      'magnesium',
+    )
+  )
+    return 'Renal & Electrolytes';
+  if (has('glucose', 'a1c', 'hba1c', 'insulin', 'tsh', 'thyroid', 'cortisol'))
+    return 'Endocrine';
+  return 'Other';
 }
 
 // BP component LOINCs.
@@ -279,6 +363,13 @@ export function useClinicalTimelineData(): ClinicalTimelineData {
         );
         const refLow = range?.low?.value;
         const refHigh = range?.high?.value;
+        const key = (loinc || name).toLowerCase();
+        const status = String(resource.status || '').toLowerCase();
+        const amended = status === 'amended' || status === 'corrected';
+        const isMissing =
+          status === 'cancelled' ||
+          status === 'entered-in-error' ||
+          resource.dataAbsentReason !== undefined;
 
         // Blood pressure → split into systolic / diastolic lanes.
         const components = resource.component || [];
@@ -305,6 +396,7 @@ export function useClinicalTimelineData(): ClinicalTimelineData {
               false,
               undefined,
               undefined,
+              amended,
             );
           }
           if (diastolic?.value !== undefined) {
@@ -319,8 +411,20 @@ export function useClinicalTimelineData(): ClinicalTimelineData {
               false,
               undefined,
               undefined,
+              amended,
             );
           }
+          continue;
+        }
+
+        // Cancelled / not-available result → record as a "missing" mark.
+        if (isMissing) {
+          getBuilder(
+            vital ? vitalMap : labMap,
+            key,
+            name,
+            vital ? 'vitals' : 'labs',
+          ).missingDates.push(t);
           continue;
         }
 
@@ -328,7 +432,6 @@ export function useClinicalTimelineData(): ClinicalTimelineData {
         if (value === undefined) continue;
         const unit = resource.valueQuantity?.unit;
         const abnormal = isAbnormal(resource, value, refLow, refHigh);
-        const key = (loinc || name).toLowerCase();
         pushSeriesLane(
           vital ? vitalMap : labMap,
           key,
@@ -340,6 +443,7 @@ export function useClinicalTimelineData(): ClinicalTimelineData {
           abnormal,
           refLow,
           refHigh,
+          amended,
         );
       }
 
@@ -359,6 +463,13 @@ export function useClinicalTimelineData(): ClinicalTimelineData {
             refLow: builder.refLow,
             refHigh: builder.refHigh,
             unit: builder.unit,
+            missingDates: builder.missingDates.length
+              ? builder.missingDates
+              : undefined,
+            labGroup:
+              builder.category === 'labs'
+                ? deriveLabGroup(builder.title)
+                : undefined,
           });
         }
       };
@@ -473,6 +584,7 @@ export function useClinicalTimelineData(): ClinicalTimelineData {
       const allTimestamps: number[] = [];
       for (const lane of lanes) {
         lane.series?.forEach((p) => allTimestamps.push(p.t));
+        lane.missingDates?.forEach((t) => allTimestamps.push(t));
         lane.durations?.forEach((dItem) => {
           allTimestamps.push(dItem.start);
           allTimestamps.push(dItem.end);
@@ -483,6 +595,24 @@ export function useClinicalTimelineData(): ClinicalTimelineData {
         allTimestamps.length > 0
           ? [Math.min(...allTimestamps), Math.max(...allTimestamps)]
           : null;
+
+      // Flag "new" analytes — those whose first reading lands in the most
+      // recent 15% of the record (i.e. a recently-introduced test).
+      if (extent) {
+        const [emin, emax] = extent;
+        const spanMs = emax - emin;
+        if (spanMs > 0) {
+          for (const lane of lanes) {
+            if (
+              lane.kind === 'series' &&
+              lane.series &&
+              lane.series.length > 0
+            ) {
+              if (lane.series[0].t >= emin + spanMs * 0.85) lane.isNew = true;
+            }
+          }
+        }
+      }
 
       setData({ lanes, allTimestamps, extent, status: 'success' });
     }

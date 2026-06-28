@@ -190,7 +190,12 @@ function expandLanes(
 
 interface TooltipSection {
   category: LaneCategory;
-  rows: { label: string; value: string; abnormal?: boolean }[];
+  rows: {
+    label: string;
+    value: string;
+    abnormal?: boolean;
+    tone?: 'amended' | 'missing';
+  }[];
 }
 
 export function ClinicalTimeline() {
@@ -406,9 +411,10 @@ export function ClinicalTimeline() {
       label: string,
       value: string,
       abnormal?: boolean,
+      tone?: 'amended' | 'missing',
     ) => {
       const rows = byCategory.get(category) || [];
-      rows.push({ label, value, abnormal });
+      rows.push({ label, value, abnormal, tone });
       byCategory.set(category, rows);
     };
     for (const lane of filteredLanes) {
@@ -418,8 +424,19 @@ export function ClinicalTimeline() {
           if (Math.abs(p.t - hover.t) < Math.abs(nearest.t - hover.t))
             nearest = p;
         }
+        const nearMissing = (lane.missingDates || []).some(
+          (t) => Math.abs(t - hover.t) <= thr,
+        );
         if (nearest && Math.abs(nearest.t - hover.t) <= thr) {
-          add(lane.category, lane.title, nearest.display, nearest.abnormal);
+          add(
+            lane.category,
+            lane.title,
+            nearest.display,
+            nearest.abnormal,
+            nearest.amended ? 'amended' : undefined,
+          );
+        } else if (nearMissing) {
+          add(lane.category, lane.title, 'not available', false, 'missing');
         }
       } else if (lane.kind === 'duration' && lane.durations) {
         for (const item of lane.durations) {
@@ -818,6 +835,11 @@ function LaneRow({
     lane.kind === 'series'
       ? (lane.series || []).filter((p) => p.abnormal).length
       : 0;
+  const amendedCount =
+    lane.kind === 'series'
+      ? (lane.series || []).filter((p) => p.amended).length
+      : 0;
+  const missingCount = lane.missingDates?.length || 0;
 
   return (
     <div className="flex border-b border-gray-100">
@@ -868,15 +890,32 @@ function LaneRow({
             </button>
           )}
         </div>
-        <div className="flex items-center gap-1.5 pl-3.5">
+        <div className="flex flex-wrap items-center gap-1 pl-3.5">
           {lane.subtitle && (
             <span className="truncate text-[10px] text-gray-400">
               {lane.subtitle}
             </span>
           )}
+          {lane.isNew && (
+            <span className="rounded bg-emerald-100 px-1 text-[9px] font-bold text-emerald-700">
+              NEW
+            </span>
+          )}
           {abnormalCount > 0 && (
             <span className="rounded bg-amber-100 px-1 text-[9px] font-bold text-amber-700">
               ⚠ {abnormalCount}
+            </span>
+          )}
+          {amendedCount > 0 && (
+            <span className="inline-flex items-center gap-0.5 rounded bg-purple-100 px-1 text-[9px] font-bold text-purple-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
+              {amendedCount}
+            </span>
+          )}
+          {missingCount > 0 && (
+            <span className="inline-flex items-center gap-0.5 rounded bg-red-100 px-1 text-[9px] font-bold text-red-600">
+              <span className="h-1.5 w-1.5 rounded-full border border-red-500" />
+              {missingCount}
             </span>
           )}
           {commentCount > 0 && (
@@ -1009,6 +1048,17 @@ function SeriesLane({
         );
         return (
           <g key={i}>
+            {p.amended && (
+              <circle
+                cx={xFor(p.t)}
+                cy={yFor(p.value)}
+                r={5.5}
+                fill="none"
+                stroke="#8e44ad"
+                strokeWidth={1.5}
+                style={{ pointerEvents: 'none' }}
+              />
+            )}
             <circle
               cx={xFor(p.t)}
               cy={yFor(p.value)}
@@ -1034,6 +1084,33 @@ function SeriesLane({
           </g>
         );
       })}
+      {(lane.missingDates || []).map((t, i) => (
+        <g
+          key={`m${i}`}
+          style={{ cursor: 'pointer' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onComment(lane.category, lane.title, t, lane.title);
+          }}
+        >
+          <circle
+            cx={xFor(t)}
+            cy={height / 2}
+            r={4}
+            fill="#fff"
+            stroke="#ff3b30"
+            strokeWidth={1.5}
+          />
+          <line
+            x1={xFor(t) - 2}
+            y1={height / 2}
+            x2={xFor(t) + 2}
+            y2={height / 2}
+            stroke="#ff3b30"
+            strokeWidth={1.5}
+          />
+        </g>
+      ))}
     </g>
   );
 }
@@ -1268,13 +1345,18 @@ function UnifiedTooltip({
                   </span>
                   <span
                     className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[11px] font-semibold ${
-                      row.abnormal
-                        ? 'bg-amber-100 text-amber-700'
-                        : 'bg-gray-100 text-gray-800'
+                      row.tone === 'missing'
+                        ? 'bg-red-100 text-red-600'
+                        : row.tone === 'amended'
+                          ? 'bg-purple-100 text-purple-700'
+                          : row.abnormal
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-gray-100 text-gray-800'
                     }`}
                   >
-                    {row.abnormal ? '⚠ ' : ''}
+                    {row.abnormal && !row.tone ? '⚠ ' : ''}
                     {row.value}
+                    {row.tone === 'amended' ? ' ✎' : ''}
                   </span>
                 </div>
               ))}
