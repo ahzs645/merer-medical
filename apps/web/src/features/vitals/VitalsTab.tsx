@@ -5,6 +5,7 @@ import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
+import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { GenericBanner } from '../../shared/components/GenericBanner';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
@@ -83,10 +84,14 @@ function readObservation(resource: FhirObservation): {
 }
 
 function isVitalSign(resource: Record<string, unknown>): boolean {
-  const categories =
-    (resource['category'] as
-      | Array<{ coding?: Array<{ code?: string }> }>
-      | undefined) || [];
+  // FHIR models Observation.category as an array, but some stored/imported
+  // records carry a single CodeableConcept object instead. Normalize both
+  // shapes to an array so `.some` never throws on the object form.
+  const raw = resource['category'] as
+    | Array<{ coding?: Array<{ code?: string }> }>
+    | { coding?: Array<{ code?: string }> }
+    | undefined;
+  const categories = Array.isArray(raw) ? raw : raw ? [raw] : [];
   return categories.some((category) =>
     (category.coding || []).some((coding) => coding.code === 'vital-signs'),
   );
@@ -96,12 +101,16 @@ function useVitals() {
   const db = useRxDb();
   const user = useUser();
   const [groups, setGroups] = useState<VitalGroup[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading',
+  );
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let mounted = true;
     async function load() {
       setStatus('loading');
+      setError(null);
       const docs = await db.clinical_documents
         .find({
           selector: {
@@ -158,13 +167,17 @@ function useVitals() {
       setGroups(list);
       setStatus('success');
     }
-    load();
+    load().catch((e) => {
+      if (!mounted) return;
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setStatus('error');
+    });
     return () => {
       mounted = false;
     };
   }, [db, user.id]);
 
-  return { groups, status };
+  return { groups, status, error };
 }
 
 /** Tiny dependency-free SVG sparkline of a vital's recent numeric values. */
@@ -209,7 +222,7 @@ function Sparkline({ readings }: { readings: Reading[] }) {
 }
 
 export function VitalsTab() {
-  const { groups, status } = useVitals();
+  const { groups, status, error } = useVitals();
   const [query, setQuery] = useState('');
 
   const filtered = useMemo(() => {
@@ -236,6 +249,8 @@ export function VitalsTab() {
 
           {status === 'loading' ? (
             <Placeholder text="Loading vital signs…" />
+          ) : status === 'error' ? (
+            <ErrorPanel error={error} text="Unable to load vital signs." />
           ) : groups.length === 0 ? (
             <Placeholder text="No vital signs recorded yet." icon />
           ) : filtered.length === 0 ? (

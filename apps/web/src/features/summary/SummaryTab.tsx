@@ -27,7 +27,6 @@ import { useUser } from '../../app/providers/UserProvider';
 import { BookmarkedListCard } from './components/BookmarkedListCard';
 import { TrackersSummaryCard } from './components/TrackersSummaryCard';
 import React from 'react';
-// import { MereRecommendationsListCard } from '../features/ai-recommendations/components/MereRecommendationsListCard';
 import {
   SummaryPagePreferences,
   SummaryPagePreferencesCard,
@@ -318,7 +317,6 @@ function summaryReducer(state: SummaryState, action: SummaryActions) {
 
 const CardTypeToDisplayMap: Record<SummaryPagePreferencesCard['type'], string> =
   {
-    recommendations: 'Mere Assistant Recommendations',
     pinned: 'Bookmarked Items',
     medications: 'Medications',
     conditions: 'Conditions',
@@ -328,11 +326,6 @@ const CardTypeToDisplayMap: Record<SummaryPagePreferencesCard['type'], string> =
   };
 
 const DEFAULT_CARD_ORDER: SummaryPagePreferences['cards'] = [
-  {
-    type: 'recommendations',
-    order: 0,
-    is_visible: false, // Disabled USPSTF feature
-  },
   {
     type: 'pinned',
     order: 1,
@@ -577,15 +570,12 @@ function SummaryTab() {
           conditionCount={cond.length}
           immunizationCount={imm.length}
           allergyCount={allergy.length}
-          pinnedCount={pinned.length}
         />
         <ResultsHubContent />
         <TrackersSummaryCard />
         {sortedCards.map((card) => {
           if (!card.is_visible) return null;
           switch (card.type) {
-            case 'recommendations':
-              return null; // <MereRecommendationsListCard key={card.type} />;
             case 'pinned':
               return <BookmarkedListCard key={card.type} items={pinned} />;
             case 'medications':
@@ -626,13 +616,9 @@ function SummaryTab() {
                     className="border inset bg-gray-50 rounded-md p-2 py-6"
                   >
                     {sortedCards
-                      .filter((i) => {
-                        // Hide recommendations (USPSTF feature disabled)
-                        if (i.type === 'recommendations') {
-                          return false;
-                        }
-                        return true;
-                      })
+                      // Drop any unknown/legacy card types (e.g. the removed
+                      // recommendations card) so the editor only lists real cards.
+                      .filter((i) => i.type in CardTypeToDisplayMap)
                       .map((card, index) => (
                         <Draggable
                           key={card.type}
@@ -702,24 +688,14 @@ function ForYouFeed({
   conditionCount,
   immunizationCount,
   allergyCount,
-  pinnedCount,
 }: {
   medicationCount: number;
   conditionCount: number;
   immunizationCount: number;
   allergyCount: number;
-  pinnedCount: number;
 }) {
   const { t } = useInterfaceLanguage();
   const items = [
-    pinnedCount > 0
-      ? {
-          label: 'Today',
-          title: `${pinnedCount} bookmarked record${pinnedCount === 1 ? '' : 's'}`,
-          description: 'Review the records you marked as important.',
-          route: AppRoutes.Summary,
-        }
-      : undefined,
     medicationCount > 0
       ? {
           label: 'For you',
@@ -744,8 +720,8 @@ function ForYouFeed({
           title: `${immunizationCount} immunization record${
             immunizationCount === 1 ? '' : 's'
           }`,
-          description: 'Review vaccine history in your summary.',
-          route: AppRoutes.Summary,
+          description: 'Review your vaccine history and booster status.',
+          route: AppRoutes.Immunizations,
         }
       : undefined,
   ].filter((item): item is NonNullable<typeof item> => Boolean(item));
