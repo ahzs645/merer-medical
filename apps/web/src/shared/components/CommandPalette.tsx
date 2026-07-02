@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Dialog, Transition } from '@headlessui/react';
 import {
   BeakerIcon,
   ChartBarIcon,
@@ -187,11 +188,21 @@ const COMMAND_ITEMS: CommandPaletteItem[] = [
   },
 ];
 
-export function CommandPalette() {
+export function CommandPalette({
+  open: controlledOpen,
+  onOpenChange,
+}: {
+  /** Optional controlled open state, so a separate trigger (e.g. the mobile
+   * "More" sheet) can open the same single palette instance. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+} = {}) {
   const { t } = useInterfaceLanguage();
   const navigate = useNavigate();
   const location = useLocation();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -201,7 +212,7 @@ export function CommandPalette() {
         event.preventDefault();
         setOpen(true);
       }
-      if (event.key === 'Escape') setOpen(false);
+      // Escape-to-close is handled by the Headless UI Dialog below.
     }
 
     window.addEventListener('keydown', onKeyDown);
@@ -211,7 +222,6 @@ export function CommandPalette() {
   useEffect(() => {
     if (!open) return;
     setQuery('');
-    requestAnimationFrame(() => inputRef.current?.focus());
   }, [open]);
 
   const results = useMemo(() => {
@@ -259,7 +269,7 @@ export function CommandPalette() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mx-1 my-1 hidden h-10 w-10 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700 md:flex"
+        className="mx-1 my-1 flex h-11 w-11 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
         aria-expanded={open}
         aria-label={t('Search')}
         title={t('Search')}
@@ -267,67 +277,97 @@ export function CommandPalette() {
         <MagnifyingGlassIcon className="h-5 w-5" />
       </button>
 
-      {open ? (
-        <div className="fixed inset-0 z-50 bg-gray-950/40 p-3 sm:p-6">
-          <div className="mx-auto mt-16 max-w-2xl overflow-hidden rounded-lg bg-white shadow-2xl ring-1 ring-gray-200">
-            <div className="flex items-center gap-3 border-b border-gray-200 px-4 py-3">
-              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={t('Search records, pages, and actions')}
-                className="min-w-0 flex-1 border-0 p-0 text-base text-gray-900 placeholder:text-gray-400 focus:ring-0"
-              />
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-                aria-label={t('Close search')}
-              >
-                <XMarkIcon className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="max-h-[60vh] overflow-y-auto p-2">
-              {results.length > 0 ? (
-                results.map((item) => {
-                  const Icon = item.icon;
-                  const active = location.pathname === item.route;
-                  return (
-                    <button
-                      key={item.route}
-                      type="button"
-                      onClick={() => runCommand(item)}
-                      className="flex w-full items-start gap-3 rounded-md px-3 py-3 text-left hover:bg-primary-50"
-                    >
-                      <Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary-700" />
-                      <span className="min-w-0 flex-1">
-                        <span className="flex items-center gap-2">
-                          <span className="font-semibold text-gray-900">
-                            {t(item.title)}
-                          </span>
-                          {active ? (
-                            <span className="rounded bg-primary-100 px-1.5 py-0.5 text-xs font-medium text-primary-700">
-                              {t('Current')}
-                            </span>
-                          ) : null}
-                        </span>
-                        <span className="mt-0.5 block text-sm text-gray-600">
-                          {t(item.description)}
-                        </span>
-                      </span>
-                    </button>
-                  );
-                })
-              ) : (
-                <div className="px-4 py-8 text-center text-sm text-gray-600">
-                  {t('No matching pages or actions')}
+      <Transition show={open} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() => setOpen(false)}
+          initialFocus={inputRef}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-200"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-150"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-gray-950/40" aria-hidden="true" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 z-10 overflow-y-auto p-3 sm:p-6">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-200"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-150"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="mx-auto mt-16 max-w-2xl overflow-hidden rounded-lg bg-white shadow-2xl ring-1 ring-gray-200">
+                <Dialog.Title className="sr-only">{t('Search')}</Dialog.Title>
+                <div className="flex items-center gap-3 border-b border-gray-200 px-4 py-3">
+                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                  <input
+                    ref={inputRef}
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder={t('Search records, pages, and actions')}
+                    className="min-w-0 flex-1 border-0 p-0 text-base text-gray-900 placeholder:text-gray-400 focus:ring-0"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    className="flex h-11 w-11 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                    aria-label={t('Close search')}
+                  >
+                    <XMarkIcon className="h-5 w-5" />
+                  </button>
                 </div>
-              )}
-            </div>
+                <div className="max-h-[60vh] overflow-y-auto p-2">
+                  {results.length > 0 ? (
+                    results.map((item) => {
+                      const Icon = item.icon;
+                      const active = location.pathname === item.route;
+                      return (
+                        <button
+                          key={item.route}
+                          type="button"
+                          onClick={() => runCommand(item)}
+                          className="flex w-full items-start gap-3 rounded-md px-3 py-3 text-left hover:bg-primary-50"
+                        >
+                          <Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary-700" />
+                          <span className="min-w-0 flex-1">
+                            <span className="flex items-center gap-2">
+                              <span className="font-semibold text-gray-900">
+                                {t(item.title)}
+                              </span>
+                              {active ? (
+                                <span className="rounded bg-primary-100 px-1.5 py-0.5 text-xs font-medium text-primary-700">
+                                  {t('Current')}
+                                </span>
+                              ) : null}
+                            </span>
+                            <span className="mt-0.5 block text-sm text-gray-600">
+                              {t(item.description)}
+                            </span>
+                          </span>
+                        </button>
+                      );
+                    })
+                  ) : (
+                    <div className="px-4 py-8 text-center text-sm text-gray-600">
+                      {t('No matching pages or actions')}
+                    </div>
+                  )}
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
-        </div>
-      ) : null}
+        </Dialog>
+      </Transition>
     </>
   );
 }
