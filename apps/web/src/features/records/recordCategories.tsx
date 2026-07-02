@@ -2,6 +2,7 @@ import { type ComponentType } from 'react';
 import {
   BeakerIcon,
   BuildingOffice2Icon,
+  ChartPieIcon,
   ClipboardDocumentCheckIcon,
   ClipboardDocumentListIcon,
   DocumentTextIcon,
@@ -17,11 +18,20 @@ import {
   RectangleStackIcon,
   ScissorsIcon,
   ShieldCheckIcon,
+  SparklesIcon,
   Squares2X2Icon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
 
 import { Routes as AppRoutes } from '../../Routes';
+
+export interface RecordSubPage {
+  to: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+  /** Match this sub-page only on the exact path (for index/overview routes). */
+  end?: boolean;
+}
 
 export interface RecordCategory {
   to: string;
@@ -36,6 +46,12 @@ export interface RecordCategory {
    * aggregate/specialty views) so we show no count rather than a wrong one.
    */
   resourceTypes?: string[];
+  /**
+   * Sub-pages of a specialty workspace (Dental, Optometry). The desktop side
+   * nav renders these as an indented list while the category is active, so
+   * wide viewports don't need the second horizontal tab row inside the page.
+   */
+  children?: RecordSubPage[];
 }
 
 export interface RecordGroup {
@@ -169,8 +185,82 @@ export const RECORD_GROUPS: RecordGroup[] = [
   {
     heading: 'Specialty',
     items: [
-      { to: AppRoutes.Dental, label: 'Dental', icon: FaceSmileIcon },
-      { to: AppRoutes.Optometry, label: 'Optometry', icon: EyeIcon },
+      {
+        to: AppRoutes.Dental,
+        label: 'Dental',
+        icon: FaceSmileIcon,
+        children: [
+          {
+            to: AppRoutes.Dental,
+            label: 'Overview',
+            icon: ChartPieIcon,
+            end: true,
+          },
+          {
+            to: AppRoutes.DentalChart,
+            label: 'Chart & teeth',
+            icon: Squares2X2Icon,
+          },
+          {
+            to: AppRoutes.DentalTreatment,
+            label: 'Treatment',
+            icon: ClipboardDocumentCheckIcon,
+          },
+          {
+            to: AppRoutes.DentalHygiene,
+            label: 'Hygiene & perio',
+            icon: SparklesIcon,
+          },
+          {
+            to: AppRoutes.DentalImaging,
+            label: 'Imaging & scans',
+            icon: PhotoIcon,
+          },
+          {
+            to: AppRoutes.DentalRecords,
+            label: 'Records & claims',
+            icon: DocumentTextIcon,
+          },
+        ],
+      },
+      {
+        to: AppRoutes.Optometry,
+        label: 'Optometry',
+        icon: EyeIcon,
+        children: [
+          {
+            to: AppRoutes.Optometry,
+            label: 'Overview',
+            icon: ChartPieIcon,
+            end: true,
+          },
+          {
+            to: AppRoutes.OptometryPrescriptions,
+            label: 'Prescriptions',
+            icon: Squares2X2Icon,
+          },
+          {
+            to: AppRoutes.OptometryExams,
+            label: 'Exams & metrics',
+            icon: ClipboardDocumentListIcon,
+          },
+          {
+            to: AppRoutes.OptometrySurgery,
+            label: 'Surgery & procedures',
+            icon: ScissorsIcon,
+          },
+          {
+            to: AppRoutes.OptometryImaging,
+            label: 'Imaging & scans',
+            icon: PhotoIcon,
+          },
+          {
+            to: AppRoutes.OptometryRecords,
+            label: 'Records',
+            icon: DocumentTextIcon,
+          },
+        ],
+      },
     ],
   },
 ];

@@ -212,6 +212,20 @@ const ALL_COMMAND_ITEMS: CommandPaletteItem[] = [
     keywords: [],
     icon: category.icon,
   })),
+  // Specialty sub-pages (Dental → Chart & teeth, Optometry → Exams, …), so
+  // deep workspace destinations are searchable too. Overview pages are skipped
+  // because the category entry above already points at the same route.
+  ...ALL_RECORD_CATEGORIES.flatMap((category) =>
+    (category.children ?? [])
+      .filter((child) => child.to !== category.to)
+      .map((child) => ({
+        title: `${category.label} — ${child.label}`,
+        description: 'Records',
+        route: child.to,
+        keywords: [child.label, category.label],
+        icon: child.icon,
+      })),
+  ),
 ];
 
 export function CommandPalette({
