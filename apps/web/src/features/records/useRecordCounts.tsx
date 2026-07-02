@@ -29,8 +29,9 @@ const COUNTED_RESOURCE_TYPES = Array.from(
 /**
  * Computes per-resource-type counts once for the whole Records area and shares
  * them via context, so the side nav and the hub don't each run their own query.
- * Uses count-only queries (no document payloads are materialized) and keeps the
- * numbers live as records are added / removed / synced while Records is mounted.
+ * Tallies with a single find() (reading only resource_type via .get(), not each
+ * document's full JSON) and keeps the numbers live as records are added /
+ * removed / synced while Records is mounted.
  */
 export function RecordCountsProvider({ children }: { children: ReactNode }) {
   const db = useRxDb();
