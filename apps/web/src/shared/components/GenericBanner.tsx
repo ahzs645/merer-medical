@@ -2,7 +2,7 @@ import { type ReactNode } from 'react';
 
 export function GenericBanner({
   text = '',
-  uppercase = true,
+  uppercase = false,
   action,
 }: {
   text?: string;

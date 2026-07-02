@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  BuildingOffice2Icon,
-  MagnifyingGlassIcon,
-  UserIcon,
-} from '@heroicons/react/24/outline';
+import { BuildingOffice2Icon, UserIcon } from '@heroicons/react/24/outline';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
 import { GenericBanner } from '../../shared/components/GenericBanner';
+import {
+  EmptyState,
+  SearchInput,
+} from '../../shared/components/records/RecordListPage';
+import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 
 interface Provider {
@@ -71,12 +72,16 @@ function useDirectory() {
   const user = useUser();
   const [providers, setProviders] = useState<Provider[]>([]);
   const [facilities, setFacilities] = useState<Facility[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading',
+  );
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let mounted = true;
     async function load() {
       setStatus('loading');
+      setError(null);
       const [careTeamDocs, encounterDocs] = await Promise.all([
         db.clinical_documents
           .find({
@@ -149,17 +154,21 @@ function useDirectory() {
       setFacilities(facilityList);
       setStatus('success');
     }
-    load();
+    load().catch((e) => {
+      if (!mounted) return;
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setStatus('error');
+    });
     return () => {
       mounted = false;
     };
   }, [db, user.id]);
 
-  return { providers, facilities, status };
+  return { providers, facilities, status, error };
 }
 
 export function DirectoryTab() {
-  const { providers, facilities, status } = useDirectory();
+  const { providers, facilities, status, error } = useDirectory();
   const [query, setQuery] = useState('');
 
   const q = query.trim().toLowerCase();
@@ -190,20 +199,17 @@ export function DirectoryTab() {
     <AppPage banner={<GenericBanner text="Providers & locations" />}>
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-3xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          <label className="relative block">
-            <span className="sr-only">Search providers and locations</span>
-            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search providers and locations"
-              className="focus:border-primary-500 focus:ring-primary-500 h-10 w-full rounded-md border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-1"
-            />
-          </label>
+          <SearchInput
+            value={query}
+            onChange={setQuery}
+            placeholder="Search providers and locations"
+            label="Search providers and locations"
+          />
 
           {status === 'loading' ? (
-            <Placeholder text="Loading directory…" />
+            <EmptyState text="Loading directory…" />
+          ) : status === 'error' ? (
+            <ErrorPanel error={error} text="Unable to load directory." />
           ) : (
             <>
               <Section
@@ -212,9 +218,9 @@ export function DirectoryTab() {
                 count={filteredProviders.length}
               >
                 {providers.length === 0 ? (
-                  <Placeholder text="No providers recorded yet." />
+                  <EmptyState text="No providers recorded yet." />
                 ) : filteredProviders.length === 0 ? (
-                  <Placeholder text="No providers match this search." />
+                  <EmptyState text="No providers match this search." />
                 ) : (
                   filteredProviders.map((provider) => (
                     <article
@@ -250,9 +256,9 @@ export function DirectoryTab() {
                 count={filteredFacilities.length}
               >
                 {facilities.length === 0 ? (
-                  <Placeholder text="No locations recorded yet." />
+                  <EmptyState text="No locations recorded yet." />
                 ) : filteredFacilities.length === 0 ? (
-                  <Placeholder text="No locations match this search." />
+                  <EmptyState text="No locations match this search." />
                 ) : (
                   filteredFacilities.map((facility) => (
                     <article
@@ -306,13 +312,5 @@ function Section({
       </div>
       {children}
     </section>
-  );
-}
-
-function Placeholder({ text }: { text: string }) {
-  return (
-    <div className="rounded-md bg-white p-6 text-center text-sm text-gray-600 shadow-sm ring-1 ring-gray-200">
-      {text}
-    </div>
   );
 }

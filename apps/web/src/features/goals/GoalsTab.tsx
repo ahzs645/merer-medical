@@ -5,9 +5,8 @@ import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { Routes as AppRoutes } from '../../Routes';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
-import { AppPage } from '../../shared/components/AppPage';
 import { BannerAddLink } from '../../shared/components/BannerAddLink';
-import { GenericBanner } from '../../shared/components/GenericBanner';
+import { RecordListPage } from '../../shared/components/records/RecordListPage';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, isRecord } from '../../shared/utils/fhirText';
@@ -25,12 +24,16 @@ function useGoals() {
   const db = useRxDb();
   const user = useUser();
   const [items, setItems] = useState<GoalItem[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading',
+  );
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let mounted = true;
     async function load() {
       setStatus('loading');
+      setError(null);
       const docs = await db.clinical_documents
         .find({
           selector: {
@@ -64,94 +67,78 @@ function useGoals() {
       );
       setStatus('success');
     }
-    load();
+    load().catch((e) => {
+      if (!mounted) return;
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setStatus('error');
+    });
     return () => {
       mounted = false;
     };
   }, [db, user.id]);
 
-  return { items, status };
+  return { items, status, error };
 }
 
 export function GoalsTab() {
-  const { items, status } = useGoals();
+  const { items, status, error } = useGoals();
 
   return (
-    <AppPage
-      banner={
-        <GenericBanner
-          text="Goals"
-          action={
-            <BannerAddLink
-              to={`${AppRoutes.AddRecord}?type=goal`}
-              label="Add goal"
-            />
-          }
+    <RecordListPage
+      title="Goals"
+      bannerAction={
+        <BannerAddLink
+          to={`${AppRoutes.AddRecord}?type=goal`}
+          label="Add goal"
         />
       }
+      status={status}
+      error={error}
+      loadingText="Loading goals…"
+      errorText="Unable to load goals."
+      isEmpty={items.length === 0}
+      emptyText="No health goals recorded yet."
+      emptyIcon={<FlagIcon className="h-6 w-6" />}
     >
-      <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-3xl gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          {status === 'loading' ? (
-            <Placeholder text="Loading goals…" />
-          ) : items.length === 0 ? (
-            <Placeholder text="No health goals recorded yet." icon />
-          ) : (
-            items.map((item) => (
-              <article
-                key={item.id}
-                className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h3 className="break-words text-base font-semibold text-gray-900">
-                      {item.description}
-                    </h3>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {item.achievement && (
-                        <span className="inline-flex items-center rounded bg-blue-50 px-2 py-0.5 text-xs font-medium capitalize text-blue-700 ring-1 ring-inset ring-blue-600/10">
-                          {item.achievement}
-                        </span>
-                      )}
-                      {item.status && (
-                        <span className="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium capitalize text-gray-700">
-                          {item.status}
-                        </span>
-                      )}
-                      {item.addresses.map((address) => (
-                        <span
-                          key={address}
-                          className="inline-flex items-center rounded bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700 ring-1 ring-inset ring-primary-600/10"
-                        >
-                          {address}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  {item.startDate && (
-                    <span className="shrink-0 text-sm text-gray-500">
-                      {safeFormatDate(item.startDate, 'PP', '')}
-                    </span>
-                  )}
-                </div>
-              </article>
-            ))
-          )}
-        </div>
-      </div>
-    </AppPage>
-  );
-}
-
-function Placeholder({ text, icon }: { text: string; icon?: boolean }) {
-  return (
-    <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
-      {icon && (
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-700">
-          <FlagIcon className="h-6 w-6" />
-        </div>
-      )}
-      {text}
-    </div>
+      {items.map((item) => (
+        <article
+          key={item.id}
+          className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="break-words text-base font-semibold text-gray-900">
+                {item.description}
+              </h3>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {item.achievement && (
+                  <span className="inline-flex items-center rounded bg-blue-50 px-2 py-0.5 text-xs font-medium capitalize text-blue-700 ring-1 ring-inset ring-blue-600/10">
+                    {item.achievement}
+                  </span>
+                )}
+                {item.status && (
+                  <span className="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium capitalize text-gray-700">
+                    {item.status}
+                  </span>
+                )}
+                {item.addresses.map((address) => (
+                  <span
+                    key={address}
+                    className="inline-flex items-center rounded bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700 ring-1 ring-inset ring-primary-600/10"
+                  >
+                    {address}
+                  </span>
+                ))}
+              </div>
+            </div>
+            {item.startDate && (
+              <span className="shrink-0 text-sm text-gray-500">
+                {safeFormatDate(item.startDate, 'PP', '')}
+              </span>
+            )}
+          </div>
+        </article>
+      ))}
+    </RecordListPage>
   );
 }
