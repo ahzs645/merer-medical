@@ -572,6 +572,28 @@ export const arabicTranslations: Record<string, string> = {
   'Use a passkey instead of a passphrase':
     'استخدم مفتاح مرور بدلا من عبارة مرور',
   Working: 'جار العمل',
+  // Timeline comments
+  Comments: 'التعليقات',
+  'Add a comment…': 'أضف تعليقا…',
+  Post: 'نشر',
+  'No comments yet': 'لا توجد تعليقات بعد',
+  You: 'أنت',
+  'Delete comment': 'حذف التعليق',
+  '{count} comment': '{count} تعليق',
+  '{count} comments': '{count} تعليقات',
+  // Citations
+  'Evidence:': 'الدليل:',
+  'Open citation source': 'فتح مصدر الاقتباس',
+  // Results hub and Summary digest
+  'Loading results...': 'جار تحميل النتائج...',
+  'No results found.': 'لم يتم العثور على نتائج.',
+  'Open all results': 'فتح كل النتائج',
+  Attention: 'انتباه',
+  'Unknown date': 'تاريخ غير معروف',
+  '{attention} of {total} results may need attention.':
+    'قد تحتاج {attention} من أصل {total} نتيجة إلى الانتباه.',
+  '{total} results, none flagged for attention.':
+    '{total} نتيجة، لم يتم تمييز أي منها للانتباه.',
 };
 
 export function getInterfaceLanguageDirection(language: InterfaceLanguage) {

@@ -149,7 +149,7 @@ export function NotificationCenter() {
                     type="button"
                     onClick={() => setOpen(false)}
                     aria-label={t('Close notifications')}
-                    className="flex h-11 w-11 items-center justify-center rounded-md text-gray-400 hover:text-gray-600"
+                    className="flex h-11 w-11 items-center justify-center rounded-md text-gray-500 hover:text-gray-700"
                   >
                     <XMarkIcon className="h-5 w-5" />
                   </button>
@@ -197,7 +197,7 @@ export function NotificationCenter() {
                           type="button"
                           onClick={() => void dismiss(notification.id)}
                           aria-label={t('Dismiss notification')}
-                          className="flex h-11 w-11 flex-shrink-0 items-center justify-center text-gray-300 hover:text-gray-500"
+                          className="flex h-11 w-11 flex-shrink-0 items-center justify-center text-gray-500 hover:text-gray-700"
                         >
                           <XMarkIcon className="h-4 w-4" />
                         </button>

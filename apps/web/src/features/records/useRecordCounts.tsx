@@ -77,7 +77,8 @@ export function RecordCountsProvider({ children }: { children: ReactNode }) {
     const subscription = db.clinical_documents.$.pipe(
       debounceTime(400),
     ).subscribe(() => {
-      recompute().catch(() => {});
+      // Keep the last good tally if a change-triggered recompute fails.
+      recompute().catch(() => undefined);
     });
 
     return () => {

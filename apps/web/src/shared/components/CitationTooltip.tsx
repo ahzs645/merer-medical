@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
+
 export type CitationTooltipSource = {
   id?: string;
   source?: string;
@@ -18,11 +20,18 @@ export function CitationTooltip({
   citation?: CitationTooltipSource;
   children: ReactNode;
 }) {
+  const { t } = useInterfaceLanguage();
   if (!citation) return <>{children}</>;
 
   return (
     <span className="group relative inline-flex">
-      <span className="cursor-help border-b border-dotted border-primary-700/70 text-inherit">
+      {/* Focusable so the tooltip opens for keyboard users (via
+          group-focus-within) and on touch, where tapping focuses the span —
+          hover alone would make citations unreachable on mobile. */}
+      <span
+        tabIndex={0}
+        className="focus:ring-primary-500 cursor-help rounded-sm border-b border-dotted border-primary-700/70 text-inherit focus:outline-none focus:ring-1"
+      >
         {children}
       </span>
       <span className="absolute left-0 top-full z-30 hidden w-80 pt-2 group-hover:block group-focus-within:block">
@@ -36,7 +45,7 @@ export function CitationTooltip({
             <span className="mt-1 block">{citation.fullCitation}</span>
           ) : null}
           <span className="mt-2 block text-gray-600">
-            Evidence:{' '}
+            {t('Evidence:')}{' '}
             <span className="font-semibold">
               {formatEvidenceGrade(citation.evidenceGrade, citation.grade)}
             </span>
@@ -54,7 +63,7 @@ export function CitationTooltip({
               rel="noreferrer"
               target="_blank"
             >
-              Open citation source
+              {t('Open citation source')}
             </a>
           ) : null}
         </span>

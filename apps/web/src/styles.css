@@ -97,3 +97,22 @@ html {
     background-position: 100% 50%;
   }
 }
+
+/*
+ * Honor the OS "reduce motion" preference. Animations and transitions
+ * complete near-instantly (rather than being removed, so `animationend` /
+ * `transitionend` handlers and Headless UI transitions still fire), and CSS
+ * smooth scrolling falls back to instant jumps. JS-driven smooth scrolling
+ * (scrollBy/scrollIntoView with behavior: "smooth") checks the same media
+ * query at the call site.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
