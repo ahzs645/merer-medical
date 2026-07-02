@@ -47,7 +47,7 @@ import { useLocalConfig } from '../../app/providers/LocalConfigProvider';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { Link } from 'react-router-dom';
 import { Routes as AppRoutes } from '../../Routes';
-import { ResultsHubContent } from '../results/ResultsTab';
+import { ResultsDigestCard } from '../results/ResultsDigestCard';
 
 function fetchMedications(
   db: RxDatabase<DatabaseCollections>,
@@ -571,7 +571,7 @@ function SummaryTab() {
           immunizationCount={imm.length}
           allergyCount={allergy.length}
         />
-        <ResultsHubContent />
+        <ResultsDigestCard />
         <TrackersSummaryCard />
         {sortedCards.map((card) => {
           if (!card.is_visible) return null;
