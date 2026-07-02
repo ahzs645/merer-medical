@@ -211,18 +211,18 @@ export function EncountersTab() {
       search={{
         query,
         onChange: setQuery,
-        placeholder: 'Search encounters',
-        label: 'Search encounters',
+        placeholder: 'Search visits',
+        label: 'Search visits',
       }}
       status={status}
       error={error}
-      loadingText="Loading encounters…"
-      errorText="Unable to load encounters."
+      loadingText="Loading visits…"
+      errorText="Unable to load visits."
       isEmpty={items.length === 0}
-      emptyText="No visits or encounters recorded yet."
+      emptyText="No visits recorded yet."
       emptyIcon={<BuildingOffice2Icon className="h-6 w-6" />}
       isNoMatch={filtered.length === 0}
-      noMatchText="No encounters match this search."
+      noMatchText="No visits match this search."
     >
       {filtered.map((item) => {
         const parsed = item.location ? parseLocation(item.location) : undefined;

@@ -28,10 +28,12 @@ export interface RecordCategory {
   label: string;
   icon: ComponentType<{ className?: string }>;
   /**
-   * FHIR resource_type(s) that back this category, used to show an approximate
-   * record count on the browse hub. Left undefined where no single resource
-   * type cleanly represents the category (Vitals, aggregate views, specialty
-   * connections) so we show no count rather than a misleading one.
+   * FHIR resource_type(s) that back this category, used to show a record count
+   * on the browse hub and side nav. Set ONLY where the tally equals the number
+   * of rows the target page actually lists (a clean 1:1 mapping). Left
+   * undefined for categories whose page shows derived, filtered, de-duplicated
+   * or multi-type data (Labs, Vitals, Imaging, My conditions, Providers,
+   * aggregate/specialty views) so we show no count rather than a wrong one.
    */
   resourceTypes?: string[];
 }
@@ -50,19 +52,13 @@ export const RECORD_GROUPS: RecordGroup[] = [
   {
     heading: 'Results',
     items: [
-      {
-        to: AppRoutes.Labs,
-        label: 'Labs',
-        icon: BeakerIcon,
-        resourceTypes: ['diagnosticreport'],
-      },
+      // Labs, Vitals and Imaging show derived/filtered/multi-type data
+      // (lab panels + observations, vital-sign-filtered observations, imaging
+      // studies + reports), so no single resource_type tally matches the page.
+      // We omit their counts rather than show a misleading number.
+      { to: AppRoutes.Labs, label: 'Labs', icon: BeakerIcon },
       { to: AppRoutes.Vitals, label: 'Vitals', icon: HeartIcon },
-      {
-        to: AppRoutes.Imaging,
-        label: 'Imaging',
-        icon: PhotoIcon,
-        resourceTypes: ['imagingstudy', 'media'],
-      },
+      { to: AppRoutes.Imaging, label: 'Imaging', icon: PhotoIcon },
       {
         to: AppRoutes.Results,
         label: 'All results',
@@ -156,7 +152,7 @@ export const RECORD_GROUPS: RecordGroup[] = [
         to: AppRoutes.Documents,
         label: 'Documents',
         icon: DocumentTextIcon,
-        resourceTypes: ['documentreference'],
+        resourceTypes: ['documentreference', 'documentreference_attachment'],
       },
       {
         to: AppRoutes.Insurance,
@@ -164,17 +160,10 @@ export const RECORD_GROUPS: RecordGroup[] = [
         icon: IdentificationIcon,
         resourceTypes: ['coverage'],
       },
-      {
-        to: AppRoutes.Directory,
-        label: 'Providers',
-        icon: UsersIcon,
-        resourceTypes: [
-          'careteam',
-          'practitioner',
-          'practitionerrole',
-          'organization',
-        ],
-      },
+      // Providers/locations are derived and de-duplicated from CareTeam and
+      // Encounter.location, so a raw resource_type tally doesn't match the
+      // number of rows shown — omit the count.
+      { to: AppRoutes.Directory, label: 'Providers', icon: UsersIcon },
     ],
   },
   {

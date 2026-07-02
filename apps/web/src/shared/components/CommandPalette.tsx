@@ -1,4 +1,11 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Fragment,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentType,
+} from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import {
@@ -22,13 +29,14 @@ import {
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { Routes as AppRoutes } from '../../Routes';
+import { ALL_RECORD_CATEGORIES } from '../../features/records/recordCategories';
 
 type CommandPaletteItem = {
   title: string;
   description: string;
   route: string;
   keywords: string[];
-  icon: typeof MagnifyingGlassIcon;
+  icon: ComponentType<{ className?: string }>;
 };
 
 const COMMAND_ITEMS: CommandPaletteItem[] = [
@@ -188,6 +196,24 @@ const COMMAND_ITEMS: CommandPaletteItem[] = [
   },
 ];
 
+// Every record category not already curated above, so the long-tail
+// (Vitals, Allergies, Immunizations, Visits, Referrals, Procedures, Goals,
+// Histories, Insurance, Providers, All results, …) is searchable too. Derived
+// from the same category config the hub/side nav use, so it stays in sync.
+const curatedRoutes = new Set(COMMAND_ITEMS.map((item) => item.route));
+const ALL_COMMAND_ITEMS: CommandPaletteItem[] = [
+  ...COMMAND_ITEMS,
+  ...ALL_RECORD_CATEGORIES.filter(
+    (category) => !curatedRoutes.has(category.to),
+  ).map((category) => ({
+    title: category.label,
+    description: 'Records',
+    route: category.to,
+    keywords: [],
+    icon: category.icon,
+  })),
+];
+
 export function CommandPalette({
   open: controlledOpen,
   onOpenChange,
@@ -226,9 +252,9 @@ export function CommandPalette({
 
   const results = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    if (!normalizedQuery) return COMMAND_ITEMS;
+    if (!normalizedQuery) return ALL_COMMAND_ITEMS;
 
-    return COMMAND_ITEMS.map((item) => {
+    return ALL_COMMAND_ITEMS.map((item) => {
       const haystack = [
         item.title,
         item.description,

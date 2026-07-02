@@ -125,8 +125,7 @@ export const arabicTranslations: Record<string, string> = {
   'Visual acuity, IOP, refraction, OCT, visual field, and topography metrics will appear here as eye-specific Observations.':
     'ستظهر هنا قياسات حدة الإبصار وضغط العين والانكسار وOCT والمجال البصري والتضاريس كملاحظات خاصة بالعين.',
   'Showing {visible} of {total} records': 'عرض {visible} من {total} سجلات',
-  'Something went wrong while loading records.':
-    'حدث خطأ أثناء تحميل السجلات.',
+  'Something went wrong while loading records.': 'حدث خطأ أثناء تحميل السجلات.',
   'Unable to load optometry records.': 'تعذر تحميل سجلات البصريات.',
   'Unable to load dental records.': 'تعذر تحميل سجلات الأسنان.',
   'imaging records': 'سجلات تصوير',
@@ -472,7 +471,6 @@ export const arabicTranslations: Record<string, string> = {
   'Loading dental records...': 'جار تحميل سجلات الأسنان...',
   Lower: 'سفلي',
   'Made with': 'صنع بـ',
-  'Mere Assistant Recommendations': 'توصيات مساعد مير',
   'No dental imaging has been detected yet. The dental workspace will pull from imaging records tagged by oral/dental terms.':
     'لم يتم اكتشاف تصوير أسنان بعد. ستسحب مساحة عمل الأسنان سجلات التصوير الموسومة بمصطلحات فموية أو سنية.',
   'No matching records': 'لا توجد سجلات مطابقة',

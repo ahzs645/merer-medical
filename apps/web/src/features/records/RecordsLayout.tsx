@@ -3,6 +3,7 @@ import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 
 import { Routes as AppRoutes } from '../../Routes';
 import { RecordsSideNav } from './RecordsSideNav';
+import { RecordCountsProvider } from './useRecordCounts';
 
 /**
  * Records shell. On wide viewports a grouped vertical side nav shows every
@@ -14,26 +15,28 @@ export function RecordsLayout() {
   const atRoot = !!useMatch(AppRoutes.Records);
 
   return (
-    <div className="flex h-full min-h-0 bg-gray-50">
-      <aside className="hidden w-60 shrink-0 overflow-y-auto border-r border-gray-200 bg-white lg:block">
-        <RecordsSideNav />
-      </aside>
-      <div className="flex min-h-0 flex-1 flex-col">
-        {!atRoot && (
-          <div className="border-b border-gray-200 bg-white px-3 py-2 lg:hidden">
-            <Link
-              to={AppRoutes.Records}
-              className="text-primary-700 hover:text-primary-900 inline-flex items-center gap-1 text-sm font-medium"
-            >
-              <ChevronLeftIcon className="h-4 w-4" />
-              All records
-            </Link>
+    <RecordCountsProvider>
+      <div className="flex h-full min-h-0 bg-gray-50">
+        <aside className="hidden w-60 shrink-0 overflow-y-auto border-r border-gray-200 bg-white lg:block">
+          <RecordsSideNav />
+        </aside>
+        <div className="flex min-h-0 flex-1 flex-col">
+          {!atRoot && (
+            <div className="border-b border-gray-200 bg-white px-3 py-2 lg:hidden">
+              <Link
+                to={AppRoutes.Records}
+                className="text-primary-700 hover:text-primary-900 inline-flex items-center gap-1 text-sm font-medium"
+              >
+                <ChevronLeftIcon className="h-4 w-4" />
+                All records
+              </Link>
+            </div>
+          )}
+          <div className="min-h-0 flex-1">
+            <Outlet />
           </div>
-        )}
-        <div className="min-h-0 flex-1">
-          <Outlet />
         </div>
       </div>
-    </div>
+    </RecordCountsProvider>
   );
 }

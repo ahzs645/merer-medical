@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import { Dialog, Transition } from '@headlessui/react';
@@ -174,6 +174,10 @@ function MobileMoreButton({
   onOpenSearch: () => void;
 }) {
   const location = useLocation();
+  // When the user taps "Search", defer opening the palette until the sheet has
+  // finished closing — otherwise the sheet's focus-restore fires after the
+  // palette focuses its input and steals focus back (mobile focus race).
+  const pendingSearch = useRef(false);
   const moreRoutes = [
     AppRoutes.Utilities,
     AppRoutes.MereAIAssistant,
@@ -212,7 +216,16 @@ function MobileMoreButton({
         </span>
       </button>
 
-      <Transition.Root show={open} as={Fragment}>
+      <Transition.Root
+        show={open}
+        as={Fragment}
+        afterLeave={() => {
+          if (pendingSearch.current) {
+            pendingSearch.current = false;
+            onOpenSearch();
+          }
+        }}
+      >
         <Dialog as="div" className="relative z-40 md:hidden" onClose={setOpen}>
           <Transition.Child
             as={Fragment}
@@ -245,8 +258,8 @@ function MobileMoreButton({
                   <button
                     type="button"
                     onClick={() => {
+                      pendingSearch.current = true;
                       setOpen(false);
-                      onOpenSearch();
                     }}
                     className="flex min-h-[44px] items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm font-semibold text-slate-800"
                   >
