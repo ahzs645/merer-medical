@@ -75,6 +75,7 @@ import { ReferralsTab } from '../features/referrals/ReferralsTab';
 import { DirectoryTab } from '../features/directory/DirectoryTab';
 import { ResultsTab } from '../features/results/ResultsTab';
 import { RecordsLayout } from '../features/records/RecordsLayout';
+import { RecordsHub } from '../features/records/RecordsHub';
 import SettingsTab from '../features/settings/SettingsTab';
 import { SharingTab } from '../features/sharing/SharingTab';
 import SummaryTab from '../features/summary/SummaryTab';
@@ -136,7 +137,7 @@ const routes = [
         children: [
           {
             index: true,
-            element: <Navigate to={AppRoutes.Labs} replace />,
+            element: <RecordsHub />,
           },
           {
             path: 'labs',
