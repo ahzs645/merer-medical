@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { Dialog, Transition } from '@headlessui/react';
 import {
   BellIcon,
   CheckCircleIcon,
@@ -87,101 +88,128 @@ export function NotificationCenter() {
         </p>
       </button>
 
-      {open && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/30"
-            onClick={() => setOpen(false)}
-            aria-hidden="true"
-          />
-          <div className="fixed inset-x-0 bottom-0 z-50 flex max-h-[75vh] flex-col rounded-t-xl bg-white shadow-xl sm:inset-x-auto sm:end-4 sm:top-4 sm:bottom-auto sm:max-h-[75vh] sm:w-96 sm:rounded-xl">
-            <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
-              <h2 className="text-sm font-semibold text-gray-900">
-                {t('Notifications')}
-              </h2>
-              <div className="flex items-center gap-3">
-                {unreadCount > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => void markAllRead()}
-                    className="text-xs font-semibold text-primary-700 hover:underline"
-                  >
-                    {t('Mark all read')}
-                  </button>
-                )}
-                {notifications.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => void dismissAll()}
-                    className="text-xs font-semibold text-gray-500 hover:underline"
-                  >
-                    {t('Clear all')}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  aria-label={t('Close notifications')}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <XMarkIcon className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
+      <Transition show={open} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-40"
+          onClose={() => setOpen(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-200"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-150"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div
+              className="fixed inset-0 z-40 bg-black/30"
+              aria-hidden="true"
+            />
+          </Transition.Child>
 
-            <div className="flex-1 overflow-y-auto">
-              {notifications.length === 0 ? (
-                <p className="px-4 py-10 text-center text-sm text-gray-500">
-                  {t("You're all caught up.")}
-                </p>
-              ) : (
-                <ul className="divide-y divide-gray-100">
-                  {notifications.map((notification) => (
-                    <li
-                      key={notification.id}
-                      className={`flex items-start gap-3 px-4 py-3 ${
-                        notification.read ? 'bg-white' : 'bg-primary-50'
-                      }`}
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-200"
+            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            enterTo="opacity-100 translate-y-0 sm:scale-100"
+            leave="ease-in duration-150"
+            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          >
+            <Dialog.Panel className="fixed inset-x-0 bottom-0 z-50 flex max-h-[75vh] flex-col rounded-t-xl bg-white shadow-xl sm:inset-x-auto sm:end-4 sm:top-4 sm:bottom-auto sm:max-h-[75vh] sm:w-96 sm:rounded-xl">
+              <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2">
+                <Dialog.Title
+                  as="h2"
+                  className="text-sm font-semibold text-gray-900"
+                >
+                  {t('Notifications')}
+                </Dialog.Title>
+                <div className="flex items-center gap-1">
+                  {unreadCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => void markAllRead()}
+                      className="inline-flex min-h-[44px] items-center px-2 text-xs font-semibold text-primary-700 hover:underline"
                     >
-                      <span className="mt-0.5 flex-shrink-0">
-                        {variantIcon(notification.variant)}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => onItemClick(notification)}
-                        className="min-w-0 flex-1 text-start"
+                      {t('Mark all read')}
+                    </button>
+                  )}
+                  {notifications.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => void dismissAll()}
+                      className="inline-flex min-h-[44px] items-center px-2 text-xs font-semibold text-gray-500 hover:underline"
+                    >
+                      {t('Clear all')}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    aria-label={t('Close notifications')}
+                    className="flex h-11 w-11 items-center justify-center rounded-md text-gray-500 hover:text-gray-700"
+                  >
+                    <XMarkIcon className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <p className="px-4 py-10 text-center text-sm text-gray-500">
+                    {t("You're all caught up.")}
+                  </p>
+                ) : (
+                  <ul className="divide-y divide-gray-100">
+                    {notifications.map((notification) => (
+                      <li
+                        key={notification.id}
+                        className={`flex items-start gap-3 px-4 py-3 ${
+                          notification.read ? 'bg-white' : 'bg-primary-50'
+                        }`}
                       >
-                        {notification.title && (
-                          <p className="text-sm font-semibold text-gray-900">
-                            {t(notification.title)}
+                        <span className="mt-0.5 flex-shrink-0">
+                          {variantIcon(notification.variant)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => onItemClick(notification)}
+                          className="min-w-0 flex-1 text-start"
+                        >
+                          {notification.title && (
+                            <p className="text-sm font-semibold text-gray-900">
+                              {t(notification.title)}
+                            </p>
+                          )}
+                          <p className="text-sm text-gray-700">
+                            {t(notification.message)}
                           </p>
-                        )}
-                        <p className="text-sm text-gray-700">
-                          {t(notification.message)}
-                        </p>
-                        <p className="mt-1 text-xs text-gray-400">
-                          {relativeTime(notification.created_at, language)}
-                          {notification.action_label
-                            ? ` • ${t(notification.action_label)}`
-                            : ''}
-                        </p>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => void dismiss(notification.id)}
-                        aria-label={t('Dismiss notification')}
-                        className="flex-shrink-0 text-gray-300 hover:text-gray-500"
-                      >
-                        <XMarkIcon className="h-4 w-4" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+                          <p className="mt-1 text-xs text-gray-500">
+                            {relativeTime(notification.created_at, language)}
+                            {notification.action_label
+                              ? ` • ${t(notification.action_label)}`
+                              : ''}
+                          </p>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void dismiss(notification.id)}
+                          aria-label={t('Dismiss notification')}
+                          className="flex h-11 w-11 flex-shrink-0 items-center justify-center text-gray-500 hover:text-gray-700"
+                        >
+                          <XMarkIcon className="h-4 w-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </Dialog.Panel>
+          </Transition.Child>
+        </Dialog>
+      </Transition>
     </>
   );
 }

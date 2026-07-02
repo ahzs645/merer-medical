@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import { Dialog, Transition } from '@headlessui/react';
@@ -6,6 +6,7 @@ import {
   Cog6ToothIcon,
   DocumentIcon,
   EllipsisHorizontalIcon,
+  MagnifyingGlassIcon,
   NewspaperIcon,
   PlusCircleIcon,
   PlusIcon,
@@ -29,6 +30,7 @@ export function TabWrapper() {
   const user = useUser(),
     { experimental__use_openai_rag } = useLocalConfig();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   return (
     <div className="mobile-full-height relative flex min-h-0 max-w-[100vw] flex-col overflow-hidden md:flex-row-reverse">
@@ -49,7 +51,7 @@ export function TabWrapper() {
               >
                 <ShareIcon className="h-5 w-5" />
               </Link>
-              <CommandPalette />
+              <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
             </div>
           </div>
           <TabButton
@@ -115,6 +117,7 @@ export function TabWrapper() {
             open={moreOpen}
             setOpen={setMoreOpen}
             showAssistant={!!experimental__use_openai_rag}
+            onOpenSearch={() => setSearchOpen(true)}
           />
           <div className="hidden md:block md:flex-1"></div>
           <div className="border-primary-700 hidden flex-shrink-0 border-t p-4 md:block">
@@ -163,12 +166,18 @@ function MobileMoreButton({
   open,
   setOpen,
   showAssistant,
+  onOpenSearch,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
   showAssistant: boolean;
+  onOpenSearch: () => void;
 }) {
   const location = useLocation();
+  // When the user taps "Search", defer opening the palette until the sheet has
+  // finished closing — otherwise the sheet's focus-restore fires after the
+  // palette focuses its input and steals focus back (mobile focus race).
+  const pendingSearch = useRef(false);
   const moreRoutes = [
     AppRoutes.Utilities,
     AppRoutes.MereAIAssistant,
@@ -207,7 +216,16 @@ function MobileMoreButton({
         </span>
       </button>
 
-      <Transition.Root show={open} as={Fragment}>
+      <Transition.Root
+        show={open}
+        as={Fragment}
+        afterLeave={() => {
+          if (pendingSearch.current) {
+            pendingSearch.current = false;
+            onOpenSearch();
+          }
+        }}
+      >
         <Dialog as="div" className="relative z-40 md:hidden" onClose={setOpen}>
           <Transition.Child
             as={Fragment}
@@ -237,6 +255,19 @@ function MobileMoreButton({
                   More
                 </Dialog.Title>
                 <div className="grid grid-cols-2 gap-2 px-3 pb-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      pendingSearch.current = true;
+                      setOpen(false);
+                    }}
+                    className="flex min-h-[44px] items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm font-semibold text-slate-800"
+                  >
+                    <span className="h-5 w-5 flex-shrink-0">
+                      <MagnifyingGlassIcon />
+                    </span>
+                    <span className="min-w-0 truncate">Search</span>
+                  </button>
                   <MobileMoreLink
                     route={AppRoutes.Utilities}
                     title="Utilities"

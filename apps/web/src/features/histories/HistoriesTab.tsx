@@ -13,6 +13,7 @@ import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
 import { BannerAddLink } from '../../shared/components/BannerAddLink';
 import { GenericBanner } from '../../shared/components/GenericBanner';
+import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, isRecord, periodStart } from '../../shared/utils/fhirText';
@@ -46,12 +47,16 @@ function useHistoriesData() {
     family: [],
     social: [],
   });
-  const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading',
+  );
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let mounted = true;
     async function load() {
       setStatus('loading');
+      setError(null);
       const fetch = async (rt: string) =>
         (
           await db.clinical_documents
@@ -141,13 +146,17 @@ function useHistoriesData() {
       setData({ medical, surgical, family: familyItems, social });
       setStatus('success');
     }
-    load();
+    load().catch((e) => {
+      if (!mounted) return;
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setStatus('error');
+    });
     return () => {
       mounted = false;
     };
   }, [db, user.id]);
 
-  return { data, status };
+  return { data, status, error };
 }
 
 const SECTIONS: {
@@ -183,7 +192,7 @@ const SECTIONS: {
 ];
 
 export function HistoriesTab() {
-  const { data, status } = useHistoriesData();
+  const { data, status, error } = useHistoriesData();
 
   return (
     <AppPage
@@ -197,17 +206,23 @@ export function HistoriesTab() {
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-5xl gap-4 px-4 py-4 pb-24 sm:grid-cols-2 sm:px-6 lg:px-8">
-          {SECTIONS.map((section) => (
-            <HistorySection
-              key={section.key}
-              title={section.title}
-              icon={section.icon}
-              items={data[section.key]}
-              empty={section.empty}
-              loading={status === 'loading'}
-            />
-          ))}
+        <div className="mx-auto w-full max-w-5xl px-4 py-4 pb-24 sm:px-6 lg:px-8">
+          {status === 'error' ? (
+            <ErrorPanel error={error} text="Unable to load histories." />
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {SECTIONS.map((section) => (
+                <HistorySection
+                  key={section.key}
+                  title={section.title}
+                  icon={section.icon}
+                  items={data[section.key]}
+                  empty={section.empty}
+                  loading={status === 'loading'}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </AppPage>

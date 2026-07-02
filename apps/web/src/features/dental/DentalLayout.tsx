@@ -1,38 +1,19 @@
 import { Outlet } from 'react-router-dom';
 
-import {
-  ChartPieIcon,
-  ClipboardDocumentCheckIcon,
-  DocumentTextIcon,
-  PhotoIcon,
-  SparklesIcon,
-  Squares2X2Icon,
-} from '@heroicons/react/24/outline';
-
 import { AppPage } from '../../shared/components/AppPage';
 import { ErrorPanel, LoadingPanel } from '../../shared/components/StatusPanel';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { Routes as AppRoutes } from '../../Routes';
+import { ALL_RECORD_CATEGORIES } from '../records/recordCategories';
 import { DentalHeader } from './components/DentalHeader';
 import { useDentalData } from './hooks/useDentalData';
 import { ScrollableTabNav } from '../../shared/components/ScrollableTabNav';
 
-const dentalTabs = [
-  { to: AppRoutes.Dental, label: 'Overview', icon: ChartPieIcon, end: true },
-  { to: AppRoutes.DentalChart, label: 'Chart & teeth', icon: Squares2X2Icon },
-  {
-    to: AppRoutes.DentalTreatment,
-    label: 'Treatment',
-    icon: ClipboardDocumentCheckIcon,
-  },
-  { to: AppRoutes.DentalHygiene, label: 'Hygiene & perio', icon: SparklesIcon },
-  { to: AppRoutes.DentalImaging, label: 'Imaging & scans', icon: PhotoIcon },
-  {
-    to: AppRoutes.DentalRecords,
-    label: 'Records & claims',
-    icon: DocumentTextIcon,
-  },
-];
+// Sub-pages come from the shared record-category config so the tab strip, the
+// desktop side nav, and the command palette can't drift apart.
+const dentalTabs =
+  ALL_RECORD_CATEGORIES.find((category) => category.to === AppRoutes.Dental)
+    ?.children ?? [];
 
 export function DentalLayout() {
   const { t } = useInterfaceLanguage();
@@ -48,7 +29,9 @@ export function DentalLayout() {
       }
     >
       <div className="flex h-full min-h-0 flex-col bg-gray-50">
-        <div className="border-b border-gray-200 bg-white px-2 sm:px-6 lg:px-8">
+        {/* On lg+ the Records side nav lists these sub-pages, so the strip
+            only renders on narrow viewports. */}
+        <div className="border-b border-gray-200 bg-white px-2 sm:px-6 lg:hidden">
           <ScrollableTabNav tabs={dentalTabs} ariaLabel="Dental sections" />
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">

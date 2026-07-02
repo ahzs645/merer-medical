@@ -1,15 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  ExclamationTriangleIcon,
-  MagnifyingGlassIcon,
-} from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
-import { AppPage } from '../../shared/components/AppPage';
-import { GenericBanner } from '../../shared/components/GenericBanner';
+import { Badge } from '../../shared/components/Badge';
+import { RecordListPage } from '../../shared/components/records/RecordListPage';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getAllergyIntoleranceDisplayName } from '../../shared/utils/fhirAccessHelpers';
 import { getFhirResource } from '../../shared/utils/fhirResource';
@@ -29,12 +26,16 @@ function useAllergies() {
   const db = useRxDb();
   const user = useUser();
   const [items, setItems] = useState<AllergyItem[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading',
+  );
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let mounted = true;
     async function load() {
       setStatus('loading');
+      setError(null);
       const [docs, connectionDocs] = await Promise.all([
         db.clinical_documents
           .find({
@@ -83,17 +84,21 @@ function useAllergies() {
       setItems(list);
       setStatus('success');
     }
-    load();
+    load().catch((e) => {
+      if (!mounted) return;
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setStatus('error');
+    });
     return () => {
       mounted = false;
     };
   }, [db, user.id]);
 
-  return { items, status };
+  return { items, status, error };
 }
 
 export function AllergiesTab() {
-  const { items, status } = useAllergies();
+  const { items, status, error } = useAllergies();
   const [query, setQuery] = useState('');
 
   const filtered = useMemo(() => {
@@ -107,71 +112,51 @@ export function AllergiesTab() {
   }, [items, query]);
 
   return (
-    <AppPage banner={<GenericBanner text="Allergies" />}>
-      <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-3xl gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          <label className="relative block">
-            <span className="sr-only">Search allergies</span>
-            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search allergies"
-              className="h-10 w-full rounded-md border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-            />
-          </label>
-
-          {status === 'loading' ? (
-            <Placeholder text="Loading allergies…" />
-          ) : items.length === 0 ? (
-            <Placeholder text="No allergies recorded yet." icon />
-          ) : filtered.length === 0 ? (
-            <Placeholder text="No allergies match this search." />
-          ) : (
-            filtered.map((item) => (
-              <article
-                key={item.id}
-                className="flex items-start justify-between gap-3 rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
-              >
-                <div className="min-w-0">
-                  <h3 className="break-words text-sm font-semibold text-gray-900">
-                    {item.name}
-                  </h3>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-                    {item.clinicalStatus && (
-                      <span className="capitalize">{item.clinicalStatus}</span>
-                    )}
-                    {item.reaction && <span>· {item.reaction}</span>}
-                    {item.severity && (
-                      <span className="capitalize">· {item.severity}</span>
-                    )}
-                    {item.source && <span>· {item.source}</span>}
-                  </div>
-                </div>
-                {item.date && (
-                  <span className="shrink-0 text-sm text-gray-500">
-                    {safeFormatDate(item.date, 'PP', '')}
-                  </span>
-                )}
-              </article>
-            ))
+    <RecordListPage
+      title="Allergies"
+      search={{
+        query,
+        onChange: setQuery,
+        placeholder: 'Search allergies',
+        label: 'Search allergies',
+      }}
+      status={status}
+      error={error}
+      loadingText="Loading allergies…"
+      errorText="Unable to load allergies."
+      isEmpty={items.length === 0}
+      emptyText="No allergies recorded yet."
+      emptyIcon={<ExclamationTriangleIcon className="h-6 w-6" />}
+      isNoMatch={filtered.length === 0}
+      noMatchText="No allergies match this search."
+    >
+      {filtered.map((item) => (
+        <article
+          key={item.id}
+          className="flex items-start justify-between gap-3 rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
+        >
+          <div className="min-w-0">
+            <h3 className="break-words text-sm font-semibold text-gray-900">
+              {item.name}
+            </h3>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+              {item.clinicalStatus && (
+                <Badge className="capitalize">{item.clinicalStatus}</Badge>
+              )}
+              {item.reaction && <span>· {item.reaction}</span>}
+              {item.severity && (
+                <span className="capitalize">· {item.severity}</span>
+              )}
+              {item.source && <span>· {item.source}</span>}
+            </div>
+          </div>
+          {item.date && (
+            <span className="shrink-0 text-sm text-gray-500">
+              {safeFormatDate(item.date, 'PP', '')}
+            </span>
           )}
-        </div>
-      </div>
-    </AppPage>
-  );
-}
-
-function Placeholder({ text, icon }: { text: string; icon?: boolean }) {
-  return (
-    <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
-      {icon && (
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-700">
-          <ExclamationTriangleIcon className="h-6 w-6" />
-        </div>
-      )}
-      {text}
-    </div>
+        </article>
+      ))}
+    </RecordListPage>
   );
 }

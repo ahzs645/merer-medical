@@ -108,7 +108,6 @@ export function SearchBar({
         {isVectorSearchEnabled ? (
           <div className="w-full bg-gradient-to-br from-indigo-400 via-purple-300 to-primary-600 p-[3px] background-animate rounded-md">
             <input
-              tabIndex={1}
               type="text"
               name="search"
               id="search"
@@ -124,7 +123,6 @@ export function SearchBar({
         ) : (
           <div className="w-full">
             <input
-              tabIndex={1}
               type="text"
               name="search"
               id="search"

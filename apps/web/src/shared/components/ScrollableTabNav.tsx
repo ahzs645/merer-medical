@@ -103,7 +103,13 @@ export function ScrollableTabNav({
   }, [location.pathname, tabs, scrollTabIntoView, updateScrollState]);
 
   const scrollBy = (delta: number) => {
-    scrollRef.current?.scrollBy({ left: delta, behavior: 'smooth' });
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    scrollRef.current?.scrollBy({
+      left: delta,
+      behavior: reduceMotion ? 'auto' : 'smooth',
+    });
   };
 
   return (

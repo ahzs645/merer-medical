@@ -1,11 +1,8 @@
-import { ComponentType, SVGProps, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  ArrowDownTrayIcon,
   BeakerIcon,
-  DocumentArrowUpIcon,
   DocumentTextIcon,
   PhotoIcon,
-  ShareIcon,
 } from '@heroicons/react/24/outline';
 
 import { AppPage } from '../../shared/components/AppPage';
@@ -247,11 +244,6 @@ function ResultDetailPanel({
               {detail.organization ? ` · ${detail.organization}` : ''}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <ActionButton icon={ArrowDownTrayIcon} label="Download" />
-            <ActionButton icon={DocumentArrowUpIcon} label="Visit packet" />
-            <ActionButton icon={ShareIcon} label="Share/export" />
-          </div>
         </div>
       </header>
 
@@ -408,24 +400,6 @@ function InfoBlock({ label, value }: { label: string; value?: string }) {
         {value || 'Not available'}
       </p>
     </div>
-  );
-}
-
-function ActionButton({
-  icon: Icon,
-  label,
-}: {
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
-    >
-      <Icon className="h-4 w-4" />
-      {label}
-    </button>
   );
 }
 

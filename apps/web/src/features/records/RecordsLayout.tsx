@@ -1,80 +1,42 @@
-import { Outlet } from 'react-router-dom';
-
-import {
-  BeakerIcon,
-  BuildingOffice2Icon,
-  ClipboardDocumentCheckIcon,
-  DocumentTextIcon,
-  ExclamationTriangleIcon,
-  EyeIcon,
-  FaceSmileIcon,
-  FlagIcon,
-  HeartIcon,
-  IdentificationIcon,
-  ClipboardDocumentListIcon,
-  ExclamationCircleIcon,
-  PaperAirplaneIcon,
-  PhotoIcon,
-  ScissorsIcon,
-  ShieldCheckIcon,
-  Squares2X2Icon,
-  UsersIcon,
-} from '@heroicons/react/24/outline';
+import { Link, Outlet, useMatch } from 'react-router-dom';
+import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 
 import { Routes as AppRoutes } from '../../Routes';
-import { ScrollableTabNav } from '../../shared/components/ScrollableTabNav';
+import { RecordsSideNav } from './RecordsSideNav';
+import { RecordCountsProvider } from './useRecordCounts';
 
-const recordTabs = [
-  { to: AppRoutes.Labs, label: 'Labs', icon: BeakerIcon },
-  { to: AppRoutes.Vitals, label: 'Vitals', icon: HeartIcon },
-  { to: AppRoutes.Documents, label: 'Documents', icon: DocumentTextIcon },
-  { to: AppRoutes.Imaging, label: 'Imaging', icon: PhotoIcon },
-  {
-    to: AppRoutes.Medications,
-    label: 'Medications',
-    icon: ClipboardDocumentListIcon,
-  },
-  {
-    to: AppRoutes.Immunizations,
-    label: 'Immunizations',
-    icon: ShieldCheckIcon,
-  },
-  {
-    to: AppRoutes.Insurance,
-    label: 'Insurance',
-    icon: IdentificationIcon,
-  },
-  {
-    to: AppRoutes.CarePlans,
-    label: 'Care plans',
-    icon: ClipboardDocumentCheckIcon,
-  },
-  { to: AppRoutes.Problems, label: 'Problems', icon: ExclamationCircleIcon },
-  { to: AppRoutes.Conditions, label: 'My Conditions', icon: Squares2X2Icon },
-  {
-    to: AppRoutes.Allergies,
-    label: 'Allergies',
-    icon: ExclamationTriangleIcon,
-  },
-  { to: AppRoutes.Procedures, label: 'Procedures', icon: ScissorsIcon },
-  { to: AppRoutes.Encounters, label: 'Visits', icon: BuildingOffice2Icon },
-  { to: AppRoutes.Referrals, label: 'Referrals', icon: PaperAirplaneIcon },
-  { to: AppRoutes.Goals, label: 'Goals', icon: FlagIcon },
-  { to: AppRoutes.Histories, label: 'Histories', icon: UsersIcon },
-  { to: AppRoutes.Directory, label: 'Providers', icon: UsersIcon },
-  { to: AppRoutes.Dental, label: 'Dental', icon: FaceSmileIcon },
-  { to: AppRoutes.Optometry, label: 'Optometry', icon: EyeIcon },
-];
-
+/**
+ * Records shell. On wide viewports a grouped vertical side nav shows every
+ * category at once; on narrow viewports the index route is a browse hub and
+ * sub-pages get a "back to all records" affordance (drill-in) — replacing the
+ * horizontal 19-tab strip that never fit on screen.
+ */
 export function RecordsLayout() {
+  const atRoot = !!useMatch(AppRoutes.Records);
+
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-gray-50">
-      <div className="border-b border-gray-200 bg-white px-2 sm:px-6 lg:px-8">
-        <ScrollableTabNav tabs={recordTabs} ariaLabel="Records" />
+    <RecordCountsProvider>
+      <div className="flex h-full min-h-0 bg-gray-50">
+        <aside className="hidden w-60 shrink-0 overflow-y-auto border-r border-gray-200 bg-white lg:block">
+          <RecordsSideNav />
+        </aside>
+        <div className="flex min-h-0 flex-1 flex-col">
+          {!atRoot && (
+            <div className="border-b border-gray-200 bg-white px-3 py-2 lg:hidden">
+              <Link
+                to={AppRoutes.Records}
+                className="text-primary-700 hover:text-primary-900 inline-flex items-center gap-1 text-sm font-medium"
+              >
+                <ChevronLeftIcon className="h-4 w-4" />
+                All records
+              </Link>
+            </div>
+          )}
+          <div className="min-h-0 flex-1">
+            <Outlet />
+          </div>
+        </div>
       </div>
-      <div className="min-h-0 flex-1">
-        <Outlet />
-      </div>
-    </div>
+    </RecordCountsProvider>
   );
 }

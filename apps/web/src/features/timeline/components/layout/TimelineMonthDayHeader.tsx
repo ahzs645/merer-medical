@@ -24,7 +24,7 @@ export const TimelineMonthDayHeader: React.FC<TimelineMonthDayHeaderProps> = ({
             <div className="px-3 bg-gray-50 border-2 md:border-4 border-gray-200 rounded-full aspect-square flex flex-col justify-center">
               <p className="text-sm font-black text-center">
                 {checkIfDefaultDate(dateKey) ? null : (
-                  <p className="font-bold">{`${formattedTitleDateMonthString(dateKey)}`}</p>
+                  <span className="font-bold">{`${formattedTitleDateMonthString(dateKey)}`}</span>
                 )}
               </p>
               <p className="text-center text-sm leading-none">

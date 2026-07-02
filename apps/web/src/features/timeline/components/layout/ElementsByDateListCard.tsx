@@ -162,18 +162,18 @@ function DispayDocumentReferencesOrAttachmentTimelineItem(props: {
     <div className="mb-2 ml-2">
       <TimelineCardCategoryTitle title={'Documents'} color="text-teal-600" />
       <ul className="list-disc list-inside">
-        {docsToDisplay.slice(0, 5).map((item) => (
+        {docsToDisplay.slice(0, 5).map((item, index) => (
           <DocumentListItem
-            key={item.id}
+            key={`${item.id ?? item.metadata?.id ?? 'doc'}-${index}`}
             item={item as ClinicalDocument<BundleEntry<DocumentReference>>}
           />
         ))}
-        <p className="text-xs font-medium md:text-sm text-gray-900">
-          {docsToDisplay.length > 5
-            ? `... and ${docsToDisplay.length - 5} more`
-            : null}
-        </p>
       </ul>
+      {docsToDisplay.length > 5 ? (
+        <p className="text-xs font-medium md:text-sm text-gray-900">
+          {`... and ${docsToDisplay.length - 5} more`}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -565,9 +565,13 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
   const connectionDocs = useConnectionDocs(uniqueConnectionIds);
 
   const title =
-    titleFields.length >= 2 && titleFields.length < 3
-      ? `Your ${titleFields.join(' & ')}`
-      : `Your ${titleFields.slice(0, -1).join(', ')}${titleFields.length > 1 ? ', and' : ''} ${titleFields.slice(-1)}`;
+    titleFields.length === 0
+      ? 'Your health record'
+      : titleFields.length === 1
+        ? `Your ${titleFields[0]}`
+        : titleFields.length === 2
+          ? `Your ${titleFields.join(' & ')}`
+          : `Your ${titleFields.slice(0, -1).join(', ')}, and ${titleFields.slice(-1)}`;
 
   return (
     <CardBase>
@@ -579,9 +583,12 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
         </div>
         <div className="flex sm:flex-row flex-col sm:justify-between">
           <div className="flex flex-col">
-            {connectionDocs.map((conn) =>
+            {connectionDocs.map((conn, index) =>
               conn?.get('name') ? (
-                <p className="mr-1 flex flex-row align-center items-center text-gray-900 text-sm md:text-base">
+                <p
+                  key={conn?.get('id') ?? index}
+                  className="mr-1 flex flex-row align-center items-center text-gray-900 text-sm md:text-base"
+                >
                   <MapPinIcon className="mr-1 h-4 sm:h-5 w-auto inline-block text-primary-700" />
                   {conn?.get('name')}
                 </p>
@@ -590,8 +597,11 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
           <div className="flex flex-col">
             {uniqueAuthors.length > 0 &&
-              uniqueAuthors.map((author) => (
-                <p className="mr-1 flex flex-row align-center items-center text-gray-900 text-sm md:text-base">
+              uniqueAuthors.map((author, index) => (
+                <p
+                  key={`${author ?? 'author'}-${index}`}
+                  className="mr-1 flex flex-row align-center items-center text-gray-900 text-sm md:text-base"
+                >
                   <UserIcon className="mr-1 h-4 sm:h-5 w-auto inline-block text-primary-700" />
                   {author}
                 </p>

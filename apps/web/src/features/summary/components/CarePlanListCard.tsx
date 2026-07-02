@@ -48,24 +48,34 @@ export function CarePlanListCard({
                         item.data_record.raw.resource?.goal?.length !== 0 ? (
                           <div className="py-2">
                             {item.data_record.raw.resource?.addresses?.map(
-                              (item) => (
+                              (address, addressIndex) => (
                                 <p
-                                  key={item.id}
+                                  key={
+                                    address.id ??
+                                    address.reference ??
+                                    address.display ??
+                                    addressIndex
+                                  }
                                   className="text-sm font-bold text-gray-900 md:text-base"
                                 >
-                                  {item.display}
+                                  {address.display}
                                 </p>
                               ),
                             )}
                             <ul>
                               {item.data_record.raw.resource?.goal?.map(
-                                (item) => (
+                                (goal, goalIndex) => (
                                   <li
-                                    key={item.id}
+                                    key={
+                                      goal.id ??
+                                      goal.reference ??
+                                      goal.display ??
+                                      goalIndex
+                                    }
                                     className="pl-4 text-base text-gray-600"
                                   >
                                     {' -    '}
-                                    {item.display}
+                                    {goal.display}
                                   </li>
                                 ),
                               )}
