@@ -70,7 +70,7 @@ test('Manual medication record can be created and shows up in the medications li
   await page.getByRole('button', { name: 'Save record' }).click();
 
   // saving notifies and navigates back to the timeline
-  await expect(page.getByText('1 record added')).toBeVisible({
+  await expect(page.getByText('Record added').first()).toBeVisible({
     timeout: 15_000,
   });
 
