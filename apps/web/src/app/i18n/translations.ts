@@ -185,6 +185,23 @@ export const arabicTranslations: Record<string, string> = {
   Prescriptions: 'الوصفات',
   Previous: 'السابق',
   'Privacy and Security': 'الخصوصية والأمان',
+  'Record added': 'تمت إضافة السجل',
+  'Record added — ready for the next one':
+    'تمت إضافة السجل — جاهز للسجل التالي',
+  'Record deleted': 'تم حذف السجل',
+  'Record updated': 'تم تحديث السجل',
+  'record added this session': 'سجل أضيف في هذه الجلسة',
+  'records added': 'سجلات أضيفت',
+  'records added this session': 'سجلات أضيفت في هذه الجلسة',
+  'Delete this manual record?': 'هل تريد حذف هذا السجل اليدوي؟',
+  'Unable to delete record': 'تعذر حذف السجل',
+  'Unable to load record': 'تعذر تحميل السجل',
+  'Unable to add record': 'تعذر إضافة السجل',
+  'Unable to load linked files': 'تعذر تحميل الملفات المرتبطة',
+  'Open source': 'فتح المصدر',
+  Deleting: 'جار الحذف',
+  'Document added — opening it': 'تمت إضافة المستند — جار فتحه',
+  'FreeStyle Libre readings imported': 'قراءات FreeStyle Libre تم استيرادها',
   Records: 'السجلات',
   Reference: 'المرجع',
   'Reference standard': 'المعيار المرجعي',
@@ -595,6 +612,92 @@ export const arabicTranslations: Record<string, string> = {
     'قد تحتاج {attention} من أصل {total} نتيجة إلى الانتباه.',
   '{total} results, none flagged for attention.':
     '{total} نتيجة، لم يتم تمييز أي منها للانتباه.',
+  // Sources / connections hub
+  Sources: 'المصادر',
+  'Bring records together from patient portals, files, devices, and manual entry. Everything is stored locally on this device.':
+    'اجمع السجلات من بوابات المرضى والملفات والأجهزة والإدخال اليدوي. يتم تخزين كل شيء محليا على هذا الجهاز.',
+  'Connected portals': 'البوابات المتصلة',
+  'Patient portals you have connected for automatic syncing.':
+    'بوابات المرضى التي قمت بربطها للمزامنة التلقائية.',
+  'No portals connected yet.': 'لا توجد بوابات متصلة بعد.',
+  'Add a portal': 'إضافة بوابة',
+  'Devices and wearables': 'الأجهزة والأجهزة القابلة للارتداء',
+  'Continuous glucose monitors and other devices you import readings from.':
+    'أجهزة مراقبة الجلوكوز المستمرة وغيرها من الأجهزة التي تستورد قراءاتها.',
+  'No devices yet. Import a FreeStyle Libre export or log device readings manually.':
+    'لا توجد أجهزة بعد. استورد ملف تصدير FreeStyle Libre أو سجل قراءات الجهاز يدويا.',
+  'Import records': 'استيراد السجلات',
+  'Move records in and out of the app as files — useful when your provider is unsupported.':
+    'انقل السجلات من التطبيق وإليه كملفات — مفيد عندما يكون مزود الرعاية لديك غير مدعوم.',
+  'Add manually': 'إضافة يدويا',
+  'Enter records by hand, including dedicated dental and optometry modes.':
+    'أدخل السجلات يدويا، بما في ذلك وضعان مخصصان للأسنان والبصريات.',
+  'Add a record': 'إضافة سجل',
+  'Dental records': 'سجلات الأسنان',
+  'Optometry records': 'سجلات البصريات',
+  'Source health / sync history': 'حالة المصادر / سجل المزامنة',
+  'Last successful and attempted sync for every source.':
+    'آخر مزامنة ناجحة وآخر محاولة مزامنة لكل مصدر.',
+  'Last sync': 'آخر مزامنة',
+  'Last attempt': 'آخر محاولة',
+  'No sources yet.': 'لا توجد مصادر بعد.',
+  Error: 'خطأ',
+  OK: 'سليم',
+  // Immunizations
+  'Loading immunization records...': 'جار تحميل سجلات التحصينات...',
+  'No immunizations yet': 'لا توجد تحصينات بعد',
+  'Immunizations will appear here once they are added manually or synced from a patient portal.':
+    'ستظهر التحصينات هنا بمجرد إضافتها يدويا أو مزامنتها من بوابة مريض.',
+  // Loading states across tabs
+  'Loading medications...': 'جار تحميل الأدوية...',
+  'Loading insurance...': 'جار تحميل التأمين...',
+  'Loading documents...': 'جار تحميل المستندات...',
+  'Loading problems...': 'جار تحميل المشكلات الصحية...',
+  'Loading care plan records...': 'جار تحميل سجلات خطط الرعاية...',
+  'Loading conditions...': 'جار تحميل الحالات...',
+  // OAuth callback pages
+  'Authenticated! Redirecting': 'تم التحقق! جار إعادة التوجيه',
+  'There was a problem trying to sign in':
+    'حدثت مشكلة أثناء محاولة تسجيل الدخول',
+  'Go to Settings': 'الانتقال إلى الإعدادات',
+  'Go Back': 'رجوع',
+  'You can try enabling proxy authentication in the settings section if login continues to fail':
+    'يمكنك تجربة تفعيل المصادقة عبر الوسيط من قسم الإعدادات إذا استمر فشل تسجيل الدخول',
+  'Epic OAuth configuration is incomplete':
+    'إعدادات OAuth لنظام Epic غير مكتملة',
+  'Cerner OAuth configuration is incomplete':
+    'إعدادات OAuth لنظام Cerner غير مكتملة',
+  'VA OAuth configuration is incomplete': 'إعدادات OAuth لنظام VA غير مكتملة',
+  'Veradigm OAuth configuration is incomplete':
+    'إعدادات OAuth لنظام Veradigm غير مكتملة',
+  'Healow OAuth configuration is incomplete':
+    'إعدادات OAuth لنظام Healow غير مكتملة',
+  'User session not found': 'لم يتم العثور على جلسة المستخدم',
+  'Missing required tokens from authentication response':
+    'رموز مطلوبة مفقودة من استجابة المصادقة',
+  'Authentication failed': 'فشلت المصادقة',
+  'Error completing authentication: no session':
+    'خطأ في إكمال المصادقة: لا توجد جلسة',
+  'Error completing authentication: not logged in':
+    'خطأ في إكمال المصادقة: لم يتم تسجيل الدخول',
+  'Error completing authentication: no access token provided':
+    'خطأ في إكمال المصادقة: لم يتم توفير رمز وصول',
+  'Token refresh failed. You may need to sign in again to sync records in the future.':
+    'فشل تحديث رمز الوصول. قد تحتاج إلى تسجيل الدخول مرة أخرى لمزامنة السجلات مستقبلا.',
+  'This MyChart instance does not support automatic token refresh. You will need to sign in again to sync records in the future.':
+    'لا تدعم نسخة MyChart هذه التحديث التلقائي لرمز الوصول. ستحتاج إلى تسجيل الدخول مرة أخرى لمزامنة السجلات مستقبلا.',
+  'Dynamic client registration failed. You may need to sign in again to sync records in the future.':
+    'فشل تسجيل العميل الديناميكي. قد تحتاج إلى تسجيل الدخول مرة أخرى لمزامنة السجلات مستقبلا.',
+  // Settings import notifications
+  'Import failed: database is not ready yet.':
+    'فشل الاستيراد: قاعدة البيانات ليست جاهزة بعد.',
+  'This user profile package is encrypted. Import it from Data settings so you can enter the passphrase.':
+    'حزمة الملف الشخصي هذه مشفرة. استوردها من إعدادات البيانات لتتمكن من إدخال عبارة المرور.',
+  'Import failed': 'فشل الاستيراد',
+  'Imported user profile': 'تم استيراد الملف الشخصي للمستخدم',
+  records: 'سجلات',
+  Skipped: 'تم تخطي',
+  'Reloading...': 'جار إعادة التحميل...',
 };
 
 export function getInterfaceLanguageDirection(language: InterfaceLanguage) {
