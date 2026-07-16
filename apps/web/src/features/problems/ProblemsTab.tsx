@@ -21,8 +21,10 @@ import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocumen
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
+import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import { getManualRecordNote } from '../../shared/utils/manualRecordUtils';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 
@@ -68,7 +70,7 @@ const GROUPS: { id: ProblemStatus; title: string }[] = [
 const ADD_PROBLEM_PATH = `${AppRoutes.AddRecord}?type=condition`;
 
 export function ProblemsTab() {
-  const { items, status } = useProblemsData();
+  const { items, status, error } = useProblemsData();
   const [query, setQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<FilterId>('all');
 
@@ -131,6 +133,8 @@ export function ProblemsTab() {
             <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
               Loading problems...
             </div>
+          ) : status === 'error' ? (
+            <ErrorPanel error={error} />
           ) : items.length === 0 ? (
             <EmptyProblemsState />
           ) : (
@@ -148,14 +152,20 @@ export function ProblemsTab() {
 function useProblemsData() {
   const db = useRxDb();
   const user = useUser();
+  // Refetch when a manual record is added, edited, or deleted.
+  const recordChangeTick = useRecordChangeTick();
   const [items, setItems] = useState<ProblemItem[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading',
+  );
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchProblems() {
       setStatus('loading');
+      setError(null);
       const [conditionDocs, connectionDocs] = await Promise.all([
         db.clinical_documents
           .find({
@@ -196,14 +206,18 @@ function useProblemsData() {
       setStatus('success');
     }
 
-    fetchProblems();
+    fetchProblems().catch((e) => {
+      if (!isMounted) return;
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setStatus('error');
+    });
 
     return () => {
       isMounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
-  return { items, status };
+  return { items, status, error };
 }
 
 function ProblemsHeader({

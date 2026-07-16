@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { AppPage } from '../../shared/components/AppPage';
+import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { ImmunizationCountry, ImmunizationRecord } from './types';
 import { ImmunizationByTypePanel } from './components/ImmunizationByTypePanel';
 import { ImmunizationDoseModal } from './components/ImmunizationDoseModal';
@@ -16,7 +17,7 @@ import { useImmunizationData } from './hooks/useImmunizationData';
 export function ImmunizationsTab() {
   const { t } = useInterfaceLanguage();
   const user = useUser();
-  const { records, counts, status } = useImmunizationData();
+  const { records, counts, status, error } = useImmunizationData();
   const [country, setCountry] = useState<ImmunizationCountry>('CA');
   const [selectedDose, setSelectedDose] = useState<ImmunizationRecord | null>(
     null,
@@ -39,7 +40,7 @@ export function ImmunizationsTab() {
   );
 
   const isLoading = status === 'loading';
-  const isEmpty = !isLoading && records.length === 0;
+  const isEmpty = status === 'success' && records.length === 0;
 
   return (
     <AppPage banner={<ImmunizationHeader recordCount={records.length} />}>
@@ -51,7 +52,9 @@ export function ImmunizationsTab() {
             </div>
           )}
 
-          {!isLoading && (
+          {status === 'error' && <ErrorPanel error={error} />}
+
+          {status === 'success' && (
             <>
               <ImmunizationSummaryPanel counts={counts} />
               <ImmunizationRecommendationsPanel

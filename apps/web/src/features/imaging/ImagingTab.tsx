@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
+import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { ImagingCategoryTabs } from './components/ImagingCategoryTabs';
 import { ImagingHeader } from './components/ImagingHeader';
 import { ImagingItemCard } from './components/ImagingItemCard';
@@ -14,7 +15,7 @@ import { filterImagingItems } from './utils/imagingRecords';
 
 export function ImagingTab() {
   const { t } = useInterfaceLanguage();
-  const { items, counts, status } = useImagingData(),
+  const { items, counts, status, error } = useImagingData(),
     [query, setQuery] = useState(''),
     [category, setCategory] = useState<ImagingCategory | 'all'>('all');
 
@@ -41,6 +42,8 @@ export function ImagingTab() {
             <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
               {t('Loading imaging records...')}
             </div>
+          ) : status === 'error' ? (
+            <ErrorPanel error={error} />
           ) : filteredItems.length > 0 ? (
             <div className="grid gap-3">
               {filteredItems.map((item) => (
