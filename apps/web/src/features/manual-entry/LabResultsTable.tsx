@@ -201,7 +201,11 @@ export function LabResultsTable({
         {t('Add lab row')}
       </button>
       {submitAttempted && completedRowCount === 0 && (
-        <p className="mt-1 text-xs font-medium text-red-600">
+        <p
+          role="alert"
+          data-invalid="true"
+          className="mt-1 text-xs font-medium text-red-600"
+        >
           {t('Add at least one lab result.')}
         </p>
       )}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 import { Routes as AppRoutes } from '../../Routes';
@@ -88,8 +88,11 @@ export function ManualRecordForm({
     isSocialHistoryType,
     isFamilyHistoryType,
     canLinkSourceFile,
+    isNewLabEntry,
     titleMissing,
     fileMissing,
+    isDirty,
+    failedSubmitCount,
     terminologyProfile,
     terminologyLanguage,
     terminologyLookupMode,
@@ -105,7 +108,31 @@ export function ManualRecordForm({
   // preset skips it entirely.
   const canPickType = !isEditing && !hasTypePreset;
   const [pickerOpen, setPickerOpen] = useState(canPickType);
-  const handleCancel = onCancel ?? (() => navigate(AppRoutes.Timeline));
+  // A modal host passes onCancel and owns its own discard confirmation; the
+  // standalone page guards the navigate-away itself.
+  const handleCancel =
+    onCancel ??
+    (() => {
+      if (isDirty() && !window.confirm(t('Discard unsaved changes?'))) {
+        return;
+      }
+      navigate(AppRoutes.Timeline);
+    });
+
+  // A blocked submit scrolls the first invalid control into view so the
+  // Save click never looks like a silent no-op.
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (!failedSubmitCount || !formRef.current) return;
+    const invalid = formRef.current.querySelector<HTMLElement>(
+      '[aria-invalid="true"], [data-invalid="true"]',
+    );
+    if (!invalid) return;
+    invalid.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if (invalid instanceof HTMLInputElement) {
+      invalid.focus({ preventScroll: true });
+    }
+  }, [failedSubmitCount]);
 
   const containerClass = embedded
     ? 'px-4 py-4'
@@ -125,6 +152,7 @@ export function ManualRecordForm({
           />
         ) : (
           <form
+            ref={formRef}
             onSubmit={onSubmit}
             className="flex flex-col gap-5 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6"
           >
@@ -387,7 +415,9 @@ export function ManualRecordForm({
 
             <ManualObservationSection form={form} />
 
-            {!isDeviceImportType && (
+            {/* New labs are named per row in the results table above, so the
+                single Name field is hidden — it would be ignored on save. */}
+            {!isDeviceImportType && !isNewLabEntry && (
               <div>
                 <label
                   htmlFor="manual-record-title"
@@ -441,7 +471,10 @@ export function ManualRecordForm({
                     />
                   )}
                 {submitAttempted && titleMissing && (
-                  <p className="mt-1 text-xs font-medium text-red-600">
+                  <p
+                    role="alert"
+                    className="mt-1 text-xs font-medium text-red-600"
+                  >
                     {t('A name is required.')}
                   </p>
                 )}
@@ -459,6 +492,7 @@ export function ManualRecordForm({
                 <input
                   id="manual-record-file"
                   type="file"
+                  aria-invalid={submitAttempted && fileMissing}
                   onChange={(event) => {
                     const file = event.target.files?.[0];
                     if (!file) return;
@@ -488,7 +522,10 @@ export function ManualRecordForm({
                   </p>
                 )}
                 {submitAttempted && fileMissing && (
-                  <p className="mt-1 text-xs font-medium text-red-600">
+                  <p
+                    role="alert"
+                    className="mt-1 text-xs font-medium text-red-600"
+                  >
                     {t('Select a file before saving this document.')}
                   </p>
                 )}

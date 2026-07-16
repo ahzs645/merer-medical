@@ -97,6 +97,7 @@ export const arabicTranslations: Record<string, string> = {
   'Already have a Mere profile? Import your .emrpkg file.':
     'هل لديك ملف شخصي في مير؟ استورد ملف .emrpkg الخاص بك.',
   File: 'الملف',
+  'Discard unsaved changes?': 'هل تريد تجاهل التغييرات غير المحفوظة؟',
   'First Name': 'الاسم الأول',
   Flag: 'العلامة',
   French: 'الفرنسية',
