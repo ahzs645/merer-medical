@@ -32,9 +32,6 @@ import {
 } from '../../../repositories/AttachmentRepository';
 import {
   getManualMedicationParts,
-  getManualObservationInterpretation,
-  getManualObservationRange,
-  getManualObservationValue,
   getManualRecordNote,
   isManualRecord,
 } from '../../../shared/utils/manualRecordUtils';
@@ -64,8 +61,10 @@ import {
   getManualConnection,
   getManualRecordKind,
   getManualSpecialtyDetails,
-  normalizeAbsentReason,
   normalizeImagingDetails,
+  parseManualCoverageFields,
+  parseManualFamilyRelationship,
+  parseManualObservationFields,
 } from '../manualRecordBuilders';
 import {
   buildLibreClinicalDocument,
@@ -961,7 +960,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         if (!doc || !isManualRecord(doc)) {
           notifyDispatch({
             type: 'set_notification',
-            message: 'Manual record not found',
+            message: t('Manual record not found'),
             variant: 'error',
           });
           navigate(AppRoutes.Timeline);
@@ -1042,93 +1041,21 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         setDate((doc.metadata?.date || today).slice(0, 10));
         setNotes(getManualRecordNote(doc) || '');
         if (doc.data_record.resource_type === 'familymemberhistory') {
-          const familyResource = (
-            doc.data_record.raw as {
-              resource?: { relationship?: { text?: string } };
-            }
-          ).resource;
-          setFamilyRelationship(familyResource?.relationship?.text || '');
+          setFamilyRelationship(parseManualFamilyRelationship(doc));
         }
-        const observationValue = getManualObservationValue(doc);
-        const rawObservation = doc.data_record.raw as {
-          resource?: {
-            valueQuantity?: { comparator?: string };
-            valueString?: string;
-            valueCodeableConcept?: { text?: string };
-            dataAbsentReason?: {
-              coding?: Array<{ code?: string }>;
-              text?: string;
-            };
-            referenceRange?: Array<{ text?: string }>;
-          };
-        };
-        if (rawObservation.resource?.dataAbsentReason) {
-          setValueKind('absent');
-          setAbsentReason(
-            normalizeAbsentReason(
-              rawObservation.resource.dataAbsentReason.coding?.[0]?.code ||
-                rawObservation.resource.dataAbsentReason.text,
-            ),
-          );
-        } else if (rawObservation.resource?.valueCodeableConcept) {
-          setValueKind('coded');
-        } else if (rawObservation.resource?.valueString) {
-          setValueKind('string');
-        } else {
-          setValueKind('quantity');
-        }
-        setComparator(rawObservation.resource?.valueQuantity?.comparator || '');
-        setRangeText(rawObservation.resource?.referenceRange?.[0]?.text || '');
-        if (observationValue) {
-          const [first, ...rest] = observationValue.split(' ');
-          setValue(first);
-          setUnit(rest.join(' '));
-        }
-        const range = getManualObservationRange(doc);
-        if (range?.includes('-')) {
-          const [low, highWithUnit] = range.split('-');
-          const [high] = highWithUnit.trim().split(' ');
-          setRangeLow(low.trim());
-          setRangeHigh(high.trim());
-        }
-        setInterpretation(getManualObservationInterpretation(doc) || '');
+        // Raw-FHIR field reconstruction lives beside the builders in
+        // manualRecordParsing.ts; the parsed shapes match the field groups
+        // so they apply as single patches.
+        const { absentReason: parsedAbsentReason, ...observationPatch } =
+          parseManualObservationFields(doc);
+        setObservationFields(observationPatch);
+        if (parsedAbsentReason) setAbsentReason(parsedAbsentReason);
         const medication = getManualMedicationParts(doc);
         setDose(medication.dose);
         setFrequency(medication.frequency);
         setRoute(medication.route);
-        if (doc.data_record.resource_type === 'coverage') {
-          const coverageResource = (
-            doc.data_record.raw as {
-              resource?: {
-                subscriberId?: string;
-                status?: string;
-                type?: { text?: string };
-                relationship?: { text?: string };
-                period?: { start?: string; end?: string };
-                class?: Array<{ type?: { text?: string }; value?: string }>;
-              };
-            }
-          ).resource;
-          const coverageClass = (name: string) =>
-            coverageResource?.class?.find(
-              (entry) => entry.type?.text?.toLowerCase() === name,
-            )?.value || '';
-          setCoverageMemberId(coverageResource?.subscriberId || '');
-          setCoveragePlanType(coverageResource?.type?.text || '');
-          setCoverageRelationship(coverageResource?.relationship?.text || '');
-          setCoverageStatus(
-            coverageResource?.status === 'cancelled' ? 'cancelled' : 'active',
-          );
-          setCoveragePeriodStart(
-            (coverageResource?.period?.start || '').slice(0, 10),
-          );
-          setCoveragePeriodEnd(
-            (coverageResource?.period?.end || '').slice(0, 10),
-          );
-          setCoverageGroupNumber(coverageClass('group'));
-          setCoveragePhone(coverageClass('phone'));
-          setCoverageAddress(coverageClass('address'));
-        }
+        const coveragePatch = parseManualCoverageFields(doc);
+        if (coveragePatch) setCoverageFields(coveragePatch);
         if (doc.data_record.resource_type === 'documentreference_attachment') {
           setFileName(doc.metadata?.display_name || '');
           setFileContentType(doc.data_record.content_type);
@@ -1146,7 +1073,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         console.error(error);
         notifyDispatch({
           type: 'set_notification',
-          message: `Unable to load record: ${(error as Error).message}`,
+          message: `${t('Unable to load record')}: ${(error as Error).message}`,
           variant: 'error',
         });
         navigate(AppRoutes.Timeline);
@@ -1366,7 +1293,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         resetFields();
         notifyDispatch({
           type: 'set_notification',
-          message: 'Record added — ready for the next one',
+          message: t('Record added — ready for the next one'),
           variant: 'success',
         });
         return;
@@ -1381,7 +1308,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
       if (uploadedDocumentId) {
         notifyDispatch({
           type: 'set_notification',
-          message: 'Document added — opening it',
+          message: t('Document added — opening it'),
           variant: 'success',
         });
         navigate(
@@ -1395,8 +1322,10 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
       notifyDispatch({
         type: 'set_notification',
         message: loadedDocument
-          ? 'Record updated'
-          : `${docs.length} record${docs.length === 1 ? '' : 's'} added`,
+          ? t('Record updated')
+          : docs.length === 1
+            ? t('Record added')
+            : `${docs.length} ${t('records added')}`,
         variant: 'success',
       });
       complete();
@@ -1404,7 +1333,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
       console.error(error);
       notifyDispatch({
         type: 'set_notification',
-        message: `Unable to add record: ${(error as Error).message}`,
+        message: `${t('Unable to add record')}: ${(error as Error).message}`,
         variant: 'error',
       });
     } finally {
@@ -1451,7 +1380,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
 
       notifyDispatch({
         type: 'set_notification',
-        message: `Imported ${docs.length} FreeStyle Libre readings`,
+        message: `${docs.length} ${t('FreeStyle Libre readings imported')}`,
         variant: 'success',
       });
       notifyRecordsChanged();
@@ -1466,7 +1395,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
       console.error(error);
       notifyDispatch({
         type: 'set_notification',
-        message: `Unable to import LibreView file: ${(error as Error).message}`,
+        message: `${t('Unable to import LibreView file')}: ${(error as Error).message}`,
         variant: 'error',
       });
     } finally {

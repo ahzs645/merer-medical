@@ -12,4 +12,9 @@ export { buildClinicalDocument } from './manualFhirDocument';
 export {
   getManualRecordKind,
   normalizeAbsentReason,
+  parseManualCoverageFields,
+  parseManualFamilyRelationship,
+  parseManualObservationFields,
+  type ParsedManualCoverageFields,
+  type ParsedManualObservationFields,
 } from './manualRecordParsing';

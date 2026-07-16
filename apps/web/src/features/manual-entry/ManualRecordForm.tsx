@@ -635,10 +635,14 @@ export function ManualRecordForm({
             {!isDeviceImportType && (
               <div className="flex items-center justify-between gap-3">
                 <span className="text-xs font-medium text-gray-500">
+                  {/* Keep the count outside t() — interpolated strings can
+                      never match a dictionary key. */}
                   {savedCount > 0 &&
-                    t(
-                      `${savedCount} record${savedCount === 1 ? '' : 's'} added this session`,
-                    )}
+                    `${savedCount} ${t(
+                      savedCount === 1
+                        ? 'record added this session'
+                        : 'records added this session',
+                    )}`}
                 </span>
                 <div className="flex justify-end gap-3">
                   <button
