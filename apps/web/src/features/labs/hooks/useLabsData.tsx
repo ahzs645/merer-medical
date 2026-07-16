@@ -10,6 +10,7 @@ import {
 } from '../types';
 import { buildReportsByObservationId } from '../utils/reportLinks';
 import { getFhirResource } from '../../../shared/utils/fhirResource';
+import { parseDateAsUtc } from '../../../shared/utils/parseDateAsUtc';
 import { ReferenceContext } from '../enrichment/types';
 
 export function useLabsData() {
@@ -257,9 +258,8 @@ function normalizePatientSex(value: unknown): ReferenceContext['sex'] {
 }
 
 function calculateAgeYears(birthDate?: string): number | undefined {
-  if (!birthDate) return undefined;
-  const birth = new Date(`${birthDate}T00:00:00Z`);
-  if (Number.isNaN(birth.getTime())) return undefined;
+  const birth = parseDateAsUtc(birthDate);
+  if (!birth) return undefined;
   const now = new Date();
   let age = now.getUTCFullYear() - birth.getUTCFullYear();
   const monthDelta = now.getUTCMonth() - birth.getUTCMonth();

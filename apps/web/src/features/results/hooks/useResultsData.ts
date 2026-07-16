@@ -5,6 +5,7 @@ import { useUser } from '../../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../../models/connection-document/ConnectionDocument.type';
 import { getFhirResource } from '../../../shared/utils/fhirResource';
+import { parseDateAsUtc } from '../../../shared/utils/parseDateAsUtc';
 import {
   ReferenceContext,
   ReferenceOverlayMode,
@@ -134,9 +135,8 @@ function normalizePatientSex(value: unknown): ReferenceContext['sex'] {
 }
 
 function calculateAgeYears(birthDate?: string): number | undefined {
-  if (!birthDate) return undefined;
-  const birth = new Date(`${birthDate}T00:00:00Z`);
-  if (Number.isNaN(birth.getTime())) return undefined;
+  const birth = parseDateAsUtc(birthDate);
+  if (!birth) return undefined;
   const now = new Date();
   let age = now.getUTCFullYear() - birth.getUTCFullYear();
   const monthDelta = now.getUTCMonth() - birth.getUTCMonth();
