@@ -74,6 +74,7 @@ import {
   parseLibreViewFile,
 } from '../../diabetes/libreView';
 import { appendAuditLog } from '../../audit/auditLog';
+import { notifyRecordsChanged } from '../../../shared/utils/recordChangeSignal';
 
 function patchReducer<T>(state: T, patch: Partial<T>): T {
   return { ...state, ...patch };
@@ -1353,8 +1354,10 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         );
       }
 
-      // Everything is persisted; the form no longer holds unsaved content.
+      // Everything is persisted; the form no longer holds unsaved content,
+      // and subscribed record lists (timeline, tab pages) refresh in place.
       dirtyRef.current = false;
+      notifyRecordsChanged();
 
       // Batch mode: stay on the form and clear the inputs so the next
       // record can be entered without navigating away.
@@ -1451,7 +1454,14 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         message: `Imported ${docs.length} FreeStyle Libre readings`,
         variant: 'success',
       });
-      navigate(AppRoutes.Labs);
+      notifyRecordsChanged();
+      // A modal host closes itself via its callback; the standalone page
+      // goes to Labs where the imported readings live.
+      if (options.onComplete) {
+        options.onComplete();
+      } else {
+        navigate(AppRoutes.Labs);
+      }
     } catch (error) {
       console.error(error);
       notifyDispatch({

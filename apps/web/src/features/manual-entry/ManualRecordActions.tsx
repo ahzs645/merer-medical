@@ -5,7 +5,6 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/outline';
 import { MouseEvent, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { ManualRecordModal } from './ManualRecordModal';
 
@@ -19,15 +18,14 @@ import {
   openClinicalDocumentAttachment,
   supportsClinicalDocumentAttachments,
 } from '../../repositories/AttachmentRepository';
-import { Routes as AppRoutes } from '../../Routes';
 import { deleteClinicalDocument } from '../../repositories/ClinicalDocumentRepository';
+import { notifyRecordsChanged } from '../../shared/utils/recordChangeSignal';
 import { isManualRecord } from '../../shared/utils/manualRecordUtils';
 import { ManualSourceDocumentLink } from './ManualSourceDocumentLink';
 
 export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
   const db = useRxDb();
   const user = useUser();
-  const navigate = useNavigate();
   const notifyDispatch = useNotificationDispatch();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -76,8 +74,10 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
         message: 'Record deleted',
         variant: 'success',
       });
-      navigate(AppRoutes.Timeline);
-      window.setTimeout(() => navigate(0), 0);
+      // Hosting lists subscribe to this signal and refresh in place — no
+      // navigation or reload, which would lose scroll position (and, in
+      // demo mode, the whole in-memory database).
+      notifyRecordsChanged();
     } catch (error) {
       console.error(error);
       notifyDispatch({
@@ -178,7 +178,7 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
         open={isEditOpen}
         recordId={item.id}
         onClose={() => setIsEditOpen(false)}
-        onSaved={() => navigate(0)}
+        onSaved={notifyRecordsChanged}
       />
     </div>
   );

@@ -11,6 +11,7 @@ import {
 import { buildReportsByObservationId } from '../utils/reportLinks';
 import { getFhirResource } from '../../../shared/utils/fhirResource';
 import { parseDateAsUtc } from '../../../shared/utils/parseDateAsUtc';
+import { useRecordChangeTick } from '../../../shared/utils/recordChangeSignal';
 import { ReferenceContext } from '../enrichment/types';
 
 export function useLabsData() {
@@ -35,6 +36,8 @@ export function useLabsData() {
       patientRecords: 0,
     }),
     [status, setStatus] = useState<'loading' | 'success'>('loading');
+  // Refetch when a manual record is added, edited, or deleted.
+  const recordChangeTick = useRecordChangeTick();
 
   useEffect(() => {
     let isMounted = true;
@@ -127,7 +130,7 @@ export function useLabsData() {
     return () => {
       isMounted = false;
     };
-  }, [db, user.birthday, user.gender, user.id]);
+  }, [db, user.birthday, user.gender, user.id, recordChangeTick]);
 
   return {
     labs,

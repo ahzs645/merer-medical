@@ -8,6 +8,7 @@ import { useLocalConfig } from '../../../app/providers/LocalConfigProvider';
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
 import { useVectors } from '../../vectors';
+import { useRecordChangeTick } from '../../../shared/utils/recordChangeSignal';
 import { DatabaseCollections } from '../../../app/providers/DatabaseCollections';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { QueryStatus, RecordsByDate, TimelineRecordTypeFilter } from '../types';
@@ -776,10 +777,14 @@ export function useRecordQuery(
     300,
   );
 
+  // Manual add/edit/delete bumps this tick so the timeline refreshes in
+  // place instead of requiring a full page reload.
+  const recordChangeTick = useRecordChangeTick();
+
   useEffect(() => {
     dispatch({ type: 'RESET_PAGINATION' });
     execQueryRef.current(false);
-  }, [query, enableAISemanticSearch, typeFilter]);
+  }, [query, enableAISemanticSearch, typeFilter, recordChangeTick]);
 
   return {
     data: state.data,

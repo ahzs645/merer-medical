@@ -21,6 +21,7 @@ import {
 import { AppPage } from '../../shared/components/AppPage';
 import { StylizedSelect } from '../../shared/components/StylizedSelect';
 import { formatDisplayText } from '../../shared/utils/StyleUtils';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 
 type CareResourceType = 'careplan' | 'goal' | 'servicerequest';
@@ -69,6 +70,8 @@ export function CarePlansTab() {
   const user = useUser();
   const [documents, setDocuments] = useState<CareDocument[]>([]);
   const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  // Refetch when a manual record is added, edited, or deleted.
+  const recordChangeTick = useRecordChangeTick();
   const [localItems, setLocalItems] = useState<LocalCareItem[]>([]);
   const [title, setTitle] = useState('');
   const [kind, setKind] = useState<LocalCareItem['kind']>('task');
@@ -100,7 +103,7 @@ export function CarePlansTab() {
     return () => {
       isMounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   useEffect(() => {
     let isMounted = true;
@@ -131,7 +134,7 @@ export function CarePlansTab() {
     return () => {
       isMounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   const groupedDocuments = useMemo(() => {
     return CARE_RESOURCE_TYPES.map((type) => ({

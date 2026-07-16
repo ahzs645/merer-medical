@@ -12,7 +12,7 @@ import {
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { format, parseISO } from 'date-fns';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../Routes';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
@@ -59,7 +59,6 @@ export function MedicationsTab() {
   const [selectedFilter, setSelectedFilter] = useState<FilterChip['id']>('all');
   const [query, setQuery] = useState('');
   const [addAllergyOpen, setAddAllergyOpen] = useState(false);
-  const navigate = useNavigate();
   const { t } = useInterfaceLanguage();
   const { allergies, filteredItems, items, status, supplementItems } =
     useMedicationsData({ query, selectedFilter });
@@ -111,11 +110,12 @@ export function MedicationsTab() {
         </div>
       }
     >
+      {/* Saving notifies the record-change signal; the medications hook
+          refreshes in place, so no reload is needed. */}
       <ManualRecordModal
         open={addAllergyOpen}
         initialRecordType="allergyintolerance"
         onClose={() => setAddAllergyOpen(false)}
-        onSaved={() => navigate(0)}
       />
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
