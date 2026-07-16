@@ -44,6 +44,7 @@ import { VeradigmLocalStorageKeys } from '../../services/fhir/Veradigm';
 import { HealowLocalStorageKeys } from '../../services/fhir/Healow';
 import { Routes } from '../../Routes';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
+import { useNotificationDispatch } from '../../app/providers/NotificationProvider';
 import { useUserPreferences } from '../../app/providers/UserPreferencesProvider';
 import { useIntegrationStatus } from '../sources/integrationStatus';
 import { IntegrationStatusPanel } from '../sources/components/IntegrationStatusPanel';
@@ -550,6 +551,7 @@ function SyncHistoryRow({ item }: { item: RxDocument<ConnectionDocument> }) {
 const ConnectionTab: React.FC = () => {
   const list = useConnectionCards(),
     { t } = useInterfaceLanguage(),
+    notifyDispatch = useNotificationDispatch(),
     config = useConfig(),
     userPreferences = useUserPreferences(),
     integrationStatus = useIntegrationStatus(),
@@ -571,20 +573,14 @@ const ConnectionTab: React.FC = () => {
       fhirVersion?: 'DSTU2' | 'R4',
     ) => {
       const version = fhirVersion || 'DSTU2';
-      const commit = () => {
+      // Build the auth URL for the chosen vendor. Throwing/rejecting here
+      // (e.g. missing OAuth configuration) must surface to the user instead
+      // of leaving the Connect click a silent no-op.
+      const buildAuthUrl = (): Promise<string> => {
         switch (vendor) {
-          case 'epic': {
+          case 'epic':
             setTenantEpicUrl(base, auth, token, name, id, version);
-            initiateEpicAuth(config, base, auth, token, name, id, version).then(
-              (url) => {
-                window.location.href = url;
-              },
-            );
-            break;
-          }
-          case 'cerner': {
-            setTenantCernerUrl(base, auth, token, name, id, version);
-            initiateCernerAuth(
+            return initiateEpicAuth(
               config,
               base,
               auth,
@@ -592,30 +588,44 @@ const ConnectionTab: React.FC = () => {
               name,
               id,
               version,
-            ).then((url) => {
-              window.location.href = url;
-            });
-            break;
-          }
-          case 'veradigm': {
+            );
+          case 'cerner':
+            setTenantCernerUrl(base, auth, token, name, id, version);
+            return initiateCernerAuth(
+              config,
+              base,
+              auth,
+              token,
+              name,
+              id,
+              version,
+            );
+          case 'veradigm':
             setTenantVeradigmUrl(base, auth, token, name, id);
-            initiateVeradigmAuth(config, base, auth, token, name).then(
-              (url) => {
-                window.location.href = url;
-              },
-            );
-            break;
-          }
-          case 'healow': {
+            return initiateVeradigmAuth(config, base, auth, token, name);
+          case 'healow':
             setTenantHealowUrl(base, auth, token, name, id);
-            initiateHealowAuth(config, base, auth, token, name, id).then(
-              (url) => {
-                window.location.href = url;
-              },
+            return initiateHealowAuth(config, base, auth, token, name, id);
+          default:
+            return Promise.reject(
+              new Error(`Unsupported portal type: ${vendor}`),
             );
-            break;
-          }
         }
+      };
+      const commit = () => {
+        Promise.resolve()
+          .then(buildAuthUrl)
+          .then((url) => {
+            window.location.href = url;
+          })
+          .catch((error) => {
+            console.error(error);
+            notifyDispatch({
+              type: 'set_notification',
+              message: `Unable to start the connection to ${name}: ${(error as Error).message}`,
+              variant: 'error',
+            });
+          });
       };
 
       commitRef.current = commit;
@@ -629,7 +639,7 @@ const ConnectionTab: React.FC = () => {
       setOpenSelectModal(false);
       setShowPreflight(true);
     },
-    [config, userPreferences?.use_proxy],
+    [config, notifyDispatch, userPreferences?.use_proxy],
   );
 
   const portalConnections = list?.filter(
