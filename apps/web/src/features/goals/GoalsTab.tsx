@@ -1,12 +1,10 @@
-import { useEffect, useState } from 'react';
 import { FlagIcon } from '@heroicons/react/24/outline';
 
-import { useRxDb } from '../../app/providers/RxDbProvider';
-import { useUser } from '../../app/providers/UserProvider';
 import { Routes as AppRoutes } from '../../Routes';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { BannerAddLink } from '../../shared/components/BannerAddLink';
 import { RecordListPage } from '../../shared/components/records/RecordListPage';
+import { useRecordList } from '../../shared/hooks/useRecordList';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, isRecord } from '../../shared/utils/fhirText';
@@ -20,64 +18,31 @@ interface GoalItem {
   startDate?: string;
 }
 
-function useGoals() {
-  const db = useRxDb();
-  const user = useUser();
-  const [items, setItems] = useState<GoalItem[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
-    'loading',
-  );
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-      setStatus('loading');
-      setError(null);
-      const docs = await db.clinical_documents
-        .find({
-          selector: {
-            user_id: user.id,
-            'data_record.resource_type': 'goal',
-          },
-        })
-        .exec();
-      if (!mounted) return;
-      setItems(
-        docs.map((doc) => {
-          const d = doc.toMutableJSON() as ClinicalDocument;
-          const r = getFhirResource<Record<string, unknown>>(d);
-          const addresses = Array.isArray(r['addresses'])
-            ? (r['addresses'] as unknown[])
-                .map((a) =>
-                  isRecord(a) ? (a['display'] as string) : undefined,
-                )
-                .filter((x): x is string => Boolean(x))
-            : [];
-          return {
-            id: d.id,
-            description:
-              firstText(r['description']) || d.metadata?.display_name || 'Goal',
-            status: firstText(r['lifecycleStatus']) || firstText(r['status']),
-            achievement: firstText(r['achievementStatus']),
-            addresses,
-            startDate: (r['startDate'] as string) || d.metadata?.date,
-          };
-        }),
-      );
-      setStatus('success');
-    }
-    load().catch((e) => {
-      if (!mounted) return;
-      setError(e instanceof Error ? e : new Error(String(e)));
-      setStatus('error');
-    });
-    return () => {
-      mounted = false;
+function mapGoalDocs(docs: ClinicalDocument[]): GoalItem[] {
+  return docs.map((d) => {
+    const r = getFhirResource<Record<string, unknown>>(d);
+    const addresses = Array.isArray(r['addresses'])
+      ? (r['addresses'] as unknown[])
+          .map((a) => (isRecord(a) ? (a['display'] as string) : undefined))
+          .filter((x): x is string => Boolean(x))
+      : [];
+    return {
+      id: d.id,
+      description:
+        firstText(r['description']) || d.metadata?.display_name || 'Goal',
+      status: firstText(r['lifecycleStatus']) || firstText(r['status']),
+      achievement: firstText(r['achievementStatus']),
+      addresses,
+      startDate: (r['startDate'] as string) || d.metadata?.date,
     };
-  }, [db, user.id]);
+  });
+}
 
-  return { items, status, error };
+function useGoals() {
+  return useRecordList<GoalItem>({
+    resourceTypes: ['goal'],
+    mapDocs: mapGoalDocs,
+  });
 }
 
 export function GoalsTab() {

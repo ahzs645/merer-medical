@@ -4,6 +4,7 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   useState,
 } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -31,9 +32,6 @@ import {
 } from '../../../repositories/AttachmentRepository';
 import {
   getManualMedicationParts,
-  getManualObservationInterpretation,
-  getManualObservationRange,
-  getManualObservationValue,
   getManualRecordNote,
   isManualRecord,
 } from '../../../shared/utils/manualRecordUtils';
@@ -63,8 +61,10 @@ import {
   getManualConnection,
   getManualRecordKind,
   getManualSpecialtyDetails,
-  normalizeAbsentReason,
   normalizeImagingDetails,
+  parseManualCoverageFields,
+  parseManualFamilyRelationship,
+  parseManualObservationFields,
 } from '../manualRecordBuilders';
 import {
   buildLibreClinicalDocument,
@@ -73,10 +73,29 @@ import {
   parseLibreViewFile,
 } from '../../diabetes/libreView';
 import { appendAuditLog } from '../../audit/auditLog';
+import { notifyRecordsChanged } from '../../../shared/utils/recordChangeSignal';
 
 function patchReducer<T>(state: T, patch: Partial<T>): T {
   return { ...state, ...patch };
 }
+
+// Default titles applied by the dental/optometry sub-type pickers. A title
+// matching one of these is safe to replace when the user switches kinds; any
+// other text was typed by the user and must be preserved.
+const defaultEntryTitles = new Set<string>([
+  ...dentalEntryTypes.map((entry) => entry.title),
+  ...optometryEntryTypes.map((entry) => entry.title),
+]);
+
+// Keys of GeneralFields that only select which form is shown. Changing them
+// is not user content, so they don't trigger the unsaved-changes warning.
+const generalSelectionKeys = new Set<string>([
+  'specialty',
+  'recordType',
+  'dentalEntryKind',
+  'optometryEntryKind',
+  'deviceImportType',
+]);
 
 type DentalFields = {
   toothNumber: string;
@@ -373,6 +392,35 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
   );
   // Where to go after a successful save: the host's callback, else the timeline.
   const complete = options.onComplete ?? (() => navigate(AppRoutes.Timeline));
+  // Tracks whether the user has entered content since the form was last
+  // pristine (fresh, reset, or hydrated from a loaded record) so hosts can
+  // confirm before discarding it. Programmatic writes (presets, edit-load,
+  // reset, picker defaults) are wrapped in withoutDirtyTracking so only real
+  // user edits count.
+  const dirtyRef = useRef(false);
+  const suppressDirtyRef = useRef(false);
+  const markDirty = () => {
+    if (!suppressDirtyRef.current) dirtyRef.current = true;
+  };
+  const withoutDirtyTracking = (apply: () => void) => {
+    const previous = suppressDirtyRef.current;
+    suppressDirtyRef.current = true;
+    try {
+      apply();
+    } finally {
+      suppressDirtyRef.current = previous;
+    }
+  };
+  const isDirty = () => dirtyRef.current;
+  const trackDirty =
+    <T>(patchFields: (patch: Partial<T>) => void) =>
+    (patch: Partial<T>) => {
+      markDirty();
+      patchFields(patch);
+    };
+  // Bumped when a submit is blocked by validation so the form can scroll the
+  // first invalid field into view.
+  const [failedSubmitCount, setFailedSubmitCount] = useState(0);
   const createInitialGeneralFields = (): GeneralFields => ({
     specialty: requestedSpecialty,
     recordType: 'condition',
@@ -385,11 +433,17 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     familyRelationship: '',
     selectedTerminology: undefined,
   });
-  const [generalFields, setGeneralFields] = useReducer(
+  const [generalFields, patchGeneralFields] = useReducer(
     patchReducer<GeneralFields>,
     undefined,
     createInitialGeneralFields,
   );
+  const setGeneralFields = (patch: Partial<GeneralFields>) => {
+    if (Object.keys(patch).some((key) => !generalSelectionKeys.has(key))) {
+      markDirty();
+    }
+    patchGeneralFields(patch);
+  };
   const {
     specialty,
     recordType,
@@ -420,22 +474,26 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
   const setSelectedTerminology = (
     selectedTerminology: TerminologyEntry | undefined,
   ) => setGeneralFields({ selectedTerminology });
-  const [dentalFields, setDentalFields] = useReducer(
+  const [dentalFields, patchDentalFields] = useReducer(
     patchReducer<DentalFields>,
     initialDentalFields,
   );
-  const [optometryFields, setOptometryFields] = useReducer(
+  const setDentalFields = trackDirty(patchDentalFields);
+  const [optometryFields, patchOptometryFields] = useReducer(
     patchReducer<OptometryFields>,
     initialOptometryFields,
   );
-  const [surgeryFields, setSurgeryFields] = useReducer(
+  const setOptometryFields = trackDirty(patchOptometryFields);
+  const [surgeryFields, patchSurgeryFields] = useReducer(
     patchReducer<SurgeryFields>,
     initialSurgeryFields,
   );
-  const [imagingFields, setImagingFields] = useReducer(
+  const setSurgeryFields = trackDirty(patchSurgeryFields);
+  const [imagingFields, patchImagingFields] = useReducer(
     patchReducer<ImagingFields>,
     initialImagingFields,
   );
+  const setImagingFields = trackDirty(patchImagingFields);
   const {
     toothNumber,
     dentalTeeth,
@@ -603,10 +661,11 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     setImagingFields({ imagingAccessionId });
   const setImagingStudyId = (imagingStudyId: string) =>
     setImagingFields({ imagingStudyId });
-  const [observationFields, setObservationFields] = useReducer(
+  const [observationFields, patchObservationFields] = useReducer(
     patchReducer<ObservationFields>,
     initialObservationFields,
   );
+  const setObservationFields = trackDirty(patchObservationFields);
   const {
     valueKind,
     comparator,
@@ -633,19 +692,21 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     setObservationFields({ interpretation });
   const setAbsentReason = (absentReason: ManualObservationAbsentReason) =>
     setObservationFields({ absentReason });
-  const [medicationFields, setMedicationFields] = useReducer(
+  const [medicationFields, patchMedicationFields] = useReducer(
     patchReducer<MedicationFields>,
     initialMedicationFields,
   );
+  const setMedicationFields = trackDirty(patchMedicationFields);
   const { dose, frequency, route } = medicationFields;
   const setDose = (dose: string) => setMedicationFields({ dose });
   const setFrequency = (frequency: string) =>
     setMedicationFields({ frequency });
   const setRoute = (route: string) => setMedicationFields({ route });
-  const [coverageFields, setCoverageFields] = useReducer(
+  const [coverageFields, patchCoverageFields] = useReducer(
     patchReducer<CoverageFields>,
     initialCoverageFields,
   );
+  const setCoverageFields = trackDirty(patchCoverageFields);
   const {
     coverageMemberId,
     coverageGroupNumber,
@@ -675,10 +736,11 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     setCoverageFields({ coveragePhone });
   const setCoverageAddress = (coverageAddress: string) =>
     setCoverageFields({ coverageAddress });
-  const [documentFileFields, setDocumentFileFields] = useReducer(
+  const [documentFileFields, patchDocumentFileFields] = useReducer(
     patchReducer<DocumentFileFields>,
     initialDocumentFileFields,
   );
+  const setDocumentFileFields = trackDirty(patchDocumentFileFields);
   const { fileName, fileContentType, fileData, linkedFile } =
     documentFileFields;
   const setFileName = (fileName: string) => setDocumentFileFields({ fileName });
@@ -688,11 +750,12 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     setDocumentFileFields({ fileData });
   const setLinkedFile = (linkedFile: LinkedAttachmentFile | null) =>
     setDocumentFileFields({ linkedFile });
-  const [labRowsFields, setLabRowsFields] = useReducer(
+  const [labRowsFields, patchLabRowsFields] = useReducer(
     patchReducer<LabRowsFields>,
     undefined,
     createInitialLabRowsFields,
   );
+  const setLabRowsFields = trackDirty(patchLabRowsFields);
   const { labRows } = labRowsFields;
   const setLabRows = (
     next: LabResultRow[] | ((current: LabResultRow[]) => LabResultRow[]),
@@ -722,9 +785,13 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
   const isFamilyHistoryType = recordType === 'familymemberhistory';
   const canLinkSourceFile = supportsClinicalDocumentAttachments();
   const completedLabRows = labRows.filter((row) => row.title.trim());
+  // New labs are entered through the multi-row table, so the single Name
+  // field doesn't apply. Edited labs are single observations and need it.
+  const isNewLabEntry = recordType === 'lab' && !isEditing;
   const titleMissing =
-    recordType === 'lab' || isDeviceImportType ? false : !title.trim();
+    isNewLabEntry || isDeviceImportType ? false : !title.trim();
   const fileMissing = isDocumentType && !fileData;
+  const labRowsMissing = isNewLabEntry && completedLabRows.length === 0;
   const terminologyProfile = localConfig.terminology_profile || 'canada';
   const terminologyLanguage = localConfig.terminology_language || 'en';
   const terminologyLookupMode = localConfig.terminology_lookup_mode || 'hybrid';
@@ -732,31 +799,40 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     localConfig.terminology_remote_enabled || false;
 
   function resetFields() {
-    setGeneralFields({
-      title: '',
-      notes: '',
-      familyRelationship: '',
-      selectedTerminology: undefined,
+    withoutDirtyTracking(() => {
+      setGeneralFields({
+        title: '',
+        notes: '',
+        familyRelationship: '',
+        selectedTerminology: undefined,
+      });
+      setObservationFields(initialObservationFields);
+      setMedicationFields(initialMedicationFields);
+      setCoverageFields(initialCoverageFields);
+      setDocumentFileFields(initialDocumentFileFields);
+      setDentalFields(initialDentalFields);
+      setOptometryFields(initialOptometryFields);
+      setSurgeryFields(initialSurgeryFields);
+      setImagingFields(initialImagingFields);
+      setLabRowsFields(createInitialLabRowsFields());
     });
-    setObservationFields(initialObservationFields);
-    setMedicationFields(initialMedicationFields);
-    setCoverageFields(initialCoverageFields);
-    setDocumentFileFields(initialDocumentFileFields);
-    setDentalFields(initialDentalFields);
-    setOptometryFields(initialOptometryFields);
-    setSurgeryFields(initialSurgeryFields);
-    setImagingFields(initialImagingFields);
-    setLabRowsFields(createInitialLabRowsFields());
+    dirtyRef.current = false;
     setSubmitAttempted(false);
   }
 
   function applyDentalEntryKind(nextKind: DentalEntryKind) {
     const config = dentalEntryTypes.find((entry) => entry.value === nextKind);
     if (!config) return;
-    setDentalEntryKind(nextKind);
-    setRecordType(config.recordType);
-    if (!title.trim() || specialty !== 'dental') setTitle(config.title);
-    setSpecialty('dental');
+    withoutDirtyTracking(() => {
+      setDentalEntryKind(nextKind);
+      setRecordType(config.recordType);
+      // Only replace an empty title or a previous picker default — never
+      // text the user typed themselves.
+      if (!title.trim() || defaultEntryTitles.has(title)) {
+        setTitle(config.title);
+      }
+      setSpecialty('dental');
+    });
     setSubmitAttempted(false);
   }
 
@@ -765,10 +841,16 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
       (entry) => entry.value === nextKind,
     );
     if (!config) return;
-    setOptometryEntryKind(nextKind);
-    setRecordType(config.recordType);
-    if (!title.trim() || specialty !== 'optometry') setTitle(config.title);
-    setSpecialty('optometry');
+    withoutDirtyTracking(() => {
+      setOptometryEntryKind(nextKind);
+      setRecordType(config.recordType);
+      // Only replace an empty title or a previous picker default — never
+      // text the user typed themselves.
+      if (!title.trim() || defaultEntryTitles.has(title)) {
+        setTitle(config.title);
+      }
+      setSpecialty('optometry');
+    });
     setSubmitAttempted(false);
   }
 
@@ -796,20 +878,24 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     dentalEntryKind === 'retention';
 
   function applyTemplate(template: ManualTemplate) {
-    setRecordType(template.kind);
-    setTitle(template.title);
-    setUnit(template.unit);
-    setSelectedTerminology(template.terminology);
-    if (template.kind === 'lab') {
-      setLabRows([
-        {
-          ...createLabRow(),
-          title: template.title,
-          unit: template.unit,
-          terminology: template.terminology,
-        },
-      ]);
-    }
+    // Template chips fill recreatable defaults, so they don't count as
+    // unsaved user content on their own.
+    withoutDirtyTracking(() => {
+      setRecordType(template.kind);
+      setTitle(template.title);
+      setUnit(template.unit);
+      setSelectedTerminology(template.terminology);
+      if (template.kind === 'lab') {
+        setLabRows([
+          {
+            ...createLabRow(),
+            title: template.title,
+            unit: template.unit,
+            terminology: template.terminology,
+          },
+        ]);
+      }
+    });
     setSubmitAttempted(false);
   }
 
@@ -838,26 +924,28 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
 
   useEffect(() => {
     if (recordId) return;
-    if (requestedSpecialty === 'dental') {
-      applyDentalEntryKind(
-        requestedDental &&
-          dentalEntryTypes.some((entry) => entry.value === requestedDental)
-          ? requestedDental
-          : 'cleaning',
-      );
-    } else if (requestedSpecialty === 'optometry') {
-      applyOptometryEntryKind(
-        requestedOptometry &&
-          optometryEntryTypes.some(
-            (entry) => entry.value === requestedOptometry,
-          )
-          ? requestedOptometry
-          : 'checkup',
-      );
-    } else if (requestedRecordType) {
-      setRecordType(requestedRecordType);
-    }
-    if (requestedTitle) setTitle(requestedTitle);
+    withoutDirtyTracking(() => {
+      if (requestedSpecialty === 'dental') {
+        applyDentalEntryKind(
+          requestedDental &&
+            dentalEntryTypes.some((entry) => entry.value === requestedDental)
+            ? requestedDental
+            : 'cleaning',
+        );
+      } else if (requestedSpecialty === 'optometry') {
+        applyOptometryEntryKind(
+          requestedOptometry &&
+            optometryEntryTypes.some(
+              (entry) => entry.value === requestedOptometry,
+            )
+            ? requestedOptometry
+            : 'checkup',
+        );
+      } else if (requestedRecordType) {
+        setRecordType(requestedRecordType);
+      }
+      if (requestedTitle) setTitle(requestedTitle);
+    });
     // Apply presets once on initial add form load.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -872,13 +960,16 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         if (!doc || !isManualRecord(doc)) {
           notifyDispatch({
             type: 'set_notification',
-            message: 'Manual record not found',
+            message: t('Manual record not found'),
             variant: 'error',
           });
           navigate(AppRoutes.Timeline);
           return;
         }
         setLoadedDocument(doc);
+        // Hydrating from the stored record is not user input; keep the form
+        // pristine until the user actually changes something.
+        suppressDirtyRef.current = true;
         setRecordType(getManualRecordKind(doc));
         const manualDetails = getManualSpecialtyDetails(doc);
         setSpecialty(manualDetails.specialty);
@@ -950,93 +1041,21 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         setDate((doc.metadata?.date || today).slice(0, 10));
         setNotes(getManualRecordNote(doc) || '');
         if (doc.data_record.resource_type === 'familymemberhistory') {
-          const familyResource = (
-            doc.data_record.raw as {
-              resource?: { relationship?: { text?: string } };
-            }
-          ).resource;
-          setFamilyRelationship(familyResource?.relationship?.text || '');
+          setFamilyRelationship(parseManualFamilyRelationship(doc));
         }
-        const observationValue = getManualObservationValue(doc);
-        const rawObservation = doc.data_record.raw as {
-          resource?: {
-            valueQuantity?: { comparator?: string };
-            valueString?: string;
-            valueCodeableConcept?: { text?: string };
-            dataAbsentReason?: {
-              coding?: Array<{ code?: string }>;
-              text?: string;
-            };
-            referenceRange?: Array<{ text?: string }>;
-          };
-        };
-        if (rawObservation.resource?.dataAbsentReason) {
-          setValueKind('absent');
-          setAbsentReason(
-            normalizeAbsentReason(
-              rawObservation.resource.dataAbsentReason.coding?.[0]?.code ||
-                rawObservation.resource.dataAbsentReason.text,
-            ),
-          );
-        } else if (rawObservation.resource?.valueCodeableConcept) {
-          setValueKind('coded');
-        } else if (rawObservation.resource?.valueString) {
-          setValueKind('string');
-        } else {
-          setValueKind('quantity');
-        }
-        setComparator(rawObservation.resource?.valueQuantity?.comparator || '');
-        setRangeText(rawObservation.resource?.referenceRange?.[0]?.text || '');
-        if (observationValue) {
-          const [first, ...rest] = observationValue.split(' ');
-          setValue(first);
-          setUnit(rest.join(' '));
-        }
-        const range = getManualObservationRange(doc);
-        if (range?.includes('-')) {
-          const [low, highWithUnit] = range.split('-');
-          const [high] = highWithUnit.trim().split(' ');
-          setRangeLow(low.trim());
-          setRangeHigh(high.trim());
-        }
-        setInterpretation(getManualObservationInterpretation(doc) || '');
+        // Raw-FHIR field reconstruction lives beside the builders in
+        // manualRecordParsing.ts; the parsed shapes match the field groups
+        // so they apply as single patches.
+        const { absentReason: parsedAbsentReason, ...observationPatch } =
+          parseManualObservationFields(doc);
+        setObservationFields(observationPatch);
+        if (parsedAbsentReason) setAbsentReason(parsedAbsentReason);
         const medication = getManualMedicationParts(doc);
         setDose(medication.dose);
         setFrequency(medication.frequency);
         setRoute(medication.route);
-        if (doc.data_record.resource_type === 'coverage') {
-          const coverageResource = (
-            doc.data_record.raw as {
-              resource?: {
-                subscriberId?: string;
-                status?: string;
-                type?: { text?: string };
-                relationship?: { text?: string };
-                period?: { start?: string; end?: string };
-                class?: Array<{ type?: { text?: string }; value?: string }>;
-              };
-            }
-          ).resource;
-          const coverageClass = (name: string) =>
-            coverageResource?.class?.find(
-              (entry) => entry.type?.text?.toLowerCase() === name,
-            )?.value || '';
-          setCoverageMemberId(coverageResource?.subscriberId || '');
-          setCoveragePlanType(coverageResource?.type?.text || '');
-          setCoverageRelationship(coverageResource?.relationship?.text || '');
-          setCoverageStatus(
-            coverageResource?.status === 'cancelled' ? 'cancelled' : 'active',
-          );
-          setCoveragePeriodStart(
-            (coverageResource?.period?.start || '').slice(0, 10),
-          );
-          setCoveragePeriodEnd(
-            (coverageResource?.period?.end || '').slice(0, 10),
-          );
-          setCoverageGroupNumber(coverageClass('group'));
-          setCoveragePhone(coverageClass('phone'));
-          setCoverageAddress(coverageClass('address'));
-        }
+        const coveragePatch = parseManualCoverageFields(doc);
+        if (coveragePatch) setCoverageFields(coveragePatch);
         if (doc.data_record.resource_type === 'documentreference_attachment') {
           setFileName(doc.metadata?.display_name || '');
           setFileContentType(doc.data_record.content_type);
@@ -1046,12 +1065,15 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
               : undefined,
           );
         }
+        suppressDirtyRef.current = false;
+        dirtyRef.current = false;
       })
       .catch((error) => {
+        suppressDirtyRef.current = false;
         console.error(error);
         notifyDispatch({
           type: 'set_notification',
-          message: `Unable to load record: ${(error as Error).message}`,
+          message: `${t('Unable to load record')}: ${(error as Error).message}`,
           variant: 'error',
         });
         navigate(AppRoutes.Timeline);
@@ -1067,8 +1089,12 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     setSubmitAttempted(true);
     if (!db || isSaving) return;
     if (recordType === 'device') return;
-    if (titleMissing || fileMissing) return;
-    if (recordType === 'lab' && completedLabRows.length === 0) return;
+    if (titleMissing || fileMissing || labRowsMissing) {
+      // Let the form scroll the first invalid field into view — a blocked
+      // submit must never look like a silent no-op.
+      setFailedSubmitCount((count) => count + 1);
+      return;
+    }
 
     setIsSaving(true);
     try {
@@ -1255,6 +1281,11 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         );
       }
 
+      // Everything is persisted; the form no longer holds unsaved content,
+      // and subscribed record lists (timeline, tab pages) refresh in place.
+      dirtyRef.current = false;
+      notifyRecordsChanged();
+
       // Batch mode: stay on the form and clear the inputs so the next
       // record can be entered without navigating away.
       if (keepAdding && !loadedDocument) {
@@ -1262,7 +1293,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         resetFields();
         notifyDispatch({
           type: 'set_notification',
-          message: 'Record added — ready for the next one',
+          message: t('Record added — ready for the next one'),
           variant: 'success',
         });
         return;
@@ -1277,7 +1308,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
       if (uploadedDocumentId) {
         notifyDispatch({
           type: 'set_notification',
-          message: 'Document added — opening it',
+          message: t('Document added — opening it'),
           variant: 'success',
         });
         navigate(
@@ -1291,8 +1322,10 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
       notifyDispatch({
         type: 'set_notification',
         message: loadedDocument
-          ? 'Record updated'
-          : `${docs.length} record${docs.length === 1 ? '' : 's'} added`,
+          ? t('Record updated')
+          : docs.length === 1
+            ? t('Record added')
+            : `${docs.length} ${t('records added')}`,
         variant: 'success',
       });
       complete();
@@ -1300,7 +1333,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
       console.error(error);
       notifyDispatch({
         type: 'set_notification',
-        message: `Unable to add record: ${(error as Error).message}`,
+        message: `${t('Unable to add record')}: ${(error as Error).message}`,
         variant: 'error',
       });
     } finally {
@@ -1347,15 +1380,22 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
 
       notifyDispatch({
         type: 'set_notification',
-        message: `Imported ${docs.length} FreeStyle Libre readings`,
+        message: `${docs.length} ${t('FreeStyle Libre readings imported')}`,
         variant: 'success',
       });
-      navigate(AppRoutes.Labs);
+      notifyRecordsChanged();
+      // A modal host closes itself via its callback; the standalone page
+      // goes to Labs where the imported readings live.
+      if (options.onComplete) {
+        options.onComplete();
+      } else {
+        navigate(AppRoutes.Labs);
+      }
     } catch (error) {
       console.error(error);
       notifyDispatch({
         type: 'set_notification',
-        message: `Unable to import LibreView file: ${(error as Error).message}`,
+        message: `${t('Unable to import LibreView file')}: ${(error as Error).message}`,
         variant: 'error',
       });
     } finally {
@@ -1580,8 +1620,12 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     isFamilyHistoryType,
     canLinkSourceFile,
     completedLabRows,
+    isNewLabEntry,
     titleMissing,
     fileMissing,
+    labRowsMissing,
+    isDirty,
+    failedSubmitCount,
     terminologyProfile,
     terminologyLanguage,
     terminologyLookupMode,

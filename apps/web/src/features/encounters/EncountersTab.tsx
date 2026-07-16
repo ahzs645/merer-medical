@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { BuildingOffice2Icon } from '@heroicons/react/24/outline';
 
-import { useRxDb } from '../../app/providers/RxDbProvider';
-import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { Badge } from '../../shared/components/Badge';
 import { RecordListPage } from '../../shared/components/records/RecordListPage';
+import {
+  compareByDateDesc,
+  useRecordList,
+} from '../../shared/hooks/useRecordList';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getEncounterLocation } from '../../shared/utils/fhirAccessHelpers';
 import { getFhirResource } from '../../shared/utils/fhirResource';
@@ -102,93 +104,57 @@ interface EncounterItem {
   source?: string;
 }
 
-function useEncounters() {
-  const db = useRxDb();
-  const user = useUser();
-  const [items, setItems] = useState<EncounterItem[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
-    'loading',
-  );
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-      setStatus('loading');
-      setError(null);
-      const [encounterDocs, allDocs, connectionDocs] = await Promise.all([
-        db.clinical_documents
-          .find({
-            selector: {
-              user_id: user.id,
-              'data_record.resource_type': 'encounter',
-            },
-          })
-          .exec(),
-        db.clinical_documents.find({ selector: { user_id: user.id } }).exec(),
-        db.connection_documents.find({ selector: { user_id: user.id } }).exec(),
-      ]);
-      if (!mounted) return;
-
-      const connById = new Map(
-        connectionDocs.map((d) => {
-          const c = d.toMutableJSON() as ConnectionDocument;
-          return [c.id, c] as const;
-        }),
-      );
-
-      // Count, per calendar day, how many "records" (non-encounter resource
-      // types of interest) happened. This is a DATE-BASED association only —
-      // the underlying data has no encounter references.
-      const recordsByDay = new Map<string, number>();
-      for (const row of allDocs) {
-        const d = row.toMutableJSON() as ClinicalDocument;
-        const resourceType = d.data_record?.resource_type;
-        if (!resourceType || !SAME_DAY_RESOURCE_TYPES.has(resourceType)) {
-          continue;
-        }
-        const day = (d.metadata?.date || '').slice(0, 10);
-        if (!day) continue;
-        recordsByDay.set(day, (recordsByDay.get(day) || 0) + 1);
-      }
-
-      const list = encounterDocs.map((doc) => {
-        const d = doc.toMutableJSON() as ClinicalDocument;
-        const r = getFhirResource<Record<string, unknown>>(d);
-        const classDisplay = firstText(
-          (r['class'] as Record<string, unknown>)?.['display'],
-        );
-        const date = periodStart(r['period']) || d.metadata?.date;
-        const day = (date || '').slice(0, 10);
-        return {
-          id: d.id,
-          title: d.metadata?.display_name || classDisplay || 'Encounter',
-          date,
-          classDisplay,
-          location: getEncounterLocation(d),
-          reason: firstText((r['reasonCode'] as unknown[] | undefined)?.[0]),
-          // Same-day count of OTHER records (encounters aren't counted above).
-          sameDayCount: day ? recordsByDay.get(day) || 0 : 0,
-          source:
-            connById.get(d.connection_record_id)?.name ||
-            d.metadata?.source_name,
-        };
-      });
-      list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-      setItems(list);
-      setStatus('success');
+function mapEncounterDocs(
+  docs: ClinicalDocument[],
+  connectionsById: Map<string, ConnectionDocument>,
+): EncounterItem[] {
+  // Count, per calendar day, how many "records" (non-encounter resource
+  // types of interest) happened. This is a DATE-BASED association only —
+  // the underlying data has no encounter references.
+  const recordsByDay = new Map<string, number>();
+  for (const d of docs) {
+    const resourceType = d.data_record?.resource_type;
+    if (!resourceType || !SAME_DAY_RESOURCE_TYPES.has(resourceType)) {
+      continue;
     }
-    load().catch((e) => {
-      if (!mounted) return;
-      setError(e instanceof Error ? e : new Error(String(e)));
-      setStatus('error');
-    });
-    return () => {
-      mounted = false;
-    };
-  }, [db, user.id]);
+    const day = (d.metadata?.date || '').slice(0, 10);
+    if (!day) continue;
+    recordsByDay.set(day, (recordsByDay.get(day) || 0) + 1);
+  }
 
-  return { items, status, error };
+  return docs
+    .filter((d) => d.data_record?.resource_type === 'encounter')
+    .map((d) => {
+      const r = getFhirResource<Record<string, unknown>>(d);
+      const classDisplay = firstText(
+        (r['class'] as Record<string, unknown>)?.['display'],
+      );
+      const date = periodStart(r['period']) || d.metadata?.date;
+      const day = (date || '').slice(0, 10);
+      return {
+        id: d.id,
+        title: d.metadata?.display_name || classDisplay || 'Encounter',
+        date,
+        classDisplay,
+        location: getEncounterLocation(d),
+        reason: firstText((r['reasonCode'] as unknown[] | undefined)?.[0]),
+        // Same-day count of OTHER records (encounters aren't counted above).
+        sameDayCount: day ? recordsByDay.get(day) || 0 : 0,
+        source:
+          connectionsById.get(d.connection_record_id)?.name ||
+          d.metadata?.source_name,
+      };
+    });
+}
+
+function useEncounters() {
+  return useRecordList<EncounterItem>({
+    // Encounters plus the resource types counted as same-day activity —
+    // mapEncounterDocs partitions them.
+    resourceTypes: ['encounter', ...SAME_DAY_RESOURCE_TYPES],
+    mapDocs: mapEncounterDocs,
+    sort: compareByDateDesc,
+  });
 }
 
 export function EncountersTab() {

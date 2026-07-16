@@ -37,13 +37,17 @@ export function useConditionsData() {
   const db = useRxDb();
   const user = useUser();
   const [bundles, setBundles] = useState<ConditionBundle[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading',
+  );
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function load() {
       setStatus('loading');
+      setError(null);
       const [
         conditions,
         medications,
@@ -97,11 +101,15 @@ export function useConditionsData() {
       setStatus('success');
     }
 
-    load();
+    load().catch((e) => {
+      if (!isMounted) return;
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setStatus('error');
+    });
     return () => {
       isMounted = false;
     };
   }, [db, user.id]);
 
-  return { bundles, status };
+  return { bundles, status, error };
 }

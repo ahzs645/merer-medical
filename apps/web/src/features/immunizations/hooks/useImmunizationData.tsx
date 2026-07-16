@@ -12,13 +12,15 @@ export function useImmunizationData() {
   const db = useRxDb(),
     user = useUser(),
     [documents, setDocuments] = useState<ClinicalDocument<unknown>[]>([]),
-    [status, setStatus] = useState<'loading' | 'success'>('loading');
+    [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading'),
+    [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchImmunizationDocuments() {
       setStatus('loading');
+      setError(null);
 
       const docs = await db.clinical_documents
         .find({
@@ -38,7 +40,11 @@ export function useImmunizationData() {
       setStatus('success');
     }
 
-    fetchImmunizationDocuments();
+    fetchImmunizationDocuments().catch((e) => {
+      if (!isMounted) return;
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setStatus('error');
+    });
 
     return () => {
       isMounted = false;
@@ -53,5 +59,5 @@ export function useImmunizationData() {
     };
   }, [documents]);
 
-  return { ...immunizationData, status };
+  return { ...immunizationData, status, error };
 }

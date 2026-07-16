@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   BuildingOffice2Icon,
   IdentificationIcon,
@@ -15,8 +14,10 @@ import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
+import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import { formatDisplayText } from '../../shared/utils/StyleUtils';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
@@ -41,8 +42,7 @@ type InsuranceItem = {
 
 export function InsuranceTab() {
   const { t } = useInterfaceLanguage();
-  const navigate = useNavigate();
-  const { items, status } = useInsuranceData();
+  const { items, status, error } = useInsuranceData();
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | undefined>();
   const [addOpen, setAddOpen] = useState(false);
@@ -85,17 +85,22 @@ export function InsuranceTab() {
         />
       }
     >
+      {/* Saving notifies the record-change signal; the coverage hook
+          refreshes in place, so no reload is needed. */}
       <ManualRecordModal
         open={addOpen}
         initialRecordType="coverage"
         onClose={() => setAddOpen(false)}
-        onSaved={() => navigate(0)}
       />
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.25fr)] lg:px-8">
           {status === 'loading' ? (
             <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200 lg:col-span-2">
               {t('Loading insurance...')}
+            </div>
+          ) : status === 'error' ? (
+            <div className="lg:col-span-2">
+              <ErrorPanel error={error} />
             </div>
           ) : filteredItems.length === 0 ? (
             <div className="rounded-md bg-white p-8 text-center shadow-sm ring-1 ring-gray-200 lg:col-span-2">
@@ -330,14 +335,20 @@ function Detail({
 function useInsuranceData() {
   const db = useRxDb();
   const user = useUser();
+  // Refetch when a manual record is added, edited, or deleted.
+  const recordChangeTick = useRecordChangeTick();
   const [items, setItems] = useState<InsuranceItem[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading',
+  );
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchCoverage() {
       setStatus('loading');
+      setError(null);
       const [coverageDocs, connectionDocs] = await Promise.all([
         db.clinical_documents
           .find({
@@ -373,14 +384,18 @@ function useInsuranceData() {
       setStatus('success');
     }
 
-    fetchCoverage();
+    fetchCoverage().catch((e) => {
+      if (!isMounted) return;
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setStatus('error');
+    });
 
     return () => {
       isMounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
-  return { items, status };
+  return { items, status, error };
 }
 
 function toInsuranceItem(

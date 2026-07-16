@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
+import { useRecordChangeTick } from '../../../shared/utils/recordChangeSignal';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { normalizeMedicationDocuments } from '..';
 import {
@@ -30,6 +31,8 @@ export function useMedicationsData({
   const [items, setItems] = useState<MedicationViewItem[]>([]);
   const [allergies, setAllergies] = useState<ClinicalDocument[]>([]);
   const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  // Refetch when a manual record is added, edited, or deleted.
+  const recordChangeTick = useRecordChangeTick();
 
   useEffect(() => {
     let isMounted = true;
@@ -74,7 +77,7 @@ export function useMedicationsData({
     return () => {
       isMounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   const filteredItems = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
+import { useRecordChangeTick } from '../../../shared/utils/recordChangeSignal';
 import { ImagingItem } from '../types';
 import {
   IMAGING_RESOURCE_TYPES,
@@ -13,13 +14,17 @@ export function useImagingData() {
   const db = useRxDb(),
     user = useUser(),
     [items, setItems] = useState<ImagingItem[]>([]),
-    [status, setStatus] = useState<'loading' | 'success'>('loading');
+    [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading'),
+    [error, setError] = useState<Error | null>(null);
+  // Refetch when a manual record is added, edited, or deleted.
+  const recordChangeTick = useRecordChangeTick();
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchImaging() {
       setStatus('loading');
+      setError(null);
 
       const docs = await db.clinical_documents
         .find({
@@ -42,12 +47,16 @@ export function useImagingData() {
       setStatus('success');
     }
 
-    fetchImaging();
+    fetchImaging().catch((e) => {
+      if (!isMounted) return;
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setStatus('error');
+    });
 
     return () => {
       isMounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   const counts = useMemo(
     () => ({
@@ -66,5 +75,5 @@ export function useImagingData() {
     [items],
   );
 
-  return { items, counts, status };
+  return { items, counts, status, error };
 }

@@ -323,9 +323,13 @@ export function RxDbProvider(props: RxDbProviderProps) {
             setInitialized('COMPLETE');
           })
           .catch((error) => {
+            // Keep the app usable with an empty in-memory database, but say
+            // plainly that the demo records failed to load — a raw import
+            // error alone reads like a broken app.
+            console.error('Demo data import failed:', error);
             notifyDispatch({
               type: 'set_notification',
-              message: (error as Error).message,
+              message: `The demo records could not be loaded, so the demo starts empty: ${(error as Error).message}`,
               variant: 'error',
             });
             setDb(db);

@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowRightCircleIcon } from '@heroicons/react/24/outline';
 
-import { useRxDb } from '../../app/providers/RxDbProvider';
-import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { Badge } from '../../shared/components/Badge';
 import { RecordListPage } from '../../shared/components/records/RecordListPage';
+import {
+  compareByDateDesc,
+  useRecordList,
+} from '../../shared/hooks/useRecordList';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
@@ -22,81 +24,45 @@ interface ReferralItem {
   source?: string;
 }
 
-function useReferrals() {
-  const db = useRxDb();
-  const user = useUser();
-  const [items, setItems] = useState<ReferralItem[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
-    'loading',
-  );
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-      setStatus('loading');
-      setError(null);
-      const [docs, connectionDocs] = await Promise.all([
-        db.clinical_documents
-          .find({
-            selector: {
-              user_id: user.id,
-              'data_record.resource_type': 'servicerequest',
-            },
-          })
-          .exec(),
-        db.connection_documents.find({ selector: { user_id: user.id } }).exec(),
-      ]);
-      if (!mounted) return;
-      const connById = new Map(
-        connectionDocs.map((d) => {
-          const c = d.toMutableJSON() as ConnectionDocument;
-          return [c.id, c] as const;
-        }),
-      );
-      const list = docs.map((doc) => {
-        const d = doc.toMutableJSON() as ClinicalDocument;
-        const r = getFhirResource<Record<string, unknown>>(d);
-        const requester = r['requester'] as Record<string, unknown> | undefined;
-        const performer = Array.isArray(r['performer'])
-          ? (r['performer'][0] as Record<string, unknown> | undefined)
-          : undefined;
-        const notes = Array.isArray(r['note'])
-          ? (r['note'] as Array<Record<string, unknown>>)
-              .map((n) => firstText(n['text']))
-              .filter((t): t is string => Boolean(t))
-          : [];
-        return {
-          id: d.id,
-          name: d.metadata?.display_name || firstText(r['code']) || 'Referral',
-          status: firstText(r['status']),
-          requester: firstText(requester?.['display']),
-          performer: firstText(performer?.['display']),
-          notes,
-          date:
-            (r['authoredOn'] as string) ||
-            periodStart(r['occurrencePeriod']) ||
-            d.metadata?.date,
-          source:
-            connById.get(d.connection_record_id)?.name ||
-            d.metadata?.source_name,
-        };
-      });
-      list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-      setItems(list);
-      setStatus('success');
-    }
-    load().catch((e) => {
-      if (!mounted) return;
-      setError(e instanceof Error ? e : new Error(String(e)));
-      setStatus('error');
-    });
-    return () => {
-      mounted = false;
+function mapReferralDocs(
+  docs: ClinicalDocument[],
+  connectionsById: Map<string, ConnectionDocument>,
+): ReferralItem[] {
+  return docs.map((d) => {
+    const r = getFhirResource<Record<string, unknown>>(d);
+    const requester = r['requester'] as Record<string, unknown> | undefined;
+    const performer = Array.isArray(r['performer'])
+      ? (r['performer'][0] as Record<string, unknown> | undefined)
+      : undefined;
+    const notes = Array.isArray(r['note'])
+      ? (r['note'] as Array<Record<string, unknown>>)
+          .map((n) => firstText(n['text']))
+          .filter((t): t is string => Boolean(t))
+      : [];
+    return {
+      id: d.id,
+      name: d.metadata?.display_name || firstText(r['code']) || 'Referral',
+      status: firstText(r['status']),
+      requester: firstText(requester?.['display']),
+      performer: firstText(performer?.['display']),
+      notes,
+      date:
+        (r['authoredOn'] as string) ||
+        periodStart(r['occurrencePeriod']) ||
+        d.metadata?.date,
+      source:
+        connectionsById.get(d.connection_record_id)?.name ||
+        d.metadata?.source_name,
     };
-  }, [db, user.id]);
+  });
+}
 
-  return { items, status, error };
+function useReferrals() {
+  return useRecordList<ReferralItem>({
+    resourceTypes: ['servicerequest'],
+    mapDocs: mapReferralDocs,
+    sort: compareByDateDesc,
+  });
 }
 
 export function ReferralsTab() {

@@ -15,6 +15,7 @@ import {
   nameLabAliases,
 } from './labEnrichmentCatalog';
 import { labCitations } from './labCitations';
+import { parseDateAsUtc } from '../../../shared/utils/parseDateAsUtc';
 import {
   LabAuditSummary,
   LabEnrichment,
@@ -309,12 +310,9 @@ function calculateAgeYearsAtDate(
   birthDate?: string,
   collectionDate?: string,
 ): number | undefined {
-  if (!birthDate || !collectionDate) return undefined;
-  const birth = new Date(`${birthDate}T00:00:00Z`);
-  const collected = new Date(`${collectionDate}T00:00:00Z`);
-  if (Number.isNaN(birth.getTime()) || Number.isNaN(collected.getTime())) {
-    return undefined;
-  }
+  const birth = parseDateAsUtc(birthDate);
+  const collected = parseDateAsUtc(collectionDate);
+  if (!birth || !collected) return undefined;
 
   let age = collected.getUTCFullYear() - birth.getUTCFullYear();
   const monthDelta = collected.getUTCMonth() - birth.getUTCMonth();

@@ -22,7 +22,7 @@ export type TutorialState = {
 };
 
 export type TutorialAction =
-  | { type: 'initalize_steps'; steps: string[] }
+  | { type: 'initialize_steps'; steps: string[] }
   | { type: 'next_step' }
   | { type: 'previous_step' }
   | { type: 'complete_tutorial' };
@@ -32,12 +32,14 @@ export const tutorialReducer: React.Reducer<TutorialState, TutorialAction> = (
   action: TutorialAction,
 ) => {
   switch (action.type) {
-    case 'initalize_steps': {
+    case 'initialize_steps': {
       return {
+        ...state,
         currentStep: 0,
         steps: action.steps,
         direction: 1,
-      } as TutorialState;
+        isComplete: false,
+      };
     }
     case 'next_step': {
       if (state.currentStep >= state.steps.length - 1) {
@@ -75,7 +77,21 @@ export const swipePower = (offset: number, velocity: number) => {
 export type ValueOf<T> = T[keyof T];
 
 /**
- * Return all keys in local storage that start with 'tutorial_' in order by unix timestamp
+ * Explicit display order for tutorial steps. Steps used to be ordered by
+ * localeCompare on the timestamped storage keys, which made the sequence an
+ * alphabetical accident rather than a declared one. Storage keys are unchanged;
+ * only the ordering is now explicit.
+ */
+const tutorialStepOrder: string[] = [
+  TutorialLocalStorageKeys.WELCOME_SCREEN,
+  TutorialLocalStorageKeys.INSTALL_PWA,
+  TutorialLocalStorageKeys.ADD_A_CONNECTION,
+  TutorialLocalStorageKeys.COMPLETE,
+];
+
+/**
+ * Return all keys in local storage that start with 'tutorial_', ordered by
+ * tutorialStepOrder. Unknown keys fall back to the end, in localeCompare order.
  * @param config
  * @returns
  */
@@ -86,6 +102,17 @@ function getTutorialKeysFromLocalStorage<T>(config: Partial<T>): string[] {
     })
     .map(([key, _]) => key)
     .sort((a, b) => {
+      const aIndex = tutorialStepOrder.indexOf(a);
+      const bIndex = tutorialStepOrder.indexOf(b);
+      if (aIndex !== -1 && bIndex !== -1) {
+        return aIndex - bIndex;
+      }
+      if (aIndex !== -1) {
+        return -1;
+      }
+      if (bIndex !== -1) {
+        return 1;
+      }
       return a.localeCompare(b);
     });
 }
@@ -94,6 +121,10 @@ const isInstalledPWA = () => {
   return window.matchMedia('(display-mode: standalone)').matches;
 };
 
+// Tradeoff: the tutorial only renders on the Timeline page. Users who first
+// land on (or navigate to) any other route won't see pending tutorial steps
+// until they visit the Timeline, but this keeps the overlay from covering
+// task-focused pages.
 const canShowTutorialOnPage = (pathname: string) => {
   const normalized = pathname.replace(/\/+$/, '') || AppRoutes.Timeline;
   return normalized === AppRoutes.Timeline;
@@ -118,12 +149,13 @@ export function TutorialOverlay() {
         ),
       [tutorialConfig],
     );
-  const [state, dispatch] = React.useReducer(tutorialReducer, {
+  const initialState: TutorialState = {
     currentStep: 0,
     steps: [],
     direction: 1,
     isComplete: false,
-  } as TutorialState);
+  };
+  const [state, dispatch] = React.useReducer(tutorialReducer, initialState);
 
   useEffect(() => {
     if (state.isComplete && state.steps.length > 0) {
@@ -133,14 +165,14 @@ export function TutorialOverlay() {
         newTutorialState[key] = false;
       }
       updateTutorialConfig(newTutorialState);
-      dispatch({ type: 'initalize_steps', steps: [] });
+      dispatch({ type: 'initialize_steps', steps: [] });
     }
   }, [state.isComplete, state.steps, updateTutorialConfig]);
 
   useEffect(() => {
     if (!state.isComplete) {
       dispatch({
-        type: 'initalize_steps',
+        type: 'initialize_steps',
         steps: [...tutorialSteps, TutorialLocalStorageKeys.COMPLETE],
       });
     }
@@ -207,7 +239,7 @@ export function TutorialOverlay() {
           initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="bg-primary-700 mobile-full-height absolute inset-0 z-50 flex w-full flex-col overflow-hidden opacity-25"
+          className="bg-primary-700 mobile-full-height absolute inset-0 z-50 flex w-full flex-col overflow-hidden"
         >
           <div className="relative flex min-h-0 flex-1 overflow-hidden">
             <AnimatePresence initial={false} custom={state.direction}>

@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
@@ -20,12 +20,15 @@ type ManualRecordModalProps = {
 // its edit-load effect) only runs while the modal is mounted/open.
 function ManualRecordModalBody({
   onClose,
+  requestClose,
+  registerCloseGuard,
   onSaved,
   ...options
 }: {
   onClose: () => void;
-  onSaved?: () => void;
-} & Omit<UseManualRecordFormOptions, 'onComplete'>) {
+  requestClose: () => void;
+  registerCloseGuard: (guard: () => boolean) => void;
+} & Omit<ManualRecordModalProps, 'open'>) {
   const { t } = useInterfaceLanguage();
   const form = useManualRecordForm({
     ...options,
@@ -33,6 +36,14 @@ function ManualRecordModalBody({
       onSaved?.();
       onClose();
     },
+  });
+
+  // Every close path (X, backdrop, Escape, Cancel) runs this guard so a
+  // half-filled form is never discarded without confirmation.
+  useEffect(() => {
+    registerCloseGuard(
+      () => !form.isDirty() || window.confirm(t('Discard unsaved changes?')),
+    );
   });
 
   return (
@@ -43,7 +54,7 @@ function ManualRecordModalBody({
         </Dialog.Title>
         <button
           type="button"
-          onClick={onClose}
+          onClick={requestClose}
           className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
           aria-label={t('Close')}
         >
@@ -51,7 +62,7 @@ function ManualRecordModalBody({
         </button>
       </div>
       <div className="max-h-[80vh] overflow-y-auto">
-        <ManualRecordForm form={form} onCancel={onClose} embedded />
+        <ManualRecordForm form={form} onCancel={requestClose} embedded />
       </div>
     </>
   );
@@ -63,9 +74,21 @@ export function ManualRecordModal({
   onSaved,
   ...options
 }: ManualRecordModalProps) {
+  // The body registers the actual dirty-check; until it mounts, closing is
+  // always allowed.
+  const closeGuardRef = useRef<() => boolean>(() => true);
+  const requestClose = () => {
+    if (closeGuardRef.current()) onClose();
+  };
+  // Drop the stale guard once the body unmounts so a reopened modal starts
+  // from a clean slate.
+  useEffect(() => {
+    if (!open) closeGuardRef.current = () => true;
+  }, [open]);
+
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-40" onClose={onClose}>
+      <Dialog as="div" className="relative z-40" onClose={requestClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-200"
@@ -92,6 +115,10 @@ export function ManualRecordModal({
               <Dialog.Panel className="w-full max-w-3xl rounded-lg bg-white shadow-xl">
                 <ManualRecordModalBody
                   onClose={onClose}
+                  requestClose={requestClose}
+                  registerCloseGuard={(guard) => {
+                    closeGuardRef.current = guard;
+                  }}
                   onSaved={onSaved}
                   {...options}
                 />

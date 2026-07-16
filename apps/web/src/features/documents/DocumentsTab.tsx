@@ -16,8 +16,10 @@ import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocumen
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
+import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 
 type DocumentRecord = ClinicalDocument<BundleEntry<DocumentReference>>;
 type AttachmentRecord = ClinicalDocument<string | Blob>;
@@ -41,7 +43,7 @@ type DocumentSection = {
 export function DocumentsTab() {
   const { t } = useInterfaceLanguage();
   const [query, setQuery] = useState('');
-  const { items, status } = useDocumentsData();
+  const { items, status, error } = useDocumentsData();
 
   const filteredItems = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -82,6 +84,8 @@ export function DocumentsTab() {
             <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
               {t('Loading documents...')}
             </div>
+          ) : status === 'error' ? (
+            <ErrorPanel error={error} />
           ) : filteredItems.length > 0 ? (
             <>
               {sections.map((section) => (
@@ -145,14 +149,20 @@ function DocumentSectionList({ section }: { section: DocumentSection }) {
 function useDocumentsData() {
   const db = useRxDb();
   const user = useUser();
+  // Refetch when a manual record is added, edited, or deleted.
+  const recordChangeTick = useRecordChangeTick();
   const [items, setItems] = useState<DocumentItem[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success'>('loading');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
+    'loading',
+  );
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchDocuments() {
       setStatus('loading');
+      setError(null);
       const [
         documentDocs,
         attachmentDocs,
@@ -269,14 +279,18 @@ function useDocumentsData() {
       setStatus('success');
     }
 
-    fetchDocuments();
+    fetchDocuments().catch((e) => {
+      if (!isMounted) return;
+      setError(e instanceof Error ? e : new Error(String(e)));
+      setStatus('error');
+    });
 
     return () => {
       isMounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
-  return { items, status };
+  return { items, status, error };
 }
 
 function DocumentsHeader({

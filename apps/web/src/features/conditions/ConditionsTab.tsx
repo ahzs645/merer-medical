@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
+import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { useConditionsData } from './hooks/useConditionsData';
 import { ConditionBundle, RelatedKind } from './types';
 
@@ -24,7 +25,7 @@ function conditionDetailPath(id: string): string {
 }
 
 export function ConditionsTab() {
-  const { bundles, status } = useConditionsData();
+  const { bundles, status, error } = useConditionsData();
   const [query, setQuery] = useState('');
 
   const filtered = useMemo(() => {
@@ -51,6 +52,8 @@ export function ConditionsTab() {
         <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'loading' ? (
             <Placeholder text="Loading conditions..." />
+          ) : status === 'error' ? (
+            <ErrorPanel error={error} />
           ) : bundles.length === 0 ? (
             <EmptyState />
           ) : filtered.length === 0 ? (

@@ -104,7 +104,7 @@ const SettingsTab: React.FC = () => {
       if (!db) {
         notifyDispatch({
           type: 'set_notification',
-          message: 'Import failed: database is not ready yet.',
+          message: t('Import failed: database is not ready yet.'),
           variant: 'error',
         });
         return;
@@ -116,8 +116,9 @@ const SettingsTab: React.FC = () => {
         if (info.encrypted) {
           notifyDispatch({
             type: 'set_notification',
-            message:
+            message: t(
               'This user profile package is encrypted. Import it from Data settings so you can enter the passphrase.',
+            ),
             variant: 'error',
           });
           return;
@@ -131,11 +132,11 @@ const SettingsTab: React.FC = () => {
           0,
         );
         const extra = unknownTables.length
-          ? ` Skipped: ${unknownTables.join(', ')}.`
+          ? ` ${t('Skipped')}: ${unknownTables.join(', ')}.`
           : '';
         notifyDispatch({
           type: 'set_notification',
-          message: `Imported user profile with ${total} records.${extra} Reloading...`,
+          message: `${t('Imported user profile')}: ${total} ${t('records')}.${extra} ${t('Reloading...')}`,
           variant: 'success',
         });
         setShowUserSwitcher(false);
@@ -143,12 +144,12 @@ const SettingsTab: React.FC = () => {
       } catch (e) {
         notifyDispatch({
           type: 'set_notification',
-          message: `Import failed: ${(e as Error).message}`,
+          message: `${t('Import failed')}: ${(e as Error).message}`,
           variant: 'error',
         });
       }
     },
-    [db, notifyDispatch],
+    [db, notifyDispatch, t],
   );
 
   const openUserProfileImport = useCallback(() => {

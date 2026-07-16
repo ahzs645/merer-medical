@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
-import { useRxDb } from '../../app/providers/RxDbProvider';
-import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { Badge } from '../../shared/components/Badge';
 import { RecordListPage } from '../../shared/components/records/RecordListPage';
+import {
+  compareByDateDesc,
+  useRecordList,
+} from '../../shared/hooks/useRecordList';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getAllergyIntoleranceDisplayName } from '../../shared/utils/fhirAccessHelpers';
 import { getFhirResource } from '../../shared/utils/fhirResource';
@@ -22,79 +24,43 @@ interface AllergyItem {
   source?: string;
 }
 
-function useAllergies() {
-  const db = useRxDb();
-  const user = useUser();
-  const [items, setItems] = useState<AllergyItem[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
-    'loading',
-  );
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-      setStatus('loading');
-      setError(null);
-      const [docs, connectionDocs] = await Promise.all([
-        db.clinical_documents
-          .find({
-            selector: {
-              user_id: user.id,
-              'data_record.resource_type': 'allergyintolerance',
-            },
-          })
-          .exec(),
-        db.connection_documents.find({ selector: { user_id: user.id } }).exec(),
-      ]);
-      if (!mounted) return;
-      const connById = new Map(
-        connectionDocs.map((d) => {
-          const c = d.toMutableJSON() as ConnectionDocument;
-          return [c.id, c] as const;
-        }),
-      );
-      const list = docs.map((doc) => {
-        const d = doc.toMutableJSON() as ClinicalDocument;
-        const r = getFhirResource<Record<string, unknown>>(d);
-        const reaction = Array.isArray(r['reaction'])
-          ? (r['reaction'][0] as Record<string, unknown> | undefined)
-          : undefined;
-        return {
-          id: d.id,
-          name:
-            getAllergyIntoleranceDisplayName(d) ||
-            d.metadata?.display_name ||
-            firstText(r['code']) ||
-            'Allergy',
-          clinicalStatus: firstText(r['clinicalStatus']),
-          reaction: firstText(reaction?.['manifestation']),
-          severity: firstText(reaction?.['severity']),
-          date:
-            (r['recordedDate'] as string) ||
-            (r['onsetDateTime'] as string) ||
-            periodStart(r['onsetPeriod']) ||
-            d.metadata?.date,
-          source:
-            connById.get(d.connection_record_id)?.name ||
-            d.metadata?.source_name,
-        };
-      });
-      list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-      setItems(list);
-      setStatus('success');
-    }
-    load().catch((e) => {
-      if (!mounted) return;
-      setError(e instanceof Error ? e : new Error(String(e)));
-      setStatus('error');
-    });
-    return () => {
-      mounted = false;
+function mapAllergyDocs(
+  docs: ClinicalDocument[],
+  connectionsById: Map<string, ConnectionDocument>,
+): AllergyItem[] {
+  return docs.map((d) => {
+    const r = getFhirResource<Record<string, unknown>>(d);
+    const reaction = Array.isArray(r['reaction'])
+      ? (r['reaction'][0] as Record<string, unknown> | undefined)
+      : undefined;
+    return {
+      id: d.id,
+      name:
+        getAllergyIntoleranceDisplayName(d) ||
+        d.metadata?.display_name ||
+        firstText(r['code']) ||
+        'Allergy',
+      clinicalStatus: firstText(r['clinicalStatus']),
+      reaction: firstText(reaction?.['manifestation']),
+      severity: firstText(reaction?.['severity']),
+      date:
+        (r['recordedDate'] as string) ||
+        (r['onsetDateTime'] as string) ||
+        periodStart(r['onsetPeriod']) ||
+        d.metadata?.date,
+      source:
+        connectionsById.get(d.connection_record_id)?.name ||
+        d.metadata?.source_name,
     };
-  }, [db, user.id]);
+  });
+}
 
-  return { items, status, error };
+function useAllergies() {
+  return useRecordList<AllergyItem>({
+    resourceTypes: ['allergyintolerance'],
+    mapDocs: mapAllergyDocs,
+    sort: compareByDateDesc,
+  });
 }
 
 export function AllergiesTab() {

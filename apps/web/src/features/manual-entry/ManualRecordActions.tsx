@@ -5,10 +5,10 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/outline';
 import { MouseEvent, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { ManualRecordModal } from './ManualRecordModal';
 
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { useNotificationDispatch } from '../../app/providers/NotificationProvider';
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
@@ -19,16 +19,16 @@ import {
   openClinicalDocumentAttachment,
   supportsClinicalDocumentAttachments,
 } from '../../repositories/AttachmentRepository';
-import { Routes as AppRoutes } from '../../Routes';
 import { deleteClinicalDocument } from '../../repositories/ClinicalDocumentRepository';
+import { notifyRecordsChanged } from '../../shared/utils/recordChangeSignal';
 import { isManualRecord } from '../../shared/utils/manualRecordUtils';
 import { ManualSourceDocumentLink } from './ManualSourceDocumentLink';
 
 export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
   const db = useRxDb();
   const user = useUser();
-  const navigate = useNavigate();
   const notifyDispatch = useNotificationDispatch();
+  const { t } = useInterfaceLanguage();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [linkedFiles, setLinkedFiles] = useState<
@@ -48,7 +48,7 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
         if (!cancelled) {
           notifyDispatch({
             type: 'set_notification',
-            message: `Unable to load linked files: ${(error as Error).message}`,
+            message: `${t('Unable to load linked files')}: ${(error as Error).message}`,
             variant: 'error',
           });
         }
@@ -65,7 +65,7 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
     event.preventDefault();
     event.stopPropagation();
     if (!db || isDeleting) return;
-    const confirmed = window.confirm('Delete this manual record?');
+    const confirmed = window.confirm(t('Delete this manual record?'));
     if (!confirmed) return;
 
     setIsDeleting(true);
@@ -73,16 +73,18 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
       await deleteClinicalDocument(db, user.id, item.id);
       notifyDispatch({
         type: 'set_notification',
-        message: 'Record deleted',
+        message: t('Record deleted'),
         variant: 'success',
       });
-      navigate(AppRoutes.Timeline);
-      window.setTimeout(() => navigate(0), 0);
+      // Hosting lists subscribe to this signal and refresh in place — no
+      // navigation or reload, which would lose scroll position (and, in
+      // demo mode, the whole in-memory database).
+      notifyRecordsChanged();
     } catch (error) {
       console.error(error);
       notifyDispatch({
         type: 'set_notification',
-        message: `Unable to delete record: ${(error as Error).message}`,
+        message: `${t('Unable to delete record')}: ${(error as Error).message}`,
         variant: 'error',
       });
     } finally {
@@ -139,7 +141,7 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
             title={file.filename || 'Open linked file'}
           >
             <EyeIcon className="h-4 w-4" />
-            Open source
+            {t('Open source')}
           </button>
           <button
             type="button"
@@ -148,7 +150,7 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
             title={file.filename || 'Download linked file'}
           >
             <DocumentArrowDownIcon className="h-4 w-4" />
-            Download
+            {t('Download')}
           </button>
         </span>
       ))}
@@ -163,7 +165,7 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
         className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
       >
         <PencilSquareIcon className="h-4 w-4" />
-        Edit
+        {t('Edit')}
       </button>
       <button
         type="button"
@@ -172,13 +174,13 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
         className="inline-flex items-center gap-1 rounded-md border border-red-200 px-2 py-1 text-xs font-semibold text-red-700 shadow-sm hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <TrashIcon className="h-4 w-4" />
-        {isDeleting ? 'Deleting' : 'Delete'}
+        {t(isDeleting ? 'Deleting' : 'Delete')}
       </button>
       <ManualRecordModal
         open={isEditOpen}
         recordId={item.id}
         onClose={() => setIsEditOpen(false)}
-        onSaved={() => navigate(0)}
+        onSaved={notifyRecordsChanged}
       />
     </div>
   );
