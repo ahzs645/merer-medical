@@ -98,6 +98,9 @@ const GENERAL_IMAGING_TERMS = [
   'ct',
   'diagnostic imaging',
   'dicom',
+  // "chest film" and "knee radiograph" are what people actually type; both
+  // used to land in Documents.
+  'film',
   'fluoroscopy',
   'image',
   'imaging',
@@ -106,6 +109,7 @@ const GENERAL_IMAGING_TERMS = [
   'mri',
   'nuclear medicine',
   'pet',
+  'radiograph',
   'radiology',
   'scan',
   'scintigraphy',
@@ -114,6 +118,16 @@ const GENERAL_IMAGING_TERMS = [
   'xray',
   ...SPECIALTY_IMAGING_TERMS,
 ];
+
+/**
+ * The title the Imaging tab prefills on "Add image or scan", and the marker
+ * `isImagingDocument` reads back: the manual form stores the preset's title but
+ * drops a specialty it does not know (only dental and optometry exist), so the
+ * name is the one part of the preset that survives into the saved record. Kept
+ * in English on purpose — it is data the classifier below matches on, not a
+ * label anyone reads in place of their own title.
+ */
+export const IMAGING_PRESET_TITLE = 'Imaging record';
 
 export function mapImagingDocument(document: ImagingDocument): ImagingItem {
   const resource = getResource(document);
@@ -217,6 +231,9 @@ export function isImagingDocument(document: ImagingDocument): boolean {
     document.metadata?.manual_subtype || specialtyDetails?.subtype;
   const contentType = document.data_record.content_type || '';
   const manualImaging = getManualImagingDetails(document);
+  const namedAsImaging = GENERAL_IMAGING_TERMS.some((term) =>
+    textHasTerm(text, term),
+  );
 
   if (manualSubtype === 'source-document') return false;
   if (manualImaging) return true;
@@ -226,6 +243,12 @@ export function isImagingDocument(document: ImagingDocument): boolean {
     return (
       contentType === 'application/dicom' ||
       contentType.includes('dicom') ||
+      // An attachment used to reach Imaging only by being an image file, a
+      // DICOM, or matching a modality category — so the ordinary path, a PDF
+      // saved through "Add image or scan", landed in Documents and dropped the
+      // user on that document's detail page instead. What the record is called
+      // decides here, as it already does for every other resource type.
+      namedAsImaging ||
       categories.some((category) =>
         ['xray', 'ct', 'mri', 'ultrasound', 'scan', 'report'].includes(
           category,
@@ -234,7 +257,7 @@ export function isImagingDocument(document: ImagingDocument): boolean {
     );
   }
 
-  return GENERAL_IMAGING_TERMS.some((term) => textHasTerm(text, term));
+  return namedAsImaging;
 }
 
 function getStructuredFindings(resource: any) {
@@ -283,7 +306,9 @@ function getStructuredFindings(resource: any) {
 
 function textHasTerm(text: string, term: string) {
   const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, 'i').test(text);
+  // Tolerate the plural: "chest films" and "knee scans" are the same records as
+  // "chest film" and "knee scan", and the singular-only match filed them apart.
+  return new RegExp(`(^|[^a-z0-9])${escaped}s?([^a-z0-9]|$)`, 'i').test(text);
 }
 
 export function formatDate(date?: string) {

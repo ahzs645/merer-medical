@@ -18,7 +18,19 @@ import { ImagingCategory } from './types';
 import {
   countImagingCategories,
   filterImagingItems,
+  IMAGING_PRESET_TITLE,
 } from './utils/imagingRecords';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
+
+// The title is what files the record under Imaging whatever the attached file
+// turns out to be (see IMAGING_PRESET_TITLE), and `returnTo` is what brings the
+// user back here instead of to the new document's own detail page, two
+// navigations away from the list they were building.
+const ADD_IMAGING_PATH = buildAddRecordPath({
+  type: 'document',
+  title: IMAGING_PRESET_TITLE,
+  returnTo: AppRoutes.Imaging,
+});
 
 export function ImagingTab() {
   const { t } = useInterfaceLanguage();
@@ -60,9 +72,7 @@ export function ImagingTab() {
           }}
           action={
             <RecordHeaderLink
-              to={`${AppRoutes.AddRecord}?type=document&title=${encodeURIComponent(
-                'Imaging record',
-              )}`}
+              to={ADD_IMAGING_PATH}
               label={t('Add image or scan')}
               icon={DocumentPlusIcon}
               compact
@@ -106,9 +116,7 @@ export function ImagingTab() {
                 )}
               </p>
               <Link
-                to={`${AppRoutes.AddRecord}?type=document&title=${encodeURIComponent(
-                  'Imaging record',
-                )}`}
+                to={ADD_IMAGING_PATH}
                 className="mt-4 inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
               >
                 {t('Add image or scan')}

@@ -4,6 +4,7 @@ import { IMAGING_CATEGORIES } from '../types';
 import {
   countImagingCategories,
   filterImagingItems,
+  IMAGING_PRESET_TITLE,
   inferModalityFromText,
   isImagingDocument,
   mapImagingDocument,
@@ -102,6 +103,77 @@ describe('imagingRecords', () => {
       modality: 'MRI',
       bodySite: 'Right knee',
       studyType: 'Radiology report',
+    });
+  });
+
+  // The four ways "Add image or scan" was walked through by hand. Only the
+  // last two used to reach this page, and they are the two least likely to be
+  // taken: most people attach a PDF and never open the optional Modality field.
+  describe('records saved through the "Add image or scan" button', () => {
+    it('files a PDF kept under the prefilled title as imaging', () => {
+      expect(
+        isImagingDocument(
+          doc({
+            data_record: { content_type: 'application/pdf', raw: 'base64-pdf' },
+            metadata: { display_name: IMAGING_PRESET_TITLE },
+          }),
+        ),
+      ).toBe(true);
+    });
+
+    it('files a PDF the user retitled in their own words as imaging', () => {
+      expect(
+        isImagingDocument(
+          doc({
+            data_record: { content_type: 'application/pdf', raw: 'base64-pdf' },
+            metadata: { display_name: 'chest film' },
+          }),
+        ),
+      ).toBe(true);
+      expect(
+        isImagingDocument(
+          doc({
+            data_record: { content_type: 'application/pdf', raw: 'base64-pdf' },
+            metadata: { display_name: 'Chest films 2026' },
+          }),
+        ),
+      ).toBe(true);
+    });
+
+    it('files a real image file as imaging', () => {
+      expect(
+        isImagingDocument(
+          doc({
+            data_record: { content_type: 'image/png', raw: 'base64-image' },
+            metadata: { display_name: 'Left wrist' },
+          }),
+        ),
+      ).toBe(true);
+    });
+
+    it('files a PDF with the optional Modality field filled as imaging', () => {
+      expect(
+        isImagingDocument(
+          doc({
+            data_record: { content_type: 'application/pdf', raw: 'base64-pdf' },
+            metadata: {
+              display_name: 'Outside study',
+              manual_imaging_details: { modality: 'CT' },
+            },
+          }),
+        ),
+      ).toBe(true);
+    });
+
+    it('still leaves a document that is not imaging out of the page', () => {
+      expect(
+        isImagingDocument(
+          doc({
+            data_record: { content_type: 'application/pdf', raw: 'base64-pdf' },
+            metadata: { display_name: 'Insurance card front' },
+          }),
+        ),
+      ).toBe(false);
     });
   });
 

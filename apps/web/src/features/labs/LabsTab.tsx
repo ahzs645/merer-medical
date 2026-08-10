@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { DocumentPlusIcon } from '@heroicons/react/24/outline';
 
-import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
 import { EmptyRecordsPlaceholder } from '../../shared/components/EmptyRecordsPlaceholder';
 import {
@@ -27,18 +27,33 @@ import {
 import { labFilterLabels } from './utils/labFormatters';
 import {
   getSavedLabsQuery,
+  initialLabsView,
+  LABS_ADDED_PARAM,
   LABS_SCROLL_CONTAINER_ID,
+  labsPathAfterAdd,
   restoreLabsScrollPosition,
   saveLabsQuery,
 } from './utils/labsPageState';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { GLUCOSE_LOINC_CODE } from '../diabetes/libreView';
 import { LabFilterMode } from './types';
 
+const ADD_LAB_PATH = buildAddRecordPath({
+  type: 'lab',
+  returnTo: labsPathAfterAdd(),
+});
+
 export function LabsTab() {
-  const [query, setQuery] = useState(getSavedLabsQuery),
+  const [searchParams, setSearchParams] = useSearchParams(),
+    [initialView] = useState(() =>
+      initialLabsView(searchParams, getSavedLabsQuery()),
+    ),
+    [query, setQuery] = useState(initialView.query),
     [referenceMode, setReferenceMode] =
       useState<ReferenceOverlayMode>('canadian'),
-    [filterMode, setFilterMode] = useState<LabFilterMode>('attention'),
+    [filterMode, setFilterMode] = useState<LabFilterMode>(
+      initialView.filterMode,
+    ),
     scrollContainerRef = useRef<HTMLDivElement | null>(null),
     {
       labs,
@@ -105,6 +120,16 @@ export function LabsTab() {
     saveLabsQuery(query);
   }, [query]);
 
+  // The marker is consumed once, on arrival. Leaving it in the URL would put
+  // the page back on "All" on every reload of this entry, overriding a filter
+  // the reader has since chosen for themselves.
+  useEffect(() => {
+    if (!searchParams.has(LABS_ADDED_PARAM)) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete(LABS_ADDED_PARAM);
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
+
   useEffect(() => {
     if (status === 'success' && scrollContainerRef.current) {
       restoreLabsScrollPosition(scrollContainerRef.current);
@@ -124,7 +149,7 @@ export function LabsTab() {
           }}
           action={
             <RecordHeaderLink
-              to={`${AppRoutes.AddRecord}?type=lab`}
+              to={ADD_LAB_PATH}
               label="Add lab result"
               icon={DocumentPlusIcon}
               compact
@@ -134,13 +159,13 @@ export function LabsTab() {
           // the first card, the only record page that did. It is the same
           // control every other tab wears in the banner, so it wears it here.
           filters={{
-            items: (
-              Object.keys(labFilterLabels) as LabFilterMode[]
-            ).map((mode) => ({
-              id: mode,
-              label: labFilterLabels[mode],
-              count: filterCounts[mode],
-            })),
+            items: (Object.keys(labFilterLabels) as LabFilterMode[]).map(
+              (mode) => ({
+                id: mode,
+                label: labFilterLabels[mode],
+                count: filterCounts[mode],
+              }),
+            ),
             selectedId: filterMode,
             onSelect: setFilterMode,
             label: 'Filter labs',

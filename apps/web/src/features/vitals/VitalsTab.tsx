@@ -4,11 +4,25 @@ import { HeartIcon } from '@heroicons/react/24/outline';
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
+import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
-import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
+import {
+  RecordHeaderLink,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
+import { isVitalSignObservation } from './utils/vitalRecords';
+
+// Saving lands back here rather than on the Timeline: a reading you typed on
+// the Vitals page belongs in front of you on the Vitals page.
+const ADD_VITAL_PATH = buildAddRecordPath({
+  type: 'vital',
+  returnTo: AppRoutes.Vitals,
+});
 
 interface Reading {
   date?: string;
@@ -104,20 +118,6 @@ function readObservation(resource: FhirObservation): {
   return { text: '—' };
 }
 
-function isVitalSign(resource: Record<string, unknown>): boolean {
-  // FHIR models Observation.category as an array, but some stored/imported
-  // records carry a single CodeableConcept object instead. Normalize both
-  // shapes to an array so `.some` never throws on the object form.
-  const raw = resource['category'] as
-    | Array<{ coding?: Array<{ code?: string }> }>
-    | { coding?: Array<{ code?: string }> }
-    | undefined;
-  const categories = Array.isArray(raw) ? raw : raw ? [raw] : [];
-  return categories.some((category) =>
-    (category.coding || []).some((coding) => coding.code === 'vital-signs'),
-  );
-}
-
 function useVitals() {
   const db = useRxDb();
   const user = useUser();
@@ -126,6 +126,9 @@ function useVitals() {
     'loading',
   );
   const [error, setError] = useState<Error | null>(null);
+  // Refetch when a manual record is added, edited, or deleted: without it a
+  // vital added from this page's own button never appeared until a reload.
+  const recordChangeTick = useRecordChangeTick();
 
   useEffect(() => {
     let mounted = true;
@@ -145,10 +148,9 @@ function useVitals() {
       const byKey = new Map<string, VitalGroup>();
       for (const doc of docs) {
         const d = doc.toMutableJSON() as ClinicalDocument;
-        const resource = getFhirResource<
-          FhirObservation & Record<string, unknown>
-        >(d);
-        if (!resource || !isVitalSign(resource)) continue;
+        if (!isVitalSignObservation(d)) continue;
+        const resource = getFhirResource<FhirObservation>(d);
+        if (!resource) continue;
         const loinc = resource.code?.coding?.[0]?.code;
         const name =
           resource.code?.text ||
@@ -196,7 +198,7 @@ function useVitals() {
     return () => {
       mounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   return { groups, status, error };
 }
@@ -262,6 +264,15 @@ export function VitalsTab() {
             onChange: setQuery,
             placeholder: 'Search vital signs',
           }}
+          // Vitals was one of six browsable categories with no way in, which is
+          // why nobody discovers that a reading can be typed by hand at all.
+          action={
+            <RecordHeaderLink
+              to={ADD_VITAL_PATH}
+              label="Add vital sign"
+              compact
+            />
+          }
         />
       }
     >
