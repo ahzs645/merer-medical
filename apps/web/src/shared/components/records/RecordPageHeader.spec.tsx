@@ -84,4 +84,63 @@ describe('RecordPageHeader', () => {
       expect(/min-h-\[44px\]|\bh-11\b/.test(classes)).toBe(true);
     });
   });
+
+  /**
+   * The two rules the banner's phone layout rests on. jsdom does no layout, so
+   * these assert the structure and the classes that decide it — enough to
+   * catch the shapes this header had before: an action stranded beneath the
+   * search box, and filter chips stacked into rows above the first record.
+   */
+  it('puts the action beside the title, not under the search box', () => {
+    const { container } = renderHeader(
+      <RecordPageHeader
+        title="All lab results"
+        search={{
+          query: '',
+          onChange: () => undefined,
+          placeholder: 'Search lab name or code',
+        }}
+        action={<RecordHeaderLink to="/records/new" label="Add lab result" />}
+      />,
+    );
+
+    const titleRow = container.querySelector('h1')?.closest('div.flex-wrap');
+    expect(
+      titleRow?.contains(screen.getByRole('link', { name: /Add lab result/ })),
+    ).toBe(true);
+    expect(
+      titleRow?.contains(screen.getByLabelText('Search lab name or code')),
+    ).toBe(false);
+  });
+
+  it('scrolls the filter chips sideways rather than stacking rows', () => {
+    renderHeader(
+      <RecordPageHeader
+        title="Medications"
+        filters={{
+          items: [
+            { id: 'all', label: 'All', count: 3 },
+            { id: 'current', label: 'Current', count: 0 },
+            { id: 'planned', label: 'Planned', count: 0 },
+            { id: 'stopped', label: 'Stopped', count: 0 },
+            { id: 'supplements', label: 'Supplements', count: 1 },
+            { id: 'needsReview', label: 'Needs review', count: 7 },
+          ],
+          selectedId: 'all',
+          onSelect: () => undefined,
+          label: 'Filter medications',
+        }}
+      />,
+    );
+
+    const group = screen.getByRole('group', { name: 'Filter medications' });
+    expect(group.className).toContain('overflow-x-auto');
+    // Wrapping starts at `sm`: six chips stacked into three rows on a phone
+    // and pushed the first medication off the screen.
+    expect(group.className).toContain('sm:flex-wrap');
+    expect(group.className).not.toMatch(/(^|\s)flex-wrap/);
+    group.querySelectorAll('button').forEach((chip) => {
+      expect(chip.className).toContain('shrink-0');
+    });
+  });
 });
