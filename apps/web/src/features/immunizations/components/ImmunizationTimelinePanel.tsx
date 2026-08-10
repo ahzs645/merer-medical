@@ -1,10 +1,9 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
-import { Routes as AppRoutes } from '../../../Routes';
 import { safeFormatDate } from '../../../shared/utils/dateFormatters';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
+import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { ImmunizationRecord } from '../types';
 
 type TimelineYear = {
@@ -69,26 +68,13 @@ export function ImmunizationTimelinePanel({
                         <h3 className="min-w-0 text-sm font-semibold text-gray-900">
                           {record.vaccineName}
                         </h3>
-                        <div className="flex shrink-0 items-center gap-2">
-                          {isManualRecord(record.document) && (
-                            <Link
-                              to={AppRoutes.EditRecord.replace(
-                                ':recordId',
-                                record.document.id,
-                              )}
-                              className="text-xs font-semibold text-primary-700 hover:text-primary-900"
-                            >
-                              {t('Edit')}
-                            </Link>
+                        <span className="shrink-0 text-xs font-medium text-gray-500">
+                          {safeFormatDate(
+                            record.date,
+                            'MMM d, yyyy',
+                            t('Undated'),
                           )}
-                          <span className="text-xs font-medium text-gray-500">
-                            {safeFormatDate(
-                              record.date,
-                              'MMM d, yyyy',
-                              t('Undated'),
-                            )}
-                          </span>
-                        </div>
+                        </span>
                       </div>
                       {(record.manufacturer || record.performer) && (
                         <p className="mt-0.5 text-xs text-gray-500">
@@ -120,6 +106,12 @@ export function ImmunizationTimelinePanel({
                         <p className="mt-1.5 whitespace-pre-line text-xs leading-5 text-gray-600">
                           {record.summary}
                         </p>
+                      )}
+                      {/* Gate the mount rather than lean on the component's own
+                          check: a synced dose should not pay for the linked-file
+                          lookup ManualRecordActions runs on every record. */}
+                      {isManualRecord(record.document) && (
+                        <ManualRecordActions item={record.document} />
                       )}
                     </div>
                   </li>

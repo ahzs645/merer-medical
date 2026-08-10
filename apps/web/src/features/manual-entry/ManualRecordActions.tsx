@@ -130,6 +130,9 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
     }
   }
 
+  // Edit and Delete carry the 44px minimum the rest of the app applies to
+  // banner actions, filter chips and back links; the row stretches its other
+  // chips to match, so the source-document controls come up with them.
   return (
     <div className="mt-3 flex flex-wrap gap-2">
       {linkedFiles.map((file) => (
@@ -162,7 +165,7 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
           event.stopPropagation();
           setIsEditOpen(true);
         }}
-        className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
+        className="inline-flex min-h-[44px] items-center gap-1 rounded-md border border-gray-300 px-3 py-1 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
       >
         <PencilSquareIcon className="h-4 w-4" />
         {t('Edit')}
@@ -171,7 +174,7 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
         type="button"
         disabled={isDeleting}
         onClick={onDelete}
-        className="inline-flex items-center gap-1 rounded-md border border-red-200 px-2 py-1 text-xs font-semibold text-red-700 shadow-sm hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex min-h-[44px] items-center gap-1 rounded-md border border-red-200 px-3 py-1 text-xs font-semibold text-red-700 shadow-sm hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <TrashIcon className="h-4 w-4" />
         {t(isDeleting ? 'Deleting' : 'Delete')}

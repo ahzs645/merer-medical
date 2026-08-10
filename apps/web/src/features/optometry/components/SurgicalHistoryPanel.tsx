@@ -1,9 +1,8 @@
 import { ScissorsIcon } from '@heroicons/react/24/outline';
-import { Link } from 'react-router-dom';
 
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
-import { Routes as AppRoutes } from '../../../Routes';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
+import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { OptometryRecord } from '../types';
 import { SurgeryDetail, buildSurgeryList } from '../utils/surgeryRecords';
 
@@ -99,22 +98,9 @@ function SurgeryCard({ surgery }: { surgery: SurgeryDetail }) {
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          {isManualRecord(surgery.document) && (
-            <Link
-              to={AppRoutes.EditRecord.replace(
-                ':recordId',
-                surgery.document.id,
-              )}
-              className="text-xs font-semibold text-primary-700 hover:text-primary-900"
-            >
-              {t('Edit')}
-            </Link>
-          )}
-          <span className="text-xs font-medium text-gray-500">
-            {surgery.date?.split('T')[0] || t('Undated')}
-          </span>
-        </div>
+        <span className="text-xs font-medium text-gray-500">
+          {surgery.date?.split('T')[0] || t('Undated')}
+        </span>
       </div>
 
       {surgery.surgeon && (
@@ -157,6 +143,10 @@ function SurgeryCard({ surgery }: { surgery: SurgeryDetail }) {
         <p className="mt-1 text-xs text-gray-500">
           {t('Follow-up')}: {surgery.followUp}
         </p>
+      )}
+
+      {isManualRecord(surgery.document) && (
+        <ManualRecordActions item={surgery.document} />
       )}
     </article>
   );

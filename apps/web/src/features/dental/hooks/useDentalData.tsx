@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
+import { useRecordChangeTick } from '../../../shared/utils/recordChangeSignal';
 import {
   IMAGING_RESOURCE_TYPES,
   mapImagingDocument,
@@ -45,6 +46,9 @@ const DENTAL_RESOURCE_TYPES = [
 export function useDentalData() {
   const db = useRxDb(),
     user = useUser(),
+    // Without this a record deleted from a dental panel stays on screen — and
+    // in the tooth chart and counts derived from it — until a reload.
+    recordChangeTick = useRecordChangeTick(),
     [documents, setDocuments] = useState<ClinicalDocument<unknown>[]>([]),
     [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading'),
     [error, setError] = useState<Error | null>(null);
@@ -89,7 +93,7 @@ export function useDentalData() {
     return () => {
       isMounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   const dentalData = useMemo(() => {
     const imaging = filterDentalImaging(

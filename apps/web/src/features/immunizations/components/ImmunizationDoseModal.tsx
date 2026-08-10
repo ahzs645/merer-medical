@@ -181,7 +181,7 @@ export function ImmunizationDoseModal({
           <div className="mt-5 flex justify-end">
             <Link
               to={AppRoutes.EditRecord.replace(':recordId', record.document.id)}
-              className="text-sm font-semibold text-primary-700 hover:text-primary-900"
+              className="inline-flex min-h-[44px] items-center text-sm font-semibold text-primary-700 hover:text-primary-900"
             >
               {t('Open source record')}
             </Link>

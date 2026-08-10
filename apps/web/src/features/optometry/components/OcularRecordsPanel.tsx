@@ -1,7 +1,5 @@
-import { Link } from 'react-router-dom';
-
-import { Routes as AppRoutes } from '../../../Routes';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
+import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { OptometryRecord } from '../types';
 
 export function OcularRecordsPanel({
@@ -33,22 +31,9 @@ export function OcularRecordsPanel({
                 <h3 className="text-sm font-semibold text-gray-900">
                   {record.title}
                 </h3>
-                <div className="flex items-center gap-2">
-                  {isManualRecord(record.document) && (
-                    <Link
-                      to={AppRoutes.EditRecord.replace(
-                        ':recordId',
-                        record.document.id,
-                      )}
-                      className="text-xs font-semibold text-primary-700 hover:text-primary-900"
-                    >
-                      Edit
-                    </Link>
-                  )}
-                  <span className="text-xs font-medium uppercase text-gray-500">
-                    {record.kind}
-                  </span>
-                </div>
+                <span className="text-xs font-medium uppercase text-gray-500">
+                  {record.kind}
+                </span>
               </div>
               <p className="mt-1 text-sm text-gray-600">
                 {[record.date?.split('T')[0], record.laterality]
@@ -59,6 +44,9 @@ export function OcularRecordsPanel({
                 <p className="mt-2 line-clamp-2 text-sm text-gray-700">
                   {record.summary}
                 </p>
+              )}
+              {isManualRecord(record.document) && (
+                <ManualRecordActions item={record.document} />
               )}
             </article>
           ))}

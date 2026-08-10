@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../../Routes';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
+import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { DentalRecord } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
@@ -50,22 +51,9 @@ export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
                 <h3 className="text-sm font-semibold text-gray-900">
                   {record.title}
                 </h3>
-                <div className="flex items-center gap-2">
-                  {isManualRecord(record.document) && (
-                    <Link
-                      to={AppRoutes.EditRecord.replace(
-                        ':recordId',
-                        record.document.id,
-                      )}
-                      className="inline-flex min-h-[44px] items-center text-xs font-semibold text-primary-700 hover:text-primary-900"
-                    >
-                      {t('Edit')}
-                    </Link>
-                  )}
-                  <span className="text-xs font-medium uppercase text-gray-500">
-                    {record.date?.split('T')[0] || t('Undated')}
-                  </span>
-                </div>
+                <span className="text-xs font-medium uppercase text-gray-500">
+                  {record.date?.split('T')[0] || t('Undated')}
+                </span>
               </div>
               {record.summary && (
                 <p className="mt-2 line-clamp-3 text-sm leading-6 text-gray-700">
@@ -110,6 +98,9 @@ export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
                     .filter(Boolean)
                     .join(' · ')}
                 </p>
+              )}
+              {isManualRecord(record.document) && (
+                <ManualRecordActions item={record.document} />
               )}
             </article>
           ))}

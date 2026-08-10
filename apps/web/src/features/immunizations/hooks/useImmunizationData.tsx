@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
+import { useRecordChangeTick } from '../../../shared/utils/recordChangeSignal';
 import {
   buildImmunizationCounts,
   mapImmunizationDocument,
@@ -11,6 +12,9 @@ import {
 export function useImmunizationData() {
   const db = useRxDb(),
     user = useUser(),
+    // Without this the timeline keeps showing a dose the user just deleted
+    // until the page is reloaded.
+    recordChangeTick = useRecordChangeTick(),
     [documents, setDocuments] = useState<ClinicalDocument<unknown>[]>([]),
     [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading'),
     [error, setError] = useState<Error | null>(null);
@@ -49,7 +53,7 @@ export function useImmunizationData() {
     return () => {
       isMounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   const immunizationData = useMemo(() => {
     const records = documents.map(mapImmunizationDocument);
