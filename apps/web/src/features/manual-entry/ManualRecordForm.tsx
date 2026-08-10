@@ -178,7 +178,14 @@ export function ManualRecordForm({
           <form
             ref={formRef}
             onSubmit={onSubmit}
-            className="flex flex-col gap-5 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6"
+            // Hosted in a dialog, the card chrome is a white bordered box
+            // drawn inside a white bordered box — the sheet is already the
+            // container. On its own page it sits on slate and needs to be one.
+            className={`flex flex-col gap-5 ${
+              embedded
+                ? ''
+                : 'rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6'
+            }`}
           >
             {canPickType && (
               <button

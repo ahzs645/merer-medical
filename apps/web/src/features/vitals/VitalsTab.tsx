@@ -331,9 +331,13 @@ export function VitalsTab() {
                     the summary left a list-item, because a flex summary drops
                     the triangle in Chrome. */}
                 {group.readings.length > 1 && (
-                  <details className="mt-3 border-t border-gray-100">
+                  <details className="-mb-4 mt-3 border-t border-gray-100">
                     <summary
-                      className="text-primary-700 hover:text-primary-800 min-h-[44px] cursor-pointer py-3 text-xs font-semibold"
+                      // 14px of padding around a 16px line is the 44px target exactly. With
+                      // `py-3` + `min-h-[44px]` the 4px of slack all fell below the
+                      // text, and the card's own 16px of padding fell under that:
+                      // 32px of white under the label against 12px above it.
+                      className="text-primary-700 hover:text-primary-800 cursor-pointer py-3.5 text-xs font-semibold"
                       // Every card offers the same phrase, so the spoken name
                       // adds the vital — as a suffix, so the visible label is
                       // still the start of it.
@@ -343,7 +347,7 @@ export function VitalsTab() {
                     >
                       {earlierReadingsLabel(group.readings.length - 1)}
                     </summary>
-                    <table className="w-full text-xs text-gray-600">
+                    <table className="mb-4 w-full text-xs text-gray-600">
                       <tbody>
                         {/* From the second reading down: the newest is the
                             headline above. The old 6-row cap goes with it —

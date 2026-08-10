@@ -128,7 +128,10 @@ describe('VitalsTab history disclosure', () => {
     expect(summary.getAttribute('aria-label')).toBe(
       '2 earlier readings for Body Mass Index',
     );
-    expect(summary.className).toContain('min-h-[44px]');
+    // 14px of padding around the 16px line is the 44px target, reached
+    // exactly rather than by a minimum — with `min-h-[44px]` the slack fell
+    // entirely below the text and the card read as bottom-heavy.
+    expect(summary.className).toContain('py-3.5');
   });
 
   it('counts one hidden reading in the singular', async () => {
