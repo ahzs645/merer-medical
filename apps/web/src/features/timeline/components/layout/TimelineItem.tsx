@@ -21,6 +21,7 @@ import {
   CarePlan,
   CareTeam,
   Goal,
+  ServiceRequest,
   Appointment,
   Specimen,
 } from 'fhir/r4';
@@ -42,6 +43,7 @@ import {
 import { ElementsByDateListCard } from './ElementsByDateListCard';
 import { EncounterCard } from '../cards/EncounterCard';
 import { GoalCard } from '../cards/GoalCard';
+import { ServiceRequestCard } from '../cards/ServiceRequestCard';
 import { FamilyMemberHistoryCard } from '../cards/FamilyMemberHistoryCard';
 import { ImmunizationCard } from '../cards/ImmunizationCard';
 import { MedicationCard } from '../cards/MedicationCard';
@@ -182,6 +184,14 @@ export const TimelineItem = memo(function TimelineItem({
                   <CareTeamCard
                     key={item.id}
                     item={item as ClinicalDocument<R4BundleEntry<CareTeam>>}
+                  />
+                )}
+                {item.data_record.resource_type === 'servicerequest' && (
+                  <ServiceRequestCard
+                    key={item.id}
+                    item={
+                      item as ClinicalDocument<R4BundleEntry<ServiceRequest>>
+                    }
                   />
                 )}
                 {item.data_record.resource_type === 'goal' && (

@@ -25,16 +25,20 @@ export function isVitalSignObservation(document: ClinicalDocument): boolean {
   // shapes to an array so `.some` never throws on the object form.
   const raw = resource?.category;
   const categories = Array.isArray(raw) ? raw : raw ? [raw] : [];
+  // Specialty records are excluded before the category is read, not after.
+  // The manual builder writes the standard `vital-signs` coding on every
+  // vital-kind Observation, and dental tooth findings and optometry acuity /
+  // IOP entries are vital-kind by the app's own mapping — so checking the
+  // category first would put a valueless tooth finding on the Vitals page,
+  // rendered as "—", from under the tab that actually shows it.
+  if (isManualRecord(document) && isSpecialtyRecord(document)) return false;
+
   const hasVitalSignsCategory = categories.some((category) =>
     (category.coding || []).some((coding) => coding.code === 'vital-signs'),
   );
   if (hasVitalSignsCategory) return true;
 
-  return (
-    isManualRecord(document) &&
-    getManualKind(document) === 'vital' &&
-    !isSpecialtyRecord(document)
-  );
+  return isManualRecord(document) && getManualKind(document) === 'vital';
 }
 
 function getManualKind(document: ClinicalDocument): string | undefined {

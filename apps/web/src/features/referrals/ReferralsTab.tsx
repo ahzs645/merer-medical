@@ -6,6 +6,7 @@ import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { Badge } from '../../shared/components/Badge';
 import { RecordListPage } from '../../shared/components/records/RecordListPage';
 import { RecordHeaderLink } from '../../shared/components/records/RecordPageHeader';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import {
   compareByDateDesc,
   useRecordList,
@@ -69,35 +70,40 @@ export function ReferralsTab() {
       {filtered.map((item) => (
         <article
           key={item.id}
-          className="flex items-start justify-between gap-3 rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
+          className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
         >
-          <div className="min-w-0">
-            <h3 className="break-words text-sm font-semibold text-gray-900">
-              {item.name}
-            </h3>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-              {item.status && (
-                <Badge className="capitalize">{item.status}</Badge>
-              )}
-              {item.requester && <span>· {item.requester}</span>}
-              {item.performer && <span>· {item.performer}</span>}
-              {item.source && <span>· {item.source}</span>}
-            </div>
-            {item.notes.length > 0 && (
-              <div className="mt-2 space-y-1 text-xs text-gray-600">
-                {item.notes.map((note, i) => (
-                  <p key={i} className="break-words">
-                    {note}
-                  </p>
-                ))}
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="break-words text-sm font-semibold text-gray-900">
+                {item.name}
+              </h3>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                {item.status && (
+                  <Badge className="capitalize">{item.status}</Badge>
+                )}
+                {item.requester && <span>· {item.requester}</span>}
+                {item.performer && <span>· {item.performer}</span>}
+                {item.source && <span>· {item.source}</span>}
               </div>
+              {item.notes.length > 0 && (
+                <div className="mt-2 space-y-1 text-xs text-gray-600">
+                  {item.notes.map((note, i) => (
+                    <p key={i} className="break-words">
+                      {note}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+            {item.date && (
+              <span className="shrink-0 text-sm text-gray-500">
+                {safeFormatDate(item.date, 'PP', '')}
+              </span>
             )}
           </div>
-          {item.date && (
-            <span className="shrink-0 text-sm text-gray-500">
-              {safeFormatDate(item.date, 'PP', '')}
-            </span>
-          )}
+          {/* A referral you typed is a referral you can mistype. The component
+              shows nothing for records synced from a provider. */}
+          <ManualRecordActions item={item.document} />
         </article>
       ))}
     </RecordListPage>

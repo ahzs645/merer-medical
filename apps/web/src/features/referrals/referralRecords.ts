@@ -12,6 +12,8 @@ export interface ReferralItem {
   notes: string[];
   date?: string;
   source?: string;
+  /** The record behind the card, so a hand-entered referral can be corrected. */
+  document: ClinicalDocument;
 }
 
 /**
@@ -50,6 +52,7 @@ export function mapReferralDocs(
       source:
         connectionsById.get(d.connection_record_id)?.name ||
         d.metadata?.source_name,
+      document: d,
     };
   });
 }

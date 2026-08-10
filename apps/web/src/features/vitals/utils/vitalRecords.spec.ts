@@ -122,6 +122,44 @@ describe('isVitalSignObservation', () => {
     expect(isVitalSignObservation(dentalFinding)).toBe(false);
   });
 
+  it('keeps specialty entries off Vitals now that they carry the coding too', () => {
+    // The builder writes the standard vital-signs coding on every vital-kind
+    // observation, and a tooth finding is vital-kind. Read the category first
+    // and this lands on Vitals as a valueless "—", out from under the Dental
+    // tab. The two halves of the fix were written by different hands; this is
+    // the case where they meet.
+    const dentalFinding = observationDoc(
+      {
+        fullUrl: 'manual:9c11',
+        manual_kind: 'vital',
+        resource: {
+          resourceType: 'Observation',
+          category: [
+            {
+              text: 'Vital Signs',
+              coding: [
+                {
+                  system:
+                    'http://terminology.hl7.org/CodeSystem/observation-category',
+                  code: 'vital-signs',
+                  display: 'Vital Signs',
+                },
+              ],
+            },
+            { text: 'dental' },
+          ],
+        },
+      },
+      {
+        display_name: 'Tooth finding',
+        manual_specialty: 'dental',
+        manual_specialty_details: { specialty: 'dental', subtype: 'finding' },
+      },
+    );
+
+    expect(isVitalSignObservation(dentalFinding)).toBe(false);
+  });
+
   it('ignores a laboratory observation and non-observation records', () => {
     expect(
       isVitalSignObservation(
