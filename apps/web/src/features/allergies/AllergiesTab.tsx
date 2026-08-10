@@ -96,76 +96,81 @@ export function AllergiesTab() {
   }, [items, query]);
 
   return (
-    <RecordListPage
-      title="Allergies"
-      search={{
-        query,
-        onChange: setQuery,
-        placeholder: 'Search allergies',
-        label: 'Search allergies',
-      }}
-      // Adding an allergy used to be a button on the Medications banner, which
-      // is where you would look for it last. It belongs on the page that owns
-      // the list.
-      action={
-        <RecordHeaderButton
-          onClick={() => setAddOpen(true)}
-          label="Add allergy"
-          compact
-        />
-      }
-      status={status}
-      error={error}
-      loadingText="Loading allergies…"
-      errorText="Unable to load allergies."
-      isEmpty={items.length === 0}
-      emptyText="No allergies recorded yet."
-      emptyIcon={<ExclamationTriangleIcon className="h-6 w-6" />}
-      isNoMatch={allergens.length === 0 && alsoRecorded.length === 0}
-      noMatchText="No allergies match this search."
-    >
-      {/* Saving notifies the record-change signal, so the list refreshes in
-          place without a reload. */}
+    <>
+      {/* Outside `RecordListPage`, whose `children` only render once the list
+          has something in it: inside, "Add allergy" was a dead click on an
+          empty list and on a search that matched nothing — exactly when you
+          reach for it — and the dialog then opened by itself when the filter
+          cleared. */}
       <ManualRecordModal
         open={addOpen}
         initialRecordType="allergyintolerance"
         onClose={() => setAddOpen(false)}
       />
-      {/* Count the allergens, not the record rows: "No Known Allergies" and
+      <RecordListPage
+        title="Allergies"
+        search={{
+          query,
+          onChange: setQuery,
+          placeholder: 'Search allergies',
+          label: 'Search allergies',
+        }}
+        // Adding an allergy used to be a button on the Medications banner, which
+        // is where you would look for it last. It belongs on the page that owns
+        // the list.
+        action={
+          <RecordHeaderButton
+            onClick={() => setAddOpen(true)}
+            label="Add allergy"
+            compact
+          />
+        }
+        status={status}
+        error={error}
+        loadingText="Loading allergies…"
+        errorText="Unable to load allergies."
+        isEmpty={items.length === 0}
+        emptyText="No allergies recorded yet."
+        emptyIcon={<ExclamationTriangleIcon className="h-6 w-6" />}
+        isNoMatch={allergens.length === 0 && alsoRecorded.length === 0}
+        noMatchText="No allergies match this search."
+      >
+        {/* Count the allergens, not the record rows: "No Known Allergies" and
           "Not on File" are statements about the list, not entries in it. */}
-      <p className="text-sm text-gray-600">
-        {allergens.length === 1
-          ? '1 allergen'
-          : `${allergens.length} allergens`}
-      </p>
-
-      {allergens.map((item) => (
-        <AllergyCard key={item.id} item={item} />
-      ))}
-
-      {allergens.length === 0 && (
-        <p className="rounded-md bg-white p-4 text-sm text-gray-600 shadow-sm ring-1 ring-gray-200">
-          No allergens recorded.
+        <p className="text-sm text-gray-600">
+          {allergens.length === 1
+            ? '1 allergen'
+            : `${allergens.length} allergens`}
         </p>
-      )}
 
-      {alsoRecorded.length > 0 && (
-        <section className="mt-3">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-            Also recorded
-          </h2>
-          <p className="mt-1 text-xs text-gray-500">
-            These entries state that no allergy was found or that no allergy
-            history was taken. They are not allergens.
+        {allergens.map((item) => (
+          <AllergyCard key={item.id} item={item} />
+        ))}
+
+        {allergens.length === 0 && (
+          <p className="rounded-md bg-white p-4 text-sm text-gray-600 shadow-sm ring-1 ring-gray-200">
+            No allergens recorded.
           </p>
-          <div className="mt-2 grid gap-2">
-            {alsoRecorded.map((item) => (
-              <AllergyCard key={item.id} item={item} muted />
-            ))}
-          </div>
-        </section>
-      )}
-    </RecordListPage>
+        )}
+
+        {alsoRecorded.length > 0 && (
+          <section className="mt-3">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Also recorded
+            </h2>
+            <p className="mt-1 text-xs text-gray-500">
+              These entries state that no allergy was found or that no allergy
+              history was taken. They are not allergens.
+            </p>
+            <div className="mt-2 grid gap-2">
+              {alsoRecorded.map((item) => (
+                <AllergyCard key={item.id} item={item} muted />
+              ))}
+            </div>
+          </section>
+        )}
+      </RecordListPage>
+    </>
   );
 }
 
