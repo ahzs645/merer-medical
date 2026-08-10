@@ -133,7 +133,11 @@ function useVitals() {
   useEffect(() => {
     let mounted = true;
     async function load() {
-      setStatus('loading');
+      // Only a first load blanks the page. Flipping back to `loading` on every
+      // record change swapped the whole list for the placeholder, unmounting
+      // the cards — and closing any history someone had opened — each time a
+      // vital was added from this page's own button.
+      setStatus((current) => (current === 'success' ? current : 'loading'));
       setError(null);
       const docs = await db.clinical_documents
         .find({
@@ -244,6 +248,14 @@ function Sparkline({ readings }: { readings: Reading[] }) {
   );
 }
 
+/**
+ * Names the trigger by what it opens and how much of it: "Show more" would not
+ * say whether one row or twelve are hidden under it.
+ */
+function earlierReadingsLabel(count: number): string {
+  return `${count} earlier ${count === 1 ? 'reading' : 'readings'}`;
+}
+
 export function VitalsTab() {
   const { groups, status, error } = useVitals();
   const [query, setQuery] = useState('');
@@ -311,11 +323,34 @@ export function VitalsTab() {
                   <Sparkline readings={group.readings} />
                 </div>
 
+                {/* Six dated rows a card, three cards: the history alone filled
+                    a phone screen before you reached the third vital, and the
+                    sparkline above already says which way it is going. Native
+                    <details> as in RecordCoveragePanel — the browser gives the
+                    button semantics, the expanded state and the keyboard — with
+                    the summary left a list-item, because a flex summary drops
+                    the triangle in Chrome. */}
                 {group.readings.length > 1 && (
-                  <div className="mt-3 border-t border-gray-100 pt-2">
+                  <details className="mt-3 border-t border-gray-100">
+                    <summary
+                      className="text-primary-700 hover:text-primary-800 min-h-[44px] cursor-pointer py-3 text-xs font-semibold"
+                      // Every card offers the same phrase, so the spoken name
+                      // adds the vital — as a suffix, so the visible label is
+                      // still the start of it.
+                      aria-label={`${earlierReadingsLabel(
+                        group.readings.length - 1,
+                      )} for ${group.name}`}
+                    >
+                      {earlierReadingsLabel(group.readings.length - 1)}
+                    </summary>
                     <table className="w-full text-xs text-gray-600">
                       <tbody>
-                        {group.readings.slice(0, 6).map((reading, index) => (
+                        {/* From the second reading down: the newest is the
+                            headline above. The old 6-row cap goes with it —
+                            it bounded a list that was always open, and here it
+                            would only hide readings someone opened the list to
+                            find. */}
+                        {group.readings.slice(1).map((reading, index) => (
                           <tr
                             key={index}
                             className="border-b border-gray-50 last:border-0"
@@ -332,7 +367,7 @@ export function VitalsTab() {
                         ))}
                       </tbody>
                     </table>
-                  </div>
+                  </details>
                 )}
               </article>
             ))
