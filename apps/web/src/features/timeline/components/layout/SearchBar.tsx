@@ -114,7 +114,7 @@ export function SearchBar({
               placeholder={placeholder}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className={`border-transparent border-0 focus:border-transparent focus:ring-0 outline-none transition-colors block w-full rounded-md pl-10 pr-10 shadow-sm sm:text-sm`}
+              className={`border-transparent border-0 focus:border-transparent focus:ring-0 outline-none transition-colors block h-11 w-full rounded-md pl-10 pr-10 shadow-sm sm:text-sm`}
             />
             {status === QueryStatus.LOADING && (
               <LoadingSpinner tailwindColor="text-indigo-400" />
@@ -129,7 +129,7 @@ export function SearchBar({
               placeholder={placeholder}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className={`focus:border-primary-500 focus:ring-primary-500 transition-colors block w-full rounded-md border-gray-300 pl-10 pr-10 shadow-sm sm:text-sm`}
+              className={`focus:border-primary-500 focus:ring-primary-500 transition-colors block h-11 w-full rounded-md border-gray-300 pl-10 pr-10 shadow-sm sm:text-sm`}
             />
             {status === QueryStatus.LOADING && <LoadingSpinner />}
           </div>
@@ -150,7 +150,7 @@ export function SearchBar({
           <button
             type="button"
             onClick={() => setTypeFilter('all')}
-            className="h-[38px] rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            className="min-h-[44px] rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
           >
             Clear
           </button>

@@ -41,6 +41,7 @@ import {
   ManualObservationValueKind,
   TerminologyEntry,
 } from '../clinicalTerminology';
+import { safeReturnTo } from '../addRecordPath';
 import {
   createLabRow,
   dentalEntryTypes,
@@ -390,8 +391,30 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     requestedDental ||
     requestedOptometry
   );
-  // Where to go after a successful save: the host's callback, else the timeline.
-  const complete = options.onComplete ?? (() => navigate(AppRoutes.Timeline));
+  // What the user pressed to get here, as a title — "Add medication". The page
+  // header used to read "Add record" whichever button you came from, so the
+  // page could not confirm it was the one you asked for. Derived from the
+  // *requested* kind, not `recordType`, which moves as soon as the form is
+  // used; each half is translated on its own because an interpolated string
+  // can never match a dictionary key.
+  const requestedTypeLabel = requestedRecordType
+    ? recordTypes.find((entry) => entry.value === requestedRecordType)?.label
+    : undefined;
+  const presetAddTitle = requestedTypeLabel
+    ? `${t('Add')} ${t(requestedTypeLabel).toLowerCase()}`
+    : requestedSpecialty === 'dental'
+      ? t('Add dental record')
+      : requestedSpecialty === 'optometry'
+        ? t('Add eye-care record')
+        : undefined;
+  // Where to go after a successful save: the host's callback, else back to the
+  // page that sent you here, else the timeline. Landing on the Timeline after
+  // adding a lab from the Labs page reads as a failure — you asked for one
+  // page, you were thrown to another, and the row you just typed is nowhere in
+  // front of you.
+  const returnTo = safeReturnTo(searchParams.get('returnTo'));
+  const complete =
+    options.onComplete ?? (() => navigate(returnTo ?? AppRoutes.Timeline));
   // Tracks whether the user has entered content since the form was last
   // pristine (fresh, reset, or hydrated from a loaded record) so hosts can
   // confirm before discarding it. Programmatic writes (presets, edit-load,
@@ -781,6 +804,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
   const isDocumentType = recordType === 'document';
   const isMedicationType = recordType === 'medicationstatement';
   const isCoverageType = recordType === 'coverage';
+  const isReferralType = recordType === 'servicerequest';
   const isSocialHistoryType = recordType === 'socialhistory';
   const isFamilyHistoryType = recordType === 'familymemberhistory';
   const canLinkSourceFile = supportsClinicalDocumentAttachments();
@@ -1301,8 +1325,10 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
 
       // A freshly uploaded document opens straight to its detail page so the
       // user can work through it (view it and add linked records) right away.
+      // A caller that named where to return wins over the document default:
+      // "Add image or scan" should land you on Imaging, not on a file viewer.
       const uploadedDocumentId =
-        !loadedDocument && recordType === 'document'
+        !loadedDocument && recordType === 'document' && !returnTo
           ? savedDocs[0]?.metadata?.id
           : undefined;
       if (uploadedDocumentId) {
@@ -1411,6 +1437,8 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     recordId,
     isEditing,
     hasTypePreset,
+    presetAddTitle,
+    returnTo,
     specialty,
     setSpecialty,
     recordType,
@@ -1616,6 +1644,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     isDocumentType,
     isMedicationType,
     isCoverageType,
+    isReferralType,
     isSocialHistoryType,
     isFamilyHistoryType,
     canLinkSourceFile,

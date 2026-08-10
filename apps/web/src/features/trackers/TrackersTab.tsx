@@ -20,6 +20,7 @@ import {
 } from '../../repositories/WorkflowRecordRepository';
 import { formatDisplayText } from '../../shared/utils/StyleUtils';
 import { AppPage } from '../../shared/components/AppPage';
+import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { StylizedSelect } from '../../shared/components/StylizedSelect';
 import {
   TRACKER_ENTRY_KIND,
@@ -133,14 +134,10 @@ export function TrackersTab() {
   return (
     <AppPage
       banner={
-        <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <h1 className="text-2xl font-bold sm:text-3xl">Trackers</h1>
-            <p className="mt-1 text-sm text-primary-100">
-              Log symptoms, vitals, mood, sleep, and activity between visits.
-            </p>
-          </div>
-        </div>
+        <RecordPageHeader
+          title="Trackers"
+          description="Log symptoms, vitals, mood, sleep, and activity between visits."
+        />
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">
@@ -197,7 +194,7 @@ export function TrackersTab() {
                 />
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+                  className="bg-primary hover:bg-primary-700 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-white shadow-sm"
                 >
                   <PlusIcon className="h-5 w-5" />
                   Add entry
@@ -288,14 +285,17 @@ function TrackerEntryRow({
               {formatDateTime(entry.recordedAt)}
             </div>
           </div>
-          <div className="mt-2 flex items-center gap-2">
+          <div className="-my-1 mt-1 flex items-center gap-1">
             <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
               {formatDisplayText(entry.kind)}
             </span>
+            {/* Destructive, so it gets a real touch target and a colour that
+                separates it from the category pill sitting next to it. */}
             <button
               type="button"
               onClick={() => onDelete(entry.id)}
-              className="text-xs font-medium text-gray-500 hover:text-red-600"
+              aria-label={`Delete entry: ${entry.label}`}
+              className="inline-flex min-h-[44px] items-center rounded-md px-2 text-xs font-medium text-red-700 hover:bg-red-50 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-600"
             >
               Delete
             </button>

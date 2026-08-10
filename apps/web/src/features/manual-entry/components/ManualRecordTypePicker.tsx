@@ -9,10 +9,13 @@ import {
   ExclamationTriangleIcon,
   EyeIcon,
   FaceSmileIcon,
+  FlagIcon,
   HeartIcon,
   HomeIcon,
+  PaperAirplaneIcon,
   ScissorsIcon,
   ShieldCheckIcon,
+  Squares2X2Icon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
 
@@ -133,12 +136,30 @@ const pickerGroups: PickerGroup[] = [
         },
       },
       {
+        label: 'Referral',
+        description: 'A referral to a specialist, clinic or service',
+        icon: PaperAirplaneIcon,
+        apply: (form) => {
+          form.updateSpecialty('general');
+          form.setRecordType('servicerequest');
+        },
+      },
+      {
         label: 'Care plan',
         description: 'A plan of care, goals or follow-up instructions',
         icon: ClipboardDocumentCheckIcon,
         apply: (form) => {
           form.updateSpecialty('general');
           form.setRecordType('careplan');
+        },
+      },
+      {
+        label: 'Health goal',
+        description: 'A target you are working towards, and when you started',
+        icon: FlagIcon,
+        apply: (form) => {
+          form.updateSpecialty('general');
+          form.setRecordType('goal');
         },
       },
       {
@@ -166,6 +187,16 @@ const pickerGroups: PickerGroup[] = [
         description: 'Glasses & contact Rx, refraction, acuity, IOP, surgery',
         icon: EyeIcon,
         apply: (form) => form.updateSpecialty('optometry'),
+      },
+      {
+        label: 'Vision prescription',
+        description: 'A glasses or contact lens prescription, eye by eye',
+        icon: Squares2X2Icon,
+        // Goes through the optometry entry kind rather than setting the record
+        // type directly: the lens fields only render under the optometry
+        // specialty, so a bare `visionprescription` is a prescription form with
+        // nowhere to type the prescription.
+        apply: (form) => form.applyOptometryEntryKind('glassesPrescription'),
       },
     ],
   },
@@ -213,10 +244,22 @@ export function ManualRecordTypePicker({
           <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
             {t(group.title)}
           </h2>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Only reach for the third column when the group has enough cards to
+              fill it — otherwise short groups (Results, Specialty, Files) left
+              an empty cell in the row. */}
+          <div
+            className={`mt-3 grid gap-3 sm:grid-cols-2 ${
+              group.cards.length > 2 ? 'lg:grid-cols-3' : ''
+            }`}
+          >
             {group.cards.map((card) => {
               const Icon = card.icon;
               return (
+                // The icon sits beside the title rather than on a line of its
+                // own: stacked, seventeen cards ran to 3.5 phone screens of
+                // scrolling before you could start typing, and a third of that
+                // height was the icon row. Nothing is hidden or folded away —
+                // the descriptions are what make the picker worth scrolling.
                 <button
                   key={card.label}
                   type="button"
@@ -224,16 +267,18 @@ export function ManualRecordTypePicker({
                     card.apply(form);
                     onPick();
                   }}
-                  className="flex h-full flex-col gap-2 rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm transition-colors hover:border-primary-400 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                  className="flex h-full items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 text-left shadow-sm transition-colors hover:border-primary-400 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-200"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-primary-50 text-primary-700">
+                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary-50 text-primary-700">
                     <Icon className="h-5 w-5" />
                   </span>
-                  <span className="text-sm font-semibold text-gray-900">
-                    {t(card.label)}
-                  </span>
-                  <span className="text-xs text-gray-600">
-                    {t(card.description)}
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold text-gray-900">
+                      {t(card.label)}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-gray-600">
+                      {t(card.description)}
+                    </span>
                   </span>
                 </button>
               );

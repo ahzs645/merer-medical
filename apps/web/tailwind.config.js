@@ -3,6 +3,12 @@ const { join } = require('path');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  future: {
+    // Wrap `hover:` utilities in `@media (hover: hover)`. Without this, tapping
+    // a card or button on a touch device leaves its hover style stuck until
+    // something else is tapped. Default in Tailwind v4.
+    hoverOnlyWhenSupported: true,
+  },
   content: [
     join(
       __dirname,

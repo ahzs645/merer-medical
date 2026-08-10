@@ -53,34 +53,34 @@ function vendorRow(vendor: VendorAvailability): {
       return {
         label: vendor.label,
         tone: 'warn',
-        detail: 'Configured, but requires the sync proxy to be enabled.',
+        detail: 'Ready, but the server still needs to turn syncing on.',
       };
     }
     return {
       label: vendor.label,
       tone: 'off',
+      // Deployment-level: the person reading this may not run the server, so
+      // say who can turn it on rather than naming the environment variable.
       detail: vendor.requiredEnv
-        ? `Not configured on this deployment (set ${vendor.requiredEnv}).`
-        : 'Not configured on this deployment.',
+        ? `Turned off here. Whoever runs this server can enable it (${vendor.requiredEnv}).`
+        : 'Turned off on this server.',
     };
   }
   if (vendor.sandboxOnly) {
     return {
       label: vendor.label,
       tone: 'warn',
-      detail: 'Sandbox/test access only — production credentials not set.',
+      detail: 'Test access only — you can connect, but only to sample data.',
     };
   }
   if (vendor.confidentialMode !== undefined) {
     return {
       label: vendor.label,
       tone: 'ok',
-      detail: vendor.confidentialMode
-        ? 'Available (confidential client mode).'
-        : 'Available (public client mode).',
+      detail: 'Ready to connect.',
     };
   }
-  return { label: vendor.label, tone: 'ok', detail: 'Available.' };
+  return { label: vendor.label, tone: 'ok', detail: 'Ready to connect.' };
 }
 
 /**
@@ -111,13 +111,13 @@ export function IntegrationStatusPanel({
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           <Disclosure.Button className="flex w-full items-center justify-between px-5 py-4 text-left">
             <div>
-              <h3 className="text-base font-bold text-gray-900">
+              <h2 className="text-base font-bold text-gray-900">
                 Browser and portal setup
-              </h3>
+              </h2>
               <p className="mt-0.5 text-sm text-gray-500">
                 {status.publicUrlConfigured && status.anyPortalEnabled
                   ? 'Check which patient portals are available before connecting.'
-                  : 'Local browser records are available. Portal sync needs deployment configuration.'}
+                  : 'You can add records from files and manual entry right now. Connecting a patient portal needs a setup step on the server.'}
               </p>
             </div>
             <ChevronDownIcon
@@ -134,7 +134,7 @@ export function IntegrationStatusPanel({
                 detail={
                   status.publicUrlConfigured
                     ? 'Configured — portals can redirect back to this app.'
-                    : 'Not set (PUBLIC_URL). Local browser storage still works; portal OAuth callbacks cannot complete.'
+                    : 'Not set up, so portals cannot send you back after sign-in. Records already on this device are unaffected.'
                 }
               />
               <StatusRow

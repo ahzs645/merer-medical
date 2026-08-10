@@ -76,9 +76,13 @@ function NotificationRenderer(
     <>
       {props.children}
       {/* Global notification live region, render this permanently at the end of the document */}
+      {/* Bottom-anchored at every breakpoint: top-right put the toast on top of
+          in-page tab strips (e.g. Utilities' "Sharing" / "Audit log"), hiding
+          primary navigation until it timed out or was dismissed. pb-24 clears
+          the mobile tab bar, which is gone from md up. */}
       <div
         aria-live="assertive"
-        className="pointer-events-none fixed inset-0 z-50 flex items-end px-4 pb-24 pt-6 sm:items-start sm:p-6"
+        className="pointer-events-none fixed inset-0 z-50 flex items-end px-4 pb-24 pt-6 print:hidden sm:px-6 md:pb-6"
       >
         <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
           {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
@@ -86,15 +90,20 @@ function NotificationRenderer(
             show={props.data.showNotification}
             as={React.Fragment}
             enter="transform ease-out duration-300 transition"
-            enterFrom="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-            enterTo="translate-y-0 opacity-100 sm:translate-x-0"
+            enterFrom="translate-y-2 opacity-0"
+            enterTo="translate-y-0 opacity-100"
             leave="transition ease-in duration-100"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
             <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
               <div className="p-4">
-                <div className="flex items-start">
+                {/* `items-center`, and the close button's 44px overhang
+                    pulled back on both sides: with `items-start` and only
+                    `-mt-2`, a 44px control in a row of 24px content stretched
+                    the row 12px past the text and the toast read as
+                    bottom-heavy. */}
+                <div className="flex items-center">
                   <div className="flex-shrink-0">
                     {props.data.variant === 'error' && (
                       <XMarkIcon
@@ -115,17 +124,19 @@ function NotificationRenderer(
                       />
                     )}
                   </div>
-                  <div className="ml-3 w-0 flex-1 pt-0.5">
+                  <div className="ml-3 w-0 flex-1">
                     {props.data.message && (
                       <p className="text-sm font-medium text-gray-900">
                         {props.data.message}
                       </p>
                     )}
                   </div>
-                  <div className="ml-4 flex flex-shrink-0">
+                  <div className="-mr-2 -my-2 ml-2 flex flex-shrink-0">
                     <button
                       type="button"
-                      className="focus:ring-primary-700 inline-flex rounded-md bg-white text-gray-700 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                      // Sized to the 44px touch minimum: the icon stays 20px but
+                      // the hit area covers the corner of the toast.
+                      className="focus:ring-primary-700 inline-flex h-11 w-11 items-center justify-center rounded-md bg-white text-gray-700 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2"
                       onClick={() => {
                         dispatch({ type: 'hide_notification' });
                       }}

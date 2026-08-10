@@ -27,11 +27,11 @@
             "coding": [
               {
                 "system": "http://terminology.hl7.org/CodeSystem/subscriber-relationship",
-                "code": "self",
-                "display": "Self"
+                "code": "child",
+                "display": "Child"
               }
             ],
-            "text": "Self"
+            "text": "Child"
           },
           "period": {
             "start": "2026-01-01"
@@ -109,7 +109,7 @@
             "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
           },
           "relationship": {
-            "text": "Spouse"
+            "text": "Child"
           },
           "period": {
             "start": "2025-07-01",
@@ -187,7 +187,7 @@
             "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
           },
           "relationship": {
-            "text": "Self"
+            "text": "Child"
           },
           "period": {
             "start": "2023-01-01",
@@ -222,7 +222,7 @@
           "order": 3,
           "text": {
             "status": "generated",
-            "div": "Coastal Mutual medical coverage ended on 2024-12-31 after an employer change. Member ID COAST-112309."
+            "div": "Coastal Mutual medical coverage ended on 2024-12-31 after a change in the family's employer plan. Member ID COAST-112309."
           }
         }
       },

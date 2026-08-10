@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowDownTrayIcon,
+  CheckCircleIcon,
   CodeBracketIcon,
   DocumentTextIcon,
 } from '@heroicons/react/24/outline';
@@ -13,10 +14,29 @@ import { GenericBanner } from '../../shared/components/GenericBanner';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText } from '../../shared/utils/fhirText';
+import { resourceTypeLabel } from '../../shared/utils/resourceTypeLabels';
+
+/**
+ * Rows that exist in `clinical_documents` but are not records in their own
+ * right: a `documentreference_attachment` is the file hanging off a
+ * DocumentReference we already count, and `provenance` is an audit trail.
+ * The rest of the app counts records with exactly this exclusion (see the Labs
+ * record-coverage summary), so the export headline has to use it too — without
+ * it this screen claimed 355 records while every other screen said 352.
+ */
+const NON_RECORD_RESOURCE_TYPES = new Set([
+  'documentreference_attachment',
+  'provenance',
+]);
 
 interface Counts {
+  /** Records, on the same definition the rest of the app uses. */
   total: number;
   byType: Record<string, number>;
+  /** Attachment rows: shipped inside the bundle, never counted as records. */
+  attachments: number;
+  /** Everything in the database, i.e. how many entries the bundle carries. */
+  entries: number;
 }
 
 function useAllRecords() {
@@ -84,42 +104,45 @@ function esc(value: string): string {
     .replace(/>/g, '&gt;');
 }
 
+/**
+ * Sections the printable summary is built from, in order. Shared with the UI
+ * so the "what's in this file" preview cannot drift from the file itself.
+ */
+const SUMMARY_SECTIONS: { type: string; title: string }[] = [
+  { type: 'condition', title: 'Conditions' },
+  { type: 'medicationstatement', title: 'Medications' },
+  { type: 'allergyintolerance', title: 'Allergies' },
+  { type: 'immunization', title: 'Immunizations' },
+  { type: 'procedure', title: 'Procedures' },
+  { type: 'observation', title: 'Results & vitals' },
+];
+
 function buildHtmlSummary(
   docs: ClinicalDocument[],
   patientName: string,
 ): string {
-  const groups: { type: string; title: string }[] = [
-    { type: 'condition', title: 'Conditions' },
-    { type: 'medicationstatement', title: 'Medications' },
-    { type: 'allergyintolerance', title: 'Allergies' },
-    { type: 'immunization', title: 'Immunizations' },
-    { type: 'procedure', title: 'Procedures' },
-    { type: 'observation', title: 'Results & vitals' },
-  ];
   const today = safeFormatDate('2026-06-09', 'PP', '');
-  const sections = groups
-    .map(({ type, title }) => {
-      const items = docs
-        .filter((d) => d.data_record.resource_type === type)
-        .map((d) => {
-          const r = getFhirResource<Record<string, unknown>>(d);
-          const name =
-            d.metadata?.display_name ||
-            firstText(r['code']) ||
-            firstText(r['medicationCodeableConcept']) ||
-            firstText(r['vaccineCode']) ||
-            'Record';
-          const date = d.metadata?.date
-            ? safeFormatDate(d.metadata.date, 'PP', '')
-            : '';
-          return `<tr><td>${esc(name)}</td><td>${esc(date)}</td></tr>`;
-        });
-      if (items.length === 0) return '';
-      return `<h2>${esc(title)} (${items.length})</h2><table><thead><tr><th>Name</th><th>Date</th></tr></thead><tbody>${items.join(
-        '',
-      )}</tbody></table>`;
-    })
-    .join('');
+  const sections = SUMMARY_SECTIONS.map(({ type, title }) => {
+    const items = docs
+      .filter((d) => d.data_record.resource_type === type)
+      .map((d) => {
+        const r = getFhirResource<Record<string, unknown>>(d);
+        const name =
+          d.metadata?.display_name ||
+          firstText(r['code']) ||
+          firstText(r['medicationCodeableConcept']) ||
+          firstText(r['vaccineCode']) ||
+          'Record';
+        const date = d.metadata?.date
+          ? safeFormatDate(d.metadata.date, 'PP', '')
+          : '';
+        return `<tr><td>${esc(name)}</td><td>${esc(date)}</td></tr>`;
+      });
+    if (items.length === 0) return '';
+    return `<h2>${esc(title)} (${items.length})</h2><table><thead><tr><th>Name</th><th>Date</th></tr></thead><tbody>${items.join(
+      '',
+    )}</tbody></table>`;
+  }).join('');
 
   return `<!doctype html><html><head><meta charset="utf-8"><title>Health Summary — ${esc(
     patientName,
@@ -140,15 +163,55 @@ function buildHtmlSummary(
 export function RecordExportTab() {
   const user = useUser();
   const { docs, status } = useAllRecords();
+  const [lastDownload, setLastDownload] = useState<string>();
 
-  const counts: Counts = docs.reduce(
-    (acc, doc) => {
-      acc.total += 1;
-      const type = doc.data_record.resource_type;
-      acc.byType[type] = (acc.byType[type] || 0) + 1;
-      return acc;
-    },
-    { total: 0, byType: {} } as Counts,
+  const counts: Counts = useMemo(
+    () =>
+      docs.reduce(
+        (acc, doc) => {
+          acc.entries += 1;
+          const type = doc.data_record.resource_type;
+          if (NON_RECORD_RESOURCE_TYPES.has(type)) {
+            if (type === 'documentreference_attachment') acc.attachments += 1;
+            return acc;
+          }
+          acc.total += 1;
+          acc.byType[type] = (acc.byType[type] || 0) + 1;
+          return acc;
+        },
+        { total: 0, byType: {}, attachments: 0, entries: 0 } as Counts,
+      ),
+    [docs],
+  );
+
+  // Several resource types share one label (medicationstatement and
+  // medicationrequest both read "Medications"), so fold them into a single
+  // chip — otherwise the breakdown repeats itself and reads like two figures.
+  const chips = useMemo(() => {
+    const grouped = new Map<string, { type: string; count: number }>();
+    Object.entries(counts.byType).forEach(([type, count]) => {
+      const key = resourceTypeLabel(type);
+      const existing = grouped.get(key);
+      grouped.set(key, {
+        type: existing?.type ?? type,
+        count: (existing?.count ?? 0) + count,
+      });
+    });
+    return [...grouped.values()]
+      .map(({ type, count }) => ({
+        label: resourceTypeLabel(type, count),
+        count,
+      }))
+      .sort((a, b) => b.count - a.count);
+  }, [counts.byType]);
+
+  const summaryPreview = useMemo(
+    () =>
+      SUMMARY_SECTIONS.map(({ type, title }) => ({
+        title,
+        count: counts.byType[type] || 0,
+      })).filter((section) => section.count > 0),
+    [counts.byType],
   );
 
   const patientName =
@@ -170,18 +233,27 @@ export function RecordExportTab() {
             </p>
 
             {status === 'success' && counts.total > 0 && (
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {Object.entries(counts.byType)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([type, count]) => (
+              <>
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {chips.map(({ label, count }) => (
                     <span
-                      key={type}
+                      key={label}
                       className="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
                     >
-                      {type} · {count}
+                      {label} · {count}
                     </span>
                   ))}
-              </div>
+                </div>
+                <p className="mt-2 text-xs text-gray-500">
+                  Every record stored on this device, counted once, so the chips
+                  add up to the total above. Screens that show one slice of your
+                  library report smaller figures — Results, for example, counts
+                  lab, imaging and report results and leaves out vitals and
+                  other observations.{' '}
+                  {counts.attachments > 0 &&
+                    `${counts.attachments} files attached to documents travel inside the FHIR Bundle but are not counted as records of their own.`}
+                </p>
+              </>
             )}
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -190,29 +262,85 @@ export function RecordExportTab() {
                 title="Health summary"
                 subtitle="Printable HTML document"
                 disabled={status !== 'success' || counts.total === 0}
-                onClick={() =>
+                onClick={() => {
+                  const filename = `mere-health-summary-${slug}.html`;
                   download(
-                    `mere-health-summary-${slug}.html`,
+                    filename,
                     buildHtmlSummary(docs, patientName),
                     'text/html',
-                  )
-                }
+                  );
+                  setLastDownload(filename);
+                }}
               />
               <ExportButton
                 icon={CodeBracketIcon}
                 title="FHIR Bundle"
                 subtitle="Standards-based JSON (R4)"
                 disabled={status !== 'success' || counts.total === 0}
-                onClick={() =>
+                onClick={() => {
+                  const filename = `mere-fhir-bundle-${slug}.json`;
                   download(
-                    `mere-fhir-bundle-${slug}.json`,
+                    filename,
                     JSON.stringify(buildBundle(docs, patientName), null, 2),
                     'application/fhir+json',
-                  )
-                }
+                  );
+                  setLastDownload(filename);
+                }}
               />
             </div>
+
+            {/* Downloads leave no trace in the browser UI on some platforms,
+                so confirm what was written rather than leaving a dead click. */}
+            {lastDownload && (
+              <p className="mt-3 flex items-center gap-1.5 text-xs text-gray-600">
+                <CheckCircleIcon className="h-4 w-4 shrink-0 text-green-600" />
+                <span className="min-w-0 break-all">
+                  Saved to your downloads: {lastDownload}
+                </span>
+              </p>
+            )}
           </div>
+
+          {status === 'success' && counts.total > 0 && (
+            <div className="rounded-md bg-white p-5 shadow-sm ring-1 ring-gray-200">
+              <h2 className="text-base font-semibold text-gray-900">
+                What each file contains
+              </h2>
+              <dl className="mt-3 grid gap-5 sm:grid-cols-2">
+                <div>
+                  <dt className="text-sm font-semibold text-gray-900">
+                    Health summary
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-600">
+                    A printable page you can hand to a new clinic or a family
+                    member. One section per area, newest first:
+                  </dd>
+                  <dd className="mt-2 flex flex-wrap gap-1.5">
+                    {summaryPreview.map((section) => (
+                      <span
+                        key={section.title}
+                        className="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+                      >
+                        {section.title} · {section.count}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-semibold text-gray-900">
+                    FHIR Bundle
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-600">
+                    {counts.attachments > 0
+                      ? `Everything, unabridged: ${counts.entries} entries as an R4 collection Bundle — your ${counts.total} records plus ${counts.attachments} attached files.`
+                      : `Everything, unabridged: ${counts.entries} entries as an R4 collection Bundle.`}{' '}
+                    Machine-readable, for importing into another health app or
+                    keeping as a backup.
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          )}
 
           <p className="text-xs text-gray-400">
             Exports are generated locally on your device — nothing is uploaded.

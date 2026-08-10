@@ -1,8 +1,6 @@
-import { Link } from 'react-router-dom';
-
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
-import { Routes as AppRoutes } from '../../../Routes';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
+import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { OptometryRecord } from '../types';
 import {
   EyeRxDelta,
@@ -93,32 +91,19 @@ function TimelineRow({
               {entry.title}
             </h3>
             <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ring-1 ${classBadge[entry.rxClass]}`}
+              className={`rounded-full px-2 py-0.5 text-xs font-semibold uppercase ring-1 ${classBadge[entry.rxClass]}`}
             >
               {t(entry.rxClass)}
             </span>
             {entry.isCurrent && (
-              <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary-700 ring-1 ring-primary-200">
+              <span className="rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold uppercase text-primary-700 ring-1 ring-primary-200">
                 {t('Current')}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            {isManualRecord(entry.document) && (
-              <Link
-                to={AppRoutes.EditRecord.replace(
-                  ':recordId',
-                  entry.document.id,
-                )}
-                className="text-xs font-semibold text-primary-700 hover:text-primary-900"
-              >
-                {t('Edit')}
-              </Link>
-            )}
-            <span className="text-xs font-medium text-gray-500">
-              {entry.date?.split('T')[0] || t('Undated')}
-            </span>
-          </div>
+          <span className="text-xs font-medium text-gray-500">
+            {entry.date?.split('T')[0] || t('Undated')}
+          </span>
         </div>
 
         {(entry.product || entry.prescriber) && (
@@ -139,6 +124,10 @@ function TimelineRow({
             ? `${t('Change since previous')}: ${changeSummary}`
             : t('No change from the previous prescription of this type.')}
         </p>
+
+        {isManualRecord(entry.document) && (
+          <ManualRecordActions item={entry.document} />
+        )}
       </div>
     </li>
   );

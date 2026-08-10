@@ -47,7 +47,7 @@ export function ImmunizationListCard({
       <Disclosure defaultOpen={true}>
         {({ open }) => (
           <>
-            <Disclosure.Button className="w-full font-bold">
+            <Disclosure.Button className="min-h-[44px] w-full font-bold">
               <div className="flex w-full items-center justify-between py-6 text-xl font-extrabold">
                 Immunizations
                 <ChevronDownIcon
@@ -73,8 +73,8 @@ export function ImmunizationListCard({
                         <Disclosure defaultOpen={false}>
                           {({ open }) => (
                             <>
-                              <Disclosure.Button className="w-full">
-                                <p className="text-sm font-bold text-gray-900 md:text-base flex w-full text-left">
+                              <Disclosure.Button className="min-h-[44px] w-full">
+                                <p className="text-sm font-bold text-gray-900 md:text-base flex w-full items-center text-left">
                                   {item?.[0].metadata?.display_name}{' '}
                                   {!open ? `(${item?.length})` : ''}
                                   <ChevronDownIcon

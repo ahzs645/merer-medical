@@ -68,13 +68,14 @@ export function ResultsDigestCard() {
           </h2>
           <p className="text-sm text-gray-600">
             {totals.attention > 0
-              ? t('{attention} of {total} results may need attention.')
+              ? t(
+                  '{attention} of {total} lab, imaging and report results may need attention.',
+                )
                   .replace('{attention}', `${totals.attention}`)
                   .replace('{total}', `${totals.total}`)
-              : t('{total} results, none flagged for attention.').replace(
-                  '{total}',
-                  `${totals.total}`,
-                )}
+              : t(
+                  '{total} lab, imaging and report results, none flagged for attention.',
+                ).replace('{total}', `${totals.total}`)}
           </p>
         </div>
         <Link

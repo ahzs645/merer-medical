@@ -112,8 +112,18 @@ export function ManualSpecialtySection({
     isDeviceImportType,
   } = form;
 
+  // The panel exists to say the selects inside it belong together. With the
+  // general section chosen there is only one, so the box groups nothing and
+  // reads as a stray container around a dropdown that sits under an unboxed
+  // one.
+  const hasSubKind = specialty === 'dental' || specialty === 'optometry';
+
   return !isDeviceImportType ? (
-    <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
+    <div
+      className={
+        hasSubKind ? 'rounded-md border border-gray-200 bg-gray-50 p-4' : ''
+      }
+    >
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label

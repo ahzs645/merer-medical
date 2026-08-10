@@ -43,7 +43,7 @@ export function LabReferenceStandardControl({
                 role="radio"
                 aria-checked={selected}
                 onClick={() => setSelectedMode(mode)}
-                className={`inline-flex min-h-9 items-center justify-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold sm:justify-start ${
+                className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold sm:justify-start ${
                   selected
                     ? 'border-primary-700 bg-primary-50 text-primary-900'
                     : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'

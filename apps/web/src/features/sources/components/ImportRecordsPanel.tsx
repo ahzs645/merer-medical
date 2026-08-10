@@ -4,8 +4,6 @@ import {
   ArrowDownTrayIcon,
   ArrowUpTrayIcon,
   DocumentArrowDownIcon,
-  PencilSquareIcon,
-  PlusIcon,
 } from '@heroicons/react/24/outline';
 
 import {
@@ -19,6 +17,7 @@ import {
   inspectEmrpkg,
 } from '../../../services/emrpkg';
 import { ButtonLoadingSpinner } from '../../connections/components/ButtonLoadingSpinner';
+import { buildAddRecordPath } from '../../manual-entry/addRecordPath';
 import { Routes } from '../../../Routes';
 
 function readFileAsBytes(file: File): Promise<Uint8Array> {
@@ -258,24 +257,31 @@ export function ImportRecordsPanel() {
           </button>
         </ActionCard>
 
+        {/* This card used to link to a bare `/records/new` and then spend the
+            last sentence of its description telling the user to "Choose Device
+            on the next screen" — asking them to do by hand what the link had
+            been able to carry all along. The preset does it; the sentence is
+            gone. `returnTo` keeps them on Sources, where they were importing.
+
+            The card that stood beside it, "Add record manually", was the
+            Sources page's own "Add a record" button a section further down,
+            with a different label and the same destination. A typed-in record
+            is not a file moving in or out of the app, which is all this section
+            claims to be about, so the copy of it that lives here is the one
+            that went. */}
         <ActionCard
           icon={<ArrowUpTrayIcon />}
           title="Import device file"
-          description="Import a FreeStyle Libre export or other device file as readings. Choose “Device” on the next screen."
+          description="Import a FreeStyle Libre export or other device file as readings."
         >
-          <Link to={Routes.AddRecord} className={secondaryButtonClass}>
+          <Link
+            to={buildAddRecordPath({
+              type: 'device',
+              returnTo: Routes.AddConnection,
+            })}
+            className={secondaryButtonClass}
+          >
             Import device file
-          </Link>
-        </ActionCard>
-
-        <ActionCard
-          icon={<PencilSquareIcon />}
-          title="Add record manually"
-          description="Log conditions, medications, labs, vitals and more by hand — including dental and optometry."
-        >
-          <Link to={Routes.AddRecord} className={secondaryButtonClass}>
-            <PlusIcon className="mr-1 h-4 w-4" />
-            Add manually
           </Link>
         </ActionCard>
       </div>

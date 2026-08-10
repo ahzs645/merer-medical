@@ -5,13 +5,11 @@ import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
-import { GenericBanner } from '../../shared/components/GenericBanner';
-import {
-  EmptyState,
-  SearchInput,
-} from '../../shared/components/records/RecordListPage';
+import { EmptyState } from '../../shared/components/records/RecordListPage';
+import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 
 interface Provider {
   name: string;
@@ -70,6 +68,9 @@ export function parseFacility(display: string): Facility {
 function useDirectory() {
   const db = useRxDb();
   const user = useUser();
+  // A manually added visit brings its location with it, so this list grows
+  // when records change too. Refetch on the same signal every other tab uses.
+  const recordChangeTick = useRecordChangeTick();
   const [providers, setProviders] = useState<Provider[]>([]);
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
@@ -162,7 +163,7 @@ function useDirectory() {
     return () => {
       mounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   return { providers, facilities, status, error };
 }
@@ -196,16 +197,20 @@ export function DirectoryTab() {
   );
 
   return (
-    <AppPage banner={<GenericBanner text="Providers & locations" />}>
+    <AppPage
+      banner={
+        <RecordPageHeader
+          title="Providers & locations"
+          search={{
+            query,
+            onChange: setQuery,
+            placeholder: 'Search providers and locations',
+          }}
+        />
+      }
+    >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-3xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          <SearchInput
-            value={query}
-            onChange={setQuery}
-            placeholder="Search providers and locations"
-            label="Search providers and locations"
-          />
-
           {status === 'loading' ? (
             <EmptyState text="Loading directory…" />
           ) : status === 'error' ? (

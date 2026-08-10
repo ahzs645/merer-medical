@@ -9,17 +9,26 @@ export type ImagingResourceType =
 
 export type ImagingDocument = ClinicalDocument<unknown>;
 
-export type ImagingCategory =
-  | 'dental'
-  | 'optometry'
-  | 'xray'
-  | 'ct'
-  | 'mri'
-  | 'ultrasound'
-  | 'scan'
-  | 'report'
-  | 'attachment'
-  | 'other';
+/**
+ * Categories are tags, not buckets: `inferCategories` assigns every category a
+ * record matches, so one record can be counted under several of them.
+ */
+export const IMAGING_CATEGORIES = [
+  'dental',
+  'optometry',
+  'xray',
+  'ct',
+  'mri',
+  'ultrasound',
+  'scan',
+  'report',
+  'attachment',
+  'other',
+] as const;
+
+export type ImagingCategory = (typeof IMAGING_CATEGORIES)[number];
+
+export type ImagingCategoryCounts = Record<ImagingCategory, number>;
 
 export type ImagingItem = {
   id: string;

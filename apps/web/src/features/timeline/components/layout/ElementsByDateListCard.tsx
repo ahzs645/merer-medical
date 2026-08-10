@@ -72,6 +72,10 @@ import { parseCCDA } from '../document-reference/parseCCDA/parseCCDA';
 import parse, { HTMLReactParserOptions, domToReact } from 'html-react-parser';
 import DOMPurify from 'dompurify';
 import { getTimelineRecordElementId } from '../../utils/timelineAnchors';
+import {
+  buildTimelineCardTitle,
+  getTimelineCategories,
+} from '../../utils/timelineCategories';
 
 const options: HTMLReactParserOptions = {
   replace(domNode) {
@@ -393,6 +397,16 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           }) as ClinicalDocument<R4BundleEntry<CareTeam>>[],
       [itemList],
     ),
+    // A day whose only record is a referral rendered as nothing at all: with
+    // no category and no section, `titleFields` came back empty and the whole
+    // group returned null.
+    referrals = useMemo(
+      () =>
+        itemList.filter(
+          (item) => item.data_record.resource_type === 'servicerequest',
+        ),
+      [itemList],
+    ),
     goals = useMemo(
       () =>
         itemList
@@ -486,55 +500,11 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
 
   const [expanded, setExpanded] = React.useState(false);
 
+  // Shared with the timeline so a date whose records render nothing can be
+  // skipped entirely rather than shown as an empty card.
   const titleFields = useMemo(
-    () =>
-      [
-        immunizations.length > 0 ? 'Immunizations' : '',
-        conditions.length > 0 ? 'Conditions' : '',
-        procedures.length > 0 ? 'Procedures' : '',
-        consents.length > 0 ? 'Consents' : '',
-        observations.length > 0 ? 'Labs' : '',
-        medicationStatements.length > 0 ||
-        medicationRequests.length > 0 ||
-        medicationOrders.length > 0
-          ? 'Medications'
-          : '',
-        diagnosticReports.length > 0 ? 'Lab Panels' : '',
-        documentReferences.length > 0 || documentReferenceAttachments.length > 0
-          ? 'Documents'
-          : '',
-        encounters.length > 0 ? 'Encounters' : '',
-        coverages.length > 0 ? 'Coverage' : '',
-        carePlans.length > 0 ? 'Care Plans' : '',
-        careTeams.length > 0 ? 'Care Teams' : '',
-        goals.length > 0 ? 'Goals' : '',
-        appointments.length > 0 ? 'Appointments' : '',
-        specimens.length > 0 ? 'Specimens' : '',
-        allergyIntolerances.length > 0 ? 'Allergies' : '',
-        familyMemberHistories.length > 0 ? 'Family History' : '',
-      ].filter(Boolean),
-    [
-      conditions.length,
-      diagnosticReports.length,
-      documentReferenceAttachments.length,
-      documentReferences.length,
-      encounters.length,
-      immunizations.length,
-      medicationStatements.length,
-      medicationRequests.length,
-      medicationOrders.length,
-      observations.length,
-      procedures.length,
-      consents.length,
-      coverages.length,
-      carePlans.length,
-      careTeams.length,
-      goals.length,
-      appointments.length,
-      specimens.length,
-      allergyIntolerances.length,
-      familyMemberHistories.length,
-    ],
+    () => getTimelineCategories(itemList),
+    [itemList],
   );
 
   const uniqueConnectionIds = useMemo(() => {
@@ -564,23 +534,22 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
 
   const connectionDocs = useConnectionDocs(uniqueConnectionIds);
 
-  const title =
-    titleFields.length === 0
-      ? 'Your health record'
-      : titleFields.length === 1
-        ? `Your ${titleFields[0]}`
-        : titleFields.length === 2
-          ? `Your ${titleFields.join(' & ')}`
-          : `Your ${titleFields.slice(0, -1).join(', ')}, and ${titleFields.slice(-1)}`;
+  const title = buildTimelineCardTitle(titleFields);
+
+  // Nothing in this group has a section in the card body: rendering it would
+  // put a clinic name under a generic title with no records beneath it.
+  if (titleFields.length === 0) {
+    return null;
+  }
 
   return (
     <CardBase>
       <div className="min-w-0 flex-1 flex-col">
-        <div
-          className={`text-lg font-bold flex flex-row items-center align-middle sm:text-2xl sm:mb-1 text-primary-600`}
+        <h2
+          className={`text-base font-bold flex flex-row items-center align-middle sm:text-2xl sm:mb-1 text-primary-600`}
         >
           {title}
-        </div>
+        </h2>
         <div className="flex sm:flex-row flex-col sm:justify-between">
           <div className="flex flex-col">
             {connectionDocs.map((conn, index) =>
@@ -864,6 +833,24 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
             </ul>
           </div>
         )}
+        {referrals.length > 0 && (
+          <div className="mb-2 ml-2">
+            <TimelineCardCategoryTitle
+              title={'Referrals'}
+              color="text-sky-600"
+            />
+            <ul className="list-disc list-inside">
+              {referrals.map((item) => (
+                <li
+                  className="text-xs font-medium md:text-sm text-gray-900"
+                  key={item.id}
+                >
+                  {item.metadata?.display_name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         {goals.length > 0 && (
           <div className="mb-2 ml-2">
             <TimelineCardCategoryTitle
@@ -964,7 +951,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           <div className="relative flex justify-center">
             <button
               type="button"
-              className="inline-flex items-center gap-x-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              className="inline-flex min-h-[44px] items-center gap-x-1.5 rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
               onClick={() => setExpanded(!expanded)}
             >
               {expanded ? 'View Less' : 'View More'}

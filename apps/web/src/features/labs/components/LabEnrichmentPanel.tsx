@@ -35,7 +35,7 @@ export function LabEnrichmentPanel({
         <h2 className="text-base font-semibold text-gray-900">
           Enrichment & audit
         </h2>
-        <span className="rounded-full bg-gray-50 px-2 py-1 text-[11px] font-semibold text-gray-700 ring-1 ring-gray-200">
+        <span className="rounded-full bg-gray-50 px-2 py-1 text-xs font-semibold text-gray-700 ring-1 ring-gray-200">
           {auditLabels[enrichment.audit.status]}
         </span>
       </div>
@@ -59,9 +59,11 @@ export function LabEnrichmentPanel({
         />
         <InfoTile
           icon={<CheckBadgeIcon className="h-4 w-4" />}
-          title="Planner usage"
+          title="Key marker"
           value={
-            enrichment.usedByPlanner ? 'Used by planner' : 'Not used by planner'
+            enrichment.usedByPlanner
+              ? 'Tracked as a key metabolic marker'
+              : 'Not a key metabolic marker'
           }
           detail={
             enrichment.normalizedValue?.note ||
@@ -141,7 +143,7 @@ function FlagPill({
 }) {
   return (
     <span
-      className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${flagStyles[flag]}`}
+      className={`rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${flagStyles[flag]}`}
     >
       {label}
     </span>

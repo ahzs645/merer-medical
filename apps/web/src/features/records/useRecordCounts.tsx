@@ -10,10 +10,14 @@ import { debounceTime } from 'rxjs/operators';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
+import { isAllergyNegation } from '../../shared/utils/allergyNegation';
+import { firstText } from '../../shared/utils/fhirText';
 import { ALL_RECORD_CATEGORIES, RecordCategory } from './recordCategories';
 
 export interface RecordCountsValue {
   counts: Map<string, number>;
+  /** Most recent `metadata.date` seen per resource_type, as an ISO string. */
+  latest: Map<string, string>;
   status: 'loading' | 'success' | 'error';
 }
 
@@ -37,6 +41,7 @@ export function RecordCountsProvider({ children }: { children: ReactNode }) {
   const db = useRxDb();
   const user = useUser();
   const [counts, setCounts] = useState<Map<string, number>>(new Map());
+  const [latest, setLatest] = useState<Map<string, string>>(new Map());
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
     'loading',
   );
@@ -56,15 +61,41 @@ export function RecordCountsProvider({ children }: { children: ReactNode }) {
         .exec();
       if (cancelled) return;
       const tally = new Map<string, number>();
+      const newest = new Map<string, string>();
       const wanted = new Set(COUNTED_RESOURCE_TYPES);
       for (const doc of docs) {
         const resourceType = String(
           doc.get('data_record.resource_type') || '',
         ).toLowerCase();
         if (!resourceType || !wanted.has(resourceType)) continue;
+
+        // Portals emit "no known allergy" / "not asked" as ordinary
+        // AllergyIntolerance resources. The Allergies page lists them apart
+        // from real allergens, so counting them here made the nav disagree
+        // with the page (11 vs 6 in the demo set). Only this one type pays the
+        // cost of reading its JSON; everything else stays on the fast path.
+        if (resourceType === 'allergyintolerance') {
+          const resource = doc.get('data_record.raw')?.resource;
+          const name =
+            doc.get('metadata.display_name') ||
+            firstText(resource?.substance) ||
+            firstText(resource?.code) ||
+            '';
+          if (resource && isAllergyNegation(resource, String(name))) continue;
+        }
+
         tally.set(resourceType, (tally.get(resourceType) || 0) + 1);
+
+        const date = String(doc.get('metadata.date') || '');
+        const time = date ? Date.parse(date) : NaN;
+        if (Number.isNaN(time)) continue;
+        // Stored dates carry mixed offsets and precisions, so compare parsed
+        // values rather than the raw strings.
+        const best = newest.get(resourceType);
+        if (!best || time > Date.parse(best)) newest.set(resourceType, date);
       }
       setCounts(tally);
+      setLatest(newest);
       setStatus('success');
     }
 
@@ -88,8 +119,8 @@ export function RecordCountsProvider({ children }: { children: ReactNode }) {
   }, [db, user.id]);
 
   const value = useMemo<RecordCountsValue>(
-    () => ({ counts, status }),
-    [counts, status],
+    () => ({ counts, latest, status }),
+    [counts, latest, status],
   );
 
   return (
@@ -101,7 +132,11 @@ export function RecordCountsProvider({ children }: { children: ReactNode }) {
 
 export function useRecordCounts(): RecordCountsValue {
   return (
-    useContext(RecordCountsContext) ?? { counts: new Map(), status: 'loading' }
+    useContext(RecordCountsContext) ?? {
+      counts: new Map(),
+      latest: new Map(),
+      status: 'loading',
+    }
   );
 }
 
@@ -120,4 +155,47 @@ export function countForCategory(
     (total, resourceType) => total + (counts.get(resourceType) || 0),
     0,
   );
+}
+
+/**
+ * Why a category does or doesn't have a number, so callers can tell the cases
+ * apart. Rendering "nothing" for an uncounted category made it look like an
+ * empty one; each case now gets its own treatment.
+ */
+export type CategoryCount =
+  | { kind: 'count'; value: number }
+  /** Counted, but the tally hasn't finished yet. */
+  | { kind: 'pending' }
+  /** Counted, but the tally failed. */
+  | { kind: 'unavailable' }
+  /** No 1:1 resource-type mapping exists, so this category is never tallied. */
+  | { kind: 'uncounted' };
+
+export function categoryCount(
+  category: RecordCategory,
+  { counts, status }: RecordCountsValue,
+): CategoryCount {
+  if (!category.resourceTypes || category.resourceTypes.length === 0) {
+    return { kind: 'uncounted' };
+  }
+  if (status === 'loading') return { kind: 'pending' };
+  if (status === 'error') return { kind: 'unavailable' };
+  return { kind: 'count', value: countForCategory(category, counts) ?? 0 };
+}
+
+/**
+ * ISO date of the most recent record backing a category, or `undefined` when
+ * the category isn't tallied or holds nothing dated.
+ */
+export function latestRecordDate(
+  category: RecordCategory,
+  latest: Map<string, string>,
+): string | undefined {
+  let best: string | undefined;
+  for (const resourceType of category.resourceTypes ?? []) {
+    const candidate = latest.get(resourceType);
+    if (!candidate) continue;
+    if (!best || Date.parse(candidate) > Date.parse(best)) best = candidate;
+  }
+  return best;
 }

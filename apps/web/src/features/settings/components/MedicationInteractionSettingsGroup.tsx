@@ -102,7 +102,7 @@ export function MedicationInteractionSettingsGroup() {
           <button
             type="button"
             disabled={isSyncing}
-            className="rounded-md border border-primary-200 bg-white px-3 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-h-[44px] items-center rounded-md border border-primary-200 bg-white px-3 text-sm font-semibold text-primary-700 hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-60"
             onClick={async () => {
               setIsSyncing(true);
               try {
@@ -128,7 +128,7 @@ export function MedicationInteractionSettingsGroup() {
           >
             {isSyncing ? 'Syncing...' : 'Load bundled DDInter data'}
           </button>
-          <label className="inline-flex cursor-pointer items-center rounded-md border border-primary-200 px-3 py-1.5 text-sm font-semibold text-primary-700 hover:bg-primary-50">
+          <label className="inline-flex min-h-[44px] cursor-pointer items-center rounded-md border border-primary-200 px-3 text-sm font-semibold text-primary-700 hover:bg-primary-50">
             {isImporting ? 'Importing...' : 'Import DDInter CSV bundle'}
             <input
               type="file"
@@ -163,7 +163,7 @@ export function MedicationInteractionSettingsGroup() {
           </label>
           <button
             type="button"
-            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            className="inline-flex min-h-[44px] items-center rounded-md border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
             onClick={async () => {
               await clearDdinterBundle();
               notifyDispatch({
@@ -178,7 +178,7 @@ export function MedicationInteractionSettingsGroup() {
           </button>
           <button
             type="button"
-            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            className="inline-flex min-h-[44px] items-center rounded-md border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
             onClick={async () => {
               const status = await getDdinterStatus();
               setBundleStatus(status);
@@ -195,7 +195,7 @@ export function MedicationInteractionSettingsGroup() {
           </button>
           <button
             type="button"
-            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            className="inline-flex min-h-[44px] items-center rounded-md border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
             onClick={async () => {
               await clearRxNormCache();
               await refreshStatus();
@@ -211,7 +211,7 @@ export function MedicationInteractionSettingsGroup() {
           <button
             type="button"
             disabled={isRefreshingRxNorm}
-            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-h-[44px] items-center rounded-md border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
             onClick={async () => {
               setIsRefreshingRxNorm(true);
               try {

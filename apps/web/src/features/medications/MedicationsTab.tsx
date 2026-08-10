@@ -6,7 +6,6 @@ import {
   ChevronDownIcon,
   ClockIcon,
   ExclamationTriangleIcon,
-  MagnifyingGlassIcon,
   NoSymbolIcon,
   PlusIcon,
   ShieldCheckIcon,
@@ -18,9 +17,14 @@ import { Routes as AppRoutes } from '../../Routes';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
+import {
+  RecordHeaderLink,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
+import { isAllergyNegation } from '../../shared/utils/allergyNegation';
+import { getAllergyIntoleranceDisplayName } from '../../shared/utils/fhirAccessHelpers';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
-import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
 import { useMedicationsData } from './hooks/useMedicationsData';
 import { useMedicationInteractions } from './hooks/useMedicationInteractions';
 import {
@@ -58,7 +62,6 @@ const ADD_MEDICATION_PATH = `${AppRoutes.AddRecord}?type=medicationstatement`;
 export function MedicationsTab() {
   const [selectedFilter, setSelectedFilter] = useState<FilterChip['id']>('all');
   const [query, setQuery] = useState('');
-  const [addAllergyOpen, setAddAllergyOpen] = useState(false);
   const { t } = useInterfaceLanguage();
   const { allergies, filteredItems, items, status, supplementItems } =
     useMedicationsData({ query, selectedFilter });
@@ -80,43 +83,42 @@ export function MedicationsTab() {
   return (
     <AppPage
       banner={
-        <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
-          <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold sm:text-3xl">Medications</h1>
-              <p className="mt-1 text-sm text-primary-100">
-                Reconciled prescriptions, planned therapy, stopped medications,
-                supplements, adherence, and source history.
-              </p>
-            </div>
-            <div className="flex w-fit flex-wrap gap-2">
-              <Link
-                to={ADD_MEDICATION_PATH}
-                className="inline-flex w-fit items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-inset ring-primary-100 hover:bg-primary-50"
-              >
-                <PlusIcon className="h-5 w-5" />
-                {t('Add medication')}
-              </Link>
-              <button
-                type="button"
-                onClick={() => setAddAllergyOpen(true)}
-                className="inline-flex w-fit items-center gap-2 rounded-md bg-primary-700 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-primary-500 hover:bg-primary-600"
-              >
-                <PlusIcon className="h-5 w-5" />
-                {t('Add allergy')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <RecordPageHeader<FilterChip['id']>
+          title="Medications"
+          // The old description listed the filter chips back to the reader
+          // ("planned therapy, stopped medications, supplements…") a few
+          // pixels above the chips themselves, and cost three lines on a phone
+          // to do it. Say what the page is instead; the chips say the rest.
+          description="Prescriptions and supplements reconciled across your sources, checked against your allergies and for interactions."
+          search={{
+            query,
+            onChange: setQuery,
+            placeholder:
+              'Search medication, condition, source, status, or supplement ingredient',
+            label: 'Search medications',
+          }}
+          // One action, so it can be the plus alone on a phone and still sit
+          // beside the title. Adding an allergy moved to the Allergies page,
+          // which is the page that owns them.
+          action={
+            <RecordHeaderLink
+              to={ADD_MEDICATION_PATH}
+              label={t('Add medication')}
+              compact
+            />
+          }
+          filters={{
+            items: FILTERS.map((filter) => ({
+              ...filter,
+              count: counts[filter.id] || 0,
+            })),
+            selectedId: selectedFilter,
+            onSelect: setSelectedFilter,
+            label: 'Filter medications',
+          }}
+        />
       }
     >
-      {/* Saving notifies the record-change signal; the medications hook
-          refreshes in place, so no reload is needed. */}
-      <ManualRecordModal
-        open={addAllergyOpen}
-        initialRecordType="allergyintolerance"
-        onClose={() => setAddAllergyOpen(false)}
-      />
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'loading' ? (
@@ -127,14 +129,8 @@ export function MedicationsTab() {
             <EmptyMedicationsState />
           ) : (
             <>
-              <MedicationToolbar
-                counts={counts}
-                query={query}
-                selectedFilter={selectedFilter}
-                onQueryChange={setQuery}
-                onFilterChange={setSelectedFilter}
-              />
-
+              {/* Search and the group filters live in the banner now, with
+                  every other record tab's. */}
               <AllergySafetyPanel allergies={allergies} />
               <MedicationInteractionPanel {...medicationInteractions} />
 
@@ -181,60 +177,6 @@ function EmptyMedicationsState() {
   );
 }
 
-function MedicationToolbar({
-  counts,
-  query,
-  selectedFilter,
-  onQueryChange,
-  onFilterChange,
-}: {
-  counts: Record<FilterChip['id'], number>;
-  query: string;
-  selectedFilter: FilterChip['id'];
-  onQueryChange: (value: string) => void;
-  onFilterChange: (value: FilterChip['id']) => void;
-}) {
-  return (
-    <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-      <div className="relative">
-        <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-        <input
-          className="h-10 w-full rounded-md border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-          placeholder="Search medication, condition, source, status, or supplement ingredient"
-          value={query}
-          onChange={(event) => onQueryChange(event.target.value)}
-        />
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {FILTERS.map((filter) => {
-          const Icon = filter.icon;
-          const isSelected = selectedFilter === filter.id;
-
-          return (
-            <button
-              key={filter.id}
-              type="button"
-              className={[
-                'inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-medium shadow-sm',
-                isSelected
-                  ? 'border-primary-600 bg-primary-50 text-primary-800'
-                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
-              ].join(' ')}
-              onClick={() => onFilterChange(filter.id)}
-            >
-              <Icon className="h-4 w-4" />
-              <span>{filter.label}</span>
-              <span className="rounded bg-white/70 px-1.5 py-0.5 text-xs">
-                {counts[filter.id] || 0}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 function AllergySafetyPanel({ allergies }: { allergies: ClinicalDocument[] }) {
   if (allergies.length === 0) return null;
 
@@ -247,15 +189,22 @@ function AllergySafetyPanel({ allergies }: { allergies: ClinicalDocument[] }) {
         (resource as any)?.clinicalStatus?.text ||
         (resource as any)?.status ||
         'active';
+      const name =
+        getAllergyIntoleranceDisplayName(doc) ||
+        (resource as any)?.code?.text ||
+        doc.metadata?.display_name ||
+        'Allergy';
       return {
         id: doc.id,
-        name:
-          (resource as any)?.code?.text ||
-          (resource as any)?.substance?.text ||
-          (resource as any)?.substance?.coding?.[0]?.display ||
-          doc.metadata?.display_name ||
-          'Allergy',
+        name,
         status,
+        // "No Known Allergies" / "Not on File" are statements about the list,
+        // not allergens. Chipping them next to PENICILLIN reads as five more
+        // things the patient reacts to, which is the opposite of what they say.
+        isNegation: isAllergyNegation(
+          (resource as unknown as Record<string, unknown>) ?? {},
+          name,
+        ),
         reaction: ((resource as any)?.reaction || [])
           .map((reaction: any) =>
             [
@@ -279,30 +228,52 @@ function AllergySafetyPanel({ allergies }: { allergies: ClinicalDocument[] }) {
 
   if (activeAllergies.length === 0) return null;
 
+  const allergens = activeAllergies.filter((item) => !item.isNegation);
+  const negationCount = activeAllergies.length - allergens.length;
+
   return (
-    <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-amber-200">
-      <div className="flex items-center gap-2">
-        <ExclamationTriangleIcon className="h-5 w-5 text-amber-600" />
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-700">
-          Allergy safety review
+    // A strip, not a second Allergies page. What this screen owes the reader is
+    // "here is what you react to, before you prescribe" — the names and the
+    // reactions. Managing the list, including the records that state there is
+    // no allergy, belongs on the page that owns allergies, one tap away.
+    <section
+      aria-labelledby="allergy-safety-heading"
+      className="rounded-md bg-amber-50/60 px-3 py-2.5 ring-1 ring-amber-200"
+    >
+      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+        <h2
+          id="allergy-safety-heading"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-amber-900"
+        >
+          <ExclamationTriangleIcon className="h-4 w-4 shrink-0 text-amber-600" />
+          Allergies
         </h2>
-      </div>
-      <p className="mt-2 text-sm text-gray-600">
-        Keep this list reconciled before starting, stopping, or sharing
-        medications. Imported allergies can be stale or duplicated across
-        portals.
-      </p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {activeAllergies.slice(0, 12).map((allergy) => (
-          <span
-            key={allergy.id}
-            className="rounded-md bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800"
-            title={allergy.reaction}
-          >
-            {allergy.name}
-            {allergy.reaction ? ` - ${allergy.reaction}` : ''}
-          </span>
-        ))}
+        {allergens.length > 0 ? (
+          <p className="min-w-0 text-sm text-gray-800">
+            {allergens.map((allergy, index) => (
+              <span key={allergy.id}>
+                {index > 0 && <span className="text-amber-700"> · </span>}
+                <span className="font-medium">{allergy.name}</span>
+                {allergy.reaction ? (
+                  <span className="text-gray-600"> ({allergy.reaction})</span>
+                ) : null}
+              </span>
+            ))}
+          </p>
+        ) : (
+          <p className="text-sm text-gray-800">
+            None recorded — your sources sent only &ldquo;no known
+            allergy&rdquo; statements.
+          </p>
+        )}
+        <Link
+          to={AppRoutes.Allergies}
+          className="ms-auto inline-flex min-h-[44px] items-center text-sm font-medium text-primary-700 underline"
+        >
+          {negationCount > 0
+            ? `All allergies (+${negationCount} “none” records)`
+            : 'All allergies'}
+        </Link>
       </div>
     </section>
   );
@@ -544,7 +515,7 @@ function MedicationCard({ item }: { item: MedicationViewItem }) {
 
       <button
         type="button"
-        className="mt-4 inline-flex h-9 items-center gap-2 rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+        className="mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
         onClick={() => setIsExpanded((value) => !value)}
         aria-expanded={isExpanded}
       >

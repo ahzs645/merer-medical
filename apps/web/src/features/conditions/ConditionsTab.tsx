@@ -1,14 +1,17 @@
 import { useMemo, useState } from 'react';
-import {
-  MagnifyingGlassIcon,
-  PlusIcon,
-  Squares2X2Icon,
-} from '@heroicons/react/24/outline';
+import { PlusIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
+import {
+  RecordHeaderLink,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
+import { isManualRecord } from '../../shared/utils/manualRecordUtils';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { useConditionsData } from './hooks/useConditionsData';
 import { ConditionBundle, RelatedKind } from './types';
 
@@ -19,6 +22,16 @@ const KIND_LABEL: Record<RelatedKind, [string, string]> = {
   goal: ['goal', 'goals'],
   procedure: ['procedure', 'procedures'],
 };
+
+// Same record, same word as Problems. The two pages are two views of one pile
+// of FHIR Conditions, and calling it a "problem" on one and a "condition" on
+// the other invented a second record type that does not exist. `returnTo` is
+// what still makes the two buttons different: each lands you back on the list
+// you were building.
+const ADD_CONDITION_PATH = buildAddRecordPath({
+  type: 'condition',
+  returnTo: AppRoutes.Conditions,
+});
 
 function conditionDetailPath(id: string): string {
   return `${AppRoutes.Conditions}/${encodeURIComponent(id)}`;
@@ -81,41 +94,26 @@ function ConditionsHeader({
   onQueryChange: (value: string) => void;
 }) {
   return (
-    <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <Squares2X2Icon className="h-7 w-7" />
-              <h1 className="text-2xl font-bold sm:text-3xl">My Conditions</h1>
-            </div>
-            <p className="mt-1 text-sm text-primary-100">
-              {total} {total === 1 ? 'condition' : 'conditions'}, each with its
-              related medications, labs, care plans, goals and procedures pulled
-              together.
-            </p>
-          </div>
-          <Link
-            to={`${AppRoutes.AddRecord}?type=condition`}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-white/15 px-3 py-2 text-sm font-semibold text-white ring-1 ring-inset ring-white/30 transition hover:bg-white/25"
-          >
-            <PlusIcon className="h-5 w-5" />
-            Add condition
-          </Link>
-        </div>
-        <label className="relative block rounded-md bg-white/10 p-1 ring-1 ring-white/20">
-          <span className="sr-only">Search conditions</span>
-          <MagnifyingGlassIcon className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => onQueryChange(event.target.value)}
-            placeholder="Search condition, code, or topic"
-            className="h-10 w-full rounded-md border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-          />
-        </label>
-      </div>
-    </div>
+    <RecordPageHeader
+      title="My Conditions"
+      icon={Squares2X2Icon}
+      description={`${total} ${
+        total === 1 ? 'condition' : 'conditions'
+      }, each with its related medications, labs, care plans, goals and procedures pulled together.`}
+      search={{
+        query,
+        onChange: onQueryChange,
+        placeholder: 'Search condition, code, or topic',
+        label: 'Search conditions',
+      }}
+      action={
+        <RecordHeaderLink
+          to={ADD_CONDITION_PATH}
+          label="Add condition"
+          compact
+        />
+      }
+    />
   );
 }
 
@@ -123,47 +121,59 @@ function ConditionRow({ bundle }: { bundle: ConditionBundle }) {
   const counts = countByKind(bundle);
 
   return (
-    <Link
-      to={conditionDetailPath(bundle.id)}
-      className="block rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 transition hover:ring-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="break-words text-base font-semibold text-gray-900">
-              {bundle.name}
-            </h3>
-            <StatusBadge status={bundle.status} />
-          </div>
-          {bundle.topicLabels.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-2">
-              {bundle.topicLabels.map((label) => (
-                <span
-                  key={label}
-                  className="inline-flex items-center rounded-md bg-primary-50 px-2 py-1 text-xs font-medium text-primary-700 ring-1 ring-inset ring-primary-600/10"
-                >
-                  {label}
-                </span>
-              ))}
+    // The whole row is one link, so the Edit/Delete pair sits in a footer
+    // outside it — buttons nested inside an anchor are not valid markup, and
+    // the row would swallow the tap on its way to the detail page.
+    // The ring moved to the wrapper with it, so hovering or tabbing to the
+    // link still lights the whole card the way it did before.
+    <article className="rounded-md bg-white shadow-sm ring-1 ring-gray-200 transition focus-within:ring-2 focus-within:ring-primary-500 hover:ring-primary-300">
+      <Link
+        to={conditionDetailPath(bundle.id)}
+        className="block rounded-md p-4 focus:outline-none"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="break-words text-base font-semibold text-gray-900">
+                {bundle.name}
+              </h3>
+              <StatusBadge status={bundle.status} />
             </div>
-          )}
+            {bundle.topicLabels.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {bundle.topicLabels.map((label) => (
+                  <span
+                    key={label}
+                    className="inline-flex items-center rounded-md bg-primary-50 px-2 py-1 text-xs font-medium text-primary-700 ring-1 ring-inset ring-primary-600/10"
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          <span className="shrink-0 text-sm font-medium text-primary-700">
+            {bundle.related.length} related
+          </span>
         </div>
-        <span className="shrink-0 text-sm font-medium text-primary-700">
-          {bundle.related.length} related
-        </span>
-      </div>
 
-      {bundle.related.length > 0 && (
-        <p className="mt-3 text-sm text-gray-600">
-          {counts
-            .map(([kind, count]) => {
-              const [singular, plural] = KIND_LABEL[kind];
-              return `${count} ${count === 1 ? singular : plural}`;
-            })
-            .join(' · ')}
-        </p>
+        {bundle.related.length > 0 && (
+          <p className="mt-3 text-sm text-gray-600">
+            {counts
+              .map(([kind, count]) => {
+                const [singular, plural] = KIND_LABEL[kind];
+                return `${count} ${count === 1 ? singular : plural}`;
+              })
+              .join(' · ')}
+          </p>
+        )}
+      </Link>
+      {isManualRecord(bundle.document) && (
+        <div className="px-4 pb-3">
+          <ManualRecordActions item={bundle.document} />
+        </div>
       )}
-    </Link>
+    </article>
   );
 }
 
@@ -220,11 +230,14 @@ function EmptyState() {
         Once you connect a portal or add a diagnosis, each condition will appear
         here alongside its related medications, labs, and care plans.
       </p>
+      {/* Was "Go to Problems", which asked a reader with nothing on this page
+          to go somewhere else under another name to type the same record. */}
       <Link
-        to={AppRoutes.Problems}
-        className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+        to={ADD_CONDITION_PATH}
+        className="mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
       >
-        Go to Problems
+        <PlusIcon className="h-5 w-5 shrink-0" />
+        Add condition
       </Link>
     </div>
   );

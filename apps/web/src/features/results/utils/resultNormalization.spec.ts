@@ -82,6 +82,96 @@ describe('buildResultsViewModel', () => {
     expect(detail?.linkedDocuments.map((doc) => doc.id)).toContain('report-1');
   });
 
+  // A lab panel report carries category code "Lab" in Epic exports. Counting it
+  // as a lab result made /records/results report twelve more labs than
+  // /records/labs; it is the container for results already counted.
+  it('treats a lab-categorised diagnostic report as a report, not a lab', () => {
+    const member = createDocument({
+      id: 'lab-1',
+      resourceType: 'observation',
+      displayName: 'Hemoglobin A1c',
+      date: '2026-05-01T12:00:00Z',
+      resource: {
+        resourceType: 'Observation',
+        id: 'https://example.org/FHIR/Observation/obs-1',
+        status: 'final',
+        category: [{ coding: [{ code: 'laboratory' }] }],
+        code: { text: 'Hemoglobin A1c' },
+        valueQuantity: { value: 5.4, unit: '%' },
+      },
+    });
+    const panel = createDocument({
+      id: 'panel-1',
+      resourceType: 'diagnosticreport',
+      displayName: 'HEMOGLOBIN A1C',
+      date: '2026-05-01T12:00:00Z',
+      resource: {
+        resourceType: 'DiagnosticReport',
+        id: 'https://example.org/FHIR/DiagnosticReport/report-1',
+        status: 'final',
+        category: { text: 'Lab', coding: [{ code: 'Lab', display: 'Lab' }] },
+        code: { text: 'HEMOGLOBIN A1C' },
+        result: [{ reference: 'https://example.org/FHIR/Observation/obs-1' }],
+      },
+    });
+
+    const viewModel = buildResultsViewModel({
+      clinicalDocuments: [member, panel],
+    });
+    const results = viewModel.groups.flatMap((group) => group.results);
+
+    expect(results.filter((result) => result.type === 'lab')).toHaveLength(1);
+    const panelSummary = results.find((result) => result.id === 'panel-1');
+    expect(panelSummary?.type).toBe('diagnostic-report');
+    // The panel lists the observation it contains rather than "None linked".
+    expect(
+      viewModel.detailsById
+        .get('panel-1')
+        ?.linkedDocuments.map((document) => document.id),
+    ).toContain('lab-1');
+  });
+
+  it('sorts undated results after dated ones, including pre-epoch dates', () => {
+    const undated = createDocument({
+      id: 'undated-1',
+      resourceType: 'observation',
+      displayName: 'Undated Marker',
+      date: '',
+      resource: {
+        resourceType: 'Observation',
+        id: 'obs-undated',
+        status: 'final',
+        category: [{ coding: [{ code: 'laboratory' }] }],
+        code: { text: 'Undated Marker' },
+        valueQuantity: { value: 1, unit: 'mmol/L' },
+      },
+    });
+    const preEpoch = createDocument({
+      id: 'old-1',
+      resourceType: 'observation',
+      displayName: 'Old Marker',
+      date: '1965-02-03T00:00:00Z',
+      resource: {
+        resourceType: 'Observation',
+        id: 'obs-old',
+        status: 'final',
+        category: [{ coding: [{ code: 'laboratory' }] }],
+        code: { text: 'Old Marker' },
+        valueQuantity: { value: 2, unit: 'mmol/L' },
+      },
+    });
+
+    const viewModel = buildResultsViewModel({
+      clinicalDocuments: [undated, preEpoch],
+    });
+
+    expect(
+      viewModel.groups.flatMap((group) =>
+        group.results.map((result) => result.id),
+      ),
+    ).toEqual(['old-1', 'undated-1']);
+  });
+
   it('maps imaging reports and preserves metadata-only state', () => {
     const imaging = createDocument({
       id: 'imaging-1',

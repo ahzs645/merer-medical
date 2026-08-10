@@ -1,7 +1,7 @@
 import { useUser } from '../../app/providers/UserProvider';
 import { AppPage } from '../../shared/components/AppPage';
 import { PacketContentsCard } from './components/PacketContentsCard';
-import { PreviewUtilityCard } from './components/PreviewUtilityCard';
+import { PreviewCard } from './components/PreviewCard';
 import { ProviderPacketCard } from './components/ProviderPacketCard';
 import { RecordPackageCard } from './components/RecordPackageCard';
 import { VisitPrepBanner } from './components/VisitPrepBanner';
@@ -83,7 +83,7 @@ export function VisitPrepTab() {
             <RecordPackageCard {...recordPackageExport} />
           </section>
 
-          <PreviewUtilityCard
+          <PreviewCard
             previewMode={previewMode}
             setPreviewMode={setPreviewMode}
             previewFile={previewFile}

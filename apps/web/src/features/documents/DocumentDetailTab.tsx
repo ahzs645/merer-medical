@@ -3,7 +3,6 @@ import { Link, useParams } from 'react-router-dom';
 import { Disclosure } from '@headlessui/react';
 import {
   ArrowDownTrayIcon,
-  ArrowLeftIcon,
   ArrowTopRightOnSquareIcon,
   BeakerIcon,
   CalendarDaysIcon,
@@ -23,6 +22,7 @@ import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocumen
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
+import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { EmbeddedAttachmentViewer } from '../timeline/components/document-reference/EmbeddedAttachmentViewer';
@@ -327,27 +327,19 @@ export function DocumentDetailTab() {
   return (
     <AppPage
       banner={
-        <div className="bg-primary-800 px-4 py-5 text-white sm:px-6 lg:px-8">
-          <div className="mx-auto flex max-w-7xl flex-col gap-3">
-            <Link
-              to={AppRoutes.Documents}
-              className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-primary-100 hover:text-white"
-            >
-              <ArrowLeftIcon className="h-4 w-4" />
-              All documents
-            </Link>
-            <div className="flex items-center gap-2">
-              <DocumentTextIcon className="h-7 w-7 shrink-0" />
-              <h1 className="text-2xl font-semibold">{title}</h1>
-            </div>
-            <p className="text-sm text-primary-100">
+        <RecordPageHeader
+          title={title}
+          icon={DocumentTextIcon}
+          backLink={{ to: AppRoutes.Documents, label: 'All documents' }}
+          count={
+            <>
               {safeFormatDate(document?.metadata?.date, 'PP', '')}
               {linked.length
                 ? ` · ${linked.length} linked record${linked.length === 1 ? '' : 's'}`
                 : ''}
-            </p>
-          </div>
-        </div>
+            </>
+          }
+        />
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">

@@ -15,7 +15,7 @@
         "resource": {
           "resourceType": "AllergyIntolerance",
           "id": "fb2d3054-66a5-4201-a3bc-36a060b59a05",
-          "recordedDate": "2012-02-14T03:07:15.684Z",
+          "recordedDate": "2022-02-14T03:07:15.684Z",
           "patient": {
             "display": "Smith, John",
             "reference": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/Patient/fb2d3054-66a5-4201-a3bc-36a060b59a05"
@@ -43,7 +43,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/AllergyIntolerance/fb2d3054-66a5-4201-a3bc-36a060b59a05",
-      "date": "2012-02-14T03:07:15.684Z"
+      "date": "2022-02-14T03:07:15.684Z"
     },
     "_meta": {
       "lwt": 1761781117809.38
@@ -116,7 +116,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/CarePlan/fb2d3054-66a5-4201-a3bc-36a060b59a05",
-      "date": "2006-04-01T08:53:40.204Z"
+      "date": "2023-04-01T08:53:40.204Z"
     },
     "_meta": {
       "lwt": 1761781117811.01

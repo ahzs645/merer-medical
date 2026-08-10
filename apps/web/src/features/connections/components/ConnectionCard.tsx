@@ -10,7 +10,7 @@ import cernerLogo from '../../../assets/img/cerner-logo.png';
 import allscriptsConnectLogo from '../../../assets/img/allscripts-logo.png';
 import vaLogo from '../../../assets/img/va-logo.png';
 import healowLogo from '../../../assets/img/ecw-logo.png';
-import { differenceInDays, format, parseISO } from 'date-fns';
+import { formatDistanceToNow, parseISO } from 'date-fns';
 import { RxDocument } from 'rxdb';
 import { useNotificationDispatch } from '../../../app/providers/NotificationProvider';
 import { useUserPreferences } from '../../../app/providers/UserPreferencesProvider';
@@ -31,7 +31,25 @@ import { Modal } from '../../../shared/components/Modal';
 import { ModalHeader } from '../../../shared/components/ModalHeader';
 import { deleteConnectionWithCascade } from '../../../services/fhir/ConnectionService';
 import { ConnectionDetailDrawer } from '../../sources/components/ConnectionDetailDrawer';
-import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import {
+  ArrowPathIcon,
+  InformationCircleIcon,
+  WrenchScrewdriverIcon,
+} from '@heroicons/react/24/outline';
+import { safeFormatDate } from '../../../shared/utils/dateFormatters';
+
+/**
+ * The portal brand used to be glued onto the front of every title
+ * ("MyChart - Highlands Hospital"). On a phone the shared prefix survives
+ * truncation and the words that say *which* hospital get cut, so the brand is
+ * rendered as a separate secondary line and the institution keeps the row.
+ */
+const portalBrands: Partial<Record<ConnectionSources, string>> = {
+  epic: 'MyChart',
+  cerner: 'Cerner',
+  veradigm: 'Veradigm',
+  freestyle_libre: 'FreeStyle Libre',
+};
 
 function getImage(logo: ConnectionSources) {
   switch (logo) {
@@ -167,142 +185,118 @@ export function ConnectionCard({
     return () => clearInterval(interval);
   }, [showPeriodText, syncing]);
 
+  const source = item.get('source') as ConnectionSources,
+    brand = portalBrands[source],
+    institution = item.get('name') as string,
+    lastRefreshed = item.get('last_refreshed') as string | undefined,
+    hasError = !!item.get('last_sync_was_error'),
+    displayName = brand ? `${brand} - ${institution}` : institution;
+
   return (
-    <li
-      key={item.id}
-      className="col-span-1 mb-8 divide-y divide-gray-200 rounded-lg bg-white shadow"
-    >
-      <div className="flex w-full items-center justify-between space-x-6 p-6">
-        {getImage(item.get('source')) ? (
+    <li className="col-span-1 mb-3 rounded-lg bg-white shadow">
+      <div className="flex w-full items-start gap-3 p-4">
+        {getImage(source) ? (
           <img
             className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
-            src={getImage(item.get('source'))}
-            alt={`${item.get('source')} logo`}
+            src={getImage(source)}
+            alt=""
           />
         ) : (
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-sky-100 text-sm font-semibold text-sky-800">
             CGM
           </div>
         )}
-        <div className="flex-1 truncate">
-          <div className="flex items-center space-x-3">
-            <h3 className="truncate text-sm font-semibold  text-gray-900">
-              {item.get('source') === 'epic'
-                ? `MyChart - ${item.get('name')}`
-                : item.get('source') === 'cerner'
-                  ? `Cerner - ${item.get('name')}`
-                  : item.get('source') === 'veradigm'
-                    ? `Veradigm - ${item.get('name')}`
-                    : item.get('source') === 'freestyle_libre'
-                      ? `FreeStyle Libre - ${item.get('name')}`
-                      : item.get('name')}
-            </h3>
-          </div>
-          {item.get('last_sync_was_error') ? (
-            <div className="mt-1 flex flex-row items-center truncate align-middle text-sm font-medium text-red-500">
-              <AbnormalResultIcon />
-              <p className="pl-1">
-                {formatErrorLastAttemptTimestampText(
-                  item.get('last_refreshed'),
-                )}{' '}
-              </p>
-            </div>
+        <div className="min-w-0 flex-1">
+          {brand ? (
+            <p className="truncate text-xs font-semibold uppercase tracking-wide text-gray-500">
+              {brand}
+            </p>
+          ) : null}
+          <h3
+            className="line-clamp-2 text-sm font-semibold text-gray-900"
+            title={institution}
+          >
+            {institution}
+          </h3>
+          {deleting ? (
+            <p className="mt-1 flex items-center gap-2 text-sm font-medium text-gray-700">
+              <ButtonLoadingSpinner />
+              Disconnecting…
+            </p>
+          ) : hasError ? (
+            <p className="mt-1 flex items-start text-sm font-medium text-red-600">
+              <span className="mt-0.5 flex-shrink-0">
+                <AbnormalResultIcon />
+              </span>
+              <span className="pl-1">
+                {lastRefreshed ? (
+                  <>
+                    Unable to sync since{' '}
+                    <RelativeSyncTime isoDate={lastRefreshed} />
+                  </>
+                ) : (
+                  'Unable to sync'
+                )}
+              </span>
+            </p>
           ) : (
-            <p className="mt-1 truncate text-sm font-medium text-gray-800">
-              {syncing
-                ? `Syncing now${showPeriodText}`
-                : `Connected ${
-                    item.get('last_refreshed')
-                      ? formatConnectedTimestampText(item.get('last_refreshed'))
-                      : ''
-                  }`}
+            <p className="mt-1 text-sm font-medium text-gray-700">
+              {syncing ? (
+                `Syncing now${showPeriodText}`
+              ) : lastRefreshed ? (
+                <>
+                  {isLocalImport ? 'Imported ' : 'Connected · synced '}
+                  <RelativeSyncTime isoDate={lastRefreshed} />
+                </>
+              ) : isLocalImport ? (
+                'Imported'
+              ) : (
+                'Connected'
+              )}
             </p>
           )}
         </div>
         <button
           type="button"
-          aria-label="View source details"
-          title="View source details"
+          aria-label={`Details and options for ${displayName}`}
+          title="Details and options"
           onClick={() => setShowDetail(true)}
-          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+          className="-mr-2 -mt-1 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
         >
-          <InformationCircleIcon className="h-6 w-6" />
+          <InformationCircleIcon className="h-6 w-6" aria-hidden="true" />
         </button>
       </div>
-      <div>
-        <div className="-mt-px flex divide-x divide-gray-200">
-          <button
-            disabled={deleting}
-            className={`flex w-0 flex-1 ${
-              deleting ? 'disabled:bg-slate-50' : ''
-            }`}
-            onClick={() => setShowModal(true)}
-          >
-            <div className="relative -mr-px inline-flex h-full w-0 flex-1 items-center justify-center rounded-bl-lg border border-transparent px-1 py-4 text-sm font-medium text-gray-800 hover:text-gray-800">
-              Disconnect Source
-              {deleting ? (
-                <span className="ml-3">
-                  <ButtonLoadingSpinner />
-                </span>
-              ) : null}
-            </div>
-          </button>
-          <button
-            disabled={syncing || isLocalImport}
-            className="-ml-px flex w-0 flex-1 divide-x divide-gray-800 disabled:bg-slate-50"
-            onClick={handleFetchData}
-          >
-            <div className="relative inline-flex h-full w-0 flex-1 items-center justify-center rounded-br-lg border border-transparent py-4 text-sm font-medium text-gray-800 hover:text-gray-800">
-              {isLocalImport ? 'Imported' : 'Sync'}
-              <span className="ml-3">
-                {syncing ? <ButtonLoadingSpinner /> : null}
-              </span>
-            </div>
-          </button>
-          {item.get('last_sync_was_error') ? (
+      {/* Only the routine action lives on the card. Disconnecting deletes every
+          record from the source, so it sits behind the details button with a
+          confirmation rather than beside Sync as an equal-weight twin. */}
+      {isLocalImport ? null : (
+        <div className="flex items-center justify-end gap-1 border-t border-gray-100 px-2 py-1">
+          {hasError ? (
             <button
+              type="button"
               disabled={syncing}
-              className="-ml-px flex flex-initial divide-x divide-gray-800 px-4 disabled:bg-slate-50"
               onClick={handleFix}
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-md px-3 text-sm font-bold text-amber-700 hover:bg-amber-50 disabled:text-gray-400"
             >
-              <div className="relative inline-flex h-full flex-initial items-center justify-center rounded-br-lg border border-transparent py-4 text-sm font-bold text-red-500 hover:text-gray-800">
-                Fix
-              </div>
+              <WrenchScrewdriverIcon className="h-4 w-4" aria-hidden="true" />
+              Fix connection
             </button>
           ) : null}
-        </div>
-      </div>
-      <Modal
-        open={showModal}
-        setOpen={setShowModal}
-        overflowHidden
-        overflowXHidden
-      >
-        <ModalHeader
-          title="Remove Connection"
-          subtitle="Are you sure you want to remove this connection?"
-          setClose={(x: boolean) => setShowModal(x)}
-        />
-        <div className="m-4 flex justify-end">
           <button
             type="button"
-            className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm hover:bg-gray-50"
-            onClick={() => setShowModal(false)}
+            disabled={syncing || deleting}
+            onClick={handleFetchData}
+            className="text-primary-700 hover:bg-primary-50 inline-flex min-h-[44px] items-center gap-2 rounded-md px-3 text-sm font-bold disabled:text-gray-400"
           >
-            Cancel
-          </button>
-          <button
-            type="button"
-            className="ml-3 inline-flex justify-center rounded-md border border-red-300 bg-red-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-600"
-            onClick={() => {
-              removeDocument(item);
-              setShowModal(false);
-            }}
-          >
-            Remove
+            {syncing ? (
+              <ButtonLoadingSpinner />
+            ) : (
+              <ArrowPathIcon className="h-4 w-4" aria-hidden="true" />
+            )}
+            {syncing ? 'Syncing' : 'Sync'}
           </button>
         </div>
-      </Modal>
+      )}
       <ConnectionDetailDrawer
         item={item}
         open={showDetail}
@@ -314,36 +308,71 @@ export function ConnectionCard({
         onSync={() => handleFetchData()}
         onFix={handleFix}
         onDisconnect={() => {
+          // Confirm before a destructive, irreversible delete.
           setShowDetail(false);
-          removeDocument(item);
+          setShowModal(true);
         }}
       />
+      <Modal
+        open={showModal}
+        setOpen={setShowModal}
+        overflowHidden
+        overflowXHidden
+      >
+        <ModalHeader
+          title="Disconnect this source?"
+          subtitle={
+            <p className="text-sm text-gray-700">
+              {displayName} will be disconnected and the records already
+              imported from it will be deleted from this device. This cannot be
+              undone — you can reconnect later, but you will need to sign in to
+              the portal again.
+            </p>
+          }
+          setClose={(x: boolean) => setShowModal(x)}
+        />
+        <div className="m-4 flex flex-wrap justify-end gap-3">
+          <button
+            type="button"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm hover:bg-gray-50"
+            onClick={() => setShowModal(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-md border border-red-700 bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-700"
+            onClick={() => {
+              removeDocument(item);
+              setShowModal(false);
+            }}
+          >
+            Disconnect and delete records
+          </button>
+        </div>
+      </Modal>
     </li>
   );
 }
 
-function formatConnectedTimestampText(isoDate: string) {
-  return Math.abs(differenceInDays(parseISO(isoDate), new Date())) >= 1
-    ? ` - synced on ${formatTimestampToDay(isoDate)}`
-    : ` - synced at 
-          ${formatTimestampToTime(isoDate)}`;
-}
-
-function formatErrorLastAttemptTimestampText(isoDate: string) {
-  if (!isoDate) {
-    return `Unable to sync`;
+/**
+ * A bare "synced on Nov 14" cannot tell a two-week-old sync from a two-year-old
+ * one, so show the relative age and keep the exact timestamp on hover/focus.
+ */
+function RelativeSyncTime({ isoDate }: { isoDate: string }) {
+  let relative = isoDate;
+  try {
+    relative = formatDistanceToNow(parseISO(isoDate), { addSuffix: true });
+  } catch {
+    // Fall back to the raw value rather than crashing the card.
   }
-  return Math.abs(differenceInDays(parseISO(isoDate), new Date())) >= 1
-    ? ` Unable to sync since ${formatTimestampToDay(
-        isoDate,
-      )} at ${formatTimestampToTime(isoDate)}`
-    : ` Unable to sync since ${formatTimestampToTime(isoDate)}`;
-}
-
-function formatTimestampToDay(isoDate: string) {
-  return format(parseISO(isoDate), 'MMM dd');
-}
-
-function formatTimestampToTime(isoDate: string) {
-  return format(parseISO(isoDate), 'p');
+  return (
+    <time
+      dateTime={isoDate}
+      title={safeFormatDate(isoDate, "MMMM d, yyyy 'at' h:mm a", isoDate)}
+      className="underline decoration-dotted underline-offset-2"
+    >
+      {relative}
+    </time>
+  );
 }

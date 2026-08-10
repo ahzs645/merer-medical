@@ -13,15 +13,21 @@ import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { WorkflowRecord } from '../../models/workflow-record/WorkflowRecord.type';
+import { Routes as AppRoutes } from '../../Routes';
 import {
   deleteWorkflowRecord,
   listWorkflowRecords,
   upsertWorkflowRecord,
 } from '../../repositories/WorkflowRecordRepository';
 import { AppPage } from '../../shared/components/AppPage';
+import {
+  RecordHeaderLink,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
 import { StylizedSelect } from '../../shared/components/StylizedSelect';
 import { formatDisplayText } from '../../shared/utils/StyleUtils';
 import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 
 type CareResourceType = 'careplan' | 'goal' | 'servicerequest';
@@ -59,7 +65,10 @@ const CARE_RESOURCE_TYPES: CareResourceType[] = [
   'goal',
   'servicerequest',
 ];
-const NEW_CARE_PLAN_PATH = '/records/new?type=careplan';
+const NEW_CARE_PLAN_PATH = buildAddRecordPath({
+  type: 'careplan',
+  returnTo: AppRoutes.CarePlans,
+});
 
 function storageKey(userId: string) {
   return `mere-medical:care-items:${userId}`;
@@ -184,24 +193,17 @@ export function CarePlansTab() {
   return (
     <AppPage
       banner={
-        <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
-          <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold sm:text-3xl">Care plans</h1>
-              <p className="mt-1 text-sm text-primary-100">
-                Care plans, goals, orders, and your own checklist tasks and
-                reminders.
-              </p>
-            </div>
-            <Link
+        <RecordPageHeader
+          title="Care plans"
+          description="Care plans, goals, orders, and your own checklist tasks and reminders."
+          action={
+            <RecordHeaderLink
               to={NEW_CARE_PLAN_PATH}
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-inset ring-primary-100 hover:bg-primary-50"
-            >
-              <PlusIcon className="h-5 w-5" />
-              New care plan
-            </Link>
-          </div>
-        </div>
+              label="New care plan"
+              compact
+            />
+          }
+        />
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">

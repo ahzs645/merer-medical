@@ -77,7 +77,7 @@ export function ProviderPacketCard({
                     Questions for visit
                   </h3>
                   <p className="mt-1 text-xs text-gray-500 print:hidden">
-                    Saved locally for this user.
+                    Saved on this device.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 print:hidden">

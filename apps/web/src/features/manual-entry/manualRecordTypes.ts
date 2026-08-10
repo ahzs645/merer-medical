@@ -16,6 +16,7 @@ export type ManualRecordKind =
   | 'careplan'
   | 'goal'
   | 'coverage'
+  | 'servicerequest'
   | 'document'
   | 'lab'
   | 'vital'
@@ -71,6 +72,7 @@ export const recordTypes: Array<{ value: ManualRecordKind; label: string }> = [
   { value: 'careplan', label: 'Care plan' },
   { value: 'goal', label: 'Health goal' },
   { value: 'coverage', label: 'Insurance / coverage' },
+  { value: 'servicerequest', label: 'Referral' },
   { value: 'document', label: 'Document / file' },
   { value: 'lab', label: 'Lab / result' },
   { value: 'vital', label: 'Vital sign' },

@@ -1,14 +1,28 @@
 import { useEffect, useMemo, useState } from 'react';
-import { HeartIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { HeartIcon } from '@heroicons/react/24/outline';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
+import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
-import { GenericBanner } from '../../shared/components/GenericBanner';
+import {
+  RecordHeaderLink,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
+import { isVitalSignObservation } from './utils/vitalRecords';
+
+// Saving lands back here rather than on the Timeline: a reading you typed on
+// the Vitals page belongs in front of you on the Vitals page.
+const ADD_VITAL_PATH = buildAddRecordPath({
+  type: 'vital',
+  returnTo: AppRoutes.Vitals,
+});
 
 interface Reading {
   date?: string;
@@ -39,6 +53,21 @@ type FhirObservation = {
   component?: FhirComponent[];
 };
 
+const UCUM_SUPERSCRIPTS: Record<string, string> = { '2': '²', '3': '³' };
+
+/**
+ * UCUM spells exponents inline (`kg/m2`, `m2`), which renders as a literal
+ * "kg/m2" in the largest text on the vitals card. Swap a trailing 2/3 that
+ * follows a letter for the real superscript character — "kg/m²".
+ */
+function formatUnit(unit: string): string {
+  return unit.replace(
+    /([a-zA-Z])([23])(?![0-9a-zA-Z])/g,
+    (_match, letter: string, digit: string) =>
+      `${letter}${UCUM_SUPERSCRIPTS[digit]}`,
+  );
+}
+
 /** Extracts a display value + sparkline number from a vital Observation, with
  * special handling for blood pressure (systolic/diastolic components). */
 function readObservation(resource: FhirObservation): {
@@ -54,7 +83,7 @@ function readObservation(resource: FhirObservation): {
   const systolic = findComponent('8480-6');
   const diastolic = findComponent('8462-4');
   if (systolic?.value != null || diastolic?.value != null) {
-    const unit = systolic?.unit || diastolic?.unit || 'mmHg';
+    const unit = formatUnit(systolic?.unit || diastolic?.unit || 'mmHg');
     return {
       text: `${systolic?.value ?? '–'}/${diastolic?.value ?? '–'} ${unit}`.trim(),
       numeric: systolic?.value,
@@ -62,7 +91,10 @@ function readObservation(resource: FhirObservation): {
     };
   }
   if (resource.valueQuantity?.value != null) {
-    const { value, unit } = resource.valueQuantity;
+    const { value } = resource.valueQuantity;
+    const unit = resource.valueQuantity.unit
+      ? formatUnit(resource.valueQuantity.unit)
+      : undefined;
     return {
       text: unit ? `${value} ${unit}` : `${value}`,
       numeric: value,
@@ -73,7 +105,10 @@ function readObservation(resource: FhirObservation): {
   // Fall back to the first numeric component.
   const firstComponent = components.find((c) => c.valueQuantity?.value != null);
   if (firstComponent?.valueQuantity?.value != null) {
-    const { value, unit } = firstComponent.valueQuantity;
+    const { value } = firstComponent.valueQuantity;
+    const unit = firstComponent.valueQuantity.unit
+      ? formatUnit(firstComponent.valueQuantity.unit)
+      : undefined;
     return {
       text: unit ? `${value} ${unit}` : `${value}`,
       numeric: value,
@@ -81,20 +116,6 @@ function readObservation(resource: FhirObservation): {
     };
   }
   return { text: '—' };
-}
-
-function isVitalSign(resource: Record<string, unknown>): boolean {
-  // FHIR models Observation.category as an array, but some stored/imported
-  // records carry a single CodeableConcept object instead. Normalize both
-  // shapes to an array so `.some` never throws on the object form.
-  const raw = resource['category'] as
-    | Array<{ coding?: Array<{ code?: string }> }>
-    | { coding?: Array<{ code?: string }> }
-    | undefined;
-  const categories = Array.isArray(raw) ? raw : raw ? [raw] : [];
-  return categories.some((category) =>
-    (category.coding || []).some((coding) => coding.code === 'vital-signs'),
-  );
 }
 
 function useVitals() {
@@ -105,11 +126,18 @@ function useVitals() {
     'loading',
   );
   const [error, setError] = useState<Error | null>(null);
+  // Refetch when a manual record is added, edited, or deleted: without it a
+  // vital added from this page's own button never appeared until a reload.
+  const recordChangeTick = useRecordChangeTick();
 
   useEffect(() => {
     let mounted = true;
     async function load() {
-      setStatus('loading');
+      // Only a first load blanks the page. Flipping back to `loading` on every
+      // record change swapped the whole list for the placeholder, unmounting
+      // the cards — and closing any history someone had opened — each time a
+      // vital was added from this page's own button.
+      setStatus((current) => (current === 'success' ? current : 'loading'));
       setError(null);
       const docs = await db.clinical_documents
         .find({
@@ -124,10 +152,9 @@ function useVitals() {
       const byKey = new Map<string, VitalGroup>();
       for (const doc of docs) {
         const d = doc.toMutableJSON() as ClinicalDocument;
-        const resource = getFhirResource<
-          FhirObservation & Record<string, unknown>
-        >(d);
-        if (!resource || !isVitalSign(resource)) continue;
+        if (!isVitalSignObservation(d)) continue;
+        const resource = getFhirResource<FhirObservation>(d);
+        if (!resource) continue;
         const loinc = resource.code?.coding?.[0]?.code;
         const name =
           resource.code?.text ||
@@ -175,7 +202,7 @@ function useVitals() {
     return () => {
       mounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   return { groups, status, error };
 }
@@ -221,6 +248,14 @@ function Sparkline({ readings }: { readings: Reading[] }) {
   );
 }
 
+/**
+ * Names the trigger by what it opens and how much of it: "Show more" would not
+ * say whether one row or twelve are hidden under it.
+ */
+function earlierReadingsLabel(count: number): string {
+  return `${count} earlier ${count === 1 ? 'reading' : 'readings'}`;
+}
+
 export function VitalsTab() {
   const { groups, status, error } = useVitals();
   const [query, setQuery] = useState('');
@@ -232,21 +267,29 @@ export function VitalsTab() {
   }, [groups, query]);
 
   return (
-    <AppPage banner={<GenericBanner text="Vital signs" />}>
+    <AppPage
+      banner={
+        <RecordPageHeader
+          title="Vital signs"
+          search={{
+            query,
+            onChange: setQuery,
+            placeholder: 'Search vital signs',
+          }}
+          // Vitals was one of six browsable categories with no way in, which is
+          // why nobody discovers that a reading can be typed by hand at all.
+          action={
+            <RecordHeaderLink
+              to={ADD_VITAL_PATH}
+              label="Add vital sign"
+              compact
+            />
+          }
+        />
+      }
+    >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-3xl gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          <label className="relative block">
-            <span className="sr-only">Search vital signs</span>
-            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search vital signs"
-              className="focus:border-primary-500 focus:ring-primary-500 h-10 w-full rounded-md border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-1"
-            />
-          </label>
-
           {status === 'loading' ? (
             <Placeholder text="Loading vital signs…" />
           ) : status === 'error' ? (
@@ -280,11 +323,38 @@ export function VitalsTab() {
                   <Sparkline readings={group.readings} />
                 </div>
 
+                {/* Six dated rows a card, three cards: the history alone filled
+                    a phone screen before you reached the third vital, and the
+                    sparkline above already says which way it is going. Native
+                    <details> rather than a state-holding disclosure — the browser gives the
+                    button semantics, the expanded state and the keyboard — with
+                    the summary left a list-item, because a flex summary drops
+                    the triangle in Chrome. */}
                 {group.readings.length > 1 && (
-                  <div className="mt-3 border-t border-gray-100 pt-2">
-                    <table className="w-full text-xs text-gray-600">
+                  <details className="-mb-4 mt-3 border-t border-gray-100">
+                    <summary
+                      // 14px of padding around a 16px line is the 44px target exactly. With
+                      // `py-3` + `min-h-[44px]` the 4px of slack all fell below the
+                      // text, and the card's own 16px of padding fell under that:
+                      // 32px of white under the label against 12px above it.
+                      className="text-primary-700 hover:text-primary-800 cursor-pointer py-3.5 text-xs font-semibold"
+                      // Every card offers the same phrase, so the spoken name
+                      // adds the vital — as a suffix, so the visible label is
+                      // still the start of it.
+                      aria-label={`${earlierReadingsLabel(
+                        group.readings.length - 1,
+                      )} for ${group.name}`}
+                    >
+                      {earlierReadingsLabel(group.readings.length - 1)}
+                    </summary>
+                    <table className="mb-4 w-full text-xs text-gray-600">
                       <tbody>
-                        {group.readings.slice(0, 6).map((reading, index) => (
+                        {/* From the second reading down: the newest is the
+                            headline above. The old 6-row cap goes with it —
+                            it bounded a list that was always open, and here it
+                            would only hide readings someone opened the list to
+                            find. */}
+                        {group.readings.slice(1).map((reading, index) => (
                           <tr
                             key={index}
                             className="border-b border-gray-50 last:border-0"
@@ -301,7 +371,7 @@ export function VitalsTab() {
                         ))}
                       </tbody>
                     </table>
-                  </div>
+                  </details>
                 )}
               </article>
             ))

@@ -117,7 +117,7 @@ export function TrackersSummaryCard() {
                     </ul>
                     <Link
                       to={AppRoutes.Trackers}
-                      className="mt-3 inline-block text-sm font-semibold text-primary-700 hover:text-primary-900"
+                      className="mt-1 inline-flex min-h-[44px] items-center text-sm font-semibold text-primary-700 hover:text-primary-900"
                     >
                       {t('Open trackers')}
                     </Link>

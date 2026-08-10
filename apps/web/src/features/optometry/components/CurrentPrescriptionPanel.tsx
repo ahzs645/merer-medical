@@ -1,9 +1,8 @@
 import { EyeIcon, SparklesIcon } from '@heroicons/react/24/outline';
-import { Link } from 'react-router-dom';
 
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
-import { Routes as AppRoutes } from '../../../Routes';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
+import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { OptometryRecord } from '../types';
 import {
   PrescriptionTimelineEntry,
@@ -74,19 +73,9 @@ function CurrentRxCard({
 
   return (
     <article className="rounded-md bg-gray-50 p-3 ring-1 ring-gray-200">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-gray-900">
-          <Icon className="h-5 w-5" />
-          <h3 className="text-sm font-semibold">{heading}</h3>
-        </div>
-        {entry && isManualRecord(entry.document) && (
-          <Link
-            to={AppRoutes.EditRecord.replace(':recordId', entry.document.id)}
-            className="text-xs font-semibold text-primary-700 hover:text-primary-900"
-          >
-            {t('Edit')}
-          </Link>
-        )}
+      <div className="flex items-center gap-2 text-gray-900">
+        <Icon className="h-5 w-5" />
+        <h3 className="text-sm font-semibold">{heading}</h3>
       </div>
 
       {entry ? (
@@ -130,6 +119,9 @@ function CurrentRxCard({
               </span>
             )}
           </div>
+          {isManualRecord(entry.document) && (
+            <ManualRecordActions item={entry.document} />
+          )}
         </>
       ) : (
         <p className="mt-2 text-sm leading-6 text-gray-600">{emptyText}</p>

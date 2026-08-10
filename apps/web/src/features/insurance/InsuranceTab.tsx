@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   BuildingOffice2Icon,
   IdentificationIcon,
-  MagnifyingGlassIcon,
   PlusIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
@@ -14,6 +13,10 @@ import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
+import {
+  RecordHeaderButton,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
@@ -105,9 +108,10 @@ export function InsuranceTab() {
           ) : filteredItems.length === 0 ? (
             <div className="rounded-md bg-white p-8 text-center shadow-sm ring-1 ring-gray-200 lg:col-span-2">
               <ShieldCheckIcon className="mx-auto h-8 w-8 text-gray-400" />
-              <h1 className="mt-3 text-lg font-semibold text-gray-900">
+              {/* h2: the banner already owns the page's only h1. */}
+              <h2 className="mt-3 text-lg font-semibold text-gray-900">
                 {t('No insurance records')}
-              </h1>
+              </h2>
               <p className="mt-2 text-sm text-gray-600">
                 {t(
                   'Coverage records from C-CDA, FHIR, or imported packages will appear here.',
@@ -159,45 +163,29 @@ function InsuranceHeader({
   const { t } = useInterfaceLanguage();
 
   return (
-    <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold sm:text-3xl">{t('Insurance')}</h1>
-          <p className="mt-1 text-sm text-primary-100">
-            {t(
-              'Health coverage, payer, member ID, plan period, and source provenance.',
-            )}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2 text-sm">
-            <span className="rounded-md bg-white/15 px-2.5 py-1 font-medium text-white ring-1 ring-white/25">
-              {activeCount} {t('active')}
-            </span>
-            <span className="rounded-md bg-white/15 px-2.5 py-1 font-medium text-white ring-1 ring-white/25">
-              {totalCount} {t('plans')}
-            </span>
-          </div>
-        </div>
-        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center lg:w-auto">
-          <label className="relative w-full lg:w-96">
-            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder={t('Search payer, member ID, type, or address')}
-              className="w-full rounded-md border-0 bg-white py-2 pl-10 pr-3 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
-            />
-          </label>
-          <button
-            type="button"
-            onClick={onAdd}
-            className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-800 shadow-sm hover:bg-primary-50"
-          >
-            <PlusIcon className="h-4 w-4" />
-            {t('Add insurance')}
-          </button>
-        </div>
-      </div>
-    </div>
+    <RecordPageHeader
+      title={t('Insurance')}
+      description={t(
+        'Health coverage, payer, member ID, plan period, and source provenance.',
+      )}
+      count={
+        <>
+          {activeCount} {t('active')} · {totalCount} {t('plans')}
+        </>
+      }
+      search={{
+        query,
+        onChange: setQuery,
+        placeholder: t('Search payer, member ID, type, or address'),
+      }}
+      action={
+        <RecordHeaderButton
+          onClick={onAdd}
+          label={t('Add insurance')}
+          compact
+        />
+      }
+    />
   );
 }
 
@@ -235,7 +223,9 @@ function InsurancePlanCard({
             <Fact label="Member ID" value={item.subscriberId} />
             <Fact label="Relationship" value={item.relationship} />
             <Fact label="Type" value={item.type} />
-            <Fact label="Period" value={item.periodLabel} />
+            {/* The end year is the whole point of the period, so this one wraps
+                instead of truncating ("Jun 30, 2…" told the user nothing). */}
+            <Fact label="Period" value={item.periodLabel} wrap />
           </dl>
         </div>
       </div>
@@ -287,14 +277,30 @@ function InsuranceDetails({ item }: { item: InsuranceItem }) {
   );
 }
 
-function Fact({ label, value }: { label: string; value?: string }) {
+function Fact({
+  label,
+  value,
+  wrap,
+}: {
+  label: string;
+  value?: string;
+  /** Wrap onto extra lines rather than truncating (for values that lose their
+   * meaning when clipped, like a coverage period's end date). */
+  wrap?: boolean;
+}) {
   if (!value) return null;
   return (
     <div>
       <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">
         {label}
       </dt>
-      <dd className="mt-0.5 truncate text-gray-900">{value}</dd>
+      <dd
+        className={`mt-0.5 text-gray-900 ${
+          wrap ? 'whitespace-normal break-words' : 'truncate'
+        }`}
+      >
+        {value}
+      </dd>
     </div>
   );
 }

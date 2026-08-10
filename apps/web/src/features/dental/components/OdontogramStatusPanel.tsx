@@ -23,8 +23,10 @@ export function OdontogramStatusPanel({
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
+          {/* Sits directly under the chart on the Chart tab, so it is named
+              for what it lists rather than repeating "odontogram". */}
           <h2 className="text-base font-semibold text-gray-900">
-            {t('Actionable odontogram')}
+            Tooth-by-tooth status
           </h2>
           <p className="text-sm text-gray-600">
             {t(

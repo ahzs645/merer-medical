@@ -2,12 +2,18 @@ import { useMemo, useState } from 'react';
 import { Odontogram, ToothDetail } from 'react-odontogram';
 import 'react-odontogram/style.css';
 
-import { DentalRecord, DentalTooth } from '../types';
+import {
+  DentalActionLevel,
+  DentalRecord,
+  DentalTooth,
+  OdontogramToothStatus,
+} from '../types';
 import {
   ALL_TEETH,
   DECIDUOUS_TEETH,
   UNIVERSAL_TEETH,
 } from '../utils/dentalReferenceData';
+import { orderArchForDisplay } from '../utils/toothChartLayout';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 type Dentition = 'permanent' | 'deciduous' | 'mixed';
@@ -24,30 +30,84 @@ const TEETH_BY_DENTITION: Record<Dentition, DentalTooth[]> = {
   mixed: ALL_TEETH,
 };
 
+/**
+ * Colours every tooth on the chart by the state its records put it in. The
+ * odontogram only lists the groups we hand it in its legend, so this doubles
+ * as the legend content — a single "Records" swatch explained nothing.
+ * Fills are Tailwind's 100 shades so the swatches match the tooth buttons
+ * below, which use the same scale.
+ */
+const TOOTH_STATES: {
+  actionLevel: DentalActionLevel;
+  label: string;
+  fillColor: string;
+  outlineColor: string;
+  buttonClass: string;
+}[] = [
+  {
+    actionLevel: 'active',
+    label: 'Needs attention',
+    fillColor: '#fee2e2',
+    outlineColor: '#b91c1c',
+    buttonClass: 'border-red-300 bg-red-100 text-red-900 hover:bg-red-200',
+  },
+  {
+    actionLevel: 'planned',
+    label: 'Treatment planned',
+    fillColor: '#fef3c7',
+    outlineColor: '#b45309',
+    buttonClass:
+      'border-amber-300 bg-amber-100 text-amber-900 hover:bg-amber-200',
+  },
+  {
+    actionLevel: 'complete',
+    label: 'Treatment done',
+    fillColor: '#d1fae5',
+    outlineColor: '#047857',
+    buttonClass:
+      'border-emerald-300 bg-emerald-100 text-emerald-900 hover:bg-emerald-200',
+  },
+  {
+    actionLevel: 'watch',
+    label: 'Record on file',
+    fillColor: '#dbeafe',
+    outlineColor: '#0369a1',
+    buttonClass: 'border-sky-300 bg-sky-100 text-sky-900 hover:bg-sky-200',
+  },
+];
+
 export function ToothChartPanel({
   recordsByTooth,
+  statuses,
 }: {
   recordsByTooth: Map<string, DentalRecord[]>;
+  statuses: OdontogramToothStatus[];
 }) {
   const { t } = useInterfaceLanguage();
   const [dentition, setDentition] = useState<Dentition>('permanent');
   const [selectedTooth, setSelectedTooth] = useState<string | null>(null);
 
+  const stateByTooth = useMemo(
+    () => new Map(statuses.map((status) => [status.tooth, status.actionLevel])),
+    [statuses],
+  );
+
   const teethConditions = useMemo(
-    () => [
-      {
-        label: t('Records'),
-        teeth: [...recordsByTooth.keys()]
-          .map((tooth) =>
-            UNIVERSAL_TEETH.find((item) => item.universal === tooth),
+    () =>
+      TOOTH_STATES.map(({ actionLevel, label, fillColor, outlineColor }) => ({
+        label,
+        // The drawn arch is the permanent dentition, and its tooth ids are
+        // `teeth-<FDI>`; deciduous statuses simply have nothing to paint.
+        teeth: statuses
+          .filter(
+            (status) =>
+              status.actionLevel === actionLevel && Number(status.fdi[0]) <= 4,
           )
-          .filter(Boolean)
-          .map((tooth) => `teeth-${tooth!.fdi}`),
-        outlineColor: '#0369a1',
-        fillColor: '#dbeafe',
-      },
-    ],
-    [recordsByTooth, t],
+          .map((status) => `teeth-${status.fdi}`),
+        outlineColor,
+        fillColor,
+      })).filter((condition) => condition.teeth.length > 0),
+    [statuses],
   );
 
   function handleOdontogramChange(selected: ToothDetail[]) {
@@ -62,27 +122,23 @@ export function ToothChartPanel({
 
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-        <div>
-          <h2 className="text-base font-semibold text-gray-900">
-            {t('Tooth chart')}
-          </h2>
-          <p className="text-sm text-gray-600">
-            {t(
-              'Universal numbering with FDI labels, ready for surface-level findings.',
-            )}
-          </p>
-        </div>
-        <span className="text-xs font-medium uppercase text-gray-500">
-          {t('Concept based on odontogram references')}
-        </span>
+      <div>
+        <h2 className="text-base font-semibold text-gray-900">
+          {t('Tooth chart')}
+        </h2>
+        <p className="text-sm text-gray-600">
+          {t(
+            'Universal numbering with FDI labels, ready for surface-level findings.',
+          )}
+        </p>
       </div>
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="overflow-hidden rounded-md border border-gray-200 bg-gray-50 p-3">
+        <div className="self-start overflow-hidden rounded-md border border-gray-200 bg-gray-50 p-3">
           <Odontogram
             layout="square"
             notation="Universal"
             teethConditions={teethConditions}
+            // The odontogram renders its legend only when labels are on.
             showLabels
             onChange={handleOdontogramChange}
             tooltip={{
@@ -104,11 +160,10 @@ export function ToothChartPanel({
           <ToothGrid
             teeth={teeth}
             recordsByTooth={recordsByTooth}
+            stateByTooth={stateByTooth}
             selectedTooth={selectedTooth}
             onSelectTooth={(tooth) =>
-              setSelectedTooth((current) =>
-                current === tooth ? null : tooth,
-              )
+              setSelectedTooth((current) => (current === tooth ? null : tooth))
             }
           />
           <SelectedToothRecords
@@ -162,11 +217,13 @@ function DentitionToggle({
 function ToothGrid({
   teeth,
   recordsByTooth,
+  stateByTooth,
   selectedTooth,
   onSelectTooth,
 }: {
   teeth: DentalTooth[];
   recordsByTooth: Map<string, DentalRecord[]>;
+  stateByTooth: Map<string, DentalActionLevel>;
   selectedTooth: string | null;
   onSelectTooth: (tooth: string) => void;
 }) {
@@ -174,15 +231,17 @@ function ToothGrid({
     <div className="grid gap-3">
       <ToothArch
         label="Upper"
-        teeth={teeth.filter((tooth) => tooth.arch === 'upper')}
+        teeth={orderArchForDisplay(teeth, 'upper')}
         recordsByTooth={recordsByTooth}
+        stateByTooth={stateByTooth}
         selectedTooth={selectedTooth}
         onSelectTooth={onSelectTooth}
       />
       <ToothArch
         label="Lower"
-        teeth={teeth.filter((tooth) => tooth.arch === 'lower')}
+        teeth={orderArchForDisplay(teeth, 'lower')}
         recordsByTooth={recordsByTooth}
+        stateByTooth={stateByTooth}
         selectedTooth={selectedTooth}
         onSelectTooth={onSelectTooth}
       />
@@ -194,12 +253,14 @@ function ToothArch({
   label,
   teeth,
   recordsByTooth,
+  stateByTooth,
   selectedTooth,
   onSelectTooth,
 }: {
   label: string;
   teeth: DentalTooth[];
   recordsByTooth: Map<string, DentalRecord[]>;
+  stateByTooth: Map<string, DentalActionLevel>;
   selectedTooth: string | null;
   onSelectTooth: (tooth: string) => void;
 }) {
@@ -216,6 +277,9 @@ function ToothArch({
         {teeth.map((tooth) => {
           const count = recordsByTooth.get(tooth.universal)?.length || 0;
           const isSelected = selectedTooth === tooth.universal;
+          const state = TOOTH_STATES.find(
+            (item) => item.actionLevel === stateByTooth.get(tooth.universal),
+          );
           return (
             <button
               key={tooth.universal}
@@ -226,8 +290,8 @@ function ToothArch({
               className={`aspect-square rounded-md border text-center text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                 isSelected
                   ? 'border-primary-700 bg-primary-700 text-white'
-                  : count > 0
-                    ? 'border-primary-600 bg-primary-50 text-primary-800 hover:bg-primary-100'
+                  : count > 0 && state
+                    ? state.buttonClass
                     : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'
               }`}
             >

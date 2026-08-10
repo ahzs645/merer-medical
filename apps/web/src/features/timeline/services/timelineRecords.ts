@@ -1,4 +1,3 @@
-import { format, parseISO } from 'date-fns';
 import { BundleEntry, FhirResource } from 'fhir/r2';
 import { MangoQuerySelector, RxDatabase, RxDocument } from 'rxdb';
 import { IVSSimilaritySearchParams, VectorStorage } from '@mere/vector-storage';
@@ -6,8 +5,41 @@ import { IVSSimilaritySearchParams, VectorStorage } from '@mere/vector-storage';
 import { DatabaseCollections } from '../../../app/providers/DatabaseCollections';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { TimelineRecordTypeFilter } from '../types';
+import {
+  compareTimelineDateKeysDesc,
+  timelineDateKey,
+} from '../utils/timelineDates';
 
 export const PAGE_SIZE = 50;
+
+/**
+ * Reference master-data surfaced in the Providers & locations directory, plus
+ * app plumbing, rather than dated events worth a card.
+ *
+ * `careplan` is deliberately absent: the grouped card renders a "Care Plans"
+ * section, the type filter offers "Care plans", and the Records section links
+ * to them, so excluding them here only made the category unreachable from the
+ * unfiltered timeline.
+ */
+export const NON_TIMELINE_RESOURCE_TYPES = [
+  'patient',
+  'provenance',
+  'location',
+  'practitioner',
+  'organization',
+];
+
+/**
+ * Text search hides the same types the grouped timeline does — nothing renders
+ * a `location` or `practitioner`, so matching one only produced a blank card —
+ * plus attachment chunks, whose display name is the parent document's and
+ * would list every result twice. Semantic search keeps attachments on purpose:
+ * matching inside an attachment's text is the whole point of it.
+ */
+const NON_SEARCHABLE_RESOURCE_TYPES = [
+  ...NON_TIMELINE_RESOURCE_TYPES,
+  'documentreference_attachment',
+];
 
 export async function fetchRecordsWithVectorSearch({
   db,
@@ -95,11 +127,12 @@ export async function fetchRecordsWithVectorSearch({
     .find({
       selector: {
         id: { $in: [...docIdToChunks.keys()] },
+        // Attachments stay in — searching their text is the reason semantic
+        // search exists — but the directory types are dropped for the same
+        // reason as everywhere else: no card renders them.
         'data_record.resource_type':
           typeFilter === 'all'
-            ? {
-                $nin: ['patient', 'provenance'],
-              }
+            ? { $nin: NON_TIMELINE_RESOURCE_TYPES }
             : typeFilter,
       },
     })
@@ -131,44 +164,21 @@ export async function fetchRecordsWithVectorSearch({
     if (item.get('metadata')?.date === undefined) {
       console.warn('Date is undefined for object:', item.toJSON());
       const minDate = new Date(0).toISOString();
-      groupedRecords[minDate] = [...(groupedRecords[minDate] ?? []), mutableDoc];
+      groupedRecords[minDate] = [
+        ...(groupedRecords[minDate] ?? []),
+        mutableDoc,
+      ];
       return;
     }
 
     const date = item.get('metadata')?.date
-      ? format(parseISO(item.get('metadata')?.date), 'yyyy-MM-dd')
+      ? timelineDateKey(item.get('metadata')?.date)
       : '-1';
     groupedRecords[date] = [...(groupedRecords[date] ?? []), mutableDoc];
   });
 
-  try {
-    return {
-      records: Object.keys(groupedRecords)
-        .sort((a, b) => {
-          const aDate = parseISO(a);
-          const bDate = parseISO(b);
-          if (aDate > bDate) return -1;
-          if (aDate < bDate) return 1;
-          return 0;
-        })
-        .reduce(
-          (obj, key) => {
-            obj[key] = groupedRecords[key];
-            return obj;
-          },
-          {} as Record<
-            string,
-            ClinicalDocument<BundleEntry<FhirResource>>[]
-          >,
-        ),
-      idsOfMostRelatedChunksFromSemanticSearch: ids,
-    };
-  } catch (e) {
-    console.error(e);
-  }
-
   return {
-    records: groupedRecords,
+    records: sortRecordsByDateKeyDesc(groupedRecords),
     idsOfMostRelatedChunksFromSemanticSearch: ids,
   };
 }
@@ -183,13 +193,7 @@ export async function fetchRecords(
   const parsedQuery = query?.trim() === '' ? undefined : query;
   let selector: MangoQuerySelector<ClinicalDocument<unknown>> = {
     user_id: user_id,
-    'data_record.resource_type': {
-      $nin: [
-        'patient',
-        'documentreference_attachment',
-        'provenance',
-      ],
-    },
+    'data_record.resource_type': { $nin: NON_SEARCHABLE_RESOURCE_TYPES },
     'metadata.date': { $nin: [null, undefined, ''] },
   };
 
@@ -198,13 +202,6 @@ export async function fetchRecords(
   }
 
   if (parsedQuery) {
-    if (typeFilter === 'all') {
-      selector['data_record.resource_type']['$nin'] = [
-        'patient',
-        'documentreference_attachment',
-        'provenance',
-      ];
-    }
     selector = {
       ...selector,
       'metadata.display_name': { $regex: `.*${parsedQuery}.*`, $options: 'si' },
@@ -225,16 +222,16 @@ export async function fetchRecords(
     ClinicalDocument<BundleEntry<FhirResource>>[]
   > = {};
 
-  (list as unknown as RxDocument<
-    ClinicalDocument<BundleEntry<FhirResource>>
-  >[]).forEach((item) => {
+  (
+    list as unknown as RxDocument<ClinicalDocument<BundleEntry<FhirResource>>>[]
+  ).forEach((item) => {
     if (item.get('metadata')?.date === undefined) {
       console.warn('Date is undefined for object:', item.toJSON());
       return;
     }
 
     const date = item.get('metadata')?.date
-      ? format(parseISO(item.get('metadata')?.date), 'yyyy-MM-dd')
+      ? timelineDateKey(item.get('metadata')?.date)
       : '-1';
     groupedRecords[date] = [
       ...(groupedRecords[date] ?? []),
@@ -242,7 +239,26 @@ export async function fetchRecords(
     ];
   });
 
-  return groupedRecords;
+  return sortRecordsByDateKeyDesc(groupedRecords);
+}
+
+/**
+ * Rebuilds the map newest day first. The grouping key is the local day while
+ * the database sorts the raw stored date string, and the two disagree wherever
+ * a date-only and a timestamped record share a UTC day — so the day order has
+ * to come from the keys, not from the order the rows arrived in.
+ */
+function sortRecordsByDateKeyDesc(
+  groupedRecords: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]>,
+): Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]> {
+  const sorted: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]> =
+    {};
+  for (const dateKey of Object.keys(groupedRecords).sort(
+    compareTimelineDateKeysDesc,
+  )) {
+    sorted[dateKey] = groupedRecords[dateKey];
+  }
+  return sorted;
 }
 
 function withMatchedChunks(

@@ -1,7 +1,7 @@
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
-import { ImagingCategory } from '../types';
+import { ImagingCategory, ImagingCategoryCounts } from '../types';
 
-const FILTERS: { key: ImagingCategory | 'all'; label: string }[] = [
+export const FILTERS: { key: ImagingCategory | 'all'; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'xray', label: 'X-rays' },
   { key: 'ct', label: 'CT' },
@@ -12,31 +12,61 @@ const FILTERS: { key: ImagingCategory | 'all'; label: string }[] = [
   { key: 'attachment', label: 'Files' },
   { key: 'dental', label: 'Dental' },
   { key: 'optometry', label: 'Eye care' },
+  // `other` is what `inferCategories` tags when nothing else matched, so it is
+  // the only bucket a reader cannot guess the contents of. Named for what it
+  // means to them rather than for the tag, and last because it is a remainder.
+  { key: 'other', label: 'Uncategorized' },
 ];
 
 export function ImagingCategoryTabs({
   selected,
   onSelect,
+  total,
+  counts,
 }: {
   selected: ImagingCategory | 'all';
   onSelect: (category: ImagingCategory | 'all') => void;
+  total: number;
+  counts: ImagingCategoryCounts;
 }) {
   const { t } = useInterfaceLanguage();
 
+  // Nothing to filter: the empty state below says more than a lone "All 0".
+  if (total === 0) {
+    return null;
+  }
+
+  const filters = FILTERS.map((filter) => ({
+    ...filter,
+    count: filter.key === 'all' ? total : counts[filter.key],
+  })).filter(
+    // Hide chips that would return an empty list, but keep the active one so
+    // the filter you are on is always visible and undoable.
+    (filter) => filter.count > 0 || filter.key === selected,
+  );
+
   return (
     <div className="flex flex-wrap gap-2">
-      {FILTERS.map((filter) => (
+      {filters.map((filter) => (
         <button
           key={filter.key}
           type="button"
           onClick={() => onSelect(filter.key)}
-          className={`rounded-md px-3 py-2 text-sm font-medium shadow-sm ${
+          aria-pressed={selected === filter.key}
+          className={`inline-flex min-h-[44px] items-center gap-1.5 rounded-md px-3 text-sm font-medium shadow-sm ${
             selected === filter.key
               ? 'bg-primary-700 text-white'
               : 'bg-white text-gray-700 ring-1 ring-inset ring-gray-200 hover:bg-gray-50'
           }`}
         >
           {t(filter.label)}
+          <span
+            className={`text-xs tabular-nums ${
+              selected === filter.key ? 'text-primary-100' : 'text-gray-500'
+            }`}
+          >
+            {filter.count}
+          </span>
         </button>
       ))}
     </div>

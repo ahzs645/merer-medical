@@ -267,18 +267,31 @@ export function summarizeLabGroupStatus(
     borderlineCount = flags.filter((flag) => flag === 'borderline').length,
     abnormalCount = highCount + lowCount + borderlineCount;
 
+  const totalCount = flags.length;
   const parts = [
-    highCount > 0 ? `${highCount} high` : undefined,
-    lowCount > 0 ? `${lowCount} low` : undefined,
-    borderlineCount > 0 ? `${borderlineCount} borderline` : undefined,
-  ].filter(Boolean);
+    highCount > 0 ? { count: highCount, kind: 'high' } : undefined,
+    lowCount > 0 ? { count: lowCount, kind: 'low' } : undefined,
+    borderlineCount > 0
+      ? { count: borderlineCount, kind: 'borderline' }
+      : undefined,
+  ].filter(Boolean) as { count: number; kind: string }[];
 
   return {
     highCount,
     lowCount,
     borderlineCount,
     abnormalCount,
-    label: parts.length > 0 ? parts.join(' / ') : 'In range',
+    totalCount,
+    // The denominator is what stops this reading as a verdict on the latest
+    // value: "2 of 5 high" is plainly a count across the group's history.
+    label:
+      parts.length === 0
+        ? 'In range'
+        : parts.length === 1
+          ? `${parts[0].count} of ${totalCount} ${parts[0].kind}`
+          : `${totalCount} results: ${parts
+              .map((part) => `${part.count} ${part.kind}`)
+              .join(', ')}`,
   };
 }
 

@@ -2,15 +2,28 @@ import { FlagIcon } from '@heroicons/react/24/outline';
 
 import { Routes as AppRoutes } from '../../Routes';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
-import { BannerAddLink } from '../../shared/components/BannerAddLink';
-import { RecordListPage } from '../../shared/components/records/RecordListPage';
+import {
+  EmptyStateLink,
+  RecordListPage,
+} from '../../shared/components/records/RecordListPage';
+import { RecordHeaderLink } from '../../shared/components/records/RecordPageHeader';
 import { useRecordList } from '../../shared/hooks/useRecordList';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, isRecord } from '../../shared/utils/fhirText';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
+
+const ADD_GOAL_PATH = buildAddRecordPath({
+  type: 'goal',
+  returnTo: AppRoutes.Goals,
+});
 
 interface GoalItem {
   id: string;
+  /** Kept for `ManualRecordActions`, which decides for itself whether this
+   *  record was typed here or arrived from a provider. */
+  document: ClinicalDocument;
   description: string;
   status?: string;
   achievement?: string;
@@ -28,6 +41,7 @@ function mapGoalDocs(docs: ClinicalDocument[]): GoalItem[] {
       : [];
     return {
       id: d.id,
+      document: d,
       description:
         firstText(r['description']) || d.metadata?.display_name || 'Goal',
       status: firstText(r['lifecycleStatus']) || firstText(r['status']),
@@ -51,12 +65,7 @@ export function GoalsTab() {
   return (
     <RecordListPage
       title="Goals"
-      bannerAction={
-        <BannerAddLink
-          to={`${AppRoutes.AddRecord}?type=goal`}
-          label="Add goal"
-        />
-      }
+      action={<RecordHeaderLink to={ADD_GOAL_PATH} label="Add goal" compact />}
       status={status}
       error={error}
       loadingText="Loading goals…"
@@ -64,6 +73,7 @@ export function GoalsTab() {
       isEmpty={items.length === 0}
       emptyText="No health goals recorded yet."
       emptyIcon={<FlagIcon className="h-6 w-6" />}
+      emptyAction={<EmptyStateLink to={ADD_GOAL_PATH} label="Add goal" />}
     >
       {items.map((item) => (
         <article
@@ -102,6 +112,7 @@ export function GoalsTab() {
               </span>
             )}
           </div>
+          <ManualRecordActions item={item.document} />
         </article>
       ))}
     </RecordListPage>

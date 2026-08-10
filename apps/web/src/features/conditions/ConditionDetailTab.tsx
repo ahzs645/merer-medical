@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import {
-  ArrowLeftIcon,
   BeakerIcon,
   CalendarDaysIcon,
   ClipboardDocumentCheckIcon,
@@ -9,10 +8,11 @@ import {
   ScissorsIcon,
   Squares2X2Icon,
 } from '@heroicons/react/24/outline';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
+import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { useConditionsData } from './hooks/useConditionsData';
 import { ConditionBundle, RelatedKind, RelatedRecord } from './types';
@@ -66,30 +66,20 @@ export function ConditionDetailTab() {
 
 function DetailHeader({ bundle }: { bundle?: ConditionBundle }) {
   return (
-    <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-3">
-        <Link
-          to={AppRoutes.Conditions}
-          className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-primary-100 hover:text-white"
-        >
-          <ArrowLeftIcon className="h-4 w-4" />
-          All conditions
-        </Link>
-        <div className="flex items-center gap-2">
-          <Squares2X2Icon className="h-7 w-7 shrink-0" />
-          <h1 className="text-2xl font-bold sm:text-3xl">
-            {bundle?.name ?? 'Condition'}
-          </h1>
-        </div>
-        {bundle && (
-          <p className="text-sm text-primary-100">
+    <RecordPageHeader
+      title={bundle?.name ?? 'Condition'}
+      icon={Squares2X2Icon}
+      backLink={{ to: AppRoutes.Conditions, label: 'All conditions' }}
+      count={
+        bundle && (
+          <>
             {bundle.related.length} related record
             {bundle.related.length === 1 ? '' : 's'}
             {bundle.source ? ` · ${bundle.source}` : ''}
-          </p>
-        )}
-      </div>
-    </div>
+          </>
+        )
+      }
+    />
   );
 }
 
@@ -209,13 +199,13 @@ function ConfidenceBadge({
 }) {
   if (confidence === 'linked') {
     return (
-      <span className="inline-flex items-center rounded bg-green-50 px-1.5 py-0.5 text-[11px] font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+      <span className="inline-flex items-center rounded bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
         Linked
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center rounded bg-blue-50 px-1.5 py-0.5 text-[11px] font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
+    <span className="inline-flex items-center rounded bg-blue-50 px-1.5 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
       Related
     </span>
   );

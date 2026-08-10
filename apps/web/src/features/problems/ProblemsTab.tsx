@@ -8,7 +8,6 @@ import {
 import {
   CheckCircleIcon,
   ClipboardDocumentListIcon,
-  MagnifyingGlassIcon,
   NoSymbolIcon,
   PlusIcon,
   QuestionMarkCircleIcon,
@@ -21,11 +20,16 @@ import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocumen
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
+import {
+  RecordHeaderLink,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import { getManualRecordNote } from '../../shared/utils/manualRecordUtils';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 
 type ProblemStatus = 'active' | 'resolved' | 'unknown';
@@ -67,7 +71,14 @@ const GROUPS: { id: ProblemStatus; title: string }[] = [
   { id: 'unknown', title: 'Unknown status' },
 ];
 
-const ADD_PROBLEM_PATH = `${AppRoutes.AddRecord}?type=condition`;
+// "Add problem" and "Add condition" (My Conditions) resolved to this same URL
+// and produced a record that then showed up on both pages — two words for one
+// thing. "Condition" is what the record is called in the form, and what this
+// page's own description already calls its rows.
+const ADD_CONDITION_PATH = buildAddRecordPath({
+  type: 'condition',
+  returnTo: AppRoutes.Problems,
+});
 
 export function ProblemsTab() {
   const { items, status, error } = useProblemsData();
@@ -236,69 +247,35 @@ function ProblemsHeader({
   onFilterChange: (filter: FilterId) => void;
 }) {
   return (
-    <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <ClipboardDocumentListIcon className="h-7 w-7" />
-              <h1 className="text-2xl font-bold sm:text-3xl">Problems</h1>
-            </div>
-            <p className="mt-1 text-sm text-primary-100">
-              {totalCount} {totalCount === 1 ? 'condition' : 'conditions'} from
-              connected and manually entered records.
-            </p>
-          </div>
-          <Link
-            to={ADD_PROBLEM_PATH}
-            className="inline-flex w-fit items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-inset ring-primary-100 hover:bg-primary-50"
-          >
-            <PlusIcon className="h-5 w-5" />
-            Add problem
-          </Link>
-        </div>
-
-        <div className="rounded-md bg-white/10 p-3 ring-1 ring-white/20">
-          <label className="relative block">
-            <span className="sr-only">Search problems</span>
-            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => onQueryChange(event.target.value)}
-              placeholder="Search diagnosis, code, status, source, or note"
-              className="h-10 w-full rounded-md border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-            />
-          </label>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {FILTERS.map((filter) => {
-              const Icon = filter.icon;
-              const isSelected = selectedFilter === filter.id;
-
-              return (
-                <button
-                  key={filter.id}
-                  type="button"
-                  onClick={() => onFilterChange(filter.id)}
-                  className={[
-                    'inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-medium shadow-sm',
-                    isSelected
-                      ? 'border-primary-600 bg-primary-50 text-primary-800'
-                      : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
-                  ].join(' ')}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{filter.label}</span>
-                  <span className="rounded bg-white/70 px-1.5 py-0.5 text-xs">
-                    {counts[filter.id] || 0}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
+    <RecordPageHeader<FilterId>
+      title="Problems"
+      icon={ClipboardDocumentListIcon}
+      description={`${totalCount} ${
+        totalCount === 1 ? 'condition' : 'conditions'
+      } from connected and manually entered records.`}
+      search={{
+        query,
+        onChange: onQueryChange,
+        placeholder: 'Search diagnosis, code, status, source, or note',
+        label: 'Search problems',
+      }}
+      action={
+        <RecordHeaderLink
+          to={ADD_CONDITION_PATH}
+          label="Add condition"
+          compact
+        />
+      }
+      filters={{
+        items: FILTERS.map((filter) => ({
+          ...filter,
+          count: counts[filter.id] || 0,
+        })),
+        selectedId: selectedFilter,
+        onSelect: onFilterChange,
+        label: 'Filter problems by status',
+      }}
+    />
   );
 }
 
@@ -329,7 +306,7 @@ function ProblemGroups({
         if (groupItems.length === 0) return null;
 
         return (
-          <section key={group.id}>
+          <section key={group.id} className="min-w-0">
             <div className="mb-2 flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-700">
                 {group.title}
@@ -353,7 +330,7 @@ function ProblemGroups({
 
 function ProblemCard({ item }: { item: ProblemItem }) {
   return (
-    <article className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+    <article className="min-w-0 rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -391,7 +368,7 @@ function ProblemCard({ item }: { item: ProblemItem }) {
       </dl>
 
       {item.provenance && (
-        <p className="mt-3 text-sm text-gray-700">
+        <p className="mt-3 break-words text-sm text-gray-700">
           <span className="font-medium text-gray-900">Provenance:</span>{' '}
           {item.provenance}
         </p>
@@ -420,11 +397,11 @@ function EmptyProblemsState() {
         records will appear here.
       </p>
       <Link
-        to={ADD_PROBLEM_PATH}
-        className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+        to={ADD_CONDITION_PATH}
+        className="mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
       >
-        <PlusIcon className="h-5 w-5" />
-        Add problem
+        <PlusIcon className="h-5 w-5 shrink-0" />
+        Add condition
       </Link>
     </div>
   );

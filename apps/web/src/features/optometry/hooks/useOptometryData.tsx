@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
+import { useRecordChangeTick } from '../../../shared/utils/recordChangeSignal';
 import {
   IMAGING_RESOURCE_TYPES,
   mapImagingDocument,
@@ -36,6 +37,9 @@ const OPTOMETRY_RESOURCE_TYPES = [
 export function useOptometryData() {
   const db = useRxDb(),
     user = useUser(),
+    // Without this a prescription deleted from a panel stays on screen — and
+    // stays "Current" in the timeline — until a reload.
+    recordChangeTick = useRecordChangeTick(),
     [documents, setDocuments] = useState<ClinicalDocument<unknown>[]>([]),
     [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading'),
     [error, setError] = useState<Error | null>(null);
@@ -82,7 +86,7 @@ export function useOptometryData() {
     return () => {
       isMounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   const optometryData = useMemo(() => {
     const imaging = filterEyeImaging(

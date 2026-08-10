@@ -9,6 +9,7 @@ import { DatabaseCollections } from '../../app/providers/DatabaseCollections';
 import { AboutMereSettingsGroup } from './components/AboutMereSettingsGroup';
 import { DeveloperSettingsGroup } from './components/DeveloperSettingsGroup';
 import { PrivacyAndSecuritySettingsGroup } from './components/PrivacyAndSecuritySettingsGroup';
+import { SettingsSection } from './components/SettingsSection';
 import { UserCard } from './components/UserCard';
 import { UserDataSettingsGroup } from './components/UserDataSettingsGroup';
 import { TerminologySettingsGroup } from './components/TerminologySettingsGroup';
@@ -188,19 +189,23 @@ const SettingsTab: React.FC = () => {
       banner={<GenericBanner text={t('Settings')} />}
       contentClassName="overflow-y-auto overscroll-contain bg-gray-50"
     >
-      <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pt-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between pb-4">
-          <div className="text-xl font-extrabold">{t('About Me')}</div>
-          <button
-            onClick={() => setShowUserSwitcher(true)}
-            className="text-primary-600 hover:text-primary-700 text-sm font-medium px-3 py-1 rounded-md hover:bg-primary-50 transition-colors"
-          >
-            {t('Switch User')}
-          </button>
-        </div>
-      </div>
-      <UserCard />
-      <div className="mx-auto flex max-w-4xl flex-col gap-y-4 px-4 pb-20 pt-6 sm:px-6 sm:pb-6 lg:px-8">
+      <div className="mx-auto flex max-w-4xl flex-col gap-y-4 px-4 pb-20 pt-4 sm:px-6 sm:pb-6 lg:px-8">
+        {/* Profile lives in a SettingsSection like every other group so the
+            page has a single section pattern at every breakpoint. */}
+        <SettingsSection
+          id="about-me"
+          title={t('About Me')}
+          action={
+            <button
+              onClick={() => setShowUserSwitcher(true)}
+              className="text-primary-600 hover:text-primary-700 hover:bg-primary-50 -me-2 inline-flex min-h-[44px] items-center rounded-md px-3 text-sm font-medium transition-colors"
+            >
+              {t('Switch User')}
+            </button>
+          }
+        >
+          <UserCard />
+        </SettingsSection>
         <InterfaceLanguageSettingsGroup />
         <PrivacyAndSecuritySettingsGroup />
         <TerminologySettingsGroup />

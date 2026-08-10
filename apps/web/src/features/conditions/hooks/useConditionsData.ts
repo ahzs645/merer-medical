@@ -4,6 +4,7 @@ import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../../models/connection-document/ConnectionDocument.type';
+import { useRecordChangeTick } from '../../../shared/utils/recordChangeSignal';
 import { buildConditionBundles } from '../associations/buildBundles';
 import { ConditionBundle } from '../types';
 
@@ -36,6 +37,9 @@ async function find(
 export function useConditionsData() {
   const db = useRxDb();
   const user = useUser();
+  // Refetch when a manual record is added, edited, or deleted — a condition
+  // edited in place on this page has to redraw its own row.
+  const recordChangeTick = useRecordChangeTick();
   const [bundles, setBundles] = useState<ConditionBundle[]>([]);
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
     'loading',
@@ -109,7 +113,7 @@ export function useConditionsData() {
     return () => {
       isMounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   return { bundles, status, error };
 }

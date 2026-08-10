@@ -406,7 +406,7 @@ export function UserDataSettingsGroup() {
             </p>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-3">
-            <label className="inline-flex items-center text-sm text-gray-800">
+            <label className="inline-flex min-h-[44px] items-center text-sm text-gray-800">
               <input
                 type="checkbox"
                 className="text-primary-600 focus:ring-primary-500 mr-2 h-4 w-4 rounded border-gray-300"
@@ -416,7 +416,7 @@ export function UserDataSettingsGroup() {
               {t('Encrypt export')}
             </label>
             {emrpkgEncrypt && (
-              <label className="inline-flex items-center text-sm text-gray-800">
+              <label className="inline-flex min-h-[44px] items-center text-sm text-gray-800">
                 <input
                   type="checkbox"
                   className="text-primary-600 focus:ring-primary-500 mr-2 h-4 w-4 rounded border-gray-300"
@@ -450,7 +450,7 @@ export function UserDataSettingsGroup() {
                 t('Export .emrpkg')
               )}
             </button>
-            <label className="inline-flex items-center text-sm text-gray-800">
+            <label className="inline-flex min-h-[44px] items-center text-sm text-gray-800">
               <span className="mr-2 font-medium">{t('Import mode')}</span>
               <StylizedSelect
                 value={emrpkgImportMode}

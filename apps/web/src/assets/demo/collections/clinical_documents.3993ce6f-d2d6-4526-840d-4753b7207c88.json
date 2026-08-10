@@ -42,7 +42,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/AllergyIntolerance/abe3196c-2f56-43e1-9fb1-cd78b4c3f270",
-      "date": "2006-04-01T08:53:40.204Z"
+      "date": "2023-04-01T08:53:40.204Z"
     },
     "_meta": {
       "lwt": 1761781117802.07
@@ -94,7 +94,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/CarePlan/abe3196c-2f56-43e1-9fb1-cd78b4c3f270",
-      "date": "2006-04-01T08:53:40.204Z"
+      "date": "2023-04-01T08:53:40.204Z"
     },
     "_meta": {
       "lwt": 1761781117802.08

@@ -5,7 +5,7 @@ import { formatFileSize } from '../utils/filePreview';
 import { buildPacketHtml } from '../utils/packetExport';
 import { FilePreviewPane } from './FilePreviewPane';
 
-export function PreviewUtilityCard({
+export function PreviewCard({
   previewMode,
   setPreviewMode,
   previewFile,
@@ -31,11 +31,11 @@ export function PreviewUtilityCard({
           <MagnifyingGlassIcon className="h-5 w-5 text-primary-700" />
           <div>
             <h2 className="text-base font-semibold text-gray-900">
-              Preview utility
+              Preview before you share
             </h2>
             <p className="text-sm text-gray-600">
-              Review the packet output or inspect a local PDF, image, or text
-              file before sharing.
+              See exactly what your packet looks like, or open a PDF, image, or
+              text file from this device to check it first.
             </p>
           </div>
         </div>
@@ -112,7 +112,7 @@ export function PreviewUtilityCard({
               </dl>
             ) : (
               <p className="mt-4 text-sm text-gray-500">
-                Files stay local in the browser preview.
+                Files you open stay on this device. Nothing is uploaded.
               </p>
             )}
           </div>

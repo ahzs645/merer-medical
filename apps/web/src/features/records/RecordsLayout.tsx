@@ -20,19 +20,22 @@ export function RecordsLayout() {
         <aside className="hidden w-60 shrink-0 overflow-y-auto border-r border-gray-200 bg-white lg:block">
           <RecordsSideNav />
         </aside>
-        <div className="flex min-h-0 flex-1 flex-col">
+        {/* min-w-0: a flex item defaults to min-width:auto, so without this the
+            column grows to its widest descendant instead of shrinking, and the
+            inner overflow-x-auto strips stretch the page sideways on phones. */}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {!atRoot && (
-            <div className="border-b border-gray-200 bg-white px-3 py-2 lg:hidden">
+            <div className="border-b border-gray-200 bg-white px-3 lg:hidden">
               <Link
                 to={AppRoutes.Records}
-                className="text-primary-700 hover:text-primary-900 inline-flex items-center gap-1 text-sm font-medium"
+                className="text-primary-700 hover:text-primary-900 -mx-2 inline-flex min-h-[44px] items-center gap-1 px-2 text-sm font-medium"
               >
                 <ChevronLeftIcon className="h-4 w-4" />
                 All records
               </Link>
             </div>
           )}
-          <div className="min-h-0 flex-1">
+          <div className="min-h-0 min-w-0 flex-1">
             <Outlet />
           </div>
         </div>

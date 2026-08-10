@@ -1,15 +1,14 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 import { AppPage } from '../../shared/components/AppPage';
+import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { Routes } from '../../Routes';
 import { LabHistoryChart } from './components/LabHistoryChart';
 import { LabHistoryTable } from './components/LabHistoryTable';
 import { LabReferenceOverlayControls } from './components/LabReferenceOverlayControls';
-import { LabsHeader } from './components/LabsHeader';
 import { LabsSkeleton } from './components/LabsSkeleton';
 import { buildLabReferenceOverlays } from './enrichment/labEnrichment';
 import {
@@ -92,11 +91,11 @@ export function LabDetailTab() {
   return (
     <AppPage
       banner={
-        <LabsHeader
-          query=""
-          setQuery={() => undefined}
-          hideSearch
-          hideOnMobile
+        // The banner carries the page title (and the only <h1>), so the detail
+        // card below repeats the name as an <h2> instead of a second heading.
+        <RecordPageHeader
+          title={group?.name ?? 'Lab result'}
+          backLink={{ to: Routes.Labs, label: 'All lab results' }}
         />
       }
     >
@@ -106,21 +105,12 @@ export function LabDetailTab() {
             <LabsSkeleton />
           ) : group ? (
             <>
-              <div>
-                <Link
-                  to={Routes.Labs}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-900"
-                >
-                  <ArrowLeftIcon className="h-4 w-4" />
-                  Back to all labs
-                </Link>
-              </div>
               <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div>
-                    <h1 className="text-xl font-bold text-gray-900">
+                    <h2 className="text-xl font-bold text-gray-900">
                       {group.name}
-                    </h1>
+                    </h2>
                     <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-gray-600">
                       {group.code ? <span>LOINC {group.code}</span> : null}
                       <span>{group.labs.length} results</span>
@@ -269,9 +259,10 @@ export function LabDetailTab() {
             </>
           ) : (
             <section className="rounded-md bg-white p-10 text-center shadow-sm ring-1 ring-gray-200">
-              <h1 className="text-lg font-semibold text-gray-900">
+              {/* h2: the banner already owns the page's only h1. */}
+              <h2 className="text-lg font-semibold text-gray-900">
                 Lab not found
-              </h1>
+              </h2>
               <p className="mt-2 text-sm text-gray-600">
                 This lab may have been renamed or removed.
               </p>

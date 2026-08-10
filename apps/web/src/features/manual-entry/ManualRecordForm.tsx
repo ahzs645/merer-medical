@@ -20,6 +20,19 @@ import {
   type ManualRecordKind,
 } from './manualRecordTypes';
 
+// Save and Cancel were 38px tall on a form whose own banner actions, filter
+// chips and back links all pin to 44px, and in the dialog Save sat several
+// hundred pixels below the fold with nothing holding it there. The row sticks
+// to the bottom of whichever box is scrolling — the modal's 80vh body or the
+// page — and bleeds to the card's edges (`-mx-*`/`-mb-*` cancel the form's own
+// padding) so the pinned bar reads as the card's footer rather than a slab
+// floating over the last field.
+const actionRowClass =
+  'sticky bottom-0 -mx-4 -mb-4 flex items-center gap-3 rounded-b-lg border-t border-gray-200 bg-white px-4 py-3 sm:-mx-6 sm:-mb-6 sm:px-6';
+
+const secondaryButtonClass =
+  'inline-flex min-h-[44px] items-center justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50';
+
 export function ManualRecordForm({
   form,
   onCancel,
@@ -85,6 +98,7 @@ export function ManualRecordForm({
     isDocumentType,
     isMedicationType,
     isCoverageType,
+    isReferralType,
     isSocialHistoryType,
     isFamilyHistoryType,
     canLinkSourceFile,
@@ -102,6 +116,16 @@ export function ManualRecordForm({
     onSubmit,
     onLibreFileSelected,
   } = form;
+
+  // Every template in the list is a vital or a lab, but the row used to render
+  // on every non-device form: the "Add allergy" dialog offered Blood pressure,
+  // Heart rate and Body weight above the Name field, and tapping one flipped
+  // the Type dropdown to Vital sign and overwrote the name without asking.
+  // Matching the current type means a chip can only fill the form you are
+  // already on, never redefine what you came to add.
+  const templatesForType = quickTemplates.filter(
+    (template) => template.kind === recordType,
+  );
 
   // The guided picker is the first step for a fresh add with no preset; once a
   // type is chosen we switch to the tailored form. Editing or arriving with a
@@ -154,7 +178,14 @@ export function ManualRecordForm({
           <form
             ref={formRef}
             onSubmit={onSubmit}
-            className="flex flex-col gap-5 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6"
+            // Hosted in a dialog, the card chrome is a white bordered box
+            // drawn inside a white bordered box — the sheet is already the
+            // container. On its own page it sits on slate and needs to be one.
+            className={`flex flex-col gap-5 ${
+              embedded
+                ? ''
+                : 'rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6'
+            }`}
           >
             {canPickType && (
               <button
@@ -317,13 +348,13 @@ export function ManualRecordForm({
               </div>
             )}
 
-            {!isEditing && !isDeviceImportType && (
+            {!isEditing && templatesForType.length > 0 && (
               <div>
                 <p className="block text-sm font-semibold text-gray-900">
                   {t('Quick templates')}
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {quickTemplates.map((template) => (
+                  {templatesForType.map((template) => (
                     <button
                       key={template.label}
                       type="button"
@@ -430,7 +461,9 @@ export function ManualRecordForm({
                         ? 'Condition / concern'
                         : isSocialHistoryType
                           ? 'Topic'
-                          : 'Name',
+                          : isReferralType
+                            ? 'Referred to'
+                            : 'Name',
                   )}{' '}
                   <span className="text-red-600">*</span>
                 </label>
@@ -454,6 +487,7 @@ export function ManualRecordForm({
                   recordType !== 'careplan' &&
                   recordType !== 'goal' &&
                   recordType !== 'coverage' &&
+                  recordType !== 'servicerequest' &&
                   recordType !== 'device' &&
                   recordType !== 'document' &&
                   recordType !== 'familymemberhistory' &&
@@ -633,7 +667,7 @@ export function ManualRecordForm({
             )}
 
             {!isDeviceImportType && (
-              <div className="flex items-center justify-between gap-3">
+              <div className={`${actionRowClass} justify-between`}>
                 <span className="text-xs font-medium text-gray-500">
                   {/* Keep the count outside t() — interpolated strings can
                       never match a dictionary key. */}
@@ -648,14 +682,14 @@ export function ManualRecordForm({
                   <button
                     type="button"
                     onClick={handleCancel}
-                    className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
+                    className={secondaryButtonClass}
                   >
                     {t(savedCount > 0 && !isEditing ? 'Done' : 'Cancel')}
                   </button>
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                    className="inline-flex min-h-[44px] items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                   >
                     {t(
                       isSaving
@@ -672,11 +706,11 @@ export function ManualRecordForm({
             )}
 
             {isDeviceImportType && (
-              <div className="flex justify-end">
+              <div className={`${actionRowClass} justify-end`}>
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
+                  className={secondaryButtonClass}
                 >
                   {t('Cancel')}
                 </button>

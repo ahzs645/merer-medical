@@ -34,6 +34,7 @@ export type RecordCoverageSummary = {
   totalRecords: number;
   labRows: number;
   labPanels: number;
+  undatedLabRows: number;
   medicationRecords: number;
   encounterRecords: number;
   imagingRecords: number;

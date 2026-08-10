@@ -116,20 +116,25 @@ export function ScrollableTabNav({
     <div className="relative mx-auto max-w-7xl">
       {canScrollLeft && (
         <>
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-white to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-11 bg-gradient-to-r from-white via-white to-transparent" />
           <button
             type="button"
             aria-label={t('Scroll tabs left')}
             onClick={() => scrollBy(-200)}
-            className="absolute left-0 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white p-1 text-gray-500 shadow ring-1 ring-gray-200 hover:text-gray-800"
+            className="absolute left-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-gray-600 shadow ring-1 ring-gray-200 hover:text-gray-900"
           >
-            <ChevronLeftIcon className="h-4 w-4" />
+            <ChevronLeftIcon className="h-5 w-5" />
           </button>
         </>
       )}
+      {/* Pad the scroll area by the chevron width on whichever side a chevron is
+          showing, so a tab label is never hidden underneath one. scroll-p keeps
+          scrollIntoView from parking a tab under the same chevron. */}
       <nav
         ref={scrollRef}
-        className="scrollbar-hide flex gap-1 overflow-x-auto py-2 sm:gap-2"
+        className={`scrollbar-hide flex gap-1 overflow-x-auto py-2 sm:gap-2 ${
+          canScrollLeft ? 'scroll-pl-11 pl-11' : ''
+        } ${canScrollRight ? 'scroll-pr-11 pr-11' : ''}`}
         aria-label={ariaLabel}
       >
         {tabs.map(({ to, label, icon: Icon, end }) => (
@@ -141,7 +146,7 @@ export function ScrollableTabNav({
             to={to}
             end={end}
             className={({ isActive }) =>
-              `inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-2 text-sm font-medium sm:gap-2 sm:px-3 ${
+              `inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-md px-2.5 text-sm font-medium sm:gap-2 sm:px-3 ${
                 isActive
                   ? 'bg-primary-800 text-white'
                   : 'text-gray-700 hover:bg-gray-100'
@@ -155,14 +160,14 @@ export function ScrollableTabNav({
       </nav>
       {canScrollRight && (
         <>
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-white to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-11 bg-gradient-to-l from-white via-white to-transparent" />
           <button
             type="button"
             aria-label={t('Scroll tabs right')}
             onClick={() => scrollBy(200)}
-            className="absolute right-0 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white p-1 text-gray-500 shadow ring-1 ring-gray-200 hover:text-gray-800"
+            className="absolute right-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-gray-600 shadow ring-1 ring-gray-200 hover:text-gray-900"
           >
-            <ChevronRightIcon className="h-4 w-4" />
+            <ChevronRightIcon className="h-5 w-5" />
           </button>
         </>
       )}

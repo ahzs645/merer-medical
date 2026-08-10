@@ -21,6 +21,7 @@ import {
   CarePlan,
   CareTeam,
   Goal,
+  ServiceRequest,
   Appointment,
   Specimen,
 } from 'fhir/r4';
@@ -42,6 +43,7 @@ import {
 import { ElementsByDateListCard } from './ElementsByDateListCard';
 import { EncounterCard } from '../cards/EncounterCard';
 import { GoalCard } from '../cards/GoalCard';
+import { ServiceRequestCard } from '../cards/ServiceRequestCard';
 import { FamilyMemberHistoryCard } from '../cards/FamilyMemberHistoryCard';
 import { ImmunizationCard } from '../cards/ImmunizationCard';
 import { MedicationCard } from '../cards/MedicationCard';
@@ -66,13 +68,15 @@ export const TimelineItem = memo(function TimelineItem({
   return (
     <div
       id={format(parseISO(dateKey), 'MMM-dd-yyyy')}
-      className="-mt-16 flex scroll-mt-10 flex-row gap-x-4 px-0 pt-4 md:px-2"
+      className="-mt-16 flex scroll-mt-10 flex-row gap-x-2 px-0 pt-4 md:gap-x-4 md:px-2"
       key={dateKey}
     >
-      <div className="flex w-1/6 flex-row">{/* Left sided date spacer */}</div>
+      {/* Left sided date spacer: a fixed, narrow gutter on phones so the date
+          bubble does not claim a quarter of the viewport. */}
+      <div className="flex w-12 flex-shrink-0 flex-row md:w-1/6" />
       {/* Clinical card rendering */}
 
-      <div className="flex w-5/6 flex-col gap-y-2">
+      <div className="flex min-w-0 flex-1 flex-col gap-y-2">
         {!showIndividualItems ? (
           <ElementsByDateListCard itemList={itemList} />
         ) : (
@@ -180,6 +184,14 @@ export const TimelineItem = memo(function TimelineItem({
                   <CareTeamCard
                     key={item.id}
                     item={item as ClinicalDocument<R4BundleEntry<CareTeam>>}
+                  />
+                )}
+                {item.data_record.resource_type === 'servicerequest' && (
+                  <ServiceRequestCard
+                    key={item.id}
+                    item={
+                      item as ClinicalDocument<R4BundleEntry<ServiceRequest>>
+                    }
                   />
                 )}
                 {item.data_record.resource_type === 'goal' && (
