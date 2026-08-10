@@ -397,6 +397,16 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           }) as ClinicalDocument<R4BundleEntry<CareTeam>>[],
       [itemList],
     ),
+    // A day whose only record is a referral rendered as nothing at all: with
+    // no category and no section, `titleFields` came back empty and the whole
+    // group returned null.
+    referrals = useMemo(
+      () =>
+        itemList.filter(
+          (item) => item.data_record.resource_type === 'servicerequest',
+        ),
+      [itemList],
+    ),
     goals = useMemo(
       () =>
         itemList
@@ -813,6 +823,24 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
             />
             <ul className="list-disc list-inside">
               {careTeams.map((item) => (
+                <li
+                  className="text-xs font-medium md:text-sm text-gray-900"
+                  key={item.id}
+                >
+                  {item.metadata?.display_name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {referrals.length > 0 && (
+          <div className="mb-2 ml-2">
+            <TimelineCardCategoryTitle
+              title={'Referrals'}
+              color="text-sky-600"
+            />
+            <ul className="list-disc list-inside">
+              {referrals.map((item) => (
                 <li
                   className="text-xs font-medium md:text-sm text-gray-900"
                   key={item.id}

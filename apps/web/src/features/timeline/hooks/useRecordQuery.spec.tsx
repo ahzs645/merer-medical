@@ -1303,7 +1303,11 @@ describe('fetchTimelineDateKeys', () => {
 
     const dateKeys = await fetchTimelineDateKeys(db, userId);
 
-    expect(dateKeys).toEqual(['2024-01-15']);
+    // Referrals used to belong in the dropped half of this list. They render a
+    // card now, so their date has to survive the same filter — a rail that
+    // omits a date the pager will render is the bug this test exists for,
+    // pointing the other way.
+    expect(dateKeys).toEqual(['2024-01-15', '2024-01-14']);
   });
 
   it('keeps a date whose only records are care plans', async () => {

@@ -29,6 +29,7 @@ const CATEGORY_ORDER = [
   'Specimens',
   'Allergies',
   'Family History',
+  'Referrals',
 ] as const;
 
 const CATEGORY_BY_RESOURCE_TYPE: Record<string, string> = {
@@ -52,6 +53,7 @@ const CATEGORY_BY_RESOURCE_TYPE: Record<string, string> = {
   specimen: 'Specimens',
   allergyintolerance: 'Allergies',
   familymemberhistory: 'Family History',
+  servicerequest: 'Referrals',
 };
 
 /**
