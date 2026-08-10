@@ -53,7 +53,7 @@ export function ImagingCategoryTabs({
           type="button"
           onClick={() => onSelect(filter.key)}
           aria-pressed={selected === filter.key}
-          className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium shadow-sm ${
+          className={`inline-flex min-h-[44px] items-center gap-1.5 rounded-md px-3 text-sm font-medium shadow-sm ${
             selected === filter.key
               ? 'bg-primary-700 text-white'
               : 'bg-white text-gray-700 ring-1 ring-inset ring-gray-200 hover:bg-gray-50'

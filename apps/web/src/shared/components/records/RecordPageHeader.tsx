@@ -238,6 +238,11 @@ function HeaderFilters<Id extends string>({
  * Banner actions came in three different skins (solid white, translucent, and
  * a filled `primary-700`). Two are enough: `solid` for the page's primary
  * action, `subtle` for anything sitting next to it.
+ *
+ * `compact` drops the label below `sm`, leaving a 44px square icon that keeps
+ * the title's line on a phone. It is opt-in, not the default: an unlabelled
+ * glyph is only safe when the page has exactly one action and the icon is the
+ * universal one for it. Two glyphs side by side ask the reader to guess.
  */
 function actionClass(variant: 'solid' | 'subtle'): string {
   return `inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ${
@@ -247,21 +252,43 @@ function actionClass(variant: 'solid' | 'subtle'): string {
   }`;
 }
 
+/** The label: always the accessible name, visible unless `compact` on a phone. */
+function ActionLabel({
+  label,
+  compact,
+}: {
+  label: string;
+  compact: boolean;
+}): JSX.Element {
+  return compact ? (
+    <>
+      <span className="sr-only">{label}</span>
+      <span aria-hidden="true" className="hidden sm:inline">
+        {label}
+      </span>
+    </>
+  ) : (
+    <>{label}</>
+  );
+}
+
 export function RecordHeaderLink({
   to,
   label,
   icon: Icon = PlusIcon,
   variant = 'solid',
+  compact = false,
 }: {
   to: string;
   label: string;
   icon?: IconComponent;
   variant?: 'solid' | 'subtle';
+  compact?: boolean;
 }) {
   return (
-    <Link to={to} className={actionClass(variant)}>
+    <Link to={to} className={actionClass(variant)} title={label}>
       <Icon className="h-5 w-5 shrink-0" />
-      {label}
+      <ActionLabel label={label} compact={compact} />
     </Link>
   );
 }
@@ -271,16 +298,23 @@ export function RecordHeaderButton({
   label,
   icon: Icon = PlusIcon,
   variant = 'solid',
+  compact = false,
 }: {
   onClick: () => void;
   label: string;
   icon?: IconComponent;
   variant?: 'solid' | 'subtle';
+  compact?: boolean;
 }) {
   return (
-    <button type="button" onClick={onClick} className={actionClass(variant)}>
+    <button
+      type="button"
+      onClick={onClick}
+      className={actionClass(variant)}
+      title={label}
+    >
       <Icon className="h-5 w-5 shrink-0" />
-      {label}
+      <ActionLabel label={label} compact={compact} />
     </button>
   );
 }

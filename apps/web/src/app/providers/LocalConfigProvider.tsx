@@ -41,6 +41,8 @@ interface LocalConfig {
   terminology_language?: TerminologyLanguage;
   terminology_remote_enabled?: boolean;
   medication_interactions_enabled?: boolean;
+  /** Desktop side nav shown as icons only. Ignored below `md`. */
+  side_nav_collapsed?: boolean;
   medication_interactions_provider?: 'ddinter';
 }
 
@@ -64,6 +66,7 @@ const defaultLocalConfig: LocalConfig = {
   terminology_remote_enabled: DEFAULT_TERMINOLOGY_REMOTE_ENABLED,
   medication_interactions_enabled: false,
   medication_interactions_provider: 'ddinter',
+  side_nav_collapsed: false,
 };
 
 function getLocalConfig(): LocalConfig {

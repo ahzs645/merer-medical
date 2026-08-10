@@ -3,6 +3,8 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import { Dialog, Transition } from '@headlessui/react';
 import {
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
   Cog6ToothIcon,
   DocumentIcon,
   EllipsisHorizontalIcon,
@@ -19,8 +21,11 @@ import {
 import logo from '../../assets/img/white-logo.svg';
 import { Routes as AppRoutes } from '../../Routes';
 import { useUser } from '../../app/providers/UserProvider';
-import { TabButton } from './TabButton';
-import { useLocalConfig } from '../../app/providers/LocalConfigProvider';
+import { NavTooltip, TabButton } from './TabButton';
+import {
+  useLocalConfig,
+  useUpdateLocalConfig,
+} from '../../app/providers/LocalConfigProvider';
 import { NotificationCenter } from '../../features/notifications/NotificationCenter';
 import { CommandPalette } from './CommandPalette';
 import { TutorialOverlay } from '../../features/tutorial/TutorialOverlay';
@@ -28,9 +33,18 @@ import { isDemoMode } from '../utils/demoMode';
 
 export function TabWrapper() {
   const user = useUser(),
-    { experimental__use_openai_rag } = useLocalConfig();
+    { experimental__use_openai_rag, side_nav_collapsed } = useLocalConfig();
+  const updateLocalConfig = useUpdateLocalConfig();
   const [moreOpen, setMoreOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  // Only the `md`+ rail collapses. Below that the same markup is the bottom
+  // bar, which has nothing to collapse, so every collapsed style is `md:`.
+  const collapsed = Boolean(side_nav_collapsed);
+  const toggleNav = () =>
+    updateLocalConfig({ side_nav_collapsed: !collapsed });
+  const userName = user?.first_name
+    ? `${user.first_name} ${user.last_name}`
+    : 'Unknown User';
 
   return (
     <div className="mobile-full-height relative flex min-h-0 max-w-[100vw] flex-col overflow-hidden md:flex-row-reverse">
@@ -38,31 +52,65 @@ export function TabWrapper() {
       <div className="min-h-0 flex-grow overflow-y-auto">
         <Outlet />
       </div>
-      <div className="flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 md:relative md:bottom-auto md:top-0 md:h-full md:w-auto">
-        <div className="pb-safe md:pb-0 mx-auto flex w-full max-w-3xl justify-around md:h-full md:w-64 md:flex-col md:justify-start">
-          <div className="hidden items-center md:flex">
-            <img src={logo} className="h-20 w-20 p-4" alt="logo"></img>
-            <div className="ml-auto flex items-center pr-2">
+      <div className="flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 print:hidden md:relative md:bottom-auto md:top-0 md:h-full md:w-auto">
+        <div
+          className={`pb-safe md:pb-0 mx-auto flex w-full max-w-3xl justify-around md:h-full md:flex-col md:justify-start motion-safe:md:transition-[width] motion-safe:md:duration-200 ${
+            collapsed ? 'md:w-[4.5rem]' : 'md:w-64'
+          }`}
+        >
+          <div
+            className={`hidden md:flex ${
+              collapsed
+                ? 'flex-col items-center gap-1 px-2 pt-3'
+                : 'items-center'
+            }`}
+          >
+            <img
+              src={logo}
+              className={collapsed ? 'h-10 w-10' : 'h-20 w-20 p-4'}
+              alt="logo"
+            ></img>
+            <div
+              className={`flex items-center ${
+                collapsed ? 'flex-col gap-1' : 'ml-auto pr-2'
+              }`}
+            >
               <Link
                 to={AppRoutes.Sharing}
-                className="mx-1 my-1 inline-flex h-10 w-10 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
+                className="group relative mx-1 my-1 inline-flex h-10 w-10 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
                 aria-label="Sharing"
-                title="Sharing"
               >
                 <ShareIcon className="h-5 w-5" />
+                <NavTooltip label="Sharing" collapsed={collapsed} />
               </Link>
               <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
+              <button
+                type="button"
+                onClick={toggleNav}
+                aria-pressed={collapsed}
+                className="group relative mx-1 my-1 inline-flex h-10 w-10 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
+                aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+              >
+                {collapsed ? (
+                  <ChevronDoubleRightIcon className="h-5 w-5 rtl:rotate-180" />
+                ) : (
+                  <ChevronDoubleLeftIcon className="h-5 w-5 rtl:rotate-180" />
+                )}
+                <NavTooltip label="Expand navigation" collapsed={collapsed} />
+              </button>
             </div>
           </div>
           <TabButton
             route={AppRoutes.Timeline}
             title="Timeline"
             icon={<NewspaperIcon />}
+          collapsed={collapsed}
           />
           <TabButton
             route={AppRoutes.Summary}
             title="Summary"
             icon={<QueueListIcon />}
+          collapsed={collapsed}
           />
           {/* The Records tab used to carry an overlaid "+" pinned to its top
               corner: a second tap target inside a tab, too small to hit
@@ -74,12 +122,14 @@ export function TabWrapper() {
             route={AppRoutes.Records}
             title="Records"
             icon={<DocumentIcon />}
+          collapsed={collapsed}
           />
           <div className="hidden md:contents">
             <TabButton
               route={AppRoutes.Utilities}
               title="Utilities"
               icon={<WrenchScrewdriverIcon />}
+            collapsed={collapsed}
             />
           </div>
           {experimental__use_openai_rag && (
@@ -89,6 +139,7 @@ export function TabWrapper() {
                 title="Mere Assistant"
                 smallTitle="Assistant"
                 icon={<SparklesIcon />}
+              collapsed={collapsed}
               />
             </div>
           )}
@@ -97,6 +148,7 @@ export function TabWrapper() {
               route={AppRoutes.AddConnection}
               title="Sources"
               icon={<PlusCircleIcon />}
+            collapsed={collapsed}
             />
           </div>
           <div className="hidden md:contents">
@@ -104,10 +156,11 @@ export function TabWrapper() {
               route={AppRoutes.Settings}
               title="Settings"
               icon={<Cog6ToothIcon />}
+            collapsed={collapsed}
             />
           </div>
           <div className="hidden md:contents">
-            <NotificationCenter />
+            <NotificationCenter collapsed={collapsed} />
           </div>
           <MobileMoreButton
             open={moreOpen}
@@ -116,10 +169,21 @@ export function TabWrapper() {
             onOpenSearch={() => setSearchOpen(true)}
           />
           <div className="hidden md:block md:flex-1"></div>
-          <div className="border-primary-700 hidden flex-shrink-0 border-t p-4 md:block">
-            <div className="group block flex-shrink-0">
+          <div
+            className={`border-primary-700 hidden flex-shrink-0 border-t md:block ${
+              collapsed ? 'p-2' : 'p-4'
+            }`}
+          >
+            {/* Collapsed, the whole card becomes the avatar and the link that
+                was under it, so the rail still reaches Settings in one tap. */}
+            <Link
+              to={AppRoutes.Settings}
+              className={`group relative block flex-shrink-0 ${
+                collapsed ? 'flex justify-center rounded-md py-1' : ''
+              }`}
+            >
               <div className="flex items-center">
-                <div className="inline-block h-10 w-10 rounded-full border-2 border-white bg-slate-100">
+                <div className="inline-block h-10 w-10 shrink-0 rounded-full border-2 border-white bg-slate-100">
                   {user.profile_picture?.data === undefined ? (
                     <svg
                       className="h-full w-full rounded-full text-gray-800"
@@ -136,21 +200,17 @@ export function TabWrapper() {
                     ></img>
                   )}
                 </div>
-                <div className="ml-3">
+                <div className={`ml-3 ${collapsed ? 'md:hidden' : ''}`}>
                   <p className="text-base font-medium text-white">
-                    {user?.first_name
-                      ? `${user.first_name} ${user.last_name}`
-                      : 'Unknown User'}
+                    {userName}
                   </p>
-                  <Link
-                    to={AppRoutes.Settings}
-                    className="-my-1 inline-flex min-h-[44px] items-center text-sm font-medium text-indigo-200 group-hover:text-white"
-                  >
+                  <span className="-my-1 inline-flex min-h-[44px] items-center text-sm font-medium text-indigo-200 group-hover:text-white">
                     {user?.first_name ? 'View details' : 'Add User Details'}
-                  </Link>
+                  </span>
                 </div>
               </div>
-            </div>
+              <NavTooltip label={userName} collapsed={collapsed} />
+            </Link>
           </div>
         </div>
       </div>

@@ -85,6 +85,11 @@ export function LabsTab() {
     () => sectionLabGroups(filteredGroups),
     [filteredGroups],
   );
+  const filterCounts: Record<LabFilterMode, number> = {
+    attention: attentionGroupCount,
+    planner: plannerGroupCount,
+    all: groupedLabs.length,
+  };
   const libreLabs = useMemo(
     () =>
       labs.filter(
@@ -109,7 +114,7 @@ export function LabsTab() {
   return (
     <AppPage
       banner={
-        <RecordPageHeader
+        <RecordPageHeader<LabFilterMode>
           title="All lab results"
           search={{
             query,
@@ -124,6 +129,21 @@ export function LabsTab() {
               icon={DocumentPlusIcon}
             />
           }
+          // Labs used to keep its filter in a bespoke segmented control inside
+          // the first card, the only record page that did. It is the same
+          // control every other tab wears in the banner, so it wears it here.
+          filters={{
+            items: (
+              Object.keys(labFilterLabels) as LabFilterMode[]
+            ).map((mode) => ({
+              id: mode,
+              label: labFilterLabels[mode],
+              count: filterCounts[mode],
+            })),
+            selectedId: filterMode,
+            onSelect: setFilterMode,
+            label: 'Filter labs',
+          }}
         />
       }
     >
@@ -143,12 +163,9 @@ export function LabsTab() {
                 <LibreCgmPanel labs={libreLabs} />
                 <RecordCoveragePanel
                   coverage={recordCoverage}
-                  attentionCount={attentionGroupCount}
-                  plannerCount={plannerGroupCount}
                   visibleCount={filteredGroups.length}
                   totalGroups={groupedLabs.length}
                   filterMode={filterMode}
-                  setFilterMode={setFilterMode}
                   referenceMode={referenceMode}
                   setReferenceMode={setReferenceMode}
                   referenceContext={referenceContext}

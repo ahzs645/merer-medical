@@ -355,7 +355,7 @@ function ViewToggle({
           key={value}
           type="button"
           onClick={() => setView(value)}
-          className={`rounded-md px-4 py-1 text-sm font-medium transition ${
+          className={`inline-flex min-h-[44px] items-center rounded-md px-4 text-sm font-medium transition ${
             view === value
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-500 hover:text-gray-700'

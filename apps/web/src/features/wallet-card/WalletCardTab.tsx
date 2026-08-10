@@ -359,7 +359,7 @@ export function WalletCardTab() {
   const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
 
   return (
-    <AppPage banner={<GenericBanner text="Wallet Card" />}>
+    <AppPage banner={<GenericBanner text="Wallet Card" className="print:hidden" />}>
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto w-full max-w-3xl px-4 py-4 pb-24 sm:px-6 lg:px-8">
           <div className="mb-4 flex items-start justify-between gap-3 print:hidden">
@@ -383,7 +383,13 @@ export function WalletCardTab() {
             </button>
           </div>
 
-          <div className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200 print:shadow-none print:ring-0">
+          {/* On paper this is now the whole document — the nav, the banner and
+              the toast are `print:hidden`. It still prints at page width
+              rather than card width: squeezing the three columns into a
+              3.375in card makes a 9in strip that needs a fold to carry, which
+              is a layout change, not a width change. `break-inside-avoid`
+              keeps the card off a page boundary in the meantime. */}
+          <div className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200 print:break-inside-avoid print:shadow-none print:ring-0">
             <div className="flex items-center gap-3 bg-primary-800 px-5 py-4 text-white print:bg-primary-800">
               <IdentificationIcon className="h-8 w-8 shrink-0" />
               <div>

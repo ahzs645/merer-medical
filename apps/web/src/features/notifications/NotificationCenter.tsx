@@ -15,6 +15,7 @@ import {
 import { MereNotification } from '../../models/notification/Notification.type';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { useNotifications } from './useNotifications';
+import { NavTooltip } from '../../shared/components/TabButton';
 
 function variantIcon(variant: MereNotification['variant']) {
   switch (variant) {
@@ -40,7 +41,12 @@ function relativeTime(iso: string, language: string): string {
   }
 }
 
-export function NotificationCenter() {
+export function NotificationCenter({
+  collapsed = false,
+}: {
+  /** Desktop rail is icons only; the label becomes a hover tooltip. */
+  collapsed?: boolean;
+} = {}) {
   const {
     notifications,
     unreadCount,
@@ -73,19 +79,30 @@ export function NotificationCenter() {
             ? `${t('Notifications')}, ${unreadCount} ${t('unread')}`
             : t('Notifications')
         }
-        className="relative flex w-24 flex-col items-center justify-center p-2 text-white duration-75 active:scale-90 sm:active:scale-95 md:m-1 md:w-auto md:flex-row md:justify-start md:rounded-md md:p-4"
+        className={`group relative flex w-24 flex-col items-center justify-center p-2 text-white duration-75 active:scale-90 sm:active:scale-95 md:m-1 md:w-auto md:flex-row md:rounded-md ${
+          collapsed ? 'md:justify-center md:p-3' : 'md:justify-start md:p-4'
+        }`}
       >
-        <span className="relative h-5 w-5 text-slate-800 md:me-4 md:h-8 md:w-8 md:text-white">
+        <span
+          className={`relative h-5 w-5 text-slate-800 md:h-8 md:w-8 md:text-white ${
+            collapsed ? 'md:me-0' : 'md:me-4'
+          }`}
+        >
           <BellIcon className="h-full w-full" />
           {unreadCount > 0 && (
-            <span className="absolute -end-2 -top-2 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
+            <span className="absolute -end-2 -top-2 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold leading-none text-white">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
         </span>
-        <p className="pt-1 text-[11px] text-slate-800 md:pt-0 md:text-base md:text-white">
+        <p
+          className={`pt-1 text-xs text-slate-800 md:pt-0 md:text-base md:text-white ${
+            collapsed ? 'md:hidden' : ''
+          }`}
+        >
           {t('Alerts')}
         </p>
+        <NavTooltip label={t('Alerts')} collapsed={collapsed} />
       </button>
 
       <Transition show={open} as={Fragment}>

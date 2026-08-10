@@ -5,6 +5,7 @@ import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocumen
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { Badge } from '../../shared/components/Badge';
 import { RecordListPage } from '../../shared/components/records/RecordListPage';
+import { RecordHeaderButton } from '../../shared/components/records/RecordPageHeader';
 import {
   compareByDateDesc,
   useRecordList,
@@ -14,6 +15,7 @@ import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getAllergyIntoleranceDisplayName } from '../../shared/utils/fhirAccessHelpers';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
+import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
 
 interface AllergyItem {
   id: string;
@@ -77,6 +79,7 @@ function useAllergies() {
 export function AllergiesTab() {
   const { items, status, error } = useAllergies();
   const [query, setQuery] = useState('');
+  const [addOpen, setAddOpen] = useState(false);
 
   const { allergens, alsoRecorded } = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -101,6 +104,16 @@ export function AllergiesTab() {
         placeholder: 'Search allergies',
         label: 'Search allergies',
       }}
+      // Adding an allergy used to be a button on the Medications banner, which
+      // is where you would look for it last. It belongs on the page that owns
+      // the list.
+      action={
+        <RecordHeaderButton
+          onClick={() => setAddOpen(true)}
+          label="Add allergy"
+          compact
+        />
+      }
       status={status}
       error={error}
       loadingText="Loading allergies…"
@@ -111,6 +124,13 @@ export function AllergiesTab() {
       isNoMatch={allergens.length === 0 && alsoRecorded.length === 0}
       noMatchText="No allergies match this search."
     >
+      {/* Saving notifies the record-change signal, so the list refreshes in
+          place without a reload. */}
+      <ManualRecordModal
+        open={addOpen}
+        initialRecordType="allergyintolerance"
+        onClose={() => setAddOpen(false)}
+      />
       {/* Count the allergens, not the record rows: "No Known Allergies" and
           "Not on File" are statements about the list, not entries in it. */}
       <p className="text-sm text-gray-600">
