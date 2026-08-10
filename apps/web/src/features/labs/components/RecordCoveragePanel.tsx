@@ -1,3 +1,4 @@
+import { InfoTip } from '../../../shared/components/InfoTip';
 import { referenceOverlayModes } from '../enrichment/labEnrichment';
 import { ReferenceContext, ReferenceOverlayMode } from '../enrichment/types';
 import { LabFilterMode, RecordCoverageSummary } from '../types';
@@ -43,12 +44,20 @@ export function RecordCoveragePanel({
           segmented control, before any lab. The filter moved to the banner
           with every other tab's; what is left is one line saying what you are
           looking at and the one control that changes how it is judged. */}
-      <div className="flex flex-col gap-2 border-b border-gray-200 px-3 py-2 sm:flex-row sm:items-center sm:gap-4 sm:px-5">
-        <p className="min-w-0 text-sm text-gray-600 sm:flex-1">
+      {/* `relative` so the ⓘ's bubble hangs off this row rather than off the
+          button, which on a phone would put it half off the screen. */}
+      <div className="relative flex flex-col gap-3 border-b border-gray-200 px-3 py-2 sm:flex-row sm:items-center sm:gap-4 sm:px-5">
+        <p className="flex min-w-0 items-center gap-1 text-sm text-gray-600 sm:flex-1">
+          {/* The tally is the part you read; the sentence explaining which
+              filter produced it was three lines saying the same thing the
+              selected chip in the banner already says. */}
           <span className="font-semibold text-gray-900">
             {visibleCount} of {totalGroups}
-          </span>{' '}
-          lab tests listed. {filterHints[filterMode]}
+          </span>
+          <span className="min-w-0 truncate">lab tests listed</span>
+          <InfoTip label="Why these lab tests">
+            {filterHints[filterMode]}
+          </InfoTip>
         </p>
         <label className="flex shrink-0 items-center gap-2 self-start text-xs font-semibold text-gray-700 sm:self-auto">
           <span className="uppercase tracking-wide text-gray-500">
