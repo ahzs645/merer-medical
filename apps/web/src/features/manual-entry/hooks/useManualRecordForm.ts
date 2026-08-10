@@ -41,6 +41,7 @@ import {
   ManualObservationValueKind,
   TerminologyEntry,
 } from '../clinicalTerminology';
+import { safeReturnTo } from '../addRecordPath';
 import {
   createLabRow,
   dentalEntryTypes,
@@ -390,8 +391,14 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     requestedDental ||
     requestedOptometry
   );
-  // Where to go after a successful save: the host's callback, else the timeline.
-  const complete = options.onComplete ?? (() => navigate(AppRoutes.Timeline));
+  // Where to go after a successful save: the host's callback, else back to the
+  // page that sent you here, else the timeline. Landing on the Timeline after
+  // adding a lab from the Labs page reads as a failure — you asked for one
+  // page, you were thrown to another, and the row you just typed is nowhere in
+  // front of you.
+  const returnTo = safeReturnTo(searchParams.get('returnTo'));
+  const complete =
+    options.onComplete ?? (() => navigate(returnTo ?? AppRoutes.Timeline));
   // Tracks whether the user has entered content since the form was last
   // pristine (fresh, reset, or hydrated from a loaded record) so hosts can
   // confirm before discarding it. Programmatic writes (presets, edit-load,
@@ -1301,8 +1308,10 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
 
       // A freshly uploaded document opens straight to its detail page so the
       // user can work through it (view it and add linked records) right away.
+      // A caller that named where to return wins over the document default:
+      // "Add image or scan" should land you on Imaging, not on a file viewer.
       const uploadedDocumentId =
-        !loadedDocument && recordType === 'document'
+        !loadedDocument && recordType === 'document' && !returnTo
           ? savedDocs[0]?.metadata?.id
           : undefined;
       if (uploadedDocumentId) {
