@@ -113,6 +113,36 @@ describe('RecordPageHeader', () => {
     ).toBe(false);
   });
 
+  it('keeps the accessible name when a phone drops the label', () => {
+    renderHeader(
+      <RecordPageHeader
+        title="Medications"
+        action={
+          <RecordHeaderLink to="/records/new" label="Add medication" compact />
+        }
+      />,
+    );
+
+    // The visible label is gone below `sm`; the name it is found by is not.
+    expect(screen.getByRole('link', { name: 'Add medication' })).toBeTruthy();
+  });
+
+  it('reads the description out on a phone without drawing it', () => {
+    renderHeader(
+      <RecordPageHeader
+        title="Medications"
+        description="Prescriptions and supplements reconciled across your sources."
+        action={
+          <RecordHeaderLink to="/records/new" label="Add medication" compact />
+        }
+      />,
+    );
+
+    const description = screen.getByText(/Prescriptions and supplements/);
+    expect(description.className).toContain('sr-only');
+    expect(description.className).toContain('sm:not-sr-only');
+  });
+
   it('scrolls the filter chips sideways rather than stacking rows', () => {
     renderHeader(
       <RecordPageHeader

@@ -97,6 +97,7 @@ function ConditionsHeader({
         <RecordHeaderLink
           to={`${AppRoutes.AddRecord}?type=condition`}
           label="Add condition"
+          compact
         />
       }
     />

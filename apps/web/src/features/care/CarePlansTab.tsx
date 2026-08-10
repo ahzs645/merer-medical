@@ -192,7 +192,11 @@ export function CarePlansTab() {
           title="Care plans"
           description="Care plans, goals, orders, and your own checklist tasks and reminders."
           action={
-            <RecordHeaderLink to={NEW_CARE_PLAN_PATH} label="New care plan" />
+            <RecordHeaderLink
+              to={NEW_CARE_PLAN_PATH}
+              label="New care plan"
+              compact
+            />
           }
         />
       }

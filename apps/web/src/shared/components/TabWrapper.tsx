@@ -40,8 +40,7 @@ export function TabWrapper() {
   // Only the `md`+ rail collapses. Below that the same markup is the bottom
   // bar, which has nothing to collapse, so every collapsed style is `md:`.
   const collapsed = Boolean(side_nav_collapsed);
-  const toggleNav = () =>
-    updateLocalConfig({ side_nav_collapsed: !collapsed });
+  const toggleNav = () => updateLocalConfig({ side_nav_collapsed: !collapsed });
   const userName = user?.first_name
     ? `${user.first_name} ${user.last_name}`
     : 'Unknown User';
@@ -89,7 +88,9 @@ export function TabWrapper() {
                 onClick={toggleNav}
                 aria-pressed={collapsed}
                 className="group relative mx-1 my-1 inline-flex h-10 w-10 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
-                aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+                aria-label={
+                  collapsed ? 'Expand navigation' : 'Collapse navigation'
+                }
               >
                 {collapsed ? (
                   <ChevronDoubleRightIcon className="h-5 w-5 rtl:rotate-180" />
@@ -104,13 +105,13 @@ export function TabWrapper() {
             route={AppRoutes.Timeline}
             title="Timeline"
             icon={<NewspaperIcon />}
-          collapsed={collapsed}
+            collapsed={collapsed}
           />
           <TabButton
             route={AppRoutes.Summary}
             title="Summary"
             icon={<QueueListIcon />}
-          collapsed={collapsed}
+            collapsed={collapsed}
           />
           {/* The Records tab used to carry an overlaid "+" pinned to its top
               corner: a second tap target inside a tab, too small to hit
@@ -122,14 +123,14 @@ export function TabWrapper() {
             route={AppRoutes.Records}
             title="Records"
             icon={<DocumentIcon />}
-          collapsed={collapsed}
+            collapsed={collapsed}
           />
           <div className="hidden md:contents">
             <TabButton
               route={AppRoutes.Utilities}
               title="Utilities"
               icon={<WrenchScrewdriverIcon />}
-            collapsed={collapsed}
+              collapsed={collapsed}
             />
           </div>
           {experimental__use_openai_rag && (
@@ -139,7 +140,7 @@ export function TabWrapper() {
                 title="Mere Assistant"
                 smallTitle="Assistant"
                 icon={<SparklesIcon />}
-              collapsed={collapsed}
+                collapsed={collapsed}
               />
             </div>
           )}
@@ -148,7 +149,7 @@ export function TabWrapper() {
               route={AppRoutes.AddConnection}
               title="Sources"
               icon={<PlusCircleIcon />}
-            collapsed={collapsed}
+              collapsed={collapsed}
             />
           </div>
           <div className="hidden md:contents">
@@ -156,7 +157,7 @@ export function TabWrapper() {
               route={AppRoutes.Settings}
               title="Settings"
               icon={<Cog6ToothIcon />}
-            collapsed={collapsed}
+              collapsed={collapsed}
             />
           </div>
           <div className="hidden md:contents">
@@ -201,9 +202,7 @@ export function TabWrapper() {
                   )}
                 </div>
                 <div className={`ml-3 ${collapsed ? 'md:hidden' : ''}`}>
-                  <p className="text-base font-medium text-white">
-                    {userName}
-                  </p>
+                  <p className="text-base font-medium text-white">{userName}</p>
                   <span className="-my-1 inline-flex min-h-[44px] items-center text-sm font-medium text-indigo-200 group-hover:text-white">
                     {user?.first_name ? 'View details' : 'Add User Details'}
                   </span>
@@ -285,10 +284,10 @@ function MobileMoreButton({
         <Dialog as="div" className="relative z-40 md:hidden" onClose={setOpen}>
           <Transition.Child
             as={Fragment}
-            enter="ease-out duration-200"
+            enter="transition-opacity ease-out duration-200 motion-reduce:transition-none"
             enterFrom="opacity-0"
             enterTo="opacity-100"
-            leave="ease-in duration-150"
+            leave="transition-opacity ease-in duration-150 motion-reduce:transition-none"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
@@ -296,18 +295,29 @@ function MobileMoreButton({
           </Transition.Child>
 
           <div className="fixed inset-x-0 bottom-0 z-40">
+            {/* The sheet already slid up; it was just doing it on `transition:
+                all` with the default curve, so it read as a jump. Transform
+                only, and a decelerating curve over 280ms — the shape a sheet
+                pushed by a thumb has. Reduced motion gets the end state. */}
             <Transition.Child
               as={Fragment}
-              enter="ease-out duration-200"
+              enter="transition-transform duration-[280ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none"
               enterFrom="translate-y-full"
               enterTo="translate-y-0"
-              leave="ease-in duration-150"
+              leave="transition-transform duration-200 ease-in motion-reduce:transition-none"
               leaveFrom="translate-y-0"
               leaveTo="translate-y-full"
             >
-              <Dialog.Panel className="pb-safe rounded-t-xl bg-white shadow-xl">
-                <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-gray-300" />
-                <Dialog.Title className="px-4 pb-2 pt-4 text-sm font-semibold text-gray-900">
+              {/* `pt-2.5` on the panel, not `mt-` on the grabber: a top margin
+                  on the first child collapses out through the panel, which
+                  pushed the sheet down and left the grabber sitting on its
+                  edge instead of inside it. */}
+              <Dialog.Panel className="pb-safe rounded-t-2xl bg-white pt-2.5 shadow-xl">
+                <div
+                  aria-hidden="true"
+                  className="mx-auto h-1.5 w-10 rounded-full bg-gray-300"
+                />
+                <Dialog.Title className="px-4 pb-2 pt-3 text-sm font-semibold text-gray-900">
                   More
                 </Dialog.Title>
                 <div className="grid grid-cols-2 gap-2 px-3 pb-3">

@@ -178,7 +178,13 @@ function InsuranceHeader({
         onChange: setQuery,
         placeholder: t('Search payer, member ID, type, or address'),
       }}
-      action={<RecordHeaderButton onClick={onAdd} label={t('Add insurance')} />}
+      action={
+        <RecordHeaderButton
+          onClick={onAdd}
+          label={t('Add insurance')}
+          compact
+        />
+      }
     />
   );
 }

@@ -93,6 +93,7 @@ export function DocumentsTab() {
               to={`${AppRoutes.AddRecord}?type=document`}
               label={t('Upload document')}
               icon={DocumentPlusIcon}
+              compact
             />
           }
         />

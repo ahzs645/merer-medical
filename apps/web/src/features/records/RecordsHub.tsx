@@ -75,7 +75,11 @@ export function RecordsHub() {
           // category page already carries its own typed add button, and this
           // is the one page that covers the types that don't have one.
           action={
-            <RecordHeaderLink to={AppRoutes.AddRecord} label="Add record" />
+            <RecordHeaderLink
+              to={AppRoutes.AddRecord}
+              label="Add record"
+              compact
+            />
           }
         />
       }

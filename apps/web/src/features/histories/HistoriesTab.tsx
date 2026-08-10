@@ -202,7 +202,11 @@ export function HistoriesTab() {
         <RecordPageHeader
           title="Histories"
           action={
-            <RecordHeaderLink to={AppRoutes.AddRecord} label="Add history" />
+            <RecordHeaderLink
+              to={AppRoutes.AddRecord}
+              label="Add history"
+              compact
+            />
           }
         />
       }

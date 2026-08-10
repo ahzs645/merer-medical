@@ -23,6 +23,7 @@ export function ImmunizationHeader({ recordCount }: { recordCount: number }) {
         <RecordHeaderLink
           to={`${AppRoutes.AddRecord}?type=immunization`}
           label={t('Add immunization')}
+          compact
         />
       }
     />

@@ -55,6 +55,7 @@ export function GoalsTab() {
         <RecordHeaderLink
           to={`${AppRoutes.AddRecord}?type=goal`}
           label="Add goal"
+          compact
         />
       }
       status={status}

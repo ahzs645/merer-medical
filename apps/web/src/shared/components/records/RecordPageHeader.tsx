@@ -66,12 +66,16 @@ export interface RecordPageHeaderProps<Id extends string = string> {
  * The action sits beside the title rather than under the search box, so a page
  * with one button ("Add lab result") wears it in the top-right corner at every
  * width instead of spending a whole phone row on it. Pages whose buttons
- * genuinely cannot share the line — Medications has two, Visit prep has three —
- * wrap the whole group onto its own row, right-aligned, rather than shrinking
- * the labels: "Add medication" and "Add allergy" are not interchangeable, and
- * an icon-only banner is the wrong place to make the reader guess which is
- * which. The title block carries `min-w-0` so a long title wraps instead of
- * forcing the banner wider than a 390px viewport.
+ * genuinely cannot share the line — Visit prep has three — wrap the whole group
+ * onto its own row, right-aligned, rather than shrinking the labels: "Markdown"
+ * and "HTML" are not two icons anyone can tell apart. The title block carries
+ * `min-w-0` so a long title wraps instead of forcing the banner wider than a
+ * 390px viewport.
+ *
+ * The description is orientation text — true on your first visit, furniture on
+ * every one after. Below `sm` it is read out but not drawn, which is three
+ * lines of a 390px screen back on the busiest pages; from `sm` up, where the
+ * room exists, it shows as before.
  */
 export function RecordPageHeader<Id extends string = string>({
   title,
@@ -110,7 +114,9 @@ export function RecordPageHeader<Id extends string = string>({
               </h1>
             </div>
             {description && (
-              <p className="mt-1 max-w-3xl text-sm text-primary-100">
+              // `sr-only` rather than `hidden`: a phone spends no pixels on it,
+              // a screen reader still hears it.
+              <p className="sr-only sm:not-sr-only sm:mt-1 sm:max-w-3xl sm:text-sm sm:text-primary-100">
                 {description}
               </p>
             )}
@@ -240,9 +246,12 @@ function HeaderFilters<Id extends string>({
  * action, `subtle` for anything sitting next to it.
  *
  * `compact` drops the label below `sm`, leaving a 44px square icon that keeps
- * the title's line on a phone. It is opt-in, not the default: an unlabelled
- * glyph is only safe when the page has exactly one action and the icon is the
- * universal one for it. Two glyphs side by side ask the reader to guess.
+ * the title's line on a phone. Every page with a single action passes it, so
+ * the phone banner reads the same everywhere instead of spelling the action
+ * out on Labs and abbreviating it on Medications. It stays opt-in for the one
+ * case it would break: Visit prep's three buttons, where "Markdown" and "HTML"
+ * as two document glyphs would ask the reader to guess. From `sm` up the label
+ * is back on every one of them.
  */
 function actionClass(variant: 'solid' | 'subtle'): string {
   return `inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ${

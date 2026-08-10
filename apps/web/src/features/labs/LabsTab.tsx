@@ -127,6 +127,7 @@ export function LabsTab() {
               to={`${AppRoutes.AddRecord}?type=lab`}
               label="Add lab result"
               icon={DocumentPlusIcon}
+              compact
             />
           }
           // Labs used to keep its filter in a bespoke segmented control inside

@@ -65,6 +65,7 @@ export function ImagingTab() {
               )}`}
               label={t('Add image or scan')}
               icon={DocumentPlusIcon}
+              compact
             />
           }
         />

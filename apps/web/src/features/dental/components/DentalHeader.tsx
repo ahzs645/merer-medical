@@ -39,6 +39,7 @@ export function DentalHeader({
         <RecordHeaderLink
           to={`${AppRoutes.AddRecord}?specialty=dental`}
           label={t('Add dental record')}
+          compact
         />
       }
     />

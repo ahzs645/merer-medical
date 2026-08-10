@@ -251,7 +251,9 @@ function ProblemsHeader({
         placeholder: 'Search diagnosis, code, status, source, or note',
         label: 'Search problems',
       }}
-      action={<RecordHeaderLink to={ADD_PROBLEM_PATH} label="Add problem" />}
+      action={
+        <RecordHeaderLink to={ADD_PROBLEM_PATH} label="Add problem" compact />
+      }
       filters={{
         items: FILTERS.map((filter) => ({
           ...filter,

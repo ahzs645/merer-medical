@@ -33,6 +33,7 @@ export function OptometryHeader({
         <RecordHeaderLink
           to={`${AppRoutes.AddRecord}?specialty=optometry`}
           label={t('Add eye-care record')}
+          compact
         />
       }
     />
