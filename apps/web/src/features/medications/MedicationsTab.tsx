@@ -88,7 +88,11 @@ export function MedicationsTab() {
       banner={
         <RecordPageHeader<FilterChip['id']>
           title="Medications"
-          description="Reconciled prescriptions, planned therapy, stopped medications, supplements, adherence, and source history."
+          // The old description listed the filter chips back to the reader
+          // ("planned therapy, stopped medications, supplements…") a few
+          // pixels above the chips themselves, and cost three lines on a phone
+          // to do it. Say what the page is instead; the chips say the rest.
+          description="Prescriptions and supplements reconciled across your sources, checked against your allergies and for interactions."
           search={{
             query,
             onChange: setQuery,

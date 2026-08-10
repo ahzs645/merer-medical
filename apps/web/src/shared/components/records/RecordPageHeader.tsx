@@ -1,4 +1,4 @@
-import { type ComponentType, type ReactNode } from 'react';
+import { useEffect, useRef, type ComponentType, type ReactNode } from 'react';
 import {
   ArrowLeftIcon,
   MagnifyingGlassIcon,
@@ -59,12 +59,19 @@ export interface RecordPageHeaderProps<Id extends string = string> {
  * This covers the union of those slots and collapses the ones a page does not
  * pass, so a bare title page and the busiest tab still share one skeleton:
  *
- *   row 1  [back link] title (+icon) / description / count   |   search + action
- *   row 2  filter chips
+ *   row 1  [back link] title (+icon) / description / count   |   action
+ *   row 2  search
+ *   row 3  filter chips
  *
- * Everything stacks below `md`. The shrinkable children (title block, search
- * box) carry `min-w-0` so a long title or placeholder wraps instead of forcing
- * the banner wider than a 390px viewport.
+ * The action sits beside the title rather than under the search box, so a page
+ * with one button ("Add lab result") wears it in the top-right corner at every
+ * width instead of spending a whole phone row on it. Pages whose buttons
+ * genuinely cannot share the line — Medications has two, Visit prep has three —
+ * wrap the whole group onto its own row, right-aligned, rather than shrinking
+ * the labels: "Add medication" and "Add allergy" are not interchangeable, and
+ * an icon-only banner is the wrong place to make the reader guess which is
+ * which. The title block carries `min-w-0` so a long title wraps instead of
+ * forcing the banner wider than a 390px viewport.
  */
 export function RecordPageHeader<Id extends string = string>({
   title,
@@ -77,15 +84,16 @@ export function RecordPageHeader<Id extends string = string>({
   filters,
   className = '',
 }: RecordPageHeaderProps<Id>) {
-  const hasControls = Boolean(search || action);
-
   return (
     <div
       className={`bg-primary-800 px-4 py-4 text-white sm:px-6 sm:py-5 lg:px-8 ${className}`}
     >
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div className="min-w-0">
+        {/* `flex-wrap` + a 10rem floor on the title is what decides inline vs.
+            own-row: one button fits beside a title on a 390px phone, two or
+            three do not, and the group drops whole rather than half. */}
+        <div className="flex flex-wrap items-start gap-x-3 gap-y-2">
+          <div className="min-w-0 flex-1 basis-40">
             {backLink && (
               <Link
                 to={backLink.to}
@@ -109,26 +117,18 @@ export function RecordPageHeader<Id extends string = string>({
             {count && <p className="mt-1 text-sm text-primary-100">{count}</p>}
           </div>
 
-          {hasControls && (
-            <div
-              className={`flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:items-center ${
-                // A search box claims half the row and then stops; an action
-                // row keeps its intrinsic width so it hugs the right edge.
-                // `w-full` (not `flex-1`) so the title and the search box give
-                // ground in proportion instead of the title collapsing to one
-                // word per line at exactly `md`.
-                search ? 'md:max-w-2xl' : 'md:w-auto'
-              }`}
-            >
-              {search && <HeaderSearch {...search} />}
-              {action && (
-                <div className="flex shrink-0 flex-wrap items-center gap-2">
-                  {action}
-                </div>
-              )}
+          {action && (
+            <div className="ms-auto flex shrink-0 flex-wrap items-center justify-end gap-2">
+              {action}
             </div>
           )}
         </div>
+
+        {search && (
+          <div className="min-w-0 md:max-w-2xl">
+            <HeaderSearch {...search} />
+          </div>
+        )}
 
         {filters && <HeaderFilters {...filters} />}
       </div>
@@ -166,8 +166,40 @@ function HeaderFilters<Id extends string>({
   onSelect,
   label,
 }: RecordHeaderFilters<Id>) {
+  const rowRef = useRef<HTMLDivElement>(null);
+
+  // A one-line row can hold the selected chip off-screen — after a reload, or
+  // when the selection is set from somewhere other than a tap — which leaves
+  // the list filtered by something the reader cannot see. Bring it back only
+  // when it is actually out of view, so tapping a visible chip never yanks the
+  // row out from under the finger.
+  useEffect(() => {
+    const row = rowRef.current;
+    const chip = row?.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (!row || !chip) return;
+
+    const start = chip.offsetLeft;
+    const end = start + chip.offsetWidth;
+    if (start < row.scrollLeft) {
+      row.scrollLeft = start - 8;
+    } else if (end > row.scrollLeft + row.clientWidth) {
+      row.scrollLeft = end - row.clientWidth + 8;
+    }
+  }, [selectedId]);
+
   return (
-    <div role="group" aria-label={label} className="flex flex-wrap gap-2">
+    // Six chips wrapped onto three rows on a phone, so the banner grew taller
+    // than the first record underneath it. Below `sm` they stay on one line and
+    // scroll sideways instead — the affordance the record tab strip already
+    // uses — and only wrap once there is width to wrap into. The negative
+    // margin lets the row bleed to the banner's edge so a half-cut chip reads
+    // as "more this way"; the matching padding keeps focus rings unclipped.
+    <div
+      ref={rowRef}
+      role="group"
+      aria-label={label}
+      className="scrollbar-hide -mx-1 flex gap-2 overflow-x-auto px-1 py-0.5 sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0"
+    >
       {items.map((filter) => {
         const Icon = filter.icon;
         const isSelected = filter.id === selectedId;
@@ -178,7 +210,7 @@ function HeaderFilters<Id extends string>({
             type="button"
             onClick={() => onSelect(filter.id)}
             aria-pressed={isSelected}
-            className={`inline-flex min-h-[44px] items-center gap-2 rounded-md px-3 text-sm font-medium shadow-sm ring-1 ring-inset ${
+            className={`inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-md px-3 text-sm font-medium shadow-sm ring-1 ring-inset ${
               isSelected
                 ? 'bg-white text-primary-800 ring-white'
                 : 'bg-white/10 text-white ring-white/30 hover:bg-white/20'
@@ -208,7 +240,7 @@ function HeaderFilters<Id extends string>({
  * action, `subtle` for anything sitting next to it.
  */
 function actionClass(variant: 'solid' | 'subtle'): string {
-  return `inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ${
+  return `inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ${
     variant === 'solid'
       ? 'bg-white text-primary-800 ring-primary-100 hover:bg-primary-50'
       : 'bg-white/15 text-white ring-white/30 hover:bg-white/25'

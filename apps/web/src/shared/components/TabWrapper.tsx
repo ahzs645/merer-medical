@@ -64,20 +64,16 @@ export function TabWrapper() {
             title="Summary"
             icon={<QueueListIcon />}
           />
+          {/* The Records tab used to carry an overlaid "+" pinned to its top
+              corner: a second tap target inside a tab, too small to hit
+              cleanly and unexplained by any label. Adding a record now lives
+              where the records are — the "Add record" button in the Records
+              banner — with a labelled entry in the More sheet as the reachable
+              -from-anywhere path. */}
           <TabButton
             route={AppRoutes.Records}
             title="Records"
             icon={<DocumentIcon />}
-            trailing={
-              <Link
-                to={AppRoutes.AddRecord}
-                aria-label="Add record"
-                title="Add record"
-                className="flex h-8 w-8 flex-col items-center justify-center rounded-md text-slate-800 duration-75 active:scale-90 sm:active:scale-95 md:inline-flex md:h-10 md:w-10 md:flex-row md:border md:border-primary-700 md:bg-primary-900/30 md:text-primary-100 md:hover:bg-primary-700"
-              >
-                <PlusIcon className="h-6 w-6 md:h-5 md:w-5" />
-              </Link>
-            }
           />
           <div className="hidden md:contents">
             <TabButton
@@ -255,6 +251,12 @@ function MobileMoreButton({
                   More
                 </Dialog.Title>
                 <div className="grid grid-cols-2 gap-2 px-3 pb-3">
+                  <MobileMoreLink
+                    route={AppRoutes.AddRecord}
+                    title="Add record"
+                    icon={<PlusIcon />}
+                    onClick={() => setOpen(false)}
+                  />
                   <button
                     type="button"
                     onClick={() => {

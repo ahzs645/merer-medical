@@ -61,18 +61,26 @@ function YearJumpBarUnmemo({
             aria-current={year === activeYear ? 'location' : undefined}
             aria-busy={loading || undefined}
             onClick={() => onJumpToDate?.(dateKey)}
-            className={`inline-flex min-h-[44px] flex-shrink-0 items-center gap-1 rounded-md px-3 text-sm font-medium ${
-              year === activeYear
-                ? 'bg-primary-50 text-primary-700'
-                : 'text-gray-600 hover:text-primary-700'
-            }`}
+            // The tap target stays 44px tall; the highlight does not. Painting
+            // the selected year across the full target made a pill twice the
+            // height of its own text, which read as a block of colour rather
+            // than as "this is where you are".
+            className="inline-flex min-h-[44px] flex-shrink-0 items-center px-0.5 text-sm font-medium"
           >
-            {year}
-            {loading ? (
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-600">
-                <span className="sr-only">Loading</span>
-              </span>
-            ) : null}
+            <span
+              className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 ${
+                year === activeYear
+                  ? 'bg-primary-50 text-primary-700'
+                  : 'text-gray-600 hover:text-primary-700'
+              }`}
+            >
+              {year}
+              {loading ? (
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-600">
+                  <span className="sr-only">Loading</span>
+                </span>
+              ) : null}
+            </span>
           </Link>
         );
       })}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Routes as AppRoutes } from '../../Routes';
 
@@ -7,15 +6,11 @@ export function TabButton({
   title,
   smallTitle = '',
   icon,
-  trailing,
 }: {
   route: AppRoutes;
   title: string;
   smallTitle?: string;
   icon: JSX.Element;
-  // Optional node rendered on top of (and visually inside) the highlighted
-  // button area, e.g. a quick "add" action that lives on its own link.
-  trailing?: React.ReactNode;
 }) {
   const location = useLocation()?.pathname;
   const isActive =
@@ -68,25 +63,6 @@ export function TabButton({
       )}
     </>
   );
-
-  if (trailing) {
-    // The whole button (including the area beneath the trailing action) is a
-    // single Link that highlights as one; the trailing action is overlaid on
-    // top so it stays independently clickable without nesting anchors.
-    return (
-      <div className="relative flex w-24 md:m-1 md:w-auto">
-        <Link
-          to={route}
-          className={`${linkClassName} w-full pr-9 md:w-full md:pr-12`}
-        >
-          {inner}
-        </Link>
-        <div className="absolute right-1 top-1 z-10 md:bottom-1 md:right-2 md:top-1 md:flex md:items-center">
-          {trailing}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <Link to={route} className={`${linkClassName} md:m-1`}>

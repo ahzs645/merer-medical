@@ -4,7 +4,10 @@ import { Link } from 'react-router-dom';
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
 import { EmptyState } from '../../shared/components/records/RecordListPage';
-import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
+import {
+  RecordHeaderLink,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { ALL_RECORD_CATEGORIES, RECORD_GROUPS } from './recordCategories';
 import {
@@ -68,6 +71,12 @@ export function RecordsHub() {
             placeholder: 'Search records',
             label: 'Search record categories',
           }}
+          // The hub is where "add a record of some kind" belongs: every
+          // category page already carries its own typed add button, and this
+          // is the one page that covers the types that don't have one.
+          action={
+            <RecordHeaderLink to={AppRoutes.AddRecord} label="Add record" />
+          }
         />
       }
     >
