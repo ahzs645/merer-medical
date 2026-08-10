@@ -65,6 +65,45 @@ function buildDentalBodySite(details?: ManualSpecialtyDetails) {
   return parts.length ? [{ text: parts.join('; ') }] : undefined;
 }
 
+const OBSERVATION_CATEGORY_SYSTEM =
+  'http://terminology.hl7.org/CodeSystem/observation-category';
+
+// Every page that lists observations selects on this coding, never on our
+// `manual_kind`: a hand-entered "Body weight 72 kg" carried no category at all,
+// so it reached the Timeline and then no other page in the app — VitalsTab
+// filters on `vital-signs`, and the results chart on `vital-signs`/`laboratory`.
+const OBSERVATION_CATEGORIES: Partial<
+  Record<ClinicalManualRecordKind, { code: string; display: string }>
+> = {
+  vital: { code: 'vital-signs', display: 'Vital Signs' },
+  lab: { code: 'laboratory', display: 'Laboratory' },
+  socialhistory: { code: 'social-history', display: 'Social History' },
+};
+
+function buildObservationCategory(
+  recordType: ClinicalManualRecordKind,
+  details?: ManualSpecialtyDetails,
+) {
+  const standard = OBSERVATION_CATEGORIES[recordType];
+  // The specialty entry stays alongside the standard coding rather than
+  // instead of it: the dental and optometry pages search the serialized
+  // category, so dropping it would hide a tooth finding from its own tab.
+  const categories = [
+    standard && {
+      text: standard.display,
+      coding: [
+        {
+          system: OBSERVATION_CATEGORY_SYSTEM,
+          code: standard.code,
+          display: standard.display,
+        },
+      ],
+    },
+    details?.specialty && { text: details.specialty },
+  ].filter(Boolean);
+  return categories.length ? categories : undefined;
+}
+
 function parseNumber(value?: string) {
   if (!value?.trim()) return undefined;
   const parsed = Number(value);
@@ -153,7 +192,11 @@ export function buildClinicalDocument({
     data_record: {
       raw,
       format:
-        recordType === 'careplan' || recordType === 'coverage'
+        recordType === 'careplan' ||
+        recordType === 'coverage' ||
+        // DSTU2 has no ServiceRequest at all (it was ReferralRequest), so
+        // labelling one DSTU2 would be a lie about the shape we just wrote.
+        recordType === 'servicerequest'
           ? 'FHIR.R4'
           : 'FHIR.DSTU2',
       content_type:
@@ -298,8 +341,17 @@ function buildManualFhirEntry(
       terminology,
     );
   }
+  if (recordType === 'servicerequest') {
+    return buildManualReferralEntry(
+      id,
+      title,
+      notes,
+      date,
+      terminology,
+      specialtyDetails,
+    );
+  }
   const resourceType = toFhirResourceType(recordType);
-  const isSocialHistory = recordType === 'socialhistory';
   const observationData = observation ?? {
     valueKind: 'quantity' as ManualObservationValueKind,
     comparator: '',
@@ -328,23 +380,7 @@ function buildManualFhirEntry(
     resource: {
       resourceType,
       id,
-      category: isSocialHistory
-        ? [
-            {
-              text: 'Social history',
-              coding: [
-                {
-                  system:
-                    'http://terminology.hl7.org/CodeSystem/observation-category',
-                  code: 'social-history',
-                  display: 'Social History',
-                },
-              ],
-            },
-          ]
-        : specialtyDetails?.specialty
-          ? [{ text: specialtyDetails.specialty }]
-          : undefined,
+      category: buildObservationCategory(recordType, specialtyDetails),
       code: {
         text: title.trim(),
         coding: terminology
@@ -508,6 +544,71 @@ function buildManualFamilyHistoryEntry(
   };
 }
 
+/**
+ * The generic entry would give a ServiceRequest `status: 'final'` and no
+ * `intent`, which is not a valid referral and would put the word "final" in
+ * the status badge on the Referrals card. This writes the four fields that tab
+ * actually reads — status, code, occurrence/authoredOn, note — plus the
+ * `intent` and `category` a ServiceRequest is required to carry.
+ */
+function buildManualReferralEntry(
+  id: string,
+  title: string,
+  notes: string,
+  date: string,
+  terminology?: TerminologyEntry,
+  details?: ManualSpecialtyDetails,
+) {
+  const noteText = notes.trim();
+  // The form has no "referred by" field, so the only name we can honestly put
+  // on the request is the specialty provider when one was entered; the tab
+  // renders requester and performer only when they are present.
+  const provider = details?.dentalProvider || details?.surgerySurgeon;
+  return {
+    fullUrl: `manual:${id}`,
+    manual_kind: 'servicerequest',
+    manual_uncoded: !terminology,
+    terminology_profile: terminology?.profile,
+    terminology_source: terminology?.source,
+    terminology_source_version: terminology?.sourceVersion,
+    resource: {
+      resourceType: 'ServiceRequest',
+      id,
+      status: 'active',
+      intent: 'order',
+      category: [
+        {
+          text: 'Referral',
+          coding: [
+            {
+              system: 'http://snomed.info/sct',
+              code: '306206005',
+              display: 'Referral to service',
+            },
+          ],
+        },
+      ],
+      code: {
+        text: title.trim(),
+        coding: terminology
+          ? [
+              {
+                system: terminology.system,
+                code: terminology.code,
+                display: terminology.display,
+              },
+            ]
+          : undefined,
+      },
+      performer: provider ? [{ display: provider }] : undefined,
+      authoredOn: date,
+      occurrenceDateTime: date,
+      text: noteText ? { status: 'generated', div: noteText } : undefined,
+      note: noteText ? [{ text: noteText }] : undefined,
+    },
+  };
+}
+
 function buildObservationValue(observationData: {
   valueKind: ManualObservationValueKind;
   comparator: string;
@@ -632,6 +733,8 @@ function toFhirResourceType(recordType: ClinicalManualRecordKind) {
       return 'VisionPrescription';
     case 'goal':
       return 'Goal';
+    case 'servicerequest':
+      return 'ServiceRequest';
     case 'lab':
     case 'vital':
     case 'socialhistory':

@@ -1208,8 +1208,15 @@ export const arabicTranslations: Record<string, string> = {
   'Encounter / visit': 'زيارة / مراجعة',
   'A clinic visit, appointment or hospital stay':
     'زيارة عيادة أو موعد أو إقامة في المستشفى',
+  Referral: 'إحالة',
+  'A referral to a specialist, clinic or service':
+    'إحالة إلى أخصائي أو عيادة أو خدمة',
   'A plan of care, goals or follow-up instructions':
     'خطة رعاية أو أهداف أو تعليمات متابعة',
+  'A target you are working towards, and when you started':
+    'هدف تعمل على تحقيقه، وتاريخ البدء',
+  'A glasses or contact lens prescription, eye by eye':
+    'وصفة نظارات أو عدسات لاصقة، لكل عين',
   'Insurance / coverage': 'تأمين / تغطية',
   'Payer, member ID, plan type and coverage period':
     'الجهة الدافعة ورقم العضوية ونوع الخطة وفترة التغطية',
@@ -1478,6 +1485,7 @@ export const arabicTranslations: Record<string, string> = {
   'Add goal': 'إضافة هدف',
   'In Progress': 'قيد التنفيذ',
   Improving: 'في تحسن',
+  'Add referral': 'إضافة إحالة',
   'Search referrals': 'البحث في الإحالات',
   'Search procedures': 'البحث في الإجراءات',
   'Search visits': 'البحث في الزيارات',

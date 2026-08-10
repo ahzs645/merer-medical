@@ -1,4 +1,6 @@
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
+import { isLaboratoryObservation } from '../labs/hooks/useLabsData';
+import { mapReferralDocs } from '../referrals/referralRecords';
 import {
   appendSpecialtyNotes,
   buildClinicalDocument,
@@ -6,6 +8,20 @@ import {
   getManualSpecialtyDetails,
   normalizeAbsentReason,
 } from './manualRecordBuilders';
+
+/** The predicate VitalsTab selects observations with (VitalsTab.tsx). */
+function isVitalSign(resource: Record<string, unknown>): boolean {
+  const raw = resource['category'] as
+    | Array<{ coding?: Array<{ code?: string }> }>
+    | undefined;
+  return (raw || []).some((category) =>
+    (category.coding || []).some((coding) => coding.code === 'vital-signs'),
+  );
+}
+
+function resourceOf(doc: ClinicalDocument): Record<string, any> {
+  return (doc.data_record.raw as { resource: Record<string, any> }).resource;
+}
 
 describe('manual record builders', () => {
   it('builds dental specialty details from form values', () => {
@@ -135,6 +151,123 @@ describe('manual record builders', () => {
     expect(raw.resource.valueQuantity).toMatchObject({
       value: 72,
       unit: 'bpm',
+    });
+  });
+
+  it('categorises a hand-entered vital so the Vitals page can find it', () => {
+    // A vital used to be written with no category at all, so "Body weight
+    // 72 kg" reached the Timeline and then nothing else: Vitals selects on the
+    // vital-signs coding and matched none of them.
+    const doc = buildClinicalDocument({
+      connectionId: 'conn-1',
+      userId: 'user-1',
+      recordType: 'vital',
+      recordDate: '2024-01-01T12:00:00.000Z',
+      title: 'Body weight',
+      notes: '',
+      fileName: '',
+      fileContentType: '',
+      observation: {
+        valueKind: 'quantity',
+        comparator: '',
+        value: '72',
+        unit: 'kg',
+        rangeLow: '',
+        rangeHigh: '',
+        rangeText: '',
+        interpretation: '',
+        absentReason: 'pending',
+      },
+    });
+
+    expect(resourceOf(doc).category).toEqual([
+      {
+        text: 'Vital Signs',
+        coding: [
+          {
+            system:
+              'http://terminology.hl7.org/CodeSystem/observation-category',
+            code: 'vital-signs',
+            display: 'Vital Signs',
+          },
+        ],
+      },
+    ]);
+    expect(isVitalSign(resourceOf(doc))).toBe(true);
+    expect(isLaboratoryObservation(doc as never)).toBe(false);
+  });
+
+  it('categorises a hand-entered lab as laboratory without unseating Labs', () => {
+    const doc = buildClinicalDocument({
+      connectionId: 'conn-1',
+      userId: 'user-1',
+      recordType: 'lab',
+      recordDate: '2024-01-01T12:00:00.000Z',
+      title: 'Blood glucose',
+      notes: '',
+      fileName: '',
+      fileContentType: '',
+    });
+
+    expect(resourceOf(doc).category[0].coding[0]).toMatchObject({
+      code: 'laboratory',
+    });
+    expect(isLaboratoryObservation(doc as never)).toBe(true);
+    expect(isVitalSign(resourceOf(doc))).toBe(false);
+  });
+
+  it('keeps the specialty category beside the standard coding', () => {
+    // The dental and optometry pages search the serialized category, so the
+    // specialty entry has to survive alongside the vital-signs coding.
+    const doc = buildClinicalDocument({
+      connectionId: 'conn-1',
+      userId: 'user-1',
+      recordType: 'vital',
+      recordDate: '2024-01-01T12:00:00.000Z',
+      title: 'IOP',
+      notes: '',
+      fileName: '',
+      fileContentType: '',
+      specialtyDetails: { specialty: 'optometry', subtype: 'iop' },
+    });
+
+    expect(isVitalSign(resourceOf(doc))).toBe(true);
+    expect(resourceOf(doc).category).toContainEqual({ text: 'optometry' });
+  });
+
+  it('builds a referral the Referrals tab can list', () => {
+    const doc = buildClinicalDocument({
+      connectionId: 'conn-1',
+      userId: 'user-1',
+      recordType: 'servicerequest',
+      recordDate: '2024-03-04T12:00:00.000Z',
+      title: 'Dermatology',
+      notes: 'Mole check, sent by Dr. Patel',
+      fileName: '',
+      fileContentType: '',
+    });
+
+    // The tab's own query selects on this resource type, and its mapper reads
+    // status / code / authoredOn / note.
+    expect(doc.data_record.resource_type).toBe('servicerequest');
+    expect(doc.data_record.format).toBe('FHIR.R4');
+    expect(resourceOf(doc)).toMatchObject({
+      resourceType: 'ServiceRequest',
+      status: 'active',
+      intent: 'order',
+      code: { text: 'Dermatology' },
+      authoredOn: '2024-03-04T12:00:00.000Z',
+      occurrenceDateTime: '2024-03-04T12:00:00.000Z',
+    });
+    expect(resourceOf(doc).category[0].coding[0].code).toBe('306206005');
+
+    const [item] = mapReferralDocs([{ ...doc, id: 'doc-1' }], new Map());
+    expect(item).toMatchObject({
+      name: 'Dermatology',
+      status: 'active',
+      date: '2024-03-04T12:00:00.000Z',
+      notes: ['Mole check, sent by Dr. Patel'],
+      source: 'Manual entry',
     });
   });
 
