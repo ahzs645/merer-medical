@@ -12,9 +12,13 @@ import {
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 
 interface ProcedureItem {
   id: string;
+  /** Kept for `ManualRecordActions`, which decides for itself whether this
+   *  record was typed here or arrived from a provider. */
+  document: ClinicalDocument;
   name: string;
   status?: string;
   date?: string;
@@ -29,6 +33,7 @@ function mapProcedureDocs(
     const r = getFhirResource<Record<string, unknown>>(d);
     return {
       id: d.id,
+      document: d,
       name: d.metadata?.display_name || firstText(r['code']) || 'Procedure',
       status: firstText(r['status']),
       date:
@@ -86,24 +91,27 @@ export function ProceduresTab() {
       {filtered.map((item) => (
         <article
           key={item.id}
-          className="flex items-start justify-between gap-3 rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
+          className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
         >
-          <div className="min-w-0">
-            <h3 className="break-words text-sm font-semibold text-gray-900">
-              {item.name}
-            </h3>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-              {item.status && (
-                <Badge className="capitalize">{item.status}</Badge>
-              )}
-              {item.source && <span>· {item.source}</span>}
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="break-words text-sm font-semibold text-gray-900">
+                {item.name}
+              </h3>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                {item.status && (
+                  <Badge className="capitalize">{item.status}</Badge>
+                )}
+                {item.source && <span>· {item.source}</span>}
+              </div>
             </div>
+            {item.date && (
+              <span className="shrink-0 text-sm text-gray-500">
+                {safeFormatDate(item.date, 'PP', '')}
+              </span>
+            )}
           </div>
-          {item.date && (
-            <span className="shrink-0 text-sm text-gray-500">
-              {safeFormatDate(item.date, 'PP', '')}
-            </span>
-          )}
+          <ManualRecordActions item={item.document} />
         </article>
       ))}
     </RecordListPage>

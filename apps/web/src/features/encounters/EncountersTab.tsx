@@ -13,6 +13,7 @@ import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getEncounterLocation } from '../../shared/utils/fhirAccessHelpers';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 
 // Resource types we treat as "records" when counting same-day activity.
 const SAME_DAY_RESOURCE_TYPES = new Set<string>([
@@ -95,6 +96,9 @@ function parseLocation(display: string): ParsedLocation {
 
 interface EncounterItem {
   id: string;
+  /** Kept for `ManualRecordActions`, which decides for itself whether this
+   *  record was typed here or arrived from a provider. */
+  document: ClinicalDocument;
   title: string;
   date?: string;
   classDisplay?: string;
@@ -133,6 +137,7 @@ function mapEncounterDocs(
       const day = (date || '').slice(0, 10);
       return {
         id: d.id,
+        document: d,
         title: d.metadata?.display_name || classDisplay || 'Encounter',
         date,
         classDisplay,
@@ -242,6 +247,8 @@ export function EncountersTab() {
                 {item.sameDayCount === 1 ? '' : 's'}
               </span>
             )}
+
+            <ManualRecordActions item={item.document} />
           </article>
         );
       })}

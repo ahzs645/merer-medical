@@ -9,6 +9,7 @@ import { EmptyState } from '../../shared/components/records/RecordListPage';
 import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 
 interface Provider {
   name: string;
@@ -67,6 +68,9 @@ export function parseFacility(display: string): Facility {
 function useDirectory() {
   const db = useRxDb();
   const user = useUser();
+  // A manually added visit brings its location with it, so this list grows
+  // when records change too. Refetch on the same signal every other tab uses.
+  const recordChangeTick = useRecordChangeTick();
   const [providers, setProviders] = useState<Provider[]>([]);
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
@@ -159,7 +163,7 @@ function useDirectory() {
     return () => {
       mounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   return { providers, facilities, status, error };
 }

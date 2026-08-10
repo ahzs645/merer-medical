@@ -1,27 +1,33 @@
 import { useEffect, useState, type ComponentType } from 'react';
 import {
   ClipboardDocumentListIcon,
+  PlusIcon,
   ScissorsIcon,
   UserGroupIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
-import {
-  RecordHeaderLink,
-  RecordPageHeader,
-} from '../../shared/components/records/RecordPageHeader';
+import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, isRecord, periodStart } from '../../shared/utils/fhirText';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
+import type { ManualRecordKind } from '../manual-entry/manualRecordTypes';
 
 interface HistoryItem {
   id: string;
+  /** Kept for `ManualRecordActions`, which decides for itself whether this
+   *  record was typed here or arrived from a provider. */
+  document: ClinicalDocument;
   title: string;
   detail?: string;
   date?: string;
@@ -43,6 +49,8 @@ function isSocialHistory(resource: Record<string, unknown>): boolean {
 function useHistoriesData() {
   const db = useRxDb();
   const user = useUser();
+  // Refetch when a manual record is added, edited, or deleted.
+  const recordChangeTick = useRecordChangeTick();
   const [data, setData] = useState<HistoriesData>({
     medical: [],
     surgical: [],
@@ -83,6 +91,7 @@ function useHistoriesData() {
         const r = getFhirResource<Record<string, unknown>>(doc);
         return {
           id: doc.id,
+          document: doc,
           title:
             doc.metadata?.display_name || firstText(r['code']) || 'Condition',
           detail: firstText(r['clinicalStatus']),
@@ -97,6 +106,7 @@ function useHistoriesData() {
         const r = getFhirResource<Record<string, unknown>>(doc);
         return {
           id: doc.id,
+          document: doc,
           title:
             doc.metadata?.display_name || firstText(r['code']) || 'Procedure',
           detail: firstText(r['status']),
@@ -121,6 +131,7 @@ function useHistoriesData() {
           : undefined;
         return {
           id: doc.id,
+          document: doc,
           title: relationship,
           detail: conditionsList || 'No conditions recorded',
           date: r['date'] as string | undefined,
@@ -135,6 +146,7 @@ function useHistoriesData() {
         .filter(({ r }) => isSocialHistory(r))
         .map(({ doc, r }) => ({
           id: doc.id,
+          document: doc,
           title:
             doc.metadata?.display_name || firstText(r['code']) || 'Observation',
           detail:
@@ -156,40 +168,60 @@ function useHistoriesData() {
     return () => {
       mounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   return { data, status, error };
 }
 
+/**
+ * Each section names the manual record kind that feeds it, so the add link
+ * beside it opens the right form.
+ *
+ * The banner used to carry a single "Add history" pointing at a bare
+ * `/records/new`, which dropped you on the sixteen-card picker to work out for
+ * yourself that this page is fed by four unrelated kinds. One banner button
+ * can only be honest about one of them, so the choice moved to where it is
+ * already made: you add to the list you are looking at.
+ */
 const SECTIONS: {
   key: keyof HistoriesData;
   title: string;
   icon: ComponentType<{ className?: string }>;
   empty: string;
+  addType: ManualRecordKind;
+  addLabel: string;
 }[] = [
   {
     key: 'medical',
     title: 'Medical history',
     icon: ClipboardDocumentListIcon,
     empty: 'No conditions recorded.',
+    addType: 'condition',
+    addLabel: 'Add condition',
   },
   {
     key: 'surgical',
     title: 'Surgical & procedure history',
     icon: ScissorsIcon,
     empty: 'No procedures recorded.',
+    addType: 'procedure',
+    addLabel: 'Add procedure',
   },
   {
     key: 'family',
     title: 'Family history',
     icon: UsersIcon,
     empty: 'No family history recorded.',
+    addType: 'familymemberhistory',
+    addLabel: 'Add family history',
   },
   {
     key: 'social',
     title: 'Social history',
     icon: UserGroupIcon,
     empty: 'No social history recorded.',
+    addType: 'socialhistory',
+    addLabel: 'Add social history',
   },
 ];
 
@@ -197,20 +229,7 @@ export function HistoriesTab() {
   const { data, status, error } = useHistoriesData();
 
   return (
-    <AppPage
-      banner={
-        <RecordPageHeader
-          title="Histories"
-          action={
-            <RecordHeaderLink
-              to={AppRoutes.AddRecord}
-              label="Add history"
-              compact
-            />
-          }
-        />
-      }
-    >
+    <AppPage banner={<RecordPageHeader title="Histories" />}>
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto w-full max-w-5xl px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'error' ? (
@@ -225,6 +244,11 @@ export function HistoriesTab() {
                   items={data[section.key]}
                   empty={section.empty}
                   loading={status === 'loading'}
+                  addPath={buildAddRecordPath({
+                    type: section.addType,
+                    returnTo: AppRoutes.Histories,
+                  })}
+                  addLabel={section.addLabel}
                 />
               ))}
             </div>
@@ -241,23 +265,40 @@ function HistorySection({
   items,
   empty,
   loading,
+  addPath,
+  addLabel,
 }: {
   title: string;
   icon: ComponentType<{ className?: string }>;
   items: HistoryItem[];
   empty: string;
   loading: boolean;
+  addPath: string;
+  addLabel: string;
 }) {
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="mb-3 flex items-center gap-2">
-        <Icon className="h-5 w-5 text-gray-500" />
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-700">
+        <Icon className="h-5 w-5 shrink-0 text-gray-500" />
+        <h2 className="min-w-0 text-sm font-semibold uppercase tracking-wide text-gray-700">
           {title}
         </h2>
-        {!loading && (
-          <span className="ml-auto text-xs text-gray-400">{items.length}</span>
-        )}
+        <div className="ms-auto flex shrink-0 items-center gap-2">
+          {!loading && (
+            <span className="text-xs text-gray-400">{items.length}</span>
+          )}
+          {/* The label is the accessible name in full ("Add family history");
+              the four sections sit two-to-a-row, so only "Add" is drawn. */}
+          <Link
+            to={addPath}
+            title={addLabel}
+            className="inline-flex min-h-[44px] items-center gap-1 rounded-md px-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+          >
+            <PlusIcon className="h-4 w-4 shrink-0" />
+            <span className="sr-only">{addLabel}</span>
+            <span aria-hidden="true">Add</span>
+          </Link>
+        </div>
       </div>
       {loading ? (
         <p className="text-sm text-gray-400">Loading…</p>
@@ -266,25 +307,25 @@ function HistorySection({
       ) : (
         <ul className="divide-y divide-gray-100">
           {items.map((item) => (
-            <li
-              key={item.id}
-              className="flex items-start justify-between gap-3 py-2"
-            >
-              <div className="min-w-0">
-                <p className="break-words text-sm font-medium text-gray-900">
-                  {item.title}
-                </p>
-                {item.detail && (
-                  <p className="text-xs capitalize text-gray-500">
-                    {item.detail}
+            <li key={item.id} className="py-2">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="break-words text-sm font-medium text-gray-900">
+                    {item.title}
                   </p>
+                  {item.detail && (
+                    <p className="text-xs capitalize text-gray-500">
+                      {item.detail}
+                    </p>
+                  )}
+                </div>
+                {item.date && (
+                  <span className="shrink-0 text-xs text-gray-400">
+                    {safeFormatDate(item.date, 'PP', '')}
+                  </span>
                 )}
               </div>
-              {item.date && (
-                <span className="shrink-0 text-xs text-gray-400">
-                  {safeFormatDate(item.date, 'PP', '')}
-                </span>
-              )}
+              <ManualRecordActions item={item.document} />
             </li>
           ))}
         </ul>

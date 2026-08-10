@@ -29,6 +29,7 @@ import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import { getManualRecordNote } from '../../shared/utils/manualRecordUtils';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 
 type ProblemStatus = 'active' | 'resolved' | 'unknown';
@@ -70,7 +71,14 @@ const GROUPS: { id: ProblemStatus; title: string }[] = [
   { id: 'unknown', title: 'Unknown status' },
 ];
 
-const ADD_PROBLEM_PATH = `${AppRoutes.AddRecord}?type=condition`;
+// "Add problem" and "Add condition" (My Conditions) resolved to this same URL
+// and produced a record that then showed up on both pages — two words for one
+// thing. "Condition" is what the record is called in the form, and what this
+// page's own description already calls its rows.
+const ADD_CONDITION_PATH = buildAddRecordPath({
+  type: 'condition',
+  returnTo: AppRoutes.Problems,
+});
 
 export function ProblemsTab() {
   const { items, status, error } = useProblemsData();
@@ -252,7 +260,11 @@ function ProblemsHeader({
         label: 'Search problems',
       }}
       action={
-        <RecordHeaderLink to={ADD_PROBLEM_PATH} label="Add problem" compact />
+        <RecordHeaderLink
+          to={ADD_CONDITION_PATH}
+          label="Add condition"
+          compact
+        />
       }
       filters={{
         items: FILTERS.map((filter) => ({
@@ -385,11 +397,11 @@ function EmptyProblemsState() {
         records will appear here.
       </p>
       <Link
-        to={ADD_PROBLEM_PATH}
-        className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+        to={ADD_CONDITION_PATH}
+        className="mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
       >
-        <PlusIcon className="h-5 w-5" />
-        Add problem
+        <PlusIcon className="h-5 w-5 shrink-0" />
+        Add condition
       </Link>
     </div>
   );

@@ -4,7 +4,10 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { Badge } from '../../shared/components/Badge';
-import { RecordListPage } from '../../shared/components/records/RecordListPage';
+import {
+  EmptyStateButton,
+  RecordListPage,
+} from '../../shared/components/records/RecordListPage';
 import { RecordHeaderButton } from '../../shared/components/records/RecordPageHeader';
 import {
   compareByDateDesc,
@@ -15,10 +18,14 @@ import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getAllergyIntoleranceDisplayName } from '../../shared/utils/fhirAccessHelpers';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
 
 interface AllergyItem {
   id: string;
+  /** Kept for `ManualRecordActions`, which decides for itself whether this
+   *  record was typed here or arrived from a provider. */
+  document: ClinicalDocument;
   name: string;
   clinicalStatus?: string;
   reaction?: string;
@@ -49,6 +56,7 @@ function mapAllergyDocs(
       'Allergy';
     return {
       id: d.id,
+      document: d,
       name,
       clinicalStatus: firstText(r['clinicalStatus']),
       reaction: firstText(reaction?.['manifestation']),
@@ -96,116 +104,123 @@ export function AllergiesTab() {
   }, [items, query]);
 
   return (
-    <>
-      {/* Outside `RecordListPage`, whose `children` only render once the list
-          has something in it: inside, "Add allergy" was a dead click on an
-          empty list and on a search that matched nothing — exactly when you
-          reach for it — and the dialog then opened by itself when the filter
-          cleared. */}
-      <ManualRecordModal
-        open={addOpen}
-        initialRecordType="allergyintolerance"
-        onClose={() => setAddOpen(false)}
-      />
-      <RecordListPage
-        title="Allergies"
-        search={{
-          query,
-          onChange: setQuery,
-          placeholder: 'Search allergies',
-          label: 'Search allergies',
-        }}
-        // Adding an allergy used to be a button on the Medications banner, which
-        // is where you would look for it last. It belongs on the page that owns
-        // the list.
-        action={
-          <RecordHeaderButton
-            onClick={() => setAddOpen(true)}
-            label="Add allergy"
-            compact
-          />
-        }
-        status={status}
-        error={error}
-        loadingText="Loading allergies…"
-        errorText="Unable to load allergies."
-        isEmpty={items.length === 0}
-        emptyText="No allergies recorded yet."
-        emptyIcon={<ExclamationTriangleIcon className="h-6 w-6" />}
-        isNoMatch={allergens.length === 0 && alsoRecorded.length === 0}
-        noMatchText="No allergies match this search."
-      >
-        {/* Count the allergens, not the record rows: "No Known Allergies" and
+    <RecordListPage
+      title="Allergies"
+      search={{
+        query,
+        onChange: setQuery,
+        placeholder: 'Search allergies',
+        label: 'Search allergies',
+      }}
+      // Adding an allergy used to be a button on the Medications banner, which
+      // is where you would look for it last. It belongs on the page that owns
+      // the list.
+      action={
+        <RecordHeaderButton
+          onClick={() => setAddOpen(true)}
+          label="Add allergy"
+          compact
+        />
+      }
+      // The dialog slot, not `children`: `children` only render once the list
+      // has something in it, so "Add allergy" was a dead click on an empty
+      // list — exactly when a new user reaches for it.
+      dialogs={
+        <ManualRecordModal
+          open={addOpen}
+          initialRecordType="allergyintolerance"
+          onClose={() => setAddOpen(false)}
+        />
+      }
+      status={status}
+      error={error}
+      loadingText="Loading allergies…"
+      errorText="Unable to load allergies."
+      isEmpty={items.length === 0}
+      emptyText="No allergies recorded yet."
+      emptyIcon={<ExclamationTriangleIcon className="h-6 w-6" />}
+      emptyAction={
+        <EmptyStateButton
+          onClick={() => setAddOpen(true)}
+          label="Add allergy"
+        />
+      }
+      isNoMatch={allergens.length === 0 && alsoRecorded.length === 0}
+      noMatchText="No allergies match this search."
+    >
+      {/* Count the allergens, not the record rows: "No Known Allergies" and
           "Not on File" are statements about the list, not entries in it. */}
-        <p className="text-sm text-gray-600">
-          {allergens.length === 1
-            ? '1 allergen'
-            : `${allergens.length} allergens`}
+      <p className="text-sm text-gray-600">
+        {allergens.length === 1
+          ? '1 allergen'
+          : `${allergens.length} allergens`}
+      </p>
+
+      {allergens.map((item) => (
+        <AllergyCard key={item.id} item={item} />
+      ))}
+
+      {allergens.length === 0 && (
+        <p className="rounded-md bg-white p-4 text-sm text-gray-600 shadow-sm ring-1 ring-gray-200">
+          No allergens recorded.
         </p>
+      )}
 
-        {allergens.map((item) => (
-          <AllergyCard key={item.id} item={item} />
-        ))}
-
-        {allergens.length === 0 && (
-          <p className="rounded-md bg-white p-4 text-sm text-gray-600 shadow-sm ring-1 ring-gray-200">
-            No allergens recorded.
+      {alsoRecorded.length > 0 && (
+        <section className="mt-3">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Also recorded
+          </h2>
+          <p className="mt-1 text-xs text-gray-500">
+            These entries state that no allergy was found or that no allergy
+            history was taken. They are not allergens.
           </p>
-        )}
-
-        {alsoRecorded.length > 0 && (
-          <section className="mt-3">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-              Also recorded
-            </h2>
-            <p className="mt-1 text-xs text-gray-500">
-              These entries state that no allergy was found or that no allergy
-              history was taken. They are not allergens.
-            </p>
-            <div className="mt-2 grid gap-2">
-              {alsoRecorded.map((item) => (
-                <AllergyCard key={item.id} item={item} muted />
-              ))}
-            </div>
-          </section>
-        )}
-      </RecordListPage>
-    </>
+          <div className="mt-2 grid gap-2">
+            {alsoRecorded.map((item) => (
+              <AllergyCard key={item.id} item={item} muted />
+            ))}
+          </div>
+        </section>
+      )}
+    </RecordListPage>
   );
 }
 
 function AllergyCard({ item, muted }: { item: AllergyItem; muted?: boolean }) {
   return (
     <article
-      className={`flex items-start justify-between gap-3 rounded-md p-4 shadow-sm ring-1 ${
+      className={`rounded-md p-4 shadow-sm ring-1 ${
         muted ? 'bg-gray-50 ring-gray-200' : 'bg-white ring-gray-200'
       }`}
     >
-      <div className="min-w-0">
-        <h3
-          className={`break-words text-sm font-semibold ${
-            muted ? 'text-gray-700' : 'text-gray-900'
-          }`}
-        >
-          {item.name}
-        </h3>
-        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-          {muted && <Badge tone="neutral">Not an allergen</Badge>}
-          {item.clinicalStatus && (
-            <Badge className="capitalize">{item.clinicalStatus}</Badge>
-          )}
-          {item.reaction && <span>· {item.reaction}</span>}
-          {item.severity && (
-            <span className="capitalize">· {item.severity}</span>
-          )}
-          {item.source && <span>· {item.source}</span>}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3
+            className={`break-words text-sm font-semibold ${
+              muted ? 'text-gray-700' : 'text-gray-900'
+            }`}
+          >
+            {item.name}
+          </h3>
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+            {muted && <Badge tone="neutral">Not an allergen</Badge>}
+            {item.clinicalStatus && (
+              <Badge className="capitalize">{item.clinicalStatus}</Badge>
+            )}
+            {item.reaction && <span>· {item.reaction}</span>}
+            {item.severity && (
+              <span className="capitalize">· {item.severity}</span>
+            )}
+            {item.source && <span>· {item.source}</span>}
+          </div>
         </div>
+        {item.date && (
+          <span className="shrink-0 text-sm text-gray-500">
+            {safeFormatDate(item.date, 'PP', '')}
+          </span>
+        )}
       </div>
-      {item.date && (
-        <span className="shrink-0 text-sm text-gray-500">
-          {safeFormatDate(item.date, 'PP', '')}
-        </span>
-      )}
+      <ManualRecordActions item={item.document} />
     </article>
   );
 }

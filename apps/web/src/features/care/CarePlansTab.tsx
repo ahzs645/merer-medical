@@ -13,6 +13,7 @@ import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { WorkflowRecord } from '../../models/workflow-record/WorkflowRecord.type';
+import { Routes as AppRoutes } from '../../Routes';
 import {
   deleteWorkflowRecord,
   listWorkflowRecords,
@@ -26,6 +27,7 @@ import {
 import { StylizedSelect } from '../../shared/components/StylizedSelect';
 import { formatDisplayText } from '../../shared/utils/StyleUtils';
 import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 
 type CareResourceType = 'careplan' | 'goal' | 'servicerequest';
@@ -63,7 +65,10 @@ const CARE_RESOURCE_TYPES: CareResourceType[] = [
   'goal',
   'servicerequest',
 ];
-const NEW_CARE_PLAN_PATH = '/records/new?type=careplan';
+const NEW_CARE_PLAN_PATH = buildAddRecordPath({
+  type: 'careplan',
+  returnTo: AppRoutes.CarePlans,
+});
 
 function storageKey(userId: string) {
   return `mere-medical:care-items:${userId}`;
