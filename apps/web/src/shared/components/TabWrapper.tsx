@@ -21,6 +21,7 @@ import {
 import logo from '../../assets/img/white-logo.svg';
 import { Routes as AppRoutes } from '../../Routes';
 import { useUser } from '../../app/providers/UserProvider';
+import { buildAddRecordPath } from '../../features/manual-entry/addRecordPath';
 import { NavTooltip, TabButton } from './TabButton';
 import {
   useLocalConfig,
@@ -101,6 +102,7 @@ export function TabWrapper() {
               </button>
             </div>
           </div>
+          <RailAddRecordButton collapsed={collapsed} />
           <TabButton
             route={AppRoutes.Timeline}
             title="Timeline"
@@ -117,8 +119,8 @@ export function TabWrapper() {
               corner: a second tap target inside a tab, too small to hit
               cleanly and unexplained by any label. Adding a record now lives
               where the records are — the "Add record" button in the Records
-              banner — with a labelled entry in the More sheet as the reachable
-              -from-anywhere path. */}
+              banner — with the labelled entries above and in the More sheet as
+              the reachable-from-anywhere path on each size. */}
           <TabButton
             route={AppRoutes.Records}
             title="Records"
@@ -217,6 +219,61 @@ export function TabWrapper() {
   );
 }
 
+/**
+ * The link behind both global adds.
+ *
+ * The rail and the More sheet are on screen everywhere, so "the page the button
+ * lives on" — what `returnTo` is for — is wherever the user happens to be. The
+ * one path that cannot be a return is the form itself, which would send them
+ * round the loop again.
+ */
+function useGlobalAddRecordPath(): string {
+  const { pathname } = useLocation();
+
+  return buildAddRecordPath({
+    returnTo: pathname === AppRoutes.AddRecord ? undefined : pathname,
+  });
+}
+
+/**
+ * Adding a record was the one thing a phone could do from anywhere and a
+ * desktop could not: the More sheet has carried "Add record" ever since the
+ * unlabelled "+" came off the Records tab, while the 16rem rail offered six
+ * destinations and no action, sending anyone not already on a record page
+ * through the Records hub or Sources to reach the form.
+ *
+ * It sits above the tabs instead of among them because it is not a seventh
+ * place to be, and wears the record banner's solid-action skin so the rail's
+ * add and the banner's add read as the same button rather than two different
+ * ones. Collapsed it is a glyph — the shape that was wrong on the Records tab —
+ * but only because the name survives as `sr-only` text and a `NavTooltip`, the
+ * same contract every collapsed rail item keeps.
+ *
+ * `md:` only: the phone's bottom bar has four items and the More sheet already
+ * has this entry.
+ */
+function RailAddRecordButton({ collapsed }: { collapsed: boolean }) {
+  const addRecordPath = useGlobalAddRecordPath();
+
+  return (
+    <Link
+      to={addRecordPath}
+      className={`group text-primary-800 ring-primary-100 hover:bg-primary-50 relative hidden items-center rounded-md bg-white text-sm font-semibold shadow-sm ring-1 ring-inset md:flex ${
+        collapsed
+          ? 'md:mx-auto md:my-3 md:h-11 md:w-11 md:justify-center'
+          : // 44px expanded as well as collapsed: `py-2.5` around a 20px line
+            // is 40px, and this app's own audit counts a 38px Save button as a
+            // defect.
+            'md:mx-3 md:my-3 md:min-h-[44px] md:gap-2 md:px-3 md:py-2.5'
+      }`}
+    >
+      <PlusIcon className="h-5 w-5 flex-shrink-0" />
+      {!collapsed && <span>Add record</span>}
+      <NavTooltip label="Add record" collapsed={collapsed} />
+    </Link>
+  );
+}
+
 function MobileMoreButton({
   open,
   setOpen,
@@ -229,6 +286,7 @@ function MobileMoreButton({
   onOpenSearch: () => void;
 }) {
   const location = useLocation();
+  const addRecordPath = useGlobalAddRecordPath();
   // When the user taps "Search", defer opening the palette until the sheet has
   // finished closing — otherwise the sheet's focus-restore fires after the
   // palette focuses its input and steals focus back (mobile focus race).
@@ -323,6 +381,7 @@ function MobileMoreButton({
                 <div className="grid grid-cols-2 gap-2 px-3 pb-3">
                   <MobileMoreLink
                     route={AppRoutes.AddRecord}
+                    to={addRecordPath}
                     title="Add record"
                     icon={<PlusIcon />}
                     onClick={() => setOpen(false)}
@@ -381,11 +440,19 @@ function MobileMoreButton({
 
 function MobileMoreLink({
   route,
+  to,
   title,
   icon,
   onClick,
 }: {
   route: AppRoutes;
+  /**
+   * The link, when it carries more than the route — the add entry appends a
+   * `returnTo` so a record logged from the sheet lands the user back on the
+   * page they opened it from, the same as the desktop rail's add. `route`
+   * stays the plain route, because it is what decides the active style.
+   */
+  to?: string;
   title: string;
   icon: JSX.Element;
   onClick: () => void;
@@ -398,7 +465,7 @@ function MobileMoreLink({
 
   return (
     <Link
-      to={route}
+      to={to ?? route}
       onClick={onClick}
       className={`flex items-center gap-3 rounded-lg border p-3 text-sm font-semibold ${
         isActive
