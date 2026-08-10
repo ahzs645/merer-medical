@@ -70,7 +70,7 @@ export function ImmunizationByTypePanel({
   }
 
   return (
-    <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
+    <section className="min-w-0 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
       <div className="flex items-baseline justify-between gap-2">
         <div>
           <h2 className="text-base font-semibold text-gray-900">

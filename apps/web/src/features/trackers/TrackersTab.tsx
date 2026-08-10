@@ -288,14 +288,17 @@ function TrackerEntryRow({
               {formatDateTime(entry.recordedAt)}
             </div>
           </div>
-          <div className="mt-2 flex items-center gap-2">
+          <div className="-my-1 mt-1 flex items-center gap-1">
             <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
               {formatDisplayText(entry.kind)}
             </span>
+            {/* Destructive, so it gets a real touch target and a colour that
+                separates it from the category pill sitting next to it. */}
             <button
               type="button"
               onClick={() => onDelete(entry.id)}
-              className="text-xs font-medium text-gray-500 hover:text-red-600"
+              aria-label={`Delete entry: ${entry.label}`}
+              className="inline-flex min-h-[44px] items-center rounded-md px-2 text-xs font-medium text-red-700 hover:bg-red-50 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-600"
             >
               Delete
             </button>

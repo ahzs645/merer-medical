@@ -329,7 +329,7 @@ function ProblemGroups({
         if (groupItems.length === 0) return null;
 
         return (
-          <section key={group.id}>
+          <section key={group.id} className="min-w-0">
             <div className="mb-2 flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-700">
                 {group.title}
@@ -353,7 +353,7 @@ function ProblemGroups({
 
 function ProblemCard({ item }: { item: ProblemItem }) {
   return (
-    <article className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+    <article className="min-w-0 rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -391,7 +391,7 @@ function ProblemCard({ item }: { item: ProblemItem }) {
       </dl>
 
       {item.provenance && (
-        <p className="mt-3 text-sm text-gray-700">
+        <p className="mt-3 break-words text-sm text-gray-700">
           <span className="font-medium text-gray-900">Provenance:</span>{' '}
           {item.provenance}
         </p>

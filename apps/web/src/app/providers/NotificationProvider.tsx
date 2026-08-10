@@ -122,10 +122,12 @@ function NotificationRenderer(
                       </p>
                     )}
                   </div>
-                  <div className="ml-4 flex flex-shrink-0">
+                  <div className="-mr-2 -mt-2 ml-2 flex flex-shrink-0">
                     <button
                       type="button"
-                      className="focus:ring-primary-700 inline-flex rounded-md bg-white text-gray-700 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                      // Sized to the 44px touch minimum: the icon stays 20px but
+                      // the hit area covers the corner of the toast.
+                      className="focus:ring-primary-700 inline-flex h-11 w-11 items-center justify-center rounded-md bg-white text-gray-700 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2"
                       onClick={() => {
                         dispatch({ type: 'hide_notification' });
                       }}
