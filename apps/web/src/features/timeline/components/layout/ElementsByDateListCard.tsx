@@ -576,11 +576,11 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
   return (
     <CardBase>
       <div className="min-w-0 flex-1 flex-col">
-        <div
+        <h2
           className={`text-lg font-bold flex flex-row items-center align-middle sm:text-2xl sm:mb-1 text-primary-600`}
         >
           {title}
-        </div>
+        </h2>
         <div className="flex sm:flex-row flex-col sm:justify-between">
           <div className="flex flex-col">
             {connectionDocs.map((conn, index) =>

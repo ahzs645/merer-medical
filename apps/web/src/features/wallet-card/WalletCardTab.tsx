@@ -7,6 +7,7 @@ import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocumen
 import { AppPage } from '../../shared/components/AppPage';
 import { GenericBanner } from '../../shared/components/GenericBanner';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
+import { getAllergyIntoleranceDisplayName } from '../../shared/utils/fhirAccessHelpers';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { conceptCodes, firstText, isRecord } from '../../shared/utils/fhirText';
 
@@ -28,6 +29,38 @@ const MEDICATION_RESOURCE_TYPES = [
   'medicationrequest',
   'medicationorder',
 ];
+
+/**
+ * SNOMED concepts that record the *absence* of an allergy, or that no allergy
+ * history was taken. Portals emit these as ordinary AllergyIntolerance
+ * resources, so on a full record list they are legitimate entries — but on an
+ * emergency card, "No Known Allergies" printed beneath six real allergens is
+ * worse than useless, so they are dropped here.
+ */
+const ALLERGY_NEGATION_CODES = new Set([
+  '716186003', // No known allergy
+  '409137002', // No known drug allergy
+  '428607008', // No known environmental allergy
+  '429625007', // No known food allergy
+  '428197003', // No known latex allergy
+  '1631000175102', // Patient not asked
+  '787923006', // Allergy status unknown
+]);
+
+const ALLERGY_NEGATION_TEXT =
+  /^(no known|nka\b|none known|not on file|patient not asked|unknown|no allergies)/i;
+
+function isAllergyNegation(
+  resource: Record<string, unknown>,
+  name: string,
+): boolean {
+  const codes = [
+    ...conceptCodes(resource['substance']),
+    ...conceptCodes(resource['code']),
+  ];
+  if (codes.some((code) => ALLERGY_NEGATION_CODES.has(code))) return true;
+  return ALLERGY_NEGATION_TEXT.test(name.trim());
+}
 
 function isActive(resource: Record<string, unknown>): boolean {
   const status = firstText(resource['clinicalStatus'] || resource['status']);
@@ -92,14 +125,17 @@ function useWalletData(): { data: WalletData; status: 'loading' | 'success' } {
       );
 
       const allergies = dedupe(
-        allergyDocs.map((doc) => {
+        allergyDocs.flatMap((doc): WalletItem[] => {
           const r = getFhirResource<Record<string, unknown>>(doc);
-          return {
-            id: doc.id,
-            name:
-              doc.metadata?.display_name || firstText(r['code']) || 'Allergy',
-            detail: reactionText(r),
-          };
+          // DSTU2 keeps the allergen on `substance`, R4 on `code`; the shared
+          // helper covers both. Without it every DSTU2 allergy fell back to
+          // the literal "Allergy" and deduped into a single row.
+          const name =
+            getAllergyIntoleranceDisplayName(doc) ||
+            firstText(r['code']) ||
+            'Allergy';
+          if (isAllergyNegation(r, name)) return [];
+          return [{ id: doc.id, name, detail: reactionText(r) }];
         }),
       );
 

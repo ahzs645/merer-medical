@@ -31,7 +31,9 @@ export function TimelineBanner({
           </div>
         </div>
         <div className="flex-column align-middle">
-          <p className="text-xl font-bold text-white sm:text-2xl">{text}</p>
+          {/* h1 so the default landing route exposes a page title, matching
+              GenericBanner on every other tab. */}
+          <h1 className="text-xl font-bold text-white sm:text-2xl">{text}</h1>
           <p className="text-md text-white">{subtext}</p>
         </div>
       </div>

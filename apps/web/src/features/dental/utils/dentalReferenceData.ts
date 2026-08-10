@@ -169,11 +169,23 @@ export const DECIDUOUS_TEETH: DentalTooth[] = [
 
 export const ALL_TEETH = [...UNIVERSAL_TEETH, ...DECIDUOUS_TEETH];
 
+/**
+ * Universal (ADA) tooth number → FDI two-digit notation.
+ *
+ * Universal runs clockwise from the patient's upper right third molar (1)
+ * around to the lower right third molar (32), so each arch's FDI quadrant runs
+ * in the opposite direction to the one before it:
+ *
+ *   1–8   upper right  → FDI 18…11  (descending)
+ *   9–16  upper left   → FDI 21…28  (ascending)
+ *   17–24 lower left   → FDI 38…31  (descending)
+ *   25–32 lower right  → FDI 41…48  (ascending)
+ */
 export function universalToFdi(tooth: number): string {
   if (tooth >= 1 && tooth <= 8) return `${18 - tooth + 1}`;
   if (tooth >= 9 && tooth <= 16) return `${20 + tooth - 8}`;
-  if (tooth >= 17 && tooth <= 24) return `${30 + tooth - 16}`;
-  if (tooth >= 25 && tooth <= 32) return `${48 - tooth + 25}`;
+  if (tooth >= 17 && tooth <= 24) return `${38 - (tooth - 17)}`;
+  if (tooth >= 25 && tooth <= 32) return `${41 + (tooth - 25)}`;
   return `${tooth}`;
 }
 
