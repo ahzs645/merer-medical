@@ -326,7 +326,7 @@ export function VitalsTab() {
                 {/* Six dated rows a card, three cards: the history alone filled
                     a phone screen before you reached the third vital, and the
                     sparkline above already says which way it is going. Native
-                    <details> as in RecordCoveragePanel — the browser gives the
+                    <details> rather than a state-holding disclosure — the browser gives the
                     button semantics, the expanded state and the keyboard — with
                     the summary left a list-item, because a flex summary drops
                     the triangle in Chrome. */}

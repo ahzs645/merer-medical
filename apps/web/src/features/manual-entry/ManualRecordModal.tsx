@@ -49,8 +49,13 @@ function ManualRecordModalBody({
   return (
     <>
       <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 sm:px-6">
+        {/* Named by what you pressed, the way the full-page form already is:
+            pressing "Add allergy" and landing on a sheet headed "Add record"
+            drops the context you arrived with. */}
         <Dialog.Title className="text-base font-semibold text-gray-900">
-          {t(form.isEditing ? 'Edit record' : 'Add record')}
+          {form.isEditing
+            ? t('Edit record')
+            : form.presetAddTitle || t('Add record')}
         </Dialog.Title>
         <button
           type="button"
