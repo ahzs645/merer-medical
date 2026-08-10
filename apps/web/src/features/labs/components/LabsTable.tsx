@@ -163,7 +163,7 @@ function LabMobileRow({
               event.stopPropagation();
               onToggle();
             }}
-            className="shrink-0 rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+            className="-my-1 flex h-11 w-11 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
             aria-label={`${expanded ? t('Collapse') : t('Expand')} ${
               group.name
             }`}
@@ -199,21 +199,21 @@ function LabMobileRow({
               <span className="text-gray-600">
                 {safeFormatDate(latest.metadata?.date, 'PP', t('Unknown'))}
               </span>
-              {statusSummary.abnormalCount > 0 ? (
+              <span className="flex flex-wrap items-center gap-x-2">
+                {/* Same flag that colours the value above, so the two agree. */}
                 <span
-                  className={`font-semibold ${
-                    statusSummary.highCount > 0 || statusSummary.lowCount > 0
-                      ? 'text-red-700'
-                      : 'text-amber-700'
-                  }`}
+                  className={`font-semibold ${getLatestStatusClass(
+                    latestReference.flag,
+                  )}`}
                 >
-                  {statusSummary.label}
+                  {getLatestStatusLabel(latestReference.flag)}
                 </span>
-              ) : (
-                <span className="font-medium text-gray-600">
-                  {t('In range')}
-                </span>
-              )}
+                {statusSummary.abnormalCount > 0 ? (
+                  <span className="font-medium text-gray-600">
+                    ({statusSummary.label})
+                  </span>
+                ) : null}
+              </span>
             </div>
           </div>
         </div>
@@ -358,19 +358,21 @@ function LabTableRow({
           <LinkedReportList reports={latestReports} />
         </div>
         <div className="text-sm">
+          {/* Line one is the latest result, coloured from the same flag as the
+              value cell; line two counts the group's history so a red "2 of 5
+              high" can never be read as a verdict on an in-range latest value. */}
+          <div
+            className={`font-semibold ${getLatestStatusClass(
+              latestReference.flag,
+            )}`}
+          >
+            {getLatestStatusLabel(latestReference.flag)}
+          </div>
           {statusSummary.abnormalCount > 0 ? (
-            <span
-              className={`font-semibold ${
-                statusSummary.highCount > 0 || statusSummary.lowCount > 0
-                  ? 'text-red-700'
-                  : 'text-amber-700'
-              }`}
-            >
+            <div className="mt-0.5 text-xs font-medium text-gray-600">
               {statusSummary.label}
-            </span>
-          ) : (
-            <span className="text-gray-600">{t('In range')}</span>
-          )}
+            </div>
+          ) : null}
         </div>
       </div>
       {expanded ? (
@@ -387,4 +389,24 @@ function getFlagTextClass(flag: LabFlag): string {
   if (flag === 'high' || flag === 'low') return 'text-red-700';
   if (flag === 'borderline' || flag === 'abnormal') return 'text-amber-700';
   return 'text-gray-900';
+}
+
+/** Muted for an in-range latest value; otherwise matches the value colour. */
+function getLatestStatusClass(flag: LabFlag): string {
+  if (flag === 'high' || flag === 'low') return 'text-red-700';
+  if (flag === 'borderline' || flag === 'abnormal') return 'text-amber-700';
+  return 'text-gray-600';
+}
+
+const latestStatusLabels: Record<LabFlag, string> = {
+  high: 'High',
+  low: 'Low',
+  borderline: 'Borderline',
+  abnormal: 'Abnormal',
+  normal: 'In range',
+  identity: 'In range',
+};
+
+function getLatestStatusLabel(flag: LabFlag): string {
+  return latestStatusLabels[flag] || 'In range';
 }

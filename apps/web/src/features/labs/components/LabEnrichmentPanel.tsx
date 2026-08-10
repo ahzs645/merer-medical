@@ -59,9 +59,11 @@ export function LabEnrichmentPanel({
         />
         <InfoTile
           icon={<CheckBadgeIcon className="h-4 w-4" />}
-          title="Planner usage"
+          title="Key marker"
           value={
-            enrichment.usedByPlanner ? 'Used by planner' : 'Not used by planner'
+            enrichment.usedByPlanner
+              ? 'Tracked as a key metabolic marker'
+              : 'Not a key metabolic marker'
           }
           detail={
             enrichment.normalizedValue?.note ||

@@ -43,7 +43,8 @@ export interface RecordCategory {
    * of rows the target page actually lists (a clean 1:1 mapping). Left
    * undefined for categories whose page shows derived, filtered, de-duplicated
    * or multi-type data (Labs, Vitals, Imaging, My conditions, Providers,
-   * aggregate/specialty views) so we show no count rather than a wrong one.
+   * aggregate/specialty views) rather than show a wrong number — those render
+   * an explicit "not counted" state so they don't read as empty.
    */
   resourceTypes?: string[];
   /**

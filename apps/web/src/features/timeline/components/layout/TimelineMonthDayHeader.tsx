@@ -21,13 +21,15 @@ export const TimelineMonthDayHeader: React.FC<TimelineMonthDayHeaderProps> = ({
       <div className="flex flex-row py-1">
         <div className="relative flex flex-col">
           <div className="h-0 mt-0 bg-transparent">
-            <div className="px-3 bg-gray-50 border-2 md:border-4 border-gray-200 rounded-full aspect-square flex flex-col justify-center">
-              <p className="text-sm font-black text-center">
+            {/* Smaller bubble on phones - it is a fixed gutter beside every
+                card, so its width is width the cards never get back. */}
+            <div className="px-2 md:px-3 bg-gray-50 border-2 md:border-4 border-gray-200 rounded-full aspect-square flex flex-col justify-center">
+              <p className="text-xs md:text-sm font-black text-center">
                 {checkIfDefaultDate(dateKey) ? null : (
                   <span className="font-bold">{`${formattedTitleDateMonthString(dateKey)}`}</span>
                 )}
               </p>
-              <p className="text-center text-sm leading-none">
+              <p className="text-center text-xs md:text-sm leading-none">
                 {checkIfDefaultDate(dateKey)
                   ? ''
                   : `${formattedTitleDateDayString(dateKey)}`}
@@ -47,9 +49,11 @@ export const SkeletonTimelineMonthDayHeader = memo(
         <div className="flex flex-row py-1">
           <div className="relative flex flex-col">
             <div className="h-0 mt-0 bg-transparent">
-              <div className="animate-pulse px-3 bg-gray-50 border-2 md:border-4 border-gray-200 rounded-full aspect-square flex flex-col justify-center">
-                <p className="text-sm text-gray-50 text-center">Jan</p>
-                <p className="text-sm text-gray-50 text-center">1</p>
+              <div className="animate-pulse px-2 md:px-3 bg-gray-50 border-2 md:border-4 border-gray-200 rounded-full aspect-square flex flex-col justify-center">
+                <p className="text-xs md:text-sm text-gray-50 text-center">
+                  Jan
+                </p>
+                <p className="text-xs md:text-sm text-gray-50 text-center">1</p>
               </div>
             </div>
           </div>

@@ -19,6 +19,7 @@ import {
   groupLabs,
   sectionLabGroups,
 } from './utils/labGrouping';
+import { labFilterLabels } from './utils/labFormatters';
 import {
   getSavedLabsQuery,
   LABS_SCROLL_CONTAINER_ID,
@@ -141,7 +142,9 @@ export function LabsTab() {
                     />
                   ))
                 ) : (
-                  <LabsEmptySearch query={query || filterMode} />
+                  <LabsEmptySearch
+                    query={query || labFilterLabels[filterMode]}
+                  />
                 )}
               </>
             ) : (

@@ -22,6 +22,7 @@ import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvi
 import { useUser } from '../../app/providers/UserProvider';
 import { useVectorSyncStatus } from '../vectors/providers/VectorGeneratorSyncInitializer';
 import { JumpToPanel } from './components/layout/JumpToPanel';
+import { YearJumpBar } from './components/layout/YearJumpBar';
 import { SearchBar } from './components/layout/SearchBar';
 import { TimelineBanner } from './components/layout/TimelineBanner';
 import { TimelineItem } from './components/layout/TimelineItem';
@@ -37,6 +38,7 @@ import {
   formattedTitleDateDayString,
   formattedTitleDateMonthString,
 } from './utils/timelineDates';
+import { getTimelineCategories } from './utils/timelineCategories';
 
 export { QueryStatus };
 export {
@@ -82,6 +84,14 @@ export function TimelineTab() {
 
     if (data) {
       for (const [dateKey, itemList] of Object.entries(data)) {
+        // A date whose records have no section in the grouped card used to
+        // render a titleless card with a clinic name and nothing else; drop
+        // the whole date rather than show an empty one.
+        if (
+          !showIndividualItems &&
+          getTimelineCategories(itemList).length === 0
+        )
+          continue;
         const year = dateKey.split('-')[0];
         const yearData = newYearMap.get(year);
         if (yearData) {
@@ -92,7 +102,12 @@ export function TimelineTab() {
       }
     }
     return newYearMap;
-  }, [data]);
+  }, [data, showIndividualItems]);
+
+  // The mobile year rail lists loaded dates only: unlike the desktop panel it
+  // must not offer a year whose anchor is not on the page yet, since paging is
+  // driven by scrolling and the link would silently do nothing.
+  const jumpDateKeys = useMemo(() => Object.keys(data || {}), [data]);
 
   useScrollToHash();
 
@@ -104,8 +119,8 @@ export function TimelineTab() {
           {[...yearMap.entries()].map(
             ([year, dateMap], yearIndex, yearElements) => (
               <div key={year} className="relative">
-                {/* Vertical line */}
-                <div className="absolute left-8 top-4 h-[calc(100%-12px)] w-[2px] md:w-1 bg-gray-200 z-0 rounded-full" />
+                {/* Vertical line, tracking the smaller mobile date bubble */}
+                <div className="absolute left-6 md:left-8 top-4 h-[calc(100%-12px)] w-[2px] md:w-1 bg-gray-200 z-0 rounded-full" />
                 <TimelineYearHeader
                   key={`${year}${yearIndex}`}
                   year={year}
@@ -197,57 +212,65 @@ export function TimelineTab() {
               ) && hasNoRecords ? (
                 <EmptyRecordsPlaceholder />
               ) : (
-                <div className="flex w-full overflow-hidden">
-                  <JumpToPanel
-                    items={data}
-                    dateKeys={query === '' ? timelineDateKeys : undefined}
-                    isLoading={false}
-                    activeDateKey={activeDateKey ?? Object.keys(data || {})[0]}
+                <div className="flex w-full min-w-0 flex-col overflow-hidden">
+                  <YearJumpBar
+                    dateKeys={jumpDateKeys}
+                    activeDateKey={activeDateKey ?? jumpDateKeys[0]}
                   />
-                  <div
-                    className="px-auto flex h-full max-h-full w-full justify-center overflow-y-scroll relative"
-                    ref={scrollContainer}
-                    onScroll={onScroll}
-                  >
-                    <div className="h-max w-full max-w-4xl flex-col px-4 pb-[50vh] sm:px-6 lg:px-8">
-                      <SearchBar
-                        query={query}
-                        setQuery={setQuery}
-                        status={status}
-                        typeFilter={typeFilter}
-                        setTypeFilter={setTypeFilter}
-                      />
-                      {listItems}
-                      {(Object.keys(data || {}) || []).length === 0 ? (
-                        <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
-                          <div className="text-center">
-                            <p className="text-base font-semibold text-primary-600">
-                              <MagnifyingGlassIcon className="h-12 w-12 mx-auto" />
-                            </p>
-                            <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-                              {t('No matching records')}
-                            </h1>
-                            <p className="mt-6 text-lg leading-7 text-gray-700">
-                              {query
-                                ? t(
-                                    'No records found with query: {query}',
-                                  ).replace('{query}', query)
-                                : t('No records found for this filter')}
-                            </p>
-                          </div>
-                        </main>
-                      ) : null}
-                    </div>
-                    <button
-                      onClick={scrollToTop}
-                      className={`z-40 fixed transition-all duration-200 bottom-24 right-4 md:bottom-4 md:right-8 shadow-blue-500/50 bg-primary shadow-md hover:shadow-lg active:shadow-sm rounded-full p-2 active:scale-95 hover:scale-105 ${
-                        scrollY > 100 ? 'opacity-100' : 'opacity-0'
-                      }`}
+                  <div className="flex min-h-0 w-full flex-1 overflow-hidden">
+                    <JumpToPanel
+                      items={data}
+                      dateKeys={query === '' ? timelineDateKeys : undefined}
+                      isLoading={false}
+                      activeDateKey={
+                        activeDateKey ?? Object.keys(data || {})[0]
+                      }
+                    />
+                    <div
+                      className="px-auto flex h-full max-h-full w-full justify-center overflow-y-scroll relative"
+                      ref={scrollContainer}
+                      onScroll={onScroll}
                     >
-                      <span className="text-white">
-                        <ArrowUpIcon className="h-6 w-6" />
-                      </span>
-                    </button>
+                      <div className="h-max w-full max-w-4xl flex-col px-4 pb-[50vh] sm:px-6 lg:px-8">
+                        <SearchBar
+                          query={query}
+                          setQuery={setQuery}
+                          status={status}
+                          typeFilter={typeFilter}
+                          setTypeFilter={setTypeFilter}
+                        />
+                        {listItems}
+                        {(Object.keys(data || {}) || []).length === 0 ? (
+                          <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
+                            <div className="text-center">
+                              <p className="text-base font-semibold text-primary-600">
+                                <MagnifyingGlassIcon className="h-12 w-12 mx-auto" />
+                              </p>
+                              <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                                {t('No matching records')}
+                              </h1>
+                              <p className="mt-6 text-lg leading-7 text-gray-700">
+                                {query
+                                  ? t(
+                                      'No records found with query: {query}',
+                                    ).replace('{query}', query)
+                                  : t('No records found for this filter')}
+                              </p>
+                            </div>
+                          </main>
+                        ) : null}
+                      </div>
+                      <button
+                        onClick={scrollToTop}
+                        className={`z-40 fixed transition-all duration-200 bottom-24 right-4 md:bottom-4 md:right-8 shadow-blue-500/50 bg-primary shadow-md hover:shadow-lg active:shadow-sm rounded-full p-2 active:scale-95 hover:scale-105 ${
+                          scrollY > 100 ? 'opacity-100' : 'opacity-0'
+                        }`}
+                      >
+                        <span className="text-white">
+                          <ArrowUpIcon className="h-6 w-6" />
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

@@ -37,8 +37,8 @@ export function RecordPackageCard({
         </h2>
       </div>
       <p className="mt-2 text-sm text-gray-600">
-        Export this user's records as a visit-scoped .emrpkg file for handoff or
-        backup.
+        Export your records as a visit-sized .emrpkg file to hand to a provider
+        or keep as a backup.
       </p>
       <div className="mt-3 grid gap-2">
         <CheckboxField

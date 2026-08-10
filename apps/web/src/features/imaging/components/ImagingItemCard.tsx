@@ -10,6 +10,7 @@ import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocu
 import { Modal } from '../../../shared/components/Modal';
 import { ModalHeader } from '../../../shared/components/ModalHeader';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
+import { resourceTypeLabel } from '../../../shared/utils/resourceTypeLabels';
 import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { ShowDocumentResultsAttachmentExpandable } from '../../timeline/components/document-reference/ShowDocumentReferenceAttachmentExpandable';
 import { ShowDocumentResultsExpandable } from '../../timeline/components/document-reference/ShowDocumentReferenceResultsExpandable';
@@ -63,7 +64,7 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
                 </span>
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
-                <Badge>{item.type}</Badge>
+                <Badge>{resourceTypeLabel(item.type, 1)}</Badge>
                 {item.modality && <Badge>{item.modality}</Badge>}
                 {item.bodySite && <Badge>{item.bodySite}</Badge>}
                 {item.laterality && <Badge>{item.laterality}</Badge>}
@@ -141,7 +142,7 @@ function ImagingRecordDetailsModal({
   const imagingStudy = getImagingStudyDetails(resource);
   const detailRows = [
     ['Date', formatDate(item.date)],
-    ['Type', item.type],
+    ['Type', resourceTypeLabel(item.type, 1)],
     ['Modality', item.modality],
     ['Body site', item.bodySite],
     ['Laterality', item.laterality],

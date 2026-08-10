@@ -37,7 +37,7 @@ export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
         </div>
         <Link
           to={`${AppRoutes.AddRecord}?specialty=dental&dental=orthodonticAssessment`}
-          className="text-sm font-semibold text-primary-700 hover:text-primary-900"
+          className="inline-flex min-h-[44px] items-center text-sm font-semibold text-primary-700 hover:text-primary-900"
         >
           {t('Add ortho record')}
         </Link>
@@ -57,7 +57,7 @@ export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
                         ':recordId',
                         record.document.id,
                       )}
-                      className="text-xs font-semibold text-primary-700 hover:text-primary-900"
+                      className="inline-flex min-h-[44px] items-center text-xs font-semibold text-primary-700 hover:text-primary-900"
                     >
                       {t('Edit')}
                     </Link>

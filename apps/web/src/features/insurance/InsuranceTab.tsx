@@ -235,7 +235,9 @@ function InsurancePlanCard({
             <Fact label="Member ID" value={item.subscriberId} />
             <Fact label="Relationship" value={item.relationship} />
             <Fact label="Type" value={item.type} />
-            <Fact label="Period" value={item.periodLabel} />
+            {/* The end year is the whole point of the period, so this one wraps
+                instead of truncating ("Jun 30, 2…" told the user nothing). */}
+            <Fact label="Period" value={item.periodLabel} wrap />
           </dl>
         </div>
       </div>
@@ -287,14 +289,30 @@ function InsuranceDetails({ item }: { item: InsuranceItem }) {
   );
 }
 
-function Fact({ label, value }: { label: string; value?: string }) {
+function Fact({
+  label,
+  value,
+  wrap,
+}: {
+  label: string;
+  value?: string;
+  /** Wrap onto extra lines rather than truncating (for values that lose their
+   * meaning when clipped, like a coverage period's end date). */
+  wrap?: boolean;
+}) {
   if (!value) return null;
   return (
     <div>
       <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">
         {label}
       </dt>
-      <dd className="mt-0.5 truncate text-gray-900">{value}</dd>
+      <dd
+        className={`mt-0.5 text-gray-900 ${
+          wrap ? 'whitespace-normal break-words' : 'truncate'
+        }`}
+      >
+        {value}
+      </dd>
     </div>
   );
 }

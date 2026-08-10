@@ -11,7 +11,8 @@ export function PacketContentsCard({
   return (
     <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <h2 className="text-base font-semibold text-gray-900">Packet contents</h2>
-      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Eight options: 2 or 4 columns divide evenly, 3 leaves a hole. */}
+      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         <CheckboxField
           checked={packetOptions.includeProblems}
           label="Problems"

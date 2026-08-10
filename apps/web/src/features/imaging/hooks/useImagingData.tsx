@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
@@ -58,22 +58,5 @@ export function useImagingData() {
     };
   }, [db, user.id, recordChangeTick]);
 
-  const counts = useMemo(
-    () => ({
-      total: items.length,
-      dental: items.filter((item) => item.categories.includes('dental')).length,
-      optometry: items.filter((item) => item.categories.includes('optometry'))
-        .length,
-      scans: items.filter((item) => item.categories.includes('scan')).length,
-      xray: items.filter((item) => item.categories.includes('xray')).length,
-      reports: items.filter((item) => item.categories.includes('report'))
-        .length,
-      attachments: items.filter((item) =>
-        item.categories.includes('attachment'),
-      ).length,
-    }),
-    [items],
-  );
-
-  return { items, counts, status, error };
+  return { items, status, error };
 }

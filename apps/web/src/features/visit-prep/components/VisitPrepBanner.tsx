@@ -19,8 +19,8 @@ export function VisitPrepBanner({
             Visit prep and provider packet
           </h1>
           <p className="mt-1 text-sm text-primary-100">
-            Printable PDF-ready summary and visit-scoped record package
-            generated from this user's local records.
+            A printable summary and a visit-sized copy of your records, built
+            from what is stored on this device.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

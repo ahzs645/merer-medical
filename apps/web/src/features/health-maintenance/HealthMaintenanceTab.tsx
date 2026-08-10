@@ -294,12 +294,12 @@ export function HealthMaintenanceTab() {
   return (
     <AppPage banner={<GenericBanner text="Health Maintenance" />}>
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-3xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
+        <div className="mx-auto grid w-full max-w-3xl gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'loading' ? (
             <Placeholder text="Checking your preventive care…" />
           ) : (
             <>
-              <div className="rounded-md bg-white p-4 text-sm text-gray-700 shadow-sm ring-1 ring-gray-200">
+              <div className="rounded-md bg-white px-4 py-3 text-sm text-gray-700 shadow-sm ring-1 ring-gray-200">
                 {hasLimitedProfile ? (
                   <span>
                     Add {joinLabels(missingProfileFields)} in{' '}
@@ -334,7 +334,7 @@ export function HealthMaintenanceTab() {
                 const meta = STATUS_META[key];
                 return (
                   <section key={key}>
-                    <div className="mb-2 flex items-center gap-2">
+                    <div className="mb-1.5 flex items-center gap-2">
                       <span
                         className={`h-2.5 w-2.5 rounded-full ${meta.dot}`}
                       />
@@ -356,7 +356,7 @@ export function HealthMaintenanceTab() {
               })}
 
               {dismissedCount > 0 && (
-                <div className="flex items-center justify-between rounded-md bg-white px-4 py-3 text-xs text-gray-500 shadow-sm ring-1 ring-gray-200">
+                <div className="flex items-center justify-between rounded-md bg-white px-4 py-1 text-xs text-gray-500 shadow-sm ring-1 ring-gray-200">
                   <span>
                     {dismissedCount} item{dismissedCount === 1 ? '' : 's'}{' '}
                     dismissed
@@ -364,7 +364,7 @@ export function HealthMaintenanceTab() {
                   <button
                     type="button"
                     onClick={() => persistDismissed([])}
-                    className="font-semibold text-primary-700 hover:text-primary-900"
+                    className="text-primary-700 hover:text-primary-900 -mr-2 inline-flex min-h-[44px] items-center px-2 font-semibold"
                   >
                     Reset
                   </button>
@@ -393,10 +393,10 @@ function ReminderCard({
   const meta = STATUS_META[reminder.status];
   const actionable = reminder.status === 'overdue' || reminder.status === 'due';
   return (
-    <article className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-      <div className="flex items-start justify-between gap-3">
+    <article className="rounded-md bg-white p-3 shadow-sm ring-1 ring-gray-200">
+      <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <h3 className="text-sm font-semibold text-gray-900">
               {reminder.rule.title}
             </h3>
@@ -404,7 +404,7 @@ function ReminderCard({
               {reminder.rule.category}
             </span>
           </div>
-          <p className="mt-1 text-xs text-gray-600">{reminder.rule.info}</p>
+          <p className="mt-0.5 text-xs text-gray-600">{reminder.rule.info}</p>
         </div>
         <span
           className={`shrink-0 rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${meta.badge}`}
@@ -412,28 +412,32 @@ function ReminderCard({
           {meta.label}
         </span>
       </div>
-      <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-gray-500">
-        <ShieldCheckIcon className="h-4 w-4" />
-        {reminder.summary}
-      </p>
-      {actionable && (
-        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3">
-          <Link
-            to={addRecordTarget(reminder.rule)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-primary-700"
-          >
-            <PlusIcon className="h-4 w-4" />
-            Log record
-          </Link>
-          <button
-            type="button"
-            onClick={() => onDismiss(reminder.rule.id)}
-            className="rounded-md px-2.5 py-1.5 text-xs font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
+      {/* Status line and actions share a row: the actions already stand 44px
+          tall, so a separate divided footer only added dead height. */}
+      <div className="mt-1 flex flex-wrap items-center justify-between gap-x-3">
+        <p className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+          <ShieldCheckIcon className="h-4 w-4 shrink-0" />
+          {reminder.summary}
+        </p>
+        {actionable && (
+          <div className="flex items-center gap-1">
+            <Link
+              to={addRecordTarget(reminder.rule)}
+              className="bg-primary hover:bg-primary-700 inline-flex min-h-[44px] items-center gap-1.5 rounded-md px-3 text-xs font-semibold text-white shadow-sm"
+            >
+              <PlusIcon className="h-4 w-4" />
+              Log record
+            </Link>
+            <button
+              type="button"
+              onClick={() => onDismiss(reminder.rule.id)}
+              className="inline-flex min-h-[44px] items-center rounded-md px-3 text-xs font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+      </div>
     </article>
   );
 }

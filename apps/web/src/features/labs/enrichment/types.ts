@@ -155,5 +155,8 @@ export interface LabStatusSummary {
   lowCount: number;
   borderlineCount: number;
   abnormalCount: number;
+  /** Number of results in the group the counts above were taken from. */
+  totalCount: number;
+  /** History summary, e.g. "2 of 5 high" - never a claim about the latest value. */
   label: string;
 }

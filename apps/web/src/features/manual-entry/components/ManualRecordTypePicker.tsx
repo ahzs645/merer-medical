@@ -213,7 +213,14 @@ export function ManualRecordTypePicker({
           <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
             {t(group.title)}
           </h2>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Only reach for the third column when the group has enough cards to
+              fill it — otherwise short groups (Results, Specialty, Files) left
+              an empty cell in the row. */}
+          <div
+            className={`mt-3 grid gap-3 sm:grid-cols-2 ${
+              group.cards.length > 2 ? 'lg:grid-cols-3' : ''
+            }`}
+          >
             {group.cards.map((card) => {
               const Icon = card.icon;
               return (

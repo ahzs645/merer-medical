@@ -1,7 +1,10 @@
 import { format, parseISO } from 'date-fns';
 
+import { resourceTypeLabel } from '../../../shared/utils/resourceTypeLabels';
 import {
+  IMAGING_CATEGORIES,
   ImagingCategory,
+  ImagingCategoryCounts,
   ImagingDocument,
   ImagingItem,
   ImagingResourceType,
@@ -120,7 +123,8 @@ export function mapImagingDocument(document: ImagingDocument): ImagingItem {
     document.metadata?.display_name ||
     getCodeText(resource) ||
     getAttachmentTitle(resource) ||
-    humanizeResourceType(document.data_record.resource_type);
+    // Last resort: a card with no name at least says what kind of record it is.
+    resourceTypeLabel(document.data_record.resource_type, 1);
   const categories = inferCategories(document, text);
 
   return {
@@ -176,6 +180,27 @@ export function filterImagingItems(
       .toLowerCase()
       .includes(normalizedQuery);
   });
+}
+
+/**
+ * How many records carry each category. A record is tagged with every category
+ * it matches, so these tallies overlap: they add up to more than `items.length`
+ * and must never be presented as a split of the total.
+ */
+export function countImagingCategories(
+  items: ImagingItem[],
+): ImagingCategoryCounts {
+  const counts = Object.fromEntries(
+    IMAGING_CATEGORIES.map((category) => [category, 0]),
+  ) as ImagingCategoryCounts;
+
+  for (const item of items) {
+    for (const category of item.categories) {
+      counts[category] += 1;
+    }
+  }
+
+  return counts;
 }
 
 export function isImagingDocument(document: ImagingDocument): boolean {
@@ -480,11 +505,4 @@ function getAttachmentType(resource: any): string | undefined {
     resource?.content?.[0]?.attachment?.contentType ||
     resource?.attachment?.contentType
   );
-}
-
-function humanizeResourceType(resourceType: string) {
-  return resourceType
-    .split('_')
-    .join(' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase());
 }

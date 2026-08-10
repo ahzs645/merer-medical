@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom';
 
 import { ErrorBoundary } from '../shared/components/ErrorBoundary';
+import { NotFoundPage } from '../shared/components/NotFoundPage';
 import { useConsoleLogEasterEgg } from '../shared/hooks/useConsoleLogEasterEgg';
 import { DeveloperLogsProvider } from '../app/providers/DeveloperLogsProvider';
 import {
@@ -81,6 +82,7 @@ import { SharingTab } from '../features/sharing/SharingTab';
 import SummaryTab from '../features/summary/SummaryTab';
 import { TimelineTab } from '../features/timeline/TimelineTab';
 import { TrackersTab } from '../features/trackers/TrackersTab';
+import { UtilitiesHub } from '../features/utilities/UtilitiesHub';
 import { UtilitiesLayout } from '../features/utilities/UtilitiesLayout';
 import { VisitPrepTab } from '../features/visit-prep/VisitPrepTab';
 import VARedirect from '../features/connections/oauth-callbacks/VARedirect';
@@ -299,7 +301,7 @@ const routes = [
         children: [
           {
             index: true,
-            element: <Navigate to={AppRoutes.VisitPrep} replace />,
+            element: <UtilitiesHub />,
           },
           {
             path: 'visit-prep',
@@ -409,7 +411,7 @@ const routes = [
       },
       {
         path: '*',
-        element: <Navigate to={AppRoutes.Timeline} />,
+        element: <NotFoundPage />,
       },
     ],
   },

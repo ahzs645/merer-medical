@@ -18,7 +18,7 @@ export function EyeImagingPanel({ items }: { items: ImagingItem[] }) {
         </div>
         <Link
           to={AppRoutes.Imaging}
-          className="text-sm font-medium text-primary-700 hover:text-primary-900"
+          className="inline-flex min-h-[44px] items-center text-sm font-medium text-primary-700 hover:text-primary-900"
         >
           Open imaging
         </Link>

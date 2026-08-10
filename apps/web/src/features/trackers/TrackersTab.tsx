@@ -197,7 +197,7 @@ export function TrackersTab() {
                 />
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+                  className="bg-primary hover:bg-primary-700 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-white shadow-sm"
                 >
                   <PlusIcon className="h-5 w-5" />
                   Add entry

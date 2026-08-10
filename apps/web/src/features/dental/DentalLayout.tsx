@@ -11,9 +11,25 @@ import { ScrollableTabNav } from '../../shared/components/ScrollableTabNav';
 
 // Sub-pages come from the shared record-category config so the tab strip, the
 // desktop side nav, and the command palette can't drift apart.
-const dentalTabs =
+const dentalSubPages =
   ALL_RECORD_CATEGORIES.find((category) => category.to === AppRoutes.Dental)
     ?.children ?? [];
+
+// The phone-width strip scrolls horizontally, and the full "Chart & teeth" /
+// "Hygiene & perio" names push more than half of it off-screen at 390px. The
+// icon plus a single word still identifies each sub-page; the desktop side nav
+// (lg+, where there is room) keeps the long names.
+const SHORT_TAB_LABELS: Record<string, string> = {
+  [AppRoutes.DentalChart]: 'Chart',
+  [AppRoutes.DentalHygiene]: 'Hygiene',
+  [AppRoutes.DentalImaging]: 'Imaging',
+  [AppRoutes.DentalRecords]: 'Records',
+};
+
+const dentalTabs = dentalSubPages.map((tab) => ({
+  ...tab,
+  label: SHORT_TAB_LABELS[tab.to] ?? tab.label,
+}));
 
 export function DentalLayout() {
   const { t } = useInterfaceLanguage();

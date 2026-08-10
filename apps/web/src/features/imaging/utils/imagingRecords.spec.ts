@@ -1,5 +1,6 @@
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import {
+  countImagingCategories,
   inferModalityFromText,
   isImagingDocument,
   mapImagingDocument,
@@ -99,6 +100,23 @@ describe('imagingRecords', () => {
       bodySite: 'Right knee',
       studyType: 'Radiology report',
     });
+  });
+
+  it('counts categories as overlapping tags rather than a split of the total', () => {
+    const items = [
+      doc({
+        data_record: { resource_type: 'diagnosticreport' },
+        metadata: { display_name: 'MRI right knee report' },
+      }),
+    ].map(mapImagingDocument);
+
+    const counts = countImagingCategories(items);
+
+    expect(counts.mri).toBe(1);
+    expect(counts.report).toBe(1);
+    // One record, tagged twice: any UI showing these must not imply they sum
+    // to the total.
+    expect(counts.mri + counts.report).toBeGreaterThan(items.length);
   });
 
   it('does not infer CT from OCT or incidental text', () => {

@@ -5,7 +5,18 @@ import {
   getValueString,
   getValueUnit,
 } from '../../timeline/utils/fhirpathParsers';
-import { LabDocument } from '../types';
+import { LabDocument, LabFilterMode } from '../types';
+
+/**
+ * Filter names shown to the reader. "Planner" was jargon for a hard-coded set
+ * of metabolic markers and no planner feature exists in the app, so the mode is
+ * named for what it contains (see filterHints in RecordCoveragePanel).
+ */
+export const labFilterLabels: Record<LabFilterMode, string> = {
+  attention: 'Attention',
+  planner: 'Key markers',
+  all: 'All',
+};
 
 export function formatLabValue(lab: LabDocument): string {
   const numericValue = getValueQuantity(lab),

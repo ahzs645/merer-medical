@@ -9,6 +9,8 @@ type SettingsSectionProps = PropsWithChildren<{
   description?: string;
   /** Optional leading icon for the header. */
   icon?: ReactNode;
+  /** Optional control rendered at the end of the header row (e.g. a link). */
+  action?: ReactNode;
 }>;
 
 /**
@@ -20,6 +22,7 @@ export function SettingsSection({
   id,
   description,
   icon,
+  action,
   children,
 }: SettingsSectionProps) {
   return (
@@ -32,7 +35,10 @@ export function SettingsSection({
           {icon ? (
             <span className="text-primary-600 flex-shrink-0">{icon}</span>
           ) : null}
-          <h2 className="text-lg font-extrabold text-gray-900">{title}</h2>
+          <h2 className="min-w-0 flex-1 text-lg font-extrabold text-gray-900">
+            {title}
+          </h2>
+          {action ? <div className="flex-shrink-0">{action}</div> : null}
         </div>
         {description ? (
           <p className="mt-1 max-w-xl text-sm text-gray-500">{description}</p>

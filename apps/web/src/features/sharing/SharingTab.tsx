@@ -229,8 +229,8 @@ export function SharingTab() {
               Sharing and emergency access
             </h1>
             <p className="mt-1 text-sm text-primary-100">
-              Local emergency profile, caregiver proxies, and limited share
-              grants for this user.
+              Your emergency profile, the caregivers who can act for you, and a
+              record of what you have shared — all kept on this device.
             </p>
           </div>
         </div>
@@ -242,7 +242,7 @@ export function SharingTab() {
             <div className="mb-4 flex items-center gap-2">
               <DocumentArrowDownIcon className="h-5 w-5 text-primary-700" />
               <h2 className="text-base font-semibold text-gray-900">
-                Record download wizard
+                Download your records
               </h2>
             </div>
             <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)]">
@@ -255,13 +255,13 @@ export function SharingTab() {
                     <RadioCard
                       checked={exportScope === 'full'}
                       title="Full record"
-                      description="Export all users, connections, records, and settings."
+                      description="Everything on this device: every profile, connection, record, and setting."
                       onChange={() => setExportScope('full')}
                     />
                     <RadioCard
                       checked={exportScope === 'visit'}
                       title="Visit-specific package"
-                      description="Exports current user records and workflow data, omitting other user profiles."
+                      description="Just your records and workflow notes, leaving out any other profiles on this device."
                       onChange={() => setExportScope('visit')}
                     />
                   </div>
@@ -321,9 +321,9 @@ export function SharingTab() {
                   </li>
                 </ul>
                 <p className="mt-3 text-xs text-gray-600">
-                  Share grants below are local planning notes. They do not
-                  create live recipient access; use the downloaded package to
-                  share records intentionally.
+                  The share grants below are your own notes. They give nobody
+                  access on their own — you share by handing over the package
+                  you download here.
                 </p>
                 <button
                   type="button"
@@ -492,9 +492,9 @@ export function SharingTab() {
               Share grants
             </h2>
             <p className="mt-1 text-sm text-gray-600">
-              Track intended recipients, scope, and expiration for exports.
-              These entries do not create live account permissions or share
-              links.
+              Keep track of who you shared records with, what you sent, and when
+              it should expire. These notes do not grant anyone account access
+              or create a share link.
             </p>
             <form
               className="mt-4 grid gap-3 lg:grid-cols-3"
@@ -530,7 +530,8 @@ export function SharingTab() {
                   {CATEGORY_OPTIONS.map((category) => (
                     <label
                       key={category}
-                      className="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm"
+                      // min-h keeps the whole row a 44px touch target.
+                      className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm"
                     >
                       <input
                         type="checkbox"
@@ -638,7 +639,7 @@ function CheckboxField({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm">
+    <label className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm">
       <input
         type="checkbox"
         className="rounded border-gray-300 text-primary focus:ring-primary"
@@ -663,7 +664,8 @@ function RadioCard({
 }) {
   return (
     <label
-      className={`cursor-pointer rounded-md border p-3 ${
+      // min-h keeps the whole card a 44px touch target.
+      className={`block min-h-[44px] cursor-pointer rounded-md border p-3 ${
         checked
           ? 'border-primary-500 bg-primary-50 ring-1 ring-primary-200'
           : 'border-gray-200 bg-white'

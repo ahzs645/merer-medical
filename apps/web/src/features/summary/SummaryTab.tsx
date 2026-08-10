@@ -41,6 +41,7 @@ import {
   Droppable,
   OnDragEndResponder,
 } from 'react-beautiful-dnd';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { EyeIcon } from '@heroicons/react/24/outline';
 import { EyeSlashIcon } from '@heroicons/react/24/outline';
 import { useLocalConfig } from '../../app/providers/LocalConfigProvider';
@@ -695,19 +696,22 @@ function ForYouFeed({
   allergyCount: number;
 }) {
   const { t } = useInterfaceLanguage();
+  // Each tile is labelled with the record area it opens. The labels used to be
+  // mood words ("For you", "For review"), which made the first tile repeat the
+  // section heading word for word and told nobody where the tap would land.
   const items = [
     medicationCount > 0
       ? {
-          label: 'For you',
-          title: `${medicationCount} medication record${medicationCount === 1 ? '' : 's'}`,
+          label: 'Medications',
+          title: `${medicationCount} record${medicationCount === 1 ? '' : 's'}`,
           description: 'Check medication details and source context.',
           route: AppRoutes.Medications,
         }
       : undefined,
     allergyCount > 0 || conditionCount > 0
       ? {
-          label: 'For review',
-          title: `${allergyCount + conditionCount} allergy or condition record${
+          label: 'Allergies and conditions',
+          title: `${allergyCount + conditionCount} record${
             allergyCount + conditionCount === 1 ? '' : 's'
           }`,
           description: 'Keep key clinical summary items current.',
@@ -716,8 +720,8 @@ function ForYouFeed({
       : undefined,
     immunizationCount > 0
       ? {
-          label: 'Recently available',
-          title: `${immunizationCount} immunization record${
+          label: 'Immunizations',
+          title: `${immunizationCount} record${
             immunizationCount === 1 ? '' : 's'
           }`,
           description: 'Review your vaccine history and booster status.',
@@ -741,27 +745,36 @@ function ForYouFeed({
         </div>
         <Link
           to={AppRoutes.Timeline}
-          className="text-sm font-semibold text-primary-700 hover:text-primary-900"
+          className="inline-flex min-h-[44px] items-center text-sm font-semibold text-primary-700 hover:text-primary-900"
         >
           {t('Open timeline')}
         </Link>
       </div>
       <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {items.map((item) => (
+          // Flat bordered boxes read as static panels, so give each tile the
+          // usual link affordances: a chevron, hover lift, press feedback and
+          // a visible keyboard focus ring.
           <Link
             key={`${item.label}-${item.title}`}
             to={item.route}
-            className="rounded-md border border-gray-200 p-3 hover:border-primary-300 hover:bg-primary-50"
+            className="group flex items-start justify-between gap-2 rounded-md border border-gray-200 p-3 transition hover:border-primary-300 hover:bg-primary-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 active:scale-[99%]"
           >
-            <div className="text-xs font-semibold uppercase tracking-wide text-primary-700">
-              {t(item.label)}
-            </div>
-            <div className="mt-1 text-sm font-semibold text-gray-900">
-              {t(item.title)}
-            </div>
-            <div className="mt-1 text-xs text-gray-600">
-              {t(item.description)}
-            </div>
+            <span className="min-w-0">
+              <span className="inline-flex min-h-[44px] items-center block text-xs font-semibold uppercase tracking-wide text-primary-700">
+                {t(item.label)}
+              </span>
+              <span className="mt-1 block text-sm font-semibold text-gray-900 group-hover:underline">
+                {t(item.title)}
+              </span>
+              <span className="mt-1 block text-xs text-gray-600">
+                {t(item.description)}
+              </span>
+            </span>
+            <ChevronRightIcon
+              className="mt-0.5 h-4 w-4 shrink-0 text-gray-400 transition group-hover:translate-x-0.5 group-hover:text-primary-700"
+              aria-hidden="true"
+            />
           </Link>
         ))}
       </div>

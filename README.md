@@ -89,10 +89,18 @@ services:
 
 ### Installation
 
-1. Clone the repo
+1. Clone the repo, including its submodules
 
    ```sh
-   git clone https://github.com/cfu288/mere-medical.git
+   git clone --recurse-submodules https://github.com/cfu288/mere-medical.git
+   ```
+
+   `packages/immunization-forecast` is a git submodule. If you already cloned
+   without `--recurse-submodules`, fetch it now — otherwise `nx build web` fails
+   with `TS2307: Cannot find module '@mere/immunization-forecast'`:
+
+   ```sh
+   git submodule update --init --recursive
    ```
 
 2. Set up NPM and install NPM packages

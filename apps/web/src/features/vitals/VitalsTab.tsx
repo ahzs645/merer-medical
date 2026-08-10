@@ -39,6 +39,21 @@ type FhirObservation = {
   component?: FhirComponent[];
 };
 
+const UCUM_SUPERSCRIPTS: Record<string, string> = { '2': '²', '3': '³' };
+
+/**
+ * UCUM spells exponents inline (`kg/m2`, `m2`), which renders as a literal
+ * "kg/m2" in the largest text on the vitals card. Swap a trailing 2/3 that
+ * follows a letter for the real superscript character — "kg/m²".
+ */
+function formatUnit(unit: string): string {
+  return unit.replace(
+    /([a-zA-Z])([23])(?![0-9a-zA-Z])/g,
+    (_match, letter: string, digit: string) =>
+      `${letter}${UCUM_SUPERSCRIPTS[digit]}`,
+  );
+}
+
 /** Extracts a display value + sparkline number from a vital Observation, with
  * special handling for blood pressure (systolic/diastolic components). */
 function readObservation(resource: FhirObservation): {
@@ -54,7 +69,7 @@ function readObservation(resource: FhirObservation): {
   const systolic = findComponent('8480-6');
   const diastolic = findComponent('8462-4');
   if (systolic?.value != null || diastolic?.value != null) {
-    const unit = systolic?.unit || diastolic?.unit || 'mmHg';
+    const unit = formatUnit(systolic?.unit || diastolic?.unit || 'mmHg');
     return {
       text: `${systolic?.value ?? '–'}/${diastolic?.value ?? '–'} ${unit}`.trim(),
       numeric: systolic?.value,
@@ -62,7 +77,10 @@ function readObservation(resource: FhirObservation): {
     };
   }
   if (resource.valueQuantity?.value != null) {
-    const { value, unit } = resource.valueQuantity;
+    const { value } = resource.valueQuantity;
+    const unit = resource.valueQuantity.unit
+      ? formatUnit(resource.valueQuantity.unit)
+      : undefined;
     return {
       text: unit ? `${value} ${unit}` : `${value}`,
       numeric: value,
@@ -73,7 +91,10 @@ function readObservation(resource: FhirObservation): {
   // Fall back to the first numeric component.
   const firstComponent = components.find((c) => c.valueQuantity?.value != null);
   if (firstComponent?.valueQuantity?.value != null) {
-    const { value, unit } = firstComponent.valueQuantity;
+    const { value } = firstComponent.valueQuantity;
+    const unit = firstComponent.valueQuantity.unit
+      ? formatUnit(firstComponent.valueQuantity.unit)
+      : undefined;
     return {
       text: unit ? `${value} ${unit}` : `${value}`,
       numeric: value,

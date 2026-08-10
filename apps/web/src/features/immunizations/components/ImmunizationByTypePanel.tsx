@@ -107,7 +107,7 @@ export function ImmunizationByTypePanel({
                       {t(statusMeta.label)}
                     </span>
                   )}
-                  <span className="rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
+                  <span className="inline-flex min-h-[44px] items-center rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
                     {row.doses.length}{' '}
                     {row.doses.length === 1 ? t('dose') : t('doses')}
                   </span>

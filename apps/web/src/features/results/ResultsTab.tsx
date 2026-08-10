@@ -14,6 +14,7 @@ import { LabHistoryTable } from '../labs/components/LabHistoryTable';
 import { LabReferenceOverlayControls } from '../labs/components/LabReferenceOverlayControls';
 import { LabReferenceStandardControl } from '../labs/components/LabReferenceStandardControl';
 import { ReferenceRangeDisplay } from '../../shared/components/ReferenceRangeDisplay';
+import { referenceOverlayLabels } from '../labs/enrichment/labEnrichment';
 import { ReferenceOverlayMode } from '../labs/enrichment/types';
 import { formatResultValue } from './utils/resultNormalization';
 import { useResultsData } from './hooks/useResultsData';
@@ -37,6 +38,8 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
     useState<ReferenceOverlayMode>('canadian');
   const [enabledOverlayModes, setEnabledOverlayModes] =
     useState<ReferenceOverlayMode[]>(defaultOverlayModes);
+  // Phones only: the picker is collapsed so records start near the top.
+  const [showReferencePicker, setShowReferencePicker] = useState(false);
   const { groups, detailsById, status } = useResultsData(referenceMode);
   const [selectedId, setSelectedId] = useState<string>();
   const selectedDetail = useMemo(() => {
@@ -53,38 +56,54 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
     return {
       total: results.length,
       labs: results.filter((result) => result.type === 'lab').length,
-      imaging: results.filter((result) => result.type === 'imaging').length,
+      // The tile says "Imaging & reports", so it has to count the report and
+      // document records too, not imaging studies alone.
+      imagingAndReports: results.filter((result) =>
+        ['imaging', 'diagnostic-report', 'document'].includes(result.type),
+      ).length,
       attention: results.filter((result) => result.abnormal).length,
     };
   }, [groups]);
 
   return (
     <section
-      className={`col-span-6 flex min-h-[42rem] flex-col gap-4 rounded-md bg-gray-50 p-4 shadow-sm ring-1 ring-gray-200 ${className}`}
+      className={`col-span-6 flex min-h-[42rem] flex-col gap-3 rounded-md bg-gray-50 p-3 shadow-sm ring-1 ring-gray-200 sm:gap-4 sm:p-4 ${className}`}
     >
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">
-            {t('Results')}
-          </h2>
-          <p className="text-sm text-gray-600">
-            {t('Labs, imaging, reports, and linked result documents.')}
-          </p>
-        </div>
-      </div>
+      {/* No page title here: the dark banner above already says "Results". */}
+      <p className="text-sm text-gray-600">
+        {t('Labs, imaging, reports, and linked result documents.')}
+      </p>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-4">
-        <div className="grid gap-3 sm:grid-cols-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 sm:gap-4">
+        {/* Two compact columns on phones - four full-width tiles plus the
+            reference picker used to fill two screens before the first record. */}
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
           <MetricCard label="Total results" value={totals.total} />
           <MetricCard label="Labs" value={totals.labs} />
-          <MetricCard label="Imaging & reports" value={totals.imaging} />
+          <MetricCard
+            label="Imaging & reports"
+            value={totals.imagingAndReports}
+          />
           <MetricCard label="Needs attention" value={totals.attention} />
         </div>
 
-        <LabReferenceStandardControl
-          selectedMode={referenceMode}
-          setSelectedMode={setReferenceMode}
-        />
+        <button
+          type="button"
+          onClick={() => setShowReferencePicker((shown) => !shown)}
+          aria-expanded={showReferencePicker}
+          className="flex min-h-[44px] items-center justify-between gap-2 rounded-md border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-800 shadow-sm sm:hidden"
+        >
+          <span>Reference standard</span>
+          <span className="font-normal text-gray-600">
+            {referenceOverlayLabels[referenceMode]}
+          </span>
+        </button>
+        <div className={`${showReferencePicker ? '' : 'hidden'} sm:block`}>
+          <LabReferenceStandardControl
+            selectedMode={referenceMode}
+            setSelectedMode={setReferenceMode}
+          />
+        </div>
 
         <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(20rem,0.9fr)_minmax(0,1.4fr)]">
           <section className="min-h-0 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm">
@@ -129,11 +148,13 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
 
 function MetricCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-md border border-gray-200 bg-white px-4 py-3 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+    <div className="rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm sm:px-4 sm:py-3">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 sm:text-xs">
         {label}
       </p>
-      <p className="mt-1 text-2xl font-semibold text-gray-900">{value}</p>
+      <p className="mt-0.5 text-lg font-semibold text-gray-900 sm:mt-1 sm:text-2xl">
+        {value}
+      </p>
     </div>
   );
 }

@@ -11,24 +11,37 @@ import { ImagingItemCard } from './components/ImagingItemCard';
 import { ImagingSummaryPanel } from './components/ImagingSummaryPanel';
 import { useImagingData } from './hooks/useImagingData';
 import { ImagingCategory } from './types';
-import { filterImagingItems } from './utils/imagingRecords';
+import {
+  countImagingCategories,
+  filterImagingItems,
+} from './utils/imagingRecords';
 
 export function ImagingTab() {
   const { t } = useInterfaceLanguage();
-  const { items, counts, status, error } = useImagingData(),
+  const { items, status, error } = useImagingData(),
     [query, setQuery] = useState(''),
     [category, setCategory] = useState<ImagingCategory | 'all'>('all');
 
+  // Counts are scoped to the search, not the whole library, so a tile or chip
+  // never advertises records the current query has already filtered out.
+  const searchedItems = useMemo(
+    () => filterImagingItems(items, query, 'all'),
+    [items, query],
+  );
+  const counts = useMemo(
+    () => countImagingCategories(searchedItems),
+    [searchedItems],
+  );
   const filteredItems = useMemo(
-    () => filterImagingItems(items, query, category),
-    [category, items, query],
+    () => filterImagingItems(searchedItems, '', category),
+    [category, searchedItems],
   );
 
   return (
     <AppPage
       banner={
         <ImagingHeader
-          totalCount={counts.total}
+          totalCount={items.length}
           query={query}
           setQuery={setQuery}
         />
@@ -36,8 +49,16 @@ export function ImagingTab() {
     >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          <ImagingSummaryPanel {...counts} />
-          <ImagingCategoryTabs selected={category} onSelect={setCategory} />
+          <ImagingSummaryPanel
+            total={searchedItems.length}
+            byCategory={counts}
+          />
+          <ImagingCategoryTabs
+            selected={category}
+            onSelect={setCategory}
+            total={searchedItems.length}
+            counts={counts}
+          />
           {status === 'loading' ? (
             <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
               {t('Loading imaging records...')}

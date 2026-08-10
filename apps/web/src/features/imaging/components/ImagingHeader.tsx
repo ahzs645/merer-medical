@@ -23,16 +23,18 @@ export function ImagingHeader({
   return (
     <div className="bg-primary-800 px-4 py-5 text-white sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
+        {/* shrink-0 keeps the title on one line so the search row stays level
+            with it instead of floating against a wrapped heading. */}
+        <div className="shrink-0">
           <div className="flex items-center gap-2">
-            <PhotoIcon className="h-7 w-7" />
+            <PhotoIcon className="h-7 w-7 shrink-0" />
             <h1 className="text-2xl font-semibold">{t('Imaging & Scans')}</h1>
           </div>
           <p className="mt-1 text-sm text-primary-100">
             {totalCount} {t('imaging records')}
           </p>
         </div>
-        <div className="flex w-full flex-col gap-3 sm:flex-row md:max-w-2xl">
+        <div className="flex w-full min-w-0 flex-col gap-3 sm:flex-row md:max-w-2xl md:flex-1">
           <label className="relative block min-w-0 flex-1">
             <span className="sr-only">{t('Search imaging records')}</span>
             <MagnifyingGlassIcon

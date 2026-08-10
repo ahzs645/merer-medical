@@ -612,6 +612,10 @@ export const arabicTranslations: Record<string, string> = {
     'قد تحتاج {attention} من أصل {total} نتيجة إلى الانتباه.',
   '{total} results, none flagged for attention.':
     '{total} نتيجة، لم يتم تمييز أي منها للانتباه.',
+  '{attention} of {total} lab, imaging and report results may need attention.':
+    'قد تحتاج {attention} من أصل {total} من نتائج المختبر والتصوير والتقارير إلى الانتباه.',
+  '{total} lab, imaging and report results, none flagged for attention.':
+    '{total} من نتائج المختبر والتصوير والتقارير، لم يتم تمييز أي منها للانتباه.',
   // Sources / connections hub
   Sources: 'المصادر',
   'Bring records together from patient portals, files, devices, and manual entry. Everything is stored locally on this device.':

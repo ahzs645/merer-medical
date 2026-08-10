@@ -1,6 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { format, parseISO } from 'date-fns';
 import {
   CheckCircleIcon,
   ExclamationCircleIcon,
@@ -10,6 +9,7 @@ import {
 import { RxDocument } from 'rxdb';
 
 import { AppPage } from '../../shared/components/AppPage';
+import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { ConnectionCard } from './components/ConnectionCard';
 import { EMRVendor, TenantSelectModal } from './components/TenantSelectModal';
 import { GenericBanner } from '../../shared/components/GenericBanner';
@@ -62,14 +62,9 @@ function SourcesSection({
 }
 
 function SyncHistoryRow({ item }: { item: RxDocument<ConnectionDocument> }) {
-  const fmt = (iso?: string) => {
-    if (!iso) return '—';
-    try {
-      return format(parseISO(iso), 'MMM d, p');
-    } catch {
-      return iso;
-    }
-  };
+  // Include the year: without it a sync from two years ago reads the same as
+  // one from two weeks ago on the screen meant to answer exactly that.
+  const fmt = (iso?: string) => safeFormatDate(iso, 'MMM d, yyyy, p', '—');
   const hasError = item.get('last_sync_was_error');
   return (
     <tr className="border-b border-gray-100 last:border-0">
@@ -213,10 +208,6 @@ const ConnectionTab: React.FC = () => {
           </p>
         </div>
 
-        <div className="mb-8">
-          <IntegrationStatusPanel status={integrationStatus} />
-        </div>
-
         <SourcesSection
           title={t('Connected portals')}
           description={t(
@@ -244,6 +235,11 @@ const ConnectionTab: React.FC = () => {
           >
             <p className="font-bold">{t('Add a portal')}</p>
           </button>
+          {/* The panel's own heading is an <h3>, so it has to sit under an <h2>
+              rather than above the first one for the outline to stay in order. */}
+          <div className="mt-4">
+            <IntegrationStatusPanel status={integrationStatus} />
+          </div>
         </SourcesSection>
 
         <SourcesSection

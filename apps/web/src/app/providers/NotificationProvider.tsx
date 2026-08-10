@@ -76,9 +76,13 @@ function NotificationRenderer(
     <>
       {props.children}
       {/* Global notification live region, render this permanently at the end of the document */}
+      {/* Bottom-anchored at every breakpoint: top-right put the toast on top of
+          in-page tab strips (e.g. Utilities' "Sharing" / "Audit log"), hiding
+          primary navigation until it timed out or was dismissed. pb-24 clears
+          the mobile tab bar, which is gone from md up. */}
       <div
         aria-live="assertive"
-        className="pointer-events-none fixed inset-0 z-50 flex items-end px-4 pb-24 pt-6 sm:items-start sm:p-6"
+        className="pointer-events-none fixed inset-0 z-50 flex items-end px-4 pb-24 pt-6 sm:px-6 md:pb-6"
       >
         <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
           {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
@@ -86,8 +90,8 @@ function NotificationRenderer(
             show={props.data.showNotification}
             as={React.Fragment}
             enter="transform ease-out duration-300 transition"
-            enterFrom="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-            enterTo="translate-y-0 opacity-100 sm:translate-x-0"
+            enterFrom="translate-y-2 opacity-0"
+            enterTo="translate-y-0 opacity-100"
             leave="transition ease-in duration-100"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
