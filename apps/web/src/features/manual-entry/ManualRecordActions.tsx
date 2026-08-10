@@ -24,7 +24,21 @@ import { notifyRecordsChanged } from '../../shared/utils/recordChangeSignal';
 import { isManualRecord } from '../../shared/utils/manualRecordUtils';
 import { ManualSourceDocumentLink } from './ManualSourceDocumentLink';
 
-export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
+/**
+ * The class the actions row wears, exported so a card that has an action of
+ * its own — Imaging's "Open record" — can host one row rather than stranding
+ * its button on a line above Edit and Delete.
+ */
+export const manualRecordActionRowClass = 'mt-3 flex flex-wrap gap-2';
+
+export function ManualRecordActions({
+  item,
+  inline = false,
+}: {
+  item: ClinicalDocument;
+  /** Render the buttons only, for a caller supplying the row around them. */
+  inline?: boolean;
+}) {
   const db = useRxDb();
   const user = useUser();
   const notifyDispatch = useNotificationDispatch();
@@ -133,8 +147,8 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
   // Edit and Delete carry the 44px minimum the rest of the app applies to
   // banner actions, filter chips and back links; the row stretches its other
   // chips to match, so the source-document controls come up with them.
-  return (
-    <div className="mt-3 flex flex-wrap gap-2">
+  const actions = (
+    <>
       {linkedFiles.map((file) => (
         <span key={file.id} className="inline-flex gap-1">
           <button
@@ -185,6 +199,9 @@ export function ManualRecordActions({ item }: { item: ClinicalDocument }) {
         onClose={() => setIsEditOpen(false)}
         onSaved={notifyRecordsChanged}
       />
-    </div>
+    </>
   );
+
+  if (inline) return actions;
+  return <div className={manualRecordActionRowClass}>{actions}</div>;
 }

@@ -98,7 +98,12 @@ function NotificationRenderer(
           >
             <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
               <div className="p-4">
-                <div className="flex items-start">
+                {/* `items-center`, and the close button's 44px overhang
+                    pulled back on both sides: with `items-start` and only
+                    `-mt-2`, a 44px control in a row of 24px content stretched
+                    the row 12px past the text and the toast read as
+                    bottom-heavy. */}
+                <div className="flex items-center">
                   <div className="flex-shrink-0">
                     {props.data.variant === 'error' && (
                       <XMarkIcon
@@ -119,14 +124,14 @@ function NotificationRenderer(
                       />
                     )}
                   </div>
-                  <div className="ml-3 w-0 flex-1 pt-0.5">
+                  <div className="ml-3 w-0 flex-1">
                     {props.data.message && (
                       <p className="text-sm font-medium text-gray-900">
                         {props.data.message}
                       </p>
                     )}
                   </div>
-                  <div className="-mr-2 -mt-2 ml-2 flex flex-shrink-0">
+                  <div className="-mr-2 -my-2 ml-2 flex flex-shrink-0">
                     <button
                       type="button"
                       // Sized to the 44px touch minimum: the icon stays 20px but

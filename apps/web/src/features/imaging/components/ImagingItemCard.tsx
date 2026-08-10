@@ -11,7 +11,10 @@ import { Modal } from '../../../shared/components/Modal';
 import { ModalHeader } from '../../../shared/components/ModalHeader';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { resourceTypeLabel } from '../../../shared/utils/resourceTypeLabels';
-import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
+import {
+  ManualRecordActions,
+  manualRecordActionRowClass,
+} from '../../manual-entry/ManualRecordActions';
 import { ShowDocumentResultsAttachmentExpandable } from '../../timeline/components/document-reference/ShowDocumentReferenceAttachmentExpandable';
 import { ShowDocumentResultsExpandable } from '../../timeline/components/document-reference/ShowDocumentReferenceResultsExpandable';
 import { ImagingItem } from '../types';
@@ -92,16 +95,31 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
                   ))}
                 </div>
               )}
-              <div className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700">
-                <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                {t('Open record')}
-              </div>
             </div>
           </div>
         </button>
-        {canManageRecord && (
-          <ManualRecordActions item={item.document as ClinicalDocument} />
-        )}
+        {/* One row for everything you can do to this card. "Open record" used
+            to sit inside the card body as a text hint on its own line, above
+            an Edit/Delete row it had nothing to do with — three controls, two
+            rows, no relationship. It is a button now, at the same height as
+            the other two, and the card stays clickable for anyone who taps the
+            body. */}
+        <div className={manualRecordActionRowClass}>
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="inline-flex min-h-[44px] items-center gap-1 rounded-md border border-primary-200 px-3 py-1 text-xs font-semibold text-primary-700 shadow-sm hover:bg-primary-50"
+          >
+            <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+            {t('Open record')}
+          </button>
+          {canManageRecord && (
+            <ManualRecordActions
+              item={item.document as ClinicalDocument}
+              inline
+            />
+          )}
+        </div>
       </article>
       {item.type === 'documentreference' ? (
         <ShowDocumentResultsExpandable
