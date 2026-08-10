@@ -11,8 +11,10 @@ import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
-import { BannerAddLink } from '../../shared/components/BannerAddLink';
-import { GenericBanner } from '../../shared/components/GenericBanner';
+import {
+  RecordHeaderLink,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
@@ -197,10 +199,10 @@ export function HistoriesTab() {
   return (
     <AppPage
       banner={
-        <GenericBanner
-          text="Histories"
+        <RecordPageHeader
+          title="Histories"
           action={
-            <BannerAddLink to={AppRoutes.AddRecord} label="Add history" />
+            <RecordHeaderLink to={AppRoutes.AddRecord} label="Add history" />
           }
         />
       }

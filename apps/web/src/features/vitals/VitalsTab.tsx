@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { HeartIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { HeartIcon } from '@heroicons/react/24/outline';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
-import { GenericBanner } from '../../shared/components/GenericBanner';
+import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 
@@ -253,21 +253,20 @@ export function VitalsTab() {
   }, [groups, query]);
 
   return (
-    <AppPage banner={<GenericBanner text="Vital signs" />}>
+    <AppPage
+      banner={
+        <RecordPageHeader
+          title="Vital signs"
+          search={{
+            query,
+            onChange: setQuery,
+            placeholder: 'Search vital signs',
+          }}
+        />
+      }
+    >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-3xl gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          <label className="relative block">
-            <span className="sr-only">Search vital signs</span>
-            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search vital signs"
-              className="focus:border-primary-500 focus:ring-primary-500 h-10 w-full rounded-md border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-1"
-            />
-          </label>
-
           {status === 'loading' ? (
             <Placeholder text="Loading vital signs…" />
           ) : status === 'error' ? (

@@ -148,7 +148,7 @@ export function TabWrapper() {
                   </p>
                   <Link
                     to={AppRoutes.Settings}
-                    className="text-sm font-medium text-indigo-200 group-hover:text-white"
+                    className="-my-1 inline-flex min-h-[44px] items-center text-sm font-medium text-indigo-200 group-hover:text-white"
                   >
                     {user?.first_name ? 'View details' : 'Add User Details'}
                   </Link>

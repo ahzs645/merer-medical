@@ -6,7 +6,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 import { AppPage } from '../../shared/components/AppPage';
-import { GenericBanner } from '../../shared/components/GenericBanner';
+import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { LabHistoryChart } from '../labs/components/LabHistoryChart';
@@ -26,7 +26,16 @@ export function ResultsTab() {
   const { t } = useInterfaceLanguage();
 
   return (
-    <AppPage banner={<GenericBanner text={t('Results')} />}>
+    <AppPage
+      banner={
+        <RecordPageHeader
+          title={t('Results')}
+          description={t(
+            'Labs, imaging, reports, and linked result documents.',
+          )}
+        />
+      }
+    >
       <ResultsHubContent />
     </AppPage>
   );
@@ -69,11 +78,7 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
     <section
       className={`col-span-6 flex min-h-[42rem] flex-col gap-3 rounded-md bg-gray-50 p-3 shadow-sm ring-1 ring-gray-200 sm:gap-4 sm:p-4 ${className}`}
     >
-      {/* No page title here: the dark banner above already says "Results". */}
-      <p className="text-sm text-gray-600">
-        {t('Labs, imaging, reports, and linked result documents.')}
-      </p>
-
+      {/* No page title or blurb here: the banner above carries both. */}
       <div className="flex min-h-0 flex-1 flex-col gap-3 sm:gap-4">
         {/* Two compact columns on phones - four full-width tiles plus the
             reference picker used to fill two screens before the first record. */}
@@ -253,9 +258,10 @@ function ResultDetailPanel({
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
               {resultTypeLabel(detail.type)}
             </p>
-            <h1 className="mt-1 text-xl font-semibold text-gray-900">
+            {/* h2: the banner already owns the page's only h1. */}
+            <h2 className="mt-1 text-xl font-semibold text-gray-900">
               {detail.title}
-            </h1>
+            </h2>
             <p className="mt-1 text-sm text-gray-600">
               {safeFormatDate(
                 detail.resultDate || detail.date,

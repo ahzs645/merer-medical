@@ -9,9 +9,10 @@ export function EmptyRecordsPlaceholder() {
   return (
     <div className="relative flex h-full w-full flex-col justify-center bg-gray-100 p-10 align-middle">
       <div>
-        <h1 className="text-primary-700 text-4xl font-bold">
+        {/* h2: this sits inside a page that already has its banner <h1>. */}
+        <h2 className="text-primary-700 text-4xl font-bold">
           {t('Link your medical records')}
-        </h1>
+        </h2>
         <p className="mt-2 max-w-96 text-xl text-gray-800">
           {t('Get started by connecting to a patient portal')}
         </p>

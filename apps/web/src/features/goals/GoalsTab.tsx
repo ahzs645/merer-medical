@@ -2,8 +2,8 @@ import { FlagIcon } from '@heroicons/react/24/outline';
 
 import { Routes as AppRoutes } from '../../Routes';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
-import { BannerAddLink } from '../../shared/components/BannerAddLink';
 import { RecordListPage } from '../../shared/components/records/RecordListPage';
+import { RecordHeaderLink } from '../../shared/components/records/RecordPageHeader';
 import { useRecordList } from '../../shared/hooks/useRecordList';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
@@ -51,8 +51,8 @@ export function GoalsTab() {
   return (
     <RecordListPage
       title="Goals"
-      bannerAction={
-        <BannerAddLink
+      action={
+        <RecordHeaderLink
           to={`${AppRoutes.AddRecord}?type=goal`}
           label="Add goal"
         />

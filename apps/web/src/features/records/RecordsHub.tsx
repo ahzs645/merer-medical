@@ -3,11 +3,8 @@ import { Link } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
-import { GenericBanner } from '../../shared/components/GenericBanner';
-import {
-  EmptyState,
-  SearchInput,
-} from '../../shared/components/records/RecordListPage';
+import { EmptyState } from '../../shared/components/records/RecordListPage';
+import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { ALL_RECORD_CATEGORIES, RECORD_GROUPS } from './recordCategories';
 import {
@@ -61,16 +58,21 @@ export function RecordsHub() {
   }, [q]);
 
   return (
-    <AppPage banner={<GenericBanner text="Records" />}>
+    <AppPage
+      banner={
+        <RecordPageHeader
+          title="Records"
+          search={{
+            query,
+            onChange: setQuery,
+            placeholder: 'Search records',
+            label: 'Search record categories',
+          }}
+        />
+      }
+    >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-4xl gap-6 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          <SearchInput
-            value={query}
-            onChange={setQuery}
-            placeholder="Search records"
-            label="Search record categories"
-          />
-
           {groups.length === 0 ? (
             <EmptyState text={`No record categories match “${query}”.`} />
           ) : (

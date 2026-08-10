@@ -118,6 +118,86 @@ describe('useRecordQuery helper functions', () => {
     });
   });
 
+  /**
+   * The invariant the timeline is built on: whatever order records arrive in,
+   * the day keys the UI reads come out newest first, and each record sits
+   * under the day it happened in the reader's timezone. Sorting and grouping
+   * used to be derived from different values — the raw stored string and the
+   * local day — which is only a total order while every record uses the same
+   * date format.
+   */
+  describe('day ordering invariant', () => {
+    // Tests run in America/New_York, so an early-morning UTC instant is the
+    // previous local evening.
+    const previousLocalDay = '2016-05-27T03:00:00.000Z';
+
+    it('groups a small-hours UTC instant under the local day it happened', () => {
+      const [doc] = createDocumentsWithSpecificDates(userId, [
+        { date: previousLocalDay, count: 1 },
+      ]);
+
+      expect(getRecordDateKey(doc)).toBe('2016-05-26');
+    });
+
+    it('keeps a bare date above a timestamp that shares its UTC day', () => {
+      // Raw string order puts the timestamp first ('2016-05-27' is a prefix of
+      // it), yet it belongs to the older day. Grouping has to override that.
+      const docs = createDocumentsWithSpecificDates(userId, [
+        { date: previousLocalDay, count: 2 },
+        { date: '2016-05-27', count: 1 },
+      ]);
+
+      expect(Object.keys(groupRecordsByDate(docs))).toEqual([
+        '2016-05-27',
+        '2016-05-26',
+      ]);
+    });
+
+    it('orders days newest first whatever order the records arrive in', () => {
+      const dates = [
+        '2016-05-27',
+        '2016-05-27T03:00:00.000Z',
+        '2016-05-25',
+        '2016-05-28T12:00:00.000Z',
+        '2016-05-24T23:00:00.000Z',
+      ];
+      const docs = dates.flatMap((date) =>
+        createDocumentsWithSpecificDates(userId, [{ date, count: 1 }]),
+      );
+
+      const forwards = Object.keys(groupRecordsByDate(docs));
+      const backwards = Object.keys(groupRecordsByDate([...docs].reverse()));
+
+      expect(forwards).toEqual([
+        '2016-05-28',
+        '2016-05-27',
+        '2016-05-26',
+        '2016-05-25',
+        '2016-05-24',
+      ]);
+      expect(backwards).toEqual(forwards);
+    });
+
+    it('sorts on the same value it groups on, down to the record', () => {
+      const docs = createDocumentsWithSpecificDates(userId, [
+        { date: '2024-03-02T09:00:00.000Z', count: 1 },
+        { date: '2024-03-02T21:00:00.000Z', count: 1 },
+        { date: '2024-03-01T18:00:00.000Z', count: 1 },
+      ]);
+
+      const grouped = groupRecordsByDate([...docs].reverse());
+      const flattened = Object.entries(grouped).flatMap(([dateKey, records]) =>
+        records.map((record) => [dateKey, record.metadata?.date]),
+      );
+
+      expect(flattened).toEqual([
+        ['2024-03-02', '2024-03-02T21:00:00.000Z'],
+        ['2024-03-02', '2024-03-02T09:00:00.000Z'],
+        ['2024-03-01', '2024-03-01T18:00:00.000Z'],
+      ]);
+    });
+  });
+
   describe('mergeRecordsByDate', () => {
     it('returns incoming when existing is undefined', () => {
       const incoming = createDocumentsWithSpecificDates(userId, [
@@ -164,6 +244,28 @@ describe('useRecordQuery helper functions', () => {
       expect(Object.keys(result)).toHaveLength(2);
       expect(result['2024-01-15']).toHaveLength(2);
       expect(result['2024-01-14']).toHaveLength(3);
+    });
+
+    it('keeps merged days newest first', () => {
+      const existing = groupRecordsByDate(
+        createDocumentsWithSpecificDates(userId, [
+          { date: '2024-01-15T10:00:00Z', count: 1 },
+        ]),
+      );
+      const incoming = groupRecordsByDate(
+        createDocumentsWithSpecificDates(userId, [
+          { date: '2024-01-16T10:00:00Z', count: 1 },
+          { date: '2024-01-14T10:00:00Z', count: 1 },
+        ]),
+      );
+
+      const result = mergeRecordsByDate(existing, incoming);
+
+      expect(Object.keys(result)).toEqual([
+        '2024-01-16',
+        '2024-01-15',
+        '2024-01-14',
+      ]);
     });
 
     it('preserves existing dates not in incoming', () => {
@@ -1155,6 +1257,23 @@ describe('fetchTimelineDateKeys', () => {
     const dateKeys = await fetchTimelineDateKeys(db, userId);
 
     expect(dateKeys).toEqual(['2024-01-15', '2024-01-14', '2024-01-13']);
+  });
+
+  // The rail is the ordering's most visible consumer, and the stored dates mix
+  // formats. A raw-string sort put the bare `2016-05-27` below the timestamps
+  // that belong to the 26th, so the rail counted backwards for one step.
+  it('lists dates newest first when date-only and timestamped records mix', async () => {
+    await db.clinical_documents.bulkInsert([
+      ...createDocumentsWithSpecificDates(userId, [
+        { date: '2016-05-27T03:00:00.000Z', count: 2 },
+        { date: '2016-05-27', count: 1 },
+        { date: '2016-05-25T14:00:00.000Z', count: 1 },
+      ]),
+    ]);
+
+    const dateKeys = await fetchTimelineDateKeys(db, userId);
+
+    expect(dateKeys).toEqual(['2016-05-27', '2016-05-26', '2016-05-25']);
   });
 
   // The rail used to be built from a wider selector than the pager, so it

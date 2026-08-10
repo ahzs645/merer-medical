@@ -14,6 +14,7 @@ import {
   upsertWorkflowRecord,
 } from '../../repositories/WorkflowRecordRepository';
 import { AppPage } from '../../shared/components/AppPage';
+import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { exportEmrpkgFromRxDb } from '../../services/emrpkg';
 import { appendAuditLog } from '../audit/auditLog';
 
@@ -223,17 +224,10 @@ export function SharingTab() {
   return (
     <AppPage
       banner={
-        <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <h1 className="text-2xl font-bold sm:text-3xl">
-              Sharing and emergency access
-            </h1>
-            <p className="mt-1 text-sm text-primary-100">
-              Your emergency profile, the caregivers who can act for you, and a
-              record of what you have shared — all kept on this device.
-            </p>
-          </div>
-        </div>
+        <RecordPageHeader
+          title="Sharing and emergency access"
+          description="Your emergency profile, the caregivers who can act for you, and a record of what you have shared — all kept on this device."
+        />
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">

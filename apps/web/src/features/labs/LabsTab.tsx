@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { DocumentPlusIcon } from '@heroicons/react/24/outline';
 
+import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
 import { EmptyRecordsPlaceholder } from '../../shared/components/EmptyRecordsPlaceholder';
+import {
+  RecordHeaderLink,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
 import { LabsEmptySearch } from './components/LabsEmptySearch';
-import { LabsHeader } from './components/LabsHeader';
 import { LabsSkeleton } from './components/LabsSkeleton';
 import { LabsTable } from './components/LabsTable';
 import { LibreCgmPanel } from './components/LibreCgmPanel';
@@ -102,7 +107,26 @@ export function LabsTab() {
   }, [status, labSections.length]);
 
   return (
-    <AppPage banner={<LabsHeader query={query} setQuery={setQuery} />}>
+    <AppPage
+      banner={
+        <RecordPageHeader
+          title="All lab results"
+          search={{
+            query,
+            onChange: setQuery,
+            placeholder: 'Search lab name or code',
+            label: 'Search labs',
+          }}
+          action={
+            <RecordHeaderLink
+              to={`${AppRoutes.AddRecord}?type=lab`}
+              label="Add lab result"
+              icon={DocumentPlusIcon}
+            />
+          }
+        />
+      }
+    >
       {status === 'success' && labs.length === 0 ? (
         <EmptyRecordsPlaceholder />
       ) : (

@@ -7,17 +7,34 @@ import { arabicTranslations } from './translations';
  * Regression guard for interface translation coverage.
  *
  * The app translates English strings to Arabic at runtime via a dictionary
- * lookup (see InterfaceLanguageProvider). Any t('...') string that is missing
- * from `arabicTranslations` silently stays English in Arabic mode, so this
- * spec scans the source tree for t() string-literal calls and fails when a
- * NEW untranslated string is introduced.
+ * lookup (see InterfaceLanguageProvider). Any user-facing string missing from
+ * `arabicTranslations` silently stays English in Arabic mode.
  *
- * Known gaps are tracked in `knownUntranslated.json` (a sorted JSON array).
- * The intent is for that list to only shrink over time:
- * - Adding a new t('...') string? Add an Arabic entry to
- *   `arabicTranslations` in translations.ts (preferred), or deliberately add
- *   the exact string to knownUntranslated.json.
- * - Translated a known-gap string? Remove it from knownUntranslated.json.
+ * Two scanners run here, because there are two ways a string reaches the UI:
+ *
+ * 1. `t('literal')` — matched directly out of the source.
+ * 2. `t(someVariable)` — the argument is a label pulled from an object or a
+ *    lookup table (imaging filter chips, record categories, tooth-status
+ *    legends, command-palette entries, manual-entry templates...). The literal
+ *    never appears next to a `t(`, so scanner 1 is blind to it. Scanner 2
+ *    targets those: for every file that calls `t()` with a non-literal, it
+ *    also checks the UI-label string literals declared in that file and in the
+ *    modules it imports directly — which is where those label tables live.
+ *
+ * Both scanners share one escape hatch, `knownUntranslated.json` (a sorted
+ * JSON array): a string listed there is allowed to render in English, either
+ * because the gap is a deliberate deferral or because the string must stay
+ * English (a brand, a product name, a code). The intent is for that list to
+ * only shrink:
+ * - New user-facing string? Add an Arabic entry to `arabicTranslations` in
+ *   translations.ts (preferred), or - only if it must stay English - add the
+ *   exact string to knownUntranslated.json.
+ * - Translated a listed string? Remove it from knownUntranslated.json.
+ *
+ * NOT covered: plain JSX text with no `t()` call anywhere in the file. The
+ * runtime DOM pass translates it all the same, but there is no reliable way to
+ * tell prose from markup by regex, so those gaps are found by rendering the
+ * app in Arabic rather than by this spec.
  */
 
 const SRC_ROOT = path.resolve(__dirname, '../..');
@@ -88,9 +105,88 @@ function extractTranslatableStrings(): Map<string, string[]> {
   return stringsToFiles;
 }
 
+// Matches t() called with something that is not a string literal — an
+// identifier, a member expression, or an index lookup. These are the call
+// sites T_CALL_PATTERN cannot see through.
+const DYNAMIC_T_CALL_PATTERN =
+  /\bt\(\s*(?!['"`)])[A-Za-z_$][\w$.[\]'"?]*\s*(?:\?\?[^)]*)?\)/;
+
+// Object properties that hold user-visible copy in this codebase's label
+// tables. Deliberately narrow: `name`, `value` and friends are just as often
+// identifiers, codes or clinical terms, and would flood the check with noise.
+const UI_LABEL_PROPERTY_PATTERN =
+  /\b(?:label|title|heading|description|shortLabel|subtitle)\s*:\s*(['"])((?:\\.|(?!\1)[^\\\n])*)\1/g;
+
+const LOCAL_IMPORT_PATTERN = /from\s+'(\.[^']+)'/g;
+
+/**
+ * Files whose label tables feed a dynamic `t()`: every file that calls
+ * `t(variable)` plus the local modules it imports directly (label tables are
+ * routinely declared one file over from the component that renders them).
+ */
+function collectDynamicLabelFiles(allFiles: string[]): Set<string> {
+  const known = new Set(allFiles);
+  const result = new Set<string>();
+
+  for (const file of allFiles) {
+    const source = fs.readFileSync(file, 'utf8');
+    if (!DYNAMIC_T_CALL_PATTERN.test(source)) {
+      continue;
+    }
+    result.add(file);
+
+    for (const match of source.matchAll(LOCAL_IMPORT_PATTERN)) {
+      for (const suffix of ['.ts', '.tsx', '/index.ts', '/index.tsx']) {
+        const resolved = path.join(file, '..', `${match[1]}${suffix}`);
+        if (known.has(resolved)) {
+          result.add(resolved);
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+function extractDynamicLabelStrings(): Map<string, string[]> {
+  const stringsToFiles = new Map<string, string[]>();
+
+  for (const file of collectDynamicLabelFiles(collectSourceFiles(SRC_ROOT))) {
+    const source = fs.readFileSync(file, 'utf8');
+    for (const match of source.matchAll(UI_LABEL_PROPERTY_PATTERN)) {
+      const literal = normalize(unescapeLiteral(match[2]));
+      // Needs at least two consecutive letters to be prose rather than a
+      // code, a unit or a punctuation-only marker.
+      if (!/[A-Za-z]{2}/.test(literal)) {
+        continue;
+      }
+      const files = stringsToFiles.get(literal) ?? [];
+      if (!files.includes(file)) {
+        files.push(file);
+      }
+      stringsToFiles.set(literal, files);
+    }
+  }
+
+  return stringsToFiles;
+}
+
 function loadBaseline(): string[] {
   return JSON.parse(fs.readFileSync(BASELINE_PATH, 'utf8')) as string[];
 }
+
+/** Placeholder tokens such as {count} that must survive translation. */
+function placeholderTokens(text: string): string[] {
+  return (text.match(/\{[a-zA-Z][a-zA-Z0-9_]*\}/g) ?? []).sort();
+}
+
+const ARABIC_SCRIPT = /[؀-ۿ]/;
+
+/**
+ * Dictionary values that are intentionally identical to their English key -
+ * brand names that are written the same way in Arabic copy.
+ */
+const UNTRANSLATED_BY_DESIGN = new Set(['FreeStyle Libre']);
 
 describe('interface translation coverage', () => {
   const stringsToFiles = extractTranslatableStrings();
@@ -165,5 +261,85 @@ describe('interface translation coverage', () => {
   it('keeps knownUntranslated.json sorted and free of duplicates', () => {
     const sortedUnique = [...new Set(baselineEntries)].sort();
     expect(baselineEntries).toEqual(sortedUnique);
+  });
+
+  describe('label tables reached through t(variable)', () => {
+    const dynamicStringsToFiles = extractDynamicLabelStrings();
+
+    it('finds label literals in files that call t() dynamically (scanner sanity check)', () => {
+      // Same guard as above: an empty result would make the assertion below
+      // pass for the wrong reason.
+      expect(dynamicStringsToFiles.size).toBeGreaterThan(50);
+      // Imaging filter chips are the canonical t(filter.label) call site.
+      expect(dynamicStringsToFiles.has('Uncategorized')).toBe(true);
+    });
+
+    it('has an Arabic translation (or a baseline entry) for every dynamic label', () => {
+      const missing = [...dynamicStringsToFiles.keys()]
+        .filter((text) => !dictionaryKeys.has(text) && !baseline.has(text))
+        .sort();
+
+      if (missing.length > 0) {
+        const details = missing
+          .map(
+            (text) =>
+              `  - '${text}'\n      declared in: ${dynamicStringsToFiles
+                .get(text)!
+                .map((file) => path.relative(SRC_ROOT, file))
+                .join(', ')}`,
+          )
+          .join('\n');
+        throw new Error(
+          `Found ${missing.length} label(s) with no Arabic translation in a file that ` +
+            `renders labels through t(variable):\n${details}\n\n` +
+            't() cannot be scanned for these, so they silently stay English in Arabic mode.\n' +
+            'Fix: add an Arabic entry for the exact string to arabicTranslations in ' +
+            'apps/web/src/app/i18n/translations.ts (preferred), or - if the string must ' +
+            `stay English, e.g. a brand or product name - add it to ${BASELINE_RELATIVE}.`,
+        );
+      }
+    });
+  });
+
+  describe('dictionary integrity', () => {
+    it('preserves every {placeholder} token between the English key and the Arabic value', () => {
+      const broken = Object.entries(arabicTranslations)
+        .filter(([key, value]) => {
+          const from = placeholderTokens(key);
+          const to = placeholderTokens(value);
+          return from.join('|') !== to.join('|');
+        })
+        .map(
+          ([key, value]) =>
+            `  - '${key}'\n      has ${JSON.stringify(placeholderTokens(key))} ` +
+            `but '${value}' has ${JSON.stringify(placeholderTokens(value))}`,
+        );
+
+      if (broken.length > 0) {
+        throw new Error(
+          'These translations drop, add or rename a {placeholder} token, so the ' +
+            'interpolated value would be lost at runtime:\n' +
+            broken.join('\n'),
+        );
+      }
+    });
+
+    it('translates every entry into Arabic script', () => {
+      const notTranslated = Object.entries(arabicTranslations)
+        .filter(
+          ([key, value]) =>
+            !UNTRANSLATED_BY_DESIGN.has(key) && !ARABIC_SCRIPT.test(value),
+        )
+        .map(([key, value]) => `  - '${key}' -> '${value}'`);
+
+      if (notTranslated.length > 0) {
+        throw new Error(
+          'These dictionary values contain no Arabic characters, so the entry is a ' +
+            'placeholder rather than a translation. Translate them, or - if the string ' +
+            'is a brand name that stays as-is - add the key to UNTRANSLATED_BY_DESIGN ' +
+            `in this spec:\n${notTranslated.join('\n')}`,
+        );
+      }
+    });
   });
 });

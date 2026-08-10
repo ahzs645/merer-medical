@@ -6,7 +6,6 @@ import {
   ChevronDownIcon,
   ClockIcon,
   ExclamationTriangleIcon,
-  MagnifyingGlassIcon,
   NoSymbolIcon,
   PlusIcon,
   ShieldCheckIcon,
@@ -18,6 +17,11 @@ import { Routes as AppRoutes } from '../../Routes';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
+import {
+  RecordHeaderButton,
+  RecordHeaderLink,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
@@ -80,34 +84,39 @@ export function MedicationsTab() {
   return (
     <AppPage
       banner={
-        <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
-          <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold sm:text-3xl">Medications</h1>
-              <p className="mt-1 text-sm text-primary-100">
-                Reconciled prescriptions, planned therapy, stopped medications,
-                supplements, adherence, and source history.
-              </p>
-            </div>
-            <div className="flex w-fit flex-wrap gap-2">
-              <Link
+        <RecordPageHeader<FilterChip['id']>
+          title="Medications"
+          description="Reconciled prescriptions, planned therapy, stopped medications, supplements, adherence, and source history."
+          search={{
+            query,
+            onChange: setQuery,
+            placeholder:
+              'Search medication, condition, source, status, or supplement ingredient',
+            label: 'Search medications',
+          }}
+          action={
+            <>
+              <RecordHeaderLink
                 to={ADD_MEDICATION_PATH}
-                className="inline-flex w-fit items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 shadow-sm ring-1 ring-inset ring-primary-100 hover:bg-primary-50"
-              >
-                <PlusIcon className="h-5 w-5" />
-                {t('Add medication')}
-              </Link>
-              <button
-                type="button"
+                label={t('Add medication')}
+              />
+              <RecordHeaderButton
                 onClick={() => setAddAllergyOpen(true)}
-                className="inline-flex w-fit items-center gap-2 rounded-md bg-primary-700 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-primary-500 hover:bg-primary-600"
-              >
-                <PlusIcon className="h-5 w-5" />
-                {t('Add allergy')}
-              </button>
-            </div>
-          </div>
-        </div>
+                label={t('Add allergy')}
+                variant="subtle"
+              />
+            </>
+          }
+          filters={{
+            items: FILTERS.map((filter) => ({
+              ...filter,
+              count: counts[filter.id] || 0,
+            })),
+            selectedId: selectedFilter,
+            onSelect: setSelectedFilter,
+            label: 'Filter medications',
+          }}
+        />
       }
     >
       {/* Saving notifies the record-change signal; the medications hook
@@ -127,14 +136,8 @@ export function MedicationsTab() {
             <EmptyMedicationsState />
           ) : (
             <>
-              <MedicationToolbar
-                counts={counts}
-                query={query}
-                selectedFilter={selectedFilter}
-                onQueryChange={setQuery}
-                onFilterChange={setSelectedFilter}
-              />
-
+              {/* Search and the group filters live in the banner now, with
+                  every other record tab's. */}
               <AllergySafetyPanel allergies={allergies} />
               <MedicationInteractionPanel {...medicationInteractions} />
 
@@ -177,60 +180,6 @@ function EmptyMedicationsState() {
         <PlusIcon className="h-5 w-5" />
         {t('Add medication')}
       </Link>
-    </div>
-  );
-}
-
-function MedicationToolbar({
-  counts,
-  query,
-  selectedFilter,
-  onQueryChange,
-  onFilterChange,
-}: {
-  counts: Record<FilterChip['id'], number>;
-  query: string;
-  selectedFilter: FilterChip['id'];
-  onQueryChange: (value: string) => void;
-  onFilterChange: (value: FilterChip['id']) => void;
-}) {
-  return (
-    <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-      <div className="relative">
-        <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-        <input
-          className="h-10 w-full rounded-md border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-          placeholder="Search medication, condition, source, status, or supplement ingredient"
-          value={query}
-          onChange={(event) => onQueryChange(event.target.value)}
-        />
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {FILTERS.map((filter) => {
-          const Icon = filter.icon;
-          const isSelected = selectedFilter === filter.id;
-
-          return (
-            <button
-              key={filter.id}
-              type="button"
-              className={[
-                'inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-medium shadow-sm',
-                isSelected
-                  ? 'border-primary-600 bg-primary-50 text-primary-800'
-                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
-              ].join(' ')}
-              onClick={() => onFilterChange(filter.id)}
-            >
-              <Icon className="h-4 w-4" />
-              <span>{filter.label}</span>
-              <span className="rounded bg-white/70 px-1.5 py-0.5 text-xs">
-                {counts[filter.id] || 0}
-              </span>
-            </button>
-          );
-        })}
-      </div>
     </div>
   );
 }

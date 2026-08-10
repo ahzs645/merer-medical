@@ -147,7 +147,7 @@ function LinkUnmemo({
 }) {
   if (date) {
     return (
-      <li className="relative py-1 pl-10 pr-3 text-xs font-thin hover:underline">
+      <li className="relative flex min-h-[28px] items-center pl-10 pr-3 text-xs font-thin hover:underline">
         <span
           className={`absolute left-[17px] top-1/2 h-2 w-2 -translate-y-1/2 rounded-full border ${
             loading
@@ -167,8 +167,8 @@ function LinkUnmemo({
           }}
           className={
             active
-              ? 'whitespace-nowrap font-semibold text-primary-700'
-              : 'whitespace-nowrap text-slate-700 hover:text-primary-700'
+              ? 'flex min-h-[28px] flex-1 items-center whitespace-nowrap font-semibold text-primary-700'
+              : 'flex min-h-[28px] flex-1 items-center whitespace-nowrap text-slate-700 hover:text-primary-700'
           }
           aria-busy={loading || undefined}
           onClick={() => onJumpToDate?.(date)}

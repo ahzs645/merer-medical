@@ -20,6 +20,7 @@ import {
 } from '../../repositories/WorkflowRecordRepository';
 import { formatDisplayText } from '../../shared/utils/StyleUtils';
 import { AppPage } from '../../shared/components/AppPage';
+import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { StylizedSelect } from '../../shared/components/StylizedSelect';
 import {
   TRACKER_ENTRY_KIND,
@@ -133,14 +134,10 @@ export function TrackersTab() {
   return (
     <AppPage
       banner={
-        <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <h1 className="text-2xl font-bold sm:text-3xl">Trackers</h1>
-            <p className="mt-1 text-sm text-primary-100">
-              Log symptoms, vitals, mood, sleep, and activity between visits.
-            </p>
-          </div>
-        </div>
+        <RecordPageHeader
+          title="Trackers"
+          description="Log symptoms, vitals, mood, sleep, and activity between visits."
+        />
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">

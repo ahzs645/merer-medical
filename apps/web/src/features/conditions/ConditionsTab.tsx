@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
-import {
-  MagnifyingGlassIcon,
-  PlusIcon,
-  Squares2X2Icon,
-} from '@heroicons/react/24/outline';
+import { Squares2X2Icon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
+import {
+  RecordHeaderLink,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { useConditionsData } from './hooks/useConditionsData';
 import { ConditionBundle, RelatedKind } from './types';
@@ -81,41 +81,25 @@ function ConditionsHeader({
   onQueryChange: (value: string) => void;
 }) {
   return (
-    <div className="bg-primary-800 px-3 py-4 text-white sm:px-6 sm:py-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <Squares2X2Icon className="h-7 w-7" />
-              <h1 className="text-2xl font-bold sm:text-3xl">My Conditions</h1>
-            </div>
-            <p className="mt-1 text-sm text-primary-100">
-              {total} {total === 1 ? 'condition' : 'conditions'}, each with its
-              related medications, labs, care plans, goals and procedures pulled
-              together.
-            </p>
-          </div>
-          <Link
-            to={`${AppRoutes.AddRecord}?type=condition`}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-white/15 px-3 py-2 text-sm font-semibold text-white ring-1 ring-inset ring-white/30 transition hover:bg-white/25"
-          >
-            <PlusIcon className="h-5 w-5" />
-            Add condition
-          </Link>
-        </div>
-        <label className="relative block rounded-md bg-white/10 p-1 ring-1 ring-white/20">
-          <span className="sr-only">Search conditions</span>
-          <MagnifyingGlassIcon className="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => onQueryChange(event.target.value)}
-            placeholder="Search condition, code, or topic"
-            className="h-10 w-full rounded-md border border-gray-300 bg-white pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-          />
-        </label>
-      </div>
-    </div>
+    <RecordPageHeader
+      title="My Conditions"
+      icon={Squares2X2Icon}
+      description={`${total} ${
+        total === 1 ? 'condition' : 'conditions'
+      }, each with its related medications, labs, care plans, goals and procedures pulled together.`}
+      search={{
+        query,
+        onChange: onQueryChange,
+        placeholder: 'Search condition, code, or topic',
+        label: 'Search conditions',
+      }}
+      action={
+        <RecordHeaderLink
+          to={`${AppRoutes.AddRecord}?type=condition`}
+          label="Add condition"
+        />
+      }
+    />
   );
 }
 

@@ -6,6 +6,7 @@ import {
   cleanupTestDatabase,
   seedTestDatabase,
 } from '../../../test-utils/createTestDatabase';
+import { createDocumentsWithSpecificDates } from '../../../test-utils/clinicalDocumentTestData';
 import { getTimelineCategories } from '../utils/timelineCategories';
 import { timelineDateKeyUpperBound } from '../utils/timelineDates';
 import {
@@ -46,6 +47,52 @@ describe('timeline paging over the bundled demo data', () => {
     expect(dateKeys[0]).toBe(
       [...dateKeys].sort((a, b) => b.localeCompare(a))[0],
     );
+  });
+
+  it('lists every date newest first', async () => {
+    const dateKeys = await fetchTimelineDateKeys(db, userId);
+
+    expect(dateKeys).toEqual([...dateKeys].sort((a, b) => b.localeCompare(a)));
+  });
+
+  /**
+   * Regression, and the concrete shape of the bug: the fixture stores dates in
+   * two formats. It holds real records timestamped `2016-05-27T01:50:41.883Z`,
+   * which are the evening of 26 May for a reader west of Greenwich, so they
+   * group under `2016-05-26`. A bare `2016-05-27` sorts *before* them under a
+   * raw-string descending sort ('2016-05-27' is a prefix of the timestamp), so
+   * the rail emitted 26 May above 27 May. Only the bare date is constructed
+   * here; the records it collides with are the fixture's own.
+   */
+  it('keeps a bare date above the timestamps that fall on the previous local day', async () => {
+    const sameUtcDay = await db.clinical_documents
+      .find({
+        selector: {
+          user_id: userId,
+          'metadata.date': { $regex: '^2016-05-27T' },
+        },
+      })
+      .exec();
+    expect(sameUtcDay.length).toBeGreaterThan(0);
+    expect(
+      new Set(
+        sameUtcDay.map((doc) => getRecordDateKey(doc.toMutableJSON() as never)),
+      ),
+    ).toEqual(new Set(['2016-05-26']));
+
+    await db.clinical_documents.bulkInsert(
+      createDocumentsWithSpecificDates(userId, [
+        { date: '2016-05-27', count: 1 },
+      ]),
+    );
+
+    const dateKeys = await fetchTimelineDateKeys(db, userId);
+
+    expect(dateKeys).toContain('2016-05-27');
+    expect(dateKeys.indexOf('2016-05-27')).toBeLessThan(
+      dateKeys.indexOf('2016-05-26'),
+    );
+    expect(dateKeys).toEqual([...dateKeys].sort((a, b) => b.localeCompare(a)));
   });
 
   it('surfaces every care plan the fixture holds', async () => {

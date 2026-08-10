@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import { format, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 import { useDebounceCallback } from '@react-hook/debounce';
 import { BundleEntry, FhirResource } from 'fhir/r2';
 import { MangoQuerySelector, RxDatabase } from 'rxdb';
@@ -15,29 +15,17 @@ import { QueryStatus, RecordsByDate, TimelineRecordTypeFilter } from '../types';
 import {
   fetchRecords,
   fetchRecordsWithVectorSearch,
+  NON_TIMELINE_RESOURCE_TYPES,
   PAGE_SIZE,
 } from '../services/timelineRecords';
 import { getTimelineCategories } from '../utils/timelineCategories';
-import { timelineDateKeyUpperBound } from '../utils/timelineDates';
+import {
+  compareTimelineDateKeysDesc,
+  timelineDateKey,
+  timelineDateKeyUpperBound,
+} from '../utils/timelineDates';
 
 export const GROUPED_VIEW_BATCH_SIZE = 250;
-
-/**
- * Reference master-data surfaced in the Providers & locations directory, plus
- * app plumbing, rather than dated events worth a card.
- *
- * `careplan` is deliberately absent: the grouped card renders a "Care Plans"
- * section, the type filter offers "Care plans", and the Records section links
- * to them, so excluding them here only made the category unreachable from the
- * unfiltered timeline.
- */
-const NON_TIMELINE_RESOURCE_TYPES = [
-  'patient',
-  'provenance',
-  'location',
-  'practitioner',
-  'organization',
-];
 
 /**
  * Shared selector so the paged record query and the "Jump To" date list can
@@ -67,6 +55,15 @@ export function buildTimelineSelector(
   } as MangoQuerySelector<ClinicalDocument<unknown>>;
 }
 
+/**
+ * Records in raw stored order, newest-ish first.
+ *
+ * The database can only sort the stored `metadata.date` string, which mixes
+ * date-only and timestamped values and so is *not* in the same order as the
+ * day keys the timeline groups by. That is fine here — this order exists only
+ * to walk the collection in stable, pageable chunks. Every order the UI ends
+ * up seeing is re-derived from `timelineDateKey`, never from this.
+ */
 export async function fetchRawRecords(
   db: RxDatabase<DatabaseCollections>,
   user_id: string,
@@ -95,16 +92,54 @@ export function getRecordDateKey(
   if (!record.metadata?.date) {
     return new Date(0).toISOString().split('T')[0];
   }
-  return format(parseISO(record.metadata.date), 'yyyy-MM-dd');
+  return timelineDateKey(record.metadata.date);
 }
 
+function getRecordInstant(
+  record: ClinicalDocument<BundleEntry<FhirResource>>,
+): number {
+  if (!record.metadata?.date) return 0;
+  const parsed = parseISO(record.metadata.date).getTime();
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+/**
+ * Newest first, refining `compareTimelineDateKeysDesc` within a day by instant
+ * and then by id. The id tiebreak is what makes this a total order: two
+ * records can share a date-only string, and an ordering that leaves them
+ * interchangeable lets the same page render in a different order each load.
+ */
+function compareRecordsDesc(
+  a: ClinicalDocument<BundleEntry<FhirResource>>,
+  b: ClinicalDocument<BundleEntry<FhirResource>>,
+): number {
+  const byDay = compareTimelineDateKeysDesc(
+    getRecordDateKey(a),
+    getRecordDateKey(b),
+  );
+  if (byDay !== 0) return byDay;
+
+  const byInstant = getRecordInstant(b) - getRecordInstant(a);
+  if (byInstant !== 0) return byInstant;
+
+  return (a.id ?? '').localeCompare(b.id ?? '');
+}
+
+/**
+ * Groups records into days, newest day first.
+ *
+ * The key order matters: the timeline renders `Object.entries` of this map, so
+ * insertion order *is* display order. Building it from whatever order the
+ * records arrived in is what let a raw-string database sort leak through, so
+ * the keys are sorted with the same comparator the grouping key comes from.
+ */
 export function groupRecordsByDate(
   records: ClinicalDocument<BundleEntry<FhirResource>>[],
 ): Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]> {
   const grouped: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]> =
     {};
 
-  for (const record of records) {
+  for (const record of [...records].sort(compareRecordsDesc)) {
     const dateKey = getRecordDateKey(record);
     if (grouped[dateKey]) {
       grouped[dateKey].push(record);
@@ -131,7 +166,6 @@ export async function fetchTimelineDateKeys(
   const docs = await db.clinical_documents
     .find({
       selector: buildTimelineSelector(user_id, typeFilter),
-      sort: [{ 'metadata.date': 'desc' }],
     })
     .exec();
 
@@ -142,7 +176,7 @@ export async function fetchTimelineDateKeys(
   for (const doc of docs) {
     const date = doc.get('metadata')?.date;
     if (!date) continue;
-    const dateKey = format(parseISO(date), 'yyyy-MM-dd');
+    const dateKey = timelineDateKey(date);
     // Only `data_record` is read by the category check, so avoid cloning the
     // whole document: this runs over every record the user has.
     const item = {
@@ -156,9 +190,13 @@ export async function fetchTimelineDateKeys(
     }
   }
 
+  // Sorted on the day key rather than taken from the database's order: that
+  // order is on the raw stored string, which disagrees with the day key
+  // whenever the two stored date formats meet.
   return [...byDateKey.entries()]
     .filter(([, items]) => getTimelineCategories(items).length > 0)
-    .map(([dateKey]) => dateKey);
+    .map(([dateKey]) => dateKey)
+    .sort(compareTimelineDateKeysDesc);
 }
 
 export function mergeRecordsByDate(
@@ -168,19 +206,28 @@ export function mergeRecordsByDate(
   incoming: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]>,
 ): Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]> {
   if (!existing) return incoming;
-  const merged = { ...existing };
-  for (const [dateKey, records] of Object.entries(incoming)) {
-    if (!merged[dateKey]) {
-      merged[dateKey] = records;
-      continue;
-    }
+  const merged: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]> =
+    {};
 
-    const existingIds = new Set(merged[dateKey].map((record) => record.id));
+  // Rebuilt in day order rather than spread over `existing`, because the
+  // result is rendered straight out of its key order: a page whose days
+  // interleave with the loaded ones would otherwise land wherever the merge
+  // happened to put them.
+  const dateKeys = [
+    ...new Set([...Object.keys(existing), ...Object.keys(incoming)]),
+  ].sort(compareTimelineDateKeysDesc);
+
+  for (const dateKey of dateKeys) {
+    const before = existing[dateKey] ?? [];
+    const existingIds = new Set(before.map((record) => record.id));
     merged[dateKey] = [
-      ...merged[dateKey],
-      ...records.filter((record) => !existingIds.has(record.id)),
+      ...before,
+      ...(incoming[dateKey] ?? []).filter(
+        (record) => !existingIds.has(record.id),
+      ),
     ];
   }
+
   return merged;
 }
 
@@ -267,6 +314,11 @@ export async function fetchRecordsUntilCompleteDays(
       if (newestDate && dateKey < newestDate) {
         completeDates.add(newestDate);
       }
+      // The batch arrives in raw stored order, which can dip back into a day
+      // it had already left (a bare `2016-05-28` follows a
+      // `2016-05-28T01:00:00Z` that belongs to the 27th). A day with records
+      // still arriving is not complete, whatever we concluded earlier.
+      completeDates.delete(dateKey);
       newestDate = dateKey;
       uniqueDates.add(dateKey);
     }
@@ -311,8 +363,8 @@ export async function fetchRecordsUntilCompleteDays(
         },
       );
       const grouped = groupRecordsByDate(allRecords);
-      const sortedDates = Object.keys(grouped).sort((a, b) =>
-        b.localeCompare(a),
+      const sortedDates = Object.keys(grouped).sort(
+        compareTimelineDateKeysDesc,
       );
       const completeDatesToReturn = sortedDates.filter((d) =>
         completeDates.has(d),
@@ -401,7 +453,7 @@ export async function fetchRecordsUntilCompleteDays(
   }
 
   const grouped = groupRecordsByDate(allRecords);
-  const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+  const sortedDates = Object.keys(grouped).sort(compareTimelineDateKeysDesc);
 
   if (sortedDates.length > minDays) {
     const datesToKeep = new Set(sortedDates.slice(0, minDays));

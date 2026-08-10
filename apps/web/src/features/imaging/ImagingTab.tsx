@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { DocumentPlusIcon, PhotoIcon } from '@heroicons/react/24/outline';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
+import {
+  RecordHeaderLink,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { ImagingCategoryTabs } from './components/ImagingCategoryTabs';
-import { ImagingHeader } from './components/ImagingHeader';
 import { ImagingItemCard } from './components/ImagingItemCard';
 import { ImagingSummaryPanel } from './components/ImagingSummaryPanel';
 import { useImagingData } from './hooks/useImagingData';
@@ -40,10 +44,29 @@ export function ImagingTab() {
   return (
     <AppPage
       banner={
-        <ImagingHeader
-          totalCount={items.length}
-          query={query}
-          setQuery={setQuery}
+        <RecordPageHeader
+          title={t('Imaging & Scans')}
+          icon={PhotoIcon}
+          count={
+            <>
+              {items.length} {t('imaging records')}
+            </>
+          }
+          search={{
+            query,
+            onChange: setQuery,
+            placeholder: t('Search scans, reports, modality, body site'),
+            label: t('Search imaging records'),
+          }}
+          action={
+            <RecordHeaderLink
+              to={`${AppRoutes.AddRecord}?type=document&title=${encodeURIComponent(
+                'Imaging record',
+              )}`}
+              label={t('Add image or scan')}
+              icon={DocumentPlusIcon}
+            />
+          }
         />
       }
     >

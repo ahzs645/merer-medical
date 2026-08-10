@@ -5,11 +5,8 @@ import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
-import { GenericBanner } from '../../shared/components/GenericBanner';
-import {
-  EmptyState,
-  SearchInput,
-} from '../../shared/components/records/RecordListPage';
+import { EmptyState } from '../../shared/components/records/RecordListPage';
+import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 
@@ -196,16 +193,20 @@ export function DirectoryTab() {
   );
 
   return (
-    <AppPage banner={<GenericBanner text="Providers & locations" />}>
+    <AppPage
+      banner={
+        <RecordPageHeader
+          title="Providers & locations"
+          search={{
+            query,
+            onChange: setQuery,
+            placeholder: 'Search providers and locations',
+          }}
+        />
+      }
+    >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-3xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          <SearchInput
-            value={query}
-            onChange={setQuery}
-            placeholder="Search providers and locations"
-            label="Search providers and locations"
-          />
-
           {status === 'loading' ? (
             <EmptyState text="Loading directory…" />
           ) : status === 'error' ? (
