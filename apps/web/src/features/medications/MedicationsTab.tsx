@@ -22,6 +22,8 @@ import {
   RecordHeaderLink,
   RecordPageHeader,
 } from '../../shared/components/records/RecordPageHeader';
+import { isAllergyNegation } from '../../shared/utils/allergyNegation';
+import { getAllergyIntoleranceDisplayName } from '../../shared/utils/fhirAccessHelpers';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
@@ -196,15 +198,22 @@ function AllergySafetyPanel({ allergies }: { allergies: ClinicalDocument[] }) {
         (resource as any)?.clinicalStatus?.text ||
         (resource as any)?.status ||
         'active';
+      const name =
+        getAllergyIntoleranceDisplayName(doc) ||
+        (resource as any)?.code?.text ||
+        doc.metadata?.display_name ||
+        'Allergy';
       return {
         id: doc.id,
-        name:
-          (resource as any)?.code?.text ||
-          (resource as any)?.substance?.text ||
-          (resource as any)?.substance?.coding?.[0]?.display ||
-          doc.metadata?.display_name ||
-          'Allergy',
+        name,
         status,
+        // "No Known Allergies" / "Not on File" are statements about the list,
+        // not allergens. Chipping them next to PENICILLIN reads as five more
+        // things the patient reacts to, which is the opposite of what they say.
+        isNegation: isAllergyNegation(
+          (resource as unknown as Record<string, unknown>) ?? {},
+          name,
+        ),
         reaction: ((resource as any)?.reaction || [])
           .map((reaction: any) =>
             [
@@ -228,6 +237,9 @@ function AllergySafetyPanel({ allergies }: { allergies: ClinicalDocument[] }) {
 
   if (activeAllergies.length === 0) return null;
 
+  const allergens = activeAllergies.filter((item) => !item.isNegation);
+  const negationCount = activeAllergies.length - allergens.length;
+
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-amber-200">
       <div className="flex items-center gap-2">
@@ -241,18 +253,38 @@ function AllergySafetyPanel({ allergies }: { allergies: ClinicalDocument[] }) {
         medications. Imported allergies can be stale or duplicated across
         portals.
       </p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {activeAllergies.slice(0, 12).map((allergy) => (
-          <span
-            key={allergy.id}
-            className="rounded-md bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800"
-            title={allergy.reaction}
+      {allergens.length > 0 ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {allergens.slice(0, 12).map((allergy) => (
+            <span
+              key={allergy.id}
+              className="rounded-md bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800"
+              title={allergy.reaction}
+            >
+              {allergy.name}
+              {allergy.reaction ? ` - ${allergy.reaction}` : ''}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-3 text-sm font-medium text-gray-900">
+          No allergens are recorded. Your sources sent only &ldquo;no known
+          allergy&rdquo; statements.
+        </p>
+      )}
+      {negationCount > 0 && (
+        <p className="mt-3 text-xs text-gray-600">
+          {negationCount === 1
+            ? '1 more record states that no allergy was found or that no allergy history was taken.'
+            : `${negationCount} more records state that no allergy was found or that no allergy history was taken.`}{' '}
+          <Link
+            to={AppRoutes.Allergies}
+            className="font-medium text-primary-700 underline"
           >
-            {allergy.name}
-            {allergy.reaction ? ` - ${allergy.reaction}` : ''}
-          </span>
-        ))}
-      </div>
+            See all allergies
+          </Link>
+        </p>
+      )}
     </section>
   );
 }
