@@ -101,7 +101,7 @@ function DeltaChip({ value, isAxis }: { value?: number; isAxis?: boolean }) {
 
   return (
     <span
-      className={`ml-1 inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-semibold tabular-nums ${
+      className={`ml-1 inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-xs font-semibold tabular-nums ${
         increasing ? 'bg-amber-50 text-amber-700' : 'bg-sky-50 text-sky-700'
       }`}
       title="Change since previous prescription"

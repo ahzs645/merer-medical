@@ -149,7 +149,7 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
 function MetricCard({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-md border border-gray-200 bg-white px-3 py-2 shadow-sm sm:px-4 sm:py-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 sm:text-xs">
+      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 sm:text-xs">
         {label}
       </p>
       <p className="mt-0.5 text-lg font-semibold text-gray-900 sm:mt-1 sm:text-2xl">
@@ -433,7 +433,7 @@ function StatusBadge({
 }) {
   return (
     <span
-      className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+      className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
         abnormal
           ? 'bg-amber-100 text-amber-800'
           : 'bg-emerald-100 text-emerald-800'

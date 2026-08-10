@@ -15,8 +15,8 @@
         "resource": {
           "resourceType": "AllergyIntolerance",
           "id": "Tsf4y7.SaMdkl3-gSZPBxcQB",
-          "onset": "2006-05-27",
-          "recordedDate": "2009-01-31T20:47:56.916Z",
+          "onset": "2018-11-14",
+          "recordedDate": "2019-01-31T20:47:56.916Z",
           "recorder": {
             "display": "Emilia Camacho, MA",
             "reference": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/Practitioner/TScYdiAOzx-oxdXdfw60KEwB"
@@ -60,7 +60,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/AllergyIntolerance/Tsf4y7.SaMdkl3-gSZPBxcQB",
-      "date": "2009-01-31T20:47:56.916Z"
+      "date": "2019-01-31T20:47:56.916Z"
     },
     "_meta": {
       "lwt": 1761781117806.1
@@ -153,7 +153,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/CarePlan/0affb8da-afbf-417d-8b48-a71528ff7d4e",
-      "date": "2006-04-01T08:53:40.204Z"
+      "date": "2023-04-01T08:53:40.204Z"
     },
     "_meta": {
       "lwt": 1761781117808.01
@@ -1014,7 +1014,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/DocumentReference/TBirNBc4ECUMCQS7Zb7Envt95rsm0OI2VeDBC2JBHozakaUMXzJZxT7Ja53SO-LLMsJ7E-oXfF5NGApwt2OMQ8QhPdXD.vLFXt384VNMBL6AB",
-      "date": "2006-04-01T08:53:40.204Z",
+      "date": "2023-04-01T08:53:40.204Z",
       "display_name": "Summarization of Episode Note"
     },
     "_meta": {
@@ -1422,7 +1422,7 @@
           },
           "status": "active",
           "effectivePeriod": {
-            "start": "2003-11-23"
+            "start": "2023-01-01"
           },
           "medicationCodeableConcept": {
             "coding": [
@@ -1509,7 +1509,7 @@
     },
     "metadata": {
       "id": "https://fhir.epic.com/interconnect-fhir-oauth/FHIR/DSTU2/MedicationStatement/T0vnAayRIvu7f0F-W6zeC4WrETfpZKF1xL-Mphh0UKtUB",
-      "date": "2003-11-23",
+      "date": "2023-01-01",
       "display_name": "Vitamin D 25 MCG (1000 UT) tablet"
     },
     "_meta": {

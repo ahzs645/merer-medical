@@ -1,5 +1,6 @@
 import { RxDatabase } from 'rxdb';
 import { DatabaseCollections } from '../../../app/providers/DatabaseCollections';
+import { ClinicalDocumentResourceType } from '../../../models/clinical-document/ClinicalDocument.type';
 import {
   createTestDatabase,
   cleanupTestDatabase,
@@ -7,15 +8,36 @@ import {
 import {
   createDocumentsForDays,
   createDocumentsWithSpecificDates,
+  createTestClinicalDocument,
 } from '../../../test-utils/clinicalDocumentTestData';
 import { createDefaultTestUser } from '../../../test-utils/userTestData';
 import {
   fetchRawRecords,
   fetchRecordsUntilCompleteDays,
+  fetchTimelineDateKeys,
   getRecordDateKey,
   groupRecordsByDate,
   mergeRecordsByDate,
 } from './useRecordQuery';
+import { timelineDateKeyUpperBound } from '../utils/timelineDates';
+
+/** Records of an arbitrary resource type on a fixed date. */
+function createDocumentsOfType(
+  userId: string,
+  date: string,
+  resourceType: ClinicalDocumentResourceType,
+  count = 1,
+) {
+  return Array.from({ length: count }, () => {
+    const doc = createTestClinicalDocument({ user_id: userId });
+    doc.metadata = { ...doc.metadata, date };
+    // The primary key is composed from connection/user/metadata ids, so the
+    // document id has to be rebuilt around the overridden user.
+    doc.id = `test-connection|${userId}|${doc.metadata.id}`;
+    doc.data_record.resource_type = resourceType;
+    return doc;
+  });
+}
 
 describe('useRecordQuery helper functions', () => {
   let db: RxDatabase<DatabaseCollections>;
@@ -203,22 +225,112 @@ describe('useRecordQuery helper functions', () => {
     });
 
     it('excludes filtered resource types', async () => {
-      const docs = createDocumentsForDays(userId, 1, 5);
+      const docs = createDocumentsForDays(userId, 1, 6);
       docs[0].data_record.resource_type = 'patient';
-      docs[1].data_record.resource_type = 'careplan';
-      docs[2].data_record.resource_type = 'provenance';
-      docs[3].data_record.resource_type = 'documentreference_attachment';
+      docs[1].data_record.resource_type = 'provenance';
+      docs[2].data_record.resource_type = 'documentreference_attachment';
+      docs[3].data_record.resource_type = 'location';
+      docs[4].data_record.resource_type = 'organization';
       await db.clinical_documents.bulkInsert(docs);
 
       const records = await fetchRawRecords(db, userId, 0, 10);
 
       expect(records).toHaveLength(2);
       expect(records.map((record) => record.data_record.resource_type)).toEqual(
-        expect.arrayContaining([
+        expect.arrayContaining(['observation', 'documentreference_attachment']),
+      );
+    });
+
+    // The grouped card has a "Care Plans" section and the type filter offers
+    // "Care plans", so excluding them from the unfiltered query made the
+    // category unreachable from the timeline.
+    it('includes care plans in the unfiltered timeline', async () => {
+      await db.clinical_documents.bulkInsert([
+        ...createDocumentsOfType(userId, '2024-01-15T10:00:00Z', 'careplan', 2),
+        ...createDocumentsOfType(
+          userId,
+          '2024-01-15T10:00:00Z',
           'observation',
-          'documentreference_attachment',
+          1,
+        ),
+      ]);
+
+      const records = await fetchRawRecords(db, userId, 0, 10);
+
+      expect(
+        records.filter((r) => r.data_record.resource_type === 'careplan'),
+      ).toHaveLength(2);
+    });
+
+    it('returns care plans when filtered to care plans', async () => {
+      await db.clinical_documents.bulkInsert([
+        ...createDocumentsOfType(userId, '2024-01-15T10:00:00Z', 'careplan', 2),
+        ...createDocumentsOfType(
+          userId,
+          '2024-01-15T10:00:00Z',
+          'observation',
+          3,
+        ),
+      ]);
+
+      const records = await fetchRawRecords(db, userId, 0, 10, 'careplan');
+
+      expect(records).toHaveLength(2);
+      expect(
+        records.every((r) => r.data_record.resource_type === 'careplan'),
+      ).toBe(true);
+    });
+
+    it('excludes records newer than maxDate so paging can start mid-history', async () => {
+      const docs = createDocumentsWithSpecificDates(userId, [
+        { date: '2024-01-15T10:00:00Z', count: 2 },
+        { date: '2024-01-14T10:00:00Z', count: 2 },
+        { date: '2024-01-13T10:00:00Z', count: 2 },
+      ]);
+      await db.clinical_documents.bulkInsert(docs);
+
+      const records = await fetchRawRecords(
+        db,
+        userId,
+        0,
+        10,
+        'all',
+        timelineDateKeyUpperBound('2024-01-14'),
+      );
+
+      expect(records).toHaveLength(4);
+      expect(records.map(getRecordDateKey)).toEqual([
+        '2024-01-14',
+        '2024-01-14',
+        '2024-01-13',
+        '2024-01-13',
+      ]);
+    });
+
+    it('keeps the whole target day when bounded by maxDate', async () => {
+      // The bound is a date key, not an instant: every record whose local date
+      // key is the target day has to survive it, including one whose UTC
+      // timestamp already reads as the following day.
+      await db.clinical_documents.bulkInsert(
+        createDocumentsWithSpecificDates(userId, [
+          { date: '2024-01-14T06:00:00Z', count: 1 },
+          { date: '2024-01-15T04:00:00Z', count: 1 },
         ]),
       );
+
+      const records = await fetchRawRecords(
+        db,
+        userId,
+        0,
+        10,
+        'all',
+        timelineDateKeyUpperBound('2024-01-14'),
+      );
+
+      expect(records.map(getRecordDateKey)).toEqual([
+        '2024-01-14',
+        '2024-01-14',
+      ]);
     });
 
     it('excludes records with empty metadata.date', async () => {
@@ -763,6 +875,148 @@ describe('fetchRecordsUntilCompleteDays', () => {
     });
   });
 
+  // A "Jump To" link points at a date that is usually many pages below the
+  // loaded window. Seeking re-anchors the pager there instead of leaving the
+  // link to scroll to an anchor that was never rendered.
+  describe('seeking to a date (maxDate)', () => {
+    const yearlyDates = Array.from({ length: 20 }, (_, index) => ({
+      date: `${2006 + index}-06-15T12:00:00Z`,
+      count: 40,
+    })).reverse();
+
+    it('starts at the requested date instead of the newest record', async () => {
+      await db.clinical_documents.bulkInsert(
+        createDocumentsWithSpecificDates(userId, yearlyDates),
+      );
+
+      const result = await fetchRecordsUntilCompleteDays(
+        db,
+        userId,
+        3,
+        0,
+        3000,
+        undefined,
+        false,
+        'all',
+        timelineDateKeyUpperBound('2012-06-15'),
+      );
+
+      expect(Object.keys(result.records)).toEqual([
+        '2012-06-15',
+        '2011-06-15',
+        '2010-06-15',
+      ]);
+      expect(result.hasMore).toBe(true);
+    });
+
+    it('loads the full target day, not a partial one', async () => {
+      await db.clinical_documents.bulkInsert(
+        createDocumentsWithSpecificDates(userId, [
+          { date: '2020-01-02T12:00:00Z', count: 500 },
+          { date: '2015-05-05T12:00:00Z', count: 400 },
+          { date: '2015-05-04T12:00:00Z', count: 10 },
+        ]),
+      );
+
+      const result = await fetchRecordsUntilCompleteDays(
+        db,
+        userId,
+        3,
+        0,
+        3000,
+        undefined,
+        false,
+        'all',
+        timelineDateKeyUpperBound('2015-05-05'),
+      );
+
+      expect(result.records['2015-05-05']).toHaveLength(400);
+      expect(result.records['2020-01-02']).toBeUndefined();
+    });
+
+    it('continues paging older from the seeked position', async () => {
+      await db.clinical_documents.bulkInsert(
+        createDocumentsWithSpecificDates(userId, yearlyDates),
+      );
+      const maxDate = timelineDateKeyUpperBound('2012-06-15');
+
+      const first = await fetchRecordsUntilCompleteDays(
+        db,
+        userId,
+        3,
+        0,
+        3000,
+        undefined,
+        false,
+        'all',
+        maxDate,
+      );
+      const second = await fetchRecordsUntilCompleteDays(
+        db,
+        userId,
+        3,
+        first.lastOffset,
+        3000,
+        undefined,
+        false,
+        'all',
+        maxDate,
+      );
+
+      expect(Object.keys(second.records)).toEqual([
+        '2009-06-15',
+        '2008-06-15',
+        '2007-06-15',
+      ]);
+    });
+
+    it('reports no more records once the oldest date is seeked to', async () => {
+      await db.clinical_documents.bulkInsert(
+        createDocumentsWithSpecificDates(userId, yearlyDates),
+      );
+
+      const result = await fetchRecordsUntilCompleteDays(
+        db,
+        userId,
+        3,
+        0,
+        3000,
+        undefined,
+        false,
+        'all',
+        timelineDateKeyUpperBound('2006-06-15'),
+      );
+
+      expect(Object.keys(result.records)).toEqual(['2006-06-15']);
+      expect(result.hasMore).toBe(false);
+    });
+
+    it('reaches every date the jump rail offers', async () => {
+      await db.clinical_documents.bulkInsert([
+        ...createDocumentsWithSpecificDates(userId, yearlyDates),
+        ...createDocumentsOfType(userId, '2013-02-02T12:00:00Z', 'careplan', 2),
+      ]);
+
+      const dateKeys = await fetchTimelineDateKeys(db, userId);
+      expect(dateKeys.length).toBe(21);
+
+      for (const dateKey of dateKeys) {
+        const result = await fetchRecordsUntilCompleteDays(
+          db,
+          userId,
+          1,
+          0,
+          3000,
+          undefined,
+          false,
+          'all',
+          timelineDateKeyUpperBound(dateKey),
+        );
+        expect(Object.keys(result.records)).toContain(dateKey);
+      }
+    });
+  });
+
   describe('fuzz testing - pagination integrity', () => {
     function generateRandomDateDistribution(
       seed: number,
@@ -871,5 +1125,118 @@ describe('fetchRecordsUntilCompleteDays', () => {
         expect(missing).toEqual([]);
       }
     });
+  });
+});
+
+describe('fetchTimelineDateKeys', () => {
+  let db: RxDatabase<DatabaseCollections>;
+  let userId: string;
+
+  beforeEach(async () => {
+    db = await createTestDatabase();
+    const user = createDefaultTestUser();
+    userId = user.id;
+    await db.user_documents.insert(user);
+  });
+
+  afterEach(async () => {
+    await cleanupTestDatabase(db);
+  });
+
+  it('lists dates newest first', async () => {
+    await db.clinical_documents.bulkInsert(
+      createDocumentsWithSpecificDates(userId, [
+        { date: '2024-01-13T10:00:00Z', count: 2 },
+        { date: '2024-01-15T10:00:00Z', count: 2 },
+        { date: '2024-01-14T10:00:00Z', count: 2 },
+      ]),
+    );
+
+    const dateKeys = await fetchTimelineDateKeys(db, userId);
+
+    expect(dateKeys).toEqual(['2024-01-15', '2024-01-14', '2024-01-13']);
+  });
+
+  // The rail used to be built from a wider selector than the pager, so it
+  // offered dates whose records the grouped view never renders. Those links
+  // scrolled nowhere and gave no feedback.
+  it('omits dates whose records render no card', async () => {
+    await db.clinical_documents.bulkInsert([
+      ...createDocumentsOfType(
+        userId,
+        '2024-01-15T10:00:00Z',
+        'observation',
+        2,
+      ),
+      ...createDocumentsOfType(
+        userId,
+        '2024-01-14T10:00:00Z',
+        'servicerequest',
+        2,
+      ),
+      ...createDocumentsOfType(
+        userId,
+        '2024-01-13T10:00:00Z',
+        'visionprescription',
+        1,
+      ),
+    ]);
+
+    const dateKeys = await fetchTimelineDateKeys(db, userId);
+
+    expect(dateKeys).toEqual(['2024-01-15']);
+  });
+
+  it('keeps a date whose only records are care plans', async () => {
+    await db.clinical_documents.bulkInsert(
+      createDocumentsOfType(userId, '2024-01-15T10:00:00Z', 'careplan', 3),
+    );
+
+    const dateKeys = await fetchTimelineDateKeys(db, userId);
+
+    expect(dateKeys).toEqual(['2024-01-15']);
+  });
+
+  it('omits directory master data dates', async () => {
+    await db.clinical_documents.bulkInsert([
+      ...createDocumentsOfType(
+        userId,
+        '2024-01-15T10:00:00Z',
+        'observation',
+        1,
+      ),
+      ...createDocumentsOfType(
+        userId,
+        '2024-01-14T10:00:00Z',
+        'practitioner',
+        1,
+      ),
+      ...createDocumentsOfType(
+        userId,
+        '2024-01-13T10:00:00Z',
+        'organization',
+        1,
+      ),
+    ]);
+
+    const dateKeys = await fetchTimelineDateKeys(db, userId);
+
+    expect(dateKeys).toEqual(['2024-01-15']);
+  });
+
+  it('narrows to the selected record type', async () => {
+    await db.clinical_documents.bulkInsert([
+      ...createDocumentsOfType(userId, '2024-01-15T10:00:00Z', 'careplan', 1),
+      ...createDocumentsOfType(
+        userId,
+        '2024-01-14T10:00:00Z',
+        'observation',
+        1,
+      ),
+    ]);
+
+    const dateKeys = await fetchTimelineDateKeys(db, userId, 'careplan');
+
+    expect(dateKeys).toEqual(['2024-01-15']);
   });
 });

@@ -93,12 +93,12 @@ function TimelineRow({
               {entry.title}
             </h3>
             <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ring-1 ${classBadge[entry.rxClass]}`}
+              className={`rounded-full px-2 py-0.5 text-xs font-semibold uppercase ring-1 ${classBadge[entry.rxClass]}`}
             >
               {t(entry.rxClass)}
             </span>
             {entry.isCurrent && (
-              <span className="rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary-700 ring-1 ring-primary-200">
+              <span className="rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold uppercase text-primary-700 ring-1 ring-primary-200">
                 {t('Current')}
               </span>
             )}

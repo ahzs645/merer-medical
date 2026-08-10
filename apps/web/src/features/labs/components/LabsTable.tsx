@@ -346,7 +346,7 @@ function LabTableRow({
             formatLabValue(latest) || t('No value')
           )}
           {latestReference.normalizedValue?.note ? (
-            <div className="mt-1 text-[11px] font-medium leading-4 text-gray-500">
+            <div className="mt-1 text-xs font-medium leading-4 text-gray-500">
               {latestReference.normalizedValue.note}
             </div>
           ) : null}

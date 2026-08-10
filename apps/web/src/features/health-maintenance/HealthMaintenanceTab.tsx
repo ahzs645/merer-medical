@@ -400,7 +400,7 @@ function ReminderCard({
             <h3 className="text-sm font-semibold text-gray-900">
               {reminder.rule.title}
             </h3>
-            <span className="inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-600">
+            <span className="inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600">
               {reminder.rule.category}
             </span>
           </div>

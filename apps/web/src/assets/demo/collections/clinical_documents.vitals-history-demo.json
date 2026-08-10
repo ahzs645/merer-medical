@@ -2783,58 +2783,6 @@
     "_deleted": false
   },
   {
-    "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|Goal/goal-bp",
-    "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
-    "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",
-    "data_record": {
-      "raw": {
-        "fullUrl": "urn:demo:Goal/goal-bp",
-        "resource": {
-          "resourceType": "Goal",
-          "id": "goal-bp",
-          "lifecycleStatus": "active",
-          "achievementStatus": {
-            "coding": [
-              {
-                "system": "http://terminology.hl7.org/CodeSystem/goal-achievement",
-                "code": "in-progress",
-                "display": "In Progress"
-              }
-            ],
-            "text": "In Progress"
-          },
-          "description": {
-            "text": "Keep blood pressure under 130/80 mmHg"
-          },
-          "subject": {
-            "reference": "Patient/91a8d8cb-6480-4db4-a628-18a5e44536cd"
-          },
-          "startDate": "2025-04-10",
-          "addresses": [
-            {
-              "display": "Risk for coronary artery disease between 10% and 20% in next 10 years",
-              "reference": "Condition/Risk for coronary artery disease between 10% and 20% in next 10 years"
-            }
-          ]
-        }
-      },
-      "format": "FHIR.R4",
-      "content_type": "application/json",
-      "resource_type": "goal",
-      "version_history": []
-    },
-    "metadata": {
-      "id": "Goal/goal-bp",
-      "date": "2025-04-10",
-      "display_name": "Keep blood pressure under 130/80 mmHg",
-      "source_name": "Oak Valley Community Hospital"
-    },
-    "_meta": {
-      "lwt": 1761781117811.14
-    },
-    "_deleted": false
-  },
-  {
     "id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|Goal/goal-asthma",
     "user_id": "91a8d8cb-6480-4db4-a628-18a5e44536cd",
     "connection_record_id": "9a00c884-153c-4cc9-aedd-1ef3dd8b6610",

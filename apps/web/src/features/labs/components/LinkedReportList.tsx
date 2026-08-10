@@ -26,7 +26,7 @@ export function LinkedReportList({ reports }: { reports: ReportLink[] }) {
             <span className="block break-words font-medium">
               {report.displayName || 'Associated report'}
             </span>
-            <span className="block text-[11px] leading-4 text-gray-600">
+            <span className="block text-xs leading-4 text-gray-600">
               {[safeFormatDate(report.date, 'PP', ''), report.performer]
                 .filter(Boolean)
                 .join(' - ')}

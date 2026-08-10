@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { RxDatabase } from 'rxdb';
 import { ConnectionDocument } from '../../../models/connection-document/ConnectionDocument.type';
+import { DatabaseCollections } from '../../../app/providers/DatabaseCollections';
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
 import {
@@ -29,6 +31,7 @@ export function useLabsData() {
       totalRecords: 0,
       labRows: 0,
       labPanels: 0,
+      undatedLabRows: 0,
       medicationRecords: 0,
       encounterRecords: 0,
       imagingRecords: 0,
@@ -45,18 +48,9 @@ export function useLabsData() {
     async function fetchLabs() {
       setStatus('loading');
 
-      const [labDocs, reportDocs, connectionDocs, patientDocs, allDocs] =
+      const [nextLabs, reportDocs, connectionDocs, patientDocs, allDocs] =
         await Promise.all([
-          db.clinical_documents
-            .find({
-              selector: {
-                user_id: user.id,
-                'data_record.resource_type': 'observation',
-                'metadata.date': { $nin: [null, undefined, ''] },
-              },
-              sort: [{ 'metadata.date': 'desc' }],
-            })
-            .exec(),
+          findLabObservations(db, user.id),
           db.clinical_documents
             .find({
               selector: {
@@ -101,9 +95,6 @@ export function useLabsData() {
         ]),
       );
 
-      const nextLabs = labDocs
-        .map((doc) => doc.toMutableJSON() as unknown as LabDocument)
-        .filter(isLaboratoryObservation);
       const allClinicalDocs = allDocs.map((doc) => doc.toMutableJSON() as any);
       const nextReferenceContext = buildReferenceContext(
         user,
@@ -142,7 +133,46 @@ export function useLabsData() {
   };
 }
 
+/**
+ * The one place either surface is allowed to decide what a lab result is.
+ * /records/labs and /records/results both select through this, so the two
+ * pages cannot report different lab totals (see labsResultsParity.spec.ts).
+ *
+ * Note there is deliberately no filter on `metadata.date` here: an observation
+ * that arrived without a date is still a result the user has, and dropping it
+ * would make it invisible on the page named for lab results. Undated rows sort
+ * last (compareLabsByDateDesc) and render their date as "Unknown".
+ */
+export async function findLabObservations(
+  db: RxDatabase<DatabaseCollections>,
+  userId: string,
+): Promise<LabDocument[]> {
+  const docs = await db.clinical_documents
+    .find({
+      selector: {
+        user_id: userId,
+        'data_record.resource_type': 'observation',
+      },
+      sort: [{ 'metadata.date': 'desc' }],
+    })
+    .exec();
+
+  return docs
+    .map((doc) => doc.toMutableJSON() as unknown as LabDocument)
+    .filter(isLaboratoryObservation);
+}
+
 export function isLaboratoryObservation(lab: LabDocument) {
+  // A lab-categorised DiagnosticReport is the panel that *contains* results
+  // (Epic tags CBC/CMP panels with category code "Lab"), not a result row of
+  // its own. Counting one as a lab double-counts the panel alongside the
+  // sixteen-to-twenty observations it already references.
+  if (
+    String(lab.data_record?.resource_type || '').toLowerCase() !== 'observation'
+  ) {
+    return false;
+  }
+
   if (lab.metadata?.manual_specialty === 'laboratory') return true;
   const raw = lab.data_record?.raw as { manual_kind?: string } | undefined;
   if (raw?.manual_kind === 'lab') return true;
@@ -205,11 +235,11 @@ function buildRecordCoverage(
   return {
     totalRecords: clinicalDocs.length,
     labRows: labs.length,
-    labPanels: new Set(
-      labs.map(
-        (lab) => lab.metadata?.date || lab.metadata?.source_name || lab.id,
-      ),
-    ).size,
+    // Only rows that actually carry a date count towards "Collection dates";
+    // an undated row has no collection date to contribute.
+    labPanels: new Set(labs.map((lab) => lab.metadata?.date).filter(isPresent))
+      .size,
+    undatedLabRows: labs.filter((lab) => !isPresent(lab.metadata?.date)).length,
     medicationRecords: resourceTypes.filter((type) =>
       ['medication', 'medicationrequest', 'medicationstatement'].includes(type),
     ).length,

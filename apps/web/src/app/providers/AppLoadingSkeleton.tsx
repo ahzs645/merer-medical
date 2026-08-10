@@ -64,7 +64,7 @@ export function AppLoadingSkeleton({ ready }: { ready?: boolean }) {
                 </div>
               </div>
               <div
-                className={`pt-1 text-[11px] text-white md:pt-0 md:text-base md:text-white ${
+                className={`pt-1 text-xs text-white md:pt-0 md:text-base md:text-white ${
                   i === 0 ? 'text-primary font-bold' : 'text-slate-800'
                 }`}
               >

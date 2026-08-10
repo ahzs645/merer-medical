@@ -89,12 +89,12 @@ function SurgeryCard({ surgery }: { surgery: SurgeryDetail }) {
             {surgery.title}
           </h3>
           {surgery.surgeryType && (
-            <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold uppercase text-rose-700 ring-1 ring-rose-200">
+            <span className="rounded-full bg-rose-50 px-2 py-0.5 text-xs font-semibold uppercase text-rose-700 ring-1 ring-rose-200">
               {surgery.surgeryType}
             </span>
           )}
           {surgery.eye && (
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-gray-600 ring-1 ring-gray-200">
+            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold uppercase text-gray-600 ring-1 ring-gray-200">
               {surgery.eye}
             </span>
           )}

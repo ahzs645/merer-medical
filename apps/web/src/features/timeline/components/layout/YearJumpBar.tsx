@@ -13,10 +13,19 @@ import { checkIfDefaultDate } from '../../utils/timelineDates';
 function YearJumpBarUnmemo({
   dateKeys,
   activeDateKey,
+  onJumpToDate,
+  seekingDateKey,
 }: {
   /** Timeline date keys, newest first. */
   dateKeys: string[];
   activeDateKey?: string;
+  /**
+   * Loads the target period. Most years on the rail are not paged in yet, so
+   * the plain anchor alone would scroll nowhere.
+   */
+  onJumpToDate?: (dateKey: string) => void;
+  /** Date currently being fetched by a jump, if any. */
+  seekingDateKey?: string;
 }) {
   // One jump target per year: the first (newest) date in it.
   const years = new Map<string, string>();
@@ -43,20 +52,30 @@ function YearJumpBarUnmemo({
       <span className="me-1 flex-shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-500">
         Jump to
       </span>
-      {[...years.entries()].map(([year, dateKey]) => (
-        <Link
-          key={year}
-          to={`#${format(parseISO(dateKey), 'MMM-dd-yyyy')}`}
-          aria-current={year === activeYear ? 'location' : undefined}
-          className={`inline-flex min-h-[44px] flex-shrink-0 items-center rounded-md px-3 text-sm font-medium ${
-            year === activeYear
-              ? 'bg-primary-50 text-primary-700'
-              : 'text-gray-600 hover:text-primary-700'
-          }`}
-        >
-          {year}
-        </Link>
-      ))}
+      {[...years.entries()].map(([year, dateKey]) => {
+        const loading = seekingDateKey === dateKey;
+        return (
+          <Link
+            key={year}
+            to={`#${format(parseISO(dateKey), 'MMM-dd-yyyy')}`}
+            aria-current={year === activeYear ? 'location' : undefined}
+            aria-busy={loading || undefined}
+            onClick={() => onJumpToDate?.(dateKey)}
+            className={`inline-flex min-h-[44px] flex-shrink-0 items-center gap-1 rounded-md px-3 text-sm font-medium ${
+              year === activeYear
+                ? 'bg-primary-50 text-primary-700'
+                : 'text-gray-600 hover:text-primary-700'
+            }`}
+          >
+            {year}
+            {loading ? (
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-600">
+                <span className="sr-only">Loading</span>
+              </span>
+            ) : null}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

@@ -1,6 +1,9 @@
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
+import { FILTERS } from '../components/ImagingCategoryTabs';
+import { IMAGING_CATEGORIES } from '../types';
 import {
   countImagingCategories,
+  filterImagingItems,
   inferModalityFromText,
   isImagingDocument,
   mapImagingDocument,
@@ -117,6 +120,30 @@ describe('imagingRecords', () => {
     // One record, tagged twice: any UI showing these must not imply they sum
     // to the total.
     expect(counts.mri + counts.report).toBeGreaterThan(items.length);
+  });
+
+  it('tags records that match no other category as other, and can filter to them', () => {
+    const unclassifiable = doc({
+      data_record: { resource_type: 'media' },
+      metadata: { display_name: 'Clinic visit photo' },
+    });
+    const classified = doc({
+      data_record: { resource_type: 'imagingstudy' },
+      metadata: { display_name: 'Knee series' },
+    });
+    const items = [unclassifiable, classified].map(mapImagingDocument);
+
+    expect(items[0].categories).toEqual(['other']);
+    expect(countImagingCategories(items).other).toBe(1);
+    // The bucket has to be reachable by filtering, not only through "All".
+    expect(filterImagingItems(items, '', 'other')).toEqual([items[0]]);
+  });
+
+  it('offers a filter chip for every category a record can be tagged with', () => {
+    // A category with no chip is a bucket the user can never filter down to.
+    const chipKeys = FILTERS.map((filter) => filter.key);
+
+    expect(chipKeys).toEqual(expect.arrayContaining([...IMAGING_CATEGORIES]));
   });
 
   it('does not infer CT from OCT or incidental text', () => {

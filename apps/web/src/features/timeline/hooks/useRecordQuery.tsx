@@ -17,8 +17,55 @@ import {
   fetchRecordsWithVectorSearch,
   PAGE_SIZE,
 } from '../services/timelineRecords';
+import { getTimelineCategories } from '../utils/timelineCategories';
+import { timelineDateKeyUpperBound } from '../utils/timelineDates';
 
 export const GROUPED_VIEW_BATCH_SIZE = 250;
+
+/**
+ * Reference master-data surfaced in the Providers & locations directory, plus
+ * app plumbing, rather than dated events worth a card.
+ *
+ * `careplan` is deliberately absent: the grouped card renders a "Care Plans"
+ * section, the type filter offers "Care plans", and the Records section links
+ * to them, so excluding them here only made the category unreachable from the
+ * unfiltered timeline.
+ */
+const NON_TIMELINE_RESOURCE_TYPES = [
+  'patient',
+  'provenance',
+  'location',
+  'practitioner',
+  'organization',
+];
+
+/**
+ * Shared selector so the paged record query and the "Jump To" date list can
+ * never disagree about which records belong on the timeline — a rail built
+ * from a wider selector offers dates that the pager will never render.
+ *
+ * @param maxDate ISO instant upper bound on `metadata.date`. Records are
+ *   stored as ISO strings and sorted lexicographically, so bounding the field
+ *   lets the pager start part-way down the timeline instead of only ever
+ *   walking forward from the newest record.
+ */
+export function buildTimelineSelector(
+  user_id: string,
+  typeFilter: TimelineRecordTypeFilter = 'all',
+  maxDate?: string,
+): MangoQuerySelector<ClinicalDocument<unknown>> {
+  const dateSelector: Record<string, unknown> = { $nin: [null, undefined, ''] };
+  if (maxDate) {
+    dateSelector['$lte'] = maxDate;
+  }
+
+  return {
+    user_id: user_id,
+    'data_record.resource_type':
+      typeFilter === 'all' ? { $nin: NON_TIMELINE_RESOURCE_TYPES } : typeFilter,
+    'metadata.date': dateSelector,
+  } as MangoQuerySelector<ClinicalDocument<unknown>>;
+}
 
 export async function fetchRawRecords(
   db: RxDatabase<DatabaseCollections>,
@@ -26,31 +73,11 @@ export async function fetchRawRecords(
   offset: number,
   limit: number,
   typeFilter: TimelineRecordTypeFilter = 'all',
+  maxDate?: string,
 ): Promise<ClinicalDocument<BundleEntry<FhirResource>>[]> {
-  const selector: MangoQuerySelector<ClinicalDocument<unknown>> = {
-    user_id: user_id,
-    'data_record.resource_type': {
-      // location/practitioner/organization are reference master-data surfaced in
-      // the Providers & locations directory, not timeline events.
-      $nin: [
-        'patient',
-        'careplan',
-        'provenance',
-        'location',
-        'practitioner',
-        'organization',
-      ],
-    },
-    'metadata.date': { $nin: [null, undefined, ''] },
-  };
-
-  if (typeFilter !== 'all') {
-    selector['data_record.resource_type'] = typeFilter;
-  }
-
   const docs = await db.clinical_documents
     .find({
-      selector,
+      selector: buildTimelineSelector(user_id, typeFilter, maxDate),
       sort: [{ 'metadata.date': 'desc' }],
     })
     .skip(offset)
@@ -89,45 +116,49 @@ export function groupRecordsByDate(
   return grouped;
 }
 
+/**
+ * Every date the timeline can scroll to, newest first.
+ *
+ * Dates whose records would not produce a single card section are left out:
+ * the grouped view skips those days, so offering them in the rail would give
+ * a link pointing at an anchor that is never rendered.
+ */
 export async function fetchTimelineDateKeys(
   db: RxDatabase<DatabaseCollections>,
   user_id: string,
   typeFilter: TimelineRecordTypeFilter = 'all',
 ): Promise<string[]> {
-  const selector: MangoQuerySelector<ClinicalDocument<unknown>> = {
-    user_id: user_id,
-    'data_record.resource_type': {
-      $nin: [
-        'patient',
-        'provenance',
-        'location',
-        'practitioner',
-        'organization',
-      ],
-    },
-    'metadata.date': { $nin: [null, undefined, ''] },
-  };
-
-  if (typeFilter !== 'all') {
-    selector['data_record.resource_type'] = typeFilter;
-  }
-
   const docs = await db.clinical_documents
     .find({
-      selector,
+      selector: buildTimelineSelector(user_id, typeFilter),
       sort: [{ 'metadata.date': 'desc' }],
     })
     .exec();
 
-  const dateKeys = new Set<string>();
+  const byDateKey = new Map<
+    string,
+    ClinicalDocument<BundleEntry<FhirResource>>[]
+  >();
   for (const doc of docs) {
     const date = doc.get('metadata')?.date;
-    if (date) {
-      dateKeys.add(format(parseISO(date), 'yyyy-MM-dd'));
+    if (!date) continue;
+    const dateKey = format(parseISO(date), 'yyyy-MM-dd');
+    // Only `data_record` is read by the category check, so avoid cloning the
+    // whole document: this runs over every record the user has.
+    const item = {
+      data_record: doc.get('data_record'),
+    } as ClinicalDocument<BundleEntry<FhirResource>>;
+    const existing = byDateKey.get(dateKey);
+    if (existing) {
+      existing.push(item);
+    } else {
+      byDateKey.set(dateKey, [item]);
     }
   }
 
-  return [...dateKeys];
+  return [...byDateKey.entries()]
+    .filter(([, items]) => getTimelineCategories(items).length > 0)
+    .map(([dateKey]) => dateKey);
 }
 
 export function mergeRecordsByDate(
@@ -170,6 +201,10 @@ export type PartialResultsCallback = (partial: {
  *
  * A day is "complete" when we've confirmed no more records exist for that date
  * (by seeing a record from a different date in the sorted results).
+ *
+ * `maxDate` bounds the window the offset counts within, so paging can be
+ * anchored at an arbitrary point in history rather than always starting from
+ * the newest record.
  */
 export async function fetchRecordsUntilCompleteDays(
   db: RxDatabase<DatabaseCollections>,
@@ -180,6 +215,7 @@ export async function fetchRecordsUntilCompleteDays(
   onPartialResults?: PartialResultsCallback,
   emitPartialBatches = false,
   typeFilter: TimelineRecordTypeFilter = 'all',
+  maxDate?: string,
 ): Promise<{
   records: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]>;
   hasMore: boolean;
@@ -203,6 +239,7 @@ export async function fetchRecordsUntilCompleteDays(
       offset,
       GROUPED_VIEW_BATCH_SIZE,
       typeFilter,
+      maxDate,
     );
     const batchDuration = Date.now() - batchStartTime;
     const elapsed = Date.now() - startTime;
@@ -330,6 +367,7 @@ export async function fetchRecordsUntilCompleteDays(
         offset,
         1,
         typeFilter,
+        maxDate,
       );
       if (checkBatch.length === 0) {
         console.debug(
@@ -427,11 +465,14 @@ interface QueryState {
   data: RecordsByDate | undefined;
   groupedOffset: number;
   searchPage: number;
+  /** Date the user jumped to while its records are still being fetched. */
+  seekingDateKey: string | undefined;
 }
 
 type QueryAction =
   | { type: 'START_INITIAL_LOAD' }
   | { type: 'START_LOAD_MORE' }
+  | { type: 'START_SEEK'; dateKey: string }
   | { type: 'RECEIVE_PARTIAL_RESULTS'; records: RecordsByDate; merge: boolean }
   | {
       type: 'GROUPED_QUERY_SUCCESS';
@@ -459,6 +500,14 @@ function queryReducer(state: QueryState, action: QueryAction): QueryState {
     case 'START_LOAD_MORE':
       return { ...state, status: QueryStatus.LOADING_MORE };
 
+    case 'START_SEEK':
+      return {
+        ...state,
+        status: QueryStatus.LOADING,
+        groupedOffset: 0,
+        seekingDateKey: action.dateKey,
+      };
+
     case 'RECEIVE_PARTIAL_RESULTS':
       return {
         ...state,
@@ -476,6 +525,7 @@ function queryReducer(state: QueryState, action: QueryAction): QueryState {
           ? mergeRecordsByDate(state.data, action.records)
           : action.records,
         groupedOffset: action.lastOffset,
+        seekingDateKey: undefined,
         status: action.hasMore
           ? QueryStatus.SUCCESS
           : QueryStatus.COMPLETE_HIDE_LOAD_MORE,
@@ -503,7 +553,7 @@ function queryReducer(state: QueryState, action: QueryAction): QueryState {
       };
 
     case 'QUERY_ERROR':
-      return { ...state, status: QueryStatus.ERROR };
+      return { ...state, status: QueryStatus.ERROR, seekingDateKey: undefined };
 
     case 'RESET_PAGINATION':
       return {
@@ -511,6 +561,7 @@ function queryReducer(state: QueryState, action: QueryAction): QueryState {
         status: QueryStatus.LOADING,
         groupedOffset: 0,
         searchPage: 0,
+        seekingDateKey: undefined,
       };
 
     default:
@@ -524,6 +575,7 @@ const initialState: QueryState = {
   data: undefined,
   groupedOffset: 0,
   searchPage: 0,
+  seekingDateKey: undefined,
 };
 
 async function executeGroupedQuery(
@@ -533,12 +585,14 @@ async function executeGroupedQuery(
   offset: number,
   loadMore: boolean,
   typeFilter: TimelineRecordTypeFilter,
+  maxDate: string | undefined,
   dispatch: React.Dispatch<QueryAction>,
 ) {
   console.debug('useRecordQuery: grouped view', {
     offset,
     loadMore,
     typeFilter,
+    maxDate,
   });
 
   const result = await fetchRecordsUntilCompleteDays(
@@ -560,6 +614,7 @@ async function executeGroupedQuery(
     },
     loadMore,
     typeFilter,
+    maxDate,
   );
 
   console.debug('useRecordQuery: grouped result', {
@@ -672,6 +727,12 @@ function shouldFallbackToVectorSearch(config: {
  * **Search View** (with query): Fetches records matching the query with pagination.
  * Falls back to vector search if text search returns no results and AI search is enabled.
  *
+ * **Jumping** (`jumpToDate`): re-anchors the grouped pager at an arbitrary
+ * date instead of the newest record, so the "Jump To" rail can reach periods
+ * that have not been paged in yet. The loaded set is replaced rather than
+ * merged: merging a far-off period into the current one would leave a silent
+ * hole in the timeline where the skipped years should be.
+ *
  * @param query - Search query string. Empty string triggers grouped view mode.
  * @param enableAISemanticSearch - Whether to fall back to vector search on empty results
  * @param minCompleteDays - Minimum number of complete days to fetch in grouped view (default: 3)
@@ -686,6 +747,8 @@ export function useRecordQuery(
   status: QueryStatus;
   initialized: boolean;
   loadNextPage: () => void;
+  jumpToDate: (dateKey: string) => void;
+  seekingDateKey: string | undefined;
   showIndividualItems: boolean;
 } {
   const db = useRxDb();
@@ -693,6 +756,9 @@ export function useRecordQuery(
   const user = useUser();
   const vectorStorage = useVectors();
   const requestIdRef = useRef(0);
+  // Held in a ref, not reducer state: `execQuery` has to read the window the
+  // moment a jump is requested, before a dispatch could be reflected in state.
+  const groupedMaxDateRef = useRef<string | undefined>(undefined);
 
   const [state, dispatch] = useReducer(queryReducer, initialState);
 
@@ -729,6 +795,7 @@ export function useRecordQuery(
             offset,
             loadMore,
             typeFilter,
+            groupedMaxDateRef.current,
             guardedDispatch,
           );
         } else {
@@ -777,11 +844,20 @@ export function useRecordQuery(
     300,
   );
 
+  const jumpToDate = useCallback((dateKey: string) => {
+    groupedMaxDateRef.current = timelineDateKeyUpperBound(dateKey);
+    dispatch({ type: 'START_SEEK', dateKey });
+    execQueryRef.current(false);
+  }, []);
+
   // Manual add/edit/delete bumps this tick so the timeline refreshes in
   // place instead of requiring a full page reload.
   const recordChangeTick = useRecordChangeTick();
 
   useEffect(() => {
+    // A new query, filter or record edit starts the timeline over, so drop any
+    // period the user had jumped to and page from the newest record again.
+    groupedMaxDateRef.current = undefined;
     dispatch({ type: 'RESET_PAGINATION' });
     execQueryRef.current(false);
   }, [query, enableAISemanticSearch, typeFilter, recordChangeTick]);
@@ -791,6 +867,8 @@ export function useRecordQuery(
     status: state.status,
     initialized: state.initialized,
     loadNextPage,
+    jumpToDate,
+    seekingDateKey: state.seekingDateKey,
     showIndividualItems,
   };
 }

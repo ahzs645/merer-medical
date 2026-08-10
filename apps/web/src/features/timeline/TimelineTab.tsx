@@ -57,8 +57,15 @@ export function TimelineTab() {
     vectorSyncStatus = useVectorSyncStatus(),
     enableVectorSearch =
       experimental__use_openai_rag && vectorSyncStatus === 'COMPLETE',
-    { data, status, initialized, loadNextPage, showIndividualItems } =
-      useRecordQuery(query, enableVectorSearch, typeFilter),
+    {
+      data,
+      status,
+      initialized,
+      loadNextPage,
+      jumpToDate,
+      seekingDateKey,
+      showIndividualItems,
+    } = useRecordQuery(query, enableVectorSearch, typeFilter),
     timelineDateKeys = useTimelineDateKeys(query === '', typeFilter),
     hasNoRecords =
       query === '' &&
@@ -104,10 +111,58 @@ export function TimelineTab() {
     return newYearMap;
   }, [data, showIndividualItems]);
 
-  // The mobile year rail lists loaded dates only: unlike the desktop panel it
-  // must not offer a year whose anchor is not on the page yet, since paging is
-  // driven by scrolling and the link would silently do nothing.
-  const jumpDateKeys = useMemo(() => Object.keys(data || {}), [data]);
+  // Both rails offer every date on record, not just the loaded ones: a jump
+  // re-anchors the pager (see `jumpToDate`) rather than relying on the target
+  // already being on the page. In search mode there is no full date list, so
+  // fall back to what is rendered.
+  const jumpDateKeys = useMemo(
+    () => timelineDateKeys ?? Object.keys(data || {}),
+    [timelineDateKeys, data],
+  );
+
+  const [pendingJumpDateKey, setPendingJumpDateKey] = useState<
+    string | undefined
+  >();
+
+  // Read through a ref so the callback stays stable: the rail renders one
+  // memoized link per date on record and re-rendering them all on every page
+  // load would undo that.
+  const loadedRecordsRef = useRef(data);
+  loadedRecordsRef.current = data;
+
+  const onJumpToDate = useCallback(
+    (dateKey: string) => {
+      setPendingJumpDateKey(dateKey);
+      // Already paged in: the anchor exists, so skip the refetch and let the
+      // scroll effect below take it from here.
+      const loaded = loadedRecordsRef.current;
+      if (!loaded || !(dateKey in loaded)) {
+        jumpToDate(dateKey);
+      }
+    },
+    [jumpToDate],
+  );
+
+  // The anchor for a jump target usually does not exist at click time, so the
+  // scroll has to wait for the seek to render it.
+  useEffect(() => {
+    if (!pendingJumpDateKey) return;
+
+    const element = document.getElementById(
+      format(parseISO(pendingJumpDateKey), 'MMM-dd-yyyy'),
+    );
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setPendingJumpDateKey(undefined);
+      return;
+    }
+
+    // Give up once the load settles, otherwise a target that never renders
+    // would leave the rail stuck showing a spinner forever.
+    if (status !== QueryStatus.LOADING) {
+      setPendingJumpDateKey(undefined);
+    }
+  }, [pendingJumpDateKey, data, status]);
 
   useScrollToHash();
 
@@ -216,6 +271,8 @@ export function TimelineTab() {
                   <YearJumpBar
                     dateKeys={jumpDateKeys}
                     activeDateKey={activeDateKey ?? jumpDateKeys[0]}
+                    onJumpToDate={onJumpToDate}
+                    seekingDateKey={seekingDateKey}
                   />
                   <div className="flex min-h-0 w-full flex-1 overflow-hidden">
                     <JumpToPanel
@@ -225,6 +282,8 @@ export function TimelineTab() {
                       activeDateKey={
                         activeDateKey ?? Object.keys(data || {})[0]
                       }
+                      onJumpToDate={onJumpToDate}
+                      seekingDateKey={seekingDateKey}
                     />
                     <div
                       className="px-auto flex h-full max-h-full w-full justify-center overflow-y-scroll relative"

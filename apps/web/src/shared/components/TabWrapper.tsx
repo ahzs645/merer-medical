@@ -208,7 +208,7 @@ function MobileMoreButton({
           <EllipsisHorizontalIcon />
         </span>
         <span
-          className={`pt-1 text-[11px] ${
+          className={`pt-1 text-xs ${
             isActive ? 'text-primary font-bold' : 'text-slate-800'
           }`}
         >

@@ -121,7 +121,7 @@ export function ImmunizationRecommendationsPanel({
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
                     <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset ${meta.badge}`}
+                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${meta.badge}`}
                     >
                       <StatusIcon className="h-3.5 w-3.5" aria-hidden="true" />
                       {t(meta.label)}

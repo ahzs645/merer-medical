@@ -34,21 +34,21 @@ export function LabReferenceRange({
         range={range ? `${label}: ${range}` : undefined}
         ageBand={ageBand}
         citation={citation}
-        ageBandClassName="text-[11px] leading-4"
+        ageBandClassName="text-xs leading-4"
       />
       {sourceRange && sourceRange !== range ? (
         <ReferenceRangeDisplay
           range={`Source range: ${sourceRange}`}
-          rangeClassName="text-[11px] leading-4 text-gray-500"
+          rangeClassName="text-xs leading-4 text-gray-500"
         />
       ) : null}
       {isMappedStandard === false ? (
-        <div className="text-[11px] leading-4 text-amber-700">
+        <div className="text-xs leading-4 text-amber-700">
           No mapped standard; using source range.
         </div>
       ) : null}
       {note ? (
-        <div className="text-[11px] leading-4 text-gray-500">{note}</div>
+        <div className="text-xs leading-4 text-gray-500">{note}</div>
       ) : null}
     </div>
   );

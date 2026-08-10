@@ -43,14 +43,14 @@ export function TabButton({
       {smallTitle ? (
         <>
           <p
-            className={`hidden md:block pt-1 text-[11px] md:pt-0 md:text-base md:text-white ${
+            className={`hidden md:block pt-1 text-xs md:pt-0 md:text-base md:text-white ${
               isActive ? 'text-primary font-bold' : 'text-slate-800'
             }`}
           >
             {title}
           </p>
           <p
-            className={`${!smallTitle ? '' : 'md:hidden'} pt-1 text-[11px] md:pt-0 md:text-base md:text-white ${
+            className={`${!smallTitle ? '' : 'md:hidden'} pt-1 text-xs md:pt-0 md:text-base md:text-white ${
               isActive ? 'text-primary font-bold' : 'text-slate-800'
             }`}
           >
@@ -59,7 +59,7 @@ export function TabButton({
         </>
       ) : (
         <p
-          className={`pt-1 text-[11px] md:pt-0 md:text-base md:text-white ${
+          className={`pt-1 text-xs md:pt-0 md:text-base md:text-white ${
             isActive ? 'text-primary font-bold' : 'text-slate-800'
           }`}
         >

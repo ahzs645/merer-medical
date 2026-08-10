@@ -27,11 +27,21 @@ export function JumpToPanel({
   dateKeys,
   isLoading = false,
   activeDateKey,
+  onJumpToDate,
+  seekingDateKey,
 }: {
   items?: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]>;
   dateKeys?: string[];
   isLoading: boolean;
   activeDateKey?: string;
+  /**
+   * Loads the target period. The rail lists every date on record, most of
+   * which are not paged in yet, so the plain anchor alone would scroll
+   * nowhere.
+   */
+  onJumpToDate?: (dateKey: string) => void;
+  /** Date currently being fetched by a jump, if any. */
+  seekingDateKey?: string;
 }) {
   const panelRef = useRef<HTMLDivElement | null>(null),
     linkRefs = useRef(new Map<string, HTMLAnchorElement>()),
@@ -85,6 +95,8 @@ export function JumpToPanel({
                   active={activeDateKey === key}
                   date={key}
                   linkRefs={linkRefs}
+                  onJumpToDate={onJumpToDate}
+                  loading={seekingDateKey === key}
                 />
                 <YearHeader
                   nextYear={elements[index + 1]?.[0]}
@@ -124,19 +136,25 @@ function LinkUnmemo({
   active,
   date,
   linkRefs,
+  onJumpToDate,
+  loading = false,
 }: {
   active: boolean;
   date: string;
   linkRefs: React.MutableRefObject<Map<string, HTMLAnchorElement>>;
+  onJumpToDate?: (dateKey: string) => void;
+  loading?: boolean;
 }) {
   if (date) {
     return (
       <li className="relative py-1 pl-10 pr-3 text-xs font-thin hover:underline">
         <span
           className={`absolute left-[17px] top-1/2 h-2 w-2 -translate-y-1/2 rounded-full border ${
-            active
-              ? 'border-primary-700 bg-primary-700'
-              : 'border-gray-300 bg-gray-50'
+            loading
+              ? 'animate-pulse border-primary-700 bg-primary-300'
+              : active
+                ? 'border-primary-700 bg-primary-700'
+                : 'border-gray-300 bg-gray-50'
           }`}
         />
         <Link
@@ -152,10 +170,17 @@ function LinkUnmemo({
               ? 'whitespace-nowrap font-semibold text-primary-700'
               : 'whitespace-nowrap text-slate-700 hover:text-primary-700'
           }
+          aria-busy={loading || undefined}
+          onClick={() => onJumpToDate?.(date)}
           to={`#${parseMonthDayYear(date)}`}
         >
           {parseMonthDay(date)}
         </Link>
+        {loading ? (
+          <span className="ms-2 text-[10px] uppercase tracking-wide text-primary-700">
+            Loading
+          </span>
+        ) : null}
       </li>
     );
   }

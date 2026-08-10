@@ -74,6 +74,50 @@ describe('isLaboratoryObservation', () => {
     ).toBe(true);
   });
 
+  it('accepts a laboratory observation that arrived without a date', () => {
+    expect(
+      isLaboratoryObservation(
+        observationDoc({
+          metadata: { id: 'manual:lab', display_name: 'Hemoglobin' },
+          data_record: {
+            raw: {
+              resource: {
+                resourceType: 'Observation',
+                category: [{ coding: [{ code: 'laboratory' }] }],
+              },
+            },
+            format: 'FHIR.DSTU2',
+            content_type: 'application/json',
+            resource_type: 'observation',
+            version_history: [],
+          },
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it('does not treat a lab-categorised diagnostic report as a lab result', () => {
+    expect(
+      isLaboratoryObservation(
+        observationDoc({
+          data_record: {
+            raw: {
+              resource: {
+                resourceType: 'DiagnosticReport',
+                category: { text: 'Lab', coding: [{ code: 'Lab' }] },
+                result: [{ reference: 'Observation/obs-1' }],
+              },
+            },
+            format: 'FHIR.DSTU2',
+            content_type: 'application/json',
+            resource_type: 'diagnosticreport',
+            version_history: [],
+          },
+        }),
+      ),
+    ).toBe(false);
+  });
+
   it('does not treat non-lab manual observations as labs', () => {
     expect(
       isLaboratoryObservation(

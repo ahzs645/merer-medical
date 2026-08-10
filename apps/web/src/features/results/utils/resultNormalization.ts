@@ -81,9 +81,17 @@ export function buildResultsViewModel({
     reportDocuments,
     connectionsById,
   );
-  const documentsById = new Map(
-    documents.map((document) => [document.id, document]),
-  );
+  // Indexed by both keys: DiagnosticReport.result references point at
+  // metadata.id (the resource URL), not the composite document id, so a lab
+  // panel would otherwise list none of the observations it contains.
+  const documentsById = new Map<string, ClinicalDocument<any>>();
+  documents.forEach((document) => {
+    documentsById.set(document.id, document);
+    const metadataId = document.metadata?.id;
+    if (metadataId && !documentsById.has(metadataId)) {
+      documentsById.set(metadataId, document);
+    }
+  });
   const resultSummaries: ResultSummary[] = [];
   const detailsById = new Map<string, ResultDetail>();
 
@@ -407,11 +415,12 @@ function getLinkedDocuments(
   }));
   const referencedIds = [
     ...(resource?.presentedForm || []).map((item: any) => item?.id),
-    ...(resource?.result || []).map((item: any) =>
-      String(item?.reference || '')
-        .split('/')
-        .pop(),
-    ),
+    // Both forms: FHIR imports key on the reference as written, manual records
+    // on its trailing id.
+    ...(resource?.result || []).flatMap((item: any) => {
+      const reference = String(item?.reference || '');
+      return reference ? [reference, reference.split('/').pop()] : [];
+    }),
   ].filter(Boolean);
   const fromReferences = referencedIds
     .map((id) => documentsById.get(id))
@@ -493,9 +502,21 @@ function stripHtml(value: unknown): string | undefined {
 }
 
 function compareDatesDesc(a?: string, b?: string) {
-  const timeA = a ? new Date(a).getTime() : 0;
-  const timeB = b ? new Date(b).getTime() : 0;
-  return timeB - timeA;
+  const timeA = toSortableTime(a);
+  const timeB = toSortableTime(b);
+  // Compared rather than subtracted: -Infinity minus -Infinity is NaN, which
+  // would make the comparator non-transitive when two results are both undated.
+  if (timeA === timeB) return 0;
+  return timeB > timeA ? 1 : -1;
+}
+
+/**
+ * Missing and unparseable dates sort last in a descending list. Falling back to
+ * 0 (the epoch) instead pushed undated results above anything dated before 1970.
+ */
+function toSortableTime(value?: string) {
+  const time = value ? new Date(value).getTime() : Number.NaN;
+  return Number.isNaN(time) ? Number.NEGATIVE_INFINITY : time;
 }
 
 export function formatResultValue(document: ClinicalDocument<any>) {

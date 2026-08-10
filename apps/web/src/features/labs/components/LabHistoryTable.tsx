@@ -22,7 +22,7 @@ export function LabHistoryTable({
 }) {
   return (
     <div className="overflow-hidden rounded-md bg-white ring-1 ring-gray-200">
-      <div className="hidden grid-cols-[minmax(8rem,0.8fr)_minmax(8rem,0.7fr)_minmax(8rem,0.7fr)_minmax(10rem,1fr)_minmax(12rem,1.1fr)_minmax(12rem,1.2fr)] gap-3 border-b border-gray-200 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-gray-500 md:grid">
+      <div className="hidden grid-cols-[minmax(8rem,0.8fr)_minmax(8rem,0.7fr)_minmax(8rem,0.7fr)_minmax(10rem,1fr)_minmax(12rem,1.1fr)_minmax(12rem,1.2fr)] gap-3 border-b border-gray-200 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500 md:grid">
         <div>Date</div>
         <div>Value</div>
         <div>Flag</div>

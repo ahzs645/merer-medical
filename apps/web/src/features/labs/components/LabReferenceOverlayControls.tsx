@@ -84,7 +84,7 @@ export function LabReferenceOverlayControls({
                 citation={overlay.citation}
                 className="min-w-0"
                 rangeClassName="text-gray-500"
-                ageBandClassName="text-[11px] leading-4"
+                ageBandClassName="text-xs leading-4"
               />
             </label>
           );

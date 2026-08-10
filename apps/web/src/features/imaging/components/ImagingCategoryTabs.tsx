@@ -1,7 +1,7 @@
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { ImagingCategory, ImagingCategoryCounts } from '../types';
 
-const FILTERS: { key: ImagingCategory | 'all'; label: string }[] = [
+export const FILTERS: { key: ImagingCategory | 'all'; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'xray', label: 'X-rays' },
   { key: 'ct', label: 'CT' },
@@ -12,6 +12,10 @@ const FILTERS: { key: ImagingCategory | 'all'; label: string }[] = [
   { key: 'attachment', label: 'Files' },
   { key: 'dental', label: 'Dental' },
   { key: 'optometry', label: 'Eye care' },
+  // `other` is what `inferCategories` tags when nothing else matched, so it is
+  // the only bucket a reader cannot guess the contents of. Named for what it
+  // means to them rather than for the tag, and last because it is a remainder.
+  { key: 'other', label: 'Uncategorized' },
 ];
 
 export function ImagingCategoryTabs({
