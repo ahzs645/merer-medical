@@ -1,18 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { DocumentPlusIcon } from '@heroicons/react/24/outline';
+import {
+  ChartBarSquareIcon,
+  DocumentPlusIcon,
+} from '@heroicons/react/24/outline';
 
 import { AppPage } from '../../shared/components/AppPage';
 import { EmptyRecordsPlaceholder } from '../../shared/components/EmptyRecordsPlaceholder';
 import {
+  RecordHeaderButton,
   RecordHeaderLink,
   RecordPageHeader,
 } from '../../shared/components/records/RecordPageHeader';
+import { LabReferenceSelect } from './components/LabReferenceSelect';
 import { LabsEmptySearch } from './components/LabsEmptySearch';
 import { LabsSkeleton } from './components/LabsSkeleton';
 import { LabsTable } from './components/LabsTable';
 import { LibreCgmPanel } from './components/LibreCgmPanel';
-import { RecordCoveragePanel } from './components/RecordCoveragePanel';
+import { RecordCoverageModal } from './components/RecordCoverageModal';
 import { ReferenceOverlayMode } from './enrichment/types';
 import {
   buildLabReferenceEvaluation,
@@ -54,6 +59,7 @@ export function LabsTab() {
     [filterMode, setFilterMode] = useState<LabFilterMode>(
       initialView.filterMode,
     ),
+    [coverageOpen, setCoverageOpen] = useState(false),
     scrollContainerRef = useRef<HTMLDivElement | null>(null),
     {
       labs,
@@ -141,19 +147,49 @@ export function LabsTab() {
       banner={
         <RecordPageHeader<LabFilterMode>
           title="All lab results"
+          // The one line the coverage card carried that is not a fact about the
+          // archive but a fact about this screen: how much of the list you are
+          // being shown. It reflects the search box as well as the chips, so
+          // neither of those can replace it, and it belongs with them.
+          count={
+            groupedLabs.length > 0 ? (
+              <>
+                <span className="font-semibold text-white">
+                  {filteredGroups.length} of {groupedLabs.length}
+                </span>{' '}
+                lab tests listed
+              </>
+            ) : undefined
+          }
           search={{
             query,
             onChange: setQuery,
             placeholder: 'Search lab name or code',
             label: 'Search labs',
           }}
+          // Three controls, so the group takes its own row below `md` — the
+          // banner's documented behaviour once buttons cannot share the title's
+          // line, and 52px of it buys back the 286px card underneath.
           action={
-            <RecordHeaderLink
-              to={ADD_LAB_PATH}
-              label="Add lab result"
-              icon={DocumentPlusIcon}
-              compact
-            />
+            <>
+              <LabReferenceSelect
+                mode={referenceMode}
+                setMode={setReferenceMode}
+              />
+              <RecordHeaderButton
+                onClick={() => setCoverageOpen(true)}
+                label="What's in your records"
+                icon={ChartBarSquareIcon}
+                variant="subtle"
+                compact
+              />
+              <RecordHeaderLink
+                to={ADD_LAB_PATH}
+                label="Add lab result"
+                icon={DocumentPlusIcon}
+                compact
+              />
+            </>
           }
           // Labs used to keep its filter in a bespoke segmented control inside
           // the first card, the only record page that did. It is the same
@@ -187,15 +223,6 @@ export function LabsTab() {
             ) : groupedLabs.length > 0 ? (
               <>
                 <LibreCgmPanel labs={libreLabs} />
-                <RecordCoveragePanel
-                  coverage={recordCoverage}
-                  visibleCount={filteredGroups.length}
-                  totalGroups={groupedLabs.length}
-                  filterMode={filterMode}
-                  referenceMode={referenceMode}
-                  setReferenceMode={setReferenceMode}
-                  referenceContext={referenceContext}
-                />
                 {filteredGroups.length > 0 ? (
                   labSections.map((section) => (
                     <LabsTable
@@ -220,6 +247,18 @@ export function LabsTab() {
           </div>
         </div>
       )}
+      {/* Outside the scroll container on purpose: the dialog portals itself to
+          the body, and anchoring it here would tie its lifetime to a branch
+          that unmounts when the last lab is filtered away. */}
+      <RecordCoverageModal
+        open={coverageOpen}
+        setOpen={setCoverageOpen}
+        coverage={recordCoverage}
+        visibleCount={filteredGroups.length}
+        totalGroups={groupedLabs.length}
+        filterMode={filterMode}
+        referenceContext={referenceContext}
+      />
     </AppPage>
   );
 }
