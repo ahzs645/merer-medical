@@ -80,7 +80,7 @@ export function ImmunizationByTypePanel({
             {t('Each dose in the order it was given.')}
           </p>
         </div>
-        <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-400">
+        <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-600">
           {rows.length} {t('types')}
         </span>
       </div>
@@ -121,7 +121,7 @@ export function ImmunizationByTypePanel({
                       onClick={() => onSelectDose(dose)}
                       className="inline-flex items-baseline gap-1.5 rounded-md bg-gray-50 px-2 py-1 text-xs ring-1 ring-inset ring-gray-200 transition-colors hover:bg-gray-100 hover:ring-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-200"
                     >
-                      <span className="font-medium text-gray-400">
+                      <span className="font-medium text-gray-600">
                         {dose.doseNumber ?? index + 1}
                       </span>
                       <span className="font-medium text-gray-800">

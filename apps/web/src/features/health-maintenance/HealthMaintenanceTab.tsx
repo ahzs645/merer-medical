@@ -371,7 +371,7 @@ export function HealthMaintenanceTab() {
                 </div>
               )}
 
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-600">
                 Simplified general-population guidance for demonstration —
                 always follow your clinician's recommendations.
               </p>

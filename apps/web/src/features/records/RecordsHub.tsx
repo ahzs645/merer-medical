@@ -123,12 +123,13 @@ export function RecordsHub() {
                               <span className="block text-sm font-semibold leading-snug text-gray-900">
                                 {item.label}
                               </span>
+                              {/* One colour for both: the sub-label is a
+                                  tally or a description, and both are content.
+                                  gray-400 at 12px is 2.54:1 on white, well
+                                  under the 4.5 AA asks for small text; gray-600
+                                  clears it at 7:1. */}
                               <span
-                                className={`block text-xs ${
-                                  count.kind === 'count'
-                                    ? 'text-gray-500'
-                                    : 'text-gray-400'
-                                }`}
+                                className="block text-xs text-gray-600"
                                 title={
                                   count.kind === 'uncounted'
                                     ? 'This view combines several kinds of record, so it has no single tally.'

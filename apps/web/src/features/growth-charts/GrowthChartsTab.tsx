@@ -186,7 +186,7 @@ export function GrowthChartsTab() {
                   patientName={patientName}
                 />
               ))}
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-600">
                 Reference percentiles are approximate and for visualization only
                 — not a clinical assessment.
               </p>

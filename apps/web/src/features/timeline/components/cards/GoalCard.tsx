@@ -21,13 +21,13 @@ export const GoalCard = memo(function GoalCard({
   const goal = item.data_record.raw.resource;
 
   const statusColorMap: Record<string, string> = {
-    achieved: 'text-green-600',
-    'in-progress': 'text-blue-600',
+    achieved: 'text-green-700',
+    'in-progress': 'text-blue-700',
     'on-hold': 'text-yellow-600',
     cancelled: 'text-red-600',
     proposed: 'text-gray-600',
-    planned: 'text-purple-600',
-    accepted: 'text-teal-600',
+    planned: 'text-purple-700',
+    accepted: 'text-teal-700',
   };
 
   return (
@@ -40,7 +40,7 @@ export const GoalCard = memo(function GoalCard({
       >
         <div className="min-w-0 flex-1">
           <div className="items-top flex justify-between">
-            <TimelineCardCategoryTitle title="Goal" color="text-emerald-600" />
+            <TimelineCardCategoryTitle title="Goal" color="text-emerald-700" />
             <OpenableCardIcon />
           </div>
 

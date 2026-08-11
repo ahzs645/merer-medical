@@ -342,7 +342,7 @@ export function RecordExportTab() {
             </div>
           )}
 
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-600">
             Exports are generated locally on your device — nothing is uploaded.
             The FHIR Bundle can be imported into other health apps; the health
             summary is a portable, human-readable copy.

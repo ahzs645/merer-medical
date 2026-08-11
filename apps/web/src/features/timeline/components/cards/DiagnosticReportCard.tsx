@@ -163,9 +163,9 @@ function DiagnosticReportCardUnmemo({
       <CardBase isFocusable onClick={() => setExpanded((x) => !x)}>
         <div className={'min-w-0 flex-1'} ref={ref}>
           <div className="items-top flex justify-between">
-          <TimelineCardCategoryTitle
-            title={
-              <>
+            <TimelineCardCategoryTitle
+              title={
+                <>
                   <p className="mr-1">
                     {isImagingReport(item) ? 'Imaging Report' : 'Lab Panel'}
                   </p>
@@ -177,7 +177,7 @@ function DiagnosticReportCardUnmemo({
                   {isAbnormalResult && <AbnormalResultIcon />}
                 </>
               }
-              color="text-blue-600"
+              color="text-blue-700"
             />
             <OpenableCardIcon />
           </div>

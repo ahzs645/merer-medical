@@ -14,6 +14,7 @@ import { getEncounterLocation } from '../../shared/utils/fhirAccessHelpers';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
+import { FactList } from '../../shared/components/FactList';
 
 // Resource types we treat as "records" when counting same-day activity.
 const SAME_DAY_RESOURCE_TYPES = new Set<string>([
@@ -211,7 +212,7 @@ export function EncountersTab() {
                   {item.classDisplay && (
                     <Badge className="capitalize">{item.classDisplay}</Badge>
                   )}
-                  {item.source && <span>· {item.source}</span>}
+                  <FactList facts={[item.source]} />
                 </div>
               </div>
               {item.date && (
@@ -242,7 +243,7 @@ export function EncountersTab() {
             )}
 
             {item.sameDayCount > 0 && (
-              <span className="mt-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+              <span className="mt-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
                 {item.sameDayCount} same-day record
                 {item.sameDayCount === 1 ? '' : 's'}
               </span>

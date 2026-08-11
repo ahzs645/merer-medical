@@ -20,6 +20,7 @@ import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
+import { FactList } from '../../shared/components/FactList';
 
 interface AllergyItem {
   id: string;
@@ -207,11 +208,15 @@ function AllergyCard({ item, muted }: { item: AllergyItem; muted?: boolean }) {
             {item.clinicalStatus && (
               <Badge className="capitalize">{item.clinicalStatus}</Badge>
             )}
-            {item.reaction && <span>· {item.reaction}</span>}
-            {item.severity && (
-              <span className="capitalize">· {item.severity}</span>
-            )}
-            {item.source && <span>· {item.source}</span>}
+            <FactList
+              facts={[
+                item.reaction,
+                item.severity ? (
+                  <span className="capitalize">{item.severity}</span>
+                ) : null,
+                item.source,
+              ]}
+            />
           </div>
         </div>
         {item.date && (

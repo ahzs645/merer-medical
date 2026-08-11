@@ -156,7 +156,7 @@ export function PrivacyModesCard() {
                 className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
                   mode.active
                     ? 'bg-primary-600 text-white'
-                    : 'bg-gray-100 text-gray-500'
+                    : 'bg-gray-100 text-gray-700'
                 }`}
               >
                 {mode.active ? 'Active' : 'Off'}

@@ -134,7 +134,7 @@ export function ImmunizationRecommendationsPanel({
                       {t(meta.label)}
                     </span>
                     <Menu as="div" className="relative">
-                      <Menu.Button className="rounded p-0.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-200">
+                      <Menu.Button className="rounded p-0.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-200">
                         <span className="sr-only">{t('Dismiss options')}</span>
                         <EllipsisHorizontalIcon
                           className="h-5 w-5"
@@ -233,7 +233,7 @@ export function ImmunizationRecommendationsPanel({
                   {humanizeIsoDatesInText(t(recommendation.reason))}
                 </p>
                 {recommendation.rule.recommendedAgeText && (
-                  <p className="mt-1 text-xs leading-5 text-gray-400">
+                  <p className="mt-1 text-xs leading-5 text-gray-600">
                     {t('Recommended:')}{' '}
                     {t(recommendation.rule.recommendedAgeText)}
                   </p>
@@ -270,7 +270,7 @@ export function ImmunizationRecommendationsPanel({
                       <p className="truncate text-sm font-medium text-gray-700">
                         {t(recommendation.rule.seriesLabel)}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-600">
                         {mode === 'permanent'
                           ? t("Won't recommend")
                           : t('Hidden')}{' '}

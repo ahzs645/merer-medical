@@ -182,7 +182,12 @@ export const RECORD_GROUPS: RecordGroup[] = [
         to: AppRoutes.Histories,
         label: 'Histories',
         icon: UsersIcon,
-        resourceTypes: ['familymemberhistory'],
+        // No `resourceTypes`, on the rule stated above: this page lists four
+        // sections — medical (conditions), surgical (procedures), family and
+        // social — so counting only `familymemberhistory` promised "3 records"
+        // and opened on a thirteen-row Medical history list. There is no single
+        // tally that matches the page, so it does not claim one.
+        blurb: 'Medical, surgical, family, social',
       },
     ],
   },

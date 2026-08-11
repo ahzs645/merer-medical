@@ -184,7 +184,10 @@ function normalizeStatus(
 
   if (['cancelled', 'ended'].includes(normalized)) return 'stopped';
   if (['in-progress', 'not-taken'].includes(normalized)) return 'active';
-  if (resourceType === 'MedicationRequest' || resourceType === 'MedicationOrder') {
+  if (
+    resourceType === 'MedicationRequest' ||
+    resourceType === 'MedicationOrder'
+  ) {
     return normalized ? 'intended' : 'unknown';
   }
 
@@ -324,7 +327,9 @@ function getStopReason(
   return (
     getCodeableConceptText(resource.statusReason) ||
     getCodeableConceptText(resource.reasonEnded) ||
-    notes.find((note) => /\b(stop|stopped|discontinue|discontinued)\b/i.test(note))
+    notes.find((note) =>
+      /\b(stop|stopped|discontinue|discontinued)\b/i.test(note),
+    )
   );
 }
 
@@ -337,7 +342,16 @@ function getConditionReason(resource: AnyRecord): string | undefined {
   );
 }
 
-function getSource(document: ClinicalDocument, resource: AnyRecord): MedicationSource {
+function getSource(
+  document: ClinicalDocument,
+  resource: AnyRecord,
+): MedicationSource {
+  // `connection_record_id` used to end this chain, so a medication whose FHIR
+  // resource named nobody printed the connection's UUID as its source:
+  // "0f38582a-1773-4e2b-80e3-90fda727cdbd - clinician". An internal id is not a
+  // label. With no name to show, the type alone ("Clinician") is the honest
+  // answer — `connectionId` below still carries the link for a caller that can
+  // resolve it to the connection's name.
   const label =
     resource.informationSource?.display ||
     resource.recorder?.display ||
@@ -346,7 +360,7 @@ function getSource(document: ClinicalDocument, resource: AnyRecord): MedicationS
     resource.performer?.display ||
     resource.dispenser?.display ||
     (document.metadata as AnyRecord)?.source ||
-    document.connection_record_id;
+    undefined;
 
   return {
     label,
@@ -360,7 +374,11 @@ function inferSourceType(
   resource: AnyRecord,
   label?: string,
 ): MedicationSource['type'] {
-  const text = [label, resource.informationSource?.display, resource.recorder?.display]
+  const text = [
+    label,
+    resource.informationSource?.display,
+    resource.recorder?.display,
+  ]
     .filter(Boolean)
     .join(' ')
     .toLowerCase();
@@ -381,10 +399,16 @@ function getAdherence(
   const taken = resource.taken;
   const text = notes.join(' ').toLowerCase();
 
-  if (wasNotTaken === true || taken === 'n' || /\b(not taking|not taken)\b/.test(text)) {
+  if (
+    wasNotTaken === true ||
+    taken === 'n' ||
+    /\b(not taking|not taken)\b/.test(text)
+  ) {
     return 'not-taking';
   }
-  if (/\b(taking differently|different than prescribed|changed dose)\b/.test(text)) {
+  if (
+    /\b(taking differently|different than prescribed|changed dose)\b/.test(text)
+  ) {
     return 'taking-differently';
   }
   if (taken === 'y' || /\b(taking as prescribed|as prescribed)\b/.test(text)) {
@@ -535,12 +559,16 @@ function getReconciliationState(
 }
 
 function getCodeableConceptText(concept?: AnyRecord): string | undefined {
-  return concept?.text || concept?.coding?.[0]?.display || concept?.coding?.[0]?.code;
+  return (
+    concept?.text || concept?.coding?.[0]?.display || concept?.coding?.[0]?.code
+  );
 }
 
 function formatQuantity(quantity?: AnyRecord): string | undefined {
   if (!quantity || quantity.value === undefined) return undefined;
-  return [quantity.value, quantity.unit || quantity.code].filter(Boolean).join(' ');
+  return [quantity.value, quantity.unit || quantity.code]
+    .filter(Boolean)
+    .join(' ');
 }
 
 function isRxNormSystem(system?: string) {

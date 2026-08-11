@@ -336,7 +336,7 @@ function DocumentItemCard({ item }: { item: DocumentItem }) {
             attachmentMetadata?.title ||
             t('Untitled document')}
         </h2>
-        <p className="truncate text-xs text-gray-500">
+        <p className="truncate text-xs text-gray-700">
           {safeFormatDate(item.document.metadata?.date, 'PP', '')}
           {attachmentMetadata?.title ||
           getMetadataString(item.document, 'source_image')

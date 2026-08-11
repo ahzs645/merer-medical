@@ -340,9 +340,10 @@ function ProblemCard({ item }: { item: ProblemItem }) {
             <StatusBadge status={item.status} />
           </div>
           <div className="mt-2 flex flex-wrap gap-2">
-            {item.clinicalStatus && (
-              <Badge>{humanize(item.clinicalStatus)}</Badge>
-            )}
+            {item.clinicalStatus &&
+              humanize(item.clinicalStatus) !== humanize(item.status) && (
+                <Badge>{humanize(item.clinicalStatus)}</Badge>
+              )}
             {item.verificationStatus && (
               <Badge>{humanize(item.verificationStatus)}</Badge>
             )}
@@ -364,7 +365,7 @@ function ProblemCard({ item }: { item: ProblemItem }) {
           label="Resolved"
           value={formatProblemDate(item.abatementDate)}
         />
-        <Detail label="Source" value={item.source || 'Unknown'} />
+        <Detail label="Source" value={item.source} />
       </dl>
 
       {item.provenance && (
@@ -471,11 +472,14 @@ function getProvenanceSummary(
   document: ClinicalDocument,
   connection?: ConnectionDocument,
 ) {
+  // Who it came from and how it arrived — not the wire format it arrived in,
+  // and not its identifier on the far end. Those used to be in this line, so a
+  // condition card read "ClearView Optometry · Manual · FHIR.R4 ·
+  // Condition/demo-dry-eye", and a Cerner one printed the whole endpoint URL.
+  // The provenance panel is where that belongs; this is the sentence version.
   const parts = [
     connection?.name,
     connection?.source ? humanize(connection.source) : undefined,
-    document.data_record.format,
-    document.metadata?.id,
   ].filter(Boolean);
 
   return parts.length > 0 ? parts.join(' · ') : undefined;
@@ -559,21 +563,26 @@ function Badge({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * A fact, or nothing. Most conditions record no onset and no resolution date,
+ * so a four-cell grid that printed "Unknown" for whatever it lacked spent two
+ * of its four cells, on every card, saying so.
+ */
 function Detail({ label, value }: { label: string; value?: string }) {
+  if (!value) return null;
   return (
     <div>
       <dt className="text-xs font-semibold uppercase tracking-wide text-gray-500">
         {label}
       </dt>
-      <dd className="mt-1 break-words text-sm text-gray-900">
-        {value || 'Unknown'}
-      </dd>
+      <dd className="mt-1 break-words text-sm text-gray-900">{value}</dd>
     </div>
   );
 }
 
 function formatProblemDate(date?: string) {
-  return safeFormatDate(date, 'PP', date || 'Unknown');
+  if (!date) return undefined;
+  return safeFormatDate(date, 'PP', date);
 }
 
 function humanize(value: string) {

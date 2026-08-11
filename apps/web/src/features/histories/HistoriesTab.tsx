@@ -285,7 +285,7 @@ function HistorySection({
         </h2>
         <div className="ms-auto flex shrink-0 items-center gap-2">
           {!loading && (
-            <span className="text-xs text-gray-400">{items.length}</span>
+            <span className="text-xs text-gray-600">{items.length}</span>
           )}
           {/* The label is the accessible name in full ("Add family history");
               the four sections sit two-to-a-row, so only "Add" is drawn. */}
@@ -301,7 +301,7 @@ function HistorySection({
         </div>
       </div>
       {loading ? (
-        <p className="text-sm text-gray-400">Loading…</p>
+        <p className="text-sm text-gray-600">Loading…</p>
       ) : items.length === 0 ? (
         <p className="text-sm italic text-gray-500">{empty}</p>
       ) : (
@@ -320,7 +320,7 @@ function HistorySection({
                   )}
                 </div>
                 {item.date && (
-                  <span className="shrink-0 text-xs text-gray-400">
+                  <span className="shrink-0 text-xs text-gray-600">
                     {safeFormatDate(item.date, 'PP', '')}
                   </span>
                 )}

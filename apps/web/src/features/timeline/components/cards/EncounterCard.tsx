@@ -43,7 +43,7 @@ export const EncounterCard = memo(function EncounterCard({
       >
         <div className="min-w-0 flex-1">
           <div className="items-top flex justify-between">
-            <TimelineCardCategoryTitle title="Encounter" color="text-red-500" />
+            <TimelineCardCategoryTitle title="Encounter" color="text-red-700" />
             <OpenableCardIcon />
           </div>
           <TimelineCardTitle>
