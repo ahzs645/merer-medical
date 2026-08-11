@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useId, useMemo, useState } from 'react';
 import {
   BellAlertIcon,
   CalendarDaysIcon,
@@ -82,6 +82,7 @@ export function CarePlansTab() {
   // Refetch when a manual record is added, edited, or deleted.
   const recordChangeTick = useRecordChangeTick();
   const [localItems, setLocalItems] = useState<LocalCareItem[]>([]);
+  const formFieldId = useId();
   const [title, setTitle] = useState('');
   const [kind, setKind] = useState<LocalCareItem['kind']>('task');
   const [dueDate, setDueDate] = useState('');
@@ -246,41 +247,83 @@ export function CarePlansTab() {
               <h2 className="text-sm font-semibold text-gray-900">
                 Add task or reminder
               </h2>
+              {/* Labels, not placeholders: placeholder text is gone the moment
+                  you type, and "Task/Reminder" beside a bare date picker gives
+                  a half-filled form nothing to read back from. */}
               <div className="mt-4 grid gap-3">
-                <input
-                  value={title}
-                  onChange={(event) => setTitle(event.target.value)}
-                  placeholder="What do you need to do?"
-                  className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <div className="grid grid-cols-2 gap-2">
-                  <StylizedSelect
-                    value={kind}
-                    onChange={(value) =>
-                      setKind(value as LocalCareItem['kind'])
-                    }
-                    options={[
-                      { value: 'task', label: 'Task' },
-                      { value: 'reminder', label: 'Reminder' },
-                    ]}
-                  />
+                <div>
+                  <label
+                    htmlFor={`${formFieldId}-title`}
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    What do you need to do?
+                  </label>
                   <input
-                    type="date"
-                    value={dueDate}
-                    onChange={(event) => setDueDate(event.target.value)}
-                    className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    id={`${formFieldId}-title`}
+                    value={title}
+                    onChange={(event) => setTitle(event.target.value)}
+                    className="mt-1 min-h-[44px] w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
-                <textarea
-                  value={note}
-                  onChange={(event) => setNote(event.target.value)}
-                  placeholder="Optional note"
-                  rows={3}
-                  className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                />
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label
+                      htmlFor={`${formFieldId}-kind`}
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Kind
+                    </label>
+                    <div className="mt-1">
+                      <StylizedSelect
+                        id={`${formFieldId}-kind`}
+                        value={kind}
+                        onChange={(value) =>
+                          setKind(value as LocalCareItem['kind'])
+                        }
+                        options={[
+                          { value: 'task', label: 'Task' },
+                          { value: 'reminder', label: 'Reminder' },
+                        ]}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor={`${formFieldId}-due`}
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Due
+                    </label>
+                    <input
+                      id={`${formFieldId}-due`}
+                      type="date"
+                      value={dueDate}
+                      onChange={(event) => setDueDate(event.target.value)}
+                      className="mt-1 min-h-[44px] w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label
+                    htmlFor={`${formFieldId}-note`}
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Note{' '}
+                    <span className="font-normal text-gray-500">
+                      (optional)
+                    </span>
+                  </label>
+                  <textarea
+                    id={`${formFieldId}-note`}
+                    value={note}
+                    onChange={(event) => setNote(event.target.value)}
+                    rows={3}
+                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+                  className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
                 >
                   <PlusIcon className="h-5 w-5" />
                   Add item

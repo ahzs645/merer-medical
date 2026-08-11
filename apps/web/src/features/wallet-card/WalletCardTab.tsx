@@ -359,7 +359,9 @@ export function WalletCardTab() {
   const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
 
   return (
-    <AppPage banner={<GenericBanner text="Wallet Card" className="print:hidden" />}>
+    <AppPage
+      banner={<GenericBanner text="Wallet card" className="print:hidden" />}
+    >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto w-full max-w-3xl px-4 py-4 pb-24 sm:px-6 lg:px-8">
           <div className="mb-4 flex items-start justify-between gap-3 print:hidden">

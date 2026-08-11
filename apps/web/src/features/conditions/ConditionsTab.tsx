@@ -95,7 +95,7 @@ function ConditionsHeader({
 }) {
   return (
     <RecordPageHeader
-      title="My Conditions"
+      title="My conditions"
       icon={Squares2X2Icon}
       description={`${total} ${
         total === 1 ? 'condition' : 'conditions'

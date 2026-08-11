@@ -1,6 +1,7 @@
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { OptometryRecord } from '../types';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 export function OcularRecordsPanel({
   records,
@@ -36,7 +37,7 @@ export function OcularRecordsPanel({
                 </span>
               </div>
               <p className="mt-1 text-sm text-gray-600">
-                {[record.date?.split('T')[0], record.laterality]
+                {[formatRecordDate(record.date, ''), record.laterality]
                   .filter(Boolean)
                   .join(' · ') || 'No date or laterality'}
               </p>

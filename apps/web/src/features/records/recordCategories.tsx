@@ -48,6 +48,13 @@ export interface RecordCategory {
    */
   resourceTypes?: string[];
   /**
+   * What the category holds, in three or four words. Shown on the browse hub
+   * in place of a tally for the categories that have none — "Not counted" on
+   * five of the most-used cards reads as something being broken, where "Blood
+   * work and panels" reads as the category doing its job.
+   */
+  blurb?: string;
+  /**
    * Sub-pages of a specialty workspace (Dental, Optometry). The desktop side
    * nav renders these as an indented list while the category is active, so
    * wide viewports don't need the second horizontal tab row inside the page.
@@ -73,13 +80,29 @@ export const RECORD_GROUPS: RecordGroup[] = [
       // (lab panels + observations, vital-sign-filtered observations, imaging
       // studies + reports), so no single resource_type tally matches the page.
       // We omit their counts rather than show a misleading number.
-      { to: AppRoutes.Labs, label: 'Labs', icon: BeakerIcon },
-      { to: AppRoutes.Vitals, label: 'Vitals', icon: HeartIcon },
-      { to: AppRoutes.Imaging, label: 'Imaging', icon: PhotoIcon },
+      {
+        to: AppRoutes.Labs,
+        label: 'Labs',
+        icon: BeakerIcon,
+        blurb: 'Blood work and panels',
+      },
+      {
+        to: AppRoutes.Vitals,
+        label: 'Vitals',
+        icon: HeartIcon,
+        blurb: 'Measurements over time',
+      },
+      {
+        to: AppRoutes.Imaging,
+        label: 'Imaging',
+        icon: PhotoIcon,
+        blurb: 'Scans and reports',
+      },
       {
         to: AppRoutes.Results,
         label: 'All results',
         icon: RectangleStackIcon,
+        blurb: 'Everything with a result',
       },
     ],
   },
@@ -96,6 +119,7 @@ export const RECORD_GROUPS: RecordGroup[] = [
         to: AppRoutes.Conditions,
         label: 'My conditions',
         icon: Squares2X2Icon,
+        blurb: 'Grouped by topic',
       },
       {
         to: AppRoutes.Allergies,
@@ -180,7 +204,12 @@ export const RECORD_GROUPS: RecordGroup[] = [
       // Providers/locations are derived and de-duplicated from CareTeam and
       // Encounter.location, so a raw resource_type tally doesn't match the
       // number of rows shown — omit the count.
-      { to: AppRoutes.Directory, label: 'Providers', icon: UsersIcon },
+      {
+        to: AppRoutes.Directory,
+        label: 'Providers',
+        icon: UsersIcon,
+        blurb: 'People and places',
+      },
     ],
   },
   {
@@ -189,6 +218,7 @@ export const RECORD_GROUPS: RecordGroup[] = [
       {
         to: AppRoutes.Dental,
         label: 'Dental',
+        blurb: 'Teeth, hygiene, imaging',
         icon: FaceSmileIcon,
         children: [
           {
@@ -227,6 +257,7 @@ export const RECORD_GROUPS: RecordGroup[] = [
       {
         to: AppRoutes.Optometry,
         label: 'Optometry',
+        blurb: 'Eyes, prescriptions, exams',
         icon: EyeIcon,
         children: [
           {

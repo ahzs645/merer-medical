@@ -14,7 +14,7 @@ export const interfaceLanguages: {
 
 export const arabicTranslations: Record<string, string> = {
   About: 'حول',
-  'About Me': 'نبذة عني',
+  'About me': 'نبذة عني',
   'About Mere Medical': 'حول مير ميديكال',
   Add: 'إضافة',
   'Add eye-care record': 'إضافة سجل رعاية عينية',
@@ -80,6 +80,8 @@ export const arabicTranslations: Record<string, string> = {
   Dose: 'الجرعة',
   Download: 'تنزيل',
   Edit: 'تعديل',
+  'Synced from a connected source — edit it there':
+    'تمت المزامنة من مصدر متصل — عدّله هناك',
   'Edit record': 'تعديل السجل',
   Email: 'البريد الإلكتروني',
   'Enable encrypted storage with password protection':
@@ -111,7 +113,6 @@ export const arabicTranslations: Record<string, string> = {
   'Glucose, A1c, insulin, thyroid, and hormone-related labs.':
     'الجلوكوز وA1c والأنسولين والغدة الدرقية والفحوصات المرتبطة بالهرمونات.',
   Imaging: 'التصوير',
-  'Imaging & Scans': 'التصوير والفحوصات',
   'Imaging reports, X-rays, DICOM studies, photos, and scan files will appear here when they are synced or added.':
     'ستظهر هنا تقارير التصوير والأشعة السينية ودراسات DICOM والصور وملفات الفحص عند مزامنتها أو إضافتها.',
   'imaging or device reports': 'تقارير تصوير أو أجهزة',
@@ -138,7 +139,7 @@ export const arabicTranslations: Record<string, string> = {
   'Install the App': 'تثبيت التطبيق',
   'Install the Mere App on your Computer': 'تثبيت تطبيق مير على جهاز الكمبيوتر',
   'Installation Instructions': 'تعليمات التثبيت',
-  'Interface Language': 'لغة الواجهة',
+  'Interface language': 'لغة الواجهة',
   Language: 'اللغة',
   'Last Name': 'اسم العائلة',
   'Lab / result': 'مختبر / نتيجة',
@@ -231,7 +232,7 @@ export const arabicTranslations: Record<string, string> = {
   Summary: 'الملخص',
   'Table ranges and high/low status update against the selected standard.':
     'تتحدث نطاقات الجدول وحالة الارتفاع أو الانخفاض حسب المعيار المحدد.',
-  'Switch User': 'تبديل المستخدم',
+  'Switch user': 'تبديل المستخدم',
   Sync: 'مزامنة',
   Terminology: 'المصطلحات',
   'Terminology Settings': 'إعدادات المصطلحات',
@@ -743,6 +744,11 @@ export const arabicTranslations: Record<string, string> = {
   'Change record type': 'تغيير نوع السجل',
   'Search records, pages, and actions': 'البحث في السجلات والصفحات والإجراءات',
   'No matching pages or actions': 'لا توجد صفحات أو إجراءات مطابقة',
+  'No matching records, pages, or actions':
+    'لا توجد سجلات أو صفحات أو إجراءات مطابقة',
+  'Your records': 'سجلاتك',
+  'Pages and actions': 'الصفحات والإجراءات',
+  'Searching…': 'جارٍ البحث…',
   Unknown: 'غير معروف',
   Hidden: 'مخفي',
   None: 'لا شيء',
@@ -911,8 +917,10 @@ export const arabicTranslations: Record<string, string> = {
   item: 'عنصر',
   'may need attention based on your records and profile.':
     'قد يحتاج إلى انتباه بناء على سجلاتك وملفك الشخصي.',
-  'item(s) need attention based on the selected schedule.':
-    'عنصر (عناصر) بحاجة إلى انتباه حسب الجدول المحدد.',
+  'item needs attention based on the selected schedule.':
+    'عنصر بحاجة إلى انتباه حسب الجدول المحدد.',
+  'items need attention based on the selected schedule.':
+    'عناصر بحاجة إلى انتباه حسب الجدول المحدد.',
   'Log record': 'تسجيل سجل',
   Dismiss: 'تجاهل',
   'Hide dismissed': 'إخفاء المتجاهل',
@@ -1357,8 +1365,7 @@ export const arabicTranslations: Record<string, string> = {
   // ---------------------------------------------------------------------
   // Immunizations
   // ---------------------------------------------------------------------
-  'vaccine records with booster tracking':
-    'سجل لقاح مع تتبع الجرعات المعززة',
+  'vaccine records with booster tracking': 'سجل لقاح مع تتبع الجرعات المعززة',
   'Add immunization': 'إضافة تحصين',
   'Total doses': 'إجمالي الجرعات',
   'Vaccine types': 'أنواع اللقاحات',
@@ -1379,7 +1386,8 @@ export const arabicTranslations: Record<string, string> = {
   'Brand / manufacturer': 'العلامة التجارية / الشركة المصنعة',
   'Recommended:': 'موصى به:',
   'Every year': 'كل سنة',
-  'Current seasonal product when eligible': 'المنتج الموسمي الحالي عند الاستحقاق',
+  'Current seasonal product when eligible':
+    'المنتج الموسمي الحالي عند الاستحقاق',
   'Adolescents and eligible adults': 'المراهقون والبالغون المؤهلون',
   Depends: 'حسب الحالة',
   'No matching doses found in the record.':
@@ -1436,7 +1444,8 @@ export const arabicTranslations: Record<string, string> = {
     'استخدم حقل الاسم أعلاه للجهة الدافعة أو شركة التأمين.',
   'Search payer, member ID, type, or address':
     'البحث بالجهة الدافعة أو رقم العضوية أو النوع أو العنوان',
-  'PPO, HMO, dental, vision, extended health': 'PPO، HMO، أسنان، بصر، صحة موسعة',
+  'PPO, HMO, dental, vision, extended health':
+    'PPO، HMO، أسنان، بصر، صحة موسعة',
   'Self, spouse, child, dependent': 'نفسي، الزوج أو الزوجة، ابن أو ابنة، معال',
 
   // ---------------------------------------------------------------------
@@ -1467,7 +1476,8 @@ export const arabicTranslations: Record<string, string> = {
   'Medical history': 'التاريخ الطبي',
   'Surgical & procedure history': 'تاريخ العمليات والإجراءات',
   'Surgical history': 'التاريخ الجراحي',
-  'e.g. Father, Mother, Sibling, None': 'مثال: الأب، الأم، الأخ أو الأخت، لا شيء',
+  'e.g. Father, Mother, Sibling, None':
+    'مثال: الأب، الأم، الأخ أو الأخت، لا شيء',
 
   // ---------------------------------------------------------------------
   // Care plans, goals, referrals, visits, directory
@@ -1513,7 +1523,8 @@ export const arabicTranslations: Record<string, string> = {
   'Confirm planned treatment status': 'أكد حالة العلاج المخطط',
   'Track periodontal measurements and maintenance':
     'تابع قياسات اللثة وأعمال الصيانة',
-  'Link imaging to tooth-specific records': 'اربط التصوير بسجلات الأسنان المحددة',
+  'Link imaging to tooth-specific records':
+    'اربط التصوير بسجلات الأسنان المحددة',
   Odontogram: 'مخطط الأسنان',
   'Actionable odontogram': 'مخطط أسنان تفاعلي',
   'Tooth-by-tooth status': 'الحالة سنا بسن',
@@ -1523,7 +1534,8 @@ export const arabicTranslations: Record<string, string> = {
   'Tooth range': 'نطاق الأسنان',
   'Multiple teeth': 'أسنان متعددة',
   Quadrant: 'الربع',
-  'UR, UL, LR, LL': 'الربع العلوي الأيمن، العلوي الأيسر، السفلي الأيمن، السفلي الأيسر',
+  'UR, UL, LR, LL':
+    'الربع العلوي الأيمن، العلوي الأيسر، السفلي الأيمن، السفلي الأيسر',
   'Molar class': 'تصنيف الأضراس',
   'Maxillary, mandibular, both': 'الفك العلوي، الفك السفلي، كلاهما',
   'Permanent, primary, mixed': 'دائمة، لبنية، مختلطة',

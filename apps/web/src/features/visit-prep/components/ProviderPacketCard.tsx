@@ -1,5 +1,7 @@
 import { CheckIcon } from '@heroicons/react/24/outline';
 
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
+
 import { PacketOptions, PacketSections } from '../types';
 import { PacketSection } from './PacketSection';
 import { SaveStatus } from './SaveStatus';
@@ -33,7 +35,7 @@ export function ProviderPacketCard({
         </h2>
         <p className="mt-1 text-sm text-gray-600">
           {user.first_name} {user.last_name} | Generated{' '}
-          {new Date().toLocaleDateString()}
+          {formatRecordDate(new Date().toISOString())}
         </p>
       </div>
 
@@ -73,8 +75,11 @@ export function ProviderPacketCard({
             <section>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
+                  {/* The heading is the field's label — `htmlFor` on it, rather
+                      than leaving the textarea named only by placeholder text
+                      that disappears at the first keystroke. */}
                   <h3 className="text-base font-semibold text-gray-900">
-                    Questions for visit
+                    <label htmlFor="visit-questions">Questions for visit</label>
                   </h3>
                   <p className="mt-1 text-xs text-gray-500 print:hidden">
                     Saved on this device.
@@ -96,6 +101,7 @@ export function ProviderPacketCard({
                 </div>
               </div>
               <textarea
+                id="visit-questions"
                 className="mt-2 min-h-36 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-primary focus:ring-primary print:border-gray-300"
                 value={questions}
                 onChange={(event) => updateQuestions(event.target.value)}

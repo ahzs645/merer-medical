@@ -5,6 +5,7 @@ import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguagePr
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { DentalRecord } from '../types';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 const surgeryTracks = [
   'consult',
@@ -50,7 +51,7 @@ export function DentalSurgeryPanel({ records }: { records: DentalRecord[] }) {
                   {record.title}
                 </h3>
                 <span className="text-xs font-medium uppercase text-gray-500">
-                  {record.date?.split('T')[0] || t('Undated')}
+                  {formatRecordDate(record.date, t('Undated'))}
                 </span>
               </div>
               <p className="mt-1 text-sm text-gray-600">

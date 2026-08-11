@@ -1,5 +1,6 @@
 import { DentalImagingMount } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 export function DentalImagingMountsPanel({
   mounts,
@@ -28,7 +29,7 @@ export function DentalImagingMountsPanel({
               <p className="mt-1 text-sm text-slate-700">
                 {[
                   mount.modality,
-                  mount.acquisitionDate?.split('T')[0],
+                  formatRecordDate(mount.acquisitionDate, ''),
                   mount.toothNumbers.length
                     ? `${t('Teeth')}: ${mount.toothNumbers.join(', ')}`
                     : undefined,

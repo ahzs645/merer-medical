@@ -1,5 +1,6 @@
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { OptometryRecord } from '../types';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 const metricKinds = new Set(['refraction', 'visualAcuity', 'iop']);
 
@@ -57,5 +58,5 @@ export function EyeMetricsPanel({ records }: { records: OptometryRecord[] }) {
 }
 
 function formatShortDate(date?: string) {
-  return date ? date.split('T')[0] : '-';
+  return formatRecordDate(date, '-');
 }

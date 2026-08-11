@@ -9,6 +9,7 @@ import {
   useState,
 } from 'react';
 
+import { useSearchParams } from 'react-router-dom';
 import { Transition } from '@headlessui/react';
 import { ArrowUpIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useDebounceCallback } from '@react-hook/debounce';
@@ -39,6 +40,7 @@ import {
   formattedTitleDateMonthString,
 } from './utils/timelineDates';
 import { getTimelineCategories } from './utils/timelineCategories';
+import { TIMELINE_QUERY_PARAM } from './timelineQueryParam';
 
 export { QueryStatus };
 export {
@@ -48,9 +50,12 @@ export {
 };
 
 export function TimelineTab() {
-  const user = useUser(),
+  const [searchParams, setSearchParams] = useSearchParams(),
+    user = useUser(),
     [view, setView] = useState<'cards' | 'trends'>('cards'),
-    [query, setQuery] = useState(''),
+    [query, setQuery] = useState(
+      () => searchParams.get(TIMELINE_QUERY_PARAM) ?? '',
+    ),
     [typeFilter, setTypeFilter] = useState<TimelineRecordTypeFilter>('all'),
     { t } = useInterfaceLanguage(),
     { experimental__use_openai_rag } = useLocalConfig(),
@@ -82,6 +87,16 @@ export function TimelineTab() {
     }, 100),
     [activeDateKey, setActiveDateKey] = useState<string | undefined>(),
     [scrollY, setScrollY] = useState(0);
+
+  // The param seeds the search box on arrival and is then spent — leaving it in
+  // the URL would restore it on every reload, overriding whatever the reader
+  // has typed since.
+  useEffect(() => {
+    if (!searchParams.has(TIMELINE_QUERY_PARAM)) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete(TIMELINE_QUERY_PARAM);
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const yearMap = useMemo(() => {
     const newYearMap = new Map<
@@ -301,15 +316,18 @@ export function TimelineTab() {
                           setTypeFilter={setTypeFilter}
                         />
                         {listItems}
+                        {/* The no-results state is a `section` with an `h2`,
+                            not a `main` with an `h1`: the shell owns the page's
+                            landmark and the banner owns its one heading. */}
                         {(Object.keys(data || {}) || []).length === 0 ? (
-                          <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
+                          <section className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
                             <div className="text-center">
                               <p className="text-base font-semibold text-primary-600">
                                 <MagnifyingGlassIcon className="h-12 w-12 mx-auto" />
                               </p>
-                              <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                              <h2 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
                                 {t('No matching records')}
-                              </h1>
+                              </h2>
                               <p className="mt-6 text-lg leading-7 text-gray-700">
                                 {query
                                   ? t(
@@ -318,7 +336,7 @@ export function TimelineTab() {
                                   : t('No records found for this filter')}
                               </p>
                             </div>
-                          </main>
+                          </section>
                         ) : null}
                       </div>
                       <button

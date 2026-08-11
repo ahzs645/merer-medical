@@ -59,6 +59,21 @@ module.exports = {
           'Segoe UI Symbol',
         ],
       },
+      // Named layers, so "which number wins" stops being a guess made one
+      // component at a time. Modals and sheets were spread over z-30, z-40 and
+      // z-50 while the toast stack sat at z-50, which is how a notification
+      // ended up covering the buttons of an open sheet.
+      //
+      //   popover  in-page overlays that belong to a control — tooltips,
+      //            select menus, citation cards
+      //   toast    the global notification stack
+      //   dialog   modals, sheets, the command palette: exclusive surfaces the
+      //            reader opened on purpose, so nothing draws over them
+      zIndex: {
+        popover: '30',
+        toast: '50',
+        dialog: '60',
+      },
       colors: {
         primary: {
           DEFAULT: '#006183',

@@ -10,7 +10,10 @@ import { Fragment, useMemo, useState } from 'react';
 
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { StylizedSelect } from '../../../shared/components/StylizedSelect';
-import { safeFormatDate } from '../../../shared/utils/dateFormatters';
+import {
+  humanizeIsoDatesInText,
+  safeFormatDate,
+} from '../../../shared/utils/dateFormatters';
 import { useDismissedRecommendations } from '../hooks/useDismissedRecommendations';
 import { ImmunizationCountry, ImmunizationRecommendation } from '../types';
 import {
@@ -80,7 +83,11 @@ export function ImmunizationRecommendationsPanel({
           </h2>
           <p className="mt-0.5 text-sm text-gray-600">
             {attention > 0
-              ? `${attention} ${t('item(s) need attention based on the selected schedule.')}`
+              ? `${attention} ${
+                  attention === 1
+                    ? t('item needs attention based on the selected schedule.')
+                    : t('items need attention based on the selected schedule.')
+                }`
               : dismissed.length > 0
                 ? t('No active recommendations for the selected schedule.')
                 : t('Everything looks up to date for the selected schedule.')}
@@ -217,8 +224,13 @@ export function ImmunizationRecommendationsPanel({
                   </div>
                 </dl>
 
+                {/* The forecast package writes this sentence, and writes the
+                    date in it as `2025-10-22` — directly under a "Next due"
+                    field reading "Oct 2025". Same date, two formats, one card.
+                    We do not own that string, so we normalise the dates in it
+                    on the way out. */}
                 <p className="mt-2.5 text-xs leading-5 text-gray-600">
-                  {t(recommendation.reason)}
+                  {humanizeIsoDatesInText(t(recommendation.reason))}
                 </p>
                 {recommendation.rule.recommendedAgeText && (
                   <p className="mt-1 text-xs leading-5 text-gray-400">

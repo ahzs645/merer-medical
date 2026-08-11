@@ -350,17 +350,28 @@ export function DocumentDetailTab() {
             <Placeholder text="This document could not be found." />
           ) : (
             <>
-              {/* Summary stats */}
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <Stat label="Linked records" value={linked.length} />
-                <Stat label="Measurements" value={measureCount} />
-                <Stat
-                  label="Abnormal"
-                  value={abnormalCount}
-                  tone={abnormalCount > 0 ? 'danger' : 'default'}
-                />
-                <Stat label="Panels" value={panels.length} />
-              </div>
+              {/* Summary stats — only the ones this document actually has.
+                  Measurements, Abnormal and Panels are lab vocabulary, and a
+                  consent form has none of them, so a signed PDF opened on four
+                  cards reading 0, 0, 0, 0 before anything true about it. */}
+              {linked.length > 0 || measureCount > 0 ? (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <Stat label="Linked records" value={linked.length} />
+                  {measureCount > 0 ? (
+                    <Stat label="Measurements" value={measureCount} />
+                  ) : null}
+                  {measureCount > 0 ? (
+                    <Stat
+                      label="Abnormal"
+                      value={abnormalCount}
+                      tone={abnormalCount > 0 ? 'danger' : 'default'}
+                    />
+                  ) : null}
+                  {panels.length > 0 ? (
+                    <Stat label="Panels" value={panels.length} />
+                  ) : null}
+                </div>
+              ) : null}
 
               <div className="grid gap-4 lg:grid-cols-12">
                 {/* Document sidebar — stays beside the measurements */}
@@ -368,7 +379,7 @@ export function DocumentDetailTab() {
                   <div className="flex flex-col gap-4 lg:sticky lg:top-4">
                     {document && (
                       <div className="rounded-md bg-white p-2 shadow-sm ring-1 ring-gray-200">
-                        <ManualRecordActions item={document} />
+                        <ManualRecordActions item={document} explainReadOnly />
                       </div>
                     )}
 
@@ -420,8 +431,9 @@ export function DocumentDetailTab() {
                   </div>
                 </aside>
 
-                {/* Measurements + other records */}
-                <main className="flex flex-col gap-4 lg:col-span-7">
+                {/* Measurements + other records. A section, not a `main` —
+                    the app shell owns the page landmark. */}
+                <section className="flex flex-col gap-4 lg:col-span-7">
                   {/* Add a record straight from the document, auto-linked */}
                   <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -581,7 +593,7 @@ export function DocumentDetailTab() {
                   {linked.length === 0 && (
                     <Placeholder text="Nothing is linked to this document yet." />
                   )}
-                </main>
+                </section>
               </div>
 
               <ManualRecordModal

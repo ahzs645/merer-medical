@@ -49,9 +49,23 @@ export function TabWrapper() {
   return (
     <div className="mobile-full-height relative flex min-h-0 max-w-[100vw] flex-col overflow-hidden md:flex-row-reverse">
       {!isDemoMode() && <TutorialOverlay />}
-      <div className="min-h-0 flex-grow overflow-y-auto">
+      {/* First stop in the tab order on every route, and the only way past the
+          secondary navigation some pages open with — the timeline's date rail,
+          the Records category list. It targets the `main` below, which is why
+          `main` is here and not inside each page: one landmark, 46 routes. */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-dialog focus:inline-flex focus:min-h-[44px] focus:items-center focus:rounded-md focus:bg-white focus:px-4 focus:text-sm focus:font-semibold focus:text-primary-800 focus:shadow-lg focus:ring-2 focus:ring-primary-600"
+      >
+        Skip to content
+      </a>
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="min-h-0 flex-grow overflow-y-auto focus:outline-none"
+      >
         <Outlet />
-      </div>
+      </main>
       <div className="flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 print:hidden md:relative md:bottom-auto md:top-0 md:h-full md:w-auto">
         <div
           className={`pb-safe md:pb-0 mx-auto flex w-full max-w-3xl justify-around md:h-full md:flex-col md:justify-start motion-safe:md:transition-[width] motion-safe:md:duration-200 ${
@@ -339,7 +353,11 @@ function MobileMoreButton({
           }
         }}
       >
-        <Dialog as="div" className="relative z-40 md:hidden" onClose={setOpen}>
+        <Dialog
+          as="div"
+          className="relative z-dialog md:hidden"
+          onClose={setOpen}
+        >
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-out duration-200 motion-reduce:transition-none"
@@ -352,7 +370,7 @@ function MobileMoreButton({
             <div className="fixed inset-0 bg-black/30" />
           </Transition.Child>
 
-          <div className="fixed inset-x-0 bottom-0 z-40">
+          <div className="fixed inset-x-0 bottom-0 z-dialog">
             {/* The sheet already slid up; it was just doing it on `transition:
                 all` with the default curve, so it read as a jump. Transform
                 only, and a decelerating curve over 280ms — the shape a sheet

@@ -80,6 +80,57 @@ html {
   overscroll-behavior-y: none;
 }
 
+/*
+ * Wide-table shells: pick the layout from the space the table actually has,
+ * not from the width of the window.
+ *
+ * The labs table switched on at `md` (768px) and forced itself to 62rem. But
+ * `md` is also where the 16rem nav rail appears, and `lg` adds a 15rem records
+ * side nav on top of that — so at 834px the table had 578px of column to live
+ * in, and at 1024px it had *less*, 528px. It scrolled sideways inside its own
+ * box with the Linked report and Status columns off the end, and the date
+ * sliced mid-string. The table needs about 50rem of column before it is worth
+ * showing; the window has no idea when that is, and the container does.
+ *
+ * Below the threshold the card list shows, which is the same list a phone gets
+ * and is legible at any width.
+ */
+.table-shell {
+  container-type: inline-size;
+}
+
+.table-shell > .table-shell-cards {
+  display: block;
+}
+
+.table-shell > .table-shell-table {
+  display: none;
+}
+
+@container (min-width: 52rem) {
+  .table-shell > .table-shell-cards {
+    display: none;
+  }
+
+  .table-shell > .table-shell-table {
+    display: block;
+  }
+}
+
+/* Without container query support, fall back to the viewport switch this
+   replaced, so the desktop table does not disappear on an older browser. */
+@supports not (container-type: inline-size) {
+  @media (min-width: 768px) {
+    .table-shell > .table-shell-cards {
+      display: none;
+    }
+
+    .table-shell > .table-shell-table {
+      display: block;
+    }
+  }
+}
+
 .background-animate {
   background-size: 400%;
 

@@ -57,7 +57,7 @@ export function ImagingTab() {
     <AppPage
       banner={
         <RecordPageHeader
-          title={t('Imaging & Scans')}
+          title={t('Imaging & scans')}
           icon={PhotoIcon}
           count={
             <>

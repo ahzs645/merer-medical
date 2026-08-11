@@ -147,18 +147,23 @@ export function LabsTab() {
       banner={
         <RecordPageHeader<LabFilterMode>
           title="All lab results"
-          // The one line the coverage card carried that is not a fact about the
-          // archive but a fact about this screen: how much of the list you are
-          // being shown. It reflects the search box as well as the chips, so
-          // neither of those can replace it, and it belongs with them.
+          // How much of the list you are being shown — it reflects the search
+          // box as well as the chips, so neither replaces it.
+          //
+          // On a phone it is the one row here that repeats itself: the chips
+          // directly below already read "Attention 5 · Key markers 2 · All 50",
+          // and the page opens on Attention, so "5 of 50 lab tests listed"
+          // above them mostly succeeded in reading as "you only have 5 labs".
+          // It stays from `sm` up, where the banner has the room and the count
+          // is the only thing tying the search box to the chips.
           count={
             groupedLabs.length > 0 ? (
-              <>
+              <span className="hidden sm:inline">
                 <span className="font-semibold text-white">
                   {filteredGroups.length} of {groupedLabs.length}
                 </span>{' '}
                 lab tests listed
-              </>
+              </span>
             ) : undefined
           }
           search={{

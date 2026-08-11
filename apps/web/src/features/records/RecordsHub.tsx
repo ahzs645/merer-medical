@@ -21,17 +21,26 @@ import {
 /** How many categories the wide-viewport overview ranks before it stops. */
 const OVERVIEW_ROWS = 6;
 
-/** Sub-label under a category name: a tally, or why there isn't one. */
-function countText(count: CategoryCount): string {
+/**
+ * Sub-label under a category name: a tally, or — where there is no honest
+ * single number to show — what the category holds.
+ *
+ * Five of these cards are combined views with no 1:1 resource tally, and they
+ * used to read "Not counted", which on a phone was the whole story: Labs,
+ * Vitals, Imaging, All results and My conditions all announcing an absence,
+ * with the footnote that explains why living in a `lg`-only block. A card
+ * saying what it is beats a card saying what it could not compute.
+ */
+function countText(count: CategoryCount, blurb?: string): string {
   switch (count.kind) {
     case 'count':
       return `${count.value} record${count.value === 1 ? '' : 's'}`;
     case 'pending':
       return 'Counting…';
     case 'unavailable':
-      return 'Count unavailable';
+      return blurb ?? 'Count unavailable';
     default:
-      return 'Not counted';
+      return blurb ?? 'Not counted';
   }
 }
 
@@ -126,7 +135,7 @@ export function RecordsHub() {
                                     : undefined
                                 }
                               >
-                                {countText(count)}
+                                {countText(count, item.blurb)}
                               </span>
                             </span>
                           </Link>

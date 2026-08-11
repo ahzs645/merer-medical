@@ -37,7 +37,11 @@ export function CommentModal({
 
   return (
     <Transition.Root show={show} as={Fragment} afterLeave={onClose} appear>
-      <Dialog as="div" className="relative z-50" onClose={() => setShow(false)}>
+      <Dialog
+        as="div"
+        className="relative z-dialog"
+        onClose={() => setShow(false)}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-200"

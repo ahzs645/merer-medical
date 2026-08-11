@@ -91,11 +91,30 @@ export function LabDetailTab() {
   return (
     <AppPage
       banner={
-        // The banner carries the page title (and the only <h1>), so the detail
-        // card below repeats the name as an <h2> instead of a second heading.
+        // The banner carries the page title (and the only <h1>). The card below
+        // used to repeat the name as an <h2> with the same metadata line, and
+        // the status again in a stat card, so "LYMPHS" and "No flag" each
+        // appeared twice before anything new was said. The metadata belongs to
+        // the title, so it lives here now.
         <RecordPageHeader
           title={group?.name ?? 'Lab result'}
           backLink={{ to: Routes.Labs, label: 'All lab results' }}
+          count={
+            group ? (
+              <span className="flex flex-wrap gap-x-3 gap-y-0.5">
+                {group.code ? <span>LOINC {group.code}</span> : null}
+                <span>{group.labs.length} results</span>
+                <span>
+                  Latest{' '}
+                  {safeFormatDate(
+                    group.labs[0]?.metadata?.date,
+                    'PP',
+                    'Unknown',
+                  )}
+                </span>
+              </span>
+            ) : undefined
+          }
         />
       }
     >
@@ -105,73 +124,67 @@ export function LabDetailTab() {
             <LabsSkeleton />
           ) : group ? (
             <>
-              <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
-                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">
-                      {group.name}
-                    </h2>
-                    <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-gray-600">
-                      {group.code ? <span>LOINC {group.code}</span> : null}
-                      <span>{group.labs.length} results</span>
-                      <span>
-                        Latest{' '}
-                        {safeFormatDate(
-                          group.labs[0]?.metadata?.date,
-                          'PP',
-                          'Unknown',
-                        )}
-                      </span>
-                      {labInsight?.latest.statusLabel ? (
-                        <span
-                          className={`font-semibold ${getLabResultStatusClass(
-                            labInsight.latest.status,
-                          )}`}
-                        >
-                          {labInsight.latest.statusLabel}
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
-              </section>
-              <RelatedConditionsCard conditions={relatedConditions} />
+              {/* One summary line, not four full-width cards.
+                  The cards read "Comments 0" and "Reported by 0 / Unknown
+                  source" — a count standing in for a name, and a whole card
+                  saying nothing is there — and on a phone they pushed the graph
+                  (the reason you opened this page) about 900px down. The value
+                  keeps its size because it is the answer; everything else is a
+                  fact beside it, and facts with nothing in them do not print. */}
               {labInsight ? (
-                <section className="grid gap-3 md:grid-cols-4">
-                  <LabInsightCard
-                    label="Latest result"
-                    value={labInsight.latest.value}
-                    detail={labInsight.latest.statusLabel}
-                    valueClassName={getLabResultStatusClass(
-                      labInsight.latest.status,
+                <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:p-5">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span
+                      className={`text-3xl font-bold ${getLabResultStatusClass(
+                        labInsight.latest.status,
+                      )}`}
+                    >
+                      {labInsight.latest.value}
+                    </span>
+                    {labInsight.latest.statusLabel ? (
+                      <span
+                        className={`text-sm font-semibold ${getLabResultStatusClass(
+                          labInsight.latest.status,
+                        )}`}
+                      >
+                        {labInsight.latest.statusLabel}
+                      </span>
+                    ) : null}
+                    <span className="text-sm text-gray-600">latest result</span>
+                  </div>
+                  <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-2 border-t border-gray-100 pt-3 text-sm">
+                    {labInsight.abnormalCount > 0 ? (
+                      <LabSummaryFact
+                        label="Flagged"
+                        value={`${labInsight.abnormalCount} of ${group.labs.length}`}
+                        detail={`${labInsight.highCount} high, ${labInsight.lowCount} low`}
+                        valueClassName="text-red-700"
+                      />
+                    ) : (
+                      <LabSummaryFact
+                        label="Flagged"
+                        value="None"
+                        valueClassName="text-green-700"
+                      />
                     )}
-                  />
-                  <LabInsightCard
-                    label="Flagged results"
-                    value={`${labInsight.abnormalCount}`}
-                    detail={`${labInsight.highCount} high, ${labInsight.lowCount} low`}
-                    valueClassName={
-                      labInsight.abnormalCount > 0
-                        ? 'text-red-700'
-                        : 'text-green-700'
-                    }
-                  />
-                  <LabInsightCard
-                    label="Comments"
-                    value={`${labInsight.commentedCount}`}
-                    detail="provider or source notes"
-                  />
-                  <LabInsightCard
-                    label="Reported by"
-                    value={`${labInsight.distinctPerformers.length || 0}`}
-                    detail={
-                      labInsight.distinctPerformers.slice(0, 2).join(', ') ||
-                      labInsight.latest.source ||
-                      'Unknown source'
-                    }
-                  />
+                    <LabSummaryFact
+                      label="Reported by"
+                      value={
+                        labInsight.distinctPerformers.slice(0, 2).join(', ') ||
+                        labInsight.latest.source ||
+                        'Unknown source'
+                      }
+                    />
+                    {labInsight.commentedCount > 0 ? (
+                      <LabSummaryFact
+                        label="With comments"
+                        value={`${labInsight.commentedCount} of ${group.labs.length}`}
+                      />
+                    ) : null}
+                  </dl>
                 </section>
               ) : null}
+              <RelatedConditionsCard conditions={relatedConditions} />
               {labInsight &&
               (labInsight.latest.comments.length > 0 ||
                 labInsight.latest.performer ||
@@ -281,7 +294,7 @@ export function LabDetailTab() {
   );
 }
 
-function LabInsightCard({
+function LabSummaryFact({
   label,
   value,
   detail,
@@ -289,18 +302,18 @@ function LabInsightCard({
 }: {
   label: string;
   value: string;
-  detail: string;
+  detail?: string;
   valueClassName?: string;
 }) {
   return (
-    <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-      <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-        {label}
-      </div>
-      <div className={`mt-2 text-xl font-bold ${valueClassName}`}>{value}</div>
-      <div className="mt-1 max-h-8 overflow-hidden text-xs text-gray-600">
-        {detail}
-      </div>
+    <div className="min-w-0">
+      <dt className="text-xs font-medium text-gray-500">{label}</dt>
+      <dd className={`font-semibold ${valueClassName}`}>
+        {value}
+        {detail ? (
+          <span className="ms-1.5 font-normal text-gray-600">({detail})</span>
+        ) : null}
+      </dd>
     </div>
   );
 }

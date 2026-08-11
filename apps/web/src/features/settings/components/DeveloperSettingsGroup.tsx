@@ -43,7 +43,7 @@ export function DeveloperSettingsGroup() {
   }
 
   return (
-    <SettingsSection id="developer" title="Developer Settings">
+    <SettingsSection id="developer" title="Developer settings">
       <div className="pb-2 text-lg font-bold">Build Settings</div>
       <div className="mb-4 rounded border border-gray-200 bg-gray-50 p-4">
         <table className="w-full text-sm">
