@@ -189,6 +189,7 @@ export function ImportRecordsPanel() {
       <div className="mb-3 flex flex-wrap items-center gap-3">
         <input
           type="password"
+          aria-label="Passphrase (for encrypted .emrpkg)"
           placeholder="Passphrase (for encrypted .emrpkg)"
           className="focus:ring-primary-500 focus:border-primary-500 block w-64 rounded-md border-gray-300 text-sm shadow-sm"
           value={passphrase}

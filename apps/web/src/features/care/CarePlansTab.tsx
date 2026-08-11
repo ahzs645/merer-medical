@@ -25,6 +25,7 @@ import {
   RecordPageHeader,
 } from '../../shared/components/records/RecordPageHeader';
 import { StylizedSelect } from '../../shared/components/StylizedSelect';
+import { resourceTypeLabel } from '../../shared/utils/resourceTypeLabels';
 import { formatDisplayText } from '../../shared/utils/StyleUtils';
 import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import { buildAddRecordPath } from '../manual-entry/addRecordPath';
@@ -505,6 +506,16 @@ function saveCareItemRecord(
   });
 }
 
+/**
+ * The name on the card.
+ *
+ * `resource.id` used to end the fallback chain, and portals hand out care plans
+ * with no title, description or code at all — so seven of the eight plans in
+ * the demo set rendered their opaque source identifier as the heading
+ * ("abe3196c-2f56-43e1-9fb1-cd78b4c3f270", "TJxi4Rbf6Cp1aiFxX0ua9XXyVGa2a67…").
+ * An id is not a name. When there is nothing to call the record, say what kind
+ * of record it is and let the date underneath tell them apart.
+ */
 function displayName(item: CareDocument) {
   const resource = getCareResource(item);
   return (
@@ -514,8 +525,7 @@ function displayName(item: CareDocument) {
       ? resource.description
       : resource?.description?.text) ||
     resource?.code?.text ||
-    resource?.id ||
-    'Untitled care record'
+    resourceTypeLabel(item.data_record.resource_type, 1)
   );
 }
 

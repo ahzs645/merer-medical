@@ -428,6 +428,7 @@ export function UserDataSettingsGroup() {
             )}
             <input
               type="password"
+              aria-label={t('Passphrase for encrypted package')}
               placeholder={t('Passphrase for encrypted package')}
               disabled={emrpkgUseWebauthn}
               className="focus:ring-primary-500 focus:border-primary-500 block w-56 rounded-md border-gray-300 text-sm shadow-sm disabled:bg-gray-100 disabled:text-gray-400"

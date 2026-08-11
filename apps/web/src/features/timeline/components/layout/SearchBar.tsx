@@ -111,6 +111,9 @@ export function SearchBar({
               type="text"
               name="search"
               id="search"
+              // Named, not just placeheld: the placeholder is gone the moment
+              // you type, and this is the field that searches your records.
+              aria-label={placeholder}
               placeholder={placeholder}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -126,6 +129,9 @@ export function SearchBar({
               type="text"
               name="search"
               id="search"
+              // Named, not just placeheld: the placeholder is gone the moment
+              // you type, and this is the field that searches your records.
+              aria-label={placeholder}
               placeholder={placeholder}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
