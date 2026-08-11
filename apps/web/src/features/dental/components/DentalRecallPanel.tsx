@@ -1,5 +1,6 @@
 import { DentalRecallItem } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 export function DentalRecallPanel({
   recalls,
@@ -22,7 +23,7 @@ export function DentalRecallPanel({
                   {recall.type || recall.record.title}
                 </h3>
                 <span className="text-xs font-semibold uppercase text-gray-500">
-                  {recall.dueDate?.split('T')[0] || t('No due date')}
+                  {formatRecordDate(recall.dueDate, t('No due date'))}
                 </span>
               </div>
               <p className="mt-1 text-sm text-gray-700">

@@ -17,8 +17,8 @@ const dentalSubPages =
 
 // The phone-width strip scrolls horizontally, and the full "Chart & teeth" /
 // "Hygiene & perio" names push more than half of it off-screen at 390px. The
-// icon plus a single word still identifies each sub-page; the desktop side nav
-// (lg+, where there is room) keeps the long names.
+// icon plus a single word still identifies each sub-page below `lg`; from `lg`
+// up, where there is room, the strip shows the full names.
 const SHORT_TAB_LABELS: Record<string, string> = {
   [AppRoutes.DentalChart]: 'Chart',
   [AppRoutes.DentalHygiene]: 'Hygiene',
@@ -28,7 +28,7 @@ const SHORT_TAB_LABELS: Record<string, string> = {
 
 const dentalTabs = dentalSubPages.map((tab) => ({
   ...tab,
-  label: SHORT_TAB_LABELS[tab.to] ?? tab.label,
+  shortLabel: SHORT_TAB_LABELS[tab.to],
 }));
 
 export function DentalLayout() {
@@ -45,9 +45,14 @@ export function DentalLayout() {
       }
     >
       <div className="flex h-full min-h-0 flex-col bg-gray-50">
-        {/* On lg+ the Records side nav lists these sub-pages, so the strip
-            only renders on narrow viewports. */}
-        <div className="border-b border-gray-200 bg-white px-2 sm:px-6 lg:hidden">
+        {/* At every width, not `lg:hidden`.
+            The theory was that the Records side nav lists these sub-pages from
+            `lg` up, so the strip was redundant there. In practice that column
+            scrolls on its own, and on a 1440×900 screen Dental's children sit
+            below its fold — so the widest viewport was the one where the five
+            sub-pages had no visible route in, while the phone had a tab strip.
+            The workspace carries its own navigation now. */}
+        <div className="border-b border-gray-200 bg-white px-2 sm:px-6">
           <ScrollableTabNav tabs={dentalTabs} ariaLabel="Dental sections" />
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">

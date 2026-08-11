@@ -715,7 +715,7 @@ function ForYouFeed({
             allergyCount + conditionCount === 1 ? '' : 's'
           }`,
           description: 'Keep key clinical summary items current.',
-          route: AppRoutes.Problems,
+          route: AppRoutes.Conditions,
         }
       : undefined,
     immunizationCount > 0

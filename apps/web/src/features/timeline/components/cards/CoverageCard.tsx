@@ -30,7 +30,7 @@ export const CoverageCard = memo(function CoverageCard({
           <div className="items-top flex justify-between">
             <TimelineCardCategoryTitle
               title="Coverage"
-              color="text-amber-600"
+              color="text-amber-700"
             />
             <OpenableCardIcon />
           </div>

@@ -1,3 +1,5 @@
+import { formatDateAndTime } from '../../../shared/utils/dateFormatters';
+
 export function SaveStatus({
   savedAt,
   status,
@@ -23,7 +25,7 @@ export function SaveStatus({
 
   return (
     <span className="text-xs text-gray-500">
-      Saved {new Date(savedAt).toLocaleString()}
+      Saved {formatDateAndTime(new Date(savedAt).toISOString())}
     </span>
   );
 }

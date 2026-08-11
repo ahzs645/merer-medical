@@ -84,7 +84,7 @@ function SyncHistoryRow({ item }: { item: RxDocument<ConnectionDocument> }) {
             Error
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 text-green-600">
+          <span className="inline-flex items-center gap-1 text-green-700">
             <CheckCircleIcon className="h-4 w-4" />
             OK
           </span>

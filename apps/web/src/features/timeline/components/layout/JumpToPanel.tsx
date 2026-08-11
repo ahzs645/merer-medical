@@ -69,8 +69,12 @@ export function JumpToPanel({
   }, [activeDateKey]);
 
   return (
-    <div
+    // A landmark, not a plain box: this rail carries one tab stop per date on
+    // record — twenty-odd of them before the timeline itself — and naming it as
+    // navigation is what lets a screen reader jump the whole thing in one move.
+    <nav
       ref={panelRef}
+      aria-label="Jump to date"
       className="scrollbar-hide sticky top-0 hidden h-full min-h-full w-0 flex-col overflow-y-scroll border-gray-200 bg-gray-50 text-slate-800 lg:flex lg:w-auto lg:border-r-2"
       onTouchStart={pauseAutoFollow}
       onWheel={pauseAutoFollow}
@@ -106,7 +110,7 @@ export function JumpToPanel({
             ))}
         </ul>
       )}
-    </div>
+    </nav>
   );
 }
 

@@ -194,13 +194,13 @@ const SettingsTab: React.FC = () => {
             page has a single section pattern at every breakpoint. */}
         <SettingsSection
           id="about-me"
-          title={t('About Me')}
+          title={t('About me')}
           action={
             <button
               onClick={() => setShowUserSwitcher(true)}
               className="text-primary-600 hover:text-primary-700 hover:bg-primary-50 -me-2 inline-flex min-h-[44px] items-center rounded-md px-3 text-sm font-medium transition-colors"
             >
-              {t('Switch User')}
+              {t('Switch user')}
             </button>
           }
         >

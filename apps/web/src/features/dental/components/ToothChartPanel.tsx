@@ -15,6 +15,7 @@ import {
 } from '../utils/dentalReferenceData';
 import { orderArchForDisplay } from '../utils/toothChartLayout';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 type Dentition = 'permanent' | 'deciduous' | 'mixed';
 
@@ -339,7 +340,7 @@ function SelectedToothRecords({
               </div>
               {record.date && (
                 <p className="mt-0.5 text-xs text-gray-500">
-                  {record.date.split('T')[0]}
+                  {formatRecordDate(record.date)}
                 </p>
               )}
             </li>

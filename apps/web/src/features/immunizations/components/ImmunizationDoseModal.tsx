@@ -118,7 +118,7 @@ export function ImmunizationDoseModal({
 
       <div className="max-h-[70vh] overflow-y-auto px-4 pb-4">
         <section>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-600">
             {t('Details')}
           </h3>
           <dl className="mt-1 divide-y divide-gray-100 text-sm">
@@ -130,7 +130,7 @@ export function ImmunizationDoseModal({
 
         {shownSource.length > 0 && (
           <section className="mt-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-600">
               {t('Where it came from')}
             </h3>
             <dl className="mt-1 divide-y divide-gray-100 text-sm">
@@ -146,7 +146,7 @@ export function ImmunizationDoseModal({
         )}
 
         <section className="mt-4">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-600">
             {t('Given the same day')}
           </h3>
           {sameDay.length > 0 ? (

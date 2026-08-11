@@ -6,6 +6,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
+import { useRegisterPageBackLink } from '../../../features/records/pageBackLink';
+
 type IconComponent = ComponentType<{ className?: string }>;
 
 export interface RecordHeaderSearch {
@@ -88,11 +90,20 @@ export function RecordPageHeader<Id extends string = string>({
   filters,
   className = '',
 }: RecordPageHeaderProps<Id>) {
+  // Tells the Records shell to drop its generic "All records" bar while a page
+  // with its own back link is on screen, so a phone shows one back link, not
+  // two stacked ones pointing at different places.
+  useRegisterPageBackLink(Boolean(backLink));
+
   return (
+    // Tighter on a phone than it was: `py-4` + `gap-4` between four rows spent
+    // 80px of a 852px screen on air. The busiest banner in the app (Labs) took
+    // 309px before its first result; from `sm` up, where the rows collapse onto
+    // fewer lines anyway, the original spacing stands.
     <div
-      className={`bg-primary-800 px-4 py-4 text-white sm:px-6 sm:py-5 lg:px-8 ${className}`}
+      className={`bg-primary-800 px-4 py-3 text-white sm:px-6 sm:py-5 lg:px-8 ${className}`}
     >
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-2.5 sm:gap-4">
         {/* `flex-wrap` + a 10rem floor on the title is what decides inline vs.
             own-row: one button fits beside a title on a 390px phone, two or
             three do not, and the group drops whole rather than half. */}

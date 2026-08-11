@@ -1,5 +1,6 @@
 import { DentalToothTimelineItem } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 const actionStyles = {
   active: 'bg-red-50 text-red-800 ring-red-200',
@@ -50,7 +51,7 @@ export function ToothTimelinePanel({
                 {item.record.title}
               </p>
               <p className="mt-1 text-xs text-gray-500">
-                {item.date?.split('T')[0] || t('Undated')}
+                {formatRecordDate(item.date, t('Undated'))}
                 {item.record.surfaces.length > 0
                   ? ` · ${t('Surfaces')}: ${item.record.surfaces.join(', ')}`
                   : ''}

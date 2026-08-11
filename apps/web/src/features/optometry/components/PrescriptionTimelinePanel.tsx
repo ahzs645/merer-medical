@@ -9,6 +9,7 @@ import {
   formatDelta,
 } from '../utils/prescriptionTimeline';
 import { EyeRxTable } from './EyeRxTable';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 const classBadge = {
   glasses: 'bg-indigo-50 text-indigo-700 ring-indigo-200',
@@ -102,7 +103,7 @@ function TimelineRow({
             )}
           </div>
           <span className="text-xs font-medium text-gray-500">
-            {entry.date?.split('T')[0] || t('Undated')}
+            {formatRecordDate(entry.date, t('Undated'))}
           </span>
         </div>
 

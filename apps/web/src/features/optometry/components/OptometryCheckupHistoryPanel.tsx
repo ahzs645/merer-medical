@@ -1,6 +1,7 @@
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { OptometryRecord } from '../types';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 export function OptometryCheckupHistoryPanel({
   records,
@@ -36,7 +37,7 @@ export function OptometryCheckupHistoryPanel({
                   {record.title}
                 </h3>
                 <span className="text-xs font-medium uppercase text-gray-500">
-                  {record.date?.split('T')[0] || 'Undated'}
+                  {formatRecordDate(record.date)}
                 </span>
               </div>
               {record.summary && (

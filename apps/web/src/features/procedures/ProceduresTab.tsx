@@ -13,6 +13,7 @@ import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
+import { FactList } from '../../shared/components/FactList';
 
 interface ProcedureItem {
   id: string;
@@ -102,7 +103,7 @@ export function ProceduresTab() {
                 {item.status && (
                   <Badge className="capitalize">{item.status}</Badge>
                 )}
-                {item.source && <span>· {item.source}</span>}
+                <FactList facts={[item.source]} />
               </div>
             </div>
             {item.date && (

@@ -1,5 +1,6 @@
 import { PerioOverview } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 export function PerioOverviewPanel({ overview }: { overview: PerioOverview }) {
   const { t } = useInterfaceLanguage();
@@ -42,7 +43,7 @@ export function PerioOverviewPanel({ overview }: { overview: PerioOverview }) {
                   className="rounded-md bg-gray-50 p-3 text-sm text-gray-700"
                 >
                   <p className="font-semibold text-gray-900">
-                    {measurement.date?.split('T')[0] || t('Undated')}
+                    {formatRecordDate(measurement.date, t('Undated'))}
                     {measurement.teeth.length > 0
                       ? ` · ${t('Teeth')}: ${measurement.teeth.join(', ')}`
                       : ''}

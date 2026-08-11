@@ -5,6 +5,7 @@ import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { OptometryRecord } from '../types';
 import { SurgeryDetail, buildSurgeryList } from '../utils/surgeryRecords';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 export function SurgicalHistoryPanel({
   records,
@@ -99,7 +100,7 @@ function SurgeryCard({ surgery }: { surgery: SurgeryDetail }) {
           )}
         </div>
         <span className="text-xs font-medium text-gray-500">
-          {surgery.date?.split('T')[0] || t('Undated')}
+          {formatRecordDate(surgery.date, t('Undated'))}
         </span>
       </div>
 

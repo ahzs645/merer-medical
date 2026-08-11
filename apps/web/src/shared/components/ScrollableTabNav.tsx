@@ -14,6 +14,13 @@ import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvi
 export interface ScrollableTab {
   to: string;
   label: string;
+  /**
+   * Shown below `lg` in place of `label`, for names that push half the strip
+   * off a 390px screen ("Chart & teeth", "Hygiene & perio"). Both are rendered
+   * and one is hidden per breakpoint, so the strip does not have to re-measure
+   * on resize; the accessible name is always the full `label`.
+   */
+  shortLabel?: string;
   icon: ComponentType<{ className?: string }>;
   end?: boolean;
 }
@@ -137,7 +144,7 @@ export function ScrollableTabNav({
         } ${canScrollRight ? 'scroll-pr-11 pr-11' : ''}`}
         aria-label={ariaLabel}
       >
-        {tabs.map(({ to, label, icon: Icon, end }) => (
+        {tabs.map(({ to, label, shortLabel, icon: Icon, end }) => (
           <NavLink
             key={to}
             ref={(node) => {
@@ -154,7 +161,19 @@ export function ScrollableTabNav({
             }
           >
             <Icon className="h-5 w-5 shrink-0" />
-            {t(label)}
+            {shortLabel ? (
+              <>
+                <span className="sr-only">{t(label)}</span>
+                <span aria-hidden="true" className="lg:hidden">
+                  {t(shortLabel)}
+                </span>
+                <span aria-hidden="true" className="hidden lg:inline">
+                  {t(label)}
+                </span>
+              </>
+            ) : (
+              t(label)
+            )}
           </NavLink>
         ))}
       </nav>

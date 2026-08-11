@@ -108,7 +108,7 @@ export function TrackersSummaryCard() {
                                 {entry.unit ? ` ${entry.unit}` : ''}
                               </p>
                             </div>
-                            <span className="shrink-0 text-xs text-gray-400">
+                            <span className="shrink-0 text-xs text-gray-600">
                               {safeFormatDate(entry.recordedAt, 'PP', '')}
                             </span>
                           </li>

@@ -1,6 +1,7 @@
 import {
   DocumentArrowDownIcon,
   EyeIcon,
+  LockClosedIcon,
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
@@ -34,10 +35,16 @@ export const manualRecordActionRowClass = 'mt-3 flex flex-wrap gap-2';
 export function ManualRecordActions({
   item,
   inline = false,
+  explainReadOnly = false,
 }: {
   item: ClinicalDocument;
   /** Render the buttons only, for a caller supplying the row around them. */
   inline?: boolean;
+  /**
+   * Say why a synced record has no Edit or Delete. For pages showing a single
+   * record; a list would repeat the note once per row.
+   */
+  explainReadOnly?: boolean;
 }) {
   const db = useRxDb();
   const user = useUser();
@@ -73,7 +80,30 @@ export function ManualRecordActions({
     };
   }, [item.id, notifyDispatch]);
 
-  if (!isManualRecord(item)) return null;
+  // A record synced from a portal is a mirror of what that system holds, so
+  // there is nothing here to edit or delete — editing it locally would put the
+  // two out of step with no way to say which is right.
+  //
+  // Returning `null` said that by saying nothing, which read as "this page is
+  // write-only: you can add a plan but never change one". Say it instead.
+  // A record synced from a portal is a mirror of what that system holds, so
+  // there is nothing here to edit or delete — changing it locally would put the
+  // two out of step with no way to say which is right.
+  //
+  // In a list that is fine unsaid: a note on all thirteen problems is thirteen
+  // notes. On a page showing one record, saying nothing reads as "you can add
+  // one of these but never change one", so those surfaces opt in.
+  if (!isManualRecord(item)) {
+    if (!explainReadOnly) return null;
+    const note = (
+      <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
+        <LockClosedIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
+        {t('Synced from a connected source — edit it there')}
+      </span>
+    );
+    if (inline) return note;
+    return <div className={manualRecordActionRowClass}>{note}</div>;
+  }
 
   async function onDelete(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();

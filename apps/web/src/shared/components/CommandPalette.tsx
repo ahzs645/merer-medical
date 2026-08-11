@@ -30,6 +30,9 @@ import {
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { Routes as AppRoutes } from '../../Routes';
 import { ALL_RECORD_CATEGORIES } from '../../features/records/recordCategories';
+import { TIMELINE_QUERY_PARAM } from '../../features/timeline/timelineQueryParam';
+import { resourceTypeLabel } from '../utils/resourceTypeLabels';
+import { useRecordSearch } from './useRecordSearch';
 
 type CommandPaletteItem = {
   title: string;
@@ -100,10 +103,18 @@ const COMMAND_ITEMS: CommandPaletteItem[] = [
     icon: DocumentTextIcon,
   },
   {
-    title: 'Problems',
-    description: 'Conditions and health issues',
-    route: AppRoutes.Problems,
-    keywords: ['conditions', 'diagnoses', 'problem list', 'health issues'],
+    title: 'Conditions',
+    description: 'Diagnoses, grouped or in detail',
+    route: AppRoutes.Conditions,
+    // "Problems" was this page's old name and is still the word most portals
+    // print, so it stays searchable.
+    keywords: [
+      'problems',
+      'problem list',
+      'diagnoses',
+      'health issues',
+      'my conditions',
+    ],
     icon: DocumentTextIcon,
   },
   {
@@ -245,6 +256,8 @@ export function CommandPalette({
   const setOpen = onOpenChange ?? setInternalOpen;
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const { hits: recordHits, searching: searchingRecords } =
+    useRecordSearch(query);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -304,6 +317,13 @@ export function CommandPalette({
     navigate(item.route);
   }
 
+  function openRecord(name: string) {
+    setOpen(false);
+    navigate(
+      `${AppRoutes.Timeline}?${TIMELINE_QUERY_PARAM}=${encodeURIComponent(name)}`,
+    );
+  }
+
   return (
     <>
       <button
@@ -320,7 +340,7 @@ export function CommandPalette({
       <Transition show={open} as={Fragment}>
         <Dialog
           as="div"
-          className="relative z-50"
+          className="relative z-dialog"
           onClose={() => setOpen(false)}
           initialFocus={inputRef}
         >
@@ -367,6 +387,43 @@ export function CommandPalette({
                   </button>
                 </div>
                 <div className="max-h-[60vh] overflow-y-auto p-2">
+                  {/* Records first: the input asks for "records, pages, and
+                      actions", and for a while it only ever answered with
+                      pages — typing a lab name returned the Labs page rather
+                      than the lab. There is no per-record route to open, so a
+                      hit lands on the timeline with the search applied, which
+                      is where a record is read in context. */}
+                  {recordHits.length > 0 ? (
+                    <>
+                      <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        {t('Your records')}
+                      </p>
+                      {recordHits.map((hit) => (
+                        <button
+                          key={hit.id}
+                          type="button"
+                          onClick={() => openRecord(hit.name)}
+                          className="flex w-full items-start gap-3 rounded-md px-3 py-3 text-left hover:bg-primary-50"
+                        >
+                          <DocumentTextIcon className="mt-0.5 h-5 w-5 shrink-0 text-primary-700" />
+                          <span className="min-w-0 flex-1">
+                            <span className="block font-semibold text-gray-900">
+                              {hit.name}
+                            </span>
+                            <span className="mt-0.5 block text-sm text-gray-600">
+                              {resourceTypeLabel(hit.resourceType, 1)} ·{' '}
+                              {hit.dateLabel}
+                            </span>
+                          </span>
+                        </button>
+                      ))}
+                      {results.length > 0 ? (
+                        <p className="px-3 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          {t('Pages and actions')}
+                        </p>
+                      ) : null}
+                    </>
+                  ) : null}
                   {results.length > 0 ? (
                     results.map((item) => {
                       const Icon = item.icon;
@@ -397,11 +454,13 @@ export function CommandPalette({
                         </button>
                       );
                     })
-                  ) : (
+                  ) : recordHits.length === 0 ? (
                     <div className="px-4 py-8 text-center text-sm text-gray-600">
-                      {t('No matching pages or actions')}
+                      {searchingRecords
+                        ? t('Searching…')
+                        : t('No matching records, pages, or actions')}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </Dialog.Panel>
             </Transition.Child>

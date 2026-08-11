@@ -39,7 +39,7 @@ export function PrivacyAndSecuritySettingsGroup() {
 
   if (userPreferences !== undefined && rawUserPreferences !== undefined) {
     return (
-      <SettingsSection id="privacy-and-security" title="Privacy and Security">
+      <SettingsSection id="privacy-and-security" title="Privacy and security">
         <div ref={ref}>
           <PrivacyModesCard />
           <ul className="divide-y divide-gray-200">

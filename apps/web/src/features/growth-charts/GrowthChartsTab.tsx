@@ -158,7 +158,7 @@ export function GrowthChartsTab() {
     'Patient';
 
   return (
-    <AppPage banner={<GenericBanner text="Growth Charts" />}>
+    <AppPage banner={<GenericBanner text="Growth charts" />}>
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto w-full max-w-4xl px-4 py-4 pb-24 sm:px-6 lg:px-8">
           <p className="mb-4 text-sm text-gray-600">
@@ -186,7 +186,7 @@ export function GrowthChartsTab() {
                   patientName={patientName}
                 />
               ))}
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-600">
                 Reference percentiles are approximate and for visualization only
                 — not a clinical assessment.
               </p>

@@ -13,6 +13,7 @@ import {
 } from '../../shared/hooks/useRecordList';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { mapReferralDocs, type ReferralItem } from './referralRecords';
+import { FactList } from '../../shared/components/FactList';
 
 function useReferrals() {
   // useRecordList re-runs on the shared record-change signal, so a referral
@@ -81,9 +82,9 @@ export function ReferralsTab() {
                 {item.status && (
                   <Badge className="capitalize">{item.status}</Badge>
                 )}
-                {item.requester && <span>· {item.requester}</span>}
-                {item.performer && <span>· {item.performer}</span>}
-                {item.source && <span>· {item.source}</span>}
+                <FactList
+                  facts={[item.requester, item.performer, item.source]}
+                />
               </div>
               {item.notes.length > 0 && (
                 <div className="mt-2 space-y-1 text-xs text-gray-600">

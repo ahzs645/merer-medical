@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
@@ -66,40 +66,46 @@ export function LabsTable({
           </div>
         </div>
       ) : null}
-      <div className="divide-y divide-gray-200 md:hidden">
-        {groups.map((group) => (
-          <LabMobileRow
-            key={group.key}
-            group={group}
-            expanded={expandedKeys.has(group.key)}
-            onToggle={() => toggleExpanded(group.key)}
-            reportsByObservationId={reportsByObservationId}
-            referenceMode={referenceMode}
-            referenceContext={referenceContext}
-          />
-        ))}
-      </div>
-      <div className="hidden overflow-x-auto md:block">
-        <div className="min-w-[62rem] xl:min-w-full">
-          <div className="grid grid-cols-[minmax(14rem,1.5fr)_minmax(8rem,0.8fr)_minmax(8rem,0.7fr)_minmax(13rem,1.15fr)_minmax(7rem,0.65fr)] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-            <div>{t('Lab test')}</div>
-            <div>{t('Latest')}</div>
-            <div>{t('Date')}</div>
-            <div>{t('Linked report')}</div>
-            <div>{t('Status')}</div>
-          </div>
-          <div className="divide-y divide-gray-200">
-            {groups.map((group) => (
-              <LabTableRow
-                key={group.key}
-                group={group}
-                expanded={expandedKeys.has(group.key)}
-                onToggle={() => toggleExpanded(group.key)}
-                reportsByObservationId={reportsByObservationId}
-                referenceMode={referenceMode}
-                referenceContext={referenceContext}
-              />
-            ))}
+      {/* `table-shell` measures this column, not the window: see styles.css.
+          The table only earns its place once it has ~50rem to lay out in, and
+          between 768px and ~1360px it did not — the rail and the records side
+          nav had taken the width the breakpoint assumed was there. */}
+      <div className="table-shell">
+        <div className="table-shell-cards divide-y divide-gray-200">
+          {groups.map((group) => (
+            <LabMobileRow
+              key={group.key}
+              group={group}
+              expanded={expandedKeys.has(group.key)}
+              onToggle={() => toggleExpanded(group.key)}
+              reportsByObservationId={reportsByObservationId}
+              referenceMode={referenceMode}
+              referenceContext={referenceContext}
+            />
+          ))}
+        </div>
+        <div className="table-shell-table overflow-x-auto">
+          <div className="min-w-[50rem]">
+            <div className="grid grid-cols-[minmax(14rem,1.5fr)_minmax(8rem,0.8fr)_minmax(8rem,0.7fr)_minmax(13rem,1.15fr)_minmax(7rem,0.65fr)] gap-3 border-b border-gray-200 bg-gray-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+              <div>{t('Lab test')}</div>
+              <div>{t('Latest')}</div>
+              <div>{t('Date')}</div>
+              <div>{t('Linked report')}</div>
+              <div>{t('Status')}</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {groups.map((group) => (
+                <LabTableRow
+                  key={group.key}
+                  group={group}
+                  expanded={expandedKeys.has(group.key)}
+                  onToggle={() => toggleExpanded(group.key)}
+                  reportsByObservationId={reportsByObservationId}
+                  referenceMode={referenceMode}
+                  referenceContext={referenceContext}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -123,7 +129,6 @@ function LabMobileRow({
   referenceContext?: ReferenceContext;
 }) {
   const { t } = useInterfaceLanguage();
-  const navigate = useNavigate();
   const latest = group.labs[0],
     latestReference = buildLabReferenceEvaluation({
       group,
@@ -137,43 +142,32 @@ function LabMobileRow({
       referenceContext,
     );
 
-  function openLabDetail() {
-    saveLabsScrollPosition();
-    navigate(getLabDetailLink(group.key));
-  }
-
   return (
     <section>
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={openLabDetail}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            openLabDetail();
-          }
-        }}
-        className="cursor-pointer px-3 py-2.5 text-left hover:bg-blue-50"
-      >
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onToggle();
-            }}
-            className="-my-1 flex h-11 w-11 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-            aria-label={`${expanded ? t('Collapse') : t('Expand')} ${
-              group.name
-            }`}
-          >
-            {expanded ? (
-              <ChevronDownIcon className="h-5 w-5" />
-            ) : (
-              <ChevronRightIcon className="h-5 w-5" />
-            )}
-          </button>
+      {/* The row was a `div[role="button"]` calling `navigate()`, with the
+          expand control nested inside it — so it had no href to open in a new
+          tab or copy, it announced itself as a button while behaving as a link,
+          and it wrapped a second control inside a first. Two siblings instead:
+          a real Link to the detail page, and a real button for the history. */}
+      <div className="flex items-center gap-2 px-3 py-2.5 hover:bg-blue-50">
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={expanded}
+          className="-my-1 flex h-11 w-11 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+          aria-label={`${expanded ? t('Collapse') : t('Expand')} ${group.name}`}
+        >
+          {expanded ? (
+            <ChevronDownIcon className="h-5 w-5" />
+          ) : (
+            <ChevronRightIcon className="h-5 w-5" />
+          )}
+        </button>
+        <Link
+          to={getLabDetailLink(group.key)}
+          onClick={saveLabsScrollPosition}
+          className="min-w-0 flex-1 rounded text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+        >
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
@@ -216,7 +210,7 @@ function LabMobileRow({
               </span>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
       {expanded ? (
         <LabHistoryPanel
@@ -244,7 +238,6 @@ function LabTableRow({
   referenceContext?: ReferenceContext;
 }) {
   const { t } = useInterfaceLanguage();
-  const navigate = useNavigate();
   const latest = group.labs[0],
     latestReports = reportsByObservationId.get(latest.metadata?.id || '') || [],
     latestReference = buildLabReferenceEvaluation({
@@ -281,33 +274,22 @@ function LabTableRow({
     .filter(Boolean)
     .join('\n');
 
-  function openLabDetail() {
-    saveLabsScrollPosition();
-    navigate(getLabDetailLink(group.key));
-  }
-
   return (
     <section>
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={openLabDetail}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            openLabDetail();
-          }
-        }}
-        className="grid w-full cursor-pointer grid-cols-[minmax(14rem,1.5fr)_minmax(8rem,0.8fr)_minmax(8rem,0.7fr)_minmax(13rem,1.15fr)_minmax(7rem,0.65fr)] gap-3 px-4 py-4 text-left hover:bg-blue-50"
-      >
+      {/* A row cell holds the linked-report list, so the whole row cannot be
+          one anchor without nesting links inside it. The lab name is the real
+          link and its `::after` covers the row, which is what makes the row
+          clickable; the two controls that must stay reachable — the expand
+          button and the report links — are lifted above that overlay. The row
+          was previously a `div[role="button"]` with a `navigate()` call, which
+          had no href at all and swallowed both of them. */}
+      <div className="relative grid w-full grid-cols-[minmax(14rem,1.5fr)_minmax(8rem,0.8fr)_minmax(8rem,0.7fr)_minmax(13rem,1.15fr)_minmax(7rem,0.65fr)] gap-3 px-4 py-4 text-left hover:bg-blue-50">
         <div className="flex min-w-0 gap-3">
           <button
             type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onToggle();
-            }}
-            className="mt-0.5 shrink-0 rounded p-0.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+            onClick={onToggle}
+            aria-expanded={expanded}
+            className="relative z-10 mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
             aria-label={`${expanded ? t('Collapse') : t('Expand')} ${
               group.name
             }`}
@@ -320,7 +302,13 @@ function LabTableRow({
           </button>
           <div className="min-w-0">
             <h2 className="break-words text-sm font-semibold text-gray-900">
-              {group.name}
+              <Link
+                to={getLabDetailLink(group.key)}
+                onClick={saveLabsScrollPosition}
+                className="rounded after:absolute after:inset-0 after:content-[''] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+              >
+                {group.name}
+              </Link>
             </h2>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600">
               {group.code ? <span>LOINC {group.code}</span> : null}
@@ -354,7 +342,7 @@ function LabTableRow({
         <div className="text-sm text-gray-700">
           {safeFormatDate(latest.metadata?.date, 'PP', t('Unknown'))}
         </div>
-        <div className="text-sm">
+        <div className="relative z-10 w-fit text-sm">
           <LinkedReportList reports={latestReports} />
         </div>
         <div className="text-sm">

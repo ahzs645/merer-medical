@@ -10,8 +10,10 @@ export enum Routes {
   Immunizations = '/records/immunizations',
   Insurance = '/records/insurance',
   CarePlans = '/records/care-plans',
+  /** Legacy. Redirects to `ConditionDetails`, the same list under its own name. */
   Problems = '/records/problems',
   Conditions = '/records/conditions',
+  ConditionDetails = '/records/conditions/details',
   ConditionDetail = '/records/conditions/:conditionId',
   Dental = '/records/dental',
   DentalChart = '/records/dental/chart',

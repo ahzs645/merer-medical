@@ -108,7 +108,7 @@ export function NotificationCenter({
       <Transition show={open} as={Fragment}>
         <Dialog
           as="div"
-          className="relative z-40"
+          className="relative z-dialog"
           onClose={() => setOpen(false)}
         >
           <Transition.Child
@@ -121,7 +121,7 @@ export function NotificationCenter({
             leaveTo="opacity-0"
           >
             <div
-              className="fixed inset-0 z-40 bg-black/30"
+              className="fixed inset-0 z-dialog bg-black/30"
               aria-hidden="true"
             />
           </Transition.Child>
@@ -135,7 +135,7 @@ export function NotificationCenter({
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <Dialog.Panel className="fixed inset-x-0 bottom-0 z-50 flex max-h-[75vh] flex-col rounded-t-xl bg-white shadow-xl sm:inset-x-auto sm:end-4 sm:top-4 sm:bottom-auto sm:max-h-[75vh] sm:w-96 sm:rounded-xl">
+            <Dialog.Panel className="fixed inset-x-0 bottom-0 z-dialog flex max-h-[75vh] flex-col rounded-t-xl bg-white shadow-xl sm:inset-x-auto sm:end-4 sm:top-4 sm:bottom-auto sm:max-h-[75vh] sm:w-96 sm:rounded-xl">
               <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2">
                 <Dialog.Title
                   as="h2"

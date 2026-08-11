@@ -428,6 +428,7 @@ export function UserDataSettingsGroup() {
             )}
             <input
               type="password"
+              aria-label={t('Passphrase for encrypted package')}
               placeholder={t('Passphrase for encrypted package')}
               disabled={emrpkgUseWebauthn}
               className="focus:ring-primary-500 focus:border-primary-500 block w-56 rounded-md border-gray-300 text-sm shadow-sm disabled:bg-gray-100 disabled:text-gray-400"
@@ -469,7 +470,7 @@ export function UserDataSettingsGroup() {
               type="button"
               disabled={emrpkgBusy}
               onClick={() => emrpkgImportRef.current?.click()}
-              className="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-500"
+              className="inline-flex items-center rounded-md border border-transparent bg-green-700 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-offset-2 disabled:bg-gray-500"
             >
               {t('Import .emrpkg')}
             </button>

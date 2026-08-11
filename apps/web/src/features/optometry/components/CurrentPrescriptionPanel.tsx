@@ -9,6 +9,7 @@ import {
   getCurrentPrescriptions,
 } from '../utils/prescriptionTimeline';
 import { EyeRxTable } from './EyeRxTable';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 export function CurrentPrescriptionPanel({
   records,
@@ -81,7 +82,7 @@ function CurrentRxCard({
       {entry ? (
         <>
           <p className="mt-1 text-xs text-gray-500">
-            {[entry.date?.split('T')[0], entry.product, entry.prescriber]
+            {[formatRecordDate(entry.date, ''), entry.product, entry.prescriber]
               .filter(Boolean)
               .join(' · ')}
           </p>

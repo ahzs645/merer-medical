@@ -45,7 +45,7 @@ export function ImmunizationTimelinePanel({
             {t('Every dose, most recent first.')}
           </p>
         </div>
-        <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-400">
+        <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-600">
           {records.length} {t('doses')}
         </span>
       </div>
@@ -55,7 +55,7 @@ export function ImmunizationTimelinePanel({
           {years.map((group) => (
             <div key={group.year}>
               <div className="sticky top-0 z-10 -mx-1 mb-2 bg-white/90 px-1 py-1 backdrop-blur">
-                <span className="text-xs font-bold uppercase tracking-wide text-gray-400">
+                <span className="text-xs font-bold uppercase tracking-wide text-gray-600">
                   {group.year}
                 </span>
               </div>

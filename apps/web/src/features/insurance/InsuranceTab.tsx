@@ -257,7 +257,9 @@ function InsuranceDetails({ item }: { item: InsuranceItem }) {
           <Detail label="Address" value={item.address} wide />
           <Detail label="Source" value={item.connection?.name} wide />
         </dl>
-        <ManualRecordActions item={item.document} />
+        {/* The detail panel shows one plan, so it is worth saying why a synced
+            one has no Edit — otherwise the page reads as add-only. */}
+        <ManualRecordActions item={item.document} explainReadOnly />
       </div>
 
       {item.sourceText && (

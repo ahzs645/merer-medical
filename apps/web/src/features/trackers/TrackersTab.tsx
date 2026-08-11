@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ChartBarIcon,
   ClockIcon,
@@ -20,8 +20,11 @@ import {
 } from '../../repositories/WorkflowRecordRepository';
 import { formatDisplayText } from '../../shared/utils/StyleUtils';
 import { AppPage } from '../../shared/components/AppPage';
-import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
-import { StylizedSelect } from '../../shared/components/StylizedSelect';
+import {
+  RecordHeaderButton,
+  RecordPageHeader,
+} from '../../shared/components/records/RecordPageHeader';
+import { TrackerEntrySheet, type TrackerEntryDraft } from './TrackerEntrySheet';
 import {
   TRACKER_ENTRY_KIND,
   TRACKER_KINDS,
@@ -37,14 +40,7 @@ export function TrackersTab() {
   const db = useRxDb();
   const user = useUser();
   const [entries, setEntries] = useState<TrackerEntry[]>([]);
-  const [kind, setKind] = useState<TrackerKind>('symptom');
-  const [label, setLabel] = useState('');
-  const [value, setValue] = useState('');
-  const [unit, setUnit] = useState('');
-  const [recordedAt, setRecordedAt] = useState(() =>
-    new Date().toISOString().slice(0, 16),
-  );
-  const [note, setNote] = useState('');
+  const [addOpen, setAddOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -102,28 +98,18 @@ export function TrackersTab() {
     );
   }, [entries]);
 
-  async function addEntry(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const normalizedValue = value.trim();
-    const normalizedLabel = label.trim() || defaultLabel(kind);
-    if (!normalizedValue) return;
-
+  async function addEntry(draft: TrackerEntryDraft) {
     const entry: TrackerEntry = {
       id: crypto.randomUUID(),
-      kind,
-      label: normalizedLabel,
-      value: normalizedValue,
-      unit: unit.trim(),
-      recordedAt: new Date(recordedAt).toISOString(),
-      note: note.trim(),
+      kind: draft.kind,
+      label: draft.label,
+      value: draft.value,
+      unit: draft.unit,
+      recordedAt: new Date(draft.recordedAt).toISOString(),
+      note: draft.note,
     };
     await saveTrackerEntryRecord(db, user.id, entry);
     setEntries((current) => [entry, ...current]);
-    setLabel('');
-    setValue('');
-    setUnit('');
-    setRecordedAt(new Date().toISOString().slice(0, 16));
-    setNote('');
   }
 
   async function deleteEntry(id: string) {
@@ -137,88 +123,22 @@ export function TrackersTab() {
         <RecordPageHeader
           title="Trackers"
           description="Log symptoms, vitals, mood, sleep, and activity between visits."
+          action={
+            <RecordHeaderButton
+              onClick={() => setAddOpen(true)}
+              label="Add entry"
+              compact
+            />
+          }
         />
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8 lg:grid-cols-[360px_minmax(0,1fr)]">
-          <section className="grid content-start gap-4">
-            <form
-              onSubmit={addEntry}
-              className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
-            >
-              <h2 className="text-sm font-semibold text-gray-900">
-                Add tracker entry
-              </h2>
-              <div className="mt-4 grid gap-3">
-                <StylizedSelect
-                  value={kind}
-                  onChange={(value) => setKind(value as TrackerKind)}
-                  options={TRACKER_KINDS.map((item) => ({
-                    value: item.kind,
-                    label: item.label,
-                  }))}
-                />
-                <input
-                  value={label}
-                  onChange={(event) => setLabel(event.target.value)}
-                  placeholder={`${defaultLabel(kind)} name`}
-                  className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <div className="grid grid-cols-[minmax(0,1fr)_96px] gap-2">
-                  <input
-                    value={value}
-                    onChange={(event) => setValue(event.target.value)}
-                    placeholder="Value"
-                    className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
-                  <input
-                    value={unit}
-                    onChange={(event) => setUnit(event.target.value)}
-                    placeholder="Unit"
-                    className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
-                </div>
-                <input
-                  type="datetime-local"
-                  value={recordedAt}
-                  onChange={(event) => setRecordedAt(event.target.value)}
-                  className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <textarea
-                  value={note}
-                  onChange={(event) => setNote(event.target.value)}
-                  placeholder="Optional note"
-                  rows={3}
-                  className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <button
-                  type="submit"
-                  className="bg-primary hover:bg-primary-700 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-white shadow-sm"
-                >
-                  <PlusIcon className="h-5 w-5" />
-                  Add entry
-                </button>
-              </div>
-            </form>
-
-            <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-              <h2 className="text-sm font-semibold text-gray-900">Totals</h2>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {TRACKER_KINDS.map((item) => (
-                  <div key={item.kind} className="rounded-md bg-gray-50 p-3">
-                    <p className="text-xs font-medium text-gray-600">
-                      {item.label}
-                    </p>
-                    <p className="mt-1 text-lg font-semibold text-gray-900">
-                      {counts[item.kind]}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </section>
-
+        {/* Entries first in source and on screen, totals beside them from `lg`
+            and under them below it. The add form used to sit here, above both,
+            so a page for reading back what you logged opened on empty fields —
+            it is a sheet now, off the "Add entry" button in the banner. */}
+        <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-8">
           <section className="rounded-md bg-white shadow-sm ring-1 ring-gray-200">
             <div className="flex items-center gap-2 border-b border-gray-200 px-4 py-3">
               <ChartBarIcon className="h-5 w-5 text-primary-700" />
@@ -236,6 +156,14 @@ export function TrackersTab() {
                   <p className="mt-1 text-sm text-gray-600">
                     Add an entry to start a patient-generated history.
                   </p>
+                  <button
+                    type="button"
+                    onClick={() => setAddOpen(true)}
+                    className="bg-primary hover:bg-primary-700 mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-md px-4 text-sm font-semibold text-white shadow-sm"
+                  >
+                    <PlusIcon className="h-5 w-5" />
+                    Add entry
+                  </button>
                 </div>
               ) : (
                 recentEntries.map((entry) => (
@@ -248,8 +176,32 @@ export function TrackersTab() {
               )}
             </div>
           </section>
+
+          <section className="h-fit rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+            <h2 className="text-sm font-semibold text-gray-900">Totals</h2>
+            <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-1">
+              {TRACKER_KINDS.map((item) => (
+                <div
+                  key={item.kind}
+                  className="flex items-baseline justify-between gap-2 rounded-md bg-gray-50 px-3 py-2"
+                >
+                  <span className="text-xs font-medium text-gray-600">
+                    {item.label}
+                  </span>
+                  <span className="text-lg font-semibold text-gray-900">
+                    {counts[item.kind]}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
+      <TrackerEntrySheet
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onSubmit={addEntry}
+      />
     </AppPage>
   );
 }
@@ -309,14 +261,6 @@ function TrackerEntryRow({
       </div>
     </article>
   );
-}
-
-function defaultLabel(kind: TrackerKind) {
-  if (kind === 'vital') return 'Vital';
-  if (kind === 'mood') return 'Mood';
-  if (kind === 'sleep') return 'Sleep';
-  if (kind === 'activity') return 'Activity';
-  return 'Symptom';
 }
 
 function readLegacyTrackerEntries(userId: string): TrackerEntry[] {

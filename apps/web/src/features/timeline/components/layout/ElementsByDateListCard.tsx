@@ -164,7 +164,7 @@ function DispayDocumentReferencesOrAttachmentTimelineItem(props: {
   ];
   return (
     <div className="mb-2 ml-2">
-      <TimelineCardCategoryTitle title={'Documents'} color="text-teal-600" />
+      <TimelineCardCategoryTitle title={'Documents'} color="text-teal-700" />
       <ul className="list-disc list-inside">
         {docsToDisplay.slice(0, 5).map((item, index) => (
           <DocumentListItem
@@ -589,7 +589,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           <div className="mb-2 ml-2">
             <TimelineCardCategoryTitle
               title={'Encounters'}
-              color="text-red-500"
+              color="text-red-700"
             />
             <ul className="list-disc list-inside">
               {encounters.map((item) => (
@@ -627,7 +627,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           <div className="mb-2 ml-2">
             <TimelineCardCategoryTitle
               title={'Procedures'}
-              color="text-blue-600"
+              color="text-blue-700"
             />
             <ul className="list-disc list-inside">
               {procedures.map((item) => (
@@ -663,7 +663,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           <div className="mb-2 ml-2">
             <TimelineCardCategoryTitle
               title={'Lab Panels'}
-              color="text-blue-600"
+              color="text-blue-700"
             />
             <ul className="list-disc list-inside">
               {diagnosticReports.slice(0, 5).map((item) => (
@@ -687,7 +687,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
         )}
         {observations.length > 0 && (
           <div className="mb-2 ml-2">
-            <TimelineCardCategoryTitle title={'Labs'} color="text-sky-600" />
+            <TimelineCardCategoryTitle title={'Labs'} color="text-sky-700" />
             <ul className="list-disc list-inside">
               {observations.slice(0, 5).map((item) => (
                 <li
@@ -711,7 +711,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           <div className="mb-2 ml-2">
             <TimelineCardCategoryTitle
               title={'Immunizations'}
-              color="text-purple-600"
+              color="text-purple-700"
             />
             <ul className="list-disc list-inside">
               {immunizations.map((item) => (
@@ -729,7 +729,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           <div className="mb-2 ml-2">
             <TimelineCardCategoryTitle
               title={'Conditions'}
-              color="text-green-600"
+              color="text-green-700"
             />
             <ul className="list-disc list-inside">
               {conditions.map((item) => (
@@ -783,7 +783,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           <div className="mb-2 ml-2">
             <TimelineCardCategoryTitle
               title={'Coverage'}
-              color="text-amber-600"
+              color="text-amber-700"
             />
             <ul className="list-disc list-inside">
               {coverages.map((item) => (
@@ -837,7 +837,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           <div className="mb-2 ml-2">
             <TimelineCardCategoryTitle
               title={'Referrals'}
-              color="text-sky-600"
+              color="text-sky-700"
             />
             <ul className="list-disc list-inside">
               {referrals.map((item) => (
@@ -855,7 +855,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           <div className="mb-2 ml-2">
             <TimelineCardCategoryTitle
               title={'Goals'}
-              color="text-emerald-600"
+              color="text-emerald-700"
             />
             <ul className="list-disc list-inside">
               {goals.map((item) => (

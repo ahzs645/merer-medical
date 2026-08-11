@@ -30,7 +30,7 @@ export const ServiceRequestCard = memo(function ServiceRequestCard({
   return (
     <CardBase>
       <div className="min-w-0 flex-1">
-        <TimelineCardCategoryTitle title="Referral" color="text-sky-600" />
+        <TimelineCardCategoryTitle title="Referral" color="text-sky-700" />
         <TimelineCardTitle>{item.metadata?.display_name}</TimelineCardTitle>
         <p className="truncate text-xs font-medium text-gray-800 md:text-sm">
           {formatTime(item.metadata?.date)}

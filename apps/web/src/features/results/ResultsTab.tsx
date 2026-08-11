@@ -173,15 +173,24 @@ function ResultGroupSection({
   selectedId?: string;
   onSelect: (id: string) => void;
 }) {
+  // Most groups hold exactly one result, and the group's title is that result's
+  // title — so the list printed every name twice in a row, header then row. A
+  // one-result group keeps the date as its header and lets the row say the name
+  // once; a group that genuinely collects several still gets its heading.
+  const namesOneResult =
+    group.results.length === 1 && group.results[0]?.title === group.title;
+
   return (
     <div className="border-b border-gray-100 last:border-b-0">
       <div className="bg-gray-50 px-3 py-2">
         <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
           {safeFormatDate(group.date, 'PP', 'Unknown date')}
         </p>
-        <h2 className="truncate text-sm font-semibold text-gray-900">
-          {group.title}
-        </h2>
+        {namesOneResult ? null : (
+          <h2 className="truncate text-sm font-semibold text-gray-900">
+            {group.title}
+          </h2>
+        )}
       </div>
       <div className="divide-y divide-gray-100">
         {group.results.map((result) => (
@@ -430,6 +439,12 @@ function InfoBlock({ label, value }: { label: string; value?: string }) {
   );
 }
 
+/**
+ * Green meant "not abnormal", which is not the same as "fine" — a result the
+ * source never gave a status for came through as a green pill reading
+ * "unknown", the same green as "final". An unknown status is grey; a known,
+ * unremarkable one keeps the green.
+ */
 function StatusBadge({
   status,
   abnormal,
@@ -437,15 +452,18 @@ function StatusBadge({
   status: string;
   abnormal: boolean;
 }) {
+  const unknown = !status || /^(unknown|entered-in-error|null)$/i.test(status);
+  const tone = abnormal
+    ? 'bg-amber-100 text-amber-800'
+    : unknown
+      ? 'bg-gray-100 text-gray-600'
+      : 'bg-emerald-100 text-emerald-800';
+
   return (
     <span
-      className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
-        abnormal
-          ? 'bg-amber-100 text-amber-800'
-          : 'bg-emerald-100 text-emerald-800'
-      }`}
+      className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${tone}`}
     >
-      {abnormal ? 'Attention' : status}
+      {abnormal ? 'Attention' : unknown ? 'No status' : status}
     </span>
   );
 }

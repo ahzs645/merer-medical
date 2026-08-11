@@ -71,7 +71,7 @@ function EyeRow({
     <tr className="align-top">
       <td className="border-t border-gray-100 py-2 pr-3">
         <span className="font-semibold text-gray-900">{eye}</span>
-        <span className="ml-1 text-xs text-gray-400">{label}</span>
+        <span className="ml-1 text-xs text-gray-600">{label}</span>
       </td>
       {COLUMNS.map((column) => {
         const value = rx?.[column.key] as number | undefined;

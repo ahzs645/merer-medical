@@ -21,17 +21,26 @@ import {
 /** How many categories the wide-viewport overview ranks before it stops. */
 const OVERVIEW_ROWS = 6;
 
-/** Sub-label under a category name: a tally, or why there isn't one. */
-function countText(count: CategoryCount): string {
+/**
+ * Sub-label under a category name: a tally, or — where there is no honest
+ * single number to show — what the category holds.
+ *
+ * Five of these cards are combined views with no 1:1 resource tally, and they
+ * used to read "Not counted", which on a phone was the whole story: Labs,
+ * Vitals, Imaging, All results and My conditions all announcing an absence,
+ * with the footnote that explains why living in a `lg`-only block. A card
+ * saying what it is beats a card saying what it could not compute.
+ */
+function countText(count: CategoryCount, blurb?: string): string {
   switch (count.kind) {
     case 'count':
       return `${count.value} record${count.value === 1 ? '' : 's'}`;
     case 'pending':
       return 'Counting…';
     case 'unavailable':
-      return 'Count unavailable';
+      return blurb ?? 'Count unavailable';
     default:
-      return 'Not counted';
+      return blurb ?? 'Not counted';
   }
 }
 
@@ -114,19 +123,20 @@ export function RecordsHub() {
                               <span className="block text-sm font-semibold leading-snug text-gray-900">
                                 {item.label}
                               </span>
+                              {/* One colour for both: the sub-label is a
+                                  tally or a description, and both are content.
+                                  gray-400 at 12px is 2.54:1 on white, well
+                                  under the 4.5 AA asks for small text; gray-600
+                                  clears it at 7:1. */}
                               <span
-                                className={`block text-xs ${
-                                  count.kind === 'count'
-                                    ? 'text-gray-500'
-                                    : 'text-gray-400'
-                                }`}
+                                className="block text-xs text-gray-600"
                                 title={
                                   count.kind === 'uncounted'
                                     ? 'This view combines several kinds of record, so it has no single tally.'
                                     : undefined
                                 }
                               >
-                                {countText(count)}
+                                {countText(count, item.blurb)}
                               </span>
                             </span>
                           </Link>

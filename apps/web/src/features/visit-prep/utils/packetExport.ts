@@ -1,3 +1,4 @@
+import { formatDateAndTime } from '../../../shared/utils/dateFormatters';
 import { PacketItem, PacketOptions, PacketSections } from '../types';
 
 export function buildPacketMarkdown({
@@ -46,7 +47,7 @@ export function buildPacketMarkdown({
   return [
     '# Visit prep and provider packet',
     `Patient: ${patientName || 'Unknown user'}`,
-    `Generated: ${generatedAt.toLocaleString()}`,
+    `Generated: ${formatDateAndTime(generatedAt.toISOString())}`,
     '',
     ...sections,
     '',
@@ -121,7 +122,7 @@ export function buildPacketHtml({
   <header>
     <h1>Visit prep and provider packet</h1>
     <p class="meta">Patient: ${escapeHtml(patientName || 'Unknown user')}</p>
-    <p class="meta">Generated: ${escapeHtml(generatedAt.toLocaleString())}</p>
+    <p class="meta">Generated: ${escapeHtml(formatDateAndTime(generatedAt.toISOString()))}</p>
   </header>
   ${sectionHtml}
 </body>

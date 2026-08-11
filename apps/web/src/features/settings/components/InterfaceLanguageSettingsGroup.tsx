@@ -7,7 +7,7 @@ export function InterfaceLanguageSettingsGroup() {
   const { language, setLanguage, t } = useInterfaceLanguage();
 
   return (
-    <SettingsSection id="interface-language" title={t('Interface Language')}>
+    <SettingsSection id="interface-language" title={t('Interface language')}>
       <label className="flex flex-col gap-2">
         <span className="text-primary-800 text-lg leading-6">
           {t('Display language')}

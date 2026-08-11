@@ -178,12 +178,20 @@ const routes = [
             element: <CarePlansTab />,
           },
           {
+            // Problems and My conditions were two nav entries over one pile of
+            // FHIR Conditions, both headers reporting the same count. They are
+            // one category with two views now; the old address still resolves.
             path: 'problems',
-            element: <ProblemsTab />,
+            element: <Navigate to={AppRoutes.ConditionDetails} replace />,
           },
           {
             path: 'conditions',
             element: <ConditionsTab />,
+          },
+          {
+            // Declared before `:conditionId` so the literal wins the match.
+            path: 'conditions/details',
+            element: <ProblemsTab />,
           },
           {
             path: 'conditions/:conditionId',

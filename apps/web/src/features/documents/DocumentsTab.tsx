@@ -154,7 +154,8 @@ function DocumentSectionList({ section }: { section: DocumentSection }) {
             <p className="text-sm text-gray-600">{t(section.description)}</p>
           </div>
           <span className="text-sm font-medium text-gray-500">
-            {section.items.length} {t('items')}
+            {section.items.length}{' '}
+            {section.items.length === 1 ? t('item') : t('items')}
           </span>
         </div>
       </div>
@@ -335,7 +336,7 @@ function DocumentItemCard({ item }: { item: DocumentItem }) {
             attachmentMetadata?.title ||
             t('Untitled document')}
         </h2>
-        <p className="truncate text-xs text-gray-500">
+        <p className="truncate text-xs text-gray-700">
           {safeFormatDate(item.document.metadata?.date, 'PP', '')}
           {attachmentMetadata?.title ||
           getMetadataString(item.document, 'source_image')

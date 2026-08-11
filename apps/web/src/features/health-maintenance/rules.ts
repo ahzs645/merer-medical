@@ -216,11 +216,23 @@ function formatShort(date: Date): string {
   });
 }
 
+/**
+ * "10 months", "2 years 2 months" — not "10m" and "2y 2m".
+ *
+ * On its own, "Overdue by 10m" is a coin flip between months and minutes, and
+ * the row it sits in is telling you a vaccine is late. The unit is worth the
+ * characters.
+ */
 function formatDuration(months: number): string {
+  const plural = (value: number, unit: string) =>
+    `${value} ${unit}${value === 1 ? '' : 's'}`;
+
   if (months >= 12) {
     const years = Math.floor(months / 12);
     const rem = months % 12;
-    return rem ? `${years}y ${rem}m` : `${years}y`;
+    return rem
+      ? `${plural(years, 'year')} ${plural(rem, 'month')}`
+      : plural(years, 'year');
   }
-  return `${months}m`;
+  return plural(months, 'month');
 }

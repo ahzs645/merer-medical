@@ -82,7 +82,7 @@ function NotificationRenderer(
           the mobile tab bar, which is gone from md up. */}
       <div
         aria-live="assertive"
-        className="pointer-events-none fixed inset-0 z-50 flex items-end px-4 pb-24 pt-6 print:hidden sm:px-6 md:pb-6"
+        className="pointer-events-none fixed inset-0 z-toast flex items-end px-4 pb-24 pt-6 print:hidden sm:px-6 md:pb-6"
       >
         <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
           {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
