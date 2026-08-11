@@ -104,6 +104,29 @@ describe('ConditionsTab', () => {
     );
   });
 
+  /**
+   * Two nav entries listed these same records under two names, and both
+   * headers reported the same count. They are one category with two readings
+   * now, and the switch is what says which one you are on.
+   */
+  it('offers the detail reading of the same records from the banner', async () => {
+    renderTab();
+
+    await waitFor(() =>
+      expect(screen.getByText('No conditions yet')).toBeTruthy(),
+    );
+    const views = screen.getByRole('group', { name: 'Condition views' });
+    expect(
+      Array.from(views.querySelectorAll('a')).map((link) => [
+        link.textContent,
+        link.getAttribute('href'),
+      ]),
+    ).toEqual([
+      ['By topic', '/records/conditions'],
+      ['Details', '/records/conditions/details'],
+    ]);
+  });
+
   it('sends nobody to Problems to type a record this page can take', async () => {
     renderTab();
 

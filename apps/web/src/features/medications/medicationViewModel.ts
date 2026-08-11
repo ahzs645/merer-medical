@@ -1,4 +1,5 @@
-import type { MedicationTimelineItem } from './';
+import type { MedicationSource, MedicationTimelineItem } from './';
+import type { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 
 export type MedicationGroup =
   | 'current'
@@ -30,10 +31,47 @@ export function toMedicationViewItem(
   };
 }
 
+/**
+ * Names the source from the connection the record arrived on, where the FHIR
+ * resource named nobody.
+ *
+ * The normaliser is a pure FHIR-to-domain transform with no database, so a
+ * `MedicationStatement` carrying no `informationSource`, `recorder`, `requester`
+ * or `performer` leaves `label` empty — and the card falls back to the type
+ * alone, "Clinician". The connection knows it as "Blessings Clinic", and
+ * `connectionId` was already being carried here for exactly this. So the lookup
+ * happens at the view boundary, where the connections are, rather than being
+ * threaded down into the transform.
+ *
+ * History events share the item's source object, so they are remapped with it.
+ */
+export function withConnectionNames(
+  item: MedicationTimelineItem,
+  connectionsById: Map<string, ConnectionDocument>,
+): MedicationTimelineItem {
+  const resolve = (source: MedicationSource): MedicationSource => {
+    if (source.label || !source.connectionId) return source;
+    const name = connectionsById.get(source.connectionId)?.name;
+    return name ? { ...source, label: name } : source;
+  };
+
+  return {
+    ...item,
+    source: resolve(item.source),
+    history: item.history.map((event) =>
+      event.source ? { ...event, source: resolve(event.source) } : event,
+    ),
+  };
+}
+
 export function sourceLabel(source: MedicationTimelineItem['source']) {
-  return [source.label, source.type && humanize(source.type)]
+  // "·", the separator the rest of the app uses between facts on one line, and
+  // a capital on the type so "Blessings Clinic · imported record" does not read
+  // as a proper noun trailing off into lower case.
+  const type = source.type && humanize(source.type);
+  return [source.label, type && type.charAt(0).toUpperCase() + type.slice(1)]
     .filter(Boolean)
-    .join(' - ');
+    .join(' · ');
 }
 
 export function humanize(value: string) {

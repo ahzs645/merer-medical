@@ -1,5 +1,6 @@
 import { useEffect, useState, type ComponentType } from 'react';
 import {
+  ArrowRightIcon,
   ClipboardDocumentListIcon,
   PlusIcon,
   ScissorsIcon,
@@ -38,6 +39,15 @@ interface HistoriesData {
   surgical: HistoryItem[];
   family: HistoryItem[];
   social: HistoryItem[];
+}
+
+/**
+ * Most recent first, undated last. Nothing sorted these, so a section that is
+ * cut off at five rows would have shown whichever five the database handed
+ * back — here, a 2012 pneumonia above a 2026 diagnosis.
+ */
+function byDateDesc(items: HistoryItem[]): HistoryItem[] {
+  return [...items].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 }
 
 function isSocialHistory(resource: Record<string, unknown>): boolean {
@@ -157,7 +167,12 @@ function useHistoriesData() {
           date: (r['effectiveDateTime'] as string) || doc.metadata?.date,
         }));
 
-      setData({ medical, surgical, family: familyItems, social });
+      setData({
+        medical: byDateDesc(medical),
+        surgical: byDateDesc(surgical),
+        family: byDateDesc(familyItems),
+        social: byDateDesc(social),
+      });
       setStatus('success');
     }
     load().catch((e) => {
@@ -182,7 +197,20 @@ function useHistoriesData() {
  * yourself that this page is fed by four unrelated kinds. One banner button
  * can only be honest about one of them, so the choice moved to where it is
  * already made: you add to the list you are looking at.
+ *
+ * `home` is the page that owns the section's records, where one exists. The
+ * first two sections re-list what Conditions and Procedures hold — the same
+ * documents, read as an intake form — and saying so, with a way through, is
+ * the difference between a summary and a third copy of the same list. Family
+ * and social history have no other page, so they name none, and stay whole.
+ *
+ * Sections that have a home are cut to `SUMMARY_ROWS`, most recent first: the
+ * medical history opened with all thirteen conditions, which filled a phone
+ * screen and pushed the other three sections — the ones this page is the only
+ * home for — out of sight.
  */
+const SUMMARY_ROWS = 5;
+
 const SECTIONS: {
   key: keyof HistoriesData;
   title: string;
@@ -190,6 +218,7 @@ const SECTIONS: {
   empty: string;
   addType: ManualRecordKind;
   addLabel: string;
+  home?: { to: string; label: string };
 }[] = [
   {
     key: 'medical',
@@ -198,6 +227,7 @@ const SECTIONS: {
     empty: 'No conditions recorded.',
     addType: 'condition',
     addLabel: 'Add condition',
+    home: { to: AppRoutes.Conditions, label: 'Conditions' },
   },
   {
     key: 'surgical',
@@ -206,6 +236,7 @@ const SECTIONS: {
     empty: 'No procedures recorded.',
     addType: 'procedure',
     addLabel: 'Add procedure',
+    home: { to: AppRoutes.Procedures, label: 'Procedures' },
   },
   {
     key: 'family',
@@ -229,7 +260,14 @@ export function HistoriesTab() {
   const { data, status, error } = useHistoriesData();
 
   return (
-    <AppPage banner={<RecordPageHeader title="Histories" />}>
+    <AppPage
+      banner={
+        <RecordPageHeader
+          title="Histories"
+          description="The intake-form reading of your record: what you have had, what was done, what runs in the family, and how you live. The first two sections are the same records Conditions and Procedures hold, not a separate list."
+        />
+      }
+    >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto w-full max-w-5xl px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'error' ? (
@@ -249,6 +287,7 @@ export function HistoriesTab() {
                     returnTo: AppRoutes.Histories,
                   })}
                   addLabel={section.addLabel}
+                  home={section.home}
                 />
               ))}
             </div>
@@ -267,6 +306,7 @@ function HistorySection({
   loading,
   addPath,
   addLabel,
+  home,
 }: {
   title: string;
   icon: ComponentType<{ className?: string }>;
@@ -275,7 +315,11 @@ function HistorySection({
   loading: boolean;
   addPath: string;
   addLabel: string;
+  home?: { to: string; label: string };
 }) {
+  const shown = home ? items.slice(0, SUMMARY_ROWS) : items;
+  const hidden = items.length - shown.length;
+
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="mb-3 flex items-center gap-2">
@@ -306,7 +350,7 @@ function HistorySection({
         <p className="text-sm italic text-gray-500">{empty}</p>
       ) : (
         <ul className="divide-y divide-gray-100">
-          {items.map((item) => (
+          {shown.map((item) => (
             <li key={item.id} className="py-2">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -329,6 +373,20 @@ function HistorySection({
             </li>
           ))}
         </ul>
+      )}
+      {home && !loading && (
+        // Named rather than a bare "See all": the point is that these rows
+        // already live somewhere with a fuller view of them, and this is the
+        // way there.
+        <Link
+          to={home.to}
+          className="mt-3 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-900"
+        >
+          {hidden > 0
+            ? `${hidden} more in ${home.label}`
+            : `Open ${home.label}`}
+          <ArrowRightIcon className="h-4 w-4 shrink-0 rtl:rotate-180" />
+        </Link>
       )}
     </section>
   );

@@ -6,7 +6,6 @@ import {
   ClipboardDocumentCheckIcon,
   ClipboardDocumentListIcon,
   DocumentTextIcon,
-  ExclamationCircleIcon,
   ExclamationTriangleIcon,
   EyeIcon,
   FaceSmileIcon,
@@ -109,17 +108,15 @@ export const RECORD_GROUPS: RecordGroup[] = [
   {
     heading: 'Health profile',
     items: [
-      {
-        to: AppRoutes.Problems,
-        label: 'Problems',
-        icon: ExclamationCircleIcon,
-        resourceTypes: ['condition'],
-      },
+      // One entry, not the two ("Problems" and "My conditions") that listed the
+      // same thirteen records under two names and both reported "13
+      // conditions". The page carries a switch between the two readings, so the
+      // count here is a clean 1:1 with the rows either one lists.
       {
         to: AppRoutes.Conditions,
-        label: 'My conditions',
+        label: 'Conditions',
         icon: Squares2X2Icon,
-        blurb: 'Grouped by topic',
+        resourceTypes: ['condition'],
       },
       {
         to: AppRoutes.Allergies,

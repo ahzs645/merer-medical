@@ -11,6 +11,7 @@ import {
   NoSymbolIcon,
   PlusIcon,
   QuestionMarkCircleIcon,
+  Squares2X2Icon,
 } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
@@ -24,6 +25,10 @@ import {
   RecordHeaderLink,
   RecordPageHeader,
 } from '../../shared/components/records/RecordPageHeader';
+import {
+  CONDITION_VIEWS,
+  RecordViewSwitch,
+} from '../../shared/components/records/RecordViewSwitch';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
@@ -66,8 +71,8 @@ const FILTERS: {
 ];
 
 const GROUPS: { id: ProblemStatus; title: string }[] = [
-  { id: 'active', title: 'Active problems' },
-  { id: 'resolved', title: 'Resolved problems' },
+  { id: 'active', title: 'Active conditions' },
+  { id: 'resolved', title: 'Resolved conditions' },
   { id: 'unknown', title: 'Unknown status' },
 ];
 
@@ -77,7 +82,7 @@ const GROUPS: { id: ProblemStatus; title: string }[] = [
 // page's own description already calls its rows.
 const ADD_CONDITION_PATH = buildAddRecordPath({
   type: 'condition',
-  returnTo: AppRoutes.Problems,
+  returnTo: AppRoutes.ConditionDetails,
 });
 
 export function ProblemsTab() {
@@ -142,7 +147,7 @@ export function ProblemsTab() {
         <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'loading' ? (
             <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
-              Loading problems...
+              Loading conditions...
             </div>
           ) : status === 'error' ? (
             <ErrorPanel error={error} />
@@ -247,24 +252,30 @@ function ProblemsHeader({
   onFilterChange: (filter: FilterId) => void;
 }) {
   return (
+    // Same title and icon as the by-topic view: this is the other reading of
+    // one category, not a second one. The switch is what changes, and the
+    // description says what this reading adds.
     <RecordPageHeader<FilterId>
-      title="Problems"
-      icon={ClipboardDocumentListIcon}
+      title="Conditions"
+      icon={Squares2X2Icon}
       description={`${totalCount} ${
         totalCount === 1 ? 'condition' : 'conditions'
-      } from connected and manually entered records.`}
+      }, each with its status, dates, codes and where it came from.`}
       search={{
         query,
         onChange: onQueryChange,
         placeholder: 'Search diagnosis, code, status, source, or note',
-        label: 'Search problems',
+        label: 'Search conditions',
       }}
       action={
-        <RecordHeaderLink
-          to={ADD_CONDITION_PATH}
-          label="Add condition"
-          compact
-        />
+        <>
+          <RecordViewSwitch views={CONDITION_VIEWS} label="Condition views" />
+          <RecordHeaderLink
+            to={ADD_CONDITION_PATH}
+            label="Add condition"
+            compact
+          />
+        </>
       }
       filters={{
         items: FILTERS.map((filter) => ({
@@ -273,7 +284,7 @@ function ProblemsHeader({
         })),
         selectedId: selectedFilter,
         onSelect: onFilterChange,
-        label: 'Filter problems by status',
+        label: 'Filter conditions by status',
       }}
     />
   );
@@ -294,7 +305,7 @@ function ProblemGroups({
   if (items.length === 0) {
     return (
       <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
-        No problems match this view.
+        No conditions match this view.
       </div>
     );
   }
@@ -331,30 +342,28 @@ function ProblemGroups({
 function ProblemCard({ item }: { item: ProblemItem }) {
   return (
     <article className="min-w-0 rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="break-words text-base font-semibold text-gray-900">
-              {item.name}
-            </h3>
-            <StatusBadge status={item.status} />
-          </div>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {item.clinicalStatus &&
-              humanize(item.clinicalStatus) !== humanize(item.status) && (
-                <Badge>{humanize(item.clinicalStatus)}</Badge>
-              )}
-            {item.verificationStatus && (
-              <Badge>{humanize(item.verificationStatus)}</Badge>
-            )}
-            {item.category && <Badge>{item.category}</Badge>}
-            {item.codes.slice(0, 3).map((code) => (
-              <Badge key={code}>{code}</Badge>
-            ))}
-          </div>
+      {/* No date beside the title: it was `onset || recorded`, and the grid
+          below prints whichever of those the record has, so every card said
+          the same date twice. */}
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="break-words text-base font-semibold text-gray-900">
+            {item.name}
+          </h3>
+          <StatusBadge status={item.status} />
         </div>
-        <div className="shrink-0 text-sm text-gray-500">
-          {formatProblemDate(item.onsetDate || item.recordedDate)}
+        <div className="mt-2 flex flex-wrap gap-2">
+          {item.clinicalStatus &&
+            humanize(item.clinicalStatus) !== humanize(item.status) && (
+              <Badge>{humanize(item.clinicalStatus)}</Badge>
+            )}
+          {item.verificationStatus && (
+            <Badge>{humanize(item.verificationStatus)}</Badge>
+          )}
+          {item.category && <Badge>{item.category}</Badge>}
+          {item.codes.slice(0, 3).map((code) => (
+            <Badge key={code}>{code}</Badge>
+          ))}
         </div>
       </div>
 
@@ -391,7 +400,7 @@ function EmptyProblemsState() {
         <ClipboardDocumentListIcon className="h-6 w-6" />
       </div>
       <h2 className="mt-4 text-lg font-semibold text-gray-900">
-        No problems yet
+        No conditions yet
       </h2>
       <p className="mx-auto mt-2 max-w-xl text-sm text-gray-600">
         Diagnoses and problem list items from connected portals or manual

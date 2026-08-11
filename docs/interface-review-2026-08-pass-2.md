@@ -74,19 +74,61 @@ the category counted `familymemberhistory`, while the page opens with a 13-row
 the category config already states: set `resourceTypes` only where the tally
 equals the rows the page lists.
 
-## Left open, deliberately
+## The two the sweep left open, since decided
 
-**Three pages show the same thirteen conditions.** Problems lists them, My
-conditions groups them by topic, and Histories opens with them under "Medical
-history" — which also repeats the twelve Procedures. Whether three doors onto
-one set of records is the right information architecture is a decision, not a
-defect.
+Both were held back because they are choices rather than defects. Both are now
+made.
 
-**The connection's name, where its key used to be.** Medications now says
-"Clinician" where it printed a UUID. It could say "Blessings Clinic": the source
-object still carries `connectionId` and the connections collection has the name.
-That needs a fetch threaded through the medication normaliser — worth doing on
-purpose rather than inside a review sweep.
+### Three doors onto thirteen conditions
+
+Problems and My conditions were two entries in the same nav group over one pile
+of thirteen FHIR `Condition` records. Both headers said "13 conditions". Neither
+name told you which one held what you were after, and "Add problem" and "Add
+condition" opened the same form.
+
+They are one category with two readings now:
+
+| | Then | Now |
+| --- | --- | --- |
+| Nav | Problems (13) · My conditions (–) | Conditions (13) |
+| Grouped by topic, with related meds/labs/plans | `/records/conditions` | `/records/conditions` |
+| Every field of every diagnosis | `/records/problems` | `/records/conditions/details` |
+
+Both pages wear the same title, icon and count, and a segmented switch in the
+banner — By topic / Details — says which reading you are on. `/records/problems`
+redirects, the way `/labs`, `/imaging`, `/dental` and four others already do;
+"problems" is still a command-palette keyword, since it is the word most portals
+print. The category's count is now a clean 1:1 with the rows either view lists,
+which is the rule the category config already stated.
+
+Histories is a genuinely different frame — the intake form: what you have had,
+what was done, what runs in the family, how you live — so it keeps its four
+sections. What it stopped doing is passing off the first two as its own. Medical
+history and Surgical history are the same documents Conditions and Procedures
+hold; each now shows the five most recent and ends in "8 more in Conditions".
+Before, the medical section alone ran thirteen rows and filled a phone screen,
+pushing family and social history — the two this page is the only home for — off
+the bottom. All four now fit above the fold at every width.
+
+Removing the duplicate also removed a duplicate inside each card: the date beside
+the title was `onset || recorded`, and the grid underneath already printed
+whichever of those the record had.
+
+### The connection's name, where its key used to be
+
+Medications said "Clinician" where it had printed a UUID. It says "Blessings
+Clinic · Imported record" now.
+
+The normaliser is a pure FHIR-to-domain transform with no database, so a
+`MedicationStatement` naming no `informationSource`, `recorder`, `requester` or
+`performer` had no way to fill the label — while the connection the record
+arrived on knew the name all along, and `connectionId` was already being carried
+through for exactly this. So the lookup happens at the view boundary, where the
+connections are, instead of threading a fetch down into the transform: one more
+parallel query in `useMedicationsData`, and a `withConnectionNames` pass over the
+timeline items before they become view items. Records that *do* name a
+prescriber are untouched — "Physician O. Cardiology, MD · Clinician" still reads
+as it did.
 
 ## Final state
 
@@ -97,4 +139,8 @@ Across 138 page loads at 393 / 834 / 1440:
 - 0 unlabelled form controls (was 11)
 - content probe clean at both sizes: no identifiers, no broken values, no empty
   boxes, no duplicate headings, no contrast failures, no missing focus styles
-- 576 tests passing, lint at its pre-change baseline
+- 577 tests passing, lint at its pre-change baseline
+
+Re-run after the two decisions above, on the surfaces they touched: geometry
+probe clean at all three widths, content probe clean on all 46 surfaces at 393
+and 1440.

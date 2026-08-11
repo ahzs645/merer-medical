@@ -103,10 +103,18 @@ const COMMAND_ITEMS: CommandPaletteItem[] = [
     icon: DocumentTextIcon,
   },
   {
-    title: 'Problems',
-    description: 'Conditions and health issues',
-    route: AppRoutes.Problems,
-    keywords: ['conditions', 'diagnoses', 'problem list', 'health issues'],
+    title: 'Conditions',
+    description: 'Diagnoses, grouped or in detail',
+    route: AppRoutes.Conditions,
+    // "Problems" was this page's old name and is still the word most portals
+    // print, so it stays searchable.
+    keywords: [
+      'problems',
+      'problem list',
+      'diagnoses',
+      'health issues',
+      'my conditions',
+    ],
     icon: DocumentTextIcon,
   },
   {

@@ -1727,7 +1727,7 @@ export const arabicTranslations: Record<string, string> = {
   // Command palette page entries
   'Review records by date': 'راجع السجلات حسب التاريخ',
   'Current health snapshot': 'لمحة عن حالتك الصحية الحالية',
-  'Conditions and health issues': 'الحالات والمشكلات الصحية',
+  'Diagnoses, grouped or in detail': 'التشخيصات، مجمعة أو بالتفصيل',
   'Results, ranges, and trends': 'النتائج والنطاقات والاتجاهات',
   'Medication records and prescriptions': 'سجلات الأدوية والوصفات',
   'Imaging reports and studies': 'تقارير ودراسات التصوير',

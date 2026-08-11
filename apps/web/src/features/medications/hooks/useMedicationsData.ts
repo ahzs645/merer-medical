@@ -4,11 +4,13 @@ import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
 import { useRecordChangeTick } from '../../../shared/utils/recordChangeSignal';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
+import { ConnectionDocument } from '../../../models/connection-document/ConnectionDocument.type';
 import { normalizeMedicationDocuments } from '..';
 import {
   MedicationViewItem,
   sourceLabel,
   toMedicationViewItem,
+  withConnectionNames,
 } from '../medicationViewModel';
 
 export const MEDICATION_RESOURCE_TYPES = [
@@ -39,7 +41,7 @@ export function useMedicationsData({
 
     async function fetchMedications() {
       setStatus('loading');
-      const [docs, allergyDocs] = await Promise.all([
+      const [docs, allergyDocs, connectionDocs] = await Promise.all([
         db.clinical_documents
           .find({
             selector: {
@@ -58,13 +60,24 @@ export function useMedicationsData({
             sort: [{ 'metadata.date': 'desc' }],
           })
           .exec(),
+        // For naming the source: a medication whose FHIR resource lists no
+        // prescriber still knows which connection it arrived on.
+        db.connection_documents.find({ selector: { user_id: user.id } }).exec(),
       ]);
 
       if (!isMounted) return;
+      const connectionsById = new Map(
+        connectionDocs.map((doc) => {
+          const connection = doc.toMutableJSON() as ConnectionDocument;
+          return [connection.id, connection] as const;
+        }),
+      );
       setItems(
         normalizeMedicationDocuments(
           docs.map((doc) => doc.toMutableJSON() as ClinicalDocument),
-        ).map(toMedicationViewItem),
+        )
+          .map((item) => withConnectionNames(item, connectionsById))
+          .map(toMedicationViewItem),
       );
       setAllergies(
         allergyDocs.map((doc) => doc.toMutableJSON() as ClinicalDocument),

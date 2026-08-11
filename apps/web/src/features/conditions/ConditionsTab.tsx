@@ -8,6 +8,10 @@ import {
   RecordHeaderLink,
   RecordPageHeader,
 } from '../../shared/components/records/RecordPageHeader';
+import {
+  CONDITION_VIEWS,
+  RecordViewSwitch,
+} from '../../shared/components/records/RecordViewSwitch';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { isManualRecord } from '../../shared/utils/manualRecordUtils';
 import { buildAddRecordPath } from '../manual-entry/addRecordPath';
@@ -95,7 +99,9 @@ function ConditionsHeader({
 }) {
   return (
     <RecordPageHeader
-      title="My conditions"
+      // "My conditions" beside a "Problems" entry listing the same records read
+      // as two categories. One name, two views, and the switch says which.
+      title="Conditions"
       icon={Squares2X2Icon}
       description={`${total} ${
         total === 1 ? 'condition' : 'conditions'
@@ -107,11 +113,14 @@ function ConditionsHeader({
         label: 'Search conditions',
       }}
       action={
-        <RecordHeaderLink
-          to={ADD_CONDITION_PATH}
-          label="Add condition"
-          compact
-        />
+        <>
+          <RecordViewSwitch views={CONDITION_VIEWS} label="Condition views" />
+          <RecordHeaderLink
+            to={ADD_CONDITION_PATH}
+            label="Add condition"
+            compact
+          />
+        </>
       }
     />
   );
