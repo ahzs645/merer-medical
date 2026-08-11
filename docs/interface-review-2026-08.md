@@ -3,6 +3,17 @@
 A pass over every screen the app can render, at three widths, looking for what
 holds up and what doesn't.
 
+> **Status:** everything in "Suggested order" below has since been implemented —
+> see the commit *"Fix what the interface review found"*. The findings are kept
+> here as written, because the reasoning is what makes the fixes reviewable.
+>
+> One correction to the original text, folded into finding 1: the app's own nav
+> rail was never the problem. `TabWrapper` already writes the rail after the
+> content and puts it back on the left with `md:flex-row-reverse`, so tab order
+> reached the page first. The list that genuinely preceded page content was the
+> Records **side nav**, on the 33 routes that mount the Records shell — measured
+> by tabbing the built app, not read off the CSS.
+
 ## How this was done
 
 The production build was served locally and driven through the `/demo` route, so
@@ -71,17 +82,22 @@ These repeat across many surfaces, so they're worth more than any single-page fi
 Verified on every capture: `document.querySelector('main')` is null everywhere,
 and there is no skip-to-content link in the codebase.
 
-On desktop that means a keyboard or screen-reader user tabs through the rail
-(logo, Sharing, Search, Collapse, Add record, 6–8 destinations, Alerts, the
-profile card) and then, inside Records, up to 25 more category links — on
-*every* navigation — before reaching the page. The app is otherwise careful
-about accessibility (one `h1` per surface, `sr-only` text behind the dash-shaped
-counts, `aria-label`s on the icon buttons, no images missing `alt`), which makes
-this the odd gap out.
+Tabbing the built app shows what that costs. The app's own rail is fine — it is
+written after the content and drawn on the left with `md:flex-row-reverse`, so
+the first tab stop on the timeline is the timeline. But on the 33 routes that
+mount the Records shell, the **side nav** is written first, so the first twenty
+tab stops on Labs are Labs, Vitals, Imaging, All results, Problems… every time.
+The timeline's "Jump To" rail does the same with one stop per date on record.
+With no landmark and no skip link there is nothing to jump past them with.
 
-**Fix:** wrap `AppPage`'s content region in `<main id="content">` and put a
-`sr-only focus:not-sr-only` skip link at the top of `TabWrapper`. One change,
-every surface.
+The app is otherwise careful here (one `h1` per surface, `sr-only` text behind
+the dash-shaped counts, `aria-label`s on the icon buttons, no images missing
+`alt`), which makes this the odd gap out.
+
+**Fix:** a `main` landmark and a skip link in `TabWrapper`; write the Records
+side nav after the content and put it back with `lg:flex-row-reverse`, the trick
+the shell already plays; make the timeline's date rail a named `nav` so it can
+be skipped by landmark too.
 
 ### 2. The tablet band gets desktop layouts in a phone-width column
 
