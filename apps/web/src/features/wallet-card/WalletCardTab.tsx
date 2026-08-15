@@ -11,6 +11,7 @@ import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getAllergyIntoleranceDisplayName } from '../../shared/utils/fhirAccessHelpers';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { conceptCodes, firstText, isRecord } from '../../shared/utils/fhirText';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 
 interface WalletItem {
   id: string;
@@ -124,6 +125,9 @@ function isActive(resource: Record<string, unknown>): boolean {
 function useWalletData(): { data: WalletData; status: 'loading' | 'success' } {
   const db = useRxDb();
   const user = useUser();
+  // Refetch when records land — a portal sync or an .emrpkg import
+  // writes straight to the collection, and this page reads it once.
+  const recordChangeTick = useRecordChangeTick();
   const [data, setData] = useState<WalletData>({
     medications: [],
     allergies: [],
@@ -227,7 +231,7 @@ function useWalletData(): { data: WalletData; status: 'loading' | 'success' } {
     return () => {
       mounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   return { data, status };
 }

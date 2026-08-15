@@ -4,6 +4,7 @@ import { useLocalConfig } from '../../../../app/providers/LocalConfigProvider';
 import { useVectorSyncStatus } from '../../../vectors/providers/VectorGeneratorSyncInitializer';
 import { TimelineRecordTypeFilter } from '../../types';
 import { StylizedSelect } from '../../../../shared/components/StylizedSelect';
+import { useInterfaceLanguage } from '../../../../app/providers/InterfaceLanguageProvider';
 
 const recordTypeOptions: {
   value: TimelineRecordTypeFilter;
@@ -72,18 +73,24 @@ export function SearchBar({
   setTypeFilter: (filter: TimelineRecordTypeFilter) => void;
 }) {
   const { experimental__use_openai_rag } = useLocalConfig();
+  const { t } = useInterfaceLanguage();
   const vectorSyncStatus = useVectorSyncStatus();
   const isVectorSearchEnabled =
     experimental__use_openai_rag && vectorSyncStatus === 'COMPLETE';
 
+  // Through `t()` rather than as bare literals: the runtime DOM pass does
+  // translate a `placeholder`, but only against a dictionary entry, and the
+  // coverage spec only scans files that call `t()` — so a literal here was
+  // invisible to both. The Timeline's search box was the one control on an
+  // Arabic phone still labelled in English.
   const placeholder = useMemo(() => {
     if (experimental__use_openai_rag && vectorSyncStatus === 'IN_PROGRESS') {
-      return 'Search your records (AI search preparing...)';
+      return t('Search your records (AI search preparing...)');
     }
     return isVectorSearchEnabled
-      ? '✨ Search your records with AI'
-      : 'Search your medical records';
-  }, [experimental__use_openai_rag, vectorSyncStatus, isVectorSearchEnabled]);
+      ? t('✨ Search your records with AI')
+      : t('Search your medical records');
+  }, [experimental__use_openai_rag, vectorSyncStatus, isVectorSearchEnabled, t]);
 
   return (
     <div className="mb-3 mt-4 flex w-full flex-col gap-2 sm:mt-6 sm:flex-row">

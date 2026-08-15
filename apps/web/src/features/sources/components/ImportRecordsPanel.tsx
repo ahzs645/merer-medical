@@ -133,8 +133,16 @@ export function ImportRecordsPanel() {
         const extra = unknownTables.length
           ? ` (skipped: ${unknownTables.join(', ')})`
           : '';
-        notify(`Imported ${total} records${extra}. Reloading…`, 'success');
-        setTimeout(() => window.location.reload(), 1500);
+        // Merging only adds clinical documents, which every record screen now
+        // picks up from the collection itself (RecordChangeBridge). Replacing
+        // swaps the whole database, profile and connections included, so that
+        // path still restarts the app.
+        const replaced = importMode === 'replace';
+        notify(
+          `Imported ${total} records${extra}.${replaced ? ' Reloading…' : ''}`,
+          'success',
+        );
+        if (replaced) setTimeout(() => window.location.reload(), 1500);
       } catch (e) {
         notify(`Import failed: ${(e as Error).message}`, 'error');
       } finally {

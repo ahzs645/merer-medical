@@ -198,12 +198,20 @@ export function UserDataSettingsGroup() {
         const extra = unknownTables.length
           ? ` (skipped: ${unknownTables.join(', ')})`
           : '';
+        // A merge only adds clinical documents, and every record screen now
+        // refreshes from the collection itself (RecordChangeBridge), so there
+        // is nothing left for a reload to do. Replacing swaps the whole
+        // database — profile and connections included — out from under
+        // providers that read them once, so that path still restarts the app.
+        const replaced = emrpkgImportMode === 'replace';
         notifyDispatch({
           type: 'set_notification',
-          message: `Imported ${total} records${extra}. Reloading…`,
+          message: `Imported ${total} records${extra}.${
+            replaced ? ' Reloading…' : ''
+          }`,
           variant: 'success',
         });
-        setTimeout(() => window.location.reload(), 1500);
+        if (replaced) setTimeout(() => window.location.reload(), 1500);
       } catch (e) {
         notifyDispatch({
           type: 'set_notification',

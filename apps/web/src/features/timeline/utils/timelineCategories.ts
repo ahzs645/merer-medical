@@ -88,18 +88,35 @@ export function getTimelineCategories(
 /**
  * Card titles used to concatenate every category present on a date, which ran
  * to three lines on a phone. Cap the list at two and count the rest.
+ *
+ * Built from a format string rather than by gluing English grammar around the
+ * category names, because the finished sentence used to be the translation
+ * key. "Your Procedures" happened to be in the dictionary, so a one-category
+ * day translated; "Your Conditions, Procedures, and 3 more" is one of a
+ * combinatorial set that can never be enumerated, so on an Arabic phone the
+ * commonest card on the timeline stayed in English next to translated ones.
+ *
+ * `t` defaults to the identity so callers with no translator — tests, and the
+ * places that only need the English string — are unaffected.
  */
-export function buildTimelineCardTitle(categories: string[]): string {
+export function buildTimelineCardTitle(
+  categories: string[],
+  t: (text: string) => string = (text) => text,
+): string {
+  const name = (index: number) => t(categories[index]);
   switch (categories.length) {
     case 0:
       return '';
     case 1:
-      return `Your ${categories[0]}`;
+      return t('Your {a}').replace('{a}', name(0));
     case 2:
-      return `Your ${categories[0]} & ${categories[1]}`;
+      return t('Your {a} & {b}')
+        .replace('{a}', name(0))
+        .replace('{b}', name(1));
     default:
-      return `Your ${categories[0]}, ${categories[1]}, and ${
-        categories.length - 2
-      } more`;
+      return t('Your {a}, {b}, and {n} more')
+        .replace('{a}', name(0))
+        .replace('{b}', name(1))
+        .replace('{n}', String(categories.length - 2));
   }
 }

@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import { Dialog, Transition } from '@headlessui/react';
@@ -32,6 +32,36 @@ import { CommandPalette } from './CommandPalette';
 import { TutorialOverlay } from '../../features/tutorial/TutorialOverlay';
 import { isDemoMode } from '../utils/demoMode';
 
+/**
+ * Suspense fallback for a route whose chunk hasn't arrived yet.
+ *
+ * Held back for a beat before it draws anything: on a warm cache a chunk
+ * resolves within a frame or two, and a spinner that appears and vanishes that
+ * fast reads as a flicker on every navigation rather than as loading.
+ */
+function RouteLoading() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setVisible(true), 250);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="flex h-full w-full items-center justify-center p-8"
+    >
+      {visible && (
+        <>
+          <span className="border-primary-600 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent motion-reduce:animate-none" />
+          <span className="sr-only">Loading…</span>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function TabWrapper() {
   const user = useUser(),
     { experimental__use_openai_rag, side_nav_collapsed } = useLocalConfig();
@@ -64,7 +94,14 @@ export function TabWrapper() {
         tabIndex={-1}
         className="min-h-0 flex-grow overflow-y-auto focus:outline-none"
       >
-        <Outlet />
+        {/* Routes are code-split, so opening one for the first time can
+            suspend while its chunk arrives. The fallback is deliberately quiet
+            — a centred spinner, no banner or skeleton furniture — because on a
+            warm cache it is on screen for a frame or two, and anything with
+            layout in it would flash. */}
+        <React.Suspense fallback={<RouteLoading />}>
+          <Outlet />
+        </React.Suspense>
       </main>
       <div className="flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 print:hidden md:relative md:bottom-auto md:top-0 md:h-full md:w-auto">
         <div

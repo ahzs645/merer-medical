@@ -227,10 +227,12 @@ function buildResultDetail({
       getIdentifierValue(resource, ['accession', 'accession number']),
     reportId: getIdentifierValue(resource, ['report', 'document']),
     studyId: imagingItem?.studyId || getIdentifierValue(resource, ['study']),
-    narrative: getNarrative(resource),
-    impression: getImpression(resource),
-    resultNote: getResultNote(resource),
-    providerComments: getProviderComments(resource),
+    ...dedupeNarrativeText({
+      narrative: getNarrative(resource),
+      impression: getImpression(resource),
+      resultNote: getResultNote(resource),
+      providerComments: getProviderComments(resource),
+    }),
     linkedDocuments: getLinkedDocuments(resource, documentsById, reports),
     downloadAvailable: hasDownload(document, resource),
     shareAvailable: true,
@@ -364,6 +366,53 @@ function getProvider(resource: any): string | undefined {
     resource?.requester?.display ||
     resource?.recorder?.display
   );
+}
+
+/**
+ * Keeps one copy of a report's prose.
+ *
+ * The four extractors below read four different FHIR fields, but sources
+ * routinely fill several with the same sentence — and two of them are the same
+ * field by construction: `getResultNote` takes `note[0].text` and
+ * `getProviderComments` maps all of `note[]`. On the demo's aligner report that
+ * printed one sentence four times, under **Impression**, **Narrative**,
+ * **Result note** and **Provider comments**, which reads as four clinicians
+ * having written the same thing.
+ *
+ * Order is specificity: an impression is a conclusion about the result, a
+ * narrative is the body, a note is an aside. Whichever says it first keeps it.
+ */
+export function dedupeNarrativeText<
+  T extends {
+    narrative?: string;
+    impression?: string;
+    resultNote?: string;
+    providerComments: string[];
+  },
+>(text: T): T {
+  const seen = new Set<string>();
+  const keep = (value?: string) => {
+    const key = value?.trim().toLowerCase();
+    if (!key) return value;
+    if (seen.has(key)) return undefined;
+    seen.add(key);
+    return value;
+  };
+
+  const impression = keep(text.impression);
+  const narrative = keep(text.narrative);
+  const resultNote = keep(text.resultNote);
+  const providerComments = text.providerComments.filter(
+    (comment) => keep(comment) !== undefined,
+  );
+
+  return {
+    ...text,
+    impression,
+    narrative,
+    resultNote,
+    providerComments,
+  };
 }
 
 function getNarrative(resource: any) {

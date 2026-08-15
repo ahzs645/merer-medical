@@ -11,12 +11,16 @@ import {
   ReferenceOverlayMode,
 } from '../../labs/enrichment/types';
 import { buildResultsViewModel } from '../utils/resultNormalization';
+import { useRecordChangeTick } from '../../../shared/utils/recordChangeSignal';
 
 export function useResultsData(
   referenceMode: ReferenceOverlayMode = 'canadian',
 ) {
   const db = useRxDb();
   const user = useUser();
+  // Refetch when records land — a portal sync or an .emrpkg import
+  // writes straight to the collection, and this page reads it once.
+  const recordChangeTick = useRecordChangeTick();
   const [documents, setDocuments] = useState<ClinicalDocument<any>[]>([]);
   const [connections, setConnections] = useState<ConnectionDocument[]>([]);
   const [referenceContext, setReferenceContext] = useState<ReferenceContext>();
@@ -78,7 +82,7 @@ export function useResultsData(
     return () => {
       isMounted = false;
     };
-  }, [db, user.birthday, user.gender, user.id]);
+  }, [db, user.birthday, user.gender, user.id, recordChangeTick]);
 
   const viewModel = useMemo(
     () =>

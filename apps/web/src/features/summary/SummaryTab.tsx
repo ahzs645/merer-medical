@@ -1,4 +1,6 @@
 import { useRxDb } from '../../app/providers/RxDbProvider';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
+import { isAllergyNegationRecord } from '../../shared/utils/allergyNegation';
 import { DatabaseCollections } from '../../app/providers/DatabaseCollections';
 import { GenericBanner } from '../../shared/components/GenericBanner';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
@@ -14,7 +16,14 @@ import {
   Observation,
 } from 'fhir/r2';
 import { RxDatabase, RxDocument } from 'rxdb';
-import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 import { MedicationsListCard } from './components/MedicationsListCard';
 import { SkeletonListCard } from './components/SkeletonListCard';
 import { ConditionsListCard } from './components/ConditionsListCard';
@@ -150,7 +159,17 @@ function fetchAllergy(db: RxDatabase<DatabaseCollections>, user_id: string) {
         ClinicalDocument<BundleEntry<FhirResource>>
       >[];
 
-      return lst;
+      // "No known allergy" / "not asked" arrive as ordinary
+      // AllergyIntolerance resources. The Allergies page and the nav both
+      // keep them out of the allergen count; counting them here is what made
+      // this card say "24 records" where the nav accounted for 19.
+      return lst.filter(
+        (doc) =>
+          !isAllergyNegationRecord(
+            doc.get('data_record.raw')?.resource,
+            doc.get('metadata.display_name'),
+          ),
+      );
     });
 }
 
@@ -363,6 +382,10 @@ const DEFAULT_CARD_ORDER: SummaryPagePreferences['cards'] = [
 function useSummaryData(): [SummaryState, React.Dispatch<SummaryActions>] {
   const db = useRxDb(),
     user = useUser();
+  // Summary reads its five collections once, when the reducer is IDLE. Records
+  // arriving from a sync or an import never moved it off COMPLETED, so the
+  // page kept showing the counts it booted with.
+  const recordChangeTick = useRecordChangeTick();
   const [data, reducer] = useReducer(summaryReducer, {
     status: ActionTypes.IDLE,
     meds: [],
@@ -374,6 +397,14 @@ function useSummaryData(): [SummaryState, React.Dispatch<SummaryActions>] {
     cards: DEFAULT_CARD_ORDER, // Initialize cards with DEFAULT_CARD_ORDER
     initialized: false,
   });
+
+  // Drop back to IDLE when records change, which re-runs the fetch below.
+  const seenTick = useRef(recordChangeTick);
+  useEffect(() => {
+    if (seenTick.current === recordChangeTick) return;
+    seenTick.current = recordChangeTick;
+    reducer({ type: ActionTypes.IDLE });
+  }, [recordChangeTick]);
 
   useEffect(() => {
     if (data.status === ActionTypes.IDLE) {

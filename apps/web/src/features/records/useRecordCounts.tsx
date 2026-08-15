@@ -10,8 +10,8 @@ import { debounceTime } from 'rxjs/operators';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
-import { isAllergyNegation } from '../../shared/utils/allergyNegation';
-import { firstText } from '../../shared/utils/fhirText';
+import { isAllergyNegationRecord } from '../../shared/utils/allergyNegation';
+import { referencedAttachmentIds } from '../../shared/utils/standaloneAttachments';
 import { ALL_RECORD_CATEGORIES, RecordCategory } from './recordCategories';
 
 export interface RecordCountsValue {
@@ -63,6 +63,18 @@ export function RecordCountsProvider({ children }: { children: ReactNode }) {
       const tally = new Map<string, number>();
       const newest = new Map<string, string>();
       const wanted = new Set(COUNTED_RESOURCE_TYPES);
+      // Attachments a DocumentReference already wraps are that document's
+      // file, not a second document. Counting every attachment row inflated
+      // Documents by one per wrapped file; the page has always listed only the
+      // standalone ones (a file uploaded here, with no wrapper).
+      const wrappedAttachments = referencedAttachmentIds(
+        docs
+          .filter(
+            (doc) =>
+              doc.get('data_record.resource_type') === 'documentreference',
+          )
+          .map((doc) => doc.get('data_record.raw')?.resource),
+      );
       for (const doc of docs) {
         const resourceType = String(
           doc.get('data_record.resource_type') || '',
@@ -74,14 +86,21 @@ export function RecordCountsProvider({ children }: { children: ReactNode }) {
         // from real allergens, so counting them here made the nav disagree
         // with the page (11 vs 6 in the demo set). Only this one type pays the
         // cost of reading its JSON; everything else stays on the fast path.
-        if (resourceType === 'allergyintolerance') {
-          const resource = doc.get('data_record.raw')?.resource;
-          const name =
-            doc.get('metadata.display_name') ||
-            firstText(resource?.substance) ||
-            firstText(resource?.code) ||
-            '';
-          if (resource && isAllergyNegation(resource, String(name))) continue;
+        if (
+          resourceType === 'allergyintolerance' &&
+          isAllergyNegationRecord(
+            doc.get('data_record.raw')?.resource,
+            doc.get('metadata.display_name'),
+          )
+        ) {
+          continue;
+        }
+
+        if (
+          resourceType === 'documentreference_attachment' &&
+          wrappedAttachments.has(String(doc.get('metadata.id') || ''))
+        ) {
+          continue;
         }
 
         tally.set(resourceType, (tally.get(resourceType) || 0) + 1);

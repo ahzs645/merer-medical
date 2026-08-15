@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
-import { Odontogram, ToothDetail } from 'react-odontogram';
-import 'react-odontogram/style.css';
+import { lazy, Suspense, useMemo, useState } from 'react';
+
+const OdontogramChart = lazy(() => import('./OdontogramChart'));
 
 import {
   DentalActionLevel,
@@ -111,11 +111,6 @@ export function ToothChartPanel({
     [statuses],
   );
 
-  function handleOdontogramChange(selected: ToothDetail[]) {
-    const universal = selected[selected.length - 1]?.notations.universal;
-    setSelectedTooth(universal ? `${universal}` : null);
-  }
-
   const teeth = TEETH_BY_DENTITION[dentition];
   const selectedRecords = selectedTooth
     ? recordsByTooth.get(selectedTooth) || []
@@ -135,26 +130,26 @@ export function ToothChartPanel({
       </div>
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="self-start overflow-hidden rounded-md border border-gray-200 bg-gray-50 p-3">
-          <Odontogram
-            layout="square"
-            notation="Universal"
-            teethConditions={teethConditions}
-            // The odontogram renders its legend only when labels are on.
-            showLabels
-            onChange={handleOdontogramChange}
-            tooltip={{
-              content: (tooth) =>
-                tooth ? (
-                  <div className="text-xs">
-                    <p className="font-semibold">
-                      {t('Tooth')} {tooth.notations.universal}
-                    </p>
-                    <p>FDI {tooth.notations.fdi}</p>
-                    <p>{tooth.type}</p>
-                  </div>
-                ) : null,
-            }}
-          />
+          {/* The chart carries three.js with it, so it arrives on its own
+              while the rest of this panel — the toggle, the numbered grid, the
+              records for the selected tooth — is already interactive. */}
+          <Suspense
+            fallback={
+              <div
+                role="status"
+                aria-live="polite"
+                className="flex h-48 items-center justify-center text-sm text-gray-600"
+              >
+                {t('Loading the tooth chart…')}
+              </div>
+            }
+          >
+            <OdontogramChart
+              teethConditions={teethConditions}
+              onSelectTooth={setSelectedTooth}
+              labels={{ tooth: t('Tooth') }}
+            />
+          </Suspense>
         </div>
         <div className="grid content-start gap-3">
           <DentitionToggle dentition={dentition} onChange={setDentition} />

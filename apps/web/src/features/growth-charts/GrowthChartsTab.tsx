@@ -18,6 +18,7 @@ import { AppPage } from '../../shared/components/AppPage';
 import { GenericBanner } from '../../shared/components/GenericBanner';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { conceptCodes } from '../../shared/utils/fhirText';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import {
   GROWTH_REFERENCE,
   GrowthMetric,
@@ -62,6 +63,9 @@ function ageAt(birthday: string, date: string): number | undefined {
 function useGrowthData() {
   const db = useRxDb();
   const user = useUser();
+  // Refetch when records land — a portal sync or an .emrpkg import
+  // writes straight to the collection, and this page reads it once.
+  const recordChangeTick = useRecordChangeTick();
   const [docs, setDocs] = useState<ClinicalDocument[]>([]);
   const [status, setStatus] = useState<'loading' | 'success'>('loading');
 
@@ -85,7 +89,7 @@ function useGrowthData() {
     return () => {
       mounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   return { docs, status };
 }

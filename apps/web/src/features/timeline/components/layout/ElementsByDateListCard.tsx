@@ -76,6 +76,7 @@ import {
   buildTimelineCardTitle,
   getTimelineCategories,
 } from '../../utils/timelineCategories';
+import { useInterfaceLanguage } from '../../../../app/providers/InterfaceLanguageProvider';
 
 const options: HTMLReactParserOptions = {
   replace(domNode) {
@@ -499,6 +500,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
     );
 
   const [expanded, setExpanded] = React.useState(false);
+  const { t } = useInterfaceLanguage();
 
   // Shared with the timeline so a date whose records render nothing can be
   // skipped entirely rather than shown as an empty card.
@@ -534,7 +536,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
 
   const connectionDocs = useConnectionDocs(uniqueConnectionIds);
 
-  const title = buildTimelineCardTitle(titleFields);
+  const title = buildTimelineCardTitle(titleFields, t);
 
   // Nothing in this group has a section in the card body: rendering it would
   // put a clinic name under a generic title with no records beneath it.

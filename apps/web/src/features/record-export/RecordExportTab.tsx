@@ -14,7 +14,10 @@ import { GenericBanner } from '../../shared/components/GenericBanner';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText } from '../../shared/utils/fhirText';
+import { isAllergyNegationRecord } from '../../shared/utils/allergyNegation';
 import { resourceTypeLabel } from '../../shared/utils/resourceTypeLabels';
+import { referencedAttachmentIds } from '../../shared/utils/standaloneAttachments';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 
 /**
  * Rows that exist in `clinical_documents` but are not records in their own
@@ -42,6 +45,9 @@ interface Counts {
 function useAllRecords() {
   const db = useRxDb();
   const user = useUser();
+  // Refetch when records land — a portal sync or an .emrpkg import
+  // writes straight to the collection, and this page reads it once.
+  const recordChangeTick = useRecordChangeTick();
   const [docs, setDocs] = useState<ClinicalDocument[]>([]);
   const [status, setStatus] = useState<'loading' | 'success'>('loading');
 
@@ -60,7 +66,7 @@ function useAllRecords() {
     return () => {
       mounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   return { docs, status };
 }
@@ -112,10 +118,28 @@ const SUMMARY_SECTIONS: { type: string; title: string }[] = [
   { type: 'condition', title: 'Conditions' },
   { type: 'medicationstatement', title: 'Medications' },
   { type: 'allergyintolerance', title: 'Allergies' },
+  // Split out for the same reason the chips are: a printed summary handed to a
+  // clinic listing "No Known Allergies" under Allergies reads as an allergy.
+  { type: 'allergyintolerance_negation', title: 'Allergy status' },
   { type: 'immunization', title: 'Immunizations' },
   { type: 'procedure', title: 'Procedures' },
   { type: 'observation', title: 'Results & vitals' },
 ];
+
+/**
+ * Which bucket a record counts and prints under. Only allergies split: the
+ * bucket is the stored `resource_type` for everything else.
+ */
+function summaryBucket(doc: ClinicalDocument): string {
+  const type = doc.data_record.resource_type;
+  if (type !== 'allergyintolerance') return type;
+  return isAllergyNegationRecord(
+    getFhirResource<Record<string, unknown>>(doc),
+    doc.metadata?.display_name,
+  )
+    ? 'allergyintolerance_negation'
+    : type;
+}
 
 function buildHtmlSummary(
   docs: ClinicalDocument[],
@@ -124,7 +148,7 @@ function buildHtmlSummary(
   const today = safeFormatDate('2026-06-09', 'PP', '');
   const sections = SUMMARY_SECTIONS.map(({ type, title }) => {
     const items = docs
-      .filter((d) => d.data_record.resource_type === type)
+      .filter((d) => summaryBucket(d) === type)
       .map((d) => {
         const r = getFhirResource<Record<string, unknown>>(d);
         const name =
@@ -165,24 +189,51 @@ export function RecordExportTab() {
   const { docs, status } = useAllRecords();
   const [lastDownload, setLastDownload] = useState<string>();
 
-  const counts: Counts = useMemo(
-    () =>
-      docs.reduce(
+  const counts: Counts = useMemo(() => {
+    // Attachments a DocumentReference wraps travel inside the bundle and are
+    // not records; a file uploaded here has no wrapper and is one, which is
+    // what the Documents page lists. Counting all of them or none of them is
+    // what made this screen and the nav disagree.
+    const wrapped = referencedAttachmentIds(
+      docs
+        .filter((d) => d.data_record.resource_type === 'documentreference')
+        .map((d) => getFhirResource<Record<string, unknown>>(d)),
+    );
+    return docs.reduce(
         (acc, doc) => {
           acc.entries += 1;
           const type = doc.data_record.resource_type;
-          if (NON_RECORD_RESOURCE_TYPES.has(type)) {
-            if (type === 'documentreference_attachment') acc.attachments += 1;
+          const isWrappedAttachment =
+            type === 'documentreference_attachment' &&
+            !!doc.metadata?.id &&
+            wrapped.has(doc.metadata.id);
+          if (NON_RECORD_RESOURCE_TYPES.has(type) && !isWrappedAttachment) {
+            if (type === 'documentreference_attachment') {
+              // Standalone upload: a document in its own right.
+              acc.total += 1;
+              acc.byType['documentreference'] =
+                (acc.byType['documentreference'] || 0) + 1;
+              return acc;
+            }
+            return acc;
+          }
+          if (isWrappedAttachment) {
+            acc.attachments += 1;
             return acc;
           }
           acc.total += 1;
-          acc.byType[type] = (acc.byType[type] || 0) + 1;
+          // "No known allergy" / "not asked" rows are AllergyIntolerance
+          // resources that record the absence of an allergen. They still
+          // export, so they stay in the total and the chips still sum to it —
+          // they just count under their own name instead of inflating
+          // "Allergies" past what every other screen reports.
+          const bucket = summaryBucket(doc);
+          acc.byType[bucket] = (acc.byType[bucket] || 0) + 1;
           return acc;
         },
-        { total: 0, byType: {}, attachments: 0, entries: 0 } as Counts,
-      ),
-    [docs],
-  );
+      { total: 0, byType: {}, attachments: 0, entries: 0 } as Counts,
+    );
+  }, [docs]);
 
   // Several resource types share one label (medicationstatement and
   // medicationrequest both read "Medications"), so fold them into a single
@@ -246,10 +297,11 @@ export function RecordExportTab() {
                 </div>
                 <p className="mt-2 text-xs text-gray-500">
                   Every record stored on this device, counted once, so the chips
-                  add up to the total above. Screens that show one slice of your
-                  library report smaller figures — Results, for example, counts
-                  lab, imaging and report results and leaves out vitals and
-                  other observations.{' '}
+                  add up to the total above and each one matches the count its
+                  own screen shows. Screens holding one slice of your library
+                  report smaller figures — Results, for example, counts lab,
+                  imaging and report results and leaves out vitals and other
+                  observations.{' '}
                   {counts.attachments > 0 &&
                     `${counts.attachments} files attached to documents travel inside the FHIR Bundle but are not counted as records of their own.`}
                 </p>

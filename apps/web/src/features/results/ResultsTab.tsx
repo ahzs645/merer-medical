@@ -17,6 +17,7 @@ import { ReferenceRangeDisplay } from '../../shared/components/ReferenceRangeDis
 import { referenceOverlayLabels } from '../labs/enrichment/labEnrichment';
 import { ReferenceOverlayMode } from '../labs/enrichment/types';
 import { formatResultValue } from './utils/resultNormalization';
+import { resultTotals } from './utils/resultTotals';
 import { useResultsData } from './hooks/useResultsData';
 import { ResultDetail, ResultGroup, ResultSummary, ResultType } from './types';
 
@@ -60,19 +61,7 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
       : undefined;
   }, [detailsById, groups, selectedId]);
 
-  const totals = useMemo(() => {
-    const results = groups.flatMap((group) => group.results);
-    return {
-      total: results.length,
-      labs: results.filter((result) => result.type === 'lab').length,
-      // The tile says "Imaging & reports", so it has to count the report and
-      // document records too, not imaging studies alone.
-      imagingAndReports: results.filter((result) =>
-        ['imaging', 'diagnostic-report', 'document'].includes(result.type),
-      ).length,
-      attention: results.filter((result) => result.abnormal).length,
-    };
-  }, [groups]);
+  const totals = useMemo(() => resultTotals(groups), [groups]);
 
   return (
     <section
@@ -86,8 +75,8 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
           <MetricCard label="Total results" value={totals.total} />
           <MetricCard label="Labs" value={totals.labs} />
           <MetricCard
-            label="Imaging & reports"
-            value={totals.imagingAndReports}
+            label="Reports, imaging and other"
+            value={totals.everythingElse}
           />
           <MetricCard label="Needs attention" value={totals.attention} />
         </div>

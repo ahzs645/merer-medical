@@ -10,6 +10,7 @@ import { AppPage } from '../../shared/components/AppPage';
 import { GenericBanner } from '../../shared/components/GenericBanner';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { conceptCodes, firstText } from '../../shared/utils/fhirText';
+import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import {
   appliesToPatient,
   evaluateReminder,
@@ -69,6 +70,9 @@ function joinLabels(labels: string[]): string {
 function useReminders() {
   const db = useRxDb();
   const user = useUser();
+  // Refetch when records land — a portal sync or an .emrpkg import
+  // writes straight to the collection, and this page reads it once.
+  const recordChangeTick = useRecordChangeTick();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [status, setStatus] = useState<'loading' | 'success'>('loading');
 
@@ -169,7 +173,7 @@ function useReminders() {
     return () => {
       mounted = false;
     };
-  }, [db, user.id, user.birthday, user.gender]);
+  }, [db, user.id, user.birthday, user.gender, recordChangeTick]);
 
   return { reminders, status };
 }

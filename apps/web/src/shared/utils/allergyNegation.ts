@@ -1,4 +1,4 @@
-import { conceptCodes } from './fhirText';
+import { conceptCodes, firstText } from './fhirText';
 
 /**
  * SNOMED concepts that record the *absence* of an allergy, or that no allergy
@@ -44,4 +44,28 @@ export function isAllergyNegation(
   ];
   if (codes.some((code) => ALLERGY_NEGATION_CODES.has(code))) return true;
   return ALLERGY_NEGATION_TEXT.test(name.trim());
+}
+
+/**
+ * The same test, applied to a stored record rather than an already-resolved
+ * name — which is what every counting screen actually has in hand.
+ *
+ * The rule above was only ever enforced where someone remembered to resolve
+ * the display name first, so the three screens that count allergies disagreed:
+ * the nav and the Allergies page said 6 while Summary and Export said 11, and
+ * the five-record gap was records stating you have *no* allergy. Taking the
+ * record here, and doing the name resolution in one place, is what keeps them
+ * agreeing.
+ */
+export function isAllergyNegationRecord(
+  resource: Record<string, unknown> | undefined | null,
+  displayName?: string,
+): boolean {
+  if (!resource) return false;
+  const name =
+    displayName ||
+    firstText(resource['substance']) ||
+    firstText(resource['code']) ||
+    '';
+  return isAllergyNegation(resource, String(name));
 }
