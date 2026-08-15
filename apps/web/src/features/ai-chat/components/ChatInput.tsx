@@ -34,7 +34,7 @@ export const ChatInput = memo(function ChatInput({
         <input
           id="chat"
           value={message}
-          className="block mr-2 h-full p-2.5 w-full text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+          className="block me-2 h-full p-2.5 w-full text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
           placeholder={placeholderText}
           onChange={handleMessageChange}
         ></input>

@@ -2,18 +2,23 @@
  * @jest-environment jsdom
  */
 import { act, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { notifyRecordsChanged } from '../../shared/utils/recordChangeSignal';
 import { DirectoryTab } from './DirectoryTab';
 
 const mockDocsByType: Record<string, ClinicalDocument[]> = {};
+// The directory reads every record now — a clinician named as the performer on
+// a report is as much a provider as a care-team member — so an unfiltered
+// query has to come back with everything rather than nothing.
 const mockFind = jest.fn((query: { selector: Record<string, unknown> }) => ({
-  exec: async () =>
-    (
-      mockDocsByType[String(query.selector['data_record.resource_type'])] ?? []
-    ).map((doc) => ({ toMutableJSON: () => doc })),
+  exec: async () => {
+    const type = query.selector['data_record.resource_type'];
+    const docs = type
+      ? mockDocsByType[String(type)] ?? []
+      : Object.values(mockDocsByType).flat();
+    return docs.map((doc) => ({ toMutableJSON: () => doc }));
+  },
 }));
 const mockDb = { clinical_documents: { find: mockFind } };
 
@@ -52,12 +57,7 @@ describe('DirectoryTab', () => {
    * save-then-navigate flow happened to provide.
    */
   it('picks up a location added while it is on screen', async () => {
-    // Inside a router because AppPage restores scroll position per location.
-    render(
-      <MemoryRouter>
-        <DirectoryTab />
-      </MemoryRouter>,
-    );
+    render(<DirectoryTab />);
     await waitFor(() => expect(mockFind).toHaveBeenCalled());
     expect(screen.queryByText('Jasper Healthcare Centre')).toBeNull();
 

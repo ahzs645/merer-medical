@@ -144,7 +144,7 @@ export function ObservationResultRow({
                       ? `${getValueQuantity(item)}`
                       : getInterpretationText(item) ||
                         (getValueString(item) && `${getValueString(item)}`)}
-                    <span className={`pl-1 inline text-xs font-light`}>
+                    <span className={`ps-1 inline text-xs font-light`}>
                       {getValueUnit(item)}
                     </span>
                   </span>
@@ -218,7 +218,7 @@ export function ObservationResultRow({
                   {/* Toggle select between graph view and list view */}
 
                   <button
-                    className="text-primary-900 absolute top-0 right-0 m-2 mr-4 rounded bg-[#E2F5FA] p-1 duration-150 active:scale-90 active:bg-gray-100 focus:outline-none focus:ring-0"
+                    className="text-primary-900 absolute top-0 end-0 m-2 me-4 rounded bg-[#E2F5FA] p-1 duration-150 active:scale-90 active:bg-gray-100 focus:outline-none focus:ring-0"
                     onClick={() =>
                       setView((v) => {
                         return v === 'GRAPH' ? 'LIST' : 'GRAPH';
@@ -235,7 +235,7 @@ export function ObservationResultRow({
                     <div className="m-4 grid grid-cols-6 gap-2 gap-y-2 py-2">
                       {relatedLabs.map((rl) => (
                         <Fragment key={`rl-${rl.id}`}>
-                          <div className="col-span-3 self-center pl-4 text-xs font-bold text-gray-600">
+                          <div className="col-span-3 self-center ps-4 text-xs font-bold text-gray-600">
                             <p className="">
                               {safeFormatDate(rl.metadata?.date, 'MM/dd/yyyy')}
                             </p>
@@ -272,7 +272,7 @@ export function ObservationResultRow({
                     <div className="mx-4 mt-4">
                       {getValueQuantity(item) !== undefined ? (
                         <div className="flex justify-center px-2 align-middle">
-                          <div className="mr-4 w-full sm:w-5/6">
+                          <div className="me-4 w-full sm:w-5/6">
                             <Suspense
                               fallback={
                                 <div className="h-72 w-full animate-pulse rounded-md bg-gray-100 motion-reduce:animate-none" />

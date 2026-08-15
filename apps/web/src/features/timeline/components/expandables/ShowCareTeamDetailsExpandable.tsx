@@ -75,7 +75,7 @@ export function ShowCareTeamDetailsExpandable({
                     {careTeam.participant.map((participant, index) => (
                       <div
                         key={index}
-                        className="text-sm text-gray-900 border-l-2 border-cyan-300 pl-2"
+                        className="text-sm text-gray-900 border-l-2 border-cyan-300 ps-2"
                       >
                         <div className="font-medium">
                           {participant.member?.display ||

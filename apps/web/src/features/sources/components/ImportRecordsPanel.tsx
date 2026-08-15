@@ -205,7 +205,7 @@ export function ImportRecordsPanel() {
           autoComplete="new-password"
         />
         <label className="inline-flex items-center text-sm text-gray-700">
-          <span className="mr-2 font-medium">On import:</span>
+          <span className="me-2 font-medium">On import:</span>
           <select
             value={importMode}
             onChange={(e) =>

@@ -273,12 +273,12 @@ function SourceDocumentPickerModal({
                           attachmentId: option.attachmentId,
                         });
                       }}
-                      className="flex w-full flex-col items-start gap-0.5 rounded-md px-3 py-2 text-left hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="flex w-full flex-col items-start gap-0.5 rounded-md px-3 py-2 text-start hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <span className="text-sm font-semibold text-gray-900">
                         {option.label}
                         {isCurrent && (
-                          <span className="ml-2 rounded bg-primary-50 px-1.5 py-0.5 text-xs font-medium text-primary-700">
+                          <span className="ms-2 rounded bg-primary-50 px-1.5 py-0.5 text-xs font-medium text-primary-700">
                             Current
                           </span>
                         )}

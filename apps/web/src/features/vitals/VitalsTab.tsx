@@ -359,12 +359,12 @@ export function VitalsTab() {
                             key={index}
                             className="border-b border-gray-50 last:border-0"
                           >
-                            <td className="py-1 pr-2 text-gray-500">
+                            <td className="py-1 pe-2 text-gray-500">
                               {reading.date
                                 ? safeFormatDate(reading.date, 'PP', '')
                                 : '—'}
                             </td>
-                            <td className="py-1 text-right font-medium text-gray-800">
+                            <td className="py-1 text-end font-medium text-gray-800">
                               {reading.text}
                             </td>
                           </tr>

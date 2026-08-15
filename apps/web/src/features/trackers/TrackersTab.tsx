@@ -24,6 +24,7 @@ import {
   RecordHeaderButton,
   RecordPageHeader,
 } from '../../shared/components/records/RecordPageHeader';
+import { useUndoableDelete } from '../../shared/hooks/useUndoableDelete';
 import { TrackerEntrySheet, type TrackerEntryDraft } from './TrackerEntrySheet';
 import {
   TRACKER_ENTRY_KIND,
@@ -39,6 +40,7 @@ function storageKey(userId: string) {
 export function TrackersTab() {
   const db = useRxDb();
   const user = useUser();
+  const deleteWithUndo = useUndoableDelete();
   const [entries, setEntries] = useState<TrackerEntry[]>([]);
   const [addOpen, setAddOpen] = useState(false);
 
@@ -113,8 +115,28 @@ export function TrackersTab() {
   }
 
   async function deleteEntry(id: string) {
-    await deleteWorkflowRecord(db, user.id, id);
-    setEntries((current) => current.filter((entry) => entry.id !== id));
+    const entry = entries.find((candidate) => candidate.id === id);
+    if (!entry) return;
+    // Deleted on the tap, with the way back in the toast: this button sits in
+    // a scrolling list under a thumb, and a confirm in front of every entry
+    // would interrupt the common case to guard the rare one.
+    await deleteWithUndo({
+      description: `${entry.label} entry`,
+      remove: async () => {
+        await deleteWorkflowRecord(db, user.id, id);
+        setEntries((current) =>
+          current.filter((candidate) => candidate.id !== id),
+        );
+      },
+      restore: async () => {
+        await saveTrackerEntryRecord(db, user.id, entry);
+        setEntries((current) =>
+          [entry, ...current].sort((a, b) =>
+            b.recordedAt.localeCompare(a.recordedAt),
+          ),
+        );
+      },
+    });
   }
 
   return (

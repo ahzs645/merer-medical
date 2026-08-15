@@ -86,7 +86,7 @@ export function CommentModal({
                 <button
                   type="button"
                   onClick={() => setShow(false)}
-                  className="group ml-3 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full"
+                  className="group ms-3 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full"
                   aria-label={t('Close')}
                 >
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 text-gray-600 group-hover:bg-gray-300">

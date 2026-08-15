@@ -415,7 +415,7 @@ export function WalletCardTab() {
                 </p>
               </div>
               {data.bloodType && (
-                <div className="ml-auto rounded-md bg-white/15 px-3 py-1 text-center">
+                <div className="ms-auto rounded-md bg-white/15 px-3 py-1 text-center">
                   <div className="text-xs uppercase tracking-wide text-primary-100">
                     Blood
                   </div>

@@ -368,7 +368,7 @@ export function HealthMaintenanceTab() {
                   <button
                     type="button"
                     onClick={() => persistDismissed([])}
-                    className="text-primary-700 hover:text-primary-900 -mr-2 inline-flex min-h-[44px] items-center px-2 font-semibold"
+                    className="text-primary-700 hover:text-primary-900 -me-2 inline-flex min-h-[44px] items-center px-2 font-semibold"
                   >
                     Reset
                   </button>

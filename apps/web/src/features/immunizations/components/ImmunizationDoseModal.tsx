@@ -24,7 +24,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4 py-1.5">
       <dt className="shrink-0 text-gray-500">{label}</dt>
-      <dd className="text-right font-medium text-gray-900">{value}</dd>
+      <dd className="text-end font-medium text-gray-900">{value}</dd>
     </div>
   );
 }
@@ -156,7 +156,7 @@ export function ImmunizationDoseModal({
                   <button
                     type="button"
                     onClick={() => onSelectRecord(other)}
-                    className="flex w-full items-center justify-between gap-2 rounded-lg bg-gray-50 px-3 py-2 text-left text-sm ring-1 ring-inset ring-gray-200 transition-colors hover:bg-gray-100"
+                    className="flex w-full items-center justify-between gap-2 rounded-lg bg-gray-50 px-3 py-2 text-start text-sm ring-1 ring-inset ring-gray-200 transition-colors hover:bg-gray-100"
                   >
                     <span className="min-w-0 truncate font-medium text-gray-800">
                       {other.vaccineName}

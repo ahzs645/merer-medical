@@ -4,7 +4,7 @@ export function SkeletonSearchBar() {
   return (
     <div className="mb-1 mt-4 w-full sm:mt-6 flex flex-row">
       <div className="relative flex items-center flex-1">
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+        <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
           <svg
             aria-hidden="true"
             className="h-5 w-5 text-gray-800 dark:text-gray-700"
@@ -28,7 +28,7 @@ export function SkeletonSearchBar() {
             name="search"
             id="search"
             placeholder="Search your medical records"
-            className="focus:border-primary-500 focus:ring-primary-500 transition-colors block w-full rounded-md border-gray-300 pl-10 pr-10 shadow-sm sm:text-sm"
+            className="focus:border-primary-500 focus:ring-primary-500 transition-colors block w-full rounded-md border-gray-300 ps-10 pe-10 shadow-sm sm:text-sm"
           />
         </div>
       </div>

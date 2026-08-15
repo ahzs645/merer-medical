@@ -65,7 +65,7 @@ export function UtilitiesToolNav() {
           onClick={() => setOpen((current) => !current)}
           aria-expanded={open}
           aria-controls="utilities-tool-menu"
-          className="flex min-h-[44px] w-full items-center gap-2 rounded-md px-3 text-left text-sm font-medium text-gray-800 ring-1 ring-gray-200 hover:bg-gray-50"
+          className="flex min-h-[44px] w-full items-center gap-2 rounded-md px-3 text-start text-sm font-medium text-gray-800 ring-1 ring-gray-200 hover:bg-gray-50"
         >
           <ActiveIcon className="text-primary-700 h-5 w-5 shrink-0" />
           <span className="min-w-0 flex-1 truncate">

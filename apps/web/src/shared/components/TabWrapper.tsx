@@ -31,6 +31,7 @@ import { NotificationCenter } from '../../features/notifications/NotificationCen
 import { CommandPalette } from './CommandPalette';
 import { TutorialOverlay } from '../../features/tutorial/TutorialOverlay';
 import { isDemoMode } from '../utils/demoMode';
+import { useScrollRestoration } from '../hooks/useScrollRestoration';
 
 /**
  * Suspense fallback for a route whose chunk hasn't arrived yet.
@@ -63,6 +64,10 @@ function RouteLoading() {
 }
 
 export function TabWrapper() {
+  // Hung off `main`, the one element that both contains every route's scroll
+  // container and is only ever rendered inside the router.
+  const mainRef = useRef<HTMLElement>(null);
+  useScrollRestoration(mainRef);
   const user = useUser(),
     { experimental__use_openai_rag, side_nav_collapsed } = useLocalConfig();
   const updateLocalConfig = useUpdateLocalConfig();
@@ -90,6 +95,7 @@ export function TabWrapper() {
         Skip to content
       </a>
       <main
+        ref={mainRef}
         id="main-content"
         tabIndex={-1}
         className="min-h-0 flex-grow overflow-y-auto focus:outline-none"
@@ -123,7 +129,7 @@ export function TabWrapper() {
             ></img>
             <div
               className={`flex items-center ${
-                collapsed ? 'flex-col gap-1' : 'ml-auto pr-2'
+                collapsed ? 'flex-col gap-1' : 'ms-auto pe-2'
               }`}
             >
               <Link
@@ -254,7 +260,7 @@ export function TabWrapper() {
                     ></img>
                   )}
                 </div>
-                <div className={`ml-3 ${collapsed ? 'md:hidden' : ''}`}>
+                <div className={`ms-3 ${collapsed ? 'md:hidden' : ''}`}>
                   <p className="text-base font-medium text-white">{userName}</p>
                   <span className="-my-1 inline-flex min-h-[44px] items-center text-sm font-medium text-indigo-200 group-hover:text-white">
                     {user?.first_name ? 'View details' : 'Add User Details'}

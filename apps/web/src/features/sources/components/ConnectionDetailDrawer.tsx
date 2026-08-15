@@ -70,7 +70,7 @@ function DetailRow({
   return (
     <div className="flex items-start justify-between gap-4 py-2">
       <span className="text-sm font-medium text-gray-500">{label}</span>
-      <span className="text-right text-sm font-medium text-gray-900">
+      <span className="text-end text-sm font-medium text-gray-900">
         {value}
       </span>
     </div>

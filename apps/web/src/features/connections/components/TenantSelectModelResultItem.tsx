@@ -34,7 +34,7 @@ export function TenantSelectModelResultItem({
       }
     >
       {({ active }) => (
-        <div className="ml-4 flex-auto">
+        <div className="ms-4 flex-auto">
           <p
             className={classNames(
               'text-sm font-medium',
@@ -57,7 +57,7 @@ export function SkeletonTenantSelectModalResultItem() {
 
   return (
     <div className="mb-2 flex cursor-default select-none rounded-xl p-3">
-      <div className="ml-4 flex-auto">
+      <div className="ms-4 flex-auto">
         <div className="text-sm font-medium text-gray-800">
           <div
             className={`h-4 animate-pulse rounded bg-gray-200`}

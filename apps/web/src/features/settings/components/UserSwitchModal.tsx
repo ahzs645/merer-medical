@@ -53,7 +53,7 @@ export function UserSwitchModal({
         <button
           type="button"
           onClick={onAddNewUser}
-          className="w-full flex items-center justify-center space-x-2 rounded-lg border-2 border-dashed border-gray-300 px-3 py-3 text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors"
+          className="w-full flex items-center justify-center gap-x-2 rounded-lg border-2 border-dashed border-gray-300 px-3 py-3 text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors"
         >
           <PlusIcon className="h-5 w-5" />
           <span className="text-sm font-medium">Import User Profile</span>
@@ -102,9 +102,9 @@ export function UserSwitchModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-start shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md">
                 <div className="bg-white px-4 pb-4 pt-5 sm:p-6">
-                  <div className="absolute right-0 top-0 pr-4 pt-4">
+                  <div className="absolute end-0 top-0 pe-4 pt-4">
                     <button
                       type="button"
                       className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"

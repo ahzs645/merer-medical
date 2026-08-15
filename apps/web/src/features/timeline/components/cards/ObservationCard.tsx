@@ -57,7 +57,7 @@ export const ObservationCard = memo(function ObservationCard({
             <p className="mt-2 text-sm font-semibold text-gray-900">
               {manualValue}
               {manualInterpretation ? (
-                <span className="ml-2 text-xs font-medium text-primary-700">
+                <span className="ms-2 text-xs font-medium text-primary-700">
                   {manualInterpretation}
                 </span>
               ) : null}

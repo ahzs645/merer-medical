@@ -1,5 +1,11 @@
 # Interface review, third pass — behaviour and code
 
+> **Status:** every item in "Suggested order" below has since been implemented —
+> see the two commits following this document. The findings are kept as written,
+> because the reasoning is what makes the fixes reviewable. What shipped, and
+> the three things the fixing itself turned up, are recorded in
+> [`interface-review-2026-08-pass-3-fixes.md`](./interface-review-2026-08-pass-3-fixes.md).
+
 A third walk over the app, at 393 px, 834 px and 1440 px. The first pass asked
 whether each screen was *drawn* correctly. The second asked whether it *said*
 something a person could read. This one asks what happens when you **use** it —

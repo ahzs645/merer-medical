@@ -43,7 +43,7 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="block w-full text-left transition hover:text-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="block w-full text-start transition hover:text-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
         >
           <div className="flex items-start gap-3">
             {thumbnailUrl ? (

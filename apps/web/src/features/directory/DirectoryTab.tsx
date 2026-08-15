@@ -10,60 +10,15 @@ import { RecordPageHeader } from '../../shared/components/records/RecordPageHead
 import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
+import { safeFormatDate } from '../../shared/utils/dateFormatters';
 
-interface Provider {
-  name: string;
-  roles: string[];
-  organization?: string;
-  contacts: string[];
-}
+import {
+  collectDirectory,
+  type DirectoryFacility,
+  type DirectoryProvider,
+} from './collectDirectory';
 
-interface Facility {
-  name: string;
-  address?: string;
-  phone?: string;
-  raw: string;
-}
-
-type CareTeamResource = {
-  participant?: Array<{
-    role?: Array<{ text?: string }>;
-    member?: { display?: string };
-    extension?: Array<{ valueString?: string }>;
-  }>;
-  managingOrganization?: Array<{ display?: string }>;
-};
-
-type EncounterResource = {
-  location?: Array<{ location?: { display?: string } }>;
-};
-
-/** Best-effort split of a concatenated facility string like
- * "Jasper Healthcare Centre Lab/DI 518 Robson Street Jasper, AB T0E 1E0 780-852-6606"
- * into name / address / phone. Never throws; falls back to the raw string. */
-export function parseFacility(display: string): Facility {
-  const raw = display.trim();
-  let working = raw;
-  let phone: string | undefined;
-  // Match a North-American phone at the end without swallowing the trailing
-  // digit of a preceding postal code (e.g. "T0E 1E0 780-852-6606").
-  const phoneMatch = working.match(
-    /(\+?1[\s.-]?)?(\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4})\s*$/,
-  );
-  if (phoneMatch && phoneMatch.index !== undefined) {
-    phone = phoneMatch[0].trim();
-    working = working.slice(0, phoneMatch.index).trim();
-  }
-  // The address usually begins at the first standalone number (street number).
-  let name = working;
-  let address: string | undefined;
-  const addressMatch = working.match(/\s(\d{1,6}\s+\S.*)$/);
-  if (addressMatch && addressMatch.index !== undefined) {
-    name = working.slice(0, addressMatch.index).trim();
-    address = addressMatch[1].trim();
-  }
-  return { name: name || raw, address, phone, raw };
-}
+export { parseFacility } from './collectDirectory';
 
 function useDirectory() {
   const db = useRxDb();
@@ -71,8 +26,8 @@ function useDirectory() {
   // A manually added visit brings its location with it, so this list grows
   // when records change too. Refetch on the same signal every other tab uses.
   const recordChangeTick = useRecordChangeTick();
-  const [providers, setProviders] = useState<Provider[]>([]);
-  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [providers, setProviders] = useState<DirectoryProvider[]>([]);
+  const [facilities, setFacilities] = useState<DirectoryFacility[]>([]);
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
     'loading',
   );
@@ -83,74 +38,19 @@ function useDirectory() {
     async function load() {
       setStatus('loading');
       setError(null);
-      const [careTeamDocs, encounterDocs] = await Promise.all([
-        db.clinical_documents
-          .find({
-            selector: {
-              user_id: user.id,
-              'data_record.resource_type': 'careteam',
-            },
-          })
-          .exec(),
-        db.clinical_documents
-          .find({
-            selector: {
-              user_id: user.id,
-              'data_record.resource_type': 'encounter',
-            },
-          })
-          .exec(),
-      ]);
+      // Every record, not just care teams and encounters: a clinician named as
+      // the performer on a report is a provider, and reading two fields out of
+      // twenty is what left this page empty while their names were on screen
+      // everywhere else.
+      const docs = await db.clinical_documents
+        .find({ selector: { user_id: user.id } })
+        .exec();
       if (!mounted) return;
 
-      const providerByName = new Map<string, Provider>();
-      for (const doc of careTeamDocs) {
-        const d = doc.toMutableJSON() as ClinicalDocument;
-        const resource = getFhirResource<CareTeamResource>(d);
-        const organization = resource?.managingOrganization?.[0]?.display;
-        for (const participant of resource?.participant || []) {
-          const name = participant.member?.display?.trim();
-          if (!name) continue;
-          const provider =
-            providerByName.get(name) ||
-            ({ name, roles: [], organization, contacts: [] } as Provider);
-          for (const role of participant.role || []) {
-            if (role.text && !provider.roles.includes(role.text)) {
-              provider.roles.push(role.text);
-            }
-          }
-          for (const extension of participant.extension || []) {
-            if (
-              extension.valueString &&
-              !provider.contacts.includes(extension.valueString)
-            ) {
-              provider.contacts.push(extension.valueString);
-            }
-          }
-          if (!provider.organization) provider.organization = organization;
-          providerByName.set(name, provider);
-        }
-      }
-
-      const facilityByKey = new Map<string, Facility>();
-      for (const doc of encounterDocs) {
-        const d = doc.toMutableJSON() as ClinicalDocument;
-        const resource = getFhirResource<EncounterResource>(d);
-        for (const entry of resource?.location || []) {
-          const display = entry.location?.display?.trim();
-          if (!display) continue;
-          if (!facilityByKey.has(display)) {
-            facilityByKey.set(display, parseFacility(display));
-          }
-        }
-      }
-
-      const providerList = Array.from(providerByName.values()).sort((a, b) =>
-        a.name.localeCompare(b.name),
-      );
-      const facilityList = Array.from(facilityByKey.values()).sort((a, b) =>
-        a.name.localeCompare(b.name),
-      );
+      const { providers: providerList, facilities: facilityList } =
+        collectDirectory(
+          docs.map((doc) => doc.toMutableJSON() as ClinicalDocument),
+        );
       setProviders(providerList);
       setFacilities(facilityList);
       setStatus('success');
@@ -201,6 +101,7 @@ export function DirectoryTab() {
       banner={
         <RecordPageHeader
           title="Providers & locations"
+          description="Everyone and everywhere named on your records, gathered from the records themselves."
           search={{
             query,
             onChange: setQuery,
@@ -223,7 +124,7 @@ export function DirectoryTab() {
                 count={filteredProviders.length}
               >
                 {providers.length === 0 ? (
-                  <EmptyState text="No providers recorded yet." />
+                  <EmptyState text="No provider is named on any record yet. Names appear here as your records arrive — the clinician on a report, the author of a document, a care-team member." />
                 ) : filteredProviders.length === 0 ? (
                   <EmptyState text="No providers match this search." />
                 ) : (
@@ -241,15 +142,23 @@ export function DirectoryTab() {
                         </p>
                       )}
                       {provider.organization && (
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-700">
                           {provider.organization}
                         </p>
                       )}
                       {provider.contacts.length > 0 && (
-                        <p className="mt-1 text-xs text-gray-500">
+                        <p className="mt-1 text-xs text-gray-700">
                           {provider.contacts.join(' · ')}
                         </p>
                       )}
+                      <p className="mt-1 text-xs text-gray-700">
+                        {provider.recordCount === 1
+                          ? 'On 1 record'
+                          : `On ${provider.recordCount} records`}
+                        {provider.latestDate
+                          ? ` · latest ${safeFormatDate(provider.latestDate, 'PP', '')}`
+                          : ''}
+                      </p>
                     </article>
                   ))
                 )}
@@ -261,7 +170,7 @@ export function DirectoryTab() {
                 count={filteredFacilities.length}
               >
                 {facilities.length === 0 ? (
-                  <EmptyState text="No locations recorded yet." />
+                  <EmptyState text="No place is named on any record yet. Clinics and hospitals appear here as your visits and documents arrive." />
                 ) : filteredFacilities.length === 0 ? (
                   <EmptyState text="No locations match this search." />
                 ) : (
@@ -279,10 +188,18 @@ export function DirectoryTab() {
                         </p>
                       )}
                       {facility.phone && (
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-700">
                           {facility.phone}
                         </p>
                       )}
+                      <p className="mt-1 text-xs text-gray-700">
+                        {facility.recordCount === 1
+                          ? 'On 1 record'
+                          : `On ${facility.recordCount} records`}
+                        {facility.latestDate
+                          ? ` · latest ${safeFormatDate(facility.latestDate, 'PP', '')}`
+                          : ''}
+                      </p>
                     </article>
                   ))
                 )}
@@ -313,7 +230,7 @@ function Section({
           {icon}
         </span>
         <h2 className="text-sm font-semibold">{title}</h2>
-        <span className="text-xs text-gray-400">{count}</span>
+        <span className="text-xs text-gray-700">{count}</span>
       </div>
       {children}
     </section>

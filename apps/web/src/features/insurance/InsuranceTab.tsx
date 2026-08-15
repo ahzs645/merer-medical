@@ -202,7 +202,7 @@ function InsurancePlanCard({
     <button
       type="button"
       onClick={onSelect}
-      className={`w-full rounded-md bg-white p-4 text-left shadow-sm ring-1 transition ${
+      className={`w-full rounded-md bg-white p-4 text-start shadow-sm ring-1 transition ${
         selected
           ? 'ring-primary-600'
           : 'ring-gray-200 hover:bg-gray-50 hover:ring-gray-300'

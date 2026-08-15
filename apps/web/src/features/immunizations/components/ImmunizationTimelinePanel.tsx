@@ -59,7 +59,7 @@ export function ImmunizationTimelinePanel({
                   {group.year}
                 </span>
               </div>
-              <ol className="space-y-2.5 border-l border-gray-200 pl-4">
+              <ol className="space-y-2.5 border-s border-gray-200 ps-4">
                 {group.records.map((record) => (
                   <li key={record.id} className="relative">
                     <span className="absolute -left-[1.30rem] top-1.5 h-2.5 w-2.5 rounded-full bg-primary-500 ring-4 ring-white" />

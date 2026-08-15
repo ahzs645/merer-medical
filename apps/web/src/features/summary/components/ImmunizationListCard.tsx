@@ -74,18 +74,18 @@ export function ImmunizationListCard({
                           {({ open }) => (
                             <>
                               <Disclosure.Button className="min-h-[44px] w-full">
-                                <p className="text-sm font-bold text-gray-900 md:text-base flex w-full items-center text-left">
+                                <p className="text-sm font-bold text-gray-900 md:text-base flex w-full items-center text-start">
                                   {item?.[0].metadata?.display_name}{' '}
                                   {!open ? `(${item?.length})` : ''}
                                   <ChevronDownIcon
-                                    className={`ml-1 h-auto w-4 rounded duration-150 active:scale-95 active:bg-slate-50 ${
+                                    className={`ms-1 h-auto w-4 rounded duration-150 active:scale-95 active:bg-slate-50 ${
                                       open ? 'rotate-180 transform' : ''
                                     }`}
                                   />
                                 </p>
                               </Disclosure.Button>
                               <Disclosure.Panel className="">
-                                <ul className="truncate pl-2 text-sm font-medium text-gray-800">
+                                <ul className="truncate ps-2 text-sm font-medium text-gray-800">
                                   {item.map((x) => (
                                     <li key={x.id}>
                                       {`• ${

@@ -166,7 +166,7 @@ function LabMobileRow({
         <Link
           to={getLabDetailLink(group.key)}
           onClick={saveLabsScrollPosition}
-          className="min-w-0 flex-1 rounded text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+          className="min-w-0 flex-1 rounded text-start focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
         >
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
@@ -182,7 +182,7 @@ function LabMobileRow({
                 </div>
               </div>
               <div
-                className={`shrink-0 text-right text-sm font-semibold ${getFlagTextClass(
+                className={`shrink-0 text-end text-sm font-semibold ${getFlagTextClass(
                   latestReference.flag,
                 )}`}
               >
@@ -283,7 +283,7 @@ function LabTableRow({
           button and the report links — are lifted above that overlay. The row
           was previously a `div[role="button"]` with a `navigate()` call, which
           had no href at all and swallowed both of them. */}
-      <div className="relative grid w-full grid-cols-[minmax(14rem,1.5fr)_minmax(8rem,0.8fr)_minmax(8rem,0.7fr)_minmax(13rem,1.15fr)_minmax(7rem,0.65fr)] gap-3 px-4 py-4 text-left hover:bg-blue-50">
+      <div className="relative grid w-full grid-cols-[minmax(14rem,1.5fr)_minmax(8rem,0.8fr)_minmax(8rem,0.7fr)_minmax(13rem,1.15fr)_minmax(7rem,0.65fr)] gap-3 px-4 py-4 text-start hover:bg-blue-50">
         <div className="flex min-w-0 gap-3">
           <button
             type="button"

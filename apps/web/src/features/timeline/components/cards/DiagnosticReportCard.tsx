@@ -166,11 +166,11 @@ function DiagnosticReportCardUnmemo({
             <TimelineCardCategoryTitle
               title={
                 <>
-                  <p className="mr-1">
+                  <p className="me-1">
                     {isImagingReport(item) ? 'Imaging Report' : 'Lab Panel'}
                   </p>
                   {status === 'loading' && (
-                    <div className="ml-2">
+                    <div className="ms-2">
                       <ButtonLoadingSpinner height="h-3" width="w-3" />
                     </div>
                   )}

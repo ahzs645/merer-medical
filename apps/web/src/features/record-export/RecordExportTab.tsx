@@ -15,6 +15,7 @@ import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText } from '../../shared/utils/fhirText';
 import { isAllergyNegationRecord } from '../../shared/utils/allergyNegation';
+import { OtherDownloadDoors } from '../../shared/components/OtherDownloadDoors';
 import { resourceTypeLabel } from '../../shared/utils/resourceTypeLabels';
 import { referencedAttachmentIds } from '../../shared/utils/standaloneAttachments';
 import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
@@ -200,37 +201,37 @@ export function RecordExportTab() {
         .map((d) => getFhirResource<Record<string, unknown>>(d)),
     );
     return docs.reduce(
-        (acc, doc) => {
-          acc.entries += 1;
-          const type = doc.data_record.resource_type;
-          const isWrappedAttachment =
-            type === 'documentreference_attachment' &&
-            !!doc.metadata?.id &&
-            wrapped.has(doc.metadata.id);
-          if (NON_RECORD_RESOURCE_TYPES.has(type) && !isWrappedAttachment) {
-            if (type === 'documentreference_attachment') {
-              // Standalone upload: a document in its own right.
-              acc.total += 1;
-              acc.byType['documentreference'] =
-                (acc.byType['documentreference'] || 0) + 1;
-              return acc;
-            }
+      (acc, doc) => {
+        acc.entries += 1;
+        const type = doc.data_record.resource_type;
+        const isWrappedAttachment =
+          type === 'documentreference_attachment' &&
+          !!doc.metadata?.id &&
+          wrapped.has(doc.metadata.id);
+        if (NON_RECORD_RESOURCE_TYPES.has(type) && !isWrappedAttachment) {
+          if (type === 'documentreference_attachment') {
+            // Standalone upload: a document in its own right.
+            acc.total += 1;
+            acc.byType['documentreference'] =
+              (acc.byType['documentreference'] || 0) + 1;
             return acc;
           }
-          if (isWrappedAttachment) {
-            acc.attachments += 1;
-            return acc;
-          }
-          acc.total += 1;
-          // "No known allergy" / "not asked" rows are AllergyIntolerance
-          // resources that record the absence of an allergen. They still
-          // export, so they stay in the total and the chips still sum to it —
-          // they just count under their own name instead of inflating
-          // "Allergies" past what every other screen reports.
-          const bucket = summaryBucket(doc);
-          acc.byType[bucket] = (acc.byType[bucket] || 0) + 1;
           return acc;
-        },
+        }
+        if (isWrappedAttachment) {
+          acc.attachments += 1;
+          return acc;
+        }
+        acc.total += 1;
+        // "No known allergy" / "not asked" rows are AllergyIntolerance
+        // resources that record the absence of an allergen. They still
+        // export, so they stay in the total and the chips still sum to it —
+        // they just count under their own name instead of inflating
+        // "Allergies" past what every other screen reports.
+        const bucket = summaryBucket(doc);
+        acc.byType[bucket] = (acc.byType[bucket] || 0) + 1;
+        return acc;
+      },
       { total: 0, byType: {}, attachments: 0, entries: 0 } as Counts,
     );
   }, [docs]);
@@ -305,6 +306,7 @@ export function RecordExportTab() {
                   {counts.attachments > 0 &&
                     `${counts.attachments} files attached to documents travel inside the FHIR Bundle but are not counted as records of their own.`}
                 </p>
+                <OtherDownloadDoors from="export" />
               </>
             )}
 
@@ -423,7 +425,7 @@ function ExportButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="flex items-center gap-3 rounded-md border border-gray-200 bg-white p-3 text-left shadow-sm transition hover:border-primary-300 hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-50"
+      className="flex items-center gap-3 rounded-md border border-gray-200 bg-white p-3 text-start shadow-sm transition hover:border-primary-300 hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-50"
     >
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary-50 text-primary-700">
         <Icon className="h-5 w-5" />
@@ -434,7 +436,7 @@ function ExportButton({
         </span>
         <span className="block text-xs text-gray-500">{subtitle}</span>
       </span>
-      <ArrowDownTrayIcon className="ml-auto h-5 w-5 shrink-0 text-gray-400" />
+      <ArrowDownTrayIcon className="ms-auto h-5 w-5 shrink-0 text-gray-400" />
     </button>
   );
 }

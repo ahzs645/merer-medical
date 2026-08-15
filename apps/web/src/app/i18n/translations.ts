@@ -1734,6 +1734,24 @@ export const arabicTranslations: Record<string, string> = {
   // The Timeline's own search box. Its placeholder used to be a bare literal,
   // which the runtime attribute pass could not match to anything.
   'Loading the tooth chart…': 'جارٍ تحميل مخطط الأسنان…',
+
+  // Dental "What to do next", which now lists the open records themselves.
+  'Nothing open. Every dental record here is complete.':
+    'لا يوجد شيء مفتوح. كل سجلات الأسنان هنا مكتملة.',
+  '{count} record still open': 'سجل واحد ما زال مفتوحًا ({count})',
+  '{count} records still open': '{count} سجلات ما زالت مفتوحة',
+  '{count} more in Records': '{count} أخرى في السجلات',
+
+  // The app's own confirmation dialogs, which replaced the browser's
+  // `window.confirm` — untranslatable beyond whatever string it was handed.
+  'Delete this record?': 'حذف هذا السجل؟',
+  'The record is removed from this device. This cannot be undone.':
+    'سيُحذف السجل من هذا الجهاز. لا يمكن التراجع عن هذا الإجراء.',
+  'The record and the files attached to it are removed from this device. This cannot be undone.':
+    'سيُحذف السجل والملفات المرفقة به من هذا الجهاز. لا يمكن التراجع عن هذا الإجراء.',
+  'What you have typed here is not saved yet.': 'ما كتبته هنا لم يُحفظ بعد.',
+  Discard: 'تجاهل',
+  'Keep editing': 'متابعة التحرير',
   'Search your medical records': 'ابحث في سجلاتك الطبية',
   '✨ Search your records with AI':
     '✨ ابحث في سجلاتك باستخدام الذكاء الاصطناعي',

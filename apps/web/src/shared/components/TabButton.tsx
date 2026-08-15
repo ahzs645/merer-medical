@@ -39,7 +39,7 @@ export function TabButton({
     <Link to={route} className={linkClassName}>
       <p
         className={`font-xs h-5 w-5 text-base md:h-8 md:w-8 md:text-white ${
-          collapsed ? 'md:mr-0' : 'md:mr-4'
+          collapsed ? 'md:me-0' : 'md:me-4'
         } ${isActive ? 'text-primary font-bold' : 'text-slate-800'}`}
       >
         {icon}

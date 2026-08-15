@@ -88,7 +88,7 @@ export function PreviewCard({
                 type="file"
                 accept=".pdf,.txt,.md,.csv,.json,image/*,application/pdf,text/*,application/json"
                 onChange={(event) => handlePreviewFile(event.target.files?.[0])}
-                className="mt-2 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-primary-700"
+                className="mt-2 block w-full text-sm text-gray-700 file:me-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-primary-700"
               />
             </label>
             {previewFile ? (

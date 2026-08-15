@@ -72,7 +72,7 @@ export function CarePlanListCard({
                                       goal.display ??
                                       goalIndex
                                     }
-                                    className="pl-4 text-base text-gray-600"
+                                    className="ps-4 text-base text-gray-600"
                                   >
                                     {' -    '}
                                     {goal.display}

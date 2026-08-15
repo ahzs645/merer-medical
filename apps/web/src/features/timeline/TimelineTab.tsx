@@ -190,14 +190,14 @@ export function TimelineTab() {
             ([year, dateMap], yearIndex, yearElements) => (
               <div key={year} className="relative">
                 {/* Vertical line, tracking the smaller mobile date bubble */}
-                <div className="absolute left-6 md:left-8 top-4 h-[calc(100%-12px)] w-[2px] md:w-1 bg-gray-200 z-0 rounded-full" />
+                <div className="absolute start-6 md:start-8 top-4 h-[calc(100%-12px)] w-[2px] md:w-1 bg-gray-200 z-0 rounded-full" />
                 <TimelineYearHeader
                   key={`${year}${yearIndex}`}
                   year={year}
                   fullDate={Object.entries(dateMap)?.[0]?.[0]}
                 />
                 {Object.entries(dateMap).map(([dateKey, itemList]) => (
-                  <div key={dateKey} className="ml-1">
+                  <div key={dateKey} className="ms-1">
                     <TimelineMonthDayHeader dateKey={dateKey} />
                     <TimelineItem
                       dateKey={dateKey}
@@ -341,7 +341,7 @@ export function TimelineTab() {
                       </div>
                       <button
                         onClick={scrollToTop}
-                        className={`z-40 fixed transition-all duration-200 bottom-24 right-4 md:bottom-4 md:right-8 shadow-blue-500/50 bg-primary shadow-md hover:shadow-lg active:shadow-sm rounded-full p-2 active:scale-95 hover:scale-105 ${
+                        className={`z-40 fixed transition-all duration-200 bottom-24 end-4 md:bottom-4 md:end-8 shadow-blue-500/50 bg-primary shadow-md hover:shadow-lg active:shadow-sm rounded-full p-2 active:scale-95 hover:scale-105 ${
                           scrollY > 100 ? 'opacity-100' : 'opacity-0'
                         }`}
                       >

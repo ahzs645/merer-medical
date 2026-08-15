@@ -30,7 +30,7 @@ export function LabHistoryPanel({
           <button
             type="button"
             onClick={() => setView('TABLE')}
-            className={`inline-flex items-center gap-1 rounded-l-md px-2.5 py-1.5 text-xs font-semibold ${
+            className={`inline-flex items-center gap-1 rounded-s-md px-2.5 py-1.5 text-xs font-semibold ${
               view === 'TABLE'
                 ? 'bg-primary-700 text-white'
                 : 'bg-white text-gray-700 hover:bg-gray-50'
@@ -42,7 +42,7 @@ export function LabHistoryPanel({
           <button
             type="button"
             onClick={() => setView('GRAPH')}
-            className={`inline-flex items-center gap-1 rounded-r-md px-2.5 py-1.5 text-xs font-semibold ${
+            className={`inline-flex items-center gap-1 rounded-e-md px-2.5 py-1.5 text-xs font-semibold ${
               view === 'GRAPH'
                 ? 'bg-primary-700 text-white'
                 : 'bg-white text-gray-700 hover:bg-gray-50'

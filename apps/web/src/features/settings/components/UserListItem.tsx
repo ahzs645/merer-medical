@@ -14,7 +14,7 @@ export function UserListItem({ user, isSelected, onClick }: UserListItemProps) {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center space-x-3 rounded-lg px-3 py-3 transition-colors ${
+      className={`w-full flex items-center gap-x-3 rounded-lg px-3 py-3 transition-colors ${
         isSelected
           ? 'bg-primary-50 border-2 border-primary-500'
           : 'bg-white border-2 border-gray-200 hover:bg-gray-50'
@@ -41,7 +41,7 @@ export function UserListItem({ user, isSelected, onClick }: UserListItemProps) {
           )}
         </div>
       </div>
-      <div className="flex-1 text-left">
+      <div className="flex-1 text-start">
         <p className="text-sm font-medium text-gray-900">
           {getUserDisplayName(user)}
         </p>

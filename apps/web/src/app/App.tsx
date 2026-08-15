@@ -30,6 +30,8 @@ import { AppConfigProvider } from '../app/providers/AppConfigProvider';
 import { AppDataProvider } from '../app/providers/AppDataProvider';
 import { TabWrapper } from '../shared/components/TabWrapper';
 import { TimelineTab } from '../features/timeline/TimelineTab';
+import { Routes as AppRoutes } from '../Routes';
+import { getRouterBasename } from '../shared/utils/demoMode';
 
 /**
  * Every route below this line is fetched when it is first opened.
@@ -98,9 +100,15 @@ const WalletCardTab = lazyNamed(
   () => import('../features/wallet-card/WalletCardTab'),
   'WalletCardTab',
 );
-const CernerRedirect = lazy(() => import('../features/connections/oauth-callbacks/CernerRedirect'));
-const ConnectionTab = lazy(() => import('../features/connections/ConnectionTab'));
-const EpicRedirect = lazy(() => import('../features/connections/oauth-callbacks/EpicRedirect'));
+const CernerRedirect = lazy(
+  () => import('../features/connections/oauth-callbacks/CernerRedirect'),
+);
+const ConnectionTab = lazy(
+  () => import('../features/connections/ConnectionTab'),
+);
+const EpicRedirect = lazy(
+  () => import('../features/connections/oauth-callbacks/EpicRedirect'),
+);
 const DentalLayout = lazyNamed(
   () => import('../features/dental/DentalLayout'),
   'DentalLayout',
@@ -137,15 +145,14 @@ const DocumentDetailTab = lazyNamed(
   () => import('../features/documents/DocumentDetailTab'),
   'DocumentDetailTab',
 );
-const HealowRedirect = lazy(() => import('../features/connections/oauth-callbacks/HealowRedirect'));
+const HealowRedirect = lazy(
+  () => import('../features/connections/oauth-callbacks/HealowRedirect'),
+);
 const LabDetailTab = lazyNamed(
   () => import('../features/labs/LabDetailTab'),
   'LabDetailTab',
 );
-const LabsTab = lazyNamed(
-  () => import('../features/labs/LabsTab'),
-  'LabsTab',
-);
+const LabsTab = lazyNamed(() => import('../features/labs/LabsTab'), 'LabsTab');
 const ImagingTab = lazyNamed(
   () => import('../features/imaging/ImagingTab'),
   'ImagingTab',
@@ -167,7 +174,9 @@ const ManualRecordTab = lazyNamed(
   () => import('../features/manual-entry/ManualRecordTab'),
   'ManualRecordTab',
 );
-const OnPatientRedirect = lazy(() => import('../features/connections/oauth-callbacks/OnPatientRedirect'));
+const OnPatientRedirect = lazy(
+  () => import('../features/connections/oauth-callbacks/OnPatientRedirect'),
+);
 const OptometryLayout = lazyNamed(
   () => import('../features/optometry/OptometryLayout'),
   'OptometryLayout',
@@ -254,10 +263,12 @@ const VisitPrepTab = lazyNamed(
   () => import('../features/visit-prep/VisitPrepTab'),
   'VisitPrepTab',
 );
-const VARedirect = lazy(() => import('../features/connections/oauth-callbacks/VARedirect'));
-const VeradigmRedirect = lazy(() => import('../features/connections/oauth-callbacks/VeradigmRedirect'));
-import { Routes as AppRoutes } from '../Routes';
-import { getRouterBasename } from '../shared/utils/demoMode';
+const VARedirect = lazy(
+  () => import('../features/connections/oauth-callbacks/VARedirect'),
+);
+const VeradigmRedirect = lazy(
+  () => import('../features/connections/oauth-callbacks/VeradigmRedirect'),
+);
 
 export default function App() {
   useConsoleLogEasterEgg();

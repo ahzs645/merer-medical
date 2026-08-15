@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 import { Routes as AppRoutes } from '../../Routes';
+import { ConfirmDeleteDialog } from '../../shared/components/ConfirmDeleteDialog';
 import { StylizedSelect } from '../../shared/components/StylizedSelect';
 import { prepareLinkedAttachmentFile } from '../../repositories/AttachmentRepository';
 import { TerminologySuggestions } from './TerminologyCombobox';
@@ -134,10 +135,12 @@ export function ManualRecordForm({
   const [pickerOpen, setPickerOpen] = useState(canPickType);
   // A modal host passes onCancel and owns its own discard confirmation; the
   // standalone page guards the navigate-away itself.
+  const [discardOpen, setDiscardOpen] = useState(false);
   const handleCancel =
     onCancel ??
     (() => {
-      if (isDirty() && !window.confirm(t('Discard unsaved changes?'))) {
+      if (isDirty()) {
+        setDiscardOpen(true);
         return;
       }
       navigate(AppRoutes.Timeline);
@@ -548,7 +551,7 @@ export function ManualRecordForm({
                     }
                     if (!title.trim()) setTitle(file.name);
                   }}
-                  className="mt-2 block w-full text-sm text-gray-900 file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-primary-700"
+                  className="mt-2 block w-full text-sm text-gray-900 file:me-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-primary-700"
                 />
                 {fileName && (
                   <p className="mt-2 text-xs font-medium text-gray-600">
@@ -600,7 +603,7 @@ export function ManualRecordForm({
                         });
                       });
                   }}
-                  className="mt-2 block w-full text-sm text-gray-900 file:mr-4 file:rounded-md file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-700 file:ring-1 file:ring-inset file:ring-primary-200 hover:file:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-2 block w-full text-sm text-gray-900 file:me-4 file:rounded-md file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-700 file:ring-1 file:ring-inset file:ring-primary-200 hover:file:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-60"
                 />
                 {linkedFile && (
                   <p className="mt-2 text-xs font-medium text-gray-600">
@@ -719,6 +722,18 @@ export function ManualRecordForm({
           </form>
         )}
       </div>
+      <ConfirmDeleteDialog
+        open={discardOpen}
+        title={t('Discard unsaved changes?')}
+        body={t('What you have typed here is not saved yet.')}
+        confirmLabel={t('Discard')}
+        cancelLabel={t('Keep editing')}
+        onConfirm={() => {
+          setDiscardOpen(false);
+          navigate(AppRoutes.Timeline);
+        }}
+        onCancel={() => setDiscardOpen(false)}
+      />
     </div>
   );
 }

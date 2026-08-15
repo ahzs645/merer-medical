@@ -77,7 +77,7 @@ export function PrivacyAndSecuritySettingsGroup() {
                     localConfig.use_encrypted_database
                       ? 'bg-primary-500'
                       : 'bg-gray-200',
-                    'focus:ring-primary-500 relative ml-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
+                    'focus:ring-primary-500 relative ms-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
                   )}
                 >
                   <span
@@ -135,7 +135,7 @@ export function PrivacyAndSecuritySettingsGroup() {
                     userPreferences.use_proxy
                       ? 'bg-primary-500'
                       : 'bg-gray-200',
-                    'focus:ring-primary-500 relative ml-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
+                    'focus:ring-primary-500 relative ms-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
                   )}
                 >
                   <span
@@ -276,7 +276,7 @@ function PasswordPromptModal({
         </button>
         <button
           type="button"
-          className=" bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 ml-4 inline-flex justify-center rounded-md border border-transparent px-4 py-2 align-middle text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-800"
+          className=" bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 ms-4 inline-flex justify-center rounded-md border border-transparent px-4 py-2 align-middle text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-800"
           disabled={isProcessing}
           onClick={async () => {
             setIsProcessing(true);
@@ -284,7 +284,7 @@ function PasswordPromptModal({
             setIsProcessing(false);
           }}
         >
-          <p className={`${isProcessing ? 'mr-2' : ''}`}>
+          <p className={`${isProcessing ? 'me-2' : ''}`}>
             {t('Remove Password')}
           </p>
           {isProcessing && <ButtonLoadingSpinner />}
@@ -429,9 +429,9 @@ function DatabasePasswordModal({
           <button
             type="submit"
             disabled={isSettingPassword}
-            className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 ml-4 inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-800"
+            className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 ms-4 inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-300 disabled:text-gray-800"
           >
-            <p className={`${isSettingPassword ? 'mr-2' : ''}`}>
+            <p className={`${isSettingPassword ? 'me-2' : ''}`}>
               {t('Set Password')}
             </p>
             {isSettingPassword && <ButtonLoadingSpinner />}

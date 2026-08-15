@@ -17,7 +17,7 @@ export function ResultComponentSection({
       {({ open }) => (
         <>
           <Disclosure.Button className="mb-1 w-full rounded-md bg-gray-50 p-1 font-bold">
-            <div className="flex w-full items-center justify-between text-left">
+            <div className="flex w-full items-center justify-between text-start">
               {matchingSectionsDisplayName}
               <ChevronRightIcon
                 className={`h-8 w-8 rounded duration-150 active:scale-95 active:bg-slate-50 ${
@@ -32,13 +32,13 @@ export function ResultComponentSection({
                 <tr>
                   <th
                     scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                    className="py-3.5 ps-4 pe-3 text-start text-sm font-semibold text-gray-900 sm:ps-0"
                   >
                     Title
                   </th>
                   <th
                     scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                    className="py-3.5 ps-4 pe-3 text-start text-sm font-semibold text-gray-900 sm:ps-0"
                   >
                     Value
                   </th>
@@ -47,7 +47,7 @@ export function ResultComponentSection({
               <tbody className="divide-y divide-gray-200">
                 {Object.values(data).map((v) => (
                   <tr key={v.value + v.title}>
-                    <td className="break-word py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                    <td className="break-word py-1 ps-4 pe-3 text-sm font-medium text-gray-900 sm:ps-0">
                       {v.title}
                       <p className="col-span-3 self-center text-xs font-light text-gray-600">
                         {v.referenceRangeLow && v.referenceRangeHigh

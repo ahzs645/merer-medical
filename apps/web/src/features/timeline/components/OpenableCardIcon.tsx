@@ -1,6 +1,6 @@
 export function OpenableCardIcon() {
   return (
-    <div className="relative py-2 pr-1">
+    <div className="relative py-2 pe-1">
       <div className="relative flex justify-center text-gray-700">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -8,7 +8,7 @@ export function OpenableCardIcon() {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="-mt-2 -mr-2 h-4 w-4"
+          className="-mt-2 -me-2 h-4 w-4"
         >
           <path
             strokeLinecap="round"

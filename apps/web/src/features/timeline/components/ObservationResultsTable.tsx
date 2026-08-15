@@ -162,7 +162,7 @@ export function ObservationResultsTable({
   return (
     <div className="overflow-hidden rounded-md border border-gray-200">
       <table className="min-w-full divide-y divide-gray-100 text-sm">
-        <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <thead className="bg-gray-50 text-start text-xs font-semibold uppercase tracking-wide text-gray-500">
           <tr>
             <th className="px-3 py-2">
               <button
@@ -203,7 +203,7 @@ export function ObservationResultsTable({
                 </span>
                 {reading.interpretation && (
                   <span
-                    className={`ml-2 rounded px-1.5 py-0.5 text-xs font-medium ${
+                    className={`ms-2 rounded px-1.5 py-0.5 text-xs font-medium ${
                       reading.abnormal
                         ? 'bg-red-100 text-red-700'
                         : 'bg-gray-100 text-gray-600'

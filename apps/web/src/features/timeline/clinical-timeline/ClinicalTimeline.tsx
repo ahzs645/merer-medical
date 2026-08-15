@@ -588,7 +588,7 @@ export function ClinicalTimeline() {
             </button>
           );
         })}
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ms-auto flex items-center gap-2">
           <button
             type="button"
             onClick={() => setShowLanePicker((v) => !v)}
@@ -617,7 +617,7 @@ export function ClinicalTimeline() {
               {groups.map((group) => (
                 <span
                   key={group.name}
-                  className="inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white py-0.5 pl-2 pr-1 text-xs text-gray-700"
+                  className="inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white py-0.5 ps-2 pe-1 text-xs text-gray-700"
                 >
                   <button
                     type="button"
@@ -987,7 +987,7 @@ function LaneRow({
           onDropLane(index);
         }}
         title="Drag to reorder"
-        className={`flex flex-shrink-0 cursor-grab flex-col justify-center border-r bg-gray-50 px-3 py-1 ${
+        className={`flex flex-shrink-0 cursor-grab flex-col justify-center border-e bg-gray-50 px-3 py-1 ${
           dragOver ? 'border-primary-500 bg-primary-50' : 'border-gray-200'
         }`}
       >
@@ -1019,7 +1019,7 @@ function LaneRow({
             </button>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-1 pl-3.5">
+        <div className="flex flex-wrap items-center gap-1 ps-3.5">
           {lane.subtitle && (
             <span className="truncate text-[10px] text-gray-400">
               {lane.subtitle}
@@ -1256,7 +1256,7 @@ function SeriesYAxis({ lane, height }: { lane: TimelineLane; height: number }) {
     <svg
       width={YAXIS_W}
       height={height}
-      className="flex-shrink-0 border-l border-gray-100 bg-white"
+      className="flex-shrink-0 border-s border-gray-100 bg-white"
     >
       {[max, min].map((v, i) => (
         <text

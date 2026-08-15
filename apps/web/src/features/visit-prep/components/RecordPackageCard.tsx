@@ -4,6 +4,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 import { CheckboxField } from './CheckboxField';
+import { OtherDownloadDoors } from '../../../shared/components/OtherDownloadDoors';
 
 export function RecordPackageCard({
   includeAttachments,
@@ -77,6 +78,7 @@ export function RecordPackageCard({
           {exportBusy ? 'Preparing...' : 'Download .emrpkg'}
         </button>
       </div>
+      <OtherDownloadDoors from="visit-prep" />
     </div>
   );
 }

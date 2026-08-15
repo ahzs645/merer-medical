@@ -108,14 +108,14 @@ export function ShowCarePlanDetailsExpandable({
                     {carePlan.activity.map((activity, index) => (
                       <div
                         key={index}
-                        className="text-sm text-gray-900 border-l-2 border-indigo-300 pl-2"
+                        className="text-sm text-gray-900 border-l-2 border-indigo-300 ps-2"
                       >
                         {activity.detail?.description ||
                           activity.detail?.code?.text ||
                           activity.detail?.code?.coding?.[0]?.display ||
                           `Activity ${index + 1}`}
                         {activity.detail?.status && (
-                          <span className="ml-2 text-gray-500">
+                          <span className="ms-2 text-gray-500">
                             ({formatDisplayText(activity.detail.status)})
                           </span>
                         )}

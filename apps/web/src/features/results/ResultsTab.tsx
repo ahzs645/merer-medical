@@ -210,7 +210,7 @@ function ResultRow({
     <button
       type="button"
       onClick={() => onSelect(result.detailId)}
-      className={`grid w-full grid-cols-[auto_minmax(0,1fr)] gap-3 px-3 py-3 text-left hover:bg-blue-50 ${
+      className={`grid w-full grid-cols-[auto_minmax(0,1fr)] gap-3 px-3 py-3 text-start hover:bg-blue-50 ${
         selected ? 'bg-blue-50' : ''
       }`}
     >
@@ -368,7 +368,7 @@ function ReportDetailBody({ detail }: { detail: ResultDetail }) {
           <h2 className="text-sm font-semibold text-gray-900">
             Provider comments
           </h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+          <ul className="mt-2 list-disc space-y-1 ps-5 text-sm text-gray-700">
             {detail.providerComments.map((comment, index) => (
               <li key={`${comment}-${index}`}>{comment}</li>
             ))}

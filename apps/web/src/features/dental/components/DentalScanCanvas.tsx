@@ -122,7 +122,7 @@ export function DentalScanCanvas({
 
   return (
     <>
-      <div className="absolute left-3 top-3 z-10 rounded-md bg-white/90 px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200">
+      <div className="absolute start-3 top-3 z-10 rounded-md bg-white/90 px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200">
         {t('Demo geometry')}
       </div>
       <div ref={mountRef} className="h-full w-full" />

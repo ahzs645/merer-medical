@@ -66,7 +66,7 @@ export const MessageBubble = memo(function MessageBubble({
         dir="ltr"
         className={`flex flex-col w-full max-w-[320px] md:max-w-md lg:max-w-lg leading-1.5 p-4 gap-0 ${isAiMessage ? 'bg-indigo-100 border-indigo-200 rounded-tr-xl rounded-br-xl rounded-bl-xl' : 'border-gray-200 bg-gray-100 rounded-tl-xl rounded-bl-xl rounded-br-xl'}`}
       >
-        <div className="flex items-center space-x-2 ">
+        <div className="flex items-center gap-x-2 ">
           <span
             className={`text-sm font-semibold ${isAiMessage ? 'text-indigo-900' : 'text-gray-900'}`}
           >
@@ -101,7 +101,7 @@ export const MessageBubble = memo(function MessageBubble({
               ol: ({ ...props }) => (
                 <ol
                   {...props}
-                  className={`marker:text-indigo-900 list-decimal list-outside ml-5 ${textColorClass}`}
+                  className={`marker:text-indigo-900 list-decimal list-outside ms-5 ${textColorClass}`}
                 />
               ),
               li: ({ ...props }) => (
@@ -110,7 +110,7 @@ export const MessageBubble = memo(function MessageBubble({
               ul: ({ ...props }) => (
                 <ul
                   {...props}
-                  className={`marker:text-indigo-900 list-disc list-outside ml-5 ${textColorClass}`}
+                  className={`marker:text-indigo-900 list-disc list-outside ms-5 ${textColorClass}`}
                 />
               ),
               p: ({ ...props }) => <p {...props} className={textColorClass} />,
@@ -186,13 +186,13 @@ export const MessageBubble = memo(function MessageBubble({
                       ul: ({ ...props }) => (
                         <ul
                           {...props}
-                          className="text-xs list-disc list-outside ml-5 text-indigo-800"
+                          className="text-xs list-disc list-outside ms-5 text-indigo-800"
                         />
                       ),
                       ol: ({ ...props }) => (
                         <ol
                           {...props}
-                          className="text-xs list-decimal list-outside ml-5 text-indigo-800"
+                          className="text-xs list-decimal list-outside ms-5 text-indigo-800"
                         />
                       ),
                       li: ({ ...props }) => (

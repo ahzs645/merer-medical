@@ -102,19 +102,51 @@ describe('ManualRecordModal', () => {
     expect(scrollers[0].className).toContain('flex-1');
   });
 
+  /**
+   * The question is asked in the app's own dialog now, not `window.confirm`.
+   * What has to hold either way: a dirty form is never discarded by the
+   * dismissal itself.
+   */
   it.each([
     ['the close button', () => fireEvent.click(screen.getByLabelText('Close'))],
     ['Escape', () => fireEvent.keyDown(document, { key: 'Escape' })],
   ])('still guards a dirty form against %s', (_label, dismiss) => {
     mockIsDirty = true;
-    const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
+    const confirmSpy = jest.spyOn(window, 'confirm');
     const onClose = jest.fn();
     render(<ManualRecordModal open onClose={onClose} />);
 
     dismiss();
 
-    expect(confirmSpy).toHaveBeenCalled();
+    expect(screen.getByText('Discard unsaved changes?')).toBeTruthy();
     expect(onClose).not.toHaveBeenCalled();
+    // The browser dialog is gone for good; this is the regression guard.
+    expect(confirmSpy).not.toHaveBeenCalled();
     confirmSpy.mockRestore();
+  });
+
+  it('closes only once the discard is confirmed', () => {
+    mockIsDirty = true;
+    const onClose = jest.fn();
+    render(<ManualRecordModal open onClose={onClose} />);
+
+    fireEvent.click(screen.getByLabelText('Close'));
+    fireEvent.click(screen.getByText('Keep editing'));
+    expect(onClose).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByLabelText('Close'));
+    fireEvent.click(screen.getByText('Discard'));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('closes a clean form without asking', () => {
+    mockIsDirty = false;
+    const onClose = jest.fn();
+    render(<ManualRecordModal open onClose={onClose} />);
+
+    fireEvent.click(screen.getByLabelText('Close'));
+
+    expect(screen.queryByText('Discard unsaved changes?')).toBeNull();
+    expect(onClose).toHaveBeenCalled();
   });
 });

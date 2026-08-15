@@ -483,7 +483,7 @@ export function DisplayCCDAEncounterSection({
       {({ open }) => (
         <>
           <Disclosure.Button className="mb-1 w-full rounded-md bg-gray-50 p-1 font-bold">
-            <div className="flex w-full items-center justify-between text-left">
+            <div className="flex w-full items-center justify-between text-start">
               {data.code?.codeDisplayName || data.title || 'Encounter'}
               <ChevronRightIcon
                 className={`h-8 w-8 rounded duration-150 active:scale-95 active:bg-slate-50 ${
@@ -551,7 +551,7 @@ export function DisplayCCDAEncounterSection({
                         <dl className="flex">
                           {data.effectiveTimeLow && (
                             <>
-                              <dt className="font-medium mr-1">Start:</dt>
+                              <dt className="font-medium me-1">Start:</dt>
                               <dd>{parseDateString(data.effectiveTimeLow)}</dd>
                             </>
                           )}
@@ -559,7 +559,7 @@ export function DisplayCCDAEncounterSection({
                         <dl className="flex">
                           {data.effectiveTimeHigh && (
                             <>
-                              <dt className="font-medium mr-1">End:</dt>
+                              <dt className="font-medium me-1">End:</dt>
                               <dd>{parseDateString(data.effectiveTimeHigh)}</dd>
                             </>
                           )}
@@ -586,7 +586,7 @@ export function DisplayCCDAEncounterSection({
                             {data.performer.map((performer, index) => (
                               <li
                                 key={index}
-                                className="pl-3 pr-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between text-sm"
+                                className="ps-3 pe-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between text-sm"
                               >
                                 <span className="items-center">
                                   {performer.assignedEntity?.assignedPerson
@@ -607,7 +607,7 @@ export function DisplayCCDAEncounterSection({
                                       <>
                                         {performer.assignedEntity.telecom.map(
                                           (contact, contactIndex) => (
-                                            <span className="sm:ml-4 flex-shrink-0">
+                                            <span className="sm:ms-4 flex-shrink-0">
                                               <a
                                                 key={contactIndex}
                                                 href={`${contact.value}`}
@@ -641,7 +641,7 @@ export function DisplayCCDAEncounterSection({
                           {data.author.map((author, index) => (
                             <li
                               key={index}
-                              className="pl-3 pr-4 py-3 flex flex-col justify-between text-sm"
+                              className="ps-3 pe-4 py-3 flex flex-col justify-between text-sm"
                             >
                               <p className="flex flex-col font-semibold">
                                 {
@@ -711,7 +711,7 @@ export function DisplayCCDAEncounterSection({
                           {data.participant.map((participant, index) => (
                             <li
                               key={index}
-                              className="pl-3 pr-4 py-3 flex flex-col justify-between text-sm"
+                              className="ps-3 pe-4 py-3 flex flex-col justify-between text-sm"
                             >
                               <p className="flex flex-col font-semibold">
                                 {
@@ -748,7 +748,7 @@ export function DisplayCCDAEncounterSection({
                               {participant.participantRole?.telecom &&
                                 participant.participantRole.telecom.length >
                                   0 && (
-                                  <span className="ml-4 flex-shrink-0">
+                                  <span className="ms-4 flex-shrink-0">
                                     {participant.participantRole.telecom.map(
                                       (contact, contactIndex) => (
                                         <a
@@ -784,7 +784,7 @@ export function DisplayCCDAEncounterSection({
                               {diag?.originalText || diag?.displayName ? (
                                 <li
                                   key={index}
-                                  className="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
+                                  className="ps-3 pe-4 py-3 flex items-center justify-between text-sm"
                                 >
                                   <p className="w-0 flex-1 flex items-center">
                                     {diag.originalText ||

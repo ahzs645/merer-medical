@@ -23,6 +23,7 @@ import {
 import { deleteClinicalDocument } from '../../repositories/ClinicalDocumentRepository';
 import { notifyRecordsChanged } from '../../shared/utils/recordChangeSignal';
 import { isManualRecord } from '../../shared/utils/manualRecordUtils';
+import { ConfirmDeleteDialog } from '../../shared/components/ConfirmDeleteDialog';
 import { ManualSourceDocumentLink } from './ManualSourceDocumentLink';
 
 /**
@@ -51,6 +52,7 @@ export function ManualRecordActions({
   const notifyDispatch = useNotificationDispatch();
   const { t } = useInterfaceLanguage();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [linkedFiles, setLinkedFiles] = useState<
     Array<{ id: string; filename?: string }>
@@ -105,12 +107,18 @@ export function ManualRecordActions({
     return <div className={manualRecordActionRowClass}>{note}</div>;
   }
 
-  async function onDelete(event: MouseEvent<HTMLButtonElement>) {
+  function onRequestDelete(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault();
     event.stopPropagation();
     if (!db || isDeleting) return;
-    const confirmed = window.confirm(t('Delete this manual record?'));
-    if (!confirmed) return;
+    // Asked in the app's own dialog rather than the browser's, and asked at
+    // all — unlike a tracker entry or a comment, deleting a record takes its
+    // attachments with it, so there is nothing for an Undo to put back.
+    setIsConfirmOpen(true);
+  }
+
+  async function onDelete() {
+    if (!db || isDeleting) return;
 
     setIsDeleting(true);
     try {
@@ -133,6 +141,7 @@ export function ManualRecordActions({
       });
     } finally {
       setIsDeleting(false);
+      setIsConfirmOpen(false);
     }
   }
 
@@ -217,7 +226,7 @@ export function ManualRecordActions({
       <button
         type="button"
         disabled={isDeleting}
-        onClick={onDelete}
+        onClick={onRequestDelete}
         className="inline-flex min-h-[44px] items-center gap-1 rounded-md border border-red-200 px-3 py-1 text-xs font-semibold text-red-700 shadow-sm hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <TrashIcon className="h-4 w-4" />
@@ -228,6 +237,22 @@ export function ManualRecordActions({
         recordId={item.id}
         onClose={() => setIsEditOpen(false)}
         onSaved={notifyRecordsChanged}
+      />
+      <ConfirmDeleteDialog
+        open={isConfirmOpen}
+        busy={isDeleting}
+        title={t('Delete this record?')}
+        body={
+          linkedFiles.length > 0
+            ? t(
+                'The record and the files attached to it are removed from this device. This cannot be undone.',
+              )
+            : t(
+                'The record is removed from this device. This cannot be undone.',
+              )
+        }
+        onConfirm={onDelete}
+        onCancel={() => setIsConfirmOpen(false)}
       />
     </>
   );

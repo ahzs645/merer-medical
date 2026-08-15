@@ -495,13 +495,13 @@ export function DocumentDetailTab() {
                             {abnormalCount ? ` (${abnormalCount})` : ''}
                           </button>
                           <label className="relative block w-full sm:w-56">
-                            <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+                            <MagnifyingGlassIcon className="pointer-events-none absolute start-2.5 top-2.5 h-4 w-4 text-gray-400" />
                             <input
                               type="search"
                               value={query}
                               onChange={(event) => setQuery(event.target.value)}
                               placeholder="Find a measurement"
-                              className="block w-full rounded-md border-0 py-1.5 pl-8 pr-3 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500"
+                              className="block w-full rounded-md border-0 py-1.5 ps-8 pe-3 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500"
                             />
                           </label>
                         </div>
@@ -633,7 +633,7 @@ function PanelDisclosure({
     <Disclosure defaultOpen={defaultOpen}>
       {({ open }) => (
         <div className="overflow-hidden rounded-md border border-gray-200">
-          <Disclosure.Button className="flex w-full items-center justify-between gap-2 bg-gray-50 px-3 py-2 text-left hover:bg-gray-100">
+          <Disclosure.Button className="flex w-full items-center justify-between gap-2 bg-gray-50 px-3 py-2 text-start hover:bg-gray-100">
             <span className="flex min-w-0 items-center gap-2">
               <ChevronRightIcon
                 className={`h-4 w-4 shrink-0 text-gray-400 transition-transform ${

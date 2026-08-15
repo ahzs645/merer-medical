@@ -81,13 +81,13 @@ export function parseCCDAVitalsSection(
           <tr>
             <th
               scope="col"
-              className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:w-auto sm:pl-0"
+              className="py-3.5 ps-4 pe-3 text-start text-sm font-semibold text-gray-900 sm:w-auto sm:ps-0"
             >
               Title
             </th>
             <th
               scope="col"
-              className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+              className="py-3.5 ps-4 pe-3 text-start text-sm font-semibold text-gray-900 sm:ps-0"
             >
               Value
             </th>
@@ -96,7 +96,7 @@ export function parseCCDAVitalsSection(
         <tbody className="divide-y divide-gray-200">
           {Object.values(extractedVital).map((v) => (
             <tr key={v.value}>
-              <td className="break-word py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+              <td className="break-word py-4 ps-4 pe-3 text-sm font-medium text-gray-900 sm:ps-0">
                 {v.title}
               </td>
               <td className="break-word px-3 py-4 text-sm text-gray-900">

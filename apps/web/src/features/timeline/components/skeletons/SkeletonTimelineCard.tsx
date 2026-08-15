@@ -9,10 +9,10 @@ export function SkeletonTimelineCardUnmemoed() {
         <div className="flex animate-pulse flex-row items-center pb-2">
           <div className="mt-1 h-4 w-12 rounded-md bg-gray-100 sm:h-4 "></div>
         </div>
-        <div className="mb-2 ml-2">
+        <div className="mb-2 ms-2">
           <span className="absolute inset-0" aria-hidden="true" />
           <div className="mb-2 mt-1 h-4 w-20 rounded-md bg-gray-100 sm:h-4 "></div>
-          <div className="ml-2">
+          <div className="ms-2">
             <ul className="list-disc list-inside">
               <li className="text-xs font-medium md:text-sm text-gray-900 flex flex-row flex-wrap items-center gap-x-2">
                 <div className="mt-1 h-3 w-24 rounded-md bg-gray-200 sm:h-4"></div>
@@ -38,10 +38,10 @@ export function SkeletonTimelineCardUnmemoed() {
         <div className="flex animate-pulse flex-row items-center pb-2">
           <div className="mt-1 h-4 w-20 rounded-md bg-gray-100 sm:h-4 "></div>
         </div>
-        <div className="mb-2 ml-2">
+        <div className="mb-2 ms-2">
           <span className="absolute inset-0" aria-hidden="true" />
           <div className="mb-2 mt-1 h-4 w-20 rounded-md bg-gray-100 sm:h-4 "></div>
-          <div className="ml-2">
+          <div className="ms-2">
             <ul className="list-disc list-inside">
               <li className="text-xs font-medium md:text-sm text-gray-900 flex flex-row flex-wrap items-center gap-x-2">
                 <div className="mt-1 h-3 w-24 rounded-md bg-gray-200 sm:h-4"></div>
@@ -87,7 +87,7 @@ export function SkeletonTimelineCardUnmemoed() {
               <div className="my-1 h-3 w-8 rounded-md bg-gray-200 sm:h-4"></div>
               <div className="my-1 h-3 w-8 rounded-md bg-gray-200 sm:h-4"></div>
               <ChevronDownIcon
-                className={`-ml-1 -mr-0.5 h-5 w-5 text-gray-400 duration-150 active:scale-95 active:bg-slate-50`}
+                className={`-ms-1 -me-0.5 h-5 w-5 text-gray-400 duration-150 active:scale-95 active:bg-slate-50`}
                 aria-hidden="true"
               />
             </button>

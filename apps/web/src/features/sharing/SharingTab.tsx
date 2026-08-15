@@ -14,6 +14,7 @@ import {
   upsertWorkflowRecord,
 } from '../../repositories/WorkflowRecordRepository';
 import { AppPage } from '../../shared/components/AppPage';
+import { OtherDownloadDoors } from '../../shared/components/OtherDownloadDoors';
 import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { exportEmrpkgFromRxDb } from '../../services/emrpkg';
 import { appendAuditLog } from '../audit/auditLog';
@@ -319,6 +320,7 @@ export function SharingTab() {
                   access on their own — you share by handing over the package
                   you download here.
                 </p>
+                <OtherDownloadDoors from="sharing" />
                 <button
                   type="button"
                   onClick={exportRecordPackage}

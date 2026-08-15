@@ -221,7 +221,7 @@ export function ProfileImageModal({
             Select a new photo
           </button>
           <button
-            className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 ml-4 inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+            className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 ms-4 inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
             type="submit"
           >
             Use Photo
@@ -292,7 +292,7 @@ export function EditUserForm({
               <Dialog.Title className="text-lg font-medium text-white">
                 Tell us about yourself
               </Dialog.Title>
-              <div className="ml-3 flex h-7 items-center">
+              <div className="ms-3 flex h-7 items-center">
                 <button
                   type="button"
                   className="bg-primary-700 rounded-md text-white hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
@@ -304,7 +304,7 @@ export function EditUserForm({
               </div>
             </div>
             <div className="mt-1">
-              <p className="text-left text-sm text-white text-opacity-95">
+              <p className="text-start text-sm text-white text-opacity-95">
                 Provide some more information about yourself so we can link your
                 medical records to you.
               </p>
@@ -468,7 +468,7 @@ export function EditUserForm({
                       e.preventDefault();
                       setTogglePhotoModal((x) => !x);
                     }}
-                    className="file:focus:ring-primary-500 file:text-medium block w-full flex-1 py-2 text-sm text-gray-800 file:ml-5 file:mr-4 file:rounded-md file:border file:border-gray-300 file:bg-white  file:px-3 file:py-2 file:text-gray-800 hover:file:bg-gray-100 focus:outline-none file:focus:outline-none file:focus:ring-2 file:focus:ring-offset-2"
+                    className="file:focus:ring-primary-500 file:text-medium block w-full flex-1 py-2 text-sm text-gray-800 file:ms-5 file:me-4 file:rounded-md file:border file:border-gray-300 file:bg-white  file:px-3 file:py-2 file:text-gray-800 hover:file:bg-gray-100 focus:outline-none file:focus:outline-none file:focus:ring-2 file:focus:ring-offset-2"
                   >
                     Upload photo
                   </button>
@@ -487,7 +487,7 @@ export function EditUserForm({
           </button>
           <button
             type="submit"
-            className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 ml-4 inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+            className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 ms-4 inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
           >
             Save
           </button>

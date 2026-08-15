@@ -196,13 +196,34 @@ export type DentalRecallItem = {
   location?: string;
 };
 
+/**
+ * One thing on the dental overview's follow-up list — a record that is open,
+ * named as itself.
+ *
+ * This used to be a bare string pushed onto a list whenever a category was
+ * non-empty ("Track periodontal measurements and maintenance" if any perio
+ * record existed), which made the panel a description of which record types
+ * you had, phrased as imperatives: nothing to complete, nothing to open, and a
+ * count above it that came from somewhere else entirely.
+ */
+export type DentalNextAction = {
+  id: string;
+  /** The record, in its own words: "Occlusal caries on tooth 30". */
+  label: string;
+  /** Why it is on the list: "Active finding · tooth 30 · Feb 12, 2026". */
+  detail: string;
+  /** The tab that holds it, so the row is a way in rather than a statement. */
+  to: string;
+};
+
 export type DentalWorkflowContext = {
   latestRecord?: DentalRecord;
   openDentalIssues: number;
   plannedTreatmentCount: number;
   perioRecordCount: number;
   imagingCount: number;
-  nextActions: string[];
+  /** Every open item, newest first. The panel shows the first few. */
+  nextActions: DentalNextAction[];
 };
 
 export type DentalTooth = {

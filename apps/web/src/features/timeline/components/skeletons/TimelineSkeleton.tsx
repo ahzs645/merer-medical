@@ -15,9 +15,9 @@ function TimelineSkeletonUnmemoed() {
           {[...Array(2)].map((_, index) => (
             <div key={index} className="relative">
               {/* Vertical line */}
-              <div className="animate-pulse absolute left-6 md:left-8 top-4 h-[calc(100%-12px)] w-[2px] md:w-1 bg-gray-50 z-0 rounded-full" />
+              <div className="animate-pulse absolute start-6 md:start-8 top-4 h-[calc(100%-12px)] w-[2px] md:w-1 bg-gray-50 z-0 rounded-full" />
               <SkeletonTimelineYearHeader />
-              <div className="ml-1">
+              <div className="ms-1">
                 <SkeletonTimelineMonthDayHeader />
                 <div className="-mt-16 flex scroll-mt-10 flex-row gap-x-2 px-0 pt-4 md:gap-x-4 md:px-2">
                   {/* Left sided date */}
@@ -31,7 +31,7 @@ function TimelineSkeletonUnmemoed() {
                   </div>
                 </div>
               </div>
-              <div className="ml-1">
+              <div className="ms-1">
                 <SkeletonTimelineMonthDayHeader />
                 <div className="flex scroll-mt-10 flex-row gap-x-4 px-0 pt-4 md:px-2">
                   {/* Left sided date */}

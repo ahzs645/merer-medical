@@ -20,7 +20,7 @@ export function ModalHeader({
         {back ? (
           <button
             type="button"
-            className="mr-4 rounded bg-white text-gray-800 duration-75 hover:text-gray-800 focus:text-gray-800 focus:outline-none focus:ring-0 active:scale-90 active:bg-slate-50"
+            className="me-4 rounded bg-white text-gray-800 duration-75 hover:text-gray-800 focus:text-gray-800 focus:outline-none focus:ring-0 active:scale-90 active:bg-slate-50"
             onClick={back}
           >
             <span className="sr-only">Back</span>
@@ -33,7 +33,7 @@ export function ModalHeader({
         {setClose ? (
           <button
             type="button"
-            className="ml-4 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded bg-white text-gray-800 duration-75 hover:text-gray-800 focus:text-gray-800 focus:outline-none focus:ring-0 active:scale-90 active:bg-slate-50"
+            className="ms-4 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded bg-white text-gray-800 duration-75 hover:text-gray-800 focus:text-gray-800 focus:outline-none focus:ring-0 active:scale-90 active:bg-slate-50"
             onClick={() => setClose(false)}
           >
             <span className="sr-only">Close</span>

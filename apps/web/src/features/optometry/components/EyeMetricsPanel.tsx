@@ -17,21 +17,21 @@ export function EyeMetricsPanel({ records }: { records: OptometryRecord[] }) {
         <div className="mt-3 overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead>
-              <tr className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                <th className="py-2 pr-4">{t('Date')}</th>
-                <th className="py-2 pr-4">{t('Type')}</th>
-                <th className="py-2 pr-4">{t('Eye')}</th>
-                <th className="py-2 pr-4">{t('Title')}</th>
+              <tr className="text-start text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th className="py-2 pe-4">{t('Date')}</th>
+                <th className="py-2 pe-4">{t('Type')}</th>
+                <th className="py-2 pe-4">{t('Eye')}</th>
+                <th className="py-2 pe-4">{t('Title')}</th>
                 <th className="py-2">{t('Values')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-gray-700">
               {metrics.map((record) => (
                 <tr key={record.id}>
-                  <td className="py-2 pr-4">{formatShortDate(record.date)}</td>
-                  <td className="py-2 pr-4">{record.kind}</td>
-                  <td className="py-2 pr-4">{record.laterality || '-'}</td>
-                  <td className="py-2 pr-4 font-medium text-gray-900">
+                  <td className="py-2 pe-4">{formatShortDate(record.date)}</td>
+                  <td className="py-2 pe-4">{record.kind}</td>
+                  <td className="py-2 pe-4">{record.laterality || '-'}</td>
+                  <td className="py-2 pe-4 font-medium text-gray-900">
                     {record.title}
                   </td>
                   <td className="py-2">

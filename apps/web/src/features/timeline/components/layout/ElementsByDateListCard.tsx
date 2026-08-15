@@ -164,7 +164,7 @@ function DispayDocumentReferencesOrAttachmentTimelineItem(props: {
     ...props.documentReferenceAttachments,
   ];
   return (
-    <div className="mb-2 ml-2">
+    <div className="mb-2 ms-2">
       <TimelineCardCategoryTitle title={'Documents'} color="text-teal-700" />
       <ul className="list-disc list-inside">
         {docsToDisplay.slice(0, 5).map((item, index) => (
@@ -558,9 +558,9 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               conn?.get('name') ? (
                 <p
                   key={conn?.get('id') ?? index}
-                  className="mr-1 flex flex-row align-center items-center text-gray-900 text-sm md:text-base"
+                  className="me-1 flex flex-row align-center items-center text-gray-900 text-sm md:text-base"
                 >
-                  <MapPinIcon className="mr-1 h-4 sm:h-5 w-auto inline-block text-primary-700" />
+                  <MapPinIcon className="me-1 h-4 sm:h-5 w-auto inline-block text-primary-700" />
                   {conn?.get('name')}
                 </p>
               ) : null,
@@ -571,9 +571,9 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               uniqueAuthors.map((author, index) => (
                 <p
                   key={`${author ?? 'author'}-${index}`}
-                  className="mr-1 flex flex-row align-center items-center text-gray-900 text-sm md:text-base"
+                  className="me-1 flex flex-row align-center items-center text-gray-900 text-sm md:text-base"
                 >
-                  <UserIcon className="mr-1 h-4 sm:h-5 w-auto inline-block text-primary-700" />
+                  <UserIcon className="me-1 h-4 sm:h-5 w-auto inline-block text-primary-700" />
                   {author}
                 </p>
               ))}
@@ -588,7 +588,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         </div>
         {encounters.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Encounters'}
               color="text-red-700"
@@ -606,7 +606,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
                     <p
                       className={
                         getEncounterClass(item)
-                          ? 'inline-block ml-1'
+                          ? 'inline-block ms-1'
                           : 'inline-block'
                       }
                     >
@@ -626,7 +626,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           />
         )}
         {procedures.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Procedures'}
               color="text-blue-700"
@@ -644,7 +644,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {consents.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Consents'}
               color="text-rose-700"
@@ -662,7 +662,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {diagnosticReports.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Lab Panels'}
               color="text-blue-700"
@@ -688,7 +688,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {observations.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle title={'Labs'} color="text-sky-700" />
             <ul className="list-disc list-inside">
               {observations.slice(0, 5).map((item) => (
@@ -710,7 +710,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {immunizations.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Immunizations'}
               color="text-purple-700"
@@ -728,7 +728,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {conditions.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Conditions'}
               color="text-green-700"
@@ -748,7 +748,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
         {(medicationStatements.length > 0 ||
           medicationRequests.length > 0 ||
           medicationOrders.length > 0) && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Medications'}
               color="text-fuchsia-600"
@@ -782,7 +782,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {coverages.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Coverage'}
               color="text-amber-700"
@@ -800,7 +800,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {carePlans.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Care Plans'}
               color="text-indigo-600"
@@ -818,7 +818,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {careTeams.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Care Teams'}
               color="text-cyan-600"
@@ -836,7 +836,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {referrals.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Referrals'}
               color="text-sky-700"
@@ -854,7 +854,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {goals.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Goals'}
               color="text-emerald-700"
@@ -872,7 +872,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {appointments.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Appointments'}
               color="text-violet-600"
@@ -890,7 +890,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {specimens.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Specimens'}
               color="text-orange-600"
@@ -908,7 +908,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {allergyIntolerances.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Allergies'}
               color="text-red-600"
@@ -926,7 +926,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           </div>
         )}
         {familyMemberHistories.length > 0 && (
-          <div className="mb-2 ml-2">
+          <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Family History'}
               color="text-amber-700"
@@ -959,7 +959,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               {expanded ? 'View Less' : 'View More'}
 
               <ChevronDownIcon
-                className={`-ml-1 -mr-0.5 h-5 w-5 text-gray-400 duration-150 active:scale-95 active:bg-slate-50 ${expanded ? 'rotate-180 transform' : ''}`}
+                className={`-ms-1 -me-0.5 h-5 w-5 text-gray-400 duration-150 active:scale-95 active:bg-slate-50 ${expanded ? 'rotate-180 transform' : ''}`}
                 aria-hidden="true"
               />
             </button>
