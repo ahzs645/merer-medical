@@ -16,7 +16,6 @@ import {
 } from '../enrichment/types';
 import { LabGroup, ReportLink } from '../types';
 import { formatLabValue, getLabDetailLink } from '../utils/labFormatters';
-import { saveLabsScrollPosition } from '../utils/labsPageState';
 import { LabHistoryPanel } from './LabHistoryPanel';
 import { LinkedReportList } from './LinkedReportList';
 
@@ -165,7 +164,6 @@ function LabMobileRow({
         </button>
         <Link
           to={getLabDetailLink(group.key)}
-          onClick={saveLabsScrollPosition}
           className="min-w-0 flex-1 rounded text-start focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
         >
           <div className="min-w-0 flex-1">
@@ -304,7 +302,6 @@ function LabTableRow({
             <h2 className="break-words text-sm font-semibold text-gray-900">
               <Link
                 to={getLabDetailLink(group.key)}
-                onClick={saveLabsScrollPosition}
                 className="rounded after:absolute after:inset-0 after:content-[''] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
               >
                 {group.name}

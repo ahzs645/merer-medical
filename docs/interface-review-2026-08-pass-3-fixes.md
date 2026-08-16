@@ -5,7 +5,7 @@ Every numbered item in that review's "Suggested order" is closed. This records
 what shipped, verified against a clean production build driven through `/demo`
 at 393 / 834 / 1440 px, plus an Arabic pass at 393 and 1440.
 
-**Baseline after:** 614 tests in 76 suites (was 577 in 70), `tsc` clean, 0
+**Baseline after:** 622 tests in 76 suites (was 577 in 70), `tsc` clean, 0
 console errors, 0 horizontal overflow, 0 identifiers on screen at any width.
 
 ---
@@ -166,6 +166,52 @@ document order).
 failing until it was clear why: the page returns pre-filtered to "Attention", so
 it is five rows tall and there is nothing to restore to. Filter and search state
 lives in component state, not the URL — so it does not survive Back, cannot be
-linked, and cannot be restored. That is a real finding this work surfaced and
-did not fix; it belongs to whoever picks up "Labs opens pre-filtered" (§10 of
-the review).
+linked, and cannot be restored.
+
+*Since fixed — see [§11 below](#11-the-view-you-are-looking-at-has-an-address).*
+
+---
+
+## 11. The view you are looking at has an address
+
+The item above, closed. It turned out to be one finding wearing two hats: the
+pre-filtered default and the un-restorable view were the same bug seen from
+different sides.
+
+**`useListViewParams`** puts a list page's search box and filter chips in the
+URL. Applied to all fourteen pages that carry them — Labs, Medications,
+Problems, Imaging, Documents, Conditions, Allergies, Vitals, Procedures,
+Encounters, Referrals, Insurance, Directory and the Records hub — so the answer
+is the same wherever you are. Written with `replace: true`, so typing updates
+the current history entry instead of pushing one per keystroke.
+
+**Labs opens on "All" now.** The default was "Attention", which meant a records
+page opened showing five of fifty rows and read as "you only have five labs".
+Two things had already been built to work around it, and both are gone:
+
+- an `added=1` marker on the return path from the manual form, so that a lab you
+  had *just typed* would be visible on the page you were returned to — a normal
+  result is not "attention", so under the default it was not there;
+- a `sessionStorage` copy of the search box, plus a `sessionStorage` copy of the
+  scroll offset saved on every row click — a per-page reimplementation of the
+  restoration the shell now does for every route.
+
+The page's own test had to enter through the `added=1` path, because none of its
+fixtures is flagged and the default hid all of them. A test that has to dodge
+the default is a fair sign about the default.
+
+Verified end-to-end at 393 and 1440, on the built app:
+
+| | Result |
+| --- | --- |
+| Opens on | **All 50**, clean URL |
+| Choosing "Attention" | `?filter=attention` |
+| Reload | comes back on Attention |
+| Back from a result | same filter, **scroll restored** |
+| `?filter=attention&q=hemo` | opens filtered, search box filled |
+
+One thing this turned up: the desktop lab row *is* a real `<Link>` (pass 1's
+finding is genuinely closed), and the reason a scripted click on it appeared to
+do nothing was the sticky banner intercepting a click on a row that had been
+scrolled into view underneath it. Worth knowing before reading that as a
+regression.

@@ -1,8 +1,6 @@
 [
   {
-    "testIds": [
-      "basophils-absolute"
-    ],
+    "testIds": ["basophils-absolute"],
     "name": "Basophils absolute",
     "sourceReview": {
       "status": "candidate",
@@ -72,9 +70,7 @@
     ]
   },
   {
-    "testIds": [
-      "eosinophils-absolute"
-    ],
+    "testIds": ["eosinophils-absolute"],
     "name": "Eosinophils absolute",
     "sourceReview": {
       "status": "candidate",
@@ -116,9 +112,7 @@
     ]
   },
   {
-    "testIds": [
-      "esr"
-    ],
+    "testIds": ["esr"],
     "name": "Erythrocyte sedimentation rate",
     "sourceReview": {
       "status": "candidate",
@@ -322,9 +316,7 @@
     ]
   },
   {
-    "testIds": [
-      "hematocrit"
-    ],
+    "testIds": ["hematocrit"],
     "name": "Haematocrit",
     "sourceReview": {
       "status": "candidate",
@@ -436,9 +428,7 @@
     ]
   },
   {
-    "testIds": [
-      "hemoglobin"
-    ],
+    "testIds": ["hemoglobin"],
     "name": "Haemoglobin",
     "sourceReview": {
       "status": "candidate",
@@ -550,9 +540,7 @@
     ]
   },
   {
-    "testIds": [
-      "lymphocytes-absolute"
-    ],
+    "testIds": ["lymphocytes-absolute"],
     "name": "Lymphocytes absolute",
     "sourceReview": {
       "status": "candidate",
@@ -594,9 +582,7 @@
     ]
   },
   {
-    "testIds": [
-      "mch"
-    ],
+    "testIds": ["mch"],
     "name": "MCH",
     "sourceReview": {
       "status": "candidate",
@@ -654,9 +640,7 @@
     ]
   },
   {
-    "testIds": [
-      "mchc"
-    ],
+    "testIds": ["mchc"],
     "name": "MCHC",
     "sourceReview": {
       "status": "candidate",
@@ -712,9 +696,7 @@
     ]
   },
   {
-    "testIds": [
-      "mcv"
-    ],
+    "testIds": ["mcv"],
     "name": "Mean cell volume",
     "sourceReview": {
       "status": "candidate",
@@ -772,9 +754,7 @@
     ]
   },
   {
-    "testIds": [
-      "monocytes-absolute"
-    ],
+    "testIds": ["monocytes-absolute"],
     "name": "Monocytes absolute",
     "sourceReview": {
       "status": "candidate",
@@ -816,9 +796,7 @@
     ]
   },
   {
-    "testIds": [
-      "neutrophils-absolute"
-    ],
+    "testIds": ["neutrophils-absolute"],
     "name": "Neutrophils absolute",
     "sourceReview": {
       "status": "candidate",
@@ -860,9 +838,7 @@
     ]
   },
   {
-    "testIds": [
-      "platelets"
-    ],
+    "testIds": ["platelets"],
     "name": "Platelets",
     "sourceReview": {
       "status": "candidate",
@@ -920,9 +896,7 @@
     ]
   },
   {
-    "testIds": [
-      "rbc"
-    ],
+    "testIds": ["rbc"],
     "name": "Red blood cells",
     "sourceReview": {
       "status": "candidate",
@@ -1034,9 +1008,7 @@
     ]
   },
   {
-    "testIds": [
-      "wbc"
-    ],
+    "testIds": ["wbc"],
     "name": "White blood cell count",
     "sourceReview": {
       "status": "candidate",

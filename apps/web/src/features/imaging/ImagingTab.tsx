@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { DocumentPlusIcon, PhotoIcon } from '@heroicons/react/24/outline';
 
@@ -21,6 +21,7 @@ import {
   IMAGING_PRESET_TITLE,
 } from './utils/imagingRecords';
 import { buildAddRecordPath } from '../manual-entry/addRecordPath';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 // The title is what files the record under Imaging whatever the attached file
 // turns out to be (see IMAGING_PRESET_TITLE), and `returnTo` is what brings the
@@ -35,8 +36,17 @@ const ADD_IMAGING_PATH = buildAddRecordPath({
 export function ImagingTab() {
   const { t } = useInterfaceLanguage();
   const { items, status, error } = useImagingData(),
-    [query, setQuery] = useState(''),
-    [category, setCategory] = useState<ImagingCategory | 'all'>('all');
+    // Search and category live in the URL, so the view survives Back, can be
+    // linked, and comes back the same length it left.
+    {
+      query,
+      setQuery,
+      filterId: category,
+      setFilterId: setCategory,
+    } = useListViewParams<ImagingCategory | 'all'>({
+      defaultFilter: 'all',
+      filterKey: 'category',
+    });
 
   // Counts are scoped to the search, not the whole library, so a tile or chip
   // never advertises records the current query has already filtered out.

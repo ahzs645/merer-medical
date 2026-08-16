@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { BuildingOffice2Icon } from '@heroicons/react/24/outline';
 
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
@@ -15,6 +15,7 @@ import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { FactList } from '../../shared/components/FactList';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 // Resource types we treat as "records" when counting same-day activity.
 const SAME_DAY_RESOURCE_TYPES = new Set<string>([
@@ -165,7 +166,9 @@ function useEncounters() {
 
 export function EncountersTab() {
   const { items, status, error } = useEncounters();
-  const [query, setQuery] = useState('');
+  // Search lives in the URL, so the view survives Back, can be linked, and
+  // comes back the same length it left — see useListViewParams.
+  const { query, setQuery } = useListViewParams();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ChevronRightIcon,
@@ -23,6 +23,7 @@ import { ErrorPanel } from '../../shared/components/StatusPanel';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 type DocumentRecord = ClinicalDocument<BundleEntry<DocumentReference>>;
 type AttachmentRecord = ClinicalDocument<string | Blob>;
@@ -45,7 +46,9 @@ type DocumentSection = {
 
 export function DocumentsTab() {
   const { t } = useInterfaceLanguage();
-  const [query, setQuery] = useState('');
+  // Search lives in the URL, so the view survives Back, can be linked, and
+  // comes back the same length it left — see useListViewParams.
+  const { query, setQuery } = useListViewParams();
   const { items, status, error } = useDocumentsData();
 
   const filteredItems = useMemo(() => {

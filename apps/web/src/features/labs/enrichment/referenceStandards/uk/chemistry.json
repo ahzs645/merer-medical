@@ -1,8 +1,6 @@
 [
   {
-    "testIds": [
-      "alt"
-    ],
+    "testIds": ["alt"],
     "name": "Alanine aminotransferase",
     "sourceReview": {
       "status": "candidate",
@@ -112,9 +110,7 @@
     ]
   },
   {
-    "testIds": [
-      "albumin"
-    ],
+    "testIds": ["albumin"],
     "name": "Albumin",
     "sourceReview": {
       "status": "candidate",
@@ -285,9 +281,7 @@
     ]
   },
   {
-    "testIds": [
-      "alkaline-phosphatase"
-    ],
+    "testIds": ["alkaline-phosphatase"],
     "name": "Alkaline phosphatase",
     "sourceReview": {
       "status": "candidate",
@@ -345,9 +339,7 @@
     ]
   },
   {
-    "testIds": [
-      "ast"
-    ],
+    "testIds": ["ast"],
     "name": "Aspartate aminotransferase",
     "sourceReview": {
       "status": "candidate",
@@ -489,9 +481,7 @@
     ]
   },
   {
-    "testIds": [
-      "bicarbonate"
-    ],
+    "testIds": ["bicarbonate"],
     "name": "Bicarbonate",
     "sourceReview": {
       "status": "candidate",
@@ -533,9 +523,7 @@
     ]
   },
   {
-    "testIds": [
-      "bilirubin-total"
-    ],
+    "testIds": ["bilirubin-total"],
     "name": "Bilirubin total",
     "sourceReview": {
       "status": "candidate",
@@ -559,9 +547,7 @@
     ]
   },
   {
-    "testIds": [
-      "crp"
-    ],
+    "testIds": ["crp"],
     "name": "C-reactive protein",
     "sourceReview": {
       "status": "candidate",
@@ -585,9 +571,7 @@
     ]
   },
   {
-    "testIds": [
-      "chloride"
-    ],
+    "testIds": ["chloride"],
     "name": "Chloride",
     "sourceReview": {
       "status": "candidate",
@@ -611,9 +595,7 @@
     ]
   },
   {
-    "testIds": [
-      "creatinine"
-    ],
+    "testIds": ["creatinine"],
     "name": "Creatinine",
     "sourceReview": {
       "status": "candidate",
@@ -805,9 +787,7 @@
     ]
   },
   {
-    "testIds": [
-      "ggt"
-    ],
+    "testIds": ["ggt"],
     "name": "Gamma glutamyltransferase",
     "sourceReview": {
       "status": "candidate",
@@ -847,9 +827,7 @@
     ]
   },
   {
-    "testIds": [
-      "glucose"
-    ],
+    "testIds": ["glucose"],
     "name": "Glucose fasting",
     "sourceReview": {
       "status": "candidate",
@@ -874,9 +852,7 @@
     ]
   },
   {
-    "testIds": [
-      "magnesium"
-    ],
+    "testIds": ["magnesium"],
     "name": "Magnesium",
     "sourceReview": {
       "status": "candidate",
@@ -918,9 +894,7 @@
     ]
   },
   {
-    "testIds": [
-      "phosphate"
-    ],
+    "testIds": ["phosphate"],
     "name": "Phosphate",
     "sourceReview": {
       "status": "candidate",
@@ -1026,9 +1000,7 @@
     ]
   },
   {
-    "testIds": [
-      "potassium"
-    ],
+    "testIds": ["potassium"],
     "name": "Potassium",
     "sourceReview": {
       "status": "candidate",
@@ -1084,9 +1056,7 @@
     ]
   },
   {
-    "testIds": [
-      "sodium"
-    ],
+    "testIds": ["sodium"],
     "name": "Sodium",
     "sourceReview": {
       "status": "candidate",
@@ -1124,9 +1094,7 @@
     ]
   },
   {
-    "testIds": [
-      "ft3"
-    ],
+    "testIds": ["ft3"],
     "name": "T3 free",
     "sourceReview": {
       "status": "candidate",
@@ -1150,9 +1118,7 @@
     ]
   },
   {
-    "testIds": [
-      "ft4"
-    ],
+    "testIds": ["ft4"],
     "name": "T4 free",
     "sourceReview": {
       "status": "candidate",
@@ -1176,9 +1142,7 @@
     ]
   },
   {
-    "testIds": [
-      "tsh"
-    ],
+    "testIds": ["tsh"],
     "name": "TSH",
     "sourceReview": {
       "status": "candidate",
@@ -1236,9 +1200,7 @@
     ]
   },
   {
-    "testIds": [
-      "urea"
-    ],
+    "testIds": ["urea"],
     "name": "Urea",
     "sourceReview": {
       "status": "candidate",

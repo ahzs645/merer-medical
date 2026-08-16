@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { HeartIcon } from '@heroicons/react/24/outline';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
@@ -16,6 +16,7 @@ import { getFhirResource } from '../../shared/utils/fhirResource';
 import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { isVitalSignObservation } from './utils/vitalRecords';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 // Saving lands back here rather than on the Timeline: a reading you typed on
 // the Vitals page belongs in front of you on the Vitals page.
@@ -258,7 +259,9 @@ function earlierReadingsLabel(count: number): string {
 
 export function VitalsTab() {
   const { groups, status, error } = useVitals();
-  const [query, setQuery] = useState('');
+  // Search lives in the URL, so the view survives Back, can be linked, and
+  // comes back the same length it left — see useListViewParams.
+  const { query, setQuery } = useListViewParams();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

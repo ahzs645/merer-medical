@@ -25,6 +25,7 @@ import { formatDisplayText } from '../../shared/utils/StyleUtils';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
 import { ProvenancePanel } from '../provenance/ProvenancePanel';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 type CoverageDocument = ClinicalDocument<BundleEntry<Coverage>>;
 
@@ -46,7 +47,9 @@ type InsuranceItem = {
 export function InsuranceTab() {
   const { t } = useInterfaceLanguage();
   const { items, status, error } = useInsuranceData();
-  const [query, setQuery] = useState('');
+  // Search lives in the URL, so the view survives Back, can be linked, and
+  // comes back the same length it left — see useListViewParams.
+  const { query, setQuery } = useListViewParams();
   const [selectedId, setSelectedId] = useState<string | undefined>();
   const [addOpen, setAddOpen] = useState(false);
 

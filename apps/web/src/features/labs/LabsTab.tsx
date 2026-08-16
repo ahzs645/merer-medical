@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import {
   ChartBarSquareIcon,
   DocumentPlusIcon,
@@ -30,37 +29,35 @@ import {
   sectionLabGroups,
 } from './utils/labGrouping';
 import { labFilterLabels } from './utils/labFormatters';
-import {
-  getSavedLabsQuery,
-  initialLabsView,
-  LABS_ADDED_PARAM,
-  LABS_SCROLL_CONTAINER_ID,
-  labsPathAfterAdd,
-  restoreLabsScrollPosition,
-  saveLabsQuery,
-} from './utils/labsPageState';
+import { LABS_SCROLL_CONTAINER_ID } from './utils/labsPageState';
 import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { GLUCOSE_LOINC_CODE } from '../diabetes/libreView';
 import { LabFilterMode } from './types';
+import { Routes as AppRoutes } from '../../Routes';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
+// Plain route: the page no longer needs telling that you are coming back from
+// having typed a result. That marker existed because the list opened filtered
+// to "Attention", where a normal new result was invisible — the reader was
+// returned to a page that did not contain the row they had just created.
 const ADD_LAB_PATH = buildAddRecordPath({
   type: 'lab',
-  returnTo: labsPathAfterAdd(),
+  returnTo: AppRoutes.Labs,
 });
 
 export function LabsTab() {
-  const [searchParams, setSearchParams] = useSearchParams(),
-    [initialView] = useState(() =>
-      initialLabsView(searchParams, getSavedLabsQuery()),
-    ),
-    [query, setQuery] = useState(initialView.query),
+  // Search and filter live in the URL, so this view survives Back, can be
+  // linked, and comes back the same length it left — which is what lets the
+  // shell restore your scroll position.
+  const {
+      query,
+      setQuery,
+      filterId: filterMode,
+      setFilterId: setFilterMode,
+    } = useListViewParams<LabFilterMode>({ defaultFilter: 'all' }),
     [referenceMode, setReferenceMode] =
       useState<ReferenceOverlayMode>('canadian'),
-    [filterMode, setFilterMode] = useState<LabFilterMode>(
-      initialView.filterMode,
-    ),
     [coverageOpen, setCoverageOpen] = useState(false),
-    scrollContainerRef = useRef<HTMLDivElement | null>(null),
     {
       labs,
       reportsByObservationId,
@@ -121,26 +118,6 @@ export function LabsTab() {
       ),
     [connectionsById, labs],
   );
-
-  useEffect(() => {
-    saveLabsQuery(query);
-  }, [query]);
-
-  // The marker is consumed once, on arrival. Leaving it in the URL would put
-  // the page back on "All" on every reload of this entry, overriding a filter
-  // the reader has since chosen for themselves.
-  useEffect(() => {
-    if (!searchParams.has(LABS_ADDED_PARAM)) return;
-    const next = new URLSearchParams(searchParams);
-    next.delete(LABS_ADDED_PARAM);
-    setSearchParams(next, { replace: true });
-  }, [searchParams, setSearchParams]);
-
-  useEffect(() => {
-    if (status === 'success' && scrollContainerRef.current) {
-      restoreLabsScrollPosition(scrollContainerRef.current);
-    }
-  }, [status, labSections.length]);
 
   return (
     <AppPage
@@ -219,7 +196,6 @@ export function LabsTab() {
       ) : (
         <div
           id={LABS_SCROLL_CONTAINER_ID}
-          ref={scrollContainerRef}
           className="h-full overflow-y-auto bg-gray-50"
         >
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-3 py-3 pb-24 sm:gap-4 sm:px-6 sm:py-4 lg:px-8">

@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 import { act, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { notifyRecordsChanged } from '../../shared/utils/recordChangeSignal';
@@ -57,7 +58,14 @@ describe('DirectoryTab', () => {
    * save-then-navigate flow happened to provide.
    */
   it('picks up a location added while it is on screen', async () => {
-    render(<DirectoryTab />);
+    // Inside a router because the search box is URL state now — unlike the
+    // earlier scroll-restoration mistake, this page really is only ever
+    // rendered inside one.
+    render(
+      <MemoryRouter>
+        <DirectoryTab />
+      </MemoryRouter>,
+    );
     await waitFor(() => expect(mockFind).toHaveBeenCalled());
     expect(screen.queryByText('Jasper Healthcare Centre')).toBeNull();
 

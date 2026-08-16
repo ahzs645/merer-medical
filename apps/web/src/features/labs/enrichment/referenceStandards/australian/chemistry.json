@@ -1,8 +1,6 @@
 [
   {
-    "testIds": [
-      "alt"
-    ],
+    "testIds": ["alt"],
     "name": "Alanine aminotransferase",
     "bands": [
       {
@@ -79,9 +77,7 @@
     }
   },
   {
-    "testIds": [
-      "albumin"
-    ],
+    "testIds": ["albumin"],
     "name": "Albumin",
     "sourceReview": {
       "status": "candidate",
@@ -220,9 +216,7 @@
     ]
   },
   {
-    "testIds": [
-      "alkaline-phosphatase"
-    ],
+    "testIds": ["alkaline-phosphatase"],
     "name": "Alkaline phosphatase",
     "bands": [
       {
@@ -618,9 +612,7 @@
     }
   },
   {
-    "testIds": [
-      "ast"
-    ],
+    "testIds": ["ast"],
     "name": "Aspartate aminotransferase",
     "bands": [
       {
@@ -667,9 +659,7 @@
     }
   },
   {
-    "testIds": [
-      "bicarbonate"
-    ],
+    "testIds": ["bicarbonate"],
     "name": "Bicarbonate",
     "bands": [
       {
@@ -792,9 +782,7 @@
     }
   },
   {
-    "testIds": [
-      "calcium"
-    ],
+    "testIds": ["calcium"],
     "name": "Calcium",
     "bands": [
       {
@@ -997,9 +985,7 @@
     }
   },
   {
-    "testIds": [
-      "calcium-corrected"
-    ],
+    "testIds": ["calcium-corrected"],
     "name": "Calcium corrected for albumin",
     "bands": [
       {
@@ -1026,9 +1012,7 @@
     }
   },
   {
-    "testIds": [
-      "chloride"
-    ],
+    "testIds": ["chloride"],
     "name": "Chloride",
     "bands": [
       {
@@ -1152,9 +1136,7 @@
     }
   },
   {
-    "testIds": [
-      "creatinine"
-    ],
+    "testIds": ["creatinine"],
     "name": "Creatinine",
     "bands": [
       {
@@ -1394,9 +1376,7 @@
     }
   },
   {
-    "testIds": [
-      "ggt"
-    ],
+    "testIds": ["ggt"],
     "name": "Gamma glutamyltransferase",
     "bands": [
       {
@@ -1441,9 +1421,7 @@
     }
   },
   {
-    "testIds": [
-      "glucose"
-    ],
+    "testIds": ["glucose"],
     "name": "Glucose",
     "sourceReview": {
       "status": "candidate",
@@ -1518,9 +1496,7 @@
     ]
   },
   {
-    "testIds": [
-      "hba1c"
-    ],
+    "testIds": ["hba1c"],
     "name": "HbA1c",
     "sourceReview": {
       "status": "candidate",
@@ -1544,9 +1520,7 @@
     ]
   },
   {
-    "testIds": [
-      "lipase"
-    ],
+    "testIds": ["lipase"],
     "name": "Lipase",
     "bands": [
       {
@@ -1589,9 +1563,7 @@
     }
   },
   {
-    "testIds": [
-      "magnesium"
-    ],
+    "testIds": ["magnesium"],
     "name": "Magnesium",
     "bands": [
       {
@@ -1680,9 +1652,7 @@
     }
   },
   {
-    "testIds": [
-      "phosphate"
-    ],
+    "testIds": ["phosphate"],
     "name": "Phosphate",
     "bands": [
       {
@@ -1901,9 +1871,7 @@
     }
   },
   {
-    "testIds": [
-      "potassium"
-    ],
+    "testIds": ["potassium"],
     "name": "Potassium",
     "bands": [
       {
@@ -2152,9 +2120,7 @@
     }
   },
   {
-    "testIds": [
-      "sodium"
-    ],
+    "testIds": ["sodium"],
     "name": "Sodium",
     "bands": [
       {
