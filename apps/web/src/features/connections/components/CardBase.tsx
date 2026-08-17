@@ -14,7 +14,7 @@ export function CardBase({
   return (
     <div
       {...props}
-      className={`max-width-full relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white shadow-sm ${
+      className={`max-width-full relative flex items-center gap-x-3 rounded-lg border border-gray-300 bg-white shadow-sm ${
         removePadding ? '' : 'px-3 py-3 md:px-6 md:py-5'
       } ${
         isFocusable

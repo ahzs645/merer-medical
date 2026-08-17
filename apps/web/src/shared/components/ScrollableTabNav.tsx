@@ -123,12 +123,12 @@ export function ScrollableTabNav({
     <div className="relative mx-auto max-w-7xl">
       {canScrollLeft && (
         <>
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-11 bg-gradient-to-r from-white via-white to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 start-0 z-10 w-11 bg-gradient-to-r from-white via-white to-transparent" />
           <button
             type="button"
             aria-label={t('Scroll tabs left')}
             onClick={() => scrollBy(-200)}
-            className="absolute left-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-gray-600 shadow ring-1 ring-gray-200 hover:text-gray-900"
+            className="absolute start-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-gray-600 shadow ring-1 ring-gray-200 hover:text-gray-900"
           >
             <ChevronLeftIcon className="h-5 w-5" />
           </button>
@@ -140,8 +140,8 @@ export function ScrollableTabNav({
       <nav
         ref={scrollRef}
         className={`scrollbar-hide flex gap-1 overflow-x-auto py-2 sm:gap-2 ${
-          canScrollLeft ? 'scroll-pl-11 pl-11' : ''
-        } ${canScrollRight ? 'scroll-pr-11 pr-11' : ''}`}
+          canScrollLeft ? 'scroll-pl-11 ps-11' : ''
+        } ${canScrollRight ? 'scroll-pr-11 pe-11' : ''}`}
         aria-label={ariaLabel}
       >
         {tabs.map(({ to, label, shortLabel, icon: Icon, end }) => (
@@ -179,12 +179,12 @@ export function ScrollableTabNav({
       </nav>
       {canScrollRight && (
         <>
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-11 bg-gradient-to-l from-white via-white to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 end-0 z-10 w-11 bg-gradient-to-l from-white via-white to-transparent" />
           <button
             type="button"
             aria-label={t('Scroll tabs right')}
             onClick={() => scrollBy(200)}
-            className="absolute right-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-gray-600 shadow ring-1 ring-gray-200 hover:text-gray-900"
+            className="absolute end-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-gray-600 shadow ring-1 ring-gray-200 hover:text-gray-900"
           >
             <ChevronRightIcon className="h-5 w-5" />
           </button>

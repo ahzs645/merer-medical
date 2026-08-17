@@ -25,13 +25,6 @@ export const DocumentReferenceCard = memo(function DocumentReferenceCard({
   const conn = useConnectionDoc(item.connection_record_id);
   const [expanded, setExpanded] = useState(false);
 
-  if (matchedChunks && matchedChunks.length > 0) {
-    console.log(
-      '[DocumentReferenceCard] Has matchedChunks:',
-      matchedChunks.length,
-    );
-  }
-
   return (
     <>
       <CardBase

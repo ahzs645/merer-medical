@@ -37,6 +37,7 @@ import {
   type MedicationViewItem,
   sourceLabel,
 } from './medicationViewModel';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 type FilterChip = {
   id: MedicationGroup | 'all';
@@ -60,8 +61,14 @@ const FILTERS: FilterChip[] = [
 const ADD_MEDICATION_PATH = `${AppRoutes.AddRecord}?type=medicationstatement`;
 
 export function MedicationsTab() {
-  const [selectedFilter, setSelectedFilter] = useState<FilterChip['id']>('all');
-  const [query, setQuery] = useState('');
+  // Search and filter live in the URL, so the view survives Back, can be
+  // linked, and comes back the same length it left.
+  const {
+    query,
+    setQuery,
+    filterId: selectedFilter,
+    setFilterId: setSelectedFilter,
+  } = useListViewParams<FilterChip['id']>({ defaultFilter: 'all' });
   const { t } = useInterfaceLanguage();
   const { allergies, filteredItems, items, status, supplementItems } =
     useMedicationsData({ query, selectedFilter });

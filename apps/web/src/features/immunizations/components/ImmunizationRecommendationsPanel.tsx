@@ -150,13 +150,13 @@ export function ImmunizationRecommendationsPanel({
                         leaveFrom="opacity-100 scale-100"
                         leaveTo="opacity-0 scale-95"
                       >
-                        <Menu.Items className="absolute right-0 z-20 mt-1 w-56 origin-top-right rounded-lg bg-white p-1 shadow-lg ring-1 ring-black/5 focus:outline-none">
+                        <Menu.Items className="absolute end-0 z-20 mt-1 w-56 origin-top-right rounded-lg bg-white p-1 shadow-lg ring-1 ring-black/5 focus:outline-none">
                           <Menu.Item>
                             {({ active }) => (
                               <button
                                 type="button"
                                 onClick={() => dismiss(group, 'snoozed')}
-                                className={`flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm ${
+                                className={`flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-start text-sm ${
                                   active
                                     ? 'bg-gray-100 text-gray-900'
                                     : 'text-gray-700'
@@ -175,7 +175,7 @@ export function ImmunizationRecommendationsPanel({
                               <button
                                 type="button"
                                 onClick={() => dismiss(group, 'permanent')}
-                                className={`flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm ${
+                                className={`flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-start text-sm ${
                                   active
                                     ? 'bg-gray-100 text-gray-900'
                                     : 'text-gray-700'

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { ArrowRightCircleIcon } from '@heroicons/react/24/outline';
 
 import { Routes as AppRoutes } from '../../Routes';
@@ -14,6 +14,7 @@ import {
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { mapReferralDocs, type ReferralItem } from './referralRecords';
 import { FactList } from '../../shared/components/FactList';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 function useReferrals() {
   // useRecordList re-runs on the shared record-change signal, so a referral
@@ -34,7 +35,9 @@ const ADD_REFERRAL_PATH = buildAddRecordPath({
 
 export function ReferralsTab() {
   const { items, status, error } = useReferrals();
-  const [query, setQuery] = useState('');
+  // Search lives in the URL, so the view survives Back, can be linked, and
+  // comes back the same length it left — see useListViewParams.
+  const { query, setQuery } = useListViewParams();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

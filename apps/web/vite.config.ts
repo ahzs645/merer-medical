@@ -144,6 +144,22 @@ export default defineConfig(({ command, mode }) => {
       sourcemap: !isProduction,
       reportCompressedSize: true,
     },
+    esbuild: {
+      // A production build carries no `console.log` / `.debug` / `.info`.
+      //
+      // 231 console statements shipped, and some of them printed record
+      // content: a preferences provider dumping the whole document on every
+      // change, a timeline card logging on every render. For an app whose
+      // pitch is "self-hosted, privacy-focused" — and which bundles an in-app
+      // console viewer — clinical data reaching the console should be a
+      // decision, not a leftover.
+      //
+      // `warn` and `error` stay: a self-hoster debugging a failed sync needs
+      // them, and they are the two that carry a message rather than a payload.
+      pure: isProduction
+        ? ['console.log', 'console.debug', 'console.info']
+        : [],
+    },
     plugins: [
       react(),
       nxViteTsPaths(),

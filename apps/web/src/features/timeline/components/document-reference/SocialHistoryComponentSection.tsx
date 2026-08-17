@@ -15,13 +15,13 @@ export function SocialHistoryComponentSection({
           <tr>
             <th
               scope="col"
-              className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+              className="py-3.5 ps-4 pe-3 text-start text-sm font-semibold text-gray-900 sm:ps-0"
             >
               Title
             </th>
             <th
               scope="col"
-              className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+              className="py-3.5 ps-4 pe-3 text-start text-sm font-semibold text-gray-900 sm:ps-0"
             >
               Value
             </th>
@@ -31,7 +31,7 @@ export function SocialHistoryComponentSection({
           {Object.values(data).map((v) => (
             <>
               <tr key={v.value + v.title}>
-                <td className="break-word py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                <td className="break-word py-1 ps-4 pe-3 text-sm font-medium text-gray-900 sm:ps-0">
                   {v.title}
                 </td>
                 <td className={`break-word px-3 py-1 text-sm text-gray-900 `}>
@@ -46,7 +46,7 @@ export function SocialHistoryComponentSection({
                         {Object.values(v.entityRelationships).map((q) => (
                           <>
                             <tr key={q.value + q.title}>
-                              <td className="break-word py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                              <td className="break-word py-1 ps-4 pe-3 text-sm font-medium text-gray-900 sm:ps-0">
                                 {q.title}
                               </td>
                               <td
@@ -63,7 +63,7 @@ export function SocialHistoryComponentSection({
                                       {Object.values(q.entityRelationships).map(
                                         (r) => (
                                           <tr key={r.value + r.title}>
-                                            <td className="break-word py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                                            <td className="break-word py-1 ps-4 pe-3 text-sm font-medium text-gray-900 sm:ps-0">
                                               {r.title}
                                             </td>
                                             <td
@@ -114,7 +114,7 @@ export function SocialHistoryComponentSection({
 //         {Object.values(data).map((v) => (
 //           <>
 //             <div key={v.value + v.title}>
-//               <div className="py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+//               <div className="py-1 ps-4 pe-3 text-sm font-medium text-gray-900 sm:ps-0">
 //                 {v.title}
 //               </div>
 //               <div className={`px-3 py-1 text-sm text-gray-900 `}>
@@ -127,7 +127,7 @@ export function SocialHistoryComponentSection({
 //                   {Object.values(v.entityRelationships).map((q) => (
 //                     <>
 //                       <div key={q.value + q.title}>
-//                         <div className="py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+//                         <div className="py-1 ps-4 pe-3 text-sm font-medium text-gray-900 sm:ps-0">
 //                           {q.title}
 //                         </div>
 //                         <div className={`px-3 py-1 text-sm text-gray-900 `}>
@@ -139,7 +139,7 @@ export function SocialHistoryComponentSection({
 //                           <div className="grid grid-cols-2 gap-2">
 //                             {Object.values(q.entityRelationships).map((r) => (
 //                               <div key={r.value + r.title}>
-//                                 <div className="py-1 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+//                                 <div className="py-1 ps-4 pe-3 text-sm font-medium text-gray-900 sm:ps-0">
 //                                   {r.title}
 //                                 </div>
 //                                 <div

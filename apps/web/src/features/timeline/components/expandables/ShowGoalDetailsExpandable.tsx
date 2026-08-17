@@ -106,7 +106,7 @@ export function ShowGoalDetailsExpandable({
                     {goal.target.map((target, index) => (
                       <div
                         key={index}
-                        className="text-sm text-gray-900 border-l-2 border-emerald-300 pl-2"
+                        className="text-sm text-gray-900 border-l-2 border-emerald-300 ps-2"
                       >
                         {target.measure?.text && (
                           <div>Measure: {target.measure.text}</div>

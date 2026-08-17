@@ -39,10 +39,10 @@ export function EyeRxTable({
   return (
     <table className="mt-3 w-full border-separate border-spacing-0 text-sm">
       <thead>
-        <tr className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-          <th className="pb-1 pr-3">Eye</th>
+        <tr className="text-start text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <th className="pb-1 pe-3">Eye</th>
           {COLUMNS.map((column) => (
-            <th key={column.key} className="pb-1 pr-3">
+            <th key={column.key} className="pb-1 pe-3">
               {column.label}
             </th>
           ))}
@@ -69,9 +69,9 @@ function EyeRow({
 }) {
   return (
     <tr className="align-top">
-      <td className="border-t border-gray-100 py-2 pr-3">
+      <td className="border-t border-gray-100 py-2 pe-3">
         <span className="font-semibold text-gray-900">{eye}</span>
-        <span className="ml-1 text-xs text-gray-600">{label}</span>
+        <span className="ms-1 text-xs text-gray-600">{label}</span>
       </td>
       {COLUMNS.map((column) => {
         const value = rx?.[column.key] as number | undefined;
@@ -80,7 +80,7 @@ function EyeRow({
           : formatDiopter(value);
         const deltaValue = delta?.[column.key];
         return (
-          <td key={column.key} className="border-t border-gray-100 py-2 pr-3">
+          <td key={column.key} className="border-t border-gray-100 py-2 pe-3">
             <span className="font-semibold tabular-nums text-gray-900">
               {formatted}
             </span>
@@ -101,7 +101,7 @@ function DeltaChip({ value, isAxis }: { value?: number; isAxis?: boolean }) {
 
   return (
     <span
-      className={`ml-1 inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-xs font-semibold tabular-nums ${
+      className={`ms-1 inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-xs font-semibold tabular-nums ${
         increasing ? 'bg-amber-50 text-amber-700' : 'bg-sky-50 text-sky-700'
       }`}
       title="Change since previous prescription"

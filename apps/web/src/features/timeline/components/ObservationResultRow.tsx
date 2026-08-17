@@ -3,21 +3,13 @@ import { format } from 'date-fns';
 import { BundleEntry, Observation } from 'fhir/r2';
 import React, {
   Fragment,
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
   useState,
 } from 'react';
-import {
-  Area,
-  CartesianGrid,
-  ComposedChart,
-  Line,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
 import { RxDatabase, RxDocument } from 'rxdb';
 
 import { Disclosure } from '@headlessui/react';
@@ -46,6 +38,13 @@ import {
 } from '../utils/fhirpathParsers';
 import { UserDocument } from '../../../models/user-document/UserDocument.type';
 import { DatabaseCollections } from '../../../app/providers/DatabaseCollections';
+
+/* Carries recharts with it, and only renders once a row is expanded and
+   switched to its graph view — so it is fetched then, not in the entry chunk
+   the timeline shares with first paint. */
+const HistoricalRelatedLabsChart = lazy(
+  () => import('./HistoricalRelatedLabsChart'),
+);
 
 function SparklineGraphSvg({
   relatedLabs,
@@ -145,7 +144,7 @@ export function ObservationResultRow({
                       ? `${getValueQuantity(item)}`
                       : getInterpretationText(item) ||
                         (getValueString(item) && `${getValueString(item)}`)}
-                    <span className={`pl-1 inline text-xs font-light`}>
+                    <span className={`ps-1 inline text-xs font-light`}>
                       {getValueUnit(item)}
                     </span>
                   </span>
@@ -219,7 +218,7 @@ export function ObservationResultRow({
                   {/* Toggle select between graph view and list view */}
 
                   <button
-                    className="text-primary-900 absolute top-0 right-0 m-2 mr-4 rounded bg-[#E2F5FA] p-1 duration-150 active:scale-90 active:bg-gray-100 focus:outline-none focus:ring-0"
+                    className="text-primary-900 absolute top-0 end-0 m-2 me-4 rounded bg-[#E2F5FA] p-1 duration-150 active:scale-90 active:bg-gray-100 focus:outline-none focus:ring-0"
                     onClick={() =>
                       setView((v) => {
                         return v === 'GRAPH' ? 'LIST' : 'GRAPH';
@@ -236,7 +235,7 @@ export function ObservationResultRow({
                     <div className="m-4 grid grid-cols-6 gap-2 gap-y-2 py-2">
                       {relatedLabs.map((rl) => (
                         <Fragment key={`rl-${rl.id}`}>
-                          <div className="col-span-3 self-center pl-4 text-xs font-bold text-gray-600">
+                          <div className="col-span-3 self-center ps-4 text-xs font-bold text-gray-600">
                             <p className="">
                               {safeFormatDate(rl.metadata?.date, 'MM/dd/yyyy')}
                             </p>
@@ -273,11 +272,17 @@ export function ObservationResultRow({
                     <div className="mx-4 mt-4">
                       {getValueQuantity(item) !== undefined ? (
                         <div className="flex justify-center px-2 align-middle">
-                          <div className="mr-4 w-full sm:w-5/6">
-                            <HistoricalRelatedLabsChart
-                              relatedLabs={relatedLabs}
-                              item={item}
-                            />
+                          <div className="me-4 w-full sm:w-5/6">
+                            <Suspense
+                              fallback={
+                                <div className="h-72 w-full animate-pulse rounded-md bg-gray-100 motion-reduce:animate-none" />
+                              }
+                            >
+                              <HistoricalRelatedLabsChart
+                                relatedLabs={relatedLabs}
+                                item={item}
+                              />
+                            </Suspense>
                           </div>
                         </div>
                       ) : (
@@ -310,152 +315,6 @@ export function ObservationResultRow({
       )}
     </Fragment>
   );
-}
-
-function HistoricalRelatedLabsChart({
-  relatedLabs,
-  item,
-}: {
-  relatedLabs: RxDocument<ClinicalDocument<BundleEntry<Observation>>>[];
-  item: ClinicalDocument<BundleEntry<Observation>>;
-}) {
-  const chartDisplayName = `${item.metadata?.display_name}`,
-    chartValueUnit = getValueUnit(item);
-  const chartData = useMemo(
-    () =>
-      relatedLabs.map((rl) => {
-        const low = getReferenceRangeLow(rl)?.value,
-          high = getReferenceRangeHigh(rl)?.value;
-
-        return {
-          date: safeFormatDate(rl.metadata?.date, 'yyyy-MM-dd'),
-          value: getValueQuantity(rl),
-          referenceRange:
-            low !== undefined && high !== undefined ? [low, high] : undefined,
-        };
-      }),
-    [relatedLabs],
-  );
-  const chartDomain = useMemo(
-    () =>
-      getPaddedChartDomain(
-        chartData
-          .flatMap((d) => [
-            d.value,
-            d.referenceRange?.[0],
-            d.referenceRange?.[1],
-          ])
-          .filter(isNumber),
-      ),
-    [chartData],
-  );
-
-  return (
-    <div className="h-72 w-full [&_.recharts-surface:focus]:outline-none [&_.recharts-wrapper:focus]:outline-none [&_[tabindex]:focus]:outline-none">
-      <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart
-          data={chartData}
-          margin={{ top: 16, right: 16, bottom: 36, left: 20 }}
-        >
-          <CartesianGrid stroke="#E5E7EB" strokeDasharray="3 3" />
-          <XAxis
-            dataKey="date"
-            interval="preserveStartEnd"
-            tickFormatter={(value) => format(new Date(value), 'yyyy-MM')}
-            tick={{ fill: '#4B5563', fontSize: 12 }}
-            angle={-55}
-            textAnchor="end"
-          />
-          <YAxis
-            domain={chartDomain}
-            label={{
-              value: chartValueUnit ? `(${chartValueUnit})` : '',
-              angle: -90,
-              position: 'insideLeft',
-              fill: '#4B5563',
-            }}
-            tick={{ fill: '#4B5563', fontSize: 12 }}
-            tickFormatter={formatChartTick}
-            width={64}
-          />
-          <Tooltip
-            content={({ active, label, payload }) => {
-              if (!active) {
-                return null;
-              }
-
-              const value = payload?.find((p) => p.dataKey === 'value')?.value,
-                range = payload?.find((p) => p.dataKey === 'referenceRange')
-                  ?.value as number[] | undefined;
-
-              const formattedLabel =
-                label !== undefined
-                  ? format(new Date(label), 'MMM Mo, yyyy')
-                  : '';
-
-              return (
-                <div className="rounded-md border border-gray-200 bg-white px-3 py-2 text-xs shadow-md">
-                  <p className="font-semibold text-gray-900">
-                    {formattedLabel}
-                  </p>
-                  <p className="text-gray-700">
-                    {chartDisplayName}: {value}
-                    {chartValueUnit ? ` ${chartValueUnit}` : ''}
-                  </p>
-                  {range ? (
-                    <p className="text-gray-500">
-                      Range: {range[0]} - {range[1]}
-                    </p>
-                  ) : null}
-                </div>
-              );
-            }}
-          />
-          <Area
-            dataKey="referenceRange"
-            fill="#D8F1F8"
-            fillOpacity={0.8}
-            stroke="transparent"
-            strokeWidth={0}
-            type="monotone"
-          />
-          <Line
-            dataKey="value"
-            dot={{ r: 3, fill: '#00A2D5', strokeWidth: 0 }}
-            name={chartDisplayName}
-            stroke="#00A2D5"
-            strokeWidth={2}
-            type="monotone"
-          />
-        </ComposedChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
-
-function isNumber(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value);
-}
-
-function getPaddedChartDomain(
-  values: number[],
-): [number | 'dataMin', number | 'dataMax'] {
-  if (values.length === 0) {
-    return ['dataMin', 'dataMax'];
-  }
-
-  const min = Math.min(...values),
-    max = Math.max(...values),
-    range = max - min,
-    padding = range > 0 ? range * 0.12 : Math.max(Math.abs(max) * 0.12, 1);
-
-  return [Math.max(0, min - padding), max + padding];
-}
-
-function formatChartTick(value: number) {
-  return Number.isInteger(value)
-    ? `${value}`
-    : value.toLocaleString(undefined, { maximumFractionDigits: 3 });
 }
 
 /**

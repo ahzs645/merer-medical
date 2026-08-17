@@ -109,7 +109,7 @@ export function IntegrationStatusPanel({
     <Disclosure defaultOpen={defaultOpen}>
       {({ open }) => (
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-          <Disclosure.Button className="flex w-full items-center justify-between px-5 py-4 text-left">
+          <Disclosure.Button className="flex w-full items-center justify-between px-5 py-4 text-start">
             <div>
               <h2 className="text-base font-bold text-gray-900">
                 Browser and portal setup

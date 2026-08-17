@@ -267,7 +267,7 @@ export function ManualRecordTypePicker({
                     card.apply(form);
                     onPick();
                   }}
-                  className="flex h-full items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 text-left shadow-sm transition-colors hover:border-primary-400 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                  className="flex h-full items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 text-start shadow-sm transition-colors hover:border-primary-400 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-200"
                 >
                   <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary-50 text-primary-700">
                     <Icon className="h-5 w-5" />

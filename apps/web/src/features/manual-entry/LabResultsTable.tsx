@@ -271,7 +271,7 @@ function KindField({ row, onUpdateRow }: LabRowControlProps) {
         { value: 'coded', label: t('Coded') },
         { value: 'absent', label: t('Absent') },
       ]}
-      buttonClassName="min-h-[34px] py-1.5 pl-2"
+      buttonClassName="min-h-[34px] py-1.5 ps-2"
     />
   );
 }
@@ -289,7 +289,7 @@ function SignField({ row, onUpdateRow }: LabRowControlProps) {
         { value: '>', label: '>' },
         { value: '>=', label: '>=' },
       ]}
-      buttonClassName="min-h-[34px] py-1.5 pl-2"
+      buttonClassName="min-h-[34px] py-1.5 ps-2"
     />
   );
 }
@@ -311,7 +311,7 @@ function ValueField({ row, onUpdateRow }: LabRowControlProps) {
           { value: 'unknown', label: t('Unknown') },
           { value: 'not-applicable', label: t('N/A') },
         ]}
-        buttonClassName="min-h-[34px] py-1.5 pl-2"
+        buttonClassName="min-h-[34px] py-1.5 ps-2"
       />
     );
   }

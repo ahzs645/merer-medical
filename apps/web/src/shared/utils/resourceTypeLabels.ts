@@ -8,6 +8,15 @@
  */
 const RESOURCE_TYPE_LABELS: Record<string, { one: string; many: string }> = {
   allergyintolerance: { one: 'Allergy', many: 'Allergies' },
+  // Not a stored resource_type: the synthetic bucket screens use for
+  // AllergyIntolerance records that state the *absence* of an allergy ("No
+  // known allergy", "not asked"). They are real records and still export, but
+  // they are not allergens, so counting them as such made this screen say 11
+  // where the Allergies page and the nav said 6.
+  allergyintolerance_negation: {
+    one: 'Allergy status',
+    many: 'Allergy status',
+  },
   careplan: { one: 'Care plan', many: 'Care plans' },
   condition: { one: 'Condition', many: 'Conditions' },
   coverage: { one: 'Insurance coverage', many: 'Insurance coverage' },

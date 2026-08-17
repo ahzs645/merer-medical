@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react';
 
 /**
- * A lightweight in-app signal for "clinical records changed" events
- * (manual add / edit / delete). Record-list hooks subscribe via
- * useRecordChangeTick and re-fetch when it increments, which lets hosts
- * refresh in place instead of forcing a full page reload — a reload is
- * jarring and, in demo mode, wipes the entire in-memory database.
+ * A lightweight in-app signal for "clinical records changed" events.
+ * Record-list hooks subscribe via useRecordChangeTick and re-fetch when it
+ * increments, which lets hosts refresh in place instead of forcing a full page
+ * reload — a reload is jarring and, in demo mode, wipes the entire in-memory
+ * database.
+ *
+ * Two kinds of publisher:
+ *
+ * - `RecordChangeBridge` subscribes to `clinical_documents.$` and fires for
+ *   *any* write, so a portal sync or an `.emrpkg` import refreshes the screen
+ *   the reader is on. This is the one that covers records arriving on their
+ *   own.
+ * - The manual add / edit / delete paths call `notifyRecordsChanged()`
+ *   directly, so your own edit lands without waiting out the bridge's debounce.
  */
 
 type Listener = () => void;

@@ -116,7 +116,7 @@ export function ExperimentalSettingsGroup() {
               }}
               className={classNames(
                 experimental__use_openai_rag ? 'bg-primary-500' : 'bg-gray-200',
-                'focus:ring-primary-500 relative ml-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
+                'focus:ring-primary-500 relative ms-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
               )}
             >
               <span
@@ -137,7 +137,7 @@ export function ExperimentalSettingsGroup() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               AI Provider
             </label>
-            <div className="flex space-x-4">
+            <div className="flex gap-x-4">
               <label className="flex items-center">
                 <input
                   type="radio"
@@ -151,7 +151,7 @@ export function ExperimentalSettingsGroup() {
                       experimental__ai_provider: 'ollama' as const,
                     });
                   }}
-                  className="mr-2"
+                  className="me-2"
                 />
                 Ollama
               </label>
@@ -165,7 +165,7 @@ export function ExperimentalSettingsGroup() {
                       experimental__ai_provider: 'openai' as const,
                     });
                   }}
-                  className="mr-2"
+                  className="me-2"
                 />
                 OpenAI
               </label>
@@ -204,7 +204,7 @@ export function ExperimentalSettingsGroup() {
                 />
                 <button
                   type="submit"
-                  className="relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-bold text-white shadow-sm  hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 disabled:bg-gray-700"
+                  className="relative ms-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-bold text-white shadow-sm  hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 disabled:bg-gray-700"
                   onClick={(e) => {
                     e.preventDefault();
                     updateLocalConfig({
@@ -241,7 +241,7 @@ export function ExperimentalSettingsGroup() {
                   />
                   <button
                     className={classNames(
-                      'ml-2 px-4 py-2 text-sm font-bold text-white rounded-md',
+                      'ms-2 px-4 py-2 text-sm font-bold text-white rounded-md',
                       isTestingConnection
                         ? 'bg-gray-400 cursor-not-allowed'
                         : 'bg-blue-600 hover:bg-blue-700',
@@ -328,7 +328,7 @@ export function ExperimentalSettingsGroup() {
                 </p>
               </div>
 
-              <div className="flex space-x-2">
+              <div className="flex gap-x-2">
                 <button
                   className="bg-primary-600 hover:bg-primary-700 rounded px-4 py-2 font-bold text-white flex-1"
                   onClick={() => {
@@ -443,7 +443,7 @@ export function ExperimentalSettingsGroup() {
                       />
                       <button
                         className={classNames(
-                          'ml-2 px-4 py-2 text-sm font-bold text-white rounded-md',
+                          'ms-2 px-4 py-2 text-sm font-bold text-white rounded-md',
                           isTestingOpenMedConnection
                             ? 'bg-gray-400 cursor-not-allowed'
                             : 'bg-blue-600 hover:bg-blue-700',
@@ -545,7 +545,7 @@ export function ExperimentalSettingsGroup() {
                 </p>
               </div>
               <button
-                className="relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-sm  hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:bg-gray-700"
+                className="relative ms-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-sm  hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:bg-gray-700"
                 onClick={async () => {
                   if (
                     // eslint-disable-next-line no-restricted-globals

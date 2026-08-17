@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
 import { ClinicalTimelineComment } from '../../../models/clinical-timeline-comment/ClinicalTimelineComment.type';
+import { useUndoableDelete } from '../../../shared/hooks/useUndoableDelete';
 
 /** ISO day bucket (yyyy-MM-dd) used to group comments on a data point. */
 export function dayKeyFromMs(t: number): string {
@@ -44,6 +45,7 @@ function generateId(): string {
 export function useTimelineComments(): TimelineCommentsApi {
   const db = useRxDb();
   const user = useUser();
+  const deleteWithUndo = useUndoableDelete();
   const [comments, setComments] = useState<ClinicalTimelineComment[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -127,10 +129,23 @@ export function useTimelineComments(): TimelineCommentsApi {
   const deleteComment = useCallback(
     async (id: string) => {
       const doc = await db.clinical_timeline_comments.findOne(id).exec();
-      if (doc) await doc.remove();
-      await reload();
+      if (!doc) return;
+      // Kept before the row goes, so Undo can put back the note you wrote
+      // rather than an approximation of it.
+      const deleted = doc.toMutableJSON();
+      await deleteWithUndo({
+        description: 'Comment',
+        remove: async () => {
+          await doc.remove();
+          await reload();
+        },
+        restore: async () => {
+          await db.clinical_timeline_comments.insert(deleted);
+          await reload();
+        },
+      });
     },
-    [db, reload],
+    [db, reload, deleteWithUndo],
   );
 
   return {

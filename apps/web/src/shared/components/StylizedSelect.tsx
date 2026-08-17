@@ -1,9 +1,6 @@
 import { Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
-import {
-  CheckIcon,
-  ChevronUpDownIcon,
-} from '@heroicons/react/20/solid';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 
 import { classNames } from '../utils/StyleUtils';
 
@@ -41,12 +38,12 @@ export function StylizedSelect<T extends string>({
         <Listbox.Button
           id={id}
           className={classNames(
-            'relative min-h-[44px] w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left text-sm text-gray-900 shadow-sm transition-colors focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
+            'relative min-h-[44px] w-full cursor-default rounded-md border border-gray-300 bg-white py-2 ps-3 pe-10 text-start text-sm text-gray-900 shadow-sm transition-colors focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
             buttonClassName ?? '',
           )}
         >
           <span className="block truncate">{selectedOption?.label}</span>
-          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+          <span className="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-2">
             <ChevronUpDownIcon className="h-5 w-5 text-gray-400" />
           </span>
         </Listbox.Button>
@@ -64,7 +61,7 @@ export function StylizedSelect<T extends string>({
                 disabled={option.disabled}
                 className={({ active, disabled: optionDisabled }) =>
                   classNames(
-                    'relative cursor-default select-none py-2 pl-9 pr-3',
+                    'relative cursor-default select-none py-2 ps-9 pe-3',
                     active ? 'bg-primary-50 text-primary-900' : 'text-gray-900',
                     optionDisabled ? 'text-gray-400' : '',
                   )
@@ -81,7 +78,7 @@ export function StylizedSelect<T extends string>({
                       {option.label}
                     </span>
                     {selected ? (
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-primary-600">
+                      <span className="absolute inset-y-0 start-0 flex items-center ps-2 text-primary-600">
                         <CheckIcon className="h-5 w-5" />
                       </span>
                     ) : null}

@@ -25,12 +25,12 @@ export function AppLoadingSkeleton({ ready }: { ready?: boolean }) {
           >
             <div className="relative h-24 w-24 md:h-48 md:w-48">
               <img
-                className="absolute left-0 top-0 h-24 w-24 animate-ping opacity-25 md:h-48 md:w-48"
+                className="absolute start-0 top-0 h-24 w-24 animate-ping opacity-25 md:h-48 md:w-48"
                 src={logoCol}
                 alt="Loading screen"
               ></img>
               <img
-                className="absolute left-0 top-0 h-24 w-24 opacity-25 md:h-48 md:w-48"
+                className="absolute start-0 top-0 h-24 w-24 opacity-25 md:h-48 md:w-48"
                 src={logoCol}
                 alt="Loading screen"
               ></img>
@@ -38,7 +38,7 @@ export function AppLoadingSkeleton({ ready }: { ready?: boolean }) {
           </Transition>
         </AppPage>
       </div>
-      <div className="flex-0 md:bg-primary-800 absolute bottom-0 left-0 z-20 w-full bg-slate-50 md:relative md:bottom-auto md:top-0 md:h-full md:w-auto">
+      <div className="flex-0 md:bg-primary-800 absolute bottom-0 start-0 z-20 w-full bg-slate-50 md:relative md:bottom-auto md:top-0 md:h-full md:w-auto">
         <div className="pb-safe md:pb-0 mx-auto flex w-full max-w-3xl justify-around md:h-full md:w-64 md:flex-col md:justify-start">
           <img
             src={logo}
@@ -55,7 +55,7 @@ export function AppLoadingSkeleton({ ready }: { ready?: boolean }) {
               }`}
             >
               <div
-                className={`font-xs h-5 w-5 text-base md:mr-4 md:h-8 md:w-8 md:text-white ${
+                className={`font-xs h-5 w-5 text-base md:me-4 md:h-8 md:w-8 md:text-white ${
                   i === 0 ? 'text-primary font-bold' : 'text-slate-800'
                 }`}
               >
@@ -87,7 +87,7 @@ export function AppLoadingSkeleton({ ready }: { ready?: boolean }) {
                     <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 </div>
-                <div className="ml-3">
+                <div className="ms-3">
                   <div className="text-base font-medium text-white">
                     <div className="flex h-4 animate-pulse flex-row items-center md:mb-2">
                       <div className="h-4 w-32 rounded-md bg-gray-500"></div>

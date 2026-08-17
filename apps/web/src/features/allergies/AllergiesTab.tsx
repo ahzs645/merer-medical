@@ -21,6 +21,7 @@ import { firstText, periodStart } from '../../shared/utils/fhirText';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
 import { FactList } from '../../shared/components/FactList';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 interface AllergyItem {
   id: string;
@@ -87,7 +88,9 @@ function useAllergies() {
 
 export function AllergiesTab() {
   const { items, status, error } = useAllergies();
-  const [query, setQuery] = useState('');
+  // Search lives in the URL, so the view survives Back, can be linked, and
+  // comes back the same length it left — see useListViewParams.
+  const { query, setQuery } = useListViewParams();
   const [addOpen, setAddOpen] = useState(false);
 
   const { allergens, alsoRecorded } = useMemo(() => {

@@ -734,12 +734,12 @@ export function TenantSelectModal({
                   >
                     <div className="relative px-4">
                       <MagnifyingGlassIcon
-                        className="pointer-events-none absolute left-8 top-3.5 h-5 w-5 text-gray-700"
+                        className="pointer-events-none absolute start-8 top-3.5 h-5 w-5 text-gray-700"
                         aria-hidden="true"
                       />
                       <Combobox.Input
                         title="tenant-search-bar"
-                        className="focus:ring-primary-700 h-12 w-full divide-y-2 rounded-xl border-0 bg-gray-100 bg-transparent pl-11 pr-4 text-gray-800 placeholder-gray-400 hover:border-gray-200 focus:ring-2 sm:text-sm"
+                        className="focus:ring-primary-700 h-12 w-full divide-y-2 rounded-xl border-0 bg-gray-100 bg-transparent ps-11 pe-4 text-gray-800 placeholder-gray-400 hover:border-gray-200 focus:ring-2 sm:text-sm"
                         placeholder="Search for your health system"
                         onChange={(event) =>
                           dispatch({

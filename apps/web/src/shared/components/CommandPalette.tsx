@@ -403,7 +403,7 @@ export function CommandPalette({
                           key={hit.id}
                           type="button"
                           onClick={() => openRecord(hit.name)}
-                          className="flex w-full items-start gap-3 rounded-md px-3 py-3 text-left hover:bg-primary-50"
+                          className="flex w-full items-start gap-3 rounded-md px-3 py-3 text-start hover:bg-primary-50"
                         >
                           <DocumentTextIcon className="mt-0.5 h-5 w-5 shrink-0 text-primary-700" />
                           <span className="min-w-0 flex-1">
@@ -433,7 +433,7 @@ export function CommandPalette({
                           key={item.route}
                           type="button"
                           onClick={() => runCommand(item)}
-                          className="flex w-full items-start gap-3 rounded-md px-3 py-3 text-left hover:bg-primary-50"
+                          className="flex w-full items-start gap-3 rounded-md px-3 py-3 text-start hover:bg-primary-50"
                         >
                           <Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary-700" />
                           <span className="min-w-0 flex-1">

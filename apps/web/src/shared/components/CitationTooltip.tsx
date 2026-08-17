@@ -34,8 +34,8 @@ export function CitationTooltip({
       >
         {children}
       </span>
-      <span className="absolute left-0 top-full z-30 hidden w-80 pt-2 group-hover:block group-focus-within:block">
-        <span className="block rounded-md border border-gray-200 bg-white p-3 text-left text-xs font-normal normal-case tracking-normal text-gray-700 shadow-xl">
+      <span className="absolute start-0 top-full z-30 hidden w-80 pt-2 group-hover:block group-focus-within:block">
+        <span className="block rounded-md border border-gray-200 bg-white p-3 text-start text-xs font-normal normal-case tracking-normal text-gray-700 shadow-xl">
           {citation.source ? (
             <span className="block font-semibold text-gray-900">
               {citation.source}
@@ -52,7 +52,7 @@ export function CitationTooltip({
             {citation.page ? ` · ${citation.page}` : ''}
           </span>
           {citation.quote ? (
-            <span className="mt-2 block border-l-2 border-primary-200 pl-2 text-gray-600">
+            <span className="mt-2 block border-l-2 border-primary-200 ps-2 text-gray-600">
               {citation.quote}
             </span>
           ) : null}

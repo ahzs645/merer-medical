@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
+import { ConfirmDeleteDialog } from '../../shared/components/ConfirmDeleteDialog';
 import { FormSheet } from '../../shared/components/FormSheet';
 import { ManualRecordForm } from './ManualRecordForm';
 import {
@@ -41,10 +42,10 @@ function ManualRecordModalBody({
 
   // Every close path (X, backdrop, Escape, Cancel) runs this guard so a
   // half-filled form is never discarded without confirmation.
+  // The guard only reports whether closing is safe; the host asks the
+  // question, in the app's own dialog rather than the browser's.
   useEffect(() => {
-    registerCloseGuard(
-      () => !form.isDirty() || window.confirm(t('Discard unsaved changes?')),
-    );
+    registerCloseGuard(() => !form.isDirty());
   });
 
   // Named by what you pressed, the way the full-page form already is: pressing
@@ -71,13 +72,21 @@ export function ManualRecordModal({
   // always allowed.
   const closeGuardRef = useRef<() => boolean>(() => true);
   const [title, setTitle] = useState(() => t('Add record'));
+  const [discardOpen, setDiscardOpen] = useState(false);
   const requestClose = () => {
-    if (closeGuardRef.current()) onClose();
+    if (closeGuardRef.current()) {
+      onClose();
+      return;
+    }
+    setDiscardOpen(true);
   };
   // Drop the stale guard once the body unmounts so a reopened modal starts
   // from a clean slate.
   useEffect(() => {
-    if (!open) closeGuardRef.current = () => true;
+    if (!open) {
+      closeGuardRef.current = () => true;
+      setDiscardOpen(false);
+    }
   }, [open]);
 
   return (
@@ -96,6 +105,18 @@ export function ManualRecordModal({
         onTitleChange={setTitle}
         onSaved={onSaved}
         {...options}
+      />
+      <ConfirmDeleteDialog
+        open={discardOpen}
+        title={t('Discard unsaved changes?')}
+        body={t('What you have typed here is not saved yet.')}
+        confirmLabel={t('Discard')}
+        cancelLabel={t('Keep editing')}
+        onConfirm={() => {
+          setDiscardOpen(false);
+          onClose();
+        }}
+        onCancel={() => setDiscardOpen(false)}
       />
     </FormSheet>
   );

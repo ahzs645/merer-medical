@@ -88,7 +88,7 @@ export function RecordsSideNav() {
                     )}
                   </NavLink>
                   {showChildren && (
-                    <ul className="mt-0.5 space-y-0.5 border-l border-gray-200 pl-4 ml-4">
+                    <ul className="mt-0.5 space-y-0.5 border-s border-gray-200 ps-4 ms-4">
                       {item.children?.map((child) => (
                         <li key={`${child.to}-${child.label}`}>
                           <NavLink

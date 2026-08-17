@@ -79,7 +79,7 @@ export function TutorialInstallPWAScreen({
                 {t('Installation Instructions')}
               </h1>
               <ol className="list-decimal">
-                <li className="ml-6">
+                <li className="ms-6">
                   {t(
                     'In the top right corner of your browser, click the share',
                   )}{' '}
@@ -101,12 +101,12 @@ export function TutorialInstallPWAScreen({
                   </span>{' '}
                   {t('button.')}
                 </li>
-                <li className="ml-6">
+                <li className="ms-6">
                   {t(
                     "In the share menu, you should see the option to 'Add to Dock'.",
                   )}
                 </li>
-                <li className="ml-6">
+                <li className="ms-6">
                   {t(
                     "Click the 'Add' button to install Mere on your computer.",
                   )}
@@ -120,7 +120,7 @@ export function TutorialInstallPWAScreen({
                 {t('Installation Instructions')}
               </h1>
               <ol className="list-decimal">
-                <li className="ml-6 mb-2">
+                <li className="ms-6 mb-2">
                   {t('In the bottom middle bar of Safari, click the share')}{' '}
                   <span className="inline-flex px-1">
                     <svg
@@ -140,12 +140,12 @@ export function TutorialInstallPWAScreen({
                   </span>{' '}
                   {t('button.')}
                 </li>
-                <li className="ml-6 mb-2">
+                <li className="ms-6 mb-2">
                   {t(
                     "In the share menu, you should see the option to 'Add to Home Screen'.",
                   )}
                 </li>
-                <li className="ml-6 mb-2">
+                <li className="ms-6 mb-2">
                   {t(
                     "Click the 'Add' button to install Mere on your computer.",
                   )}
@@ -184,7 +184,7 @@ export function TutorialInstallPWAScreen({
                 {t('Installation Instructions')}
               </h1>
               <ol className="list-decimal">
-                <li className="ml-6">
+                <li className="ms-6">
                   {t(
                     'In the top right corner inside the URL bar, click the install',
                   )}
@@ -195,10 +195,10 @@ export function TutorialInstallPWAScreen({
                   />
                   {t('button.')}
                 </li>
-                <li className="ml-6">
+                <li className="ms-6">
                   {t('You should see the "Install App?" dialog box.')}
                 </li>
-                <li className="ml-6">
+                <li className="ms-6">
                   {t(
                     "Click the 'install' button to install Mere on your computer.",
                   )}
@@ -212,12 +212,12 @@ export function TutorialInstallPWAScreen({
                 {t('Installation Instructions')}
               </h1>
               <ol className="list-decimal">
-                <li className="ml-6">
+                <li className="ms-6">
                   {t(
                     "When prompted by Chrome, click the 'Add Mere to your Home screen' dialog to install the app on your phone.",
                   )}
                 </li>{' '}
-                <li className="ml-6">
+                <li className="ms-6">
                   {t(
                     'If you do not get a prompt by Chrome, you can manually install it by clicking the three dots',
                   )}{' '}

@@ -212,7 +212,7 @@ const CernerRedirect: React.FC = () => {
         <div className="flex-column flex h-full w-full items-center justify-center">
           <svg
             aria-hidden="true"
-            className="fill-primary-700 mr-2 h-64 w-64 animate-spin text-gray-200 dark:text-gray-600"
+            className="fill-primary-700 me-2 h-64 w-64 animate-spin text-gray-200 dark:text-gray-600"
             viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"

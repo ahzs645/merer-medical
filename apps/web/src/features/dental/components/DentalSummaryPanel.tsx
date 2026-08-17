@@ -8,6 +8,9 @@ export function DentalSummaryPanel({
 }) {
   const { t } = useInterfaceLanguage();
   // No Images tile: the page header already reads "N dental images or scans".
+  // Empty categories are left out rather than drawn as a tile reading 0: a
+  // count of nothing is not a fact about your teeth, and eight tiles including
+  // "Procedures 0" pushed the one panel with something to act on below them.
   const stats = [
     { label: 'Findings', value: counts.findings },
     { label: 'Conditions', value: counts.conditions },
@@ -17,7 +20,9 @@ export function DentalSummaryPanel({
     { label: 'Treatment plan', value: counts.treatmentPlan },
     { label: 'Perio', value: counts.perio },
     { label: 'Surgery', value: counts.surgery },
-  ];
+  ].filter((stat) => stat.value > 0);
+
+  if (stats.length === 0) return null;
 
   return (
     // A single-digit count doesn't need a full-width card: three across keeps

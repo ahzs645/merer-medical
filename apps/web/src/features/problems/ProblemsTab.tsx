@@ -36,6 +36,7 @@ import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import { getManualRecordNote } from '../../shared/utils/manualRecordUtils';
 import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 type ProblemStatus = 'active' | 'resolved' | 'unknown';
 
@@ -87,8 +88,14 @@ const ADD_CONDITION_PATH = buildAddRecordPath({
 
 export function ProblemsTab() {
   const { items, status, error } = useProblemsData();
-  const [query, setQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<FilterId>('all');
+  // Search and filter live in the URL, so the view survives Back, can be
+  // linked, and comes back the same length it left.
+  const {
+    query,
+    setQuery,
+    filterId: selectedFilter,
+    setFilterId: setSelectedFilter,
+  } = useListViewParams<FilterId>({ defaultFilter: 'all' });
 
   const counts = useMemo(
     () =>

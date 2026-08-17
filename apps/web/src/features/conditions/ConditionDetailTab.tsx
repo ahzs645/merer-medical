@@ -135,9 +135,9 @@ function ConditionDetail({ bundle }: { bundle: ConditionBundle }) {
       {timeline.length > 0 && (
         <section>
           <SectionHeading icon={CalendarDaysIcon} title="Timeline" />
-          <ol className="relative ml-3 border-l border-gray-200">
+          <ol className="relative ms-3 border-s border-gray-200">
             {timeline.map((event) => (
-              <li key={event.id} className="mb-4 ml-4">
+              <li key={event.id} className="mb-4 ms-4">
                 <div className="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full bg-primary-400 ring-4 ring-gray-50" />
                 <time className="text-xs font-medium uppercase tracking-wide text-gray-500">
                   {formatDate(event.date)}

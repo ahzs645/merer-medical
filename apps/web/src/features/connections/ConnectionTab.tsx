@@ -68,13 +68,13 @@ function SyncHistoryRow({ item }: { item: RxDocument<ConnectionDocument> }) {
   const hasError = item.get('last_sync_was_error');
   return (
     <tr className="border-b border-gray-100 last:border-0">
-      <td className="py-2 pr-3 text-sm font-medium text-gray-900">
+      <td className="py-2 pe-3 text-sm font-medium text-gray-900">
         {item.get('name')}
       </td>
-      <td className="py-2 pr-3 text-sm text-gray-600">
+      <td className="py-2 pe-3 text-sm text-gray-600">
         {fmt(item.get('last_refreshed'))}
       </td>
-      <td className="py-2 pr-3 text-sm text-gray-600">
+      <td className="py-2 pe-3 text-sm text-gray-600">
         {fmt(item.get('last_sync_attempt'))}
       </td>
       <td className="py-2 text-sm">
@@ -317,14 +317,14 @@ const ConnectionTab: React.FC = () => {
             <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200 text-left">
-                    <th className="pb-2 pr-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <tr className="border-b border-gray-200 text-start">
+                    <th className="pb-2 pe-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                       {t('Source')}
                     </th>
-                    <th className="pb-2 pr-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    <th className="pb-2 pe-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                       {t('Last sync')}
                     </th>
-                    <th className="pb-2 pr-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    <th className="pb-2 pe-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
                       {t('Last attempt')}
                     </th>
                     <th className="pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">

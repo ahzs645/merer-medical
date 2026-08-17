@@ -7,7 +7,6 @@ import { MemoryRouter } from 'react-router-dom';
 
 import { LabsTab } from './LabsTab';
 import { RecordCoverageSummary } from './types';
-import { labsPathAfterAdd } from './utils/labsPageState';
 
 // `mock`-prefixed so the hoisted jest.mock factories below may reach it.
 const mockCreateElement = createElement;
@@ -79,12 +78,13 @@ function makeLab(id: string, name: string) {
   };
 }
 
-// Opened on the path the manual form sends the reader back to, which is the
-// one entry that starts on "All" — the default, Attention, hides every lab
-// these fixtures contain because none of them is flagged.
-function renderTab() {
+// Opened on the plain route. This used to have to enter through the
+// `added=1` path, because the page defaulted to "Attention" and none of these
+// fixtures is flagged — a test that had to dodge the default is a fair sign
+// the default was hiding your records.
+function renderTab(entry = '/records/labs') {
   return render(
-    <MemoryRouter initialEntries={[labsPathAfterAdd()]}>
+    <MemoryRouter initialEntries={[entry]}>
       <LabsTab />
     </MemoryRouter>,
   );
@@ -160,5 +160,53 @@ describe('LabsTab', () => {
     expect(
       screen.getByRole('button', { name: "What's in your records" }),
     ).toBeTruthy();
+  });
+});
+
+/**
+ * The view you are looking at is an address now. Before this, filter and search
+ * were component state plus a sessionStorage copy of the query: pressing Back
+ * from a result returned you to the page's default rather than the list you
+ * left, which also left the shell's scroll restoration nothing to restore to,
+ * because the page that came back was a different length.
+ */
+describe('LabsTab view state', () => {
+  beforeEach(() => {
+    mockStatus = 'success';
+    mockLabs = [makeLab('lab-1', 'Ferritin'), makeLab('lab-2', 'Sodium')];
+    window.localStorage.clear();
+  });
+
+  it('opens on the full list, not pre-filtered to a subset of it', () => {
+    const { container } = renderTab();
+
+    const all = screen.getByRole('button', { name: /^All/ });
+    expect(all.getAttribute('aria-pressed')).toBe('true');
+    // Both fixtures are ordinary results. Under the old "Attention" default
+    // this read "0 of 2", and the page a records app opened on was empty.
+    expect(screen.getByText(/lab tests listed/).textContent).toContain(
+      '2 of 2',
+    );
+    expect(container.textContent).toContain('All2');
+  });
+
+  it('opens on the view its address describes', () => {
+    renderTab('/records/labs?q=ferritin');
+
+    // The search box was applied before the first paint, from the URL, rather
+    // than restored from a sessionStorage copy after it.
+    expect(
+      (screen.getByLabelText('Search labs') as HTMLInputElement).value,
+    ).toBe('ferritin');
+    expect(screen.getByText(/lab tests listed/).textContent).toContain(
+      '1 of 2',
+    );
+  });
+
+  it('reads a filter out of the address too', () => {
+    renderTab('/records/labs?filter=attention');
+
+    const attention = screen.getByRole('button', { name: /^Attention/ });
+    expect(attention.getAttribute('aria-pressed')).toBe('true');
   });
 });

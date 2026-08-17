@@ -47,27 +47,27 @@ export function OptometryFieldModelPanel() {
         <div className="mt-3 overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead>
-              <tr className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                <th className="py-2 pr-4">Field</th>
-                <th className="py-2 pr-4">Type</th>
-                <th className="py-2 pr-4">Unit</th>
-                <th className="py-2 pr-4">Eye</th>
-                <th className="py-2 pr-4">FHIR</th>
+              <tr className="text-start text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th className="py-2 pe-4">Field</th>
+                <th className="py-2 pe-4">Type</th>
+                <th className="py-2 pe-4">Unit</th>
+                <th className="py-2 pe-4">Eye</th>
+                <th className="py-2 pe-4">FHIR</th>
                 <th className="py-2">Notes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-gray-700">
               {EYE_METRIC_FIELDS.map((field) => (
                 <tr key={field.key}>
-                  <td className="py-2 pr-4 font-medium text-gray-900">
+                  <td className="py-2 pe-4 font-medium text-gray-900">
                     {field.label}
                   </td>
-                  <td className="py-2 pr-4">{field.type}</td>
-                  <td className="py-2 pr-4">{field.unit || '-'}</td>
-                  <td className="py-2 pr-4">
+                  <td className="py-2 pe-4">{field.type}</td>
+                  <td className="py-2 pe-4">{field.unit || '-'}</td>
+                  <td className="py-2 pe-4">
                     {field.appliesTo?.join('/') || '-'}
                   </td>
-                  <td className="py-2 pr-4">{field.fhirResource}</td>
+                  <td className="py-2 pe-4">{field.fhirResource}</td>
                   <td className="max-w-md py-2 leading-6">{field.notes}</td>
                 </tr>
               ))}

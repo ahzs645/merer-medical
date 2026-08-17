@@ -74,7 +74,9 @@ const equivalentUnits: Record<string, string> = {
 export function normalizeLabUnit(unit?: string): string | undefined {
   if (!unit) return undefined;
   const trimmed = normalizeLiterDenominatorCasing(unit.trim());
-  return normalizePowerCountUnit(trimmed) || equivalentUnits[trimmed] || trimmed;
+  return (
+    normalizePowerCountUnit(trimmed) || equivalentUnits[trimmed] || trimmed
+  );
 }
 
 function normalizeLiterDenominatorCasing(unit: string): string {

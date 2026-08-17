@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../Routes';
@@ -17,6 +17,7 @@ import {
   useRecordCounts,
   type CategoryCount,
 } from './useRecordCounts';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 /** How many categories the wide-viewport overview ranks before it stops. */
 const OVERVIEW_ROWS = 6;
@@ -56,7 +57,9 @@ function countText(count: CategoryCount, blurb?: string): string {
  * gets an overview the rail can't give instead.
  */
 export function RecordsHub() {
-  const [query, setQuery] = useState('');
+  // Search lives in the URL, so the view survives Back, can be linked, and
+  // comes back the same length it left — see useListViewParams.
+  const { query, setQuery } = useListViewParams();
   const recordCounts = useRecordCounts();
   const q = query.trim().toLowerCase();
   const searching = q.length > 0;

@@ -4,6 +4,7 @@ import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { getFhirResource } from '../../../shared/utils/fhirResource';
+import { useRecordChangeTick } from '../../../shared/utils/recordChangeSignal';
 import {
   ClinicalTimelineData,
   DurationItem,
@@ -281,6 +282,9 @@ const DIASTOLIC = '8462-4';
 export function useClinicalTimelineData(): ClinicalTimelineData {
   const db = useRxDb();
   const user = useUser();
+  // Refetch when records land — a portal sync or an .emrpkg import
+  // writes straight to the collection, and this page reads it once.
+  const recordChangeTick = useRecordChangeTick();
   const [data, setData] = useState<ClinicalTimelineData>({
     lanes: [],
     allTimestamps: [],
@@ -621,7 +625,7 @@ export function useClinicalTimelineData(): ClinicalTimelineData {
     return () => {
       mounted = false;
     };
-  }, [db, user.id]);
+  }, [db, user.id, recordChangeTick]);
 
   return data;
 }

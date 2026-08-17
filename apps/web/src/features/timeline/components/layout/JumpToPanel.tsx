@@ -79,19 +79,19 @@ export function JumpToPanel({
       onTouchStart={pauseAutoFollow}
       onWheel={pauseAutoFollow}
     >
-      <p className="sticky top-0 mr-2 h-10 whitespace-nowrap bg-gray-50 p-2 font-bold">
+      <p className="sticky top-0 me-2 h-10 whitespace-nowrap bg-gray-50 p-2 font-bold">
         Jump To
       </p>
       {isLoading ? (
         <Skeleton />
       ) : (
         <ul className="relative pb-[45vh]">
-          <div className="absolute bottom-[45vh] left-5 top-0 w-px bg-gray-200" />
+          <div className="absolute bottom-[45vh] start-5 top-0 w-px bg-gray-200" />
           {list &&
             list.map(([key], index, elements) => (
               <Fragment key={key}>
                 {index === 0 ? (
-                  <li className="sticky top-10 z-10 bg-gray-50 p-1 pl-2">
+                  <li className="sticky top-10 z-10 bg-gray-50 p-1 ps-2">
                     {parseYear(key)}
                   </li>
                 ) : null}
@@ -126,7 +126,7 @@ function YearHeaderUnmemo({
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {nextYear && parseYear(nextYear) !== parseYear(currentYear) ? (
-        <li className="sticky top-10 z-10 bg-gray-50 p-1 pl-2">
+        <li className="sticky top-10 z-10 bg-gray-50 p-1 ps-2">
           {parseYear(nextYear)}
         </li>
       ) : null}
@@ -151,9 +151,9 @@ function LinkUnmemo({
 }) {
   if (date) {
     return (
-      <li className="relative flex min-h-[28px] items-center pl-10 pr-3 text-xs font-thin hover:underline">
+      <li className="relative flex min-h-[28px] items-center ps-10 pe-3 text-xs font-thin hover:underline">
         <span
-          className={`absolute left-[17px] top-1/2 h-2 w-2 -translate-y-1/2 rounded-full border ${
+          className={`absolute start-[17px] top-1/2 h-2 w-2 -translate-y-1/2 rounded-full border ${
             loading
               ? 'animate-pulse border-primary-700 bg-primary-300'
               : active
@@ -199,7 +199,7 @@ function SkeletonUnmemo() {
       {[...Array(50)].map((_, index) => (
         <li key={index}>
           <div className="flex h-4 animate-pulse flex-row items-center pt-5 ">
-            <div className="ml-4 h-3 w-12 rounded-md bg-gray-100 p-1 "></div>
+            <div className="ms-4 h-3 w-12 rounded-md bg-gray-100 p-1 "></div>
           </div>
         </li>
       ))}

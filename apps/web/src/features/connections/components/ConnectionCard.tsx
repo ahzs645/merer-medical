@@ -228,7 +228,7 @@ export function ConnectionCard({
               <span className="mt-0.5 flex-shrink-0">
                 <AbnormalResultIcon />
               </span>
-              <span className="pl-1">
+              <span className="ps-1">
                 {lastRefreshed ? (
                   <>
                     Unable to sync since{' '}
@@ -261,7 +261,7 @@ export function ConnectionCard({
           aria-label={`Details and options for ${displayName}`}
           title="Details and options"
           onClick={() => setShowDetail(true)}
-          className="-mr-2 -mt-1 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          className="-me-2 -mt-1 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
         >
           <InformationCircleIcon className="h-6 w-6" aria-hidden="true" />
         </button>

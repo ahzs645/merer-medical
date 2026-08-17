@@ -41,7 +41,7 @@ export function LabHistoryTable({
               <button
                 type="button"
                 onClick={onRowClick}
-                className="grid w-full gap-3 px-3 py-2 text-left hover:bg-blue-50 md:grid-cols-[minmax(8rem,0.8fr)_minmax(8rem,0.7fr)_minmax(8rem,0.7fr)_minmax(10rem,1fr)_minmax(12rem,1.1fr)_minmax(12rem,1.2fr)]"
+                className="grid w-full gap-3 px-3 py-2 text-start hover:bg-blue-50 md:grid-cols-[minmax(8rem,0.8fr)_minmax(8rem,0.7fr)_minmax(8rem,0.7fr)_minmax(10rem,1fr)_minmax(12rem,1.1fr)_minmax(12rem,1.2fr)]"
               >
                 <div className="text-xs font-medium text-gray-900">
                   {safeFormatDate(lab.metadata?.date, 'PP', 'Unknown')}

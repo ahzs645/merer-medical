@@ -57,7 +57,7 @@ function RecordsShell() {
           <Outlet />
         </div>
       </div>
-      <aside className="hidden w-60 shrink-0 overflow-y-auto border-r border-gray-200 bg-white lg:block">
+      <aside className="hidden w-60 shrink-0 overflow-y-auto border-e border-gray-200 bg-white lg:block">
         <RecordsSideNav />
       </aside>
     </div>

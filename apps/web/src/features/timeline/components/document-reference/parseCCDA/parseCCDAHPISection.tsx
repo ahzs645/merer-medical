@@ -79,7 +79,7 @@ export function parseCCDAHPISection(
         {({ open }) => (
           <>
             <Disclosure.Button className="mb-1 w-full rounded-md bg-gray-50 p-1 font-bold">
-              <div className="flex w-full items-center justify-between text-left">
+              <div className="flex w-full items-center justify-between text-start">
                 {extractedNote?.title || ''}{' '}
                 {extractedNote?.author ? `- ${extractedNote?.author}` : ''}
                 <ChevronRightIcon

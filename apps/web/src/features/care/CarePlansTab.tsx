@@ -418,7 +418,7 @@ function CareResourceSection({
         <h2 className="text-sm font-semibold text-gray-900">
           {sectionLabel(type)}
         </h2>
-        <span className="ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+        <span className="ms-auto rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
           {items.length}
         </span>
       </div>

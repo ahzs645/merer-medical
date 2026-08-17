@@ -69,10 +69,10 @@ export function TerminologySuggestions({
           key={`${entry.system}:${entry.code}`}
           type="button"
           onClick={() => onSelect(entry)}
-          className="rounded-md border border-gray-200 px-2 py-1 text-left text-xs font-medium text-gray-700 hover:border-primary-300 hover:bg-primary-50"
+          className="rounded-md border border-gray-200 px-2 py-1 text-start text-xs font-medium text-gray-700 hover:border-primary-300 hover:bg-primary-50"
         >
           <span className="font-semibold">{entry.display}</span>
-          <span className="ml-1 text-gray-500">
+          <span className="ms-1 text-gray-500">
             {entry.source} {entry.code}
           </span>
         </button>
@@ -142,7 +142,7 @@ export function TerminologyCombobox({
               type="button"
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => onSelect(entry)}
-              className="block w-full px-3 py-2 text-left text-xs hover:bg-primary-50"
+              className="block w-full px-3 py-2 text-start text-xs hover:bg-primary-50"
             >
               <span className="block font-semibold text-gray-900">
                 {entry.display}
@@ -177,11 +177,9 @@ export function UnitInput({
             value: unitOption,
             label: unitOption,
           })),
-          ...(!units.includes(value) && value
-            ? [{ value, label: value }]
-            : []),
+          ...(!units.includes(value) && value ? [{ value, label: value }] : []),
         ]}
-        buttonClassName="min-h-[34px] py-1.5 pl-2 text-sm"
+        buttonClassName="min-h-[34px] py-1.5 ps-2 text-sm"
       />
     );
   }

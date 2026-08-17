@@ -49,8 +49,8 @@ export function DeveloperSettingsGroup() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200">
-              <th className="pb-2 text-left font-medium">Variable</th>
-              <th className="pb-2 text-left font-medium">Value</th>
+              <th className="pb-2 text-start font-medium">Variable</th>
+              <th className="pb-2 text-start font-medium">Value</th>
             </tr>
           </thead>
           <tbody>
@@ -73,9 +73,9 @@ export function DeveloperSettingsGroup() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200">
-              <th className="pb-2 text-left font-medium">Variable</th>
-              <th className="pb-2 text-left font-medium">Status</th>
-              <th className="pb-2 text-left font-medium">Value</th>
+              <th className="pb-2 text-start font-medium">Variable</th>
+              <th className="pb-2 text-start font-medium">Status</th>
+              <th className="pb-2 text-start font-medium">Value</th>
             </tr>
           </thead>
           <tbody>

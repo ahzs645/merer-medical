@@ -4,6 +4,7 @@ import { useLocalConfig } from '../../../../app/providers/LocalConfigProvider';
 import { useVectorSyncStatus } from '../../../vectors/providers/VectorGeneratorSyncInitializer';
 import { TimelineRecordTypeFilter } from '../../types';
 import { StylizedSelect } from '../../../../shared/components/StylizedSelect';
+import { useInterfaceLanguage } from '../../../../app/providers/InterfaceLanguageProvider';
 
 const recordTypeOptions: {
   value: TimelineRecordTypeFilter;
@@ -33,7 +34,7 @@ const recordTypeOptions: {
 
 function LoadingSpinner({ tailwindColor }: { tailwindColor?: string }) {
   return (
-    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+    <div className="absolute inset-y-0 end-0 flex items-center pe-3">
       <svg
         className={`animate-spin h-5 w-5 ${tailwindColor ? tailwindColor : 'text-gray-500'}`}
         xmlns="http://www.w3.org/2000/svg"
@@ -72,23 +73,34 @@ export function SearchBar({
   setTypeFilter: (filter: TimelineRecordTypeFilter) => void;
 }) {
   const { experimental__use_openai_rag } = useLocalConfig();
+  const { t } = useInterfaceLanguage();
   const vectorSyncStatus = useVectorSyncStatus();
   const isVectorSearchEnabled =
     experimental__use_openai_rag && vectorSyncStatus === 'COMPLETE';
 
+  // Through `t()` rather than as bare literals: the runtime DOM pass does
+  // translate a `placeholder`, but only against a dictionary entry, and the
+  // coverage spec only scans files that call `t()` — so a literal here was
+  // invisible to both. The Timeline's search box was the one control on an
+  // Arabic phone still labelled in English.
   const placeholder = useMemo(() => {
     if (experimental__use_openai_rag && vectorSyncStatus === 'IN_PROGRESS') {
-      return 'Search your records (AI search preparing...)';
+      return t('Search your records (AI search preparing...)');
     }
     return isVectorSearchEnabled
-      ? '✨ Search your records with AI'
-      : 'Search your medical records';
-  }, [experimental__use_openai_rag, vectorSyncStatus, isVectorSearchEnabled]);
+      ? t('✨ Search your records with AI')
+      : t('Search your medical records');
+  }, [
+    experimental__use_openai_rag,
+    vectorSyncStatus,
+    isVectorSearchEnabled,
+    t,
+  ]);
 
   return (
     <div className="mb-3 mt-4 flex w-full flex-col gap-2 sm:mt-6 sm:flex-row">
       <div className="relative flex flex-1 items-center">
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+        <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
           <svg
             aria-hidden="true"
             className="h-5 w-5 text-gray-800 dark:text-gray-700"
@@ -117,7 +129,7 @@ export function SearchBar({
               placeholder={placeholder}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className={`border-transparent border-0 focus:border-transparent focus:ring-0 outline-none transition-colors block h-11 w-full rounded-md pl-10 pr-10 shadow-sm sm:text-sm`}
+              className={`border-transparent border-0 focus:border-transparent focus:ring-0 outline-none transition-colors block h-11 w-full rounded-md ps-10 pe-10 shadow-sm sm:text-sm`}
             />
             {status === QueryStatus.LOADING && (
               <LoadingSpinner tailwindColor="text-indigo-400" />
@@ -135,7 +147,7 @@ export function SearchBar({
               placeholder={placeholder}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className={`focus:border-primary-500 focus:ring-primary-500 transition-colors block h-11 w-full rounded-md border-gray-300 pl-10 pr-10 shadow-sm sm:text-sm`}
+              className={`focus:border-primary-500 focus:ring-primary-500 transition-colors block h-11 w-full rounded-md border-gray-300 ps-10 pe-10 shadow-sm sm:text-sm`}
             />
             {status === QueryStatus.LOADING && <LoadingSpinner />}
           </div>

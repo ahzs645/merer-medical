@@ -13,7 +13,7 @@ export function ExperimentalBanner() {
   return (
     <div
       style={bannerStyle}
-      className={`absolute top-0 left-0 bg-[backdrop-filter:var(--tw-backdrop-blur)] w-full text-indigo-700 text-xs sm:text-sm font-bold p-1 px-2 bg-opacity-40 text-center`}
+      className={`absolute top-0 start-0 bg-[backdrop-filter:var(--tw-backdrop-blur)] w-full text-indigo-700 text-xs sm:text-sm font-bold p-1 px-2 bg-opacity-40 text-center`}
     >
       Experimental
     </div>

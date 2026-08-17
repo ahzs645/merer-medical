@@ -124,14 +124,14 @@ function NotificationRenderer(
                       />
                     )}
                   </div>
-                  <div className="ml-3 w-0 flex-1">
+                  <div className="ms-3 w-0 flex-1">
                     {props.data.message && (
                       <p className="text-sm font-medium text-gray-900">
                         {props.data.message}
                       </p>
                     )}
                   </div>
-                  <div className="-mr-2 -my-2 ml-2 flex flex-shrink-0">
+                  <div className="-me-2 -my-2 ms-2 flex flex-shrink-0">
                     <button
                       type="button"
                       // Sized to the 44px touch minimum: the icon stays 20px but

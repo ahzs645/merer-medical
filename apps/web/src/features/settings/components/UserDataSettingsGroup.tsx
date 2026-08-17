@@ -198,12 +198,20 @@ export function UserDataSettingsGroup() {
         const extra = unknownTables.length
           ? ` (skipped: ${unknownTables.join(', ')})`
           : '';
+        // A merge only adds clinical documents, and every record screen now
+        // refreshes from the collection itself (RecordChangeBridge), so there
+        // is nothing left for a reload to do. Replacing swaps the whole
+        // database — profile and connections included — out from under
+        // providers that read them once, so that path still restarts the app.
+        const replaced = emrpkgImportMode === 'replace';
         notifyDispatch({
           type: 'set_notification',
-          message: `Imported ${total} records${extra}. Reloading…`,
+          message: `Imported ${total} records${extra}.${
+            replaced ? ' Reloading…' : ''
+          }`,
           variant: 'success',
         });
-        setTimeout(() => window.location.reload(), 1500);
+        if (replaced) setTimeout(() => window.location.reload(), 1500);
       } catch (e) {
         notifyDispatch({
           type: 'set_notification',
@@ -316,7 +324,7 @@ export function UserDataSettingsGroup() {
           {!fileDownloadLink ? (
             <button
               type="button"
-              className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+              className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 relative ms-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
               onClick={() => {
                 exportData(db, setFileDownloadLink).then((link) => {
                   if (link) {
@@ -330,7 +338,7 @@ export function UserDataSettingsGroup() {
           ) : (
             <a
               type="button"
-              className="bg-green-600 hover:bg-green-700 focus:ring-green-500 relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+              className="bg-green-600 hover:bg-green-700 focus:ring-green-500 relative ms-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
               ref={clickDownloadRef}
               target="_blank"
               rel="noreferrer"
@@ -356,7 +364,7 @@ export function UserDataSettingsGroup() {
             onSubmit={handleSubmit(importData)}
             className="border-0"
           >
-            <label className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-bold  text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2">
+            <label className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 relative ms-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent px-4 py-2 text-sm font-bold  text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2">
               {importButtonText}
               <input
                 type="file"
@@ -377,11 +385,11 @@ export function UserDataSettingsGroup() {
               <button
                 type="submit"
                 disabled={backupInProgress}
-                className="relative ml-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-bold text-white shadow-sm  hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-700"
+                className="relative ms-4 inline-flex flex-shrink-0 cursor-pointer items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-bold text-white shadow-sm  hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-700"
               >
                 {backupInProgress ? (
                   <>
-                    <p className="pr-2">{t('Importing')}</p>
+                    <p className="pe-2">{t('Importing')}</p>
                     <ButtonLoadingSpinner />
                   </>
                 ) : (
@@ -409,7 +417,7 @@ export function UserDataSettingsGroup() {
             <label className="inline-flex min-h-[44px] items-center text-sm text-gray-800">
               <input
                 type="checkbox"
-                className="text-primary-600 focus:ring-primary-500 mr-2 h-4 w-4 rounded border-gray-300"
+                className="text-primary-600 focus:ring-primary-500 me-2 h-4 w-4 rounded border-gray-300"
                 checked={emrpkgEncrypt}
                 onChange={(e) => setEmrpkgEncrypt(e.target.checked)}
               />
@@ -419,7 +427,7 @@ export function UserDataSettingsGroup() {
               <label className="inline-flex min-h-[44px] items-center text-sm text-gray-800">
                 <input
                   type="checkbox"
-                  className="text-primary-600 focus:ring-primary-500 mr-2 h-4 w-4 rounded border-gray-300"
+                  className="text-primary-600 focus:ring-primary-500 me-2 h-4 w-4 rounded border-gray-300"
                   checked={emrpkgUseWebauthn}
                   onChange={(e) => setEmrpkgUseWebauthn(e.target.checked)}
                 />
@@ -444,7 +452,7 @@ export function UserDataSettingsGroup() {
             >
               {emrpkgBusy ? (
                 <>
-                  <span className="pr-2">{t('Working')}</span>
+                  <span className="pe-2">{t('Working')}</span>
                   <ButtonLoadingSpinner />
                 </>
               ) : (
@@ -452,7 +460,7 @@ export function UserDataSettingsGroup() {
               )}
             </button>
             <label className="inline-flex min-h-[44px] items-center text-sm text-gray-800">
-              <span className="mr-2 font-medium">{t('Import mode')}</span>
+              <span className="me-2 font-medium">{t('Import mode')}</span>
               <StylizedSelect
                 value={emrpkgImportMode}
                 onChange={(value) =>
@@ -508,7 +516,7 @@ export function UserDataSettingsGroup() {
         </li>
         {/* Show storage usage  */}
         <li className="flex items-center py-4">
-          <div className="mr-2 flex flex-1 flex-col sm:mr-4">
+          <div className="me-2 flex flex-1 flex-col sm:me-4">
             <h2 className="text-primary-800 text-lg leading-6">
               {t('Storage usage')}
             </h2>

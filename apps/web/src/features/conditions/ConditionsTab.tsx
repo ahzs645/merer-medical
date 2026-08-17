@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { PlusIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
@@ -18,6 +18,7 @@ import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { useConditionsData } from './hooks/useConditionsData';
 import { ConditionBundle, RelatedKind } from './types';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 const KIND_LABEL: Record<RelatedKind, [string, string]> = {
   medication: ['med', 'meds'],
@@ -43,7 +44,9 @@ function conditionDetailPath(id: string): string {
 
 export function ConditionsTab() {
   const { bundles, status, error } = useConditionsData();
-  const [query, setQuery] = useState('');
+  // Search lives in the URL, so the view survives Back, can be linked, and
+  // comes back the same length it left — see useListViewParams.
+  const { query, setQuery } = useListViewParams();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

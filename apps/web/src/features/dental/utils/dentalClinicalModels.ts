@@ -2,6 +2,7 @@ import {
   DentalActionLevel,
   DentalClaimSummary,
   DentalImagingMount,
+  DentalNextAction,
   DentalPerioMeasurement,
   DentalRecallItem,
   DentalRecord,
@@ -223,6 +224,55 @@ export function buildRecallItems(records: DentalRecord[]): DentalRecallItem[] {
     }));
 }
 
+/** Where a record of each kind is read in full. */
+const ROUTE_BY_KIND: Record<string, string> = {
+  condition: '/records/dental/chart',
+  finding: '/records/dental/chart',
+  perio: '/records/dental/hygiene',
+  referral: '/records/dental/records',
+  treatmentPlan: '/records/dental/treatment',
+};
+
+function describeTeeth(record: DentalRecord): string {
+  if (record.toothNumbers.length === 0) return '';
+  if (record.toothNumbers.length === 1)
+    return `tooth ${record.toothNumbers[0]}`;
+  return `teeth ${record.toothNumbers.join(', ')}`;
+}
+
+/**
+ * The open items on the dental overview, each named as the record it is.
+ *
+ * Only records that are genuinely outstanding qualify: an active finding or
+ * condition, a perio measurement, a referral, or a treatment still marked as
+ * planned. A completed procedure is not something to do next, and neither is
+ * "you own some imaging".
+ */
+function buildNextActions(records: DentalRecord[]): DentalNextAction[] {
+  return records
+    .filter(
+      (record) =>
+        ACTIVE_KINDS.has(record.kind) || PLANNED_KINDS.has(record.kind),
+    )
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+    .map((record) => {
+      const teeth = describeTeeth(record);
+      const kindLabel = PLANNED_KINDS.has(record.kind)
+        ? 'Planned treatment'
+        : record.kind === 'perio'
+          ? 'Periodontal measurement'
+          : record.kind === 'referral'
+            ? 'Referral'
+            : 'Active finding';
+      return {
+        id: record.id,
+        label: record.title,
+        detail: [kindLabel, teeth, record.date].filter(Boolean).join(' · '),
+        to: ROUTE_BY_KIND[record.kind] ?? '/records/dental/records',
+      };
+    });
+}
+
 export function buildWorkflowContext(
   records: DentalRecord[],
   imagingCount: number,
@@ -236,29 +286,7 @@ export function buildWorkflowContext(
   const perioRecordCount = records.filter(
     (record) => record.kind === 'perio',
   ).length;
-  const nextActions: string[] = [];
-
-  if (openDentalIssues > 0) {
-    nextActions.push('Review active findings and conditions');
-  }
-  if (plannedTreatmentCount > 0) {
-    nextActions.push('Confirm planned treatment status');
-  }
-  if (perioRecordCount > 0) {
-    nextActions.push('Track periodontal measurements and maintenance');
-  }
-  if (imagingCount > 0) {
-    nextActions.push('Link imaging to tooth-specific records');
-  }
-  if (records.some((record) => record.details?.claimStatus)) {
-    nextActions.push('Review dental claims and EOBs');
-  }
-  if (records.some((record) => record.details?.recallDueDate)) {
-    nextActions.push('Confirm recall and hygiene timing');
-  }
-  if (nextActions.length === 0) {
-    nextActions.push('Add dental findings, plans, or imaging to build context');
-  }
+  const nextActions = buildNextActions(records);
 
   return {
     latestRecord: records[0],
