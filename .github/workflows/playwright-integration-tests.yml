@@ -3,16 +3,36 @@ on:
   workflow_dispatch:
   pull_request:
     branches: [main]
+    paths:
+      - "apps/api/**"
+      - "apps/web/**"
+      - "apps/web-e2e/**"
+      - "data/**"
+      - "libs/**"
+      - "packages/**"
+      - ".gitmodules"
+      - ".node-version"
+      - "nx.json"
+      - "package.json"
+      - "package-lock.json"
+      - "playwright.config.base.ts"
+      - "tsconfig.base.json"
+      - ".github/workflows/playwright-integration-tests.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
-    timeout-minutes: 60
+    timeout-minutes: 30
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
@@ -21,6 +41,8 @@ jobs:
         run: npm install -g npm@11.7.0
       - name: Install dependencies
         run: npm ci
+      - name: Verify required submodules
+        run: test -f packages/immunization-forecast/src/index.ts
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Install mkcert
@@ -32,4 +54,7 @@ jobs:
       - name: Setup api env vars
         run: cp .example.env .env
       - name: Run Playwright tests
-        run: npx nx run web-e2e:e2e
+        # The Nx serve target starts the API and web app in parallel. Keep a
+        # command-level ceiling below the job timeout so a failed child server
+        # cannot leave its sibling holding the runner indefinitely.
+        run: timeout 1200 npx nx run web-e2e:e2e
