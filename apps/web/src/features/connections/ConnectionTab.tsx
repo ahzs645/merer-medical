@@ -33,6 +33,7 @@ import { useUserPreferences } from '../../app/providers/UserPreferencesProvider'
 import { useIntegrationStatus } from '../sources/integrationStatus';
 import { IntegrationStatusPanel } from '../sources/components/IntegrationStatusPanel';
 import { ImportRecordsPanel } from '../sources/components/ImportRecordsPanel';
+import { SharedPackagePanel } from '../sources/components/SharedPackagePanel';
 import {
   PendingConnection,
   PreflightConnectModal,
@@ -200,6 +201,11 @@ const ConnectionTab: React.FC = () => {
   return (
     <AppPage banner={<GenericBanner text={t('Sources')} />}>
       <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pb-20 pt-6 sm:px-6 sm:pb-6 lg:px-8">
+        {/* Above everything, not down beside the file picker. Someone arriving
+            on a shared link came for this one decision, and on a phone the
+            import card is four sections and a scroll away. */}
+        <SharedPackagePanel />
+
         <div className="mb-6">
           <p className="text-sm font-medium text-gray-600">
             {t(

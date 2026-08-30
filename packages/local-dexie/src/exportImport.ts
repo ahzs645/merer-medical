@@ -232,12 +232,23 @@ export async function unpackEmrpkg(
 
 /** Quick header-only inspection: tells you if a buffer is encrypted and the
  * format version, without decrypting or parsing tables. */
+/**
+ * What a package says about itself, without importing it.
+ *
+ * `counts` and `tables` are only readable on an unencrypted package — the
+ * manifest lives inside the ciphertext otherwise. They are what lets a caller
+ * show someone what they are about to take into their record before they take
+ * it, which matters most when the package did not arrive as a file they chose
+ * but as a link somebody sent them.
+ */
 export async function inspectEmrpkg(bytes: Uint8Array): Promise<{
   encrypted: boolean;
   formatVersion: number;
   appVersion?: string;
   createdAt?: number;
   kdf?: EnvelopeHeader['kdf'];
+  counts?: Record<string, number>;
+  tables?: string[];
 }> {
   if (isEnvelopeBytes(bytes)) {
     try {
@@ -261,6 +272,8 @@ export async function inspectEmrpkg(bytes: Uint8Array): Promise<{
       formatVersion: manifest.version,
       appVersion: manifest.app?.version,
       createdAt: manifest.createdAt,
+      counts: manifest.counts,
+      tables: manifest.tables,
     };
   } catch {
     return { encrypted: false, formatVersion: 0 };
