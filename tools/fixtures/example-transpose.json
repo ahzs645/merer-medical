@@ -1,0 +1,236 @@
+{
+  "_comment": "A synthetic example exercising every section of the clinical transpose format. Invented data, no real patient. Build it with: node tools/transpose.mjs build tools/fixtures/example-transpose.json --output /tmp/example.emrpkg --profile-id example",
+
+  "subject": {
+    "dateOfBirth": "1970-04-12",
+    "sex": "female"
+  },
+
+  "audit": {
+    "sourceDocument": "example-clinic-letter.pdf",
+    "sourceDescription": "Synthetic two-page clinic letter used as a format example",
+    "author": "Dr Example, Example Clinic",
+    "encounterDate": "2026-02-14",
+    "transposedBy": "transpose-clinical-document skill",
+    "interpretations": [
+      "Dates in the source are DD/MM/YYYY; '14/02/2026' is read as 2026-02-14.",
+      "The single 'Bloods' table is split into the panels the letter's commentary names."
+    ]
+  },
+
+  "clinicalEncounters": [
+    {
+      "id": "visit-2026-02-14",
+      "title": "Annual review",
+      "encounterDate": "2026-02-14",
+      "provider": "Dr Example, Example Clinic",
+      "sourceImage": "example-clinic-letter.pdf",
+      "sections": [
+        {
+          "title": "Recommendations",
+          "items": [
+            "Continue current medication.",
+            "Repeat bloods in 12 months."
+          ]
+        },
+        {
+          "title": "Medications & Allergies",
+          "items": ["Allergies (if any): No Known Allergies."]
+        }
+      ]
+    }
+  ],
+
+  "vitals": [
+    {
+      "id": "vitals-2026-02-14",
+      "title": "Clinic vital signs",
+      "recordedAt": "2026-02-14",
+      "provider": "Example Clinic",
+      "sourceImage": "example-clinic-letter.pdf",
+      "measurements": [
+        {
+          "id": "bp",
+          "name": "Blood pressure",
+          "position": "Sitting",
+          "components": [
+            {
+              "name": "Systolic blood pressure",
+              "value": "118",
+              "unit": "mmHg"
+            },
+            {
+              "name": "Diastolic blood pressure",
+              "value": "74",
+              "unit": "mmHg"
+            }
+          ]
+        },
+        {
+          "id": "weight",
+          "name": "Body weight",
+          "value": "64.2",
+          "unit": "kg"
+        },
+        { "id": "height", "name": "Body height", "value": "1.66", "unit": "m" },
+        {
+          "id": "bmi",
+          "name": "Body mass index",
+          "value": "23.3",
+          "unit": "kg/m2"
+        }
+      ]
+    }
+  ],
+
+  "labPanels": [
+    {
+      "id": "fbc-2026-02-14",
+      "title": "Full Blood Count",
+      "collectedAt": "2026-02-14",
+      "provider": "Example Clinic",
+      "sourceImage": "example-clinic-letter.pdf",
+      "note": "Doctor's comment: full blood count normal.",
+      "results": [
+        {
+          "id": "hb",
+          "name": "HAEMOGLOBIN",
+          "value": "131",
+          "unit": "g/L",
+          "originalReferenceRange": "120 - 155 g/L"
+        },
+        {
+          "id": "plt",
+          "name": "Platelets",
+          "value": "148",
+          "unit": "x10^9/L",
+          "flag": "low",
+          "originalFlag": "L",
+          "originalReferenceRange": "150 - 400 x10^9/L"
+        },
+        {
+          "id": "wbc",
+          "name": "White Cells",
+          "value": "6.10",
+          "unit": "x10^9/L",
+          "originalReferenceRange": "3.6 - 11.5 x10^9/L"
+        }
+      ]
+    },
+    {
+      "id": "urine-2026-02-14",
+      "title": "Urine analysis",
+      "collectedAt": "2026-02-14",
+      "provider": "Example Clinic",
+      "sourceImage": "example-clinic-letter.pdf",
+      "results": [
+        { "id": "u-protein", "name": "Protein", "value": "Negative" },
+        { "id": "u-blood", "name": "Blood", "value": "Negative" },
+        {
+          "id": "u-rbc",
+          "name": "Red blood cells",
+          "value": "<1",
+          "unit": "Cells/uL"
+        },
+        {
+          "id": "u-culture",
+          "name": "Urine Culture",
+          "value": "No significant growth."
+        }
+      ]
+    }
+  ],
+
+  "imagingReports": [
+    {
+      "id": "cxr-2026-02-14",
+      "title": "Chest X-ray",
+      "studyDate": "2026-02-14",
+      "provider": "Example Clinic Radiology",
+      "sourceImage": "example-clinic-letter.pdf",
+      "note": "Clear lung fields. Normal cardiac silhouette. No acute abnormality."
+    }
+  ],
+
+  "medicationPlans": [
+    {
+      "id": "meds-2026-02-14",
+      "title": "Current medication",
+      "encounterDate": "2026-02-14",
+      "provider": "Dr Example, Example Clinic",
+      "sourceImage": "example-clinic-letter.pdf",
+      "items": [
+        {
+          "id": "levothyroxine",
+          "medication": "Levothyroxine",
+          "dose": "75 mcg",
+          "route": "Oral",
+          "frequency": "Daily",
+          "status": "active"
+        },
+        {
+          "id": "vitamin-d",
+          "medication": "Vitamin D",
+          "dose": "1000 units",
+          "route": "Oral",
+          "frequency": "Daily",
+          "status": "active",
+          "note": "Over the counter."
+        }
+      ]
+    }
+  ],
+
+  "conditions": [
+    {
+      "id": "hypothyroidism",
+      "name": "Hypothyroidism",
+      "clinicalStatus": "active",
+      "verificationStatus": "confirmed",
+      "category": "Past medical history",
+      "recordedDate": "2026-02-14",
+      "sourceImage": "example-clinic-letter.pdf",
+      "note": "No onset date stated in the source."
+    }
+  ],
+
+  "procedures": [
+    {
+      "id": "appendicectomy",
+      "name": "Appendicectomy",
+      "status": "completed",
+      "category": "Past surgical history",
+      "datePrecision": "unknown",
+      "recordedDate": "2026-02-14",
+      "sourceImage": "example-clinic-letter.pdf",
+      "note": "Past Surgical History gives no date. recordedDate files it under the documenting date; performedDateTime is left unset."
+    }
+  ],
+
+  "familyHistory": [
+    {
+      "id": "mother-thyroid",
+      "relationship": "Mother",
+      "conditions": ["Thyroid disease"],
+      "recordedDate": "2026-02-14",
+      "sourceImage": "example-clinic-letter.pdf"
+    }
+  ],
+
+  "socialHistory": [
+    {
+      "id": "alcohol",
+      "topic": "Alcohol",
+      "value": "Occasional, around 4 units per week.",
+      "recordedDate": "2026-02-14",
+      "sourceImage": "example-clinic-letter.pdf"
+    },
+    {
+      "id": "smoking",
+      "topic": "Smoking",
+      "value": "Never smoked.",
+      "recordedDate": "2026-02-14",
+      "sourceImage": "example-clinic-letter.pdf"
+    }
+  ]
+}

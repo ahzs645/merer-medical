@@ -5,6 +5,146 @@ import { strToU8, zipSync } from 'fflate';
 
 const FORMAT_NAME = 'mere-emr-package';
 const FORMAT_VERSION = 1;
+
+/**
+ * Code tables live above the transposition loops on purpose. They are `const`,
+ * so they sit in the temporal dead zone until this point in module evaluation —
+ * and the loops below call `labObservationCode()` / `vitalObservationCode()`
+ * while building rows. Declared after the loops (as LAB_LOINC was), the very
+ * first lab result throws `ReferenceError: Cannot access 'LAB_LOINC' before
+ * initialization` and no package is ever written.
+ */
+
+const LAB_LOINC = {
+  // CBC
+  'white blood cells': ['6690-2', 'Leukocytes [#/volume] in Blood'],
+  'red blood cells': ['789-8', 'Erythrocytes [#/volume] in Blood'],
+  hemoglobin: ['718-7', 'Hemoglobin [Mass/volume] in Blood'],
+  hematocrit: ['4544-3', 'Hematocrit [Volume Fraction] of Blood'],
+  mcv: ['787-2', 'MCV'],
+  mch: ['785-6', 'MCH'],
+  mchc: ['786-4', 'MCHC'],
+  'rdw-cv': ['788-0', 'Erythrocyte distribution width [Ratio]'],
+  platelets: ['777-3', 'Platelets [#/volume] in Blood'],
+  pdw: ['32207-3', 'Platelet distribution width'],
+  mpv: ['32623-1', 'Platelet mean volume'],
+  neutrophils: ['770-8', 'Neutrophils/100 leukocytes'],
+  'neutrophils absolute': ['751-8', 'Neutrophils [#/volume] in Blood'],
+  eosinophils: ['713-8', 'Eosinophils/100 leukocytes'],
+  'eosinophils absolute': ['711-2', 'Eosinophils [#/volume] in Blood'],
+  basophils: ['706-2', 'Basophils/100 leukocytes'],
+  'basophils absolute': ['704-7', 'Basophils [#/volume] in Blood'],
+  lymphocytes: ['736-9', 'Lymphocytes/100 leukocytes'],
+  'lymphocytes absolute': ['731-0', 'Lymphocytes [#/volume] in Blood'],
+  monocytes: ['5905-5', 'Monocytes/100 leukocytes'],
+  'monocytes absolute': ['742-7', 'Monocytes [#/volume] in Blood'],
+  // Chemistry
+  creatinine: ['2160-0', 'Creatinine [Mass/volume] in Serum or Plasma'],
+  potassium: ['2823-3', 'Potassium [Moles/volume] in Serum or Plasma'],
+  sodium: ['2951-2', 'Sodium [Moles/volume] in Serum or Plasma'],
+  chloride: ['2075-0', 'Chloride [Moles/volume] in Serum or Plasma'],
+  co2: ['2028-9', 'Carbon dioxide, total [Moles/volume] in Serum or Plasma'],
+  urea: ['22664-7', 'Urea [Moles/volume] in Serum or Plasma'],
+  'anion gap': ['33037-3', 'Anion gap in Serum or Plasma'],
+  'egfr (ckd-epi)': ['62238-1', 'GFR/1.73 sq M.predicted'],
+  'total protein': ['2885-2', 'Protein [Mass/volume] in Serum or Plasma'],
+  albumin: ['1751-7', 'Albumin [Mass/volume] in Serum or Plasma'],
+  glucose: ['2345-7', 'Glucose [Mass/volume] in Serum or Plasma'],
+  calcium: ['17861-6', 'Calcium [Mass/volume] in Serum or Plasma'],
+  magnesium: ['19123-9', 'Magnesium [Mass/volume] in Serum or Plasma'],
+  'uric acid': ['3084-1', 'Urate [Mass/volume] in Serum or Plasma'],
+  ferritin: ['2276-4', 'Ferritin [Mass/volume] in Serum or Plasma'],
+  iron: ['2498-4', 'Iron [Mass/volume] in Serum or Plasma'],
+  'alt/gpt': ['1742-6', 'Alanine aminotransferase'],
+  'ast/got': ['1920-8', 'Aspartate aminotransferase'],
+  'alkaline phosphatase': ['6768-6', 'Alkaline phosphatase'],
+  ggt: ['2324-2', 'Gamma glutamyl transferase'],
+  'pancreatic amylase': ['1798-8', 'Amylase'],
+  'bilirubin total': ['1975-2', 'Bilirubin.total'],
+  'bilirubin direct': ['1968-7', 'Bilirubin.direct'],
+  'bilirubin indirect': ['1971-1', 'Bilirubin.indirect'],
+  'c-reactive protein': ['1988-5', 'C reactive protein'],
+  // Lipids
+  'total cholesterol': ['2093-3', 'Cholesterol [Mass/volume]'],
+  'hdl cholesterol': ['2085-9', 'Cholesterol in HDL'],
+  'ldl cholesterol': ['13457-7', 'Cholesterol in LDL (calc)'],
+  triglycerides: ['2571-8', 'Triglyceride [Mass/volume]'],
+  triacylglycerol: ['2571-8', 'Triglyceride [Mass/volume]'],
+  'non-hdl cholesterol': ['43396-1', 'Cholesterol non HDL [Mass/volume]'],
+  // Diabetes
+  'glycated hemoglobin hba1c': ['4548-4', 'Hemoglobin A1c/Hemoglobin.total'],
+  'glycated hemoglobin (hba1c)': ['4548-4', 'Hemoglobin A1c/Hemoglobin.total'],
+  insulin: ['20448-7', 'Insulin [Units/volume] in Serum or Plasma'],
+  'c-peptide': ['1986-9', 'C peptide [Mass/volume] in Serum or Plasma'],
+  'c - peptide': ['1986-9', 'C peptide [Mass/volume] in Serum or Plasma'],
+  // Vitamins / hormones
+  'vitamin b12': ['2132-9', 'Cobalamin (Vitamin B12)'],
+  'cyanocobalamine (vitamin b12)': ['2132-9', 'Cobalamin (Vitamin B12)'],
+  '25-hydroxyvitamin d': ['1989-3', '25-hydroxyvitamin D'],
+  tsh: ['3016-3', 'Thyrotropin [Units/volume] in Serum or Plasma'],
+  'thyroid stimulating hormone (tsh)': ['3016-3', 'Thyrotropin'],
+  'thyroid stimulating hormone': ['3016-3', 'Thyrotropin'],
+  'free thyroxine (ft4)': ['3024-7', 'Thyroxine (T4) free'],
+  'free thyroxine': ['3024-7', 'Thyroxine (T4) free'],
+  'free triiodothyronine (ft3)': ['3051-0', 'Triiodothyronine (T3) free'],
+  'free triiodothyronine': ['3051-0', 'Triiodothyronine (T3) free'],
+  estradiol: ['2243-4', 'Estradiol (E2)'],
+  prolactin: ['2842-3', 'Prolactin'],
+  'total testosterone': ['2986-8', 'Testosterone'],
+  'follicle - stimulating hormone (fsh)': ['15067-2', 'Follitropin (FSH)'],
+  'follicle-stimulating hormone (fsh)': ['15067-2', 'Follitropin (FSH)'],
+  'luteinizing hormone (lh)': ['10501-5', 'Lutropin (LH)'],
+  'luteinizing hormone': ['10501-5', 'Lutropin (LH)'],
+  'anti-thyroid peroxidase antibodies': ['8099-8', 'Thyroid peroxidase Ab'],
+  // Coagulation
+  inr: ['6301-6', 'INR in Platelet poor plasma'],
+  'quick index': ['5894-1', 'Prothrombin time (Quick)'],
+  'prothrombin time': ['5902-2', 'Prothrombin time (PT)'],
+  'activated partial thromboplastin time aptt': ['3173-2', 'aPTT'],
+  'activated partial thromboplastin time (aptt)': ['3173-2', 'aPTT'],
+  fibrinogen: ['3255-7', 'Fibrinogen [Mass/volume]'],
+  'thrombin time': ['3243-3', 'Thrombin time'],
+  // Tumour markers
+  'alpha-fetoprotein afp': ['1834-1', 'Alpha-1-Fetoprotein'],
+  'alpha-fetoprotein (afp)': ['1834-1', 'Alpha-1-Fetoprotein'],
+  'carcinoembryonic antigen cea': ['2039-6', 'Carcinoembryonic Ag'],
+  'carcinoembryonic antigen (cea)': ['2039-6', 'Carcinoembryonic Ag'],
+  'prostate-specific antigen total': ['2857-1', 'PSA [Mass/volume]'],
+  'prostate specific antigen total psa': ['2857-1', 'PSA [Mass/volume]'],
+  'prostate-specific antigen free': ['10886-0', 'PSA Free [Mass/volume]'],
+  'index of free psa': ['12841-3', 'PSA Free/PSA total'],
+  // Blood group
+  'blood type': ['883-9', 'ABO group'],
+  'rhesus (d)': ['10331-7', 'Rh type'],
+  // Urinalysis
+  'urine color': ['5778-6', 'Color of Urine'],
+  color: ['5778-6', 'Color of Urine'],
+  'urine specific gravity': ['5811-5', 'Specific gravity of Urine'],
+  'specific gravity': ['5811-5', 'Specific gravity of Urine'],
+  'reaction (ph)': ['5803-2', 'pH of Urine'],
+  ketones: ['5797-6', 'Ketones [Mass/volume] in Urine'],
+  urobilinogen: ['5818-0', 'Urobilinogen [Mass/volume] in Urine'],
+  nitrite: ['5802-4', 'Nitrite [Presence] in Urine'],
+};
+
+const VITAL_LOINC = {
+  'blood pressure': ['85354-9', 'Blood pressure panel'],
+  'systolic blood pressure': ['8480-6', 'Systolic blood pressure'],
+  'diastolic blood pressure': ['8462-4', 'Diastolic blood pressure'],
+  'heart rate': ['8867-4', 'Heart rate'],
+  pulse: ['8867-4', 'Heart rate'],
+  'respiratory rate': ['9279-1', 'Respiratory rate'],
+  'body temperature': ['8310-5', 'Body temperature'],
+  temperature: ['8310-5', 'Body temperature'],
+  'oxygen saturation': ['2708-6', 'Oxygen saturation in Arterial blood'],
+  spo2: ['2708-6', 'Oxygen saturation in Arterial blood'],
+  'body weight': ['29463-7', 'Body weight'],
+  weight: ['29463-7', 'Body weight'],
+  'body height': ['8302-2', 'Body height'],
+  height: ['8302-2', 'Body height'],
+  'body mass index': ['39156-5', 'Body mass index (BMI) [Ratio]'],
+  bmi: ['39156-5', 'Body mass index (BMI) [Ratio]'],
+};
 const args = parseArgs(process.argv.slice(2));
 
 if (!args.source || !args.output) {
@@ -13,7 +153,8 @@ if (!args.source || !args.output) {
     --source /path/to/medicalRecords.json \\
     --output /path/to/profile.emrpkg \\
     [--assets-dir /path/to/source/files] \\
-    [--first-name First] [--last-name Last] [--profile-id stable-id]
+    [--first-name First] [--last-name Last] [--profile-id stable-id] \\
+    [--app-version label]
 
 This tool reads a local medicalRecords.json file and writes a Mere .emrpkg.
 It does not contain patient data unless you explicitly pass a source file.`);
@@ -784,6 +925,148 @@ for (const social of records.socialHistory || []) {
   );
 }
 
+for (const panel of records.vitals || []) {
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: panel.sourceImage,
+    date: panel.recordedAt,
+    title: panel.title || 'Vital signs',
+    provider: panel.provider,
+    audit: panel.audit,
+  });
+  for (const measure of panel.measurements || []) {
+    const vitalId = stableId(`vital-${panel.id}-${measure.id}`);
+    const vital = vitalObservationCode(measure.name);
+    clinicalDocuments.push(
+      clinicalDocument({
+        id: vitalId,
+        resourceType: 'observation',
+        date: measure.recordedAt || panel.recordedAt,
+        displayName: vital?.display || measure.name,
+        raw: {
+          fullUrl: `manual:${vitalId}`,
+          manual_kind: 'vital',
+          source_panel_id: panel.id,
+          source_image: measure.sourceImage || panel.sourceImage,
+          audit: panel.audit,
+          resource: {
+            resourceType: 'Observation',
+            id: vitalId,
+            status: 'final',
+            category: {
+              text: 'Vital signs',
+              coding: [
+                {
+                  system:
+                    'http://terminology.hl7.org/CodeSystem/observation-category',
+                  code: 'vital-signs',
+                  display: 'Vital Signs',
+                },
+              ],
+            },
+            code: vital
+              ? {
+                  text: vital.display,
+                  coding: [
+                    { system: 'http://loinc.org', code: vital.code, display: vital.display },
+                  ],
+                }
+              : { text: measure.name },
+            effectiveDateTime: atNoon(measure.recordedAt || panel.recordedAt),
+            issued: atNoon(measure.recordedAt || panel.recordedAt),
+            ...observationValue(measure.value, measure.unit),
+            component: buildVitalComponents(measure),
+            bodySite: measure.bodySite ? { text: measure.bodySite } : undefined,
+            method: measure.method ? { text: measure.method } : undefined,
+            referenceRange: buildReferenceRange(measure),
+            interpretation:
+              measure.flag && measure.flag !== 'identity'
+                ? { text: measure.flag }
+                : undefined,
+            note: buildNotes([
+              panel.provider ? `Provider: ${panel.provider}` : undefined,
+              measure.position ? `Position: ${measure.position}` : undefined,
+              measure.note,
+              sourceDocument
+                ? `Source document: ${sourceDocument.documentReferenceId}`
+                : undefined,
+            ]),
+          },
+        },
+        metadata: {
+          manual_specialty: 'vitals',
+          source_panel_id: panel.id,
+          source_result_id: measure.id,
+          loinc_coding: vital ? [vital.code] : [],
+          manual_uncoded: !vital,
+          ...sourceMeta(sourceDocument),
+        },
+      }),
+    );
+  }
+}
+
+for (const procedure of records.procedures || []) {
+  const procedureId = stableId(`procedure-${procedure.id}`);
+  // A surgical history line often gives no date at all. Falling through to
+  // `atNoon(undefined)` would stamp it 1970-01-01 and open a phantom decade at
+  // the foot of the timeline, so an undated procedure is filed on the date it
+  // was written down instead; `performedDateTime` below stays unset, which is
+  // what actually says "we do not know when this happened".
+  const procedureDate =
+    procedure.performedDate || procedure.date || procedure.recordedDate;
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: procedure.sourceImage,
+    date: procedureDate,
+    title: procedure.name,
+    provider: procedure.provider,
+    audit: procedure.audit,
+  });
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: procedureId,
+      resourceType: 'procedure',
+      date: procedureDate,
+      displayName: procedure.name,
+      raw: {
+        fullUrl: `manual:${procedureId}`,
+        manual_kind: 'procedure',
+        source_image: procedure.sourceImage,
+        audit: procedure.audit,
+        resource: {
+          resourceType: 'Procedure',
+          id: procedureId,
+          status: procedure.status || 'completed',
+          category: procedure.category ? { text: procedure.category } : undefined,
+          code: {
+            text: procedure.name,
+            coding: procedure.code ? [procedure.code] : undefined,
+          },
+          performedDateTime: procedure.performedDate
+            ? atNoon(procedure.performedDate)
+            : undefined,
+          bodySite: procedure.bodySite ? [{ text: procedure.bodySite }] : undefined,
+          outcome: procedure.outcome ? { text: procedure.outcome } : undefined,
+          performer: procedure.provider
+            ? [{ actor: { display: procedure.provider } }]
+            : undefined,
+          note: buildNotes([
+            procedure.provider ? `Provider: ${procedure.provider}` : undefined,
+            procedure.laterality ? `Laterality: ${procedure.laterality}` : undefined,
+            procedure.datePrecision === 'unknown'
+              ? 'Date not stated in the source document'
+              : undefined,
+            procedure.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+      metadata: { ...sourceMeta(sourceDocument) },
+    }),
+  );
+}
+
 function getOrCreateSourceDocument({ sourceImage, date, title, provider, audit }) {
   if (!sourceImage) return undefined;
 
@@ -914,7 +1197,7 @@ files['manifest.json'] = strToU8(
       format: FORMAT_NAME,
       version: FORMAT_VERSION,
       createdAt: now,
-      app: { name: 'mere-medical', version: 'diabetes-record-transpose' },
+      app: { name: 'mere-medical', version: args.appVersion || 'diabetes-record-transpose' },
       schema: { version: 1 },
       tables: Object.keys(tables),
       counts,
@@ -1318,123 +1601,45 @@ function parseSemiQuantitativeValue(value, unit) {
 // Curated analyte name -> LOINC map. Codes only need to be stable and shared
 // across same-analyte results so the app can group a measure's history and draw
 // trends; standard LOINC codes are used where well established.
-const LAB_LOINC = {
-  // CBC
-  'white blood cells': ['6690-2', 'Leukocytes [#/volume] in Blood'],
-  'red blood cells': ['789-8', 'Erythrocytes [#/volume] in Blood'],
-  hemoglobin: ['718-7', 'Hemoglobin [Mass/volume] in Blood'],
-  hematocrit: ['4544-3', 'Hematocrit [Volume Fraction] of Blood'],
-  mcv: ['787-2', 'MCV'],
-  mch: ['785-6', 'MCH'],
-  mchc: ['786-4', 'MCHC'],
-  'rdw-cv': ['788-0', 'Erythrocyte distribution width [Ratio]'],
-  platelets: ['777-3', 'Platelets [#/volume] in Blood'],
-  pdw: ['32207-3', 'Platelet distribution width'],
-  mpv: ['32623-1', 'Platelet mean volume'],
-  neutrophils: ['770-8', 'Neutrophils/100 leukocytes'],
-  'neutrophils absolute': ['751-8', 'Neutrophils [#/volume] in Blood'],
-  eosinophils: ['713-8', 'Eosinophils/100 leukocytes'],
-  'eosinophils absolute': ['711-2', 'Eosinophils [#/volume] in Blood'],
-  basophils: ['706-2', 'Basophils/100 leukocytes'],
-  'basophils absolute': ['704-7', 'Basophils [#/volume] in Blood'],
-  lymphocytes: ['736-9', 'Lymphocytes/100 leukocytes'],
-  'lymphocytes absolute': ['731-0', 'Lymphocytes [#/volume] in Blood'],
-  monocytes: ['5905-5', 'Monocytes/100 leukocytes'],
-  'monocytes absolute': ['742-7', 'Monocytes [#/volume] in Blood'],
-  // Chemistry
-  creatinine: ['2160-0', 'Creatinine [Mass/volume] in Serum or Plasma'],
-  potassium: ['2823-3', 'Potassium [Moles/volume] in Serum or Plasma'],
-  sodium: ['2951-2', 'Sodium [Moles/volume] in Serum or Plasma'],
-  chloride: ['2075-0', 'Chloride [Moles/volume] in Serum or Plasma'],
-  co2: ['2028-9', 'Carbon dioxide, total [Moles/volume] in Serum or Plasma'],
-  urea: ['22664-7', 'Urea [Moles/volume] in Serum or Plasma'],
-  'anion gap': ['33037-3', 'Anion gap in Serum or Plasma'],
-  'egfr (ckd-epi)': ['62238-1', 'GFR/1.73 sq M.predicted'],
-  'total protein': ['2885-2', 'Protein [Mass/volume] in Serum or Plasma'],
-  albumin: ['1751-7', 'Albumin [Mass/volume] in Serum or Plasma'],
-  glucose: ['2345-7', 'Glucose [Mass/volume] in Serum or Plasma'],
-  calcium: ['17861-6', 'Calcium [Mass/volume] in Serum or Plasma'],
-  magnesium: ['19123-9', 'Magnesium [Mass/volume] in Serum or Plasma'],
-  'uric acid': ['3084-1', 'Urate [Mass/volume] in Serum or Plasma'],
-  ferritin: ['2276-4', 'Ferritin [Mass/volume] in Serum or Plasma'],
-  iron: ['2498-4', 'Iron [Mass/volume] in Serum or Plasma'],
-  'alt/gpt': ['1742-6', 'Alanine aminotransferase'],
-  'ast/got': ['1920-8', 'Aspartate aminotransferase'],
-  'alkaline phosphatase': ['6768-6', 'Alkaline phosphatase'],
-  ggt: ['2324-2', 'Gamma glutamyl transferase'],
-  'pancreatic amylase': ['1798-8', 'Amylase'],
-  'bilirubin total': ['1975-2', 'Bilirubin.total'],
-  'bilirubin direct': ['1968-7', 'Bilirubin.direct'],
-  'bilirubin indirect': ['1971-1', 'Bilirubin.indirect'],
-  'c-reactive protein': ['1988-5', 'C reactive protein'],
-  // Lipids
-  'total cholesterol': ['2093-3', 'Cholesterol [Mass/volume]'],
-  'hdl cholesterol': ['2085-9', 'Cholesterol in HDL'],
-  'ldl cholesterol': ['13457-7', 'Cholesterol in LDL (calc)'],
-  triglycerides: ['2571-8', 'Triglyceride [Mass/volume]'],
-  triacylglycerol: ['2571-8', 'Triglyceride [Mass/volume]'],
-  'non-hdl cholesterol': ['43396-1', 'Cholesterol non HDL [Mass/volume]'],
-  // Diabetes
-  'glycated hemoglobin hba1c': ['4548-4', 'Hemoglobin A1c/Hemoglobin.total'],
-  'glycated hemoglobin (hba1c)': ['4548-4', 'Hemoglobin A1c/Hemoglobin.total'],
-  insulin: ['20448-7', 'Insulin [Units/volume] in Serum or Plasma'],
-  'c-peptide': ['1986-9', 'C peptide [Mass/volume] in Serum or Plasma'],
-  'c - peptide': ['1986-9', 'C peptide [Mass/volume] in Serum or Plasma'],
-  // Vitamins / hormones
-  'vitamin b12': ['2132-9', 'Cobalamin (Vitamin B12)'],
-  'cyanocobalamine (vitamin b12)': ['2132-9', 'Cobalamin (Vitamin B12)'],
-  '25-hydroxyvitamin d': ['1989-3', '25-hydroxyvitamin D'],
-  tsh: ['3016-3', 'Thyrotropin [Units/volume] in Serum or Plasma'],
-  'thyroid stimulating hormone (tsh)': ['3016-3', 'Thyrotropin'],
-  'thyroid stimulating hormone': ['3016-3', 'Thyrotropin'],
-  'free thyroxine (ft4)': ['3024-7', 'Thyroxine (T4) free'],
-  'free thyroxine': ['3024-7', 'Thyroxine (T4) free'],
-  'free triiodothyronine (ft3)': ['3051-0', 'Triiodothyronine (T3) free'],
-  'free triiodothyronine': ['3051-0', 'Triiodothyronine (T3) free'],
-  estradiol: ['2243-4', 'Estradiol (E2)'],
-  prolactin: ['2842-3', 'Prolactin'],
-  'total testosterone': ['2986-8', 'Testosterone'],
-  'follicle - stimulating hormone (fsh)': ['15067-2', 'Follitropin (FSH)'],
-  'follicle-stimulating hormone (fsh)': ['15067-2', 'Follitropin (FSH)'],
-  'luteinizing hormone (lh)': ['10501-5', 'Lutropin (LH)'],
-  'luteinizing hormone': ['10501-5', 'Lutropin (LH)'],
-  'anti-thyroid peroxidase antibodies': ['8099-8', 'Thyroid peroxidase Ab'],
-  // Coagulation
-  inr: ['6301-6', 'INR in Platelet poor plasma'],
-  'quick index': ['5894-1', 'Prothrombin time (Quick)'],
-  'prothrombin time': ['5902-2', 'Prothrombin time (PT)'],
-  'activated partial thromboplastin time aptt': ['3173-2', 'aPTT'],
-  'activated partial thromboplastin time (aptt)': ['3173-2', 'aPTT'],
-  fibrinogen: ['3255-7', 'Fibrinogen [Mass/volume]'],
-  'thrombin time': ['3243-3', 'Thrombin time'],
-  // Tumour markers
-  'alpha-fetoprotein afp': ['1834-1', 'Alpha-1-Fetoprotein'],
-  'alpha-fetoprotein (afp)': ['1834-1', 'Alpha-1-Fetoprotein'],
-  'carcinoembryonic antigen cea': ['2039-6', 'Carcinoembryonic Ag'],
-  'carcinoembryonic antigen (cea)': ['2039-6', 'Carcinoembryonic Ag'],
-  'prostate-specific antigen total': ['2857-1', 'PSA [Mass/volume]'],
-  'prostate specific antigen total psa': ['2857-1', 'PSA [Mass/volume]'],
-  'prostate-specific antigen free': ['10886-0', 'PSA Free [Mass/volume]'],
-  'index of free psa': ['12841-3', 'PSA Free/PSA total'],
-  // Blood group
-  'blood type': ['883-9', 'ABO group'],
-  'rhesus (d)': ['10331-7', 'Rh type'],
-  // Urinalysis
-  'urine color': ['5778-6', 'Color of Urine'],
-  color: ['5778-6', 'Color of Urine'],
-  'urine specific gravity': ['5811-5', 'Specific gravity of Urine'],
-  'specific gravity': ['5811-5', 'Specific gravity of Urine'],
-  'reaction (ph)': ['5803-2', 'pH of Urine'],
-  ketones: ['5797-6', 'Ketones [Mass/volume] in Urine'],
-  urobilinogen: ['5818-0', 'Urobilinogen [Mass/volume] in Urine'],
-  nitrite: ['5802-4', 'Nitrite [Presence] in Urine'],
-};
 
 function labObservationCode(name) {
   const normalized = name.toLowerCase().trim();
   const hit = LAB_LOINC[normalized];
   if (!hit) return undefined;
   return { system: 'http://loinc.org', code: hit[0], display: hit[1] };
+}
+
+
+function vitalObservationCode(name) {
+  const key = `${name || ''}`.trim().toLowerCase();
+  const hit = VITAL_LOINC[key];
+  return hit ? { code: hit[0], display: hit[1] } : undefined;
+}
+
+/**
+ * Blood pressure is one reading with two numbers, so it is stored the way FHIR
+ * stores it: a panel-coded Observation whose systolic and diastolic live in
+ * `component`. Every other vital carries its number on the Observation itself
+ * and has no components.
+ */
+function buildVitalComponents(measure) {
+  if (!Array.isArray(measure.components) || measure.components.length === 0) {
+    return undefined;
+  }
+  return measure.components.map((component) => {
+    const coded = vitalObservationCode(component.name);
+    return {
+      code: coded
+        ? {
+            text: coded.display,
+            coding: [
+              { system: 'http://loinc.org', code: coded.code, display: coded.display },
+            ],
+          }
+        : { text: component.name },
+      ...observationValue(component.value, component.unit),
+    };
+  });
 }
 
 function isDiabetesTarget(result) {
