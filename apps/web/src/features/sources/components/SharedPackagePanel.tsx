@@ -3,6 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import { ExclamationTriangleIcon, LinkIcon } from '@heroicons/react/24/outline';
 
 import { useRxDb } from '../../../app/providers/RxDbProvider';
+import {
+  useAllUsers,
+  useOptionalUser,
+  useUserManagement,
+} from '../../../app/providers/UserProvider';
+import { isUnstartedPlaceholder } from '../../../repositories/UserRepository';
 import { useNotificationDispatch } from '../../../app/providers/NotificationProvider';
 import { importEmrpkgToRxDb, inspectEmrpkg } from '../../../services/emrpkg';
 import { ButtonLoadingSpinner } from '../../connections/components/ButtonLoadingSpinner';
@@ -52,6 +58,9 @@ function describeFetchFailure(url: URL, error: unknown): string {
 
 export function SharedPackagePanel() {
   const db = useRxDb();
+  const allUsers = useAllUsers();
+  const currentUser = useOptionalUser();
+  const { removeEmptyPlaceholders } = useUserManagement();
   const notifyDispatch = useNotificationDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const raw = searchParams.get(SHARED_PACKAGE_PARAM);
@@ -146,6 +155,10 @@ export function SharedPackagePanel() {
           }`,
           variant: 'success',
         });
+        // The blank profile the app made on first boot has served its purpose
+        // once real records arrive under a patient of their own. Left alone it
+        // sits in the switcher as "Unnamed User" for good.
+        await removeEmptyPlaceholders().catch(() => 0);
         dismiss();
         if (replace) setTimeout(() => window.location.reload(), 1500);
       } catch (importError) {
@@ -158,7 +171,7 @@ export function SharedPackagePanel() {
         setImporting(false);
       }
     },
-    [db, dismiss, fetched, notifyDispatch, passphrase],
+    [db, dismiss, fetched, notifyDispatch, passphrase, removeEmptyPlaceholders],
   );
 
   if (!raw) return null;
@@ -167,6 +180,37 @@ export function SharedPackagePanel() {
   const clinical = counts?.['clinical_documents'];
   const needsPassphrase =
     fetched?.info.encrypted && fetched.info.kdf !== 'webauthn-prf';
+
+  /**
+   * A package carries its own patient. Importing additively files the records
+   * under *that* patient, so a package about someone else does not mix into the
+   * profile in use — it opens a second one and switches to it.
+   *
+   * The store already worked this way; the button did not say so. "Add to my
+   * records" is exactly wrong for a package about somebody else, and it is the
+   * reading someone would act on before handing their phone over.
+   */
+  const patient = fetched?.info.patients?.[0];
+  const knownIds = new Set(allUsers.map((u) => u.get('id')));
+  const isNewProfile = Boolean(patient && !knownIds.has(patient.id));
+  /**
+   * A device with nothing on it yet.
+   *
+   * Not `allUsers.length === 0`: the app creates a blank profile on first boot
+   * so something is always selected, so a brand-new device already has one. It
+   * is a placeholder, not a person, and treating it as one made a first-ever
+   * import announce that it was opening a "separate" profile — separate from
+   * nothing.
+   */
+  const isFirstProfile =
+    allUsers.length === 0 ||
+    !currentUser ||
+    allUsers.every((u) => isUnstartedPlaceholder(u.toMutableJSON() as never));
+  const acceptLabel = isFirstProfile
+    ? 'Open these records'
+    : isNewProfile
+      ? 'Add as a separate profile'
+      : 'Add to my records';
 
   return (
     <section className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4">
@@ -206,6 +250,21 @@ export function SharedPackagePanel() {
                 From <span className="font-medium">{fetched.origin}</span>
                 {fetched.info.appVersion ? ` · ${fetched.info.appVersion}` : ''}
               </p>
+
+              {patient?.name && (
+                <p className="mt-1 text-sm text-gray-800">
+                  Records for{' '}
+                  <span className="font-medium">{patient.name}</span>
+                </p>
+              )}
+
+              {isNewProfile && !isFirstProfile && (
+                <p className="mt-2 text-sm text-gray-700">
+                  These belong to someone who is not on this device yet, so they
+                  open as a separate profile. Nothing already here is changed,
+                  and you can switch back from Settings.
+                </p>
+              )}
 
               <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-700">
                 {typeof clinical === 'number' && (
@@ -258,7 +317,7 @@ export function SharedPackagePanel() {
                   className="bg-primary-700 hover:bg-primary-800 inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
                 >
                   {importing && <ButtonLoadingSpinner />}
-                  Add to my records
+                  {acceptLabel}
                 </button>
                 <button
                   type="button"
@@ -273,7 +332,11 @@ export function SharedPackagePanel() {
                   it discards everything already stored, and a link is the one
                   route into this app where the person pressing the button did
                   not choose the file. */}
-              <details className="mt-3">
+              {/* Only offered when the package would land on the profile in
+                  use. For a package about somebody else, adding it already
+                  leaves everything here alone, so "replace" would be an
+                  invitation to delete a record set for no reason. */}
+              <details className="mt-3" hidden={isNewProfile || isFirstProfile}>
                 <summary className="cursor-pointer text-xs text-gray-600">
                   Replace my records instead
                 </summary>

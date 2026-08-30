@@ -12,9 +12,42 @@ const mockImport = jest.fn(async () => ({
   unknownTables: [],
 }));
 const mockNotify = jest.fn();
+const mockRemovePlaceholders = jest.fn(async () => 0);
+let mockAllUsers: Array<{
+  get: (k: string) => string;
+  toMutableJSON: () => Record<string, unknown>;
+}> = [];
+let mockCurrentUser: { id: string } | undefined;
+
+function profile(id: string) {
+  return {
+    get: (key: string) => (key === 'id' ? id : ''),
+    // A real profile, not the blank one the app makes on first boot.
+    toMutableJSON: () => ({
+      id,
+      first_name: 'Existing',
+      is_default_user: false,
+    }),
+  };
+}
+
+/** The profile `createDefaultUserIfNone` puts in so something is selected. */
+function placeholder(id: string) {
+  return {
+    get: (key: string) => (key === 'id' ? id : ''),
+    toMutableJSON: () => ({ id, is_default_user: true }),
+  };
+}
 
 jest.mock('../../../app/providers/RxDbProvider', () => ({
   useRxDb: () => ({}),
+}));
+jest.mock('../../../app/providers/UserProvider', () => ({
+  useAllUsers: () => mockAllUsers,
+  useOptionalUser: () => mockCurrentUser,
+  useUserManagement: () => ({
+    removeEmptyPlaceholders: mockRemovePlaceholders,
+  }),
 }));
 jest.mock('../../../app/providers/NotificationProvider', () => ({
   useNotificationDispatch: () => mockNotify,
@@ -24,7 +57,7 @@ jest.mock('../../../services/emrpkg', () => ({
   inspectEmrpkg: jest.requireActual('@mere/local-dexie').inspectEmrpkg,
 }));
 
-function packageBytes() {
+function packageBytes(patientId = 'patient-1') {
   return zipSync({
     'manifest.json': strToU8(
       JSON.stringify({
@@ -37,6 +70,11 @@ function packageBytes() {
       }),
     ),
     'tables/clinical_documents.json': strToU8('[]'),
+    'tables/user_documents.json': strToU8(
+      JSON.stringify([
+        { id: patientId, first_name: 'Sam', last_name: 'Rivers' },
+      ]),
+    ),
   });
 }
 
@@ -54,6 +92,10 @@ describe('SharedPackagePanel', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     global.fetch = jest.fn();
+    // The package fixture's patient. An existing profile with the same id means
+    // the records belong to the person already using the app.
+    mockAllUsers = [profile('patient-1')];
+    mockCurrentUser = { id: 'patient-1' };
   });
 
   it('renders nothing without the parameter', () => {
@@ -100,6 +142,92 @@ describe('SharedPackagePanel', () => {
     await waitFor(() => expect(mockImport).toHaveBeenCalled());
     // Adding, not replacing: a link must not be able to delete a record set.
     expect(mockImport.mock.calls[0][2]).toMatchObject({ replace: false });
+  });
+
+  /**
+   * A package carries its own patient, and an additive import files records
+   * under that patient rather than the profile in use — so a package about
+   * somebody else opens a second profile. "Add to my records" was the one
+   * reading of that which is wrong, and the one someone would act on before
+   * handing over their phone.
+   */
+  it('offers a separate profile for a package about someone else', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => packageBytes('patient-2').buffer,
+    });
+    renderWith('https://example.org/records.emrpkg');
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /add as a separate profile/i }),
+      ).toBeTruthy(),
+    );
+    expect(screen.getByText('Sam Rivers')).toBeTruthy();
+    expect(screen.getByText(/open as a separate profile/i)).toBeTruthy();
+    // Replacing a record set that this import would not touch anyway.
+    expect(
+      screen.queryByText(/replace my records instead/i)?.closest('details')
+        ?.hidden,
+    ).toBe(true);
+  });
+
+  it('just opens the records when there is no profile yet', async () => {
+    mockAllUsers = [];
+    mockCurrentUser = undefined;
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => packageBytes('patient-9').buffer,
+    });
+    renderWith('https://example.org/records.emrpkg');
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /open these records/i }),
+      ).toBeTruthy(),
+    );
+  });
+
+  /**
+   * A brand-new device is not empty: the app creates a blank profile on boot so
+   * something is always selected. Counting it as a person made a first-ever
+   * import announce that it was opening a profile "separate" from nothing.
+   */
+  it('treats the blank first-boot profile as an empty device', async () => {
+    mockAllUsers = [placeholder('auto-1')];
+    mockCurrentUser = { id: 'auto-1' };
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => packageBytes('patient-7').buffer,
+    });
+    renderWith('https://example.org/records.emrpkg');
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /open these records/i }),
+      ).toBeTruthy(),
+    );
+    expect(screen.queryByText(/separate profile/i)).toBeNull();
+  });
+
+  it('clears the blank profile away once real records land', async () => {
+    mockAllUsers = [placeholder('auto-1')];
+    mockCurrentUser = { id: 'auto-1' };
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => packageBytes('patient-7').buffer,
+    });
+    renderWith('https://example.org/records.emrpkg');
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /open these records/i }),
+      ).toBeTruthy(),
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /open these records/i }),
+    );
+    await waitFor(() => expect(mockRemovePlaceholders).toHaveBeenCalled());
   });
 
   it('refuses a scheme that is not http(s)', async () => {

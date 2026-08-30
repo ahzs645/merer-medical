@@ -27,6 +27,9 @@ export const useUserRepository = () => {
         userRepo.updateUser(db, id, updates),
       switchUser: (toUserId: string) => userRepo.switchUser(db, toUserId),
       delete: (id: string) => userRepo.deleteUser(db, id),
+      countRecords: (id: string) => userRepo.countUserRecords(db, id),
+      removeEmptyPlaceholders: () =>
+        userRepo.removeEmptyPlaceholderProfiles(db),
     };
   }, [db]);
 };

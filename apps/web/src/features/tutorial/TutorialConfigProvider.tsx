@@ -31,7 +31,37 @@ const defaultTutorialLocalStorage: TutorialLocalStorage = {
   [TutorialLocalStorageKeys.COMPLETE]: false,
 };
 
+/**
+ * Landing on a shared package is not a first run to be walked through.
+ *
+ * Someone who followed a link came to look at one specific thing, and the
+ * welcome carousel stands between them and it — on a phone, in front of it. So
+ * the tour is marked done when the app opens on a package link, and the person
+ * lands on the offer itself. Nothing else about the app is skipped; the tour is
+ * only ever an introduction.
+ */
+function arrivedOnASharedPackage(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return new URLSearchParams(window.location.search).has('package');
+  } catch {
+    return false;
+  }
+}
+
+const skippedTutorial: TutorialLocalStorage = {
+  [TutorialLocalStorageKeys.WELCOME_SCREEN]: false,
+  [TutorialLocalStorageKeys.INSTALL_PWA]: false,
+  [TutorialLocalStorageKeys.ADD_A_CONNECTION]: false,
+  [TutorialLocalStorageKeys.COMPLETE]: true,
+};
+
 function getTutorialLocalStorage(): TutorialLocalStorage {
+  if (arrivedOnASharedPackage()) {
+    localStorage.setItem('tutorial_config', JSON.stringify(skippedTutorial));
+    return skippedTutorial;
+  }
+
   const tutorialConfig = localStorage.getItem('tutorial_config');
   if (tutorialConfig) {
     const parsedConfig = JSON.parse(tutorialConfig);
