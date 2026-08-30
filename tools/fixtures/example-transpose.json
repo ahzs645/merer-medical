@@ -1,14 +1,16 @@
 {
   "_comment": "A synthetic example exercising every section of the clinical transpose format. Invented data, no real patient. Build it with: node tools/transpose.mjs build tools/fixtures/example-transpose.json --output /tmp/example.emrpkg --profile-id example",
-
   "subject": {
     "dateOfBirth": "1970-04-12",
     "sex": "female"
   },
-
   "audit": {
     "sourceDocument": "example-clinic-letter.pdf",
     "sourceDescription": "Synthetic two-page clinic letter used as a format example",
+    "dateConvention": "DMY",
+    "sourceDocumentTitles": {
+      "example-clinic-letter.pdf": "Example Clinic — annual review letter"
+    },
     "author": "Dr Example, Example Clinic",
     "encounterDate": "2026-02-14",
     "transposedBy": "transpose-clinical-document skill",
@@ -17,7 +19,6 @@
       "The single 'Bloods' table is split into the panels the letter's commentary names."
     ]
   },
-
   "clinicalEncounters": [
     {
       "id": "visit-2026-02-14",
@@ -40,7 +41,6 @@
       ]
     }
   ],
-
   "vitals": [
     {
       "id": "vitals-2026-02-14",
@@ -72,7 +72,12 @@
           "value": "64.2",
           "unit": "kg"
         },
-        { "id": "height", "name": "Body height", "value": "1.66", "unit": "m" },
+        {
+          "id": "height",
+          "name": "Body height",
+          "value": "1.66",
+          "unit": "m"
+        },
         {
           "id": "bmi",
           "name": "Body mass index",
@@ -82,7 +87,6 @@
       ]
     }
   ],
-
   "labPanels": [
     {
       "id": "fbc-2026-02-14",
@@ -124,8 +128,16 @@
       "provider": "Example Clinic",
       "sourceImage": "example-clinic-letter.pdf",
       "results": [
-        { "id": "u-protein", "name": "Protein", "value": "Negative" },
-        { "id": "u-blood", "name": "Blood", "value": "Negative" },
+        {
+          "id": "u-protein",
+          "name": "Protein",
+          "value": "Negative"
+        },
+        {
+          "id": "u-blood",
+          "name": "Blood",
+          "value": "Negative"
+        },
         {
           "id": "u-rbc",
           "name": "Red blood cells",
@@ -140,7 +152,6 @@
       ]
     }
   ],
-
   "imagingReports": [
     {
       "id": "cxr-2026-02-14",
@@ -151,7 +162,6 @@
       "note": "Clear lung fields. Normal cardiac silhouette. No acute abnormality."
     }
   ],
-
   "medicationPlans": [
     {
       "id": "meds-2026-02-14",
@@ -166,7 +176,8 @@
           "dose": "75 mcg",
           "route": "Oral",
           "frequency": "Daily",
-          "status": "active"
+          "status": "active",
+          "adherence": "taking-as-directed"
         },
         {
           "id": "vitamin-d",
@@ -175,12 +186,12 @@
           "route": "Oral",
           "frequency": "Daily",
           "status": "active",
-          "note": "Over the counter."
+          "note": "Over the counter.",
+          "adherence": "taking-as-directed"
         }
       ]
     }
   ],
-
   "conditions": [
     {
       "id": "hypothyroidism",
@@ -193,7 +204,6 @@
       "note": "No onset date stated in the source."
     }
   ],
-
   "procedures": [
     {
       "id": "appendicectomy",
@@ -206,7 +216,6 @@
       "note": "Past Surgical History gives no date. recordedDate files it under the documenting date; performedDateTime is left unset."
     }
   ],
-
   "familyHistory": [
     {
       "id": "mother-thyroid",
@@ -216,7 +225,6 @@
       "sourceImage": "example-clinic-letter.pdf"
     }
   ],
-
   "socialHistory": [
     {
       "id": "alcohol",

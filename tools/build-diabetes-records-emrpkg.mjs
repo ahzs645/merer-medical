@@ -145,6 +145,13 @@ const VITAL_LOINC = {
   'body mass index': ['39156-5', 'Body mass index (BMI) [Ratio]'],
   bmi: ['39156-5', 'Body mass index (BMI) [Ratio]'],
 };
+
+const ADHERENCE_CODES = {
+  'taking-as-directed': 'Taking as directed',
+  'not-taking': 'Patient reported not taking',
+  'not-yet-started': 'Not yet started',
+  'stopped': 'Stopped',
+};
 const args = parseArgs(process.argv.slice(2));
 
 if (!args.source || !args.output) {
@@ -1067,8 +1074,21 @@ for (const procedure of records.procedures || []) {
   );
 }
 
+/**
+ * `title` is whatever the first record to cite this file happened to be called,
+ * which is an accident of section order — a letter whose labs are processed
+ * first ends up filed under "Resting ECG measurements source document". When
+ * the records file names the file in `audit.sourceDocumentTitles`, that wins.
+ */
+function sourceDocumentTitle(sourceImage, fallback) {
+  const titles = records.audit?.sourceDocumentTitles;
+  const stated = titles && typeof titles === 'object' ? titles[sourceImage] : undefined;
+  return stated || fallback;
+}
+
 function getOrCreateSourceDocument({ sourceImage, date, title, provider, audit }) {
   if (!sourceImage) return undefined;
+  title = sourceDocumentTitle(sourceImage, title);
 
   const sourceKey = `${sourceImage}`;
   const existing = sourceDocumentsByKey.get(sourceKey);
@@ -2009,7 +2029,27 @@ function inferMedicationCategory(item) {
   };
 }
 
+
+/**
+ * A stated `adherence` wins over the note-sniffing below.
+ *
+ * The heuristic reads whatever prose happens to be on the item, so whether a
+ * medication came out "taking as directed" depended on whether the transposer
+ * happened to write the word "current" in a free-text note — two drugs off the
+ * same "Current Outpatient Medication" table disagreed because one note
+ * mentioned tall-man lettering instead. Adherence is a clinical fact the source
+ * states; it should be recorded, not inferred.
+ */
 function inferMedicationAdherence(item) {
+  const stated = item.adherence;
+  if (stated && ADHERENCE_CODES[stated]) {
+    return {
+      system: 'https://mere.health/fhir/CodeSystem/medication-adherence',
+      code: stated,
+      display: ADHERENCE_CODES[stated],
+    };
+  }
+
   const text = [item.status, item.note, item.plannerImplication].join(' ');
   if (/not taking|not-taking/i.test(text)) {
     return {

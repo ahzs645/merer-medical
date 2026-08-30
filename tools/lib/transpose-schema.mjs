@@ -13,6 +13,8 @@
  * model — can act on without reading the builder.
  */
 
+import { CONVENTIONS } from './source-dates.mjs';
+
 /** Sections the builder reads. Anything else in the file is ignored. */
 export const SECTIONS = [
   'labPanels',
@@ -126,14 +128,37 @@ export function validateRecords(records) {
     warnings.push(
       'audit: missing — a transposed package with no provenance cannot be checked back against its source',
     );
-  } else if (!records.audit.sourceDocument) {
-    warnings.push(
-      'audit.sourceDocument: missing — name the file this came from',
-    );
+  } else {
+    if (!records.audit.sourceDocument) {
+      warnings.push(
+        'audit.sourceDocument: missing — name the file this came from',
+      );
+    }
+    const convention = records.audit.dateConvention;
+    if (convention === undefined) {
+      warnings.push(
+        'audit.dateConvention: missing — say how the source writes dates (DMY, MDY, YMD or ISO). Without it nobody can tell whether 03/08/2026 was read as 3 August or 8 March.',
+      );
+    } else if (!CONVENTIONS.includes(convention)) {
+      errors.push(
+        `audit.dateConvention: expected one of ${CONVENTIONS.join(', ')}, got ${JSON.stringify(convention)}`,
+      );
+    }
   }
 
   const seenIds = new Set();
+  const futureDates = [];
   let total = 0;
+
+  /**
+   * A date past the day the transpose happened is the loudest symptom of a
+   * day/month swap, because half of all swapped dates land in the future and a
+   * clinical document almost never reports one.
+   */
+  const horizon =
+    records.audit && ISO_DATE.test(`${records.audit.transposedAt ?? ''}`)
+      ? records.audit.transposedAt
+      : new Date().toISOString().slice(0, 10);
 
   for (const section of SECTIONS) {
     const rows = records[section];
@@ -148,7 +173,7 @@ export function validateRecords(records) {
     rows.forEach((row, index) => {
       const at = `${section}[${index}]`;
       total += 1;
-      checkRow(row, rules, at, errors, seenIds, section);
+      checkRow(row, rules, at, errors, seenIds, section, horizon, futureDates);
 
       if (rules.children) {
         const kids = row[rules.children.key];
@@ -165,6 +190,8 @@ export function validateRecords(records) {
               errors,
               seenIds,
               `${section}.${rules.children.key}`,
+              horizon,
+              futureDates,
             );
           });
         }
@@ -188,6 +215,12 @@ export function validateRecords(records) {
     );
   }
 
+  if (futureDates.length) {
+    warnings.push(
+      `${futureDates.length} date(s) fall after ${horizon}: ${futureDates.slice(0, 5).join(', ')}${futureDates.length > 5 ? ', …' : ''}. Check audit.dateConvention — a day/month swap puts about half of all dates in the future.`,
+    );
+  }
+
   if (total === 0) {
     errors.push(
       'no records found — every section was empty or absent, so the package would contain nothing',
@@ -197,7 +230,16 @@ export function validateRecords(records) {
   return { errors, warnings, counts };
 }
 
-function checkRow(row, rules, at, errors, seenIds, idScope) {
+function checkRow(
+  row,
+  rules,
+  at,
+  errors,
+  seenIds,
+  idScope,
+  horizon,
+  futureDates,
+) {
   if (!row || typeof row !== 'object' || Array.isArray(row)) {
     errors.push(`${at}: expected an object`);
     return;
@@ -224,10 +266,13 @@ function checkRow(row, rules, at, errors, seenIds, idScope) {
 
   for (const field of rules.dates || []) {
     const value = row[field];
-    if (value !== undefined && value !== null && !ISO_DATE.test(`${value}`)) {
+    if (value === undefined || value === null) continue;
+    if (!ISO_DATE.test(`${value}`)) {
       errors.push(
         `${at}.${field}: expected YYYY-MM-DD, got ${JSON.stringify(value)}`,
       );
+    } else if (horizon && `${value}` > horizon) {
+      futureDates.push(`${at}.${field} = ${value}`);
     }
   }
 

@@ -42,6 +42,7 @@ machine-readable definition.
   "subject": { "dateOfBirth": "1956-01-01", "sex": "male" },
   "audit": {
     "sourceDocument": "Letter.pdf",
+    "dateConvention": "DMY",
     "author": "Dr A. Clinician, GMC 1234567",
     "encounterDate": "2026-08-03",
     "interpretations": ["..."],
@@ -62,10 +63,45 @@ machine-readable definition.
 `subject` is required. `audit` is not required but a package without it cannot
 be checked back against its source; `audit.interpretations` is where every
 judgement call is recorded in prose. Keys outside this list are ignored by the
-builder, and `validate` warns about them.
+builder — a key starting with `_` is treated as a note to the reader and passes
+without comment — and `validate` warns about the rest.
 
-All dates are `YYYY-MM-DD`. A record with no date at all is stamped
-`1970-01-01`, so supply one.
+`audit` also carries two fields the tooling acts on:
+
+| Field                  | Effect                                                                                                                                                         |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dateConvention`       | `DMY`, `MDY`, `YMD` or `ISO`. Declares how the _source_ writes dates. `validate` warns when it is absent.                                                      |
+| `sourceDocumentTitles` | `{ "Letter.pdf": "…" }`. Names the DocumentReference for a file. Without it the title is whichever record cited the file first — an accident of section order. |
+
+## Dates
+
+All dates in `records.json` are `YYYY-MM-DD`. Getting there from the source is
+the part that goes wrong: `03/08/2026` is 3 August in London and 8 March in
+Boston, and both readings are valid dates, so nothing downstream can catch the
+mistake.
+
+Declare the convention once in `audit.dateConvention`, then convert through the
+tool rather than in your head:
+
+```sh
+node tools/transpose.mjs date 03/08/2026 --convention DMY   # 2026-08-03
+node tools/transpose.mjs date 03/08/2026 --region GB        # region GB → DMY
+```
+
+Both forms warn when the value reads as a different real date under the other
+convention. `--region` takes an ISO 3166 country code and maps it to the
+convention documents from there usually use — day-first nearly everywhere,
+month-first in the US and a handful of its dependencies, year-first in CN, JP,
+KR, TW, HU, LT and MN. It is a hint, not an answer: a US health system's London
+branch writes day-first. Confirm against the document — a day field above 12
+settles it, and so does a sign-off date a day or two after the appointment.
+
+`validate` also warns when a date lands after `audit.transposedAt`, because a
+day/month swap puts about half of all dates in the future and a clinical
+document almost never reports one.
+
+A record with no date at all is stamped `1970-01-01`, which opens a phantom
+decade at the foot of the timeline, so supply one.
 
 ## Sections
 
@@ -122,6 +158,11 @@ carries no top-level value:
 Despite the name, this is the right home for any narrative investigation report
 — a stress test or a resting ECG interpretation, not only radiology.
 
+Such a report becomes a `DiagnosticReport` and appears under **Results**, but
+**not** under **Imaging**: that page tests for imaging vocabulary in the text and
+an ECG has none. That is correct — an ECG is not imaging — but it does mean
+`imagingReports` is not a promise about which page a record lands on.
+
 ### `medicationPlans` → `MedicationStatement` per item, plus a `List`
 
 **`id`**, `encounterDate`, `items[]`. Each item: **`id`**, **`medication`**,
@@ -130,10 +171,17 @@ plus `dose`, `route`, `frequency`, `status`, `assignedDate`, `note`.
 `status` maps: `stopped`/`not-taking` → stopped, `historical` → completed,
 `assigned`/`planned` → intended, anything else → active.
 
-Note that a transposed medication lands under **Needs review** in the app, not
-**Current**, even when `status` is `active`: the Medications page checks
-reconciliation state before status. That is the app's behaviour, not a defect in
-the package.
+**Set `adherence` on every medication whose source says whether it is being
+taken** — one of `taking-as-directed`, `not-taking`, `not-yet-started`,
+`stopped`. A list headed "Current Outpatient Medication" states
+`taking-as-directed` for everything on it.
+
+It matters more than it looks. The Medications page buckets on reconciliation
+state before status, so an unstated adherence normalizes to `unknown` →
+`needs-review` and the drug never reaches **Current** however `active` it is.
+Without an explicit value the builder falls back to sniffing the item's prose
+for words like "current", so two drugs off the same table can disagree because
+one note happened to mention something else.
 
 ### `clinicalEncounters` → `Encounter`
 
@@ -193,10 +241,21 @@ file, the bytes are embedded as a `documentreference_attachment` and every
 record citing that name links back to it. This is what drives the app's
 Documents page and the "View source" control on each record.
 
-One wrinkle: the `DocumentReference` is titled after the _first_ record that
-referenced the file, so a package whose first section is an ECG panel shows
-"Resting ECG measurements source document" for what is really the whole letter.
-Cosmetic, but it is why ordering sections with the encounter first reads better.
+The `DocumentReference` is titled after the _first_ record that referenced the
+file, which is an accident of section order — a letter whose labs are processed
+first is filed as "Resting ECG measurements source document". Name it explicitly
+instead:
+
+```jsonc
+"audit": {
+  "sourceDocumentTitles": {
+    "Letter.pdf": "Cleveland Clinic London — Advanced Health Screening letter"
+  }
+}
+```
+
+The Documents page groups by that title, so a well-named letter files under
+"Letters and referrals" rather than "Reports and visit records".
 
 ## Checking the result in the app
 

@@ -69,14 +69,40 @@ its source.
 different numbers has two results; keep both and note it. A report that prints
 ALBUMIN twice with the same number has one; keep one and note it.
 
+**State adherence on medications.** Set `adherence` on every drug whose source
+says whether it is being taken — `taking-as-directed`, `not-taking`,
+`not-yet-started` or `stopped`. A list headed "Current Outpatient Medication"
+states `taking-as-directed` for everything on it. Leave it out and the
+Medications page files the drug under Needs review rather than Current, no
+matter that its status is active.
+
+**Name the source document.** Put `audit.sourceDocumentTitles` = `{ "Letter.pdf":
+"…" }` in the file. Without it the DocumentReference is named after whichever
+record cited the file first, so a letter ends up titled "Resting ECG
+measurements source document".
+
 **Keep ids short.** A record's id is `connectionId|userId|manual:<your id>`,
 about 70 characters before yours. The store declares a 128-character maximum,
 so keep source ids under ~50. `inspect` warns when you have gone over.
 
-**Dates are `YYYY-MM-DD`.** Work out the source's convention before converting —
-a UK clinic writes `03/08/2026` for 3 August. Zero-padded day fields, a
-signed-off date one day after the appointment, and the country of the letterhead
-all help. State your reading in `audit.interpretations`.
+**Dates are `YYYY-MM-DD`, and you do not convert them by hand.** `03/08/2026` is
+3 August in London and 8 March in Boston; both readings are valid dates, so a
+mistake here is invisible from here on. Work out the convention from the
+letterhead, declare it once in `audit.dateConvention` (`DMY`, `MDY`, `YMD`,
+`ISO`), and run each date through the tool:
+
+```sh
+node tools/transpose.mjs date 03/08/2026 --region GB      # region GB → DMY
+node tools/transpose.mjs date 03/08/2026 --convention DMY
+```
+
+It warns whenever the value would be a different real date under the other
+convention. `--region` maps an ISO 3166 country code to the convention that
+country's documents usually use, but it is a hint — a US health system's London
+branch writes day-first. Confirm against the document: a day field above 12
+settles it, and so does a sign-off date a day or two after the appointment.
+`validate` catches the rest, warning on any date after `audit.transposedAt`,
+because a day/month swap puts about half of all dates in the future.
 
 ## Where things go
 
@@ -107,6 +133,11 @@ Carry the negative assertion on the encounter record instead.
 a phantom decade at the foot of the timeline. `procedures` handles this — it
 falls back to `recordedDate` and leaves `performedDateTime` unset, which is the
 honest encoding. Other sections do not, so give them a date.
+
+And one thing to expect rather than fix: a non-imaging report in
+`imagingReports` (an ECG, a stress test) shows under Results but not under
+Imaging, because that page looks for imaging vocabulary. The section name is
+about the builder, not about which page the record lands on.
 
 ## Before you hand it over
 

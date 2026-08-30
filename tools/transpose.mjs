@@ -22,6 +22,11 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { unzipSync, strFromU8 } from 'fflate';
 import { validateRecords } from './lib/transpose-schema.mjs';
+import {
+  CONVENTIONS,
+  conventionForRegion,
+  resolveSourceDate,
+} from './lib/source-dates.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const BUILDER = resolve(here, 'build-diabetes-records-emrpkg.mjs');
@@ -33,7 +38,7 @@ if (!command || command === 'help' || command === '--help') {
   process.exit(command ? 0 : 1);
 }
 
-const commands = { validate, build, inspect };
+const commands = { validate, build, inspect, date };
 if (!commands[command]) {
   console.error(`Unknown command: ${command}\n`);
   usage();
@@ -45,7 +50,11 @@ if (!target) {
   process.exit(1);
 }
 
-commands[command](resolve(target), parseFlags(rest));
+if (command === 'date') {
+  date(target, parseFlags(rest));
+} else {
+  commands[command](resolve(target), parseFlags(rest));
+}
 
 function validate(path) {
   const { errors, warnings, counts } = readAndValidate(path);
@@ -128,6 +137,43 @@ function inspect(path) {
   }
 }
 
+/**
+ * Convert one date as the source wrote it, under a stated convention.
+ *
+ *   node tools/transpose.mjs date 03/08/2026 --convention DMY
+ *   node tools/transpose.mjs date 03/08/2026 --region GB
+ *
+ * Here so that a transposer never does the arithmetic in its head. Reading
+ * `3/8/2026` as March moves a result five months, and the wrong answer is still
+ * a valid date, so nothing downstream can catch it.
+ */
+function date(raw, flags) {
+  let convention = flags.convention;
+  if (!convention && flags.region) {
+    convention = conventionForRegion(flags.region);
+    if (!convention) {
+      console.error(`date: could not map region "${flags.region}"`);
+      process.exit(1);
+    }
+    console.log(`region ${flags.region.toUpperCase()} → ${convention}`);
+  }
+  if (!convention) {
+    console.error(
+      `date: pass --convention <${CONVENTIONS.join('|')}> or --region <ISO 3166 code>`,
+    );
+    process.exit(1);
+  }
+
+  const result = resolveSourceDate(raw, convention);
+  if (result.error) {
+    console.error(`error    ${result.error}`);
+    process.exit(1);
+  }
+  console.log(result.iso);
+  if (result.note) console.log(`warning  ${result.note}`);
+  process.exit(0);
+}
+
 function readAndValidate(path) {
   let parsed;
   try {
@@ -191,6 +237,11 @@ function usage() {
 
   node tools/transpose.mjs inspect <file.emrpkg>
       Print a built package's manifest, row counts and resource-type mix.
+
+  node tools/transpose.mjs date <value> --convention DMY|MDY|YMD|ISO
+  node tools/transpose.mjs date <value> --region GB
+      Resolve one source date to ISO. Warns when the value reads as a
+      different real date under the other convention.
 
 The records.json format is documented in docs/clinical-transpose-format.md.
 Transposing a document into that format is the transpose-clinical-document

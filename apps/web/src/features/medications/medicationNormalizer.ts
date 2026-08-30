@@ -391,10 +391,47 @@ function inferSourceType(
   return 'imported-record';
 }
 
+const ADHERENCE_EXTENSION =
+  'https://mere.health/fhir/StructureDefinition/medication-adherence';
+
+/**
+ * The manual builder states adherence outright rather than leaving it to be
+ * read out of note prose, so the extension is consulted before the heuristics.
+ * Without this every transposed medication came back `unknown`, which
+ * `getReconciliationState` turns into `needs-review` — and because the Needs
+ * review bucket is tested before `status === 'active'`, a whole imported
+ * medication list landed there with Current showing zero.
+ *
+ * The builder's vocabulary is its own: `taking-as-directed` is this module's
+ * `taking-as-prescribed`. Codes with no counterpart here (`not-yet-started`,
+ * `stopped`) are left to fall through — the FHIR `status` already routes those
+ * to the Planned and Stopped buckets, both of which are tested earlier still.
+ */
+function getAdherenceFromExtension(
+  resource: AnyRecord,
+): MedicationAdherence | undefined {
+  const extensions = resource.extension;
+  if (!Array.isArray(extensions)) return undefined;
+  const match = extensions.find(
+    (extension: AnyRecord) => extension?.url === ADHERENCE_EXTENSION,
+  );
+  const code = match?.valueCodeableConcept?.coding?.[0]?.code;
+  if (code === 'not-taking' || code === 'patient-not-taking')
+    return 'not-taking';
+  if (code === 'taking-as-directed' || code === 'taking-as-prescribed') {
+    return 'taking-as-prescribed';
+  }
+  if (code === 'taking-differently') return 'taking-differently';
+  return undefined;
+}
+
 function getAdherence(
   resource: AnyRecord,
   notes: string[],
 ): MedicationAdherence {
+  const stated = getAdherenceFromExtension(resource);
+  if (stated) return stated;
+
   const wasNotTaken = resource.wasNotTaken;
   const taken = resource.taken;
   const text = notes.join(' ').toLowerCase();
