@@ -20,6 +20,7 @@ import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
+import { ManualSourceDocumentLink } from '../manual-entry/ManualSourceDocumentLink';
 import { FactList } from '../../shared/components/FactList';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
@@ -164,50 +165,78 @@ export function AllergiesTab() {
         <AllergyCard key={item.id} item={item} />
       ))}
 
+      {/* A negation is not an entry in this list, so it is not given a row in
+          it. It used to get a full card with five actions — the same weight as
+          a real allergen — for a record that says there is nothing here, and a
+          portal that sends "Not on File" three times produced three of them.
+
+          It is not nothing either: an empty list means nobody wrote anything
+          down, while "No Known Allergies" means someone asked and recorded the
+          answer, which is the difference you want before a procedure. So it
+          becomes the sentence the page says when it has no allergens, rather
+          than a card competing with them. */}
       {allergens.length === 0 && (
-        <p className="rounded-md bg-white p-4 text-sm text-gray-600 shadow-sm ring-1 ring-gray-200">
-          No allergens recorded.
-        </p>
+        <div className="rounded-md bg-white p-4 text-sm text-gray-600 shadow-sm ring-1 ring-gray-200">
+          {alsoRecorded.length > 0 ? (
+            <NegationStatement item={alsoRecorded[0]} />
+          ) : (
+            'No allergens recorded.'
+          )}
+        </div>
       )}
 
-      {alsoRecorded.length > 0 && (
-        <section className="mt-3">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-            Also recorded
-          </h2>
-          <p className="mt-1 text-xs text-gray-500">
-            These entries state that no allergy was found or that no allergy
-            history was taken. They are not allergens.
-          </p>
-          <div className="mt-2 grid gap-2">
-            {alsoRecorded.map((item) => (
-              <AllergyCard key={item.id} item={item} muted />
-            ))}
-          </div>
-        </section>
+      {/* With allergens on the list, a record saying there are none is
+          contradicted by the page it is on. Stating it once, quietly, says
+          which source disagrees without putting "No Known Allergies" beside an
+          allergen where it could be read as covering it. */}
+      {allergens.length > 0 && alsoRecorded.length > 0 && (
+        <p className="mt-1 text-xs text-gray-500">
+          {alsoRecorded.length === 1
+            ? `${alsoRecorded[0].source || 'Another source'} recorded “${alsoRecorded[0].name}”${
+                alsoRecorded[0].date
+                  ? ` on ${safeFormatDate(alsoRecorded[0].date, 'PP', '')}`
+                  : ''
+              }.`
+            : `${alsoRecorded.length} sources recorded no known allergy.`}
+        </p>
       )}
     </RecordListPage>
   );
 }
 
-function AllergyCard({ item, muted }: { item: AllergyItem; muted?: boolean }) {
+/**
+ * What the page says instead of "No allergens recorded." when a source actually
+ * asserted it. Keeps the date, the source and a way through to the document,
+ * without the row of record actions a real allergen carries.
+ */
+function NegationStatement({ item }: { item: AllergyItem }) {
   return (
-    <article
-      className={`rounded-md p-4 shadow-sm ring-1 ${
-        muted ? 'bg-gray-50 ring-gray-200' : 'bg-white ring-gray-200'
-      }`}
-    >
+    <>
+      <p className="font-medium text-gray-900">{item.name}</p>
+      <p className="mt-1 text-xs text-gray-500">
+        <FactList
+          facts={[
+            item.source,
+            item.date ? safeFormatDate(item.date, 'PP', '') : null,
+          ]}
+        />
+      </p>
+      <ManualSourceDocumentLink item={item.document} />
+    </>
+  );
+}
+
+// The card renders allergens only. Negations are a sentence now, so the muted
+// variant that made one look like a greyed-out allergen has gone with them.
+function AllergyCard({ item }: { item: AllergyItem }) {
+  return (
+    <article className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3
-            className={`break-words text-sm font-semibold ${
-              muted ? 'text-gray-700' : 'text-gray-900'
-            }`}
-          >
+          <h3 className="break-words text-sm font-semibold text-gray-900">
             {item.name}
           </h3>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-            {muted && <Badge tone="neutral">Not an allergen</Badge>}
             {item.clinicalStatus && (
               <Badge className="capitalize">{item.clinicalStatus}</Badge>
             )}

@@ -20,6 +20,7 @@ Writing the JSON is the `transpose-clinical-document` skill's job.
 node tools/transpose.mjs validate records.json
 node tools/transpose.mjs build records.json --output out.emrpkg [flags]
 node tools/transpose.mjs inspect out.emrpkg
+node tools/transpose.mjs merge base.emrpkg other.emrpkg --output all.emrpkg
 ```
 
 `build` passes unrecognised flags to the builder:
@@ -313,6 +314,33 @@ instead:
 
 The Documents page groups by that title, so a well-named letter files under
 "Letters and referrals" rather than "Reports and visit records".
+
+## Combining packages
+
+Each build derives its user id from the profile it was given, so a second
+document about the same person arrives as a stranger — and importing the two
+packages one after another does not help, because the importer replaces the
+receiving collections and the second erases the first.
+
+```sh
+node tools/transpose.mjs merge records.emrpkg letter.emrpkg \\
+  --output combined.emrpkg --user-from 2
+```
+
+One user survives; every record from the others is re-pointed onto it and
+re-keyed, since the primary key is built from connection, user and resource id.
+**Connections are all kept**, so each record still names the document it came
+from and the Sources page lists them separately. `--user-from <n>` picks whose
+name, date of birth and profile survive (default 1, the base) — worth setting
+when the newer document carries the better name.
+
+Records that appear in both packages are kept once. The merged manifest carries
+a `mergedFrom` array naming each input, its app version and its record count.
+
+Merging reconciles identity, not clinical content: if one source says "No Known
+Allergies" and another records an allergen, you get both, and the disagreement
+is yours to resolve. That is deliberate — a package should not quietly drop one
+clinician's assertion because another disagrees.
 
 ## Checking the result in the app
 

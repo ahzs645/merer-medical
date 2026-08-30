@@ -219,7 +219,13 @@ export function validateRecords(records) {
               `${at}.${rules.children.key}[${kidIndex}]`,
               errors,
               seenIds,
-              `${section}.${rules.children.key}`,
+              // Scoped to the parent, not the section: the builder derives a
+              // child's record id from `${parent.id}-${child.id}`, so `bp`
+              // under January and `bp` under February are different records.
+              // Checking them globally rejected the commonest shape there is —
+              // the same measurement repeated over time, which is the whole
+              // point of a history.
+              `${section}.${rules.children.key}:${row.id}`,
               horizon,
               futureDates,
             );

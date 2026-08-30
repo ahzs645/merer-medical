@@ -17,8 +17,8 @@
  * a typo'd key would otherwise cost you a whole record with no diagnostic.
  */
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { basename, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { unzipSync, strFromU8 } from 'fflate';
 import { validateRecords } from './lib/transpose-schema.mjs';
@@ -27,6 +27,11 @@ import {
   conventionForRegion,
   resolveSourceDate,
 } from './lib/source-dates.mjs';
+import {
+  mergePackages,
+  readPackage,
+  writePackage,
+} from './lib/merge-packages.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const BUILDER = resolve(here, 'build-diabetes-records-emrpkg.mjs');
@@ -38,7 +43,7 @@ if (!command || command === 'help' || command === '--help') {
   process.exit(command ? 0 : 1);
 }
 
-const commands = { validate, build, inspect, date };
+const commands = { validate, build, inspect, date, merge };
 if (!commands[command]) {
   console.error(`Unknown command: ${command}\n`);
   usage();
@@ -52,6 +57,8 @@ if (!target) {
 
 if (command === 'date') {
   date(target, parseFlags(rest));
+} else if (command === 'merge') {
+  merge(target, rest);
 } else {
   commands[command](resolve(target), parseFlags(rest));
 }
@@ -174,6 +181,70 @@ function date(raw, flags) {
   process.exit(0);
 }
 
+/**
+ * Combine packages into one.
+ *
+ *   node tools/transpose.mjs merge base.emrpkg letter.emrpkg --output all.emrpkg
+ *
+ * Importing two packages one after another does not do this: the importer
+ * replaces the receiving collections, so the second erases the first. And each
+ * build derives its own user id, so the same person arrives twice as strangers.
+ */
+function merge(firstPath, rest) {
+  const inputs = [resolve(firstPath)];
+  const flagArgs = [];
+  for (let index = 0; index < rest.length; index += 1) {
+    if (rest[index].startsWith('--')) {
+      flagArgs.push(...rest.slice(index));
+      break;
+    }
+    inputs.push(resolve(rest[index]));
+  }
+  const flags = parseFlags(flagArgs);
+
+  const output = flags.output || flags.o;
+  if (!output) {
+    console.error('merge: --output <file.emrpkg> is required');
+    process.exit(1);
+  }
+  if (inputs.length < 2) {
+    console.error('merge: needs at least two packages');
+    process.exit(1);
+  }
+
+  let result;
+  try {
+    const packages = inputs.map((path) =>
+      readPackage(new Uint8Array(readFileSync(path)), basename(path)),
+    );
+    result = mergePackages(packages, {
+      userFrom: Number(flags.userFrom || 1),
+      appVersion: flags.appVersion,
+    });
+  } catch (error) {
+    console.error(`error    ${error.message}`);
+    process.exit(1);
+  }
+
+  for (const [index, path] of inputs.entries()) {
+    const from = result.manifest.mergedFrom[index];
+    console.log(
+      `  ${basename(path).padEnd(28)} ${String(from.clinicalDocuments).padStart(5)} clinical documents`,
+    );
+  }
+  console.log('');
+  console.log(
+    `patient      ${result.user.first_name} ${result.user.last_name}`,
+  );
+  for (const [name, count] of Object.entries(result.manifest.counts)) {
+    if (count > 0) console.log(`${name.padEnd(26)} ${count}`);
+  }
+  for (const note of result.notes) console.log(`\nnote     ${note}`);
+
+  writeFileSync(resolve(output), writePackage(result));
+  console.log(`\nWrote ${resolve(output)}`);
+}
+
 function readAndValidate(path) {
   let parsed;
   try {
@@ -237,6 +308,12 @@ function usage() {
 
   node tools/transpose.mjs inspect <file.emrpkg>
       Print a built package's manifest, row counts and resource-type mix.
+
+  node tools/transpose.mjs merge <base.emrpkg> <more.emrpkg…> --output <file>
+      Combine packages for one person into one. Keeps every connection so a
+      record still names the document it came from; re-points records onto the
+      surviving user. --user-from <n> picks whose name and profile survive
+      (default 1, the base).
 
   node tools/transpose.mjs date <value> --convention DMY|MDY|YMD|ISO
   node tools/transpose.mjs date <value> --region GB

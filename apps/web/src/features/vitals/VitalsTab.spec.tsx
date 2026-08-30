@@ -18,7 +18,29 @@ const mockFind = jest.fn((query: { selector: Record<string, unknown> }) => ({
     }));
   },
 }));
-const mockDb = { clinical_documents: { find: mockFind } };
+const mockConnectionFind = jest.fn(() => ({
+  exec: async () => [
+    {
+      toMutableJSON: () => ({
+        id: 'connection-1',
+        name: 'Imported manual records',
+      }),
+    },
+  ],
+}));
+const mockDb = {
+  clinical_documents: { find: mockFind },
+  connection_documents: { find: mockConnectionFind },
+};
+
+// Stubbed the way the other record-page specs stub it: the real component wants
+// the notification, language and attachment providers, and this file is testing
+// the Vitals card, not the actions row.
+const mockCreateElement = jest.requireActual('react').createElement;
+jest.mock('../manual-entry/ManualRecordActions', () => ({
+  ManualRecordActions: ({ item }: { item: { id: string } }) =>
+    mockCreateElement('span', { 'data-testid': `actions-${item.id}` }),
+}));
 
 jest.mock('../../app/providers/RxDbProvider', () => ({
   useRxDb: () => mockDb,
