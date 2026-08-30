@@ -19,9 +19,8 @@ import { ReferenceOverlayMode } from '../labs/enrichment/types';
 import { formatResultValue } from './utils/resultNormalization';
 import { resultTotals } from './utils/resultTotals';
 import { useResultsData } from './hooks/useResultsData';
+import { useLabReferenceStandard } from '../labs/hooks/useLabReferenceStandard';
 import { ResultDetail, ResultGroup, ResultSummary, ResultType } from './types';
-
-const defaultOverlayModes: ReferenceOverlayMode[] = ['canadian'];
 
 export function ResultsTab() {
   const { t } = useInterfaceLanguage();
@@ -44,10 +43,12 @@ export function ResultsTab() {
 
 export function ResultsHubContent({ className = '' }: { className?: string }) {
   const { t } = useInterfaceLanguage();
-  const [referenceMode, setReferenceMode] =
-    useState<ReferenceOverlayMode>('canadian');
-  const [enabledOverlayModes, setEnabledOverlayModes] =
-    useState<ReferenceOverlayMode[]>(defaultOverlayModes);
+  const [referenceMode, setReferenceMode] = useLabReferenceStandard();
+  // The overlay list starts from the saved standard too, so the comparison
+  // bands match the table the moment the page opens.
+  const [enabledOverlayModes, setEnabledOverlayModes] = useState<
+    ReferenceOverlayMode[]
+  >(() => [referenceMode]);
   // Phones only: the picker is collapsed so records start near the top.
   const [showReferencePicker, setShowReferencePicker] = useState(false);
   const { groups, detailsById, status } = useResultsData(referenceMode);

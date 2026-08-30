@@ -19,7 +19,9 @@ import { CONVENTIONS } from './source-dates.mjs';
 export const SECTIONS = [
   'labPanels',
   'vitals',
+  'diagnosticReports',
   'imagingReports',
+  'pendingResults',
   'medicationPlans',
   'clinicalEncounters',
   'conditions',
@@ -56,6 +58,11 @@ const SECTION_RULES = {
       dates: ['recordedAt'],
     },
   },
+  diagnosticReports: {
+    required: ['id', 'title', 'studyDate'],
+    dates: ['studyDate'],
+  },
+  // The original name for the same section. Still built, still checked.
   imagingReports: {
     required: ['id', 'title', 'studyDate'],
     dates: ['studyDate'],
@@ -67,6 +74,14 @@ const SECTION_RULES = {
       key: 'items',
       required: ['id', 'medication'],
       dates: ['assignedDate'],
+      enums: {
+        adherence: [
+          'taking-as-directed',
+          'not-taking',
+          'not-yet-started',
+          'stopped',
+        ],
+      },
     },
   },
   clinicalEncounters: {
@@ -77,6 +92,10 @@ const SECTION_RULES = {
     required: ['id', 'name'],
     dates: ['onsetDate', 'recordedDate'],
   },
+  pendingResults: {
+    required: ['id', 'name'],
+    dates: ['orderedDate'],
+  },
   procedures: {
     required: ['id', 'name'],
     dates: ['performedDate', 'recordedDate'],
@@ -84,6 +103,17 @@ const SECTION_RULES = {
   allergies: {
     required: ['id', 'substance'],
     dates: ['recordedDate'],
+    enums: {
+      negationScope: [
+        'general',
+        'drug',
+        'food',
+        'environmental',
+        'latex',
+        'not-asked',
+        'unknown',
+      ],
+    },
   },
   familyHistory: {
     required: ['id', 'relationship'],
@@ -273,6 +303,15 @@ function checkRow(
       );
     } else if (horizon && `${value}` > horizon) {
       futureDates.push(`${at}.${field} = ${value}`);
+    }
+  }
+
+  for (const [field, allowed] of Object.entries(rules.enums || {})) {
+    const value = row[field];
+    if (value !== undefined && !allowed.includes(value)) {
+      errors.push(
+        `${at}.${field}: expected one of ${allowed.join(', ')}, got ${JSON.stringify(value)}`,
+      );
     }
   }
 

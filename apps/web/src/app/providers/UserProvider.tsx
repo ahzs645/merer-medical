@@ -101,6 +101,18 @@ export function useUser() {
 }
 
 /**
+ * The same user, for callers that can carry on without one.
+ *
+ * `useUser` throws outside a provider, which is right for anything that reads
+ * or writes clinical data. A per-user *display* preference is not that: it
+ * should quietly fall back to its default rather than take the screen down, and
+ * a component test should not need a UserProvider to render a table.
+ */
+export function useOptionalUser() {
+  return useContext(UserContext);
+}
+
+/**
  * Gets the raw user document from the context, modifiable
  */
 export function useRxUserDocument() {

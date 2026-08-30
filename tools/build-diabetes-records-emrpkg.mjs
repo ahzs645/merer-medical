@@ -143,7 +143,32 @@ const VITAL_LOINC = {
   'body height': ['8302-2', 'Body height'],
   height: ['8302-2', 'Body height'],
   'body mass index': ['39156-5', 'Body mass index (BMI) [Ratio]'],
+  'body fat percentage': ['41982-0', 'Percentage of body fat Measured'],
+  'body fat mass': ['73708-0', 'Body fat [Mass] Measured'],
+  'skeletal muscle mass': ['73964-9', 'Skeletal muscle mass Measured'],
+  'visceral fat': ['91240-6', 'Visceral fat area'],
+  'waist circumference': ['56086-2', 'Waist Circumference at umbilicus'],
   bmi: ['39156-5', 'Body mass index (BMI) [Ratio]'],
+};
+
+/**
+ * SNOMED concepts for the *absence* of an allergy.
+ *
+ * "No Known Allergies" is a clinical statement worth keeping — it is the
+ * difference between asked-and-none and never-asked — but written as a plain
+ * substance it renders as though the patient were allergic to the phrase. The
+ * app already separates these out and excludes them from the wallet card, but
+ * only when it can recognise them; coding them is what makes that work by code
+ * rather than by matching English.
+ */
+const ALLERGY_NEGATION_CODES = {
+  general: ['716186003', 'No known allergy'],
+  drug: ['409137002', 'No known drug allergy'],
+  food: ['429625007', 'No known food allergy'],
+  environmental: ['428607008', 'No known environmental allergy'],
+  latex: ['428197003', 'No known latex allergy'],
+  'not-asked': ['1631000175102', 'Patient not asked'],
+  unknown: ['787923006', 'Allergy status unknown'],
 };
 
 const ADHERENCE_CODES = {
@@ -404,7 +429,20 @@ for (const panel of records.labPanels || []) {
   );
 }
 
-for (const report of records.imagingReports || []) {
+/**
+ * `imagingReports` is the original name and still works, but the section makes
+ * a `DiagnosticReport` — which is any narrative investigation, an ECG or a
+ * stress test as much as a scan. `diagnosticReports` says that; the old key is
+ * kept so existing records files keep building.
+ *
+ * The name never decided which page a record lands on: the Imaging page tests
+ * the text for imaging vocabulary, so an ECG report correctly stays off it. Set
+ * `imaging: true` on a report whose text is too terse for that test to catch.
+ */
+for (const report of [
+  ...(records.diagnosticReports || []),
+  ...(records.imagingReports || []),
+]) {
   const reportId = stableId(`imaging-${report.id}`);
   const sourceDocument = getOrCreateSourceDocument({
     sourceImage: report.sourceImage,
@@ -523,7 +561,13 @@ for (const report of records.imagingReports || []) {
           },
         },
       },
-      metadata: { ...sourceMeta(sourceDocument) },
+      metadata: {
+        // The Imaging page reads `manual_subtype` before it reads any text, so
+        // this is the way to place a scan report whose wording is too terse for
+        // the vocabulary test.
+        ...(report.imaging ? { manual_subtype: 'imaging' } : {}),
+        ...sourceMeta(sourceDocument),
+      },
     }),
   );
 }
@@ -786,10 +830,12 @@ for (const allergy of records.allergies || []) {
           status: allergy.status || 'active',
           criticality: allergy.criticality,
           recordedDate: allergyDate ? atNoon(allergyDate) : undefined,
-          substance: {
-            text: allergy.substance,
-            coding: allergy.code ? [allergy.code] : undefined,
-          },
+          substance: allergySubstance(allergy),
+          // R4 keeps the allergen on `code`; DSTU2 on `substance`. The app
+          // resolves either, and the negation test reads both — so a negated
+          // record carries its SNOMED code on both and is recognised whichever
+          // side a reader looks at.
+          code: allergySubstance(allergy),
           reaction: allergy.reaction
             ? [
                 {
@@ -1012,6 +1058,89 @@ for (const panel of records.vitals || []) {
   }
 }
 
+/**
+ * Tests the document says are ordered but not yet resulted.
+ *
+ * "Stool FIT test is pending" is not prose to be filed under an encounter — it
+ * is a bowel-cancer screen with no answer yet, and a patient's most useful
+ * question about a report is often what is still outstanding. FHIR `registered`
+ * is the status for ordered-not-resulted, and the Results page already reads it.
+ */
+for (const pending of records.pendingResults || []) {
+  const pendingId = stableId(`pending-${pending.id}`);
+  const pendingDate = pending.orderedDate || pending.date;
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: pending.sourceImage,
+    date: pendingDate,
+    title: pending.name,
+    provider: pending.provider,
+    audit: pending.audit,
+  });
+  const pendingLoinc = labObservationCode(pending.name);
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: pendingId,
+      resourceType: 'observation',
+      date: pendingDate,
+      displayName: pending.name,
+      raw: {
+        fullUrl: `manual:${pendingId}`,
+        manual_kind: 'pending-result',
+        source_image: pending.sourceImage,
+        audit: pending.audit,
+        resource: {
+          resourceType: 'Observation',
+          id: pendingId,
+          // Ordered, not resulted. Deliberately no value: a pending test with a
+          // blank value is the truth, and inventing one would be worse.
+          status: 'registered',
+          category: {
+            text: pending.category || 'Laboratory',
+            coding: [
+              {
+                system:
+                  'http://terminology.hl7.org/CodeSystem/observation-category',
+                code: 'laboratory',
+                display: 'Laboratory',
+              },
+            ],
+          },
+          code: pendingLoinc
+            ? {
+                text: pendingLoinc.display,
+                coding: [
+                  {
+                    system: 'http://loinc.org',
+                    code: pendingLoinc.code,
+                    display: pendingLoinc.display,
+                  },
+                ],
+              }
+            : { text: pending.name },
+          effectiveDateTime: pendingDate ? atNoon(pendingDate) : undefined,
+          note: buildNotes([
+            'Ordered; result not available at the time of this document.',
+            pending.provider ? `Provider: ${pending.provider}` : undefined,
+            pending.expected ? `Expected: ${pending.expected}` : undefined,
+            pending.purpose ? `Purpose: ${pending.purpose}` : undefined,
+            pending.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+      metadata: {
+        manual_specialty: 'laboratory',
+        manual_pending: true,
+        loinc_coding: pendingLoinc ? [pendingLoinc.code] : [],
+        manual_uncoded: !pendingLoinc,
+        ...sourceMeta(sourceDocument),
+      },
+    }),
+  );
+}
+
 for (const procedure of records.procedures || []) {
   const procedureId = stableId(`procedure-${procedure.id}`);
   // A surgical history line often gives no date at all. Falling through to
@@ -1084,6 +1213,28 @@ function sourceDocumentTitle(sourceImage, fallback) {
   const titles = records.audit?.sourceDocumentTitles;
   const stated = titles && typeof titles === 'object' ? titles[sourceImage] : undefined;
   return stated || fallback;
+}
+
+function allergySubstance(allergy) {
+  if (allergy.negated) {
+    const scope = allergy.negationScope || 'general';
+    const coding = ALLERGY_NEGATION_CODES[scope];
+    if (!coding) {
+      throw new Error(
+        `allergies[${allergy.id}].negationScope "${scope}" is not one of ${Object.keys(ALLERGY_NEGATION_CODES).join(', ')}`,
+      );
+    }
+    return {
+      text: allergy.substance || coding[1],
+      coding: [
+        { system: 'http://snomed.info/sct', code: coding[0], display: coding[1] },
+      ],
+    };
+  }
+  return {
+    text: allergy.substance,
+    coding: allergy.code ? [allergy.code] : undefined,
+  };
 }
 
 function getOrCreateSourceDocument({ sourceImage, date, title, provider, audit }) {

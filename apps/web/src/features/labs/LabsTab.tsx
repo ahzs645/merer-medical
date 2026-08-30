@@ -17,12 +17,12 @@ import { LabsSkeleton } from './components/LabsSkeleton';
 import { LabsTable } from './components/LabsTable';
 import { LibreCgmPanel } from './components/LibreCgmPanel';
 import { RecordCoverageModal } from './components/RecordCoverageModal';
-import { ReferenceOverlayMode } from './enrichment/types';
 import {
   buildLabReferenceEvaluation,
   isPlannerRelevantLab,
 } from './enrichment/labEnrichment';
 import { useLabsData } from './hooks/useLabsData';
+import { useLabReferenceStandard } from './hooks/useLabReferenceStandard';
 import {
   filterLabGroups,
   groupLabs,
@@ -55,8 +55,7 @@ export function LabsTab() {
       filterId: filterMode,
       setFilterId: setFilterMode,
     } = useListViewParams<LabFilterMode>({ defaultFilter: 'all' }),
-    [referenceMode, setReferenceMode] =
-      useState<ReferenceOverlayMode>('canadian'),
+    [referenceMode, setReferenceMode] = useLabReferenceStandard(),
     [coverageOpen, setCoverageOpen] = useState(false),
     {
       labs,

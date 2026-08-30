@@ -109,8 +109,11 @@ because a day/month swap puts about half of all dates in the future.
 | In the document                                                         | Section              |
 | ----------------------------------------------------------------------- | -------------------- |
 | Result tables, blood tests, urinalysis, ECG measurements                | `labPanels`          |
+| Computed risk scores — QRISK3, QDiabetes, ASCVD, FRAX                   | `labPanels`          |
 | BP, weight, height, BMI, temperature, SpO2, pulse, respiratory rate     | `vitals`             |
-| Radiology, ultrasound, stress test, any narrative investigation report  | `imagingReports`     |
+| Body composition — fat mass, visceral fat, muscle mass, vendor scores   | `vitals`             |
+| Radiology, ultrasound, stress test, any narrative investigation report  | `diagnosticReports`  |
+| Tests the document says are ordered but not yet resulted                | `pendingResults`     |
 | Current medication list, prescriptions, supplements                     | `medicationPlans`    |
 | The visit itself — findings, recommendations, follow-up, systems review | `clinicalEncounters` |
 | Problem list, past medical history, diagnoses                           | `conditions`         |
@@ -123,21 +126,35 @@ Group lab results into the panels the document itself names. If it prints one
 flat table but its commentary talks about "the liver panel" and "the kidney
 panel", grouping by those names is fair — say so in `audit.interpretations`.
 
-## Two things the format cannot say
+## Things worth knowing before you write
 
-**"No known allergies."** An `allergies` row needs a substance, so writing one
-puts "No known allergies" on the Allergies page as though it were an allergen.
-Carry the negative assertion on the encounter record instead.
+**Record "no known allergies", do not drop it.** Set `negated: true` on an
+`allergies` row (with `negationScope` if the source is specific — `drug`,
+`food`, `latex`…). Asked-and-none is different from never-asked, and the app
+already knows how to show it: filed under "Also recorded", badged "Not an
+allergen", excluded from the allergen count and from the wallet card, still
+linked to the source. Omit the row and the page reads as though the question was
+never put.
+
+**Record what is still outstanding.** "Stool FIT test is pending" is a
+`pendingResults` row, not a sentence in an encounter note. Write no value — a
+pending test has no result, and that is the point.
+
+**A risk score with no number is still a result.** "QRISK3: not validated whilst
+using a statin" goes in as the value, verbatim. Dropping it loses the fact that
+the score was considered.
 
 **"Date unknown."** A record with no date at all is stamped 1970-01-01 and opens
 a phantom decade at the foot of the timeline. `procedures` handles this — it
 falls back to `recordedDate` and leaves `performedDateTime` unset, which is the
 honest encoding. Other sections do not, so give them a date.
 
-And one thing to expect rather than fix: a non-imaging report in
-`imagingReports` (an ECG, a stress test) shows under Results but not under
-Imaging, because that page looks for imaging vocabulary. The section name is
-about the builder, not about which page the record lands on.
+**A report's section does not choose its page.** `diagnosticReports` makes a
+DiagnosticReport; the Imaging page then decides for itself by looking for
+imaging vocabulary, so an ECG lands on Results and correctly not on Imaging. If
+a report really is a scan but reads too tersely for that test, set
+`imaging: true`. (`imagingReports` still works as an alias for the section's old
+name.)
 
 ## Before you hand it over
 

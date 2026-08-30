@@ -49,7 +49,8 @@ machine-readable definition.
   },
   "labPanels": [],
   "vitals": [],
-  "imagingReports": [],
+  "diagnosticReports": [],
+  "pendingResults": [],
   "medicationPlans": [],
   "clinicalEncounters": [],
   "conditions": [],
@@ -124,6 +125,12 @@ do not pre-digest them.
 Known lab names get a LOINC code automatically (`LAB_LOINC` in the builder).
 Unmatched names still import, flagged `manual_uncoded`.
 
+**Computed risk scores go here too** — QRISK3, QDiabetes, ASCVD, FRAX — as a
+panel of their own. They are measurements with a value and a date, and a panel
+puts them on Results where they can be found. A score the document declines to
+calculate is still a result worth keeping: record the reason verbatim as the
+value ("Not validated whilst using a statin") rather than dropping the row.
+
 ### `vitals` → `Observation` with the `vital-signs` category
 
 **`id`**, **`recordedAt`**, `measurements[]`.
@@ -134,7 +141,14 @@ Each measurement: **`id`**, **`name`**, and one of `value` / `components` /
 `name` is matched against `VITAL_LOINC`: blood pressure, systolic/diastolic
 blood pressure, heart rate, pulse, respiratory rate, body temperature,
 temperature, oxygen saturation, spo2, body weight, weight, body height, height,
-body mass index, bmi.
+body mass index, bmi, body fat percentage, body fat mass, skeletal muscle mass,
+visceral fat, waist circumference.
+
+Body composition belongs here rather than in a section of its own. A value may
+be qualitative — a letter that says fat mass is "Normal" and muscle mass is
+"Just under normal range" is reporting a measurement it chose not to print, and
+`"value": "Normal"` records that faithfully. A vendor summary score with no LOINC
+(a "TRU score") still imports; it is flagged `manual_uncoded`.
 
 Blood pressure is one reading with two numbers, so it uses `components` and
 carries no top-level value:
@@ -151,17 +165,39 @@ carries no top-level value:
 }
 ```
 
-### `imagingReports` → `DiagnosticReport`, plus an `Observation` per finding
+### `diagnosticReports` → `DiagnosticReport`, plus an `Observation` per finding
 
-**`id`**, **`title`**, **`studyDate`**. Plus `findings`, `note`.
+**`id`**, **`title`**, **`studyDate`**. Plus `findings`, `imaging`, `note`.
 
-Despite the name, this is the right home for any narrative investigation report
-— a stress test or a resting ECG interpretation, not only radiology.
+Any narrative investigation report: radiology, but equally a stress test or a
+resting ECG interpretation.
 
-Such a report becomes a `DiagnosticReport` and appears under **Results**, but
-**not** under **Imaging**: that page tests for imaging vocabulary in the text and
-an ECG has none. That is correct — an ECG is not imaging — but it does mean
-`imagingReports` is not a promise about which page a record lands on.
+The section used to be called `imagingReports`, which read as a promise about
+where the record would appear. It never was one. The **Imaging** page decides
+for itself, by testing the record's text for imaging vocabulary — so an ECG
+report goes to **Results** and correctly stays off Imaging. `imagingReports`
+still works as an alias so existing records files keep building.
+
+Set `imaging: true` when a report really is a scan but its wording is too terse
+for that test — it writes `manual_subtype: "imaging"`, which the Imaging page
+reads before it reads any text.
+
+### `pendingResults` → `Observation` with status `registered`
+
+**`id`**, **`name`**. Plus `orderedDate`, `provider`, `expected`, `purpose`,
+`category`, `note`.
+
+Tests the document says were ordered but had no result yet — "Stool FIT test is
+**pending**". These belong in the record: an unreturned bowel-cancer screen is
+the kind of thing a patient should be able to find, and burying it in encounter
+prose means nobody will.
+
+The observation carries **no value**, deliberately: a pending test has no result
+and inventing one would be worse than the gap. FHIR's `registered` is the status
+for ordered-not-resulted, and the Results page already reads it — such a record
+shows there labelled _preliminary_. (That label conflates "ordered, nothing
+back" with "an early result exists", which are different things; the record is
+right, the wording is the app's to sharpen.)
 
 ### `medicationPlans` → `MedicationStatement` per item, plus a `List`
 
@@ -217,9 +253,30 @@ says the date is unknown. Never infer laterality from elsewhere in the document.
 **`id`**, **`substance`**, plus `status`, `criticality`, `recordedDate`,
 `reaction` (string, or `{ manifestation, severity }`), `code`, `note`.
 
-**"No known allergies" has no representation here.** A row needs a substance, so
-writing one renders "No known allergies" as an allergen. Put the negative
-assertion on the encounter instead.
+**To record "no known allergies", set `negated: true`.** Optionally add
+`negationScope` — `general` (the default), `drug`, `food`, `environmental`,
+`latex`, `not-asked` or `unknown`.
+
+```jsonc
+{
+  "id": "nka",
+  "substance": "No Known Allergies",
+  "negated": true,
+  "recordedDate": "2026-08-03",
+  "sourceImage": "Letter.pdf",
+}
+```
+
+This is a real clinical statement — asked-and-none is not the same as
+never-asked — and it must not read as an allergen. The negated row is coded with
+the matching SNOMED concept (716186003 and friends) on both `code` and
+`substance`, which is what the app's negation test looks for. The Allergies page
+then files it under **Also recorded** with a "Not an allergen" badge, keeps the
+allergen count at zero, and leaves it off the emergency wallet card — while
+still linking it back to the source document.
+
+Without `negated`, a substance of "No Known Allergies" is matched by a text
+fallback and mostly behaves; coding it is what makes it reliable.
 
 ### `familyHistory` → `FamilyMemberHistory`
 

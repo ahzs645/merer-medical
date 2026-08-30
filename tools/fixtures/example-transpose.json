@@ -152,16 +152,6 @@
       ]
     }
   ],
-  "imagingReports": [
-    {
-      "id": "cxr-2026-02-14",
-      "title": "Chest X-ray",
-      "studyDate": "2026-02-14",
-      "provider": "Example Clinic Radiology",
-      "sourceImage": "example-clinic-letter.pdf",
-      "note": "Clear lung fields. Normal cardiac silhouette. No acute abnormality."
-    }
-  ],
   "medicationPlans": [
     {
       "id": "meds-2026-02-14",
@@ -239,6 +229,36 @@
       "value": "Never smoked.",
       "recordedDate": "2026-02-14",
       "sourceImage": "example-clinic-letter.pdf"
+    }
+  ],
+  "diagnosticReports": [
+    {
+      "id": "cxr-2026-02-14",
+      "title": "Chest X-ray",
+      "studyDate": "2026-02-14",
+      "provider": "Example Clinic Radiology",
+      "sourceImage": "example-clinic-letter.pdf",
+      "note": "Clear lung fields. Normal cardiac silhouette. No acute abnormality."
+    }
+  ],
+  "allergies": [
+    {
+      "id": "nka",
+      "substance": "No Known Allergies",
+      "negated": true,
+      "recordedDate": "2026-02-14",
+      "sourceImage": "example-clinic-letter.pdf",
+      "note": "Allergy history taken; nothing found."
+    }
+  ],
+  "pendingResults": [
+    {
+      "id": "fit",
+      "name": "Faecal immunochemical test",
+      "orderedDate": "2026-02-14",
+      "purpose": "Bowel cancer screening",
+      "sourceImage": "example-clinic-letter.pdf",
+      "note": "Ordered on the day; no result at the time of the letter."
     }
   ]
 }
