@@ -25,3 +25,21 @@ if (global.window) {
   global.window.IntersectionObserver =
     global.window.IntersectionObserver || NoopIntersectionObserver;
 }
+
+// jsdom implements no media queries at all, so any component that branches on
+// one — a bottom sheet against a panel, a modal against a drawer — throws on
+// render. Reports the phone layout, which is the first-paint default the
+// components already assume, and stays live-updatable in case a test wants to
+// flip it.
+if (global.window && typeof global.window.matchMedia !== 'function') {
+  global.window.matchMedia = (query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  });
+}

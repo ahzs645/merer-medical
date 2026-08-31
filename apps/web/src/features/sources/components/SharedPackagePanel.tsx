@@ -1,6 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
 import { useSearchParams } from 'react-router-dom';
-import { ExclamationTriangleIcon, LinkIcon } from '@heroicons/react/24/outline';
+import {
+  ExclamationTriangleIcon,
+  LinkIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import {
@@ -12,6 +17,7 @@ import { isUnstartedPlaceholder } from '../../../repositories/UserRepository';
 import { useNotificationDispatch } from '../../../app/providers/NotificationProvider';
 import { importEmrpkgToRxDb, inspectEmrpkg } from '../../../services/emrpkg';
 import { ButtonLoadingSpinner } from '../../connections/components/ButtonLoadingSpinner';
+import { useIsDesktop } from '../../../shared/hooks/useIsDesktop';
 
 /**
  * The query parameter a shared package arrives on.
@@ -88,6 +94,7 @@ export function SharedPackagePanel() {
   const allUsers = useAllUsers();
   const currentUser = useOptionalUser();
   const { removeEmptyPlaceholders } = useUserManagement();
+  const isDesktop = useIsDesktop();
   const notifyDispatch = useNotificationDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const raw = searchParams.get(SHARED_PACKAGE_PARAM);
@@ -99,6 +106,7 @@ export function SharedPackagePanel() {
   const [importing, setImporting] = useState(false);
   const [autoloading, setAutoloading] = useState(false);
   const [passphrase, setPassphrase] = useState('');
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const dismiss = useCallback(() => {
     const next = new URLSearchParams(searchParams);
@@ -217,6 +225,7 @@ export function SharedPackagePanel() {
   }, [autoloading, fetched, importing, runImport]);
 
   if (!raw) return null;
+  const open = Boolean(raw);
 
   const counts = fetched?.info.counts;
   const clinical = counts?.['clinical_documents'];
@@ -254,165 +263,237 @@ export function SharedPackagePanel() {
       ? 'Add as a separate profile'
       : 'Add to my records';
 
-  return (
-    <section className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4">
-      <div className="flex items-start gap-3">
-        <LinkIcon className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
-        <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-semibold text-gray-900">
-            Someone shared records with you
-          </h3>
+  const body = (
+    <div className="flex items-start gap-3">
+      <LinkIcon className="mt-0.5 h-5 w-5 shrink-0 text-amber-700 sm:block" />
+      <div className="min-w-0 flex-1">
+        <h3 className="text-base font-semibold text-gray-900 sm:text-sm">
+          Someone shared records with you
+        </h3>
 
-          {loading && (
-            <p className="mt-1 text-sm text-gray-700">
-              Reading the package from {parsePackageUrl(raw)?.host ?? raw}…
-            </p>
-          )}
+        {loading && (
+          <p className="mt-1 text-sm text-gray-700">
+            Reading the package from {parsePackageUrl(raw)?.host ?? raw}…
+          </p>
+        )}
 
-          {error && (
-            <>
-              <p className="mt-1 text-sm text-gray-800">{error}</p>
-              <button
-                type="button"
-                onClick={dismiss}
-                className="mt-3 rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-800 ring-1 ring-gray-300"
-              >
-                Dismiss
-              </button>
-            </>
-          )}
+        {error && (
+          <>
+            <p className="mt-1 text-sm text-gray-800">{error}</p>
+            <button
+              type="button"
+              onClick={dismiss}
+              className="mt-3 rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-800 ring-1 ring-gray-300"
+            >
+              Dismiss
+            </button>
+          </>
+        )}
 
-          {fetched && (
-            <>
-              {/* The origin is the only thing telling the reader whether to
+        {fetched && (
+          <>
+            {/* The origin is the only thing telling the reader whether to
                   trust what follows, so it is the first thing said and it is
                   said in full — a link that arrived in a message is not a file
                   someone chose off their own disk. */}
+            <p className="mt-1 text-sm text-gray-800">
+              From <span className="font-medium">{fetched.origin}</span>
+              {fetched.info.appVersion ? ` · ${fetched.info.appVersion}` : ''}
+            </p>
+
+            {patient?.name && (
               <p className="mt-1 text-sm text-gray-800">
-                From <span className="font-medium">{fetched.origin}</span>
-                {fetched.info.appVersion ? ` · ${fetched.info.appVersion}` : ''}
+                Records for <span className="font-medium">{patient.name}</span>
               </p>
+            )}
 
-              {patient?.name && (
-                <p className="mt-1 text-sm text-gray-800">
-                  Records for{' '}
-                  <span className="font-medium">{patient.name}</span>
-                </p>
+            {autoloadRequested && !isTrustedPackageOrigin(fetched.origin) && (
+              <p className="mt-2 text-sm text-gray-700">
+                This link asked to import on its own. {fetched.origin} is not on
+                this app&rsquo;s trusted list, so it is being offered instead.
+              </p>
+            )}
+
+            {isNewProfile && !isFirstProfile && (
+              <p className="mt-2 text-sm text-gray-700">
+                These belong to someone who is not on this device yet, so they
+                open as a separate profile. Nothing already here is changed, and
+                you can switch back from Settings.
+              </p>
+            )}
+
+            <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-700">
+              {typeof clinical === 'number' && (
+                <div className="flex gap-1.5">
+                  <dt>Clinical records</dt>
+                  <dd className="font-semibold">{clinical}</dd>
+                </div>
               )}
+              {counts?.['connection_documents'] ? (
+                <div className="flex gap-1.5">
+                  <dt>Sources</dt>
+                  <dd className="font-semibold">
+                    {counts['connection_documents']}
+                  </dd>
+                </div>
+              ) : null}
+              {fetched.info.createdAt ? (
+                <div className="flex gap-1.5">
+                  <dt>Created</dt>
+                  <dd className="font-semibold">
+                    {new Date(fetched.info.createdAt).toLocaleDateString()}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
 
-              {autoloadRequested && !isTrustedPackageOrigin(fetched.origin) && (
-                <p className="mt-2 text-sm text-gray-700">
-                  This link asked to import on its own. {fetched.origin} is not
-                  on this app&rsquo;s trusted list, so it is being offered
-                  instead.
-                </p>
-              )}
+            {fetched.info.encrypted && (
+              <p className="mt-2 text-sm text-gray-700">
+                This package is encrypted, so what is inside it cannot be listed
+                until it is unlocked.
+              </p>
+            )}
 
-              {isNewProfile && !isFirstProfile && (
-                <p className="mt-2 text-sm text-gray-700">
-                  These belong to someone who is not on this device yet, so they
-                  open as a separate profile. Nothing already here is changed,
-                  and you can switch back from Settings.
-                </p>
-              )}
+            {needsPassphrase && (
+              <input
+                type="password"
+                value={passphrase}
+                onChange={(e) => setPassphrase(e.target.value)}
+                aria-label="Passphrase for the shared package"
+                placeholder="Passphrase"
+                className="mt-2 w-full max-w-xs rounded-md border-gray-300 text-sm"
+              />
+            )}
 
-              <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-700">
-                {typeof clinical === 'number' && (
-                  <div className="flex gap-1.5">
-                    <dt>Clinical records</dt>
-                    <dd className="font-semibold">{clinical}</dd>
-                  </div>
-                )}
-                {counts?.['connection_documents'] ? (
-                  <div className="flex gap-1.5">
-                    <dt>Sources</dt>
-                    <dd className="font-semibold">
-                      {counts['connection_documents']}
-                    </dd>
-                  </div>
-                ) : null}
-                {fetched.info.createdAt ? (
-                  <div className="flex gap-1.5">
-                    <dt>Created</dt>
-                    <dd className="font-semibold">
-                      {new Date(fetched.info.createdAt).toLocaleDateString()}
-                    </dd>
-                  </div>
-                ) : null}
-              </dl>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={importing}
+                onClick={() => runImport(false)}
+                className="bg-primary-700 hover:bg-primary-800 inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
+              >
+                {importing && <ButtonLoadingSpinner />}
+                {acceptLabel}
+              </button>
+              <button
+                type="button"
+                onClick={dismiss}
+                className="rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-800 ring-1 ring-gray-300"
+              >
+                Not now
+              </button>
+            </div>
 
-              {fetched.info.encrypted && (
-                <p className="mt-2 text-sm text-gray-700">
-                  This package is encrypted, so what is inside it cannot be
-                  listed until it is unlocked.
-                </p>
-              )}
-
-              {needsPassphrase && (
-                <input
-                  type="password"
-                  value={passphrase}
-                  onChange={(e) => setPassphrase(e.target.value)}
-                  aria-label="Passphrase for the shared package"
-                  placeholder="Passphrase"
-                  className="mt-2 w-full max-w-xs rounded-md border-gray-300 text-sm"
-                />
-              )}
-
-              <div className="mt-3 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  disabled={importing}
-                  onClick={() => runImport(false)}
-                  className="bg-primary-700 hover:bg-primary-800 inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
-                >
-                  {importing && <ButtonLoadingSpinner />}
-                  {acceptLabel}
-                </button>
-                <button
-                  type="button"
-                  onClick={dismiss}
-                  className="rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-800 ring-1 ring-gray-300"
-                >
-                  Not now
-                </button>
-              </div>
-
-              {/* Replacing is reachable but not offered as a peer of adding:
+            {/* Replacing is reachable but not offered as a peer of adding:
                   it discards everything already stored, and a link is the one
                   route into this app where the person pressing the button did
                   not choose the file. */}
-              {/* Only offered when the package would land on the profile in
+            {/* Only offered when the package would land on the profile in
                   use. For a package about somebody else, adding it already
                   leaves everything here alone, so "replace" would be an
                   invitation to delete a record set for no reason. */}
-              <details className="mt-3" hidden={isNewProfile || isFirstProfile}>
-                <summary className="cursor-pointer text-xs text-gray-600">
-                  Replace my records instead
-                </summary>
-                <div className="mt-2 flex items-start gap-2 rounded-md bg-white p-3 ring-1 ring-amber-300">
-                  <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
-                  <div>
-                    <p className="text-xs text-gray-700">
-                      This deletes every record already on this device and puts
-                      the shared ones in their place. Export yours first if you
-                      want to keep them.
-                    </p>
-                    <button
-                      type="button"
-                      disabled={importing}
-                      onClick={() => runImport(true)}
-                      className="mt-2 rounded-md bg-white px-3 py-1.5 text-xs font-medium text-red-700 ring-1 ring-red-300 disabled:opacity-60"
-                    >
-                      Delete my records and import these
-                    </button>
-                  </div>
+            <details className="mt-3" hidden={isNewProfile || isFirstProfile}>
+              <summary className="cursor-pointer text-xs text-gray-600">
+                Replace my records instead
+              </summary>
+              <div className="mt-2 flex items-start gap-2 rounded-md bg-white p-3 ring-1 ring-amber-300">
+                <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+                <div>
+                  <p className="text-xs text-gray-700">
+                    This deletes every record already on this device and puts
+                    the shared ones in their place. Export yours first if you
+                    want to keep them.
+                  </p>
+                  <button
+                    type="button"
+                    disabled={importing}
+                    onClick={() => runImport(true)}
+                    className="mt-2 rounded-md bg-white px-3 py-1.5 text-xs font-medium text-red-700 ring-1 ring-red-300 disabled:opacity-60"
+                  >
+                    Delete my records and import these
+                  </button>
                 </div>
-              </details>
-            </>
-          )}
-        </div>
+              </div>
+            </details>
+          </>
+        )}
       </div>
-    </section>
+    </div>
+  );
+
+  // Desktop keeps the offer in the page, where it sits above the rest of
+  // Sources and is read alongside it. A phone gets a sheet: the whole reason
+  // someone followed the link is this one decision, and a banner over a page
+  // they did not ask for reads like a notice rather than a question.
+  if (isDesktop) {
+    return (
+      <section className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4">
+        {body}
+      </section>
+    );
+  }
+
+  return (
+    <Transition.Root show={open} as={Fragment}>
+      {/* Dismissing on backdrop or Escape, same as the button: closing is not
+          losing anything. The package stays where it is and the link opens it
+          again whenever they are ready. */}
+      <Dialog
+        as="div"
+        className="relative z-dialog"
+        onClose={dismiss}
+        // Without this the dialog focuses its first focusable child — the close
+        // button — which draws a focus ring on the one control nobody should be
+        // nudged toward. Focus lands on the panel instead, so a keyboard tabs
+        // forward into the choice and a pointer user sees no pre-selection.
+        initialFocus={panelRef}
+      >
+        <Transition.Child
+          as={Fragment}
+          enter="ease-in-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in-out duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 transition-opacity" />
+        </Transition.Child>
+
+        <div className="fixed inset-0 z-10 overflow-hidden">
+          <div className="pointer-events-none fixed inset-x-0 bottom-0 flex max-h-full">
+            <Transition.Child
+              as={Fragment}
+              enter="transform transition ease-in-out duration-300"
+              enterFrom="translate-y-full"
+              enterTo="translate-y-0"
+              leave="transform transition ease-in-out duration-200"
+              leaveFrom="translate-y-0"
+              leaveTo="translate-y-full"
+            >
+              <Dialog.Panel
+                ref={panelRef}
+                tabIndex={-1}
+                className="pointer-events-auto max-h-[85vh] w-full overflow-y-auto rounded-t-2xl bg-amber-50 shadow-xl focus:outline-none"
+              >
+                <div className="flex justify-end px-4 pt-3">
+                  <button
+                    type="button"
+                    onClick={dismiss}
+                    // 44px, and in the corner a thumb reaches rather than
+                    // beside the accept button where it would be mis-hit.
+                    className="-me-2 flex h-11 w-11 items-center justify-center rounded-md text-gray-500 hover:text-gray-700"
+                  >
+                    <span className="sr-only">Close</span>
+                    <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+                  </button>
+                </div>
+                <div className="px-4 pb-8">{body}</div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition.Root>
   );
 }

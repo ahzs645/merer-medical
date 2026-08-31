@@ -65,6 +65,12 @@ connection reach the browser as the same error, and the remedies are opposite.
 
 ## What the reader sees
 
+On a phone the offer arrives as a sheet from the bottom of the screen; on a
+wider one it sits at the top of Sources as a panel. Either way it is a question,
+not a notice — closing it (the X, "Not now", tapping outside, or Escape) imports
+nothing and consumes nothing. The link is still the link, and opening it again
+brings the same offer back whenever the reader is ready.
+
 The offer names the origin and the patient, then says which of three things the
 button will do. Which one depends on whose records these are, because an
 additive import files records under **the package's own patient**, not the

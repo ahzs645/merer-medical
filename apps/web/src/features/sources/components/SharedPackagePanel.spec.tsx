@@ -78,6 +78,20 @@ function packageBytes(patientId = 'patient-1') {
   });
 }
 
+/** jsdom answers every media query the same way, so the branch is set here. */
+function setViewport(desktop: boolean) {
+  window.matchMedia = ((query: string) => ({
+    matches: desktop,
+    media: query,
+    onchange: null,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+    addListener: () => undefined,
+    removeListener: () => undefined,
+    dispatchEvent: () => false,
+  })) as unknown as typeof window.matchMedia;
+}
+
 function renderWith(target: string, extra = '') {
   return render(
     <MemoryRouter
@@ -354,6 +368,56 @@ describe('SharedPackagePanel autoload', () => {
         screen.getByRole('button', { name: /add to my records/i }),
       ).toBeTruthy(),
     );
+    expect(mockImport).not.toHaveBeenCalled();
+  });
+});
+
+describe('SharedPackagePanel presentation', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => packageBytes('patient-1').buffer,
+    });
+    mockAllUsers = [profile('patient-1')];
+    mockCurrentUser = { id: 'patient-1' };
+    globalThis.MERE_TRUSTED_PACKAGE_ORIGINS = '';
+    setViewport(false);
+  });
+
+  /**
+   * On a phone the offer is the only reason the reader followed the link, and a
+   * banner over a page they did not ask for reads like a notice rather than a
+   * question. A sheet makes it the thing on screen — and gives it a close.
+   */
+  it('presents the offer as a dialog on a phone', async () => {
+    renderWith('https://example.org/records.emrpkg');
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeTruthy());
+    expect(screen.getByRole('button', { name: /^close$/i })).toBeTruthy();
+  });
+
+  it('stays in the page on a wider screen', async () => {
+    setViewport(true);
+    renderWith('https://example.org/records.emrpkg');
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /add to my records/i }),
+      ).toBeTruthy(),
+    );
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  /**
+   * Closing must not consume the package: the link is still the link, and
+   * opening it again brings the same offer back.
+   */
+  it('closing dismisses without importing anything', async () => {
+    renderWith('https://example.org/records.emrpkg');
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeTruthy());
+
+    fireEvent.click(screen.getByRole('button', { name: /^close$/i }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(mockImport).not.toHaveBeenCalled();
   });
 });
