@@ -72,10 +72,11 @@ never times out: there is room on a large screen to leave the app usable while
 someone decides.
 
 Either way it is a question, not a notice. It follows the reader between tabs
-rather than belonging to the page they landed on, and closing it (the X, "Not
-now", and on a phone tapping outside or pressing Escape) imports nothing and
-consumes nothing. The link is still the link; opening it again brings the same
-offer back whenever they are ready.
+rather than belonging to the page they landed on, and closing it — the X, and on
+a phone tapping outside or pressing Escape — imports nothing and consumes
+nothing. There is deliberately no second button for that: declining is the
+outcome where nothing happens, and the link is still the link, so opening it
+again brings the same offer back whenever they are ready.
 
 The `?package=` parameter is cleared from the address bar as soon as the offer
 is claimed, so a link to somebody's medical record does not ride along in the

@@ -285,6 +285,14 @@ export function SharedPackagePanel() {
       ? 'Add as a separate profile'
       : 'Add to my records';
 
+  /**
+   * The only way out, on both presentations.
+   *
+   * A "Not now" beside the accept button read as a choice being made — a second
+   * button for the outcome where nothing happens, which is what closing already
+   * means. Nothing is lost either way: the package stays where it is and the
+   * link opens it again.
+   */
   const close = (
     <button
       type="button"
@@ -316,13 +324,6 @@ export function SharedPackagePanel() {
         {error && (
           <>
             <p className="mt-1 text-sm text-gray-800">{error}</p>
-            <button
-              type="button"
-              onClick={dismiss}
-              className="mt-3 rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-800 ring-1 ring-gray-300"
-            >
-              Dismiss
-            </button>
           </>
         )}
 
@@ -411,13 +412,6 @@ export function SharedPackagePanel() {
                 {importing && <ButtonLoadingSpinner />}
                 {acceptLabel}
               </button>
-              <button
-                type="button"
-                onClick={dismiss}
-                className="rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-800 ring-1 ring-gray-300"
-              >
-                Not now
-              </button>
             </div>
 
             {/* Replacing is reachable but not offered as a peer of adding:
@@ -474,7 +468,12 @@ export function SharedPackagePanel() {
       // network fetch has resolved — there is a natural beat before it either
       // way, and a card that waits to be dismissed is not asking to be noticed
       // twice.
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-toast flex justify-end px-6 pb-24 print:hidden">
+      //
+      // The toast lane's own classes, not an approximation of them: it drops
+      // to `pb-6` from `md` up (the `pb-24` is there to clear the phone tab
+      // bar), so a fixed `pb-24` left this card floating 96px above where the
+      // "Imported 624 records" toast it precedes actually lands.
+      <div className="pointer-events-none fixed inset-0 z-toast flex items-end justify-end px-4 pb-24 pt-6 print:hidden sm:px-6 md:pb-6">
         <div
           role="dialog"
           aria-modal="false"
