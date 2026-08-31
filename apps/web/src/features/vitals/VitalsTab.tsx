@@ -19,6 +19,7 @@ import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { isVitalSignObservation } from './utils/vitalRecords';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
+import { splitClinicalNote } from '../../shared/utils/clinicalNotes';
 
 // Saving lands back here rather than on the Timeline: a reading you typed on
 // the Vitals page belongs in front of you on the Vitals page.
@@ -137,25 +138,6 @@ function readObservation(resource: FhirObservation): {
   return { text: '—' };
 }
 
-/**
- * One FHIR note often holds several statements joined by newlines — the manual
- * builder writes provider, position and source as a single blob — and CSS
- * collapses those newlines, so "Provider: Home monitor Position: Sitting Taken
- * seated…" arrived as one run-on line.
- *
- * The `Source document:` line goes no further than here. It is an internal
- * pointer (`manual:source-document-…`), already carried in
- * `metadata.source_document_id` where the View source button reads it from;
- * printing the id at a reader is machine text on a medical record.
- */
-function splitNote(text?: string): string[] {
-  if (!text) return [];
-  return text
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line && !/^source document:/i.test(line));
-}
-
 function useVitals() {
   const db = useRxDb();
   const user = useUser();
@@ -238,7 +220,7 @@ function useVitals() {
             resource.method?.text
               ? `Method: ${resource.method.text}`
               : undefined,
-            ...rawNotes.flatMap((note) => splitNote(note?.text)),
+            ...rawNotes.flatMap((note) => splitClinicalNote(note?.text)),
           ].filter((note): note is string => Boolean(note)),
         };
         const existing = byKey.get(key);

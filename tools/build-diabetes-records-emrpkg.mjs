@@ -271,6 +271,11 @@ for (const panel of records.labPanels || []) {
             code: buildObservationCode(result),
             effectiveDateTime: atNoon(panel.collectedAt),
             issued: atNoon(panel.collectedAt),
+            // The panel's DiagnosticReport already named its provider; the
+            // observations under it did not, so every lab read "Reported by:
+            // Unknown source" two inches above a note saying "Provider:
+            // Cleveland Clinic London".
+            performer: panel.provider ? [{ display: panel.provider }] : undefined,
             ...observationValue(result.value, result.unit),
             referenceRange: buildReferenceRange(result),
             extension: buildLabExtensions(result, nutritionRelevance),
@@ -278,8 +283,11 @@ for (const panel of records.labPanels || []) {
               result.flag && result.flag !== 'identity'
                 ? { text: result.flag }
                 : undefined,
+            // No `Provider:` line: `performer` above carries it, and the
+            // note is rendered as provider comments a couple of inches under
+            // the field, so writing it twice made the record look like it
+            // disagreed with itself.
             note: buildNotes([
-              `Provider: ${panel.provider}`,
               `Source: ${panel.sourceImage}`,
               sourceDocument
                 ? `Source document: ${sourceDocument.documentReferenceId}`
@@ -500,6 +508,11 @@ for (const report of [
               : undefined,
             effectiveDateTime: atNoon(report.studyDate),
             issued: atNoon(report.studyDate),
+            // Same as the lab observations: the report names its provider, so
+            // the findings read out of it should not be anonymous.
+            performer: report.provider
+              ? [{ display: report.provider }]
+              : undefined,
             ...observationValue(finding.value, finding.unit),
             derivedFrom: [{ reference: `DiagnosticReport/${reportId}` }],
             note: buildNotes([

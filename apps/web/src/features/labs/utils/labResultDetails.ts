@@ -2,6 +2,7 @@ import { getFhirResource } from '../../../shared/utils/fhirResource';
 import { getReferenceRangeDisplay } from '../../timeline/utils/fhirpathParsers';
 import { LabDocument, LabGroup } from '../types';
 import { formatLabValue } from './labFormatters';
+import { splitClinicalNote } from '../../../shared/utils/clinicalNotes';
 
 export type LabResultStatus =
   | 'high'
@@ -167,13 +168,18 @@ function getInterpretationText(resource: any): string | undefined {
 }
 
 function getLabComments(resource: any, lab: LabDocument): string[] {
+  // Split rather than concatenated: one note holds several statements joined
+  // by newlines, and the internal source-document pointer is not one of the
+  // ones a reader is meant to see.
   return unique(
     [
       resource?.comments,
       resource?.comment,
       ...(resource?.note || []).map((note: any) => note?.text),
       lab.metadata?.provenance_notes,
-    ].filter(isPresent),
+    ]
+      .filter(isPresent)
+      .flatMap((value: string) => splitClinicalNote(value)),
   );
 }
 

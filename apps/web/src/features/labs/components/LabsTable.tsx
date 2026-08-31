@@ -175,7 +175,8 @@ function LabMobileRow({
                 <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-600">
                   {group.code ? <span>LOINC {group.code}</span> : null}
                   <span>
-                    {group.labs.length} {t('results')}
+                    {group.labs.length}{' '}
+                    {t(group.labs.length === 1 ? 'result' : 'results')}
                   </span>
                 </div>
               </div>
@@ -310,7 +311,8 @@ function LabTableRow({
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600">
               {group.code ? <span>LOINC {group.code}</span> : null}
               <span>
-                {group.labs.length} {t('results')}
+                {group.labs.length}{' '}
+                {t(group.labs.length === 1 ? 'result' : 'results')}
               </span>
             </div>
           </div>

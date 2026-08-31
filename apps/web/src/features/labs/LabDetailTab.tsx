@@ -103,7 +103,9 @@ export function LabDetailTab() {
             group ? (
               <span className="flex flex-wrap gap-x-3 gap-y-0.5">
                 {group.code ? <span>LOINC {group.code}</span> : null}
-                <span>{group.labs.length} results</span>
+                <span>
+                  {group.labs.length} result{group.labs.length === 1 ? '' : 's'}
+                </span>
                 <span>
                   Latest{' '}
                   {safeFormatDate(

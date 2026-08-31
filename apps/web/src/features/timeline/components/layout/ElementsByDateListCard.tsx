@@ -599,20 +599,24 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
                   key={item.id}
                   className="text-xs font-medium md:text-sm text-gray-900"
                 >
-                  {getEncounterClass(item) && (
-                    <p className="capitalize inline-block">{`${getEncounterClass(item)} -`}</p>
-                  )}
-                  {getEncounterLocation(item) && (
-                    <p
-                      className={
-                        getEncounterClass(item)
-                          ? 'inline-block ms-1'
-                          : 'inline-block'
-                      }
-                    >
-                      {getEncounterLocation(item)}
-                    </p>
-                  )}
+                  {/* One run of inline text, not two `inline-block` boxes
+                      with a dash between them: an inline-block does not break
+                      inside, so a long location moved down as a whole and left
+                      "Manual -" alone on the line above, reading like a
+                      truncation. A trailing separator with nothing after it
+                      was the other half of that — it is only drawn when there
+                      is something on both sides of it. */}
+                  {getEncounterClass(item) ? (
+                    <span className="capitalize">
+                      {getEncounterClass(item)}
+                    </span>
+                  ) : null}
+                  {getEncounterClass(item) && getEncounterLocation(item)
+                    ? ' · '
+                    : null}
+                  {getEncounterLocation(item) ? (
+                    <span>{getEncounterLocation(item)}</span>
+                  ) : null}
                 </li>
               ))}
             </ul>

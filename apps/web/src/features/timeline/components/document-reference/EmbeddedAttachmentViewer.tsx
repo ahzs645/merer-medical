@@ -1,4 +1,8 @@
 import { useEffect, useState } from 'react';
+import {
+  ArrowTopRightOnSquareIcon,
+  DocumentTextIcon,
+} from '@heroicons/react/24/outline';
 import DOMPurify from 'dompurify';
 import parse from 'html-react-parser';
 
@@ -50,7 +54,10 @@ export function EmbeddedAttachmentViewer({
         setTextContent(raw);
       }
       setHasLoadedDocument(true);
-    } else if (contentType.includes('application/pdf') && typeof raw === 'string') {
+    } else if (
+      contentType.includes('application/pdf') &&
+      typeof raw === 'string'
+    ) {
       const url = createBlobUrlFromBase64(raw, contentType);
       setPdfUrl(url);
       setHasLoadedDocument(true);
@@ -94,13 +101,7 @@ export function EmbeddedAttachmentViewer({
 
   if (pdfUrl) {
     return (
-      <div className="h-[600px] w-full p-4">
-        <iframe
-          src={pdfUrl}
-          className="h-full w-full border-0"
-          title={attachment?.title || 'PDF Document'}
-        />
-      </div>
+      <EmbeddedPdf url={pdfUrl} title={attachment?.title || 'PDF Document'} />
     );
   }
 
@@ -144,4 +145,48 @@ function createBlobUrlFromBase64(base64: string, contentType: string): string {
   const byteArray = new Uint8Array(byteNumbers);
   const blob = new Blob([byteArray], { type: contentType });
   return URL.createObjectURL(blob);
+}
+
+/**
+ * A PDF, offered rather than embedded.
+ *
+ * The browser's own PDF plugin fits a document to its frame once, when the
+ * frame loads, and never fits again. Embedded in the document page's sidebar
+ * — a five-of-twelve grid track, about 325px — it settled on a zoom that drew
+ * a twelve-page screening letter as an unreadable ribbon down the left of the
+ * card, which at a glance read as an empty document rather than a broken
+ * viewer. Nothing available from here moves it: widening the frame afterwards,
+ * remounting it at a settled width, waiting for it to be scrolled into view,
+ * a `#view=FitH` fragment, absolute positioning, a full-screen overlay. The
+ * same bytes render perfectly when the frame is the whole window, and on a
+ * phone the plugin misreads the viewport scale on top of everything else.
+ *
+ * So the card says what the file is and opens it in its own tab, where the
+ * viewer works — with the scroll, search, zoom and print the plugin only
+ * offers at that size. Nothing was legible here before the click.
+ */
+function EmbeddedPdf({ url, title }: { url: string; title: string }) {
+  return (
+    <div className="p-4">
+      <button
+        type="button"
+        onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+        className="flex w-full items-center gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 text-start hover:bg-gray-100"
+      >
+        <DocumentTextIcon className="h-8 w-8 shrink-0 text-gray-500" />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-semibold text-gray-900">
+            {title}
+          </span>
+          <span className="block text-xs text-gray-600">
+            PDF · opens in a new tab
+          </span>
+        </span>
+        <ArrowTopRightOnSquareIcon
+          className="h-5 w-5 shrink-0 text-gray-500"
+          aria-hidden="true"
+        />
+      </button>
+    </div>
+  );
 }
