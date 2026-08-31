@@ -37,8 +37,13 @@ export function LabDetailTab() {
 
   const groupedLabs = useMemo(() => groupLabs(labs), [labs]);
   const group = useMemo(() => {
-    const decodedKey = labKey ? decodeURIComponent(labKey) : '';
-    return groupedLabs.find((item) => item.key === decodedKey);
+    // No `decodeURIComponent` here: React Router has already decoded the
+    // param, so decoding it again is a no-op for most lab names and a crash
+    // for any containing a percent sign — the link is written `psa%20%25`,
+    // the param arrives as "psa %", and "% " is not a valid escape, so the
+    // whole page came down with "URI malformed". "PSA %" and "HDL % of total"
+    // are both in an ordinary blood panel.
+    return groupedLabs.find((item) => item.key === (labKey ?? ''));
   }, [groupedLabs, labKey]);
   const latestLab = group?.labs[0];
   const relatedConditions = useMemo(() => {

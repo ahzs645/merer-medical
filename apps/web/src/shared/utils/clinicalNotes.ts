@@ -19,3 +19,27 @@ export function splitClinicalNote(text?: string): string[] {
     .map((line) => line.trim())
     .filter((line) => line && !/^source document:/i.test(line));
 }
+
+/**
+ * The provider a note names, for records whose `performer` field is empty.
+ *
+ * Packages built before the transposing builder set `performer` carry the
+ * provider only as a `Provider:` line inside the note — the fact is in the
+ * record, in the wrong place. Reading it back is recovery, not invention:
+ * nothing is displayed that the record did not already say.
+ *
+ * Pair it with `withoutProviderLine` wherever the value is shown in a field
+ * of its own, so the record does not state the same thing twice.
+ */
+export function providerFromNotes(notes: string[]): string | undefined {
+  for (const note of notes) {
+    const match = /^provider:\s*(.+)$/i.exec(note);
+    if (match?.[1]?.trim()) return match[1].trim();
+  }
+  return undefined;
+}
+
+/** The same notes with that line taken out. */
+export function withoutProviderLine(notes: string[]): string[] {
+  return notes.filter((note) => !/^provider:\s*.+$/i.test(note));
+}
