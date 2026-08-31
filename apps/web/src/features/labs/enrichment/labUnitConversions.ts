@@ -58,6 +58,13 @@ export const labUnitConversions: Record<
   'vitamin-d-nmol': {
     'ng/mL': { unit: 'nmol/L', factor: 2.496 },
   },
+  // Canada states haematocrit as a percentage and Australia and the UK as a
+  // fraction. Without this the two cannot be reconciled, and a value of 45
+  // was being read against "0.40-0.52" — flagged wildly high for being
+  // written in the other convention.
+  hematocrit: {
+    '%': { unit: 'L/L', factor: 0.01 },
+  },
 };
 
 const equivalentUnits: Record<string, string> = {
@@ -149,4 +156,29 @@ export function convertLabUnit(
   }
 
   return { value, unit: normalizedSourceUnit, converted: false };
+}
+
+/**
+ * Whether two units could be describing the same measurement.
+ *
+ * A reference range is only meaningful against a value in a unit it can be
+ * compared with. "HDL % of total" is reported in `%` and the HDL reference
+ * band is `>=1.00 mmol/L`; comparing them is not a near-miss, it is a
+ * different quantity. Anything the conversion table can bridge counts as the
+ * same unit, so mg/dL against a mmol/L band is fine.
+ *
+ * An absent unit is not a contradiction. Plenty of records carry no unit at
+ * all, and refusing them a reference on that basis would lose more than it
+ * protects — this only rules out units that actively disagree.
+ */
+export function unitsAreReconcilable(
+  aliasId: string,
+  a?: string,
+  b?: string,
+): boolean {
+  const left = normalizeLabUnit(a);
+  const right = normalizeLabUnit(b);
+  if (!left || !right) return true;
+  if (left === right) return true;
+  return convertLabUnit(aliasId, 1, left, right).converted;
 }
