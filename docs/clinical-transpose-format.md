@@ -344,38 +344,17 @@ clinician's assertion because another disagrees.
 
 ## Sharing a package by link
 
-A package at a URL can be opened straight into the app:
+A built package can be opened from a URL:
 
 ```
-https://your-mere-host/connections?package=https://example.org/records.emrpkg
+https://your-mere-host/connections?package=https://records.example.org/eisa.emrpkg
 ```
 
-The app fetches it, reads the manifest, and shows what it holds — the origin,
-the record counts, when it was built — and then **waits**. A link can offer
-records; it cannot write them. Nothing reaches the store until someone presses
-"Add to my records", and that path adds rather than replaces. Replacing is
-behind a disclosure with its own warning, because it deletes everything already
-on the device and a link is the one route into the app where the person pressing
-the button did not choose the file.
-
-**The host must send CORS headers.** The browser is reading someone else's
-origin, so the server needs `Access-Control-Allow-Origin`. Static hosts you
-control (S3, Cloudflare R2, GitHub Pages, a plain nginx) can be configured for
-it; **Google Drive and Dropbox share links cannot** and will fail. The panel
-says as much rather than reporting a generic network error, because a
-cross-origin block and a dead connection reach `fetch` as the same `TypeError`.
-
-Other limits: `http(s)` only — a `javascript:` or `data:` URL is refused before
-anything is fetched — and 64 MB.
-
-### Before you publish one
-
-A `.emrpkg` at a public URL is a medical record anyone with the link can read,
-and a link is not a secret: it travels through browser history, referrer
-headers, chat logs and server access logs. Export with a passphrase for anything
-you would not hand to a stranger — an encrypted package still loads from a link,
-and the app prompts for the passphrase before importing. What it cannot do is
-list the contents first, since the manifest is inside the ciphertext.
+The app describes it and waits — a link can offer records, it cannot write them.
+Hosting requirements (the host must send CORS; Drive and Dropbox links cannot),
+what the reader is shown, opt-in auto-loading, and the privacy of putting a
+medical record on a URL are all in
+[Sharing a package by link](./sharing-a-package-by-link.md).
 
 ## Checking the result in the app
 

@@ -6,12 +6,14 @@ site published at meremedical.co).
 
 ## Index
 
-| File                                         | Topic                                                        |
-| -------------------------------------------- | ------------------------------------------------------------ |
-| [architecture.md](./architecture.md)         | Local-first data layer, `packages/` layout, Convex-shaped design.   |
-| [emrpkg-format.md](./emrpkg-format.md)       | `.emrpkg` file format spec: envelope, zip, manifest, encryption.    |
-| [migration.md](./migration.md)               | RxDB → Dexie migration roadmap, the feature flag, what's left.      |
-| [serverless-mode.md](./serverless-mode.md)   | Running Mere fully serverless (no `apps/api`, `.emrpkg` only).      |
+| File                                                           | Topic                                                                                            |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [architecture.md](./architecture.md)                           | Local-first data layer, `packages/` layout, Convex-shaped design.                                |
+| [emrpkg-format.md](./emrpkg-format.md)                         | `.emrpkg` file format spec: envelope, zip, manifest, encryption.                                 |
+| [migration.md](./migration.md)                                 | RxDB → Dexie migration roadmap, the feature flag, what's left.                                   |
+| [serverless-mode.md](./serverless-mode.md)                     | Running Mere fully serverless (no `apps/api`, `.emrpkg` only).                                   |
+| [clinical-transpose-format.md](./clinical-transpose-format.md) | Turning a clinical document into a package: the `records.json` format and `tools/transpose.mjs`. |
+| [sharing-a-package-by-link.md](./sharing-a-package-by-link.md) | Serving a `.emrpkg` at a URL, the CORS requirement, and opt-in auto-loading.                     |
 
 ## Audience
 

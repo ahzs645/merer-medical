@@ -78,10 +78,12 @@ function packageBytes(patientId = 'patient-1') {
   });
 }
 
-function renderWith(target: string) {
+function renderWith(target: string, extra = '') {
   return render(
     <MemoryRouter
-      initialEntries={[`/connections?package=${encodeURIComponent(target)}`]}
+      initialEntries={[
+        `/connections?package=${encodeURIComponent(target)}${extra}`,
+      ]}
     >
       <SharedPackagePanel />
     </MemoryRouter>,
@@ -96,6 +98,7 @@ describe('SharedPackagePanel', () => {
     // the records belong to the person already using the app.
     mockAllUsers = [profile('patient-1')];
     mockCurrentUser = { id: 'patient-1' };
+    globalThis.MERE_TRUSTED_PACKAGE_ORIGINS = '';
   });
 
   it('renders nothing without the parameter', () => {
@@ -273,6 +276,82 @@ describe('SharedPackagePanel', () => {
     await waitFor(() =>
       expect(
         screen.getByText(/does not point at a Mere package/i),
+      ).toBeTruthy(),
+    );
+    expect(mockImport).not.toHaveBeenCalled();
+  });
+});
+
+describe('SharedPackagePanel autoload', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => packageBytes('patient-1').buffer,
+    });
+    mockAllUsers = [profile('patient-1')];
+    mockCurrentUser = { id: 'patient-1' };
+    globalThis.MERE_TRUSTED_PACKAGE_ORIGINS = '';
+  });
+
+  /**
+   * The point of gating auto-import on the deployment rather than the link:
+   * anyone can append `&autoload=1`, so honouring it on its own would remove
+   * the one screen standing between a link somebody sent you and your record.
+   */
+  it('ignores autoload from an origin the deployment does not trust', async () => {
+    renderWith('https://stranger.example/records.emrpkg', '&autoload=1');
+
+    await waitFor(() =>
+      expect(screen.getByText(/not on this app.s trusted list/i)).toBeTruthy(),
+    );
+    expect(mockImport).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole('button', { name: /add to my records/i }),
+    ).toBeTruthy();
+  });
+
+  it('imports without asking from a trusted origin', async () => {
+    globalThis.MERE_TRUSTED_PACKAGE_ORIGINS = 'https://records.example';
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => packageBytes('patient-1').buffer,
+    });
+    renderWith('https://records.example/records.emrpkg', '&autoload=1');
+
+    await waitFor(() => expect(mockImport).toHaveBeenCalled());
+    // Additive even here: a trusted host may save a tap, not delete a record set.
+    expect(mockImport.mock.calls[0][2]).toMatchObject({ replace: false });
+  });
+
+  it('reads a comma-separated list and tolerates a trailing slash', async () => {
+    globalThis.MERE_TRUSTED_PACKAGE_ORIGINS =
+      'https://a.example/, https://records.example';
+    renderWith('https://records.example/records.emrpkg', '&autoload=1');
+    await waitFor(() => expect(mockImport).toHaveBeenCalled());
+  });
+
+  it('still asks when the package is encrypted', async () => {
+    globalThis.MERE_TRUSTED_PACKAGE_ORIGINS = 'https://records.example';
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      // A `MEREPKG1` envelope: encrypted, so its passphrase is not known yet.
+      arrayBuffer: async () => strToU8('MEREPKG1' + '\u0000'.repeat(40)).buffer,
+    });
+    renderWith('https://records.example/records.emrpkg', '&autoload=1');
+
+    await waitFor(() =>
+      expect(screen.getByText(/this package is encrypted/i)).toBeTruthy(),
+    );
+    expect(mockImport).not.toHaveBeenCalled();
+  });
+
+  it('does nothing extra without the parameter', async () => {
+    globalThis.MERE_TRUSTED_PACKAGE_ORIGINS = 'https://records.example';
+    renderWith('https://records.example/records.emrpkg');
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /add to my records/i }),
       ).toBeTruthy(),
     );
     expect(mockImport).not.toHaveBeenCalled();

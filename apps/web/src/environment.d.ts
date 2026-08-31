@@ -13,6 +13,8 @@ declare global {
   var MERE_APP_VERSION: string;
   var IS_DEMO: string;
   var MERE_STORAGE_BACKEND: 'rxdb' | 'dexie' | string;
+  /** Comma-separated origins allowed to auto-import a shared package. */
+  var MERE_TRUSTED_PACKAGE_ORIGINS: string;
 }
 
 export {};

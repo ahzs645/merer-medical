@@ -127,6 +127,12 @@ export default defineConfig(({ command, mode }) => {
       MERE_STORAGE_BACKEND: JSON.stringify(
         process.env['VITE_MERE_STORAGE_BACKEND'] || 'rxdb',
       ),
+      // Origins whose packages may import without a confirmation. Set by
+      // whoever deploys the app, never by the link — see
+      // docs/sharing-a-package-by-link.md.
+      MERE_TRUSTED_PACKAGE_ORIGINS: JSON.stringify(
+        process.env['VITE_MERE_TRUSTED_PACKAGE_ORIGINS'] || '',
+      ),
       'process.env.NODE_ENV': JSON.stringify(
         isProduction ? 'production' : 'development',
       ),

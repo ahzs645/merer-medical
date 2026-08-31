@@ -21,6 +21,33 @@ import { ButtonLoadingSpinner } from '../../connections/components/ButtonLoading
  */
 export const SHARED_PACKAGE_PARAM = 'package';
 
+/** Asks for the import to happen without a confirmation. Only a request. */
+export const SHARED_PACKAGE_AUTOLOAD_PARAM = 'autoload';
+
+/**
+ * Origins whose packages may import themselves.
+ *
+ * Deliberately not something the link can say about itself: `&autoload=1` is a
+ * request, and anyone can append it, so honouring it on its own would make the
+ * confirmation worthless — the one screen standing between a link somebody sent
+ * you and your medical record. The allowlist is set at build time by whoever
+ * deploys the app, who is the only party in a position to vouch for a host.
+ *
+ * Auto-import is additive and never runs on an encrypted package, which needs a
+ * passphrase nobody has yet typed.
+ */
+export function isTrustedPackageOrigin(origin: string): boolean {
+  const configured =
+    typeof globalThis.MERE_TRUSTED_PACKAGE_ORIGINS === 'string'
+      ? globalThis.MERE_TRUSTED_PACKAGE_ORIGINS
+      : '';
+  return configured
+    .split(',')
+    .map((entry) => entry.trim().replace(/\/$/, ''))
+    .filter(Boolean)
+    .includes(origin);
+}
+
 /** Anything larger is not something to pull into a browser tab unannounced. */
 const MAX_BYTES = 64 * 1024 * 1024;
 
@@ -64,11 +91,13 @@ export function SharedPackagePanel() {
   const notifyDispatch = useNotificationDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const raw = searchParams.get(SHARED_PACKAGE_PARAM);
+  const autoloadRequested = searchParams.get(SHARED_PACKAGE_AUTOLOAD_PARAM);
 
   const [fetched, setFetched] = useState<Fetched | undefined>();
   const [error, setError] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [autoloading, setAutoloading] = useState(false);
   const [passphrase, setPassphrase] = useState('');
 
   const dismiss = useCallback(() => {
@@ -120,6 +149,11 @@ export function SharedPackagePanel() {
         }
         if (cancelled) return;
         setFetched({ bytes, info, origin: url.origin });
+        setAutoloading(
+          Boolean(autoloadRequested) &&
+            !info.encrypted &&
+            isTrustedPackageOrigin(url.origin),
+        );
       } catch (fetchError) {
         if (cancelled) return;
         setError(describeFetchFailure(url, fetchError));
@@ -131,7 +165,7 @@ export function SharedPackagePanel() {
     return () => {
       cancelled = true;
     };
-  }, [raw]);
+  }, [raw, autoloadRequested]);
 
   const runImport = useCallback(
     async (replace: boolean) => {
@@ -173,6 +207,14 @@ export function SharedPackagePanel() {
     },
     [db, dismiss, fetched, notifyDispatch, passphrase, removeEmptyPlaceholders],
   );
+
+  // Kept out of the fetch effect so the import runs against the same callback
+  // the button uses — one path in, whoever pressed it.
+  useEffect(() => {
+    if (!autoloading || !fetched || importing) return;
+    setAutoloading(false);
+    void runImport(false);
+  }, [autoloading, fetched, importing, runImport]);
 
   if (!raw) return null;
 
@@ -255,6 +297,14 @@ export function SharedPackagePanel() {
                 <p className="mt-1 text-sm text-gray-800">
                   Records for{' '}
                   <span className="font-medium">{patient.name}</span>
+                </p>
+              )}
+
+              {autoloadRequested && !isTrustedPackageOrigin(fetched.origin) && (
+                <p className="mt-2 text-sm text-gray-700">
+                  This link asked to import on its own. {fetched.origin} is not
+                  on this app&rsquo;s trusted list, so it is being offered
+                  instead.
                 </p>
               )}
 
