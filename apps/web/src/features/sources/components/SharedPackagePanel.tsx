@@ -97,8 +97,32 @@ export function SharedPackagePanel() {
   const isDesktop = useIsDesktop();
   const notifyDispatch = useNotificationDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
-  const raw = searchParams.get(SHARED_PACKAGE_PARAM);
-  const autoloadRequested = searchParams.get(SHARED_PACKAGE_AUTOLOAD_PARAM);
+  /**
+   * The link is read once and then held.
+   *
+   * Keying the offer off the query string tied it to the route it arrived on,
+   * so any tap in the nav silently threw it away — which makes "dismiss" a
+   * word for something the reader never did. Claiming it into state lets the
+   * offer outlive navigation and only close when somebody closes it, and
+   * clearing the parameter straight away keeps a link to somebody's medical
+   * record from riding along in the address bar.
+   */
+  const [claimed, setClaimed] = useState<
+    { raw: string; autoload: boolean } | undefined
+  >();
+  const raw = claimed?.raw;
+  const autoloadRequested = claimed?.autoload;
+
+  const param = searchParams.get(SHARED_PACKAGE_PARAM);
+  const autoloadParam = searchParams.get(SHARED_PACKAGE_AUTOLOAD_PARAM);
+  useEffect(() => {
+    if (!param) return;
+    setClaimed({ raw: param, autoload: Boolean(autoloadParam) });
+    const next = new URLSearchParams(searchParams);
+    next.delete(SHARED_PACKAGE_PARAM);
+    next.delete(SHARED_PACKAGE_AUTOLOAD_PARAM);
+    setSearchParams(next, { replace: true });
+  }, [param, autoloadParam, searchParams, setSearchParams]);
 
   const [fetched, setFetched] = useState<Fetched | undefined>();
   const [error, setError] = useState<string | undefined>();
@@ -109,12 +133,10 @@ export function SharedPackagePanel() {
   const panelRef = useRef<HTMLDivElement>(null);
 
   const dismiss = useCallback(() => {
-    const next = new URLSearchParams(searchParams);
-    next.delete(SHARED_PACKAGE_PARAM);
-    setSearchParams(next, { replace: true });
+    setClaimed(undefined);
     setFetched(undefined);
     setError(undefined);
-  }, [searchParams, setSearchParams]);
+  }, []);
 
   useEffect(() => {
     if (!raw) {
@@ -421,15 +443,42 @@ export function SharedPackagePanel() {
     </div>
   );
 
-  // Desktop keeps the offer in the page, where it sits above the rest of
-  // Sources and is read alongside it. A phone gets a sheet: the whole reason
-  // someone followed the link is this one decision, and a banner over a page
-  // they did not ask for reads like a notice rather than a question.
+  // Desktop gets a card in the corner the app already puts its toasts in —
+  // same width, same shape — but one that never times out. There is room on a
+  // large screen to leave the page usable while deciding, which a modal would
+  // take away for a question nobody is required to answer now.
+  //
+  // `role="dialog"` with `aria-modal="false"` rather than the toast lane's
+  // `aria-live`: a live region is for announcing text, and this is a labelled
+  // thing with buttons in it. It sits above that lane so a real toast — the
+  // "Imported 624 records" that follows accepting — has its own space.
   if (isDesktop) {
     return (
-      <section className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4">
-        {body}
-      </section>
+      // No entrance transition: a Headless UI `Transition` that mounts with
+      // `show` already true renders nothing, and this card only appears once a
+      // network fetch has resolved — there is a natural beat before it either
+      // way, and a card that waits to be dismissed is not asking to be noticed
+      // twice.
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-toast flex justify-end px-6 pb-24 print:hidden">
+        <div
+          role="dialog"
+          aria-modal="false"
+          aria-label="Someone shared records with you"
+          className="pointer-events-auto w-full max-w-sm rounded-lg border border-amber-300 bg-amber-50 p-4 shadow-lg"
+        >
+          <div className="mb-1 flex justify-end">
+            <button
+              type="button"
+              onClick={dismiss}
+              className="-me-2 -mt-2 flex h-11 w-11 items-center justify-center rounded-md text-gray-500 hover:text-gray-700"
+            >
+              <span className="sr-only">Close</span>
+              <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+          {body}
+        </div>
+      </div>
     );
   }
 

@@ -65,11 +65,21 @@ connection reach the browser as the same error, and the remedies are opposite.
 
 ## What the reader sees
 
-On a phone the offer arrives as a sheet from the bottom of the screen; on a
-wider one it sits at the top of Sources as a panel. Either way it is a question,
-not a notice — closing it (the X, "Not now", tapping outside, or Escape) imports
-nothing and consumes nothing. The link is still the link, and opening it again
-brings the same offer back whenever the reader is ready.
+On a phone the offer arrives as a sheet from the bottom of the screen, over a
+dimmed page. On a wider one it is a card in the corner the app keeps its
+notifications in — same width, same shape — but one that blocks nothing and
+never times out: there is room on a large screen to leave the app usable while
+someone decides.
+
+Either way it is a question, not a notice. It follows the reader between tabs
+rather than belonging to the page they landed on, and closing it (the X, "Not
+now", and on a phone tapping outside or pressing Escape) imports nothing and
+consumes nothing. The link is still the link; opening it again brings the same
+offer back whenever they are ready.
+
+The `?package=` parameter is cleared from the address bar as soon as the offer
+is claimed, so a link to somebody's medical record does not ride along in the
+URL through the rest of the session.
 
 The offer names the origin and the patient, then says which of three things the
 button will do. Which one depends on whose records these are, because an

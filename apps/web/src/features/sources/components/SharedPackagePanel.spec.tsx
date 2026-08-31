@@ -390,13 +390,19 @@ describe('SharedPackagePanel presentation', () => {
    * banner over a page they did not ask for reads like a notice rather than a
    * question. A sheet makes it the thing on screen — and gives it a close.
    */
-  it('presents the offer as a dialog on a phone', async () => {
+  it('takes over the screen as a modal sheet on a phone', async () => {
     renderWith('https://example.org/records.emrpkg');
     await waitFor(() => expect(screen.getByRole('dialog')).toBeTruthy());
+    expect(screen.getByRole('dialog').getAttribute('aria-modal')).toBe('true');
     expect(screen.getByRole('button', { name: /^close$/i })).toBeTruthy();
   });
 
-  it('stays in the page on a wider screen', async () => {
+  /**
+   * A wider screen has room to leave the page usable while the reader decides,
+   * so the offer is a corner card that blocks nothing — but one that waits to
+   * be dismissed rather than timing out like the notifications it sits above.
+   */
+  it('leaves the page usable on a wider screen', async () => {
     setViewport(true);
     renderWith('https://example.org/records.emrpkg');
     await waitFor(() =>
@@ -404,7 +410,8 @@ describe('SharedPackagePanel presentation', () => {
         screen.getByRole('button', { name: /add to my records/i }),
       ).toBeTruthy(),
     );
-    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('dialog').getAttribute('aria-modal')).toBe('false');
+    expect(screen.getByRole('button', { name: /^close$/i })).toBeTruthy();
   });
 
   /**

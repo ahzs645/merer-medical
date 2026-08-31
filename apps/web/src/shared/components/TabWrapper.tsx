@@ -32,6 +32,7 @@ import { CommandPalette } from './CommandPalette';
 import { TutorialOverlay } from '../../features/tutorial/TutorialOverlay';
 import { isDemoMode } from '../utils/demoMode';
 import { useScrollRestoration } from '../hooks/useScrollRestoration';
+import { SharedPackagePanel } from '../../features/sources/components/SharedPackagePanel';
 
 /**
  * Suspense fallback for a route whose chunk hasn't arrived yet.
@@ -109,6 +110,11 @@ export function TabWrapper() {
           <Outlet />
         </React.Suspense>
       </main>
+      {/* Above the routes rather than inside one: an offer that disappeared
+          the moment somebody tapped the nav could not be said to need
+          dismissing. It renders fixed either way — a sheet on a phone, a card
+          in the corner on a wider screen. */}
+      <SharedPackagePanel />
       <div className="flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 print:hidden md:relative md:bottom-auto md:top-0 md:h-full md:w-auto">
         <div
           className={`pb-safe md:pb-0 mx-auto flex w-full max-w-3xl justify-around md:h-full md:flex-col md:justify-start motion-safe:md:transition-[width] motion-safe:md:duration-200 ${
