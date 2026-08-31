@@ -232,12 +232,32 @@ export async function unpackEmrpkg(
 
 /** Quick header-only inspection: tells you if a buffer is encrypted and the
  * format version, without decrypting or parsing tables. */
+/**
+ * What a package says about itself, without importing it.
+ *
+ * `counts` and `tables` are only readable on an unencrypted package — the
+ * manifest lives inside the ciphertext otherwise. They are what lets a caller
+ * show someone what they are about to take into their record before they take
+ * it, which matters most when the package did not arrive as a file they chose
+ * but as a link somebody sent them.
+ */
 export async function inspectEmrpkg(bytes: Uint8Array): Promise<{
   encrypted: boolean;
   formatVersion: number;
   appVersion?: string;
   createdAt?: number;
   kdf?: EnvelopeHeader['kdf'];
+  counts?: Record<string, number>;
+  tables?: string[];
+  /**
+   * Who the package is about.
+   *
+   * A package carries its own patient, and importing one additively files it
+   * under that patient rather than the profile in use — so "whose records are
+   * these" decides whether an import adds to yours or opens a second profile.
+   * The reader deciding that has to be told which.
+   */
+  patients?: Array<{ id: string; name: string }>;
 }> {
   if (isEnvelopeBytes(bytes)) {
     try {
@@ -261,9 +281,39 @@ export async function inspectEmrpkg(bytes: Uint8Array): Promise<{
       formatVersion: manifest.version,
       appVersion: manifest.app?.version,
       createdAt: manifest.createdAt,
+      counts: manifest.counts,
+      tables: manifest.tables,
+      patients: readPatients(files),
     };
   } catch {
     return { encrypted: false, formatVersion: 0 };
+  }
+}
+
+/**
+ * Both shapes: RxDB-sourced packages name the table `user_documents` with
+ * `first_name`/`last_name`, Dexie-sourced ones `users`. A package that names
+ * nobody returns nothing rather than an entry called "Unknown".
+ */
+function readPatients(
+  files: Record<string, Uint8Array>,
+): Array<{ id: string; name: string }> | undefined {
+  const raw = files['tables/user_documents.json'] || files['tables/users.json'];
+  if (!raw) return undefined;
+  try {
+    const rows = JSON.parse(strFromU8(raw)) as Array<Record<string, unknown>>;
+    if (!Array.isArray(rows)) return undefined;
+    return rows
+      .map((row) => ({
+        id: String(row['id'] ?? ''),
+        name: [row['first_name'], row['last_name']]
+          .filter(Boolean)
+          .join(' ')
+          .trim(),
+      }))
+      .filter((patient) => patient.id);
+  } catch {
+    return undefined;
   }
 }
 

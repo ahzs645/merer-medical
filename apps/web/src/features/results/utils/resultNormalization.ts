@@ -20,6 +20,7 @@ import { groupLabs } from '../../labs/utils/labGrouping';
 import { isLaboratoryObservation } from '../../labs/hooks/useLabsData';
 import { buildReportsByObservationId } from '../../labs/utils/reportLinks';
 import { LabDocument, ReportDocument, ReportLink } from '../../labs/types';
+import { splitClinicalNote } from '../../../shared/utils/clinicalNotes';
 import {
   isImagingDocument,
   mapImagingDocument,
@@ -448,7 +449,10 @@ function getProviderComments(resource: any): string[] {
       ? resource.note.map((note: any) => note?.text)
       : []),
   ];
-  return comments.map(stripHtml).filter(Boolean) as string[];
+  return comments
+    .map(stripHtml)
+    .filter(Boolean)
+    .flatMap((comment) => splitClinicalNote(comment as string));
 }
 
 function getLinkedDocuments(

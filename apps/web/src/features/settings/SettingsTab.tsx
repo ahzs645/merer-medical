@@ -23,6 +23,7 @@ import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvi
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useNotificationDispatch } from '../../app/providers/NotificationProvider';
 import { importEmrpkgToRxDb, inspectEmrpkg } from '../../services/emrpkg';
+import { useIsDesktop } from '../../shared/hooks/useIsDesktop';
 
 export function fetchPatientRecords(
   db: RxDatabase<DatabaseCollections>,
@@ -97,7 +98,7 @@ const SettingsTab: React.FC = () => {
   const notifyDispatch = useNotificationDispatch();
   const { pathname, hash, key } = useLocation();
   const [showUserSwitcher, setShowUserSwitcher] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const isDesktop = useIsDesktop();
   const importUserProfileRef = useRef<HTMLInputElement | null>(null);
 
   const handleUserProfileImport = useCallback(
@@ -155,19 +156,6 @@ const SettingsTab: React.FC = () => {
 
   const openUserProfileImport = useCallback(() => {
     importUserProfileRef.current?.click();
-  }, []);
-
-  // Detect screen size - matches Tailwind's sm: breakpoint (640px)
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(min-width: 640px)');
-    const handleChange = () => setIsDesktop(mediaQuery.matches);
-
-    // Set initial value
-    handleChange();
-
-    // Listen for changes
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
   useEffect(() => {

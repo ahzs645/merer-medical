@@ -16,7 +16,8 @@ The repository includes scripts for maintaining reference data and generated pac
 | `node tools/build-terminology-pack.mjs` | Builds terminology package artifacts. |
 | `node tools/fetch-terminology-snapshots.mjs` | Fetches terminology snapshots. |
 | `node tools/build-ahs-mychart-emrpkg.mjs` | Builds an AHS MyChart EMR package fixture/artifact. |
-| `node tools/build-diabetes-records-emrpkg.mjs` | Builds diabetes record EMR package data. |
+| `node tools/transpose.mjs validate\|build\|inspect` | Checks, builds and reads back a transposed clinical document. The front door for turning a letter or report into an `.emrpkg` — see [the format reference](https://github.com/ahzs645/merer-medical/blob/main/docs/clinical-transpose-format.md). |
+| `node tools/build-diabetes-records-emrpkg.mjs` | The builder `transpose.mjs build` drives. Reads a `records.json` and writes an `.emrpkg`; despite the name it is source-agnostic. |
 | `node tools/parse-health-summary.mjs` | Parses health-summary source data. |
 
 ## Data Directories

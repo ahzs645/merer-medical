@@ -4,6 +4,7 @@ import { HeartIcon } from '@heroicons/react/24/outline';
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
+import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
@@ -15,8 +16,10 @@ import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import { buildAddRecordPath } from '../manual-entry/addRecordPath';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { isVitalSignObservation } from './utils/vitalRecords';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
+import { splitClinicalNote } from '../../shared/utils/clinicalNotes';
 
 // Saving lands back here rather than on the Timeline: a reading you typed on
 // the Vitals page belongs in front of you on the Vitals page.
@@ -31,6 +34,19 @@ interface Reading {
   text: string;
   /** Numeric value used for the sparkline (systolic for blood pressure). */
   numeric?: number;
+  /**
+   * The record this reading was read out of.
+   *
+   * A number on its own is not a result — "96 %" means one thing from a clinic
+   * pulse oximeter and another from a home device, and a reading you cannot
+   * trace is a reading you cannot check. Carrying the document lets each one
+   * offer the same View source the rest of the app offers.
+   */
+  document: ClinicalDocument;
+  /** Where it came from, for the line under the value. */
+  source?: string;
+  /** Anything the source said about the reading — position, method, cuff size. */
+  notes: string[];
 }
 
 interface VitalGroup {
@@ -52,6 +68,9 @@ type FhirObservation = {
   valueQuantity?: { value?: number; unit?: string };
   valueString?: string;
   component?: FhirComponent[];
+  note?: Array<{ text?: string }> | { text?: string };
+  bodySite?: { text?: string };
+  method?: { text?: string };
 };
 
 const UCUM_SUPERSCRIPTS: Record<string, string> = { '2': '²', '3': '³' };
@@ -140,15 +159,32 @@ function useVitals() {
       // vital was added from this page's own button.
       setStatus((current) => (current === 'success' ? current : 'loading'));
       setError(null);
-      const docs = await db.clinical_documents
-        .find({
-          selector: {
-            user_id: user.id,
-            'data_record.resource_type': 'observation',
-          },
-        })
-        .exec();
+      const [docs, connectionDocs] = await Promise.all([
+        db.clinical_documents
+          .find({
+            selector: {
+              user_id: user.id,
+              'data_record.resource_type': 'observation',
+            },
+          })
+          .exec(),
+        // Which document a reading came from is half of what makes it
+        // readable, and the FHIR resource does not carry the name — the
+        // connection does. A name is a nicety though, so a failure here costs
+        // the label and not the page: without the catch, one rejected query
+        // blanks every vital the user has.
+        db.connection_documents
+          ?.find({ selector: { user_id: user.id } })
+          .exec()
+          .catch(() => []) ?? [],
+      ]);
       if (!mounted) return;
+      const connectionsById = new Map<string, ConnectionDocument>(
+        connectionDocs.map((c) => [
+          c.id,
+          c.toMutableJSON() as ConnectionDocument,
+        ]),
+      );
 
       const byKey = new Map<string, VitalGroup>();
       for (const doc of docs) {
@@ -164,10 +200,28 @@ function useVitals() {
           'Vital';
         const key = loinc || name.toLowerCase();
         const value = readObservation(resource);
+        const rawNotes = Array.isArray(resource.note)
+          ? resource.note
+          : resource.note
+            ? [resource.note]
+            : [];
         const reading: Reading = {
           date: resource.effectiveDateTime || d.metadata?.date,
           text: value.text,
           numeric: value.numeric,
+          document: d,
+          source:
+            connectionsById.get(d.connection_record_id)?.name ||
+            d.metadata?.source_name,
+          notes: [
+            resource.bodySite?.text
+              ? `Site: ${resource.bodySite.text}`
+              : undefined,
+            resource.method?.text
+              ? `Method: ${resource.method.text}`
+              : undefined,
+            ...rawNotes.flatMap((note) => splitClinicalNote(note?.text)),
+          ].filter((note): note is string => Boolean(note)),
         };
         const existing = byKey.get(key);
         if (existing) {
@@ -208,34 +262,52 @@ function useVitals() {
   return { groups, status, error };
 }
 
-/** Tiny dependency-free SVG sparkline of a vital's recent numeric values. */
-function Sparkline({ readings }: { readings: Reading[] }) {
-  const points = readings
+/**
+ * Tiny dependency-free SVG sparkline of a vital's recent numeric values.
+ *
+ * Returns nothing for a single reading: one point is not a trend, and a flat
+ * stub next to a first-ever measurement suggests a history that is not there.
+ * Qualitative vitals ("Normal", "Just under normal range") have no numbers to
+ * plot and fall out here too.
+ *
+ * Each point carries a `<title>`, so hovering or focusing a dot names its date
+ * and value without a charting library or a tooltip of our own.
+ */
+function Sparkline({ readings, name }: { readings: Reading[]; name: string }) {
+  const plotted = readings
     .filter((r) => typeof r.numeric === 'number')
     .slice(0, 12)
-    .reverse()
-    .map((r) => r.numeric as number);
-  if (points.length < 2) return null;
+    .reverse();
+  if (plotted.length < 2) return null;
+
+  const points = plotted.map((r) => r.numeric as number);
   const min = Math.min(...points);
   const max = Math.max(...points);
   const range = max - min || 1;
   const width = 120;
   const height = 32;
   const step = width / (points.length - 1);
-  const path = points
-    .map((value, index) => {
-      const x = index * step;
-      const y = height - ((value - min) / range) * (height - 4) - 2;
-      return `${index === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
-    })
+  const positions = points.map((value, index) => ({
+    x: index * step,
+    y: height - ((value - min) / range) * (height - 6) - 3,
+  }));
+  const path = positions
+    .map(
+      (p, index) =>
+        `${index === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`,
+    )
     .join(' ');
+  const first = plotted[0];
+  const last = plotted[plotted.length - 1];
+
   return (
     <svg
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
-      className="text-primary-500"
-      aria-hidden="true"
+      className="text-primary-500 overflow-visible"
+      role="img"
+      aria-label={`${name}: ${plotted.length} readings, ${first.text} on ${safeFormatDate(first.date, 'PP', 'an earlier date')} to ${last.text} on ${safeFormatDate(last.date, 'PP', 'the latest date')}`}
     >
       <path
         d={path}
@@ -245,7 +317,50 @@ function Sparkline({ readings }: { readings: Reading[] }) {
         strokeLinejoin="round"
         strokeLinecap="round"
       />
+      {positions.map((p, index) => (
+        <circle
+          key={index}
+          cx={p.x}
+          cy={p.y}
+          // The latest reading is the one the headline shows, so it is the one
+          // worth finding on the line.
+          r={index === positions.length - 1 ? 2.75 : 1.75}
+          fill="currentColor"
+        >
+          <title>
+            {`${plotted[index].text}${
+              plotted[index].date
+                ? ` on ${safeFormatDate(plotted[index].date, 'PP', '')}`
+                : ''
+            }`}
+          </title>
+        </circle>
+      ))}
     </svg>
+  );
+}
+
+/**
+ * One reading, opened up: where it came from, what the source said about it,
+ * and the same actions every other record offers.
+ *
+ * The history was a date and a number per row, which is enough to see a trend
+ * and not enough to check one. A reading that disagrees with the others is
+ * exactly the one you want to trace back to its document.
+ */
+function ReadingDetail({ reading }: { reading: Reading }) {
+  return (
+    <div className="px-1 pb-2">
+      {reading.source && (
+        <p className="text-xs text-gray-500">{reading.source}</p>
+      )}
+      {reading.notes.map((note, index) => (
+        <p key={index} className="mt-1 text-xs text-gray-600">
+          {note}
+        </p>
+      ))}
+      <ManualRecordActions item={reading.document} />
+    </div>
   );
 }
 
@@ -323,7 +438,7 @@ export function VitalsTab() {
                       )}
                     </div>
                   </div>
-                  <Sparkline readings={group.readings} />
+                  <Sparkline readings={group.readings} name={group.name} />
                 </div>
 
                 {/* Six dated rows a card, three cards: the history alone filled
@@ -333,6 +448,12 @@ export function VitalsTab() {
                     button semantics, the expanded state and the keyboard — with
                     the summary left a list-item, because a flex summary drops
                     the triangle in Chrome. */}
+                {/* The reading in the headline is a record like any other, and
+                    until now it was the only one on the page you could not
+                    trace: the actions row existed on Allergies, Conditions and
+                    Medications cards but not here. */}
+                <ManualRecordActions item={group.latest.document} />
+
                 {group.readings.length > 1 && (
                   <details className="-mb-4 mt-3 border-t border-gray-100">
                     <summary
@@ -350,30 +471,37 @@ export function VitalsTab() {
                     >
                       {earlierReadingsLabel(group.readings.length - 1)}
                     </summary>
-                    <table className="mb-4 w-full text-xs text-gray-600">
-                      <tbody>
-                        {/* From the second reading down: the newest is the
+                    <ul className="mb-4 w-full text-xs text-gray-600">
+                      {/* From the second reading down: the newest is the
                             headline above. The old 6-row cap goes with it —
                             it bounded a list that was always open, and here it
                             would only hide readings someone opened the list to
                             find. */}
-                        {group.readings.slice(1).map((reading, index) => (
-                          <tr
-                            key={index}
-                            className="border-b border-gray-50 last:border-0"
-                          >
-                            <td className="py-1 pe-2 text-gray-500">
-                              {reading.date
-                                ? safeFormatDate(reading.date, 'PP', '')
-                                : '—'}
-                            </td>
-                            <td className="py-1 text-end font-medium text-gray-800">
-                              {reading.text}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                      {group.readings.slice(1).map((reading, index) => (
+                        <li
+                          key={index}
+                          className="border-b border-gray-50 last:border-0"
+                        >
+                          {/* Nested <details> again rather than a selected-row
+                                panel: the browser supplies the button, the
+                                expanded state and the keyboard, and two readings
+                                can be open side by side for comparison. */}
+                          <details>
+                            <summary className="flex cursor-pointer list-none items-baseline justify-between gap-2 py-1.5">
+                              <span className="text-gray-500">
+                                {reading.date
+                                  ? safeFormatDate(reading.date, 'PP', '')
+                                  : '—'}
+                              </span>
+                              <span className="font-medium text-gray-800">
+                                {reading.text}
+                              </span>
+                            </summary>
+                            <ReadingDetail reading={reading} />
+                          </details>
+                        </li>
+                      ))}
+                    </ul>
                   </details>
                 )}
               </article>

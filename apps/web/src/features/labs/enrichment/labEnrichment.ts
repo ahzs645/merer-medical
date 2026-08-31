@@ -10,9 +10,11 @@ import {
 import { LabDocument, LabGroup, ReportLink } from '../types';
 import {
   getReferenceStandard,
+  getReferenceUnitsForLab,
   getSelectedReferenceBand,
   loincLabAliases,
   nameLabAliases,
+  nameQualifierRejectsAlias,
 } from './labEnrichmentCatalog';
 import { labCitations } from './labCitations';
 import { parseDateAsUtc } from '../../../shared/utils/parseDateAsUtc';
@@ -29,7 +31,8 @@ import {
   ReferenceOverlayMode,
   ReferenceStandardId,
 } from './types';
-import { convertLabUnit } from './labUnitConversions';
+import { convertLabUnit, unitsAreReconcilable } from './labUnitConversions';
+import { getFhirResource } from '../../../shared/utils/fhirResource';
 
 export const DEFAULT_REFERENCE_CONTEXT: ReferenceContext = {
   ageYears: 40,
@@ -83,7 +86,7 @@ export function buildLabEnrichment({
   const standard = getReferenceStandard(standardId),
     labId = getLabEnrichmentId(group, lab),
     band = labId
-      ? getSelectedReferenceBand(standardId, labId, context)
+      ? getSelectedReferenceBand(standardId, labId, context, getValueUnit(lab))
       : undefined,
     value = getValueQuantity(lab),
     sourceFlag = getSourceFlag(lab),
@@ -119,13 +122,39 @@ export function getLabEnrichmentId(
   group: LabGroup,
   lab?: LabDocument,
 ): string | undefined {
+  // A LOINC code is the record asserting what it measured. A name is a guess
+  // at it, so only the guess is second-guessed below.
   const loinc = lab?.metadata?.loinc_coding?.[0] || group.code;
   if (loinc && loincLabAliases[loinc]) return loincLabAliases[loinc];
 
   const name = [lab?.metadata?.display_name, group.name]
     .filter(Boolean)
     .join(' ');
-  return nameLabAliases.find((alias) => alias.pattern.test(name))?.id;
+  const candidate = nameLabAliases.find((alias) =>
+    alias.pattern.test(name),
+  )?.id;
+  if (!candidate) return undefined;
+  const resource = lab ? getFhirResource<any>(lab) : undefined;
+  if (nameQualifierRejectsAlias(name, candidate, getCategoryText(resource)))
+    return undefined;
+
+  // The last check the name cannot make for itself. If the value's unit
+  // reconciles with none of the units this test is ever given a range in,
+  // the name matched something else — no reference, no overlays, no
+  // normalization offering to convert a percentage into mmol/L.
+  const unit = lab ? getValueUnit(lab) : undefined;
+  const referenceUnits = getReferenceUnitsForLab(candidate);
+  if (
+    unit &&
+    referenceUnits.length > 0 &&
+    !referenceUnits.some((referenceUnit) =>
+      unitsAreReconcilable(candidate, unit, referenceUnit),
+    )
+  ) {
+    return undefined;
+  }
+
+  return candidate;
 }
 
 export function buildLabReferenceOverlays({
@@ -144,7 +173,12 @@ export function buildLabReferenceOverlays({
   if (labId) {
     (['canadian', 'australian', 'uk'] as ReferenceStandardId[]).forEach(
       (standardId) => {
-        const band = getSelectedReferenceBand(standardId, labId, context);
+        const band = getSelectedReferenceBand(
+          standardId,
+          labId,
+          context,
+          getValueUnit(lab),
+        );
         if (!band) return;
 
         overlays.push({
@@ -205,6 +239,7 @@ export function buildLabReferenceEvaluation({
     mode,
     labId,
     getReferenceContextForLab(referenceContext, lab),
+    getValueUnit(lab),
   );
   if (!band) {
     return {
@@ -516,4 +551,15 @@ function roundForDisplay(value: number): number {
   if (Math.abs(value) >= 100) return Number(value.toFixed(1));
   if (Math.abs(value) >= 10) return Number(value.toFixed(2));
   return Number(value.toFixed(3));
+}
+
+/** The panel a result was filed under, wherever the source put it. */
+function getCategoryText(resource: any): string | undefined {
+  const category = Array.isArray(resource?.category)
+    ? resource.category[0]
+    : resource?.category;
+  return (
+    category?.text ||
+    (category?.coding || []).map((coding: any) => coding?.display).find(Boolean)
+  );
 }

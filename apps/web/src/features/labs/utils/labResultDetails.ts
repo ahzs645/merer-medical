@@ -2,6 +2,11 @@ import { getFhirResource } from '../../../shared/utils/fhirResource';
 import { getReferenceRangeDisplay } from '../../timeline/utils/fhirpathParsers';
 import { LabDocument, LabGroup } from '../types';
 import { formatLabValue } from './labFormatters';
+import {
+  providerFromNotes,
+  splitClinicalNote,
+  withoutProviderLine,
+} from '../../../shared/utils/clinicalNotes';
 
 export type LabResultStatus =
   | 'high'
@@ -38,8 +43,18 @@ export function getLabResultDetail(lab: LabDocument): LabResultDetail {
   const resource = getFhirResource<any>(lab),
     interpretation = getInterpretationText(resource),
     status = getLabResultStatus(resource, lab),
-    performer = getPerformerText(resource),
-    accessionId = getAccessionId(resource);
+    accessionId = getAccessionId(resource),
+    notes = getLabComments(resource, lab),
+    // A package built before the builder set `performer` names its provider
+    // only inside the note, which left every one of its labs reading
+    // "Reported by: Unknown source" above a note that said who ran them. The
+    // fact was in the record, in the wrong place; those packages cannot be
+    // rebuilt, so it is read back out. When it is, the note stops repeating
+    // what the field above it now says.
+    fieldPerformer = getPerformerText(resource),
+    notePerformer = fieldPerformer ? undefined : providerFromNotes(notes),
+    performer = fieldPerformer ?? notePerformer,
+    comments = notePerformer ? withoutProviderLine(notes) : notes;
 
   return {
     id: lab.metadata?.id || lab.id,
@@ -54,7 +69,7 @@ export function getLabResultDetail(lab: LabDocument): LabResultDetail {
     date: lab.metadata?.date,
     referenceRange: getReferenceRangeDisplay(lab),
     interpretation,
-    comments: getLabComments(resource, lab),
+    comments,
     performer,
     source: lab.metadata?.source_name,
     accessionId,
@@ -167,13 +182,18 @@ function getInterpretationText(resource: any): string | undefined {
 }
 
 function getLabComments(resource: any, lab: LabDocument): string[] {
+  // Split rather than concatenated: one note holds several statements joined
+  // by newlines, and the internal source-document pointer is not one of the
+  // ones a reader is meant to see.
   return unique(
     [
       resource?.comments,
       resource?.comment,
       ...(resource?.note || []).map((note: any) => note?.text),
       lab.metadata?.provenance_notes,
-    ].filter(isPresent),
+    ]
+      .filter(isPresent)
+      .flatMap((value: string) => splitClinicalNote(value)),
   );
 }
 

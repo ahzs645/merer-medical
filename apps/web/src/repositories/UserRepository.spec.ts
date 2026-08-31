@@ -317,9 +317,11 @@ describe('userRepository', () => {
     });
 
     describe('deleteUser', () => {
-      it('deletes existing user', async () => {
+      it('deletes an existing user when another profile remains', async () => {
         const user = createTestUser();
+        const other = createSelectedTestUser({ first_name: 'Other' });
         await db.user_documents.insert(user);
+        await db.user_documents.insert(other);
 
         await userRepo.deleteUser(db, user.id);
 
@@ -327,6 +329,70 @@ describe('userRepository', () => {
           .findOne({ selector: { id: user.id } })
           .exec();
         expect(deletedUser).toBeNull();
+      });
+
+      /**
+       * The app assumes a selected user on every screen, so there has to be one
+       * left. Clearing everything is what the Settings "delete all data" path
+       * is for, not something a profile row should do by accident.
+       */
+      it('refuses to delete the last profile', async () => {
+        const user = createTestUser();
+        await db.user_documents.insert(user);
+
+        await expect(userRepo.deleteUser(db, user.id)).rejects.toThrow(
+          /only profile/i,
+        );
+        expect(
+          await db.user_documents.findOne({ selector: { id: user.id } }).exec(),
+        ).not.toBeNull();
+      });
+
+      it('hands selection on before deleting the profile in use', async () => {
+        const inUse = createSelectedTestUser({ first_name: 'InUse' });
+        const other = createTestUser({ first_name: 'Other' });
+        await db.user_documents.insert(inUse);
+        await db.user_documents.insert(other);
+
+        await userRepo.deleteUser(db, inUse.id);
+
+        const selected = await db.user_documents
+          .find({ selector: { is_selected_user: true } })
+          .exec();
+        expect(selected).toHaveLength(1);
+        expect(selected[0].get('id')).toBe(other.id);
+      });
+
+      /**
+       * Removing the user row alone stranded the records: hundreds of clinical
+       * documents belonging to a patient the app no longer lists, invisible and
+       * still in the store.
+       */
+      it('takes the profile records with it', async () => {
+        const user = createTestUser();
+        const other = createSelectedTestUser({ first_name: 'Other' });
+        await db.user_documents.insert(user);
+        await db.user_documents.insert(other);
+        await db.connection_documents.insert({
+          id: 'connection-1',
+          user_id: user.id,
+          source: 'manual',
+          location: 'manual://test',
+          name: 'Test',
+        } as never);
+        await db.connection_documents.insert({
+          id: 'connection-2',
+          user_id: other.id,
+          source: 'manual',
+          location: 'manual://keep',
+          name: 'Keep',
+        } as never);
+
+        expect(await userRepo.countUserRecords(db, user.id)).toBe(1);
+        await userRepo.deleteUser(db, user.id);
+
+        const remaining = await db.connection_documents.find().exec();
+        expect(remaining.map((d) => d.get('id'))).toEqual(['connection-2']);
       });
 
       it('throws error when user not found', async () => {

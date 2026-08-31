@@ -256,6 +256,51 @@ export async function createDefaultUserIfNone(
   return true;
 }
 
+/**
+ * A profile the app made for you, that you never started using.
+ *
+ * `createDefaultUserIfNone` puts one of these in on first boot so the app
+ * always has somebody selected. If your first real records then arrive as a
+ * package with a patient of its own, the placeholder is left behind — an
+ * "Unnamed User" beside your actual profile, for the rest of the app's life.
+ */
+export function isUnstartedPlaceholder(user: UserDocument): boolean {
+  return Boolean(
+    user.is_default_user &&
+      !user.first_name?.trim() &&
+      !user.last_name?.trim() &&
+      !user.birthday,
+  );
+}
+
+/**
+ * Clear away placeholders that were never used and hold nothing.
+ *
+ * Only ever removes a profile that is both unstarted and empty, so a profile
+ * someone deliberately made and left blank survives as long as it has a name,
+ * and one holding records is never touched whatever it is called.
+ */
+export async function removeEmptyPlaceholderProfiles(
+  db: RxDatabase<DatabaseCollections>,
+): Promise<number> {
+  const users = await db.user_documents.find().exec();
+  if (users.length < 2) return 0;
+
+  let removed = 0;
+  for (const doc of users) {
+    const user = doc.toMutableJSON() as UserDocument;
+    if (!isUnstartedPlaceholder(user)) continue;
+    if ((await countUserRecords(db, user.id)) > 0) continue;
+    try {
+      await deleteUser(db, user.id);
+      removed += 1;
+    } catch {
+      // Refuses on the last remaining profile, which is the right answer.
+    }
+  }
+  return removed;
+}
+
 export async function updateUser(
   db: RxDatabase<DatabaseCollections>,
   id: string,
@@ -323,6 +368,66 @@ export async function switchUser(
   }
 }
 
+/**
+ * Every collection that belongs to a profile rather than to the app.
+ *
+ * `user_preferences` and `vector_storage` carry a `user_id` too but declare no
+ * index on it; they are queried the same way and are small enough that it does
+ * not matter.
+ */
+const USER_OWNED_COLLECTIONS = [
+  'clinical_documents',
+  'connection_documents',
+  'user_preferences',
+  'summary_page_preferences',
+  'clinical_timeline_comments',
+  'notifications',
+  'workflow_records',
+  'vector_storage',
+] as const;
+
+/**
+ * The subset a person would call their records.
+ *
+ * Preferences and layout rows are scaffolding the app writes for itself the
+ * moment a profile exists. They are deleted with the profile like everything
+ * else, but counting them told a brand-new profile it held "1 record" — which
+ * both misdescribes the delete and made an untouched profile look used.
+ */
+const USER_RECORD_COLLECTIONS = USER_OWNED_COLLECTIONS.filter(
+  (name) => name !== 'user_preferences' && name !== 'summary_page_preferences',
+);
+
+/** How much would go with a profile — asked before deleting, not after. */
+export async function countUserRecords(
+  db: RxDatabase<DatabaseCollections>,
+  id: string,
+): Promise<number> {
+  const counts = await Promise.all(
+    USER_RECORD_COLLECTIONS.map(async (name) => {
+      const collection = db[name as keyof DatabaseCollections];
+      if (!collection) return 0;
+      const docs = await collection.find({ selector: { user_id: id } }).exec();
+      return docs.length;
+    }),
+  );
+  return counts.reduce((total, count) => total + count, 0);
+}
+
+/**
+ * Remove a profile and everything filed under it.
+ *
+ * Removing the user row alone left the records behind: hundreds of clinical
+ * documents belonging to a patient the app no longer lists, invisible, still
+ * occupying the store, and ready to reappear under any profile that happened to
+ * be created with the same id. A profile is the records; deleting one has to
+ * mean deleting them.
+ *
+ * Two things it refuses to do. It will not delete the last profile — the app
+ * assumes a selected user everywhere, and an empty store is what "start over"
+ * is for. And it will not leave nobody selected: deleting the profile in use
+ * hands selection to another first, so the app never has to render without one.
+ */
 export async function deleteUser(
   db: RxDatabase<DatabaseCollections>,
   id: string,
@@ -338,5 +443,35 @@ export async function deleteUser(
   if (!doc) {
     throw new Error(`User not found: ${id}`);
   }
+
+  const others = await db.user_documents
+    .find({ selector: { id: { $ne: id } } })
+    .exec();
+  if (others.length === 0) {
+    throw new Error(
+      'This is the only profile. Deleting it would leave the app with nobody to show.',
+    );
+  }
+
+  if (doc.get('is_selected_user')) {
+    await switchUser(db, others[0].get('id'));
+  }
+
+  for (const name of USER_OWNED_COLLECTIONS) {
+    const collection = db[name as keyof DatabaseCollections];
+    if (!collection) continue;
+    const owned = await collection.find({ selector: { user_id: id } }).exec();
+    // One at a time rather than `bulkRemove`: a collection that rejects one
+    // document should not take the rest of the cleanup down with it and strand
+    // the profile half-deleted.
+    for (const record of owned) {
+      try {
+        await record.remove();
+      } catch (error) {
+        console.warn(`Failed to remove ${name} record for user ${id}`, error);
+      }
+    }
+  }
+
   await doc.remove();
 }

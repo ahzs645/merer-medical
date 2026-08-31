@@ -13,6 +13,12 @@ type UserManagement = {
   createNewUser: (
     userData: Partial<UserDocument>,
   ) => Promise<RxDocument<UserDocument>>;
+  /** Removes the profile and everything filed under it. */
+  deleteUser: (userId: string) => Promise<void>;
+  /** How many records would go with it, for the confirmation. */
+  countUserRecords: (userId: string) => Promise<number>;
+  /** Clears away unused, empty profiles the app created for you. */
+  removeEmptyPlaceholders: () => Promise<number>;
 };
 
 const UserContext = React.createContext<UserDocument | undefined>(undefined);
@@ -68,6 +74,22 @@ export function UserProvider(props: UserProviderProps) {
         }
         return userRepo.create(userData);
       },
+      deleteUser: async (userId: string) => {
+        if (!userRepo) {
+          throw new Error('UserRepository not initialized');
+        }
+        await userRepo.delete(userId);
+      },
+      countUserRecords: async (userId: string) => {
+        if (!userRepo) {
+          throw new Error('UserRepository not initialized');
+        }
+        return userRepo.countRecords(userId);
+      },
+      removeEmptyPlaceholders: async () => {
+        if (!userRepo) return 0;
+        return userRepo.removeEmptyPlaceholders();
+      },
     }),
     [allUsers, userRepo],
   );
@@ -98,6 +120,18 @@ export function useUser() {
     throw new Error('useUser must be used within a UserProvider');
   }
   return context;
+}
+
+/**
+ * The same user, for callers that can carry on without one.
+ *
+ * `useUser` throws outside a provider, which is right for anything that reads
+ * or writes clinical data. A per-user *display* preference is not that: it
+ * should quietly fall back to its default rather than take the screen down, and
+ * a component test should not need a UserProvider to render a table.
+ */
+export function useOptionalUser() {
+  return useContext(UserContext);
 }
 
 /**

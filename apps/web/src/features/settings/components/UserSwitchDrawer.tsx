@@ -2,7 +2,7 @@ import { Fragment, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { ButtonLoadingSpinner } from '../../connections/components/ButtonLoadingSpinner';
-import { UserListItem } from './UserListItem';
+import { ProfileRow } from './ProfileRow';
 import { useUserSwitchLogic } from '../hooks/useUserSwitchLogic';
 import { useUser, useAllUsers } from '../../../app/providers/UserProvider';
 
@@ -83,11 +83,13 @@ export function UserSwitchDrawer({
                           const isSelected = userId === selectedUserId;
 
                           return (
-                            <UserListItem
+                            <ProfileRow
                               key={userId}
                               user={user}
                               isSelected={isSelected}
-                              onClick={() => handleUserSelect(userId)}
+                              isCurrent={userId === currentUser.id}
+                              canDelete={allUsers.length > 1}
+                              onSelect={() => handleUserSelect(userId)}
                             />
                           );
                         })}

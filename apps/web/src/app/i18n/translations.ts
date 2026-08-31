@@ -209,6 +209,7 @@ export const arabicTranslations: Record<string, string> = {
   Refractions: 'الانكسارات',
   Remove: 'إزالة',
   Results: 'النتائج',
+  result: 'نتيجة',
   results: 'نتائج',
   Reports: 'التقارير',
   Route: 'طريقة الإعطاء',

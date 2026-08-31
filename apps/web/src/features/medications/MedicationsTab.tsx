@@ -669,14 +669,17 @@ function ReconciliationBadge({
 }: {
   state: MedicationReconciliationState;
 }) {
+  // `unknown` is the absence of a reconciliation finding, not a finding of its
+  // own. Rendering it hung a grey "unknown" chip beside the name of every
+  // fully-described medication, which reads as a problem with the record.
+  if (state === 'unknown') return null;
+
   const tone =
     state === 'verified'
       ? 'green'
-      : state === 'unknown'
-        ? 'gray'
-        : state === 'patient-says-not-taking' || state === 'conflicting-sources'
-          ? 'red'
-          : 'yellow';
+      : state === 'patient-says-not-taking' || state === 'conflicting-sources'
+        ? 'red'
+        : 'yellow';
 
   return <Badge tone={tone}>{humanize(state)}</Badge>;
 }

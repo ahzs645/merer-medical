@@ -39,6 +39,10 @@ jest.mock('../manual-entry/ManualRecordActions', () => ({
       ? mockCreateElement('span', { 'data-testid': `actions-${item.id}` })
       : null,
 }));
+jest.mock('../manual-entry/ManualSourceDocumentLink', () => ({
+  ManualSourceDocumentLink: ({ item }: { item: ClinicalDocument }) =>
+    mockCreateElement('span', { 'data-testid': `source-${item.id}` }),
+}));
 jest.mock('../manual-entry/ManualRecordModal', () => ({
   ManualRecordModal: ({ open }: { open: boolean }) =>
     open
@@ -71,6 +75,64 @@ function renderTab() {
     </MemoryRouter>,
   );
 }
+
+describe('AllergiesTab negations', () => {
+  beforeEach(() => {
+    mockAllergyDocs = [];
+  });
+
+  /**
+   * "No Known Allergies" used to get a full record card with five actions —
+   * the same weight as a real allergen, for a record saying there is nothing
+   * here. A portal that sends "Not on File" three times produced three of them.
+   */
+  it('states an asserted negative instead of listing it as a record', async () => {
+    mockAllergyDocs = [makeDoc('nka', 'No Known Allergies', true)];
+    renderTab();
+
+    await waitFor(() => {
+      expect(screen.getByText('No Known Allergies')).toBeTruthy();
+    });
+    expect(screen.getByText('0 allergens')).toBeTruthy();
+    expect(screen.queryByText('Also recorded')).toBeNull();
+    expect(screen.queryByText('Not an allergen')).toBeNull();
+    expect(screen.queryByTestId('actions-nka')).toBeNull();
+  });
+
+  /**
+   * An empty list means nobody wrote anything down; a negation means somebody
+   * asked. The page has to be able to say which.
+   */
+  it('says something different when nothing was recorded at all', async () => {
+    renderTab();
+    // With no records of any kind the page-level empty state answers, and it
+    // says "recorded yet" — the honest phrasing for never-asked, and the thing
+    // an asserted negative replaces.
+    await waitFor(() => {
+      expect(screen.getByText('No allergies recorded yet.')).toBeTruthy();
+    });
+    expect(screen.queryByText(/No Known Allergies/i)).toBeNull();
+  });
+
+  it('does not put a negation beside an allergen that contradicts it', async () => {
+    mockAllergyDocs = [
+      makeDoc('perfume', 'Perfume', true),
+      makeDoc('nka', 'No Known Allergies', true),
+    ];
+    renderTab();
+
+    await waitFor(() => {
+      expect(screen.getByText('Perfume')).toBeTruthy();
+    });
+    expect(screen.getByText('1 allergen')).toBeTruthy();
+    // Named once, quietly, rather than shown as a peer of the allergen it
+    // disagrees with — where it could be read as covering it.
+    expect(
+      screen.queryByRole('heading', { name: 'No Known Allergies' }),
+    ).toBeNull();
+    expect(screen.getByText(/recorded .No Known Allergies./i)).toBeTruthy();
+  });
+});
 
 describe('AllergiesTab', () => {
   beforeEach(() => {
