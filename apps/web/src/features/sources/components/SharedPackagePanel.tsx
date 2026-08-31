@@ -285,9 +285,23 @@ export function SharedPackagePanel() {
       ? 'Add as a separate profile'
       : 'Add to my records';
 
+  const close = (
+    <button
+      type="button"
+      onClick={dismiss}
+      // Negative margins pull the 44px target back over the card's own padding
+      // so it reaches the corner without pushing the heading onto its own line.
+      // The body is far taller than the button, so the row does not stretch.
+      className="-me-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-gray-500 hover:text-gray-700"
+    >
+      <span className="sr-only">Close</span>
+      <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+    </button>
+  );
+
   const body = (
     <div className="flex items-start gap-3">
-      <LinkIcon className="mt-0.5 h-5 w-5 shrink-0 text-amber-700 sm:block" />
+      <LinkIcon className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
       <div className="min-w-0 flex-1">
         <h3 className="text-base font-semibold text-gray-900 sm:text-sm">
           Someone shared records with you
@@ -440,6 +454,7 @@ export function SharedPackagePanel() {
           </>
         )}
       </div>
+      {close}
     </div>
   );
 
@@ -466,16 +481,6 @@ export function SharedPackagePanel() {
           aria-label="Someone shared records with you"
           className="pointer-events-auto w-full max-w-sm rounded-lg border border-amber-300 bg-amber-50 p-4 shadow-lg"
         >
-          <div className="mb-1 flex justify-end">
-            <button
-              type="button"
-              onClick={dismiss}
-              className="-me-2 -mt-2 flex h-11 w-11 items-center justify-center rounded-md text-gray-500 hover:text-gray-700"
-            >
-              <span className="sr-only">Close</span>
-              <XMarkIcon className="h-5 w-5" aria-hidden="true" />
-            </button>
-          </div>
           {body}
         </div>
       </div>
@@ -525,19 +530,7 @@ export function SharedPackagePanel() {
                 tabIndex={-1}
                 className="pointer-events-auto max-h-[85vh] w-full overflow-y-auto rounded-t-2xl bg-amber-50 shadow-xl focus:outline-none"
               >
-                <div className="flex justify-end px-4 pt-3">
-                  <button
-                    type="button"
-                    onClick={dismiss}
-                    // 44px, and in the corner a thumb reaches rather than
-                    // beside the accept button where it would be mis-hit.
-                    className="-me-2 flex h-11 w-11 items-center justify-center rounded-md text-gray-500 hover:text-gray-700"
-                  >
-                    <span className="sr-only">Close</span>
-                    <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                  </button>
-                </div>
-                <div className="px-4 pb-8">{body}</div>
+                <div className="px-4 pb-8 pt-5">{body}</div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
