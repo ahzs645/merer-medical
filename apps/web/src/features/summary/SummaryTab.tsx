@@ -730,11 +730,22 @@ function ForYouFeed({
   // Each tile is labelled with the record area it opens. The labels used to be
   // mood words ("For you", "For review"), which made the first tile repeat the
   // section heading word for word and told nobody where the tap would land.
+  //
+  // The count goes through a format string rather than being assembled in
+  // English and handed to `t()` as a finished sentence: "3 records" is one of
+  // an unbounded set of strings a dictionary cannot hold, so in Arabic every
+  // one of these tiles stayed English. Same fix as the timeline card titles.
+  const recordCount = (count: number) =>
+    (count === 1 ? t('{count} record') : t('{count} records')).replace(
+      '{count}',
+      `${count}`,
+    );
+
   const items = [
     medicationCount > 0
       ? {
           label: 'Medications',
-          title: `${medicationCount} record${medicationCount === 1 ? '' : 's'}`,
+          title: recordCount(medicationCount),
           description: 'Check medication details and source context.',
           route: AppRoutes.Medications,
         }
@@ -742,9 +753,7 @@ function ForYouFeed({
     allergyCount > 0 || conditionCount > 0
       ? {
           label: 'Allergies and conditions',
-          title: `${allergyCount + conditionCount} record${
-            allergyCount + conditionCount === 1 ? '' : 's'
-          }`,
+          title: recordCount(allergyCount + conditionCount),
           description: 'Keep key clinical summary items current.',
           route: AppRoutes.Conditions,
         }
@@ -752,9 +761,7 @@ function ForYouFeed({
     immunizationCount > 0
       ? {
           label: 'Immunizations',
-          title: `${immunizationCount} record${
-            immunizationCount === 1 ? '' : 's'
-          }`,
+          title: recordCount(immunizationCount),
           description: 'Review your vaccine history and booster status.',
           route: AppRoutes.Immunizations,
         }
@@ -796,7 +803,9 @@ function ForYouFeed({
                 {t(item.label)}
               </span>
               <span className="mt-1 block text-sm font-semibold text-gray-900 group-hover:underline">
-                {t(item.title)}
+                {/* Already translated by `recordCount`, which fills a format
+                    string rather than composing one to look up. */}
+                {item.title}
               </span>
               <span className="mt-1 block text-xs text-gray-600">
                 {t(item.description)}

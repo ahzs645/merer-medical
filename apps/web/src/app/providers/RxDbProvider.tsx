@@ -45,6 +45,7 @@ import { InstanceConfigDocumentSchema } from '../../models/instance-config/Insta
 import { NotificationSchema } from '../../models/notification/Notification.collection';
 import { WorkflowRecordSchema } from '../../models/workflow-record/WorkflowRecord.collection';
 import { ClinicalTimelineCommentSchema } from '../../models/clinical-timeline-comment/ClinicalTimelineComment.collection';
+import { recordAuditEvent } from '../../features/audit/auditLog';
 
 if (process.env.NODE_ENV === 'development') {
   addRxPlugin(RxDBDevModePlugin);
@@ -148,11 +149,22 @@ export function handleJSONDataImport(
               ),
             );
           } else {
-            resolve(
-              `${
-                Object.keys(success).length
-              } documents were successfully imported`,
-            );
+            const imported = Object.keys(success).length;
+            // The other import door — a legacy JSON backup, and the demo's own
+            // seed — logged nothing, so the audit log could sit at "No audit
+            // events yet" directly after the database had been replaced.
+            // Written after the import, since this path drops every collection
+            // (the audit entries with them) before restoring.
+            await recordAuditEvent(db, {
+              action: 'record.import',
+              actor: 'local-user',
+              targetType: 'JSON backup',
+              source: 'Replaced everything on this device',
+              summary: `Imported ${imported} document${
+                imported === 1 ? '' : 's'
+              } from a JSON backup`,
+            });
+            resolve(`${imported} documents were successfully imported`);
           }
         } catch (e) {
           console.error(e);

@@ -7,6 +7,8 @@ import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocu
 import { ConnectionDocument } from '../../../models/connection-document/ConnectionDocument.type';
 import { normalizeMedicationDocuments } from '..';
 import {
+  matchesMedicationFilter,
+  type MedicationFilterId,
   MedicationViewItem,
   sourceLabel,
   toMedicationViewItem,
@@ -26,7 +28,7 @@ export function useMedicationsData({
   selectedFilter,
 }: {
   query: string;
-  selectedFilter: MedicationViewItem['group'] | 'all';
+  selectedFilter: MedicationFilterId;
 }) {
   const db = useRxDb();
   const user = useUser();
@@ -96,9 +98,7 @@ export function useMedicationsData({
     const normalizedQuery = query.trim().toLowerCase();
 
     return items.filter((item) => {
-      const matchesFilter =
-        selectedFilter === 'all' || item.group === selectedFilter;
-      if (!matchesFilter) return false;
+      if (!matchesMedicationFilter(item, selectedFilter)) return false;
       if (!normalizedQuery) return true;
 
       return [

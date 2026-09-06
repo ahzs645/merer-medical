@@ -520,7 +520,7 @@ export function UserDataSettingsGroup() {
             <h2 className="text-primary-800 text-lg leading-6">
               {t('Storage usage')}
             </h2>
-            {/* show if persistant storage is enabled */}
+            {/* show if persistent storage is enabled */}
             <p className="pt-2 text-sm text-gray-800">
               {hasPersistentStorageEnabled
                 ? t('Persistent storage is enabled.')
@@ -574,7 +574,7 @@ export function UserDataSettingsGroup() {
                       } else {
                         notifyDispatch({
                           type: 'set_notification',
-                          message: `Persistent storage cannot be enabled. Try installing Mere as a PWA to enable persistant storage.`,
+                          message: `Persistent storage cannot be enabled. Try installing Mere as a PWA to enable persistent storage.`,
                           variant: 'error',
                         });
                       }

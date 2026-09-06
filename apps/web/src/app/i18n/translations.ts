@@ -226,7 +226,7 @@ export const arabicTranslations: Record<string, string> = {
   Settings: 'الإعدادات',
   Scans: 'الفحوصات',
   'Skip Tutorial': 'تخطي الدليل',
-  'Some patient portals cannot communicate directly with Mere. This option enables a seperate proxy service to handle login and sync for Mere. Disabling this setting will increase privacy but can break some connections.':
+  'Some patient portals cannot communicate directly with Mere. This option enables a separate proxy service to handle login and sync for Mere. Disabling this setting will increase privacy but can break some connections.':
     'لا تستطيع بعض بوابات المرضى التواصل مباشرة مع مير. يفعّل هذا الخيار خدمة وسيطة منفصلة للتعامل مع تسجيل الدخول والمزامنة. قد يؤدي تعطيل هذا الإعداد إلى زيادة الخصوصية ولكنه قد يعطل بعض الاتصالات.',
   Source: 'المصدر',
   Status: 'الحالة',
@@ -371,8 +371,6 @@ export const arabicTranslations: Record<string, string> = {
   'Eye exam / checkup': 'فحص عين / مراجعة',
   'Eye procedure / test': 'إجراء / اختبار عيني',
   'Eye-care record': 'سجل رعاية العين',
-  'File linking is available when the local Dexie database is enabled.':
-    'ربط الملفات متاح عند تفعيل قاعدة بيانات Dexie المحلية.',
   'FreeStyle Libre': 'FreeStyle Libre',
   'General medical': 'طبي عام',
   'Glasses prescription': 'وصفة النظارات',
@@ -765,6 +763,10 @@ export const arabicTranslations: Record<string, string> = {
     '. قد يكون الرابط قديما أو ربما نقلت الصفحة. سجلاتك لم تتغير.',
   'Browse records': 'تصفح السجلات',
   'Go to timeline': 'الانتقال إلى الخط الزمني',
+  'The assistant is switched off': 'المساعد مغلق',
+  'Mere Assistant answers questions about your records using an AI model, and is off until you turn it on. Turn on "Enable Mere Assistant" under Experimental features in Settings, and choose OpenAI or a local Ollama instance.':
+    'يجيب مساعد مير عن أسئلتك حول سجلاتك باستخدام نموذج ذكاء اصطناعي، وهو مغلق حتى تفعله. فعل "تمكين مساعد مير" ضمن الميزات التجريبية في الإعدادات، واختر OpenAI أو نسخة Ollama محلية.',
+  'Open Settings': 'فتح الإعدادات',
 
   // ---------------------------------------------------------------------
   // Records hub
@@ -894,6 +896,12 @@ export const arabicTranslations: Record<string, string> = {
   'No audit events yet': 'لا توجد أحداث تدقيق بعد',
   'Imports, edits, exports, shares, AI access, and sync events will appear here as local audit entries.':
     'ستظهر هنا عمليات الاستيراد والتعديل والتصدير والمشاركة ووصول الذكاء الاصطناعي وأحداث المزامنة كإدخالات تدقيق محلية.',
+  'Record edited': 'عدل سجل',
+  'Records imported': 'استوردت سجلات',
+  'Records exported': 'صدرت سجلات',
+  'Records shared': 'شوركت سجلات',
+  'AI access': 'وصول الذكاء الاصطناعي',
+  'On this device': 'على هذا الجهاز',
 
   // ---------------------------------------------------------------------
   // Trackers
@@ -942,6 +950,12 @@ export const arabicTranslations: Record<string, string> = {
     'لا توجد توصيات نشطة للجدول المحدد.',
   'Everything looks up to date for the selected schedule.':
     'يبدو كل شيء محدثا بالنسبة للجدول المحدد.',
+  'No records yet': 'لا توجد سجلات بعد',
+  'No immunization records yet, so nothing below is a finding about you — it is the routine schedule for the selected country.':
+    'لا توجد سجلات تطعيم بعد، لذا لا شيء أدناه يمثل نتيجة تخصك — إنه الجدول الروتيني للبلد المحدد.',
+  'Without a birth date this list is not filtered by age, so it includes vaccines for every age group.':
+    'بدون تاريخ ميلاد لا تتم تصفية هذه القائمة حسب العمر، لذا تشمل لقاحات كل الفئات العمرية.',
+  'Add a birth date in Settings': 'أضف تاريخ ميلاد في الإعدادات',
   'Influenza vaccine': 'لقاح الإنفلونزا',
   'Recommended every flu season for almost everyone 6 months and older.':
     'يوصى به كل موسم إنفلونزا لمعظم الأشخاص من عمر ستة أشهر فما فوق.',
@@ -1739,6 +1753,10 @@ export const arabicTranslations: Record<string, string> = {
   // Dental "What to do next", which now lists the open records themselves.
   'Nothing open. Every dental record here is complete.':
     'لا يوجد شيء مفتوح. كل سجلات الأسنان هنا مكتملة.',
+  'No dental records yet. Findings, treatment and cleanings will be listed here once a record arrives.':
+    'لا توجد سجلات أسنان بعد. ستدرج هنا النتائج والعلاج والتنظيف بمجرد وصول سجل.',
+  '{count} record': '{count} سجل',
+  '{count} records': '{count} سجلات',
   '{count} record still open': 'سجل واحد ما زال مفتوحًا ({count})',
   '{count} records still open': '{count} سجلات ما زالت مفتوحة',
   '{count} more in Records': '{count} أخرى في السجلات',
