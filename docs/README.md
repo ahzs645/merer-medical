@@ -14,7 +14,8 @@ site published at meremedical.co).
 | [serverless-mode.md](./serverless-mode.md)                     | Running Mere fully serverless (no `apps/api`, `.emrpkg` only).                                   |
 | [clinical-transpose-format.md](./clinical-transpose-format.md) | Turning a clinical document into a package: the `records.json` format and `tools/transpose.mjs`. |
 | [sharing-a-package-by-link.md](./sharing-a-package-by-link.md) | Serving a `.emrpkg` at a URL, the CORS requirement, and opt-in auto-loading.                     |
-| [interface-review-2026-09-pass-4.md](./interface-review-2026-09-pass-4.md) | Latest interface review: is what each screen says about you true. Passes 1–3 are the `interface-review-2026-08*` files. |
+| [interface-review-2026-09-pass-4.md](./interface-review-2026-09-pass-4.md) | Interface review, fourth pass: is what each screen says about you true. Passes 1–3 are the `interface-review-2026-08*` files. |
+| [interface-review-2026-09-pass-5.md](./interface-review-2026-09-pass-5.md) | Fifth pass: detail pages, the clinical timeline, Arabic, 400% zoom, print, and tap targets. Ten open findings. |
 
 ## Audience
 
