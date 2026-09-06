@@ -1,3 +1,4 @@
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import type { RxNormCacheStatus } from '../../medications/interactions/rxnormCacheStore';
 import type { MedicationInteractionBundleStatus } from '../../medications/interactions/types';
 
@@ -8,6 +9,8 @@ export function MedicationInteractionHealthSummary({
   bundleStatus?: MedicationInteractionBundleStatus;
   rxNormCacheStatus?: RxNormCacheStatus;
 }) {
+  const { t } = useInterfaceLanguage();
+
   return (
     <div className="grid gap-3">
       <div className="rounded-md border border-gray-200 bg-white p-3 text-xs text-gray-600">
@@ -33,9 +36,20 @@ export function MedicationInteractionHealthSummary({
       <div className="rounded-md border border-gray-200 bg-white p-3 text-xs text-gray-600">
         <div className="font-semibold text-gray-900">RxNorm cache status</div>
         <div className="mt-1">
+          {/* A format string rather than a sentence assembled in English:
+              "4 cached lookups; 1 stale." is one of an unbounded set the
+              dictionary cannot hold, so in Arabic it stayed English. */}
           {rxNormCacheStatus
-            ? `${rxNormCacheStatus.entryCount.toLocaleString()} cached lookups; ${rxNormCacheStatus.staleEntryCount.toLocaleString()} stale.`
-            : 'Cache status unavailable.'}
+            ? t('{cached} cached lookups; {stale} stale.')
+                .replace(
+                  '{cached}',
+                  rxNormCacheStatus.entryCount.toLocaleString(),
+                )
+                .replace(
+                  '{stale}',
+                  rxNormCacheStatus.staleEntryCount.toLocaleString(),
+                )
+            : t('Cache status unavailable.')}
         </div>
         {rxNormCacheStatus?.lastUpdatedAt && (
           <div className="mt-1">

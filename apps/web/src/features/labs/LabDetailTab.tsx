@@ -62,8 +62,9 @@ export function LabDetailTab() {
       }));
   }, [group, conditionBundles]);
   const labInsight = useMemo(
-    () => (group ? getLabGroupInsight(group) : undefined),
-    [group],
+    () =>
+      group ? getLabGroupInsight(group, reportsByObservationId) : undefined,
+    [group, reportsByObservationId],
   );
   const referenceOverlays = useMemo(() => {
     if (!group || !latestLab) return [];

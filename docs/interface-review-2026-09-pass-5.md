@@ -1,5 +1,10 @@
 # Interface review, fifth pass — the surfaces the fourth never opened
 
+> **Status:** all ten findings below are fixed — see "What shipped" at the foot
+> of this document, and the commits following it. The findings are kept as
+> written, because the reasoning is what makes the fixes reviewable. One
+> "also noticed" item was withdrawn on inspection and is struck through.
+
 Companion to [`interface-review-2026-09-pass-4.md`](./interface-review-2026-09-pass-4.md),
 which asked whether what each screen says about you is true. This pass asks the
 same question of the places that walk never reached:
@@ -197,9 +202,15 @@ At 320 px — 1440 px at 400% zoom — every surface fits except the Markdown / 
 
 ## Also noticed, not written up
 
-- The **wallet card's conditions print in no order** while the page says the most
-  urgent are listed first. Allergies sort by severity; conditions do not. ("Bad
-  breath" and "Occlusal caries on tooth 30" are on an emergency card at all.)
+- ~~The wallet card's conditions print in no order.~~ **Withdrawn on
+  inspection:** `conditionRank` sorts them into three bands — critical
+  diagnoses, everything else, then screening scores and dental findings — which
+  is why Asthma leads and "Bad breath" and "Occlusal caries on tooth 30" sink to
+  the end. Within the middle band the order is whatever the records arrived in.
+  The one thing that reads oddly is that "TB (pulmonary tuberculosis)" is in
+  that middle band: `CRITICAL_CONDITION` names sepsis, hepatitis and HIV but not
+  tuberculosis. That is a judgement about a clinical triage list, so it is
+  recorded here rather than changed.
 - The **add-record route is not a sheet** when reached from a list page's banner
   action, though pass 1 made it one from the Records hub. Same destination, two
   presentations.
@@ -217,3 +228,49 @@ At 320 px — 1440 px at 400% zoom — every surface fits except the Markdown / 
 6. 44 px on the ⋯ menus and dose chips (§9); the Visit prep row (§10).
 7. Then the two that want a design decision: the phone clinical timeline (§6)
    and the document provenance block (§5).
+
+---
+
+## What shipped
+
+Verified against a clean production build driven through `/demo` and through the
+real app with an empty database, at 393 px and 1440 px.
+
+| # | Was | Is |
+| --- | --- | --- |
+| 1 | `activeElement` = `<body>`, nothing announced | `useRouteAnnouncement`: focus moves to `main`, a polite live region names the page ("Records"). Skips the first paint; keyed on `pathname` so typing in a search box cannot steal focus |
+| 2 | "Reported by Unknown source" | "Ben Bora, Christy Chin, MD" — `getLabGroupInsight` falls back to the linked report's performer, which is what the Labs table shows |
+| 3 | Printed card ended "…in the morning. D…" | Screen keeps the wallet-sized summary; print carries the whole instruction, "Do not crush or chew" included |
+| 4 | Y ticks `31.744 · 37.744 · 43.744`, X `2012-04` | `getChartScale` puts every tick on a round number and hands recharts the ticks; both charts label the axis "Apr 2012" |
+| 5 | "Synced from a connected source" over `Entry method: manual-entry` | `buildRecordProvenance` reads the record's own `source_type`, so entry method and source type stop disagreeing; the panel says "How it arrived: Entered by hand" and folds format and content type into "Technical details"; a record that arrived in a package no longer claims a portal |
+| 6 | `BR- E-GFR, …` and `BR- E-GFR` at every width | Lane names wrap to three lines, the column grows with the viewport (132 px on a phone, up to 240), and the first axis tick reads `2011` rather than `11` |
+| 7 | Citation popover clipped past the right edge at 393 px | A sheet above the tab bar on a phone, the anchored popover from `sm` up. Measured: 8 → 385 px in a 393 px viewport |
+| 8 | Eight blurbs, two tiles and three composed lines in English | Dictionary entries and format strings; scanner 2 now also reads label tables rendered off an object by a file that never calls `t()` — which flagged 66 more strings, 27 translated and 39 baselined as brands, standards and analyte names |
+| 9 | 20 controls under 44 px on Immunizations | 0. The ⋯ menus and dose chips are 44 px |
+| 10 | Visit prep's toolbar 334 px in a 320 px viewport | Wraps. `shrink-0` on the action row was pinning it to max-content, so its own `flex-wrap` never applied |
+
+**Baseline:** 740 tests in 88 suites, all passing (was 723 in 85). `tsc` clean,
+`eslint` clean. New specs cover the route announcement, the lab source fallback,
+the chart scale and the provenance labels.
+
+### What the fixing turned up
+
+**The two "manual"s.** The document detail's contradiction was not two
+components disagreeing — it was one function disagreeing with itself.
+`buildRecordProvenance` consulted `metadata.source_type` for `sourceType` and
+not for `entryMethod`, so a package record came back `sourceType: manual` and
+`entryMethod: portal-sync` from a single call. The panel printed both, and the
+read-only note built on the second told the reader to go and edit a portal that
+had never held the record.
+
+**Widening the scanner is not free.** Teaching scanner 2 to read label tables
+rendered without a `t()` call flagged 66 strings — a third of them genuine
+interface copy that had been quietly English since it was written, the rest
+vendor names, standards and lab analytes. `knownUntranslated.json` went from
+`[]` to 39 entries, and the spec's docblock now says what each class is and why
+it stays English, so the list can be argued with rather than just carried.
+
+**Two tap-target fixes were layout fixes.** Growing the ⋯ menu to 44 px pushed
+the status pill off the immunisation card's top row until it was given negative
+margins; the chip row needed `items-center` rather than `items-baseline` once
+the chips were taller than their text.

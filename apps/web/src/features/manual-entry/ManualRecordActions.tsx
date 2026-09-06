@@ -23,6 +23,8 @@ import {
 import { deleteClinicalDocument } from '../../repositories/ClinicalDocumentRepository';
 import { notifyRecordsChanged } from '../../shared/utils/recordChangeSignal';
 import { isManualRecord } from '../../shared/utils/manualRecordUtils';
+import { buildRecordProvenance } from '../provenance/provenance';
+import { readOnlyReason } from '../provenance/provenanceLabels';
 import { ConfirmDeleteDialog } from '../../shared/components/ConfirmDeleteDialog';
 import { ManualSourceDocumentLink } from './ManualSourceDocumentLink';
 
@@ -100,7 +102,11 @@ export function ManualRecordActions({
     const note = (
       <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
         <LockClosedIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
-        {t('Synced from a connected source — edit it there')}
+        {/* "edit it there" is advice about a portal, and this note was given
+            to every record the app cannot edit — including ones that arrived
+            in an imported package and were never near one, which then carried
+            a provenance panel saying so directly underneath. */}
+        {t(readOnlyReason(buildRecordProvenance(item).entryMethod))}
       </span>
     );
     if (inline) return note;

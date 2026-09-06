@@ -35,7 +35,10 @@ type CommentClick = (
 ) => void;
 
 const HEADER_W = 150;
-const HEADER_W_SM = 104;
+const HEADER_W_MAX = 240;
+const HEADER_W_SM = 132;
+/** Half a four-character year at 10px, so an end tick clears the svg edge. */
+const EDGE_TICK_PAD = 20;
 const YAXIS_W = 48;
 const SERIES_H = 64;
 const MARKER_H = 44;
@@ -237,7 +240,16 @@ export function ClinicalTimeline() {
     setDomain(fullExtent);
   }, [fullExtent]);
 
-  const headerW = wrapWidth > 0 && wrapWidth < 560 ? HEADER_W_SM : HEADER_W;
+  // Grows with the viewport rather than sitting at 150px however wide the
+  // panel is. At 1440px the lane names were still truncated — "BR- E-GFR, …"
+  // and "BR- E-GFR" are different tests with the same clipped label — while
+  // the chart beside them had room to spare.
+  const headerW =
+    wrapWidth > 0 && wrapWidth < 560
+      ? HEADER_W_SM
+      : Math.round(
+          Math.min(HEADER_W_MAX, Math.max(HEADER_W, wrapWidth * 0.18)),
+        );
   const contentW = Math.max(0, wrapWidth - headerW - YAXIS_W);
 
   // Visible (unsplit) lanes — drives the cross-parameter tooltip so its grouping
@@ -776,18 +788,30 @@ export function ClinicalTimeline() {
       <div className="flex border-t border-gray-200 bg-white">
         <div style={{ width: headerW }} className="flex-shrink-0" />
         <svg width={contentW} height={X_AXIS_H} className="flex-shrink-0">
-          {ticks.map((t, i) => (
-            <text
-              key={i}
-              x={xFor(t)}
-              y={17}
-              textAnchor="middle"
-              fill="#6b7280"
-              style={{ fontSize: 10 }}
-            >
-              {formatTick(t, spanMs)}
-            </text>
-          ))}
+          {ticks.map((t, i) => {
+            const x = xFor(t);
+            // A tick at either end is anchored to that end rather than
+            // centred on it: centred, half of the first label sat outside the
+            // svg and the axis opened with "11" instead of "2011".
+            const anchor =
+              x < EDGE_TICK_PAD
+                ? 'start'
+                : x > contentW - EDGE_TICK_PAD
+                  ? 'end'
+                  : 'middle';
+            return (
+              <text
+                key={i}
+                x={Math.min(Math.max(x, 0), contentW)}
+                y={17}
+                textAnchor={anchor}
+                fill="#6b7280"
+                style={{ fontSize: 10 }}
+              >
+                {formatTick(t, spanMs)}
+              </text>
+            );
+          })}
         </svg>
         <div style={{ width: YAXIS_W }} className="flex-shrink-0" />
       </div>
@@ -996,7 +1020,15 @@ function LaneRow({
             className="inline-block h-2 w-2 flex-shrink-0 rounded-sm"
             style={{ backgroundColor: CATEGORY_COLOR[lane.category] }}
           />
-          <span className="min-w-0 flex-1 truncate text-[11px] font-semibold uppercase leading-tight tracking-tight text-gray-800">
+          {/* Wraps instead of truncating at one line: the lane row is 64px
+              tall, and a name cut at eleven characters is the difference
+              between two tests and one — "BR- E-GFR" and "BR- E-GFR, AFRICAN
+              AMERICAN" both read "BR- E-GFR, …". Three lines at 11px fit the
+              row; `title` covers the handful longer than that. */}
+          <span
+            title={cleanTitle}
+            className="min-w-0 flex-1 line-clamp-3 break-words text-[11px] font-semibold uppercase leading-tight tracking-tight text-gray-800"
+          >
             {cleanTitle}
           </span>
           {expandControl && (

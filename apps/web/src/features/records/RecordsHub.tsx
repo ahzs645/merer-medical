@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../Routes';
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { AppPage } from '../../shared/components/AppPage';
 import { EmptyState } from '../../shared/components/records/RecordListPage';
 import {
@@ -32,16 +33,25 @@ const OVERVIEW_ROWS = 6;
  * with the footnote that explains why living in a `lg`-only block. A card
  * saying what it is beats a card saying what it could not compute.
  */
-function countText(count: CategoryCount, blurb?: string): string {
+function countText(
+  count: CategoryCount,
+  blurb: string | undefined,
+  t: (text: string) => string,
+): string {
   switch (count.kind) {
     case 'count':
-      return `${count.value} record${count.value === 1 ? '' : 's'}`;
+      // A format string, not a sentence built in English and looked up: "13
+      // records" is one of an unbounded set, so every counted card on this hub
+      // stayed English in Arabic.
+      return (
+        count.value === 1 ? t('{count} record') : t('{count} records')
+      ).replace('{count}', `${count.value}`);
     case 'pending':
-      return 'Counting…';
+      return t('Counting…');
     case 'unavailable':
-      return blurb ?? 'Count unavailable';
+      return blurb ? t(blurb) : t('Count unavailable');
     default:
-      return blurb ?? 'Not counted';
+      return blurb ? t(blurb) : t('Not counted');
   }
 }
 
@@ -57,6 +67,7 @@ function countText(count: CategoryCount, blurb?: string): string {
  * gets an overview the rail can't give instead.
  */
 export function RecordsHub() {
+  const { t } = useInterfaceLanguage();
   // Search lives in the URL, so the view survives Back, can be linked, and
   // comes back the same length it left — see useListViewParams.
   const { query, setQuery } = useListViewParams();
@@ -135,11 +146,13 @@ export function RecordsHub() {
                                 className="block text-xs text-gray-600"
                                 title={
                                   count.kind === 'uncounted'
-                                    ? 'This view combines several kinds of record, so it has no single tally.'
+                                    ? t(
+                                        'This view combines several kinds of record, so it has no single tally.',
+                                      )
                                     : undefined
                                 }
                               >
-                                {countText(count, item.blurb)}
+                                {countText(count, item.blurb, t)}
                               </span>
                             </span>
                           </Link>

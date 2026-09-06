@@ -21,6 +21,7 @@ import { getValueString } from '../../timeline/utils/fhirpathParsers';
 import { normalizeLabChartData } from '../enrichment/labGraphNormalization';
 import { LabReferenceOverlay } from '../enrichment/types';
 import { LabDocument, LabGroup } from '../types';
+import { getChartScale } from '../utils/chartScale';
 
 type LabHistoryChartProps = {
   group?: LabGroup;
@@ -60,9 +61,9 @@ export function LabHistoryChart({
   const chartDisplayName =
     group?.name || labs[0]?.metadata?.display_name || 'Lab result';
 
-  const chartDomain = useMemo(
+  const chartScale = useMemo(
     () =>
-      getPaddedChartDomain(
+      getChartScale(
         chartData
           .flatMap((point) => [
             point.value,
@@ -117,7 +118,8 @@ export function LabHistoryChart({
             type="number"
           />
           <YAxis
-            domain={chartDomain}
+            domain={chartScale.domain}
+            ticks={chartScale.ticks}
             label={{
               value: chartValueUnit ? `(${chartValueUnit})` : '',
               angle: -90,
@@ -263,30 +265,20 @@ function isNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
 }
 
-function getPaddedChartDomain(
-  values: number[],
-): [number | 'dataMin', number | 'dataMax'] {
-  if (values.length === 0) {
-    return ['dataMin', 'dataMax'];
-  }
-
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min;
-  const padding = range > 0 ? range * 0.12 : Math.max(Math.abs(max) * 0.12, 1);
-
-  return [Math.max(0, min - padding), max + padding];
-}
-
 function formatChartTick(value: number) {
   return Number.isInteger(value)
     ? `${value}`
     : value.toLocaleString(undefined, { maximumFractionDigits: 3 });
 }
 
+/**
+ * The house date, shortened to the month. It was `2012-04` — an ISO string on
+ * the axis of an app that spent a whole pass agreeing that a date reads
+ * "Apr 8, 2026".
+ */
 function formatAxisDate(value: number | string) {
   const date = new Date(value);
-  return isValid(date) ? format(date, 'yyyy-MM') : `${value}`;
+  return isValid(date) ? format(date, 'MMM yyyy') : `${value}`;
 }
 
 function formatTooltipDate(value: unknown) {

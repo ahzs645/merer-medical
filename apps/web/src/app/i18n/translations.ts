@@ -825,6 +825,20 @@ export const arabicTranslations: Record<string, string> = {
   Onset: 'البداية',
   'Provenance:': 'المصدر:',
   'Source and provenance': 'المصدر والأصل',
+  'Technical details': 'تفاصيل تقنية',
+  'How it arrived': 'كيف وصل',
+  Fields: 'الحقول',
+  'Synced from a patient portal': 'تمت المزامنة من بوابة المريض',
+  'Entered by hand': 'أدخل يدويا',
+  'Imported from a file': 'استورد من ملف',
+  'Imported from a device': 'استورد من جهاز',
+  'Kept as the source wrote it': 'محفوظ كما كتبه المصدر',
+  'Mapped onto standard fields': 'مطابق للحقول القياسية',
+  'Typed into this app': 'أدخل في هذا التطبيق',
+  'Imported from a file — Mere keeps it as it arrived':
+    'استورد من ملف — يحتفظ به مير كما وصل',
+  'Imported from a device — Mere keeps it as it arrived':
+    'استورد من جهاز — يحتفظ به مير كما وصل',
   'Source type': 'نوع المصدر',
   'Source range': 'نطاق المصدر',
   'Entry method': 'طريقة الإدخال',
@@ -894,6 +908,65 @@ export const arabicTranslations: Record<string, string> = {
   'Review what was exported, shared or changed, and when.':
     'راجع ما تم تصديره أو مشاركته أو تغييره ومتى.',
   'No audit events yet': 'لا توجد أحداث تدقيق بعد',
+
+  // ---------------------------------------------------------------------
+  // Records hub — what a category holds, where a tally would be misleading.
+  // These render as plain JSX, so the runtime DOM pass is what translates
+  // them; the coverage spec now scans label tables like `recordCategories`
+  // even though the file rendering them never calls t().
+  // ---------------------------------------------------------------------
+  'Blood work and panels': 'تحاليل الدم واللوحات',
+  'Measurements over time': 'قياسات عبر الزمن',
+  'Scans and reports': 'الصور والتقارير',
+  'Everything with a result': 'كل ما له نتيجة',
+  'Medical, surgical, family, social': 'طبي وجراحي وعائلي واجتماعي',
+  'People and places': 'الأشخاص والأماكن',
+  'Teeth, hygiene, imaging': 'الأسنان والنظافة والتصوير',
+  'Eyes, prescriptions, exams': 'العيون والوصفات والفحوصات',
+  'Count unavailable': 'العدد غير متاح',
+  'Counting…': 'جارٍ العد…',
+  'This view combines several kinds of record, so it has no single tally.':
+    'يجمع هذا العرض عدة أنواع من السجلات، لذا لا يوجد له عدد واحد.',
+  'Reports, imaging and other': 'التقارير والتصوير وغيرها',
+
+  // ---------------------------------------------------------------------
+  // Label tables the widened coverage scanner reached for the first time:
+  // strings rendered off an object (`item.blurb`, `chip.label`) by a file
+  // that never calls t() itself.
+  // ---------------------------------------------------------------------
+  'Active conditions': 'الحالات النشطة',
+  'All conditions': 'كل الحالات',
+  'All documents': 'كل المستندات',
+  'All portals': 'كل البوابات',
+  'Allergy status': 'حالة الحساسية',
+  'By topic': 'حسب الموضوع',
+  Comment: 'تعليق',
+  Cylinder: 'الأسطواني',
+  'Exam metrics': 'قياسات الفحص',
+  'Family & social history': 'التاريخ العائلي والاجتماعي',
+  'Filter conditions by status': 'تصفية الحالات حسب الحالة',
+  'Filter labs': 'تصفية التحاليل',
+  'Filter medications': 'تصفية الأدوية',
+  'Heart & cardiovascular': 'القلب والأوعية الدموية',
+  Height: 'الطول',
+  'Imaging and device exports': 'صادرات التصوير والأجهزة',
+  'K value': 'قيمة K',
+  'Labs & results': 'التحاليل والنتائج',
+  'Ocular conditions': 'حالات العين',
+  'Optical retail': 'بيع البصريات',
+  Prescription: 'وصفة طبية',
+  Reminder: 'تذكير',
+  'Reproductive & hormonal': 'التناسلي والهرموني',
+  'Resolved conditions': 'الحالات المنتهية',
+  'Search All': 'البحث في الكل',
+  'Search medications': 'البحث في الأدوية',
+  Weight: 'الوزن',
+  'Cache status unavailable.': 'حالة الذاكرة المؤقتة غير متاحة.',
+  '{cached} cached lookups; {stale} stale.':
+    '{cached} عملية بحث مخزنة؛ {stale} قديمة.',
+  'You have used {used} out of {total} of total storage available.':
+    'لقد استخدمت {used} من أصل {total} من إجمالي المساحة المتاحة.',
+  'Privacy and security': 'الخصوصية والأمان',
   'Imports, edits, exports, shares, AI access, and sync events will appear here as local audit entries.':
     'ستظهر هنا عمليات الاستيراد والتعديل والتصدير والمشاركة ووصول الذكاء الاصطناعي وأحداث المزامنة كإدخالات تدقيق محلية.',
   'Record edited': 'عدل سجل',

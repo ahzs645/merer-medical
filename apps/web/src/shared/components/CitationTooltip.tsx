@@ -34,7 +34,13 @@ export function CitationTooltip({
       >
         {children}
       </span>
-      <span className="absolute start-0 top-full z-30 hidden w-80 pt-2 group-hover:block group-focus-within:block">
+      {/* A sheet on a phone, the anchored popover it has always been from `sm`
+          up. Anchored at every width it was 320px wide starting at the
+          trigger's own edge, so on a 393px screen a citation opened halfway
+          across the row ran off the right side and clipped its own text —
+          including the line naming the source it exists to cite. Lifted clear
+          of the bottom tab bar. */}
+      <span className="fixed inset-x-2 bottom-[5.5rem] z-30 hidden w-auto pt-0 group-hover:block group-focus-within:block sm:absolute sm:inset-x-auto sm:bottom-auto sm:start-0 sm:top-full sm:w-80 sm:pt-2">
         <span className="block rounded-md border border-gray-200 bg-white p-3 text-start text-xs font-normal normal-case tracking-normal text-gray-700 shadow-xl">
           {citation.source ? (
             <span className="block font-semibold text-gray-900">

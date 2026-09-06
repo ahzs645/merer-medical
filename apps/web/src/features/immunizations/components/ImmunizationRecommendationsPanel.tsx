@@ -194,7 +194,12 @@ export function ImmunizationRecommendationsPanel({
                       {t(meta.label)}
                     </span>
                     <Menu as="div" className="relative">
-                      <Menu.Button className="rounded p-0.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-200">
+                      {/* 44px, like every other standalone control in the app.
+                          It was 24 — a 20px icon in 2px of padding — and it is
+                          the control that dismisses a vaccine recommendation.
+                          Negative margin so the larger hit area does not push
+                          the status pill off the card's top row. */}
+                      <Menu.Button className="-my-2.5 -me-2 flex h-11 w-11 items-center justify-center rounded text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-200">
                         <span className="sr-only">{t('Dismiss options')}</span>
                         <EllipsisHorizontalIcon
                           className="h-5 w-5"
