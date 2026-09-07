@@ -233,119 +233,11 @@ export function SharingTab() {
     >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.85fr)] lg:px-8">
-          <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 lg:col-span-2">
-            <div className="mb-4 flex items-center gap-2">
-              <DocumentArrowDownIcon className="h-5 w-5 text-primary-700" />
-              <h2 className="text-base font-semibold text-gray-900">
-                Download your records
-              </h2>
-            </div>
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)]">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <fieldset className="sm:col-span-2">
-                  <legend className="text-sm font-medium text-gray-700">
-                    Export scope
-                  </legend>
-                  <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                    <RadioCard
-                      checked={exportScope === 'full'}
-                      title="Full record"
-                      description="Everything on this device: every profile, connection, record, and setting."
-                      onChange={() => setExportScope('full')}
-                    />
-                    <RadioCard
-                      checked={exportScope === 'visit'}
-                      title="Visit-specific package"
-                      description="Just your records and workflow notes, leaving out any other profiles on this device."
-                      onChange={() => setExportScope('visit')}
-                    />
-                  </div>
-                </fieldset>
-                <CheckboxField
-                  checked={includeProvenance}
-                  label="Include provenance"
-                  onChange={setIncludeProvenance}
-                />
-                <CheckboxField
-                  checked={includeAttachments}
-                  label="Include attachments"
-                  onChange={setIncludeAttachments}
-                />
-                <CheckboxField
-                  checked={includeAuditTrail}
-                  label="Include audit trail"
-                  onChange={setIncludeAuditTrail}
-                />
-                <CheckboxField
-                  checked={passwordProtect}
-                  label="Password-protect package"
-                  onChange={setPasswordProtect}
-                />
-                {passwordProtect ? (
-                  <TextField
-                    label="Export password"
-                    type="password"
-                    value={exportPassphrase}
-                    onChange={setExportPassphrase}
-                  />
-                ) : null}
-              </div>
-              <div className="rounded-md bg-gray-50 p-4 text-sm text-gray-700 ring-1 ring-gray-200">
-                <h3 className="font-semibold text-gray-900">Package summary</h3>
-                <ul className="mt-2 space-y-1">
-                  <li>
-                    Scope:{' '}
-                    {exportScope === 'full' ? 'full record' : 'visit-specific'}
-                  </li>
-                  <li>
-                    {includeProvenance ? 'Includes' : 'Omits'} provenance
-                    metadata
-                  </li>
-                  <li>
-                    {includeAttachments ? 'Includes' : 'Omits'} embedded
-                    attachments
-                  </li>
-                  <li>
-                    {includeAuditTrail ? 'Includes' : 'Omits'} audit trail
-                    metadata
-                  </li>
-                  <li>
-                    {passwordProtect
-                      ? 'Encrypted with password'
-                      : 'Not password protected'}
-                  </li>
-                </ul>
-                <p className="mt-3 text-xs text-gray-600">
-                  The share grants below are your own notes. They give nobody
-                  access on their own — you share by handing over the package
-                  you download here.
-                </p>
-                <OtherDownloadDoors from="sharing" />
-                <button
-                  type="button"
-                  onClick={exportRecordPackage}
-                  disabled={
-                    exportBusy || (passwordProtect && !exportPassphrase.trim())
-                  }
-                  className="mt-4 inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-                >
-                  <DocumentArrowDownIcon className="h-4 w-4" />
-                  {exportBusy ? 'Preparing...' : 'Download package'}
-                </button>
-                {downloadUrl ? (
-                  <a
-                    ref={downloadRef}
-                    href={downloadUrl}
-                    download={downloadName}
-                    className="hidden"
-                  >
-                    Download
-                  </a>
-                ) : null}
-              </div>
-            </div>
-          </section>
-
+          {/* The emergency profile and the caregivers lead, because they are
+              what the page is called. The download card was first and full
+              width, so at 1440px a page titled "Sharing and emergency access"
+              opened on neither — both sat below the fold behind a package
+              builder that Export and Visit prep also offer. */}
           <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
             <div className="mb-4 flex items-center gap-2">
               <ShieldCheckIcon className="h-5 w-5 text-primary-700" />
@@ -481,6 +373,119 @@ export function SharingTab() {
                 </>
               )}
             />
+          </section>
+
+          <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 lg:col-span-2">
+            <div className="mb-4 flex items-center gap-2">
+              <DocumentArrowDownIcon className="h-5 w-5 text-primary-700" />
+              <h2 className="text-base font-semibold text-gray-900">
+                Download your records
+              </h2>
+            </div>
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)]">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <fieldset className="sm:col-span-2">
+                  <legend className="text-sm font-medium text-gray-700">
+                    Export scope
+                  </legend>
+                  <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                    <RadioCard
+                      checked={exportScope === 'full'}
+                      title="Full record"
+                      description="Everything on this device: every profile, connection, record, and setting."
+                      onChange={() => setExportScope('full')}
+                    />
+                    <RadioCard
+                      checked={exportScope === 'visit'}
+                      title="Visit-specific package"
+                      description="Just your records and workflow notes, leaving out any other profiles on this device."
+                      onChange={() => setExportScope('visit')}
+                    />
+                  </div>
+                </fieldset>
+                <CheckboxField
+                  checked={includeProvenance}
+                  label="Include provenance"
+                  onChange={setIncludeProvenance}
+                />
+                <CheckboxField
+                  checked={includeAttachments}
+                  label="Include attachments"
+                  onChange={setIncludeAttachments}
+                />
+                <CheckboxField
+                  checked={includeAuditTrail}
+                  label="Include audit trail"
+                  onChange={setIncludeAuditTrail}
+                />
+                <CheckboxField
+                  checked={passwordProtect}
+                  label="Password-protect package"
+                  onChange={setPasswordProtect}
+                />
+                {passwordProtect ? (
+                  <TextField
+                    label="Export password"
+                    type="password"
+                    value={exportPassphrase}
+                    onChange={setExportPassphrase}
+                  />
+                ) : null}
+              </div>
+              <div className="rounded-md bg-gray-50 p-4 text-sm text-gray-700 ring-1 ring-gray-200">
+                <h3 className="font-semibold text-gray-900">Package summary</h3>
+                <ul className="mt-2 space-y-1">
+                  <li>
+                    Scope:{' '}
+                    {exportScope === 'full' ? 'full record' : 'visit-specific'}
+                  </li>
+                  <li>
+                    {includeProvenance ? 'Includes' : 'Omits'} provenance
+                    metadata
+                  </li>
+                  <li>
+                    {includeAttachments ? 'Includes' : 'Omits'} embedded
+                    attachments
+                  </li>
+                  <li>
+                    {includeAuditTrail ? 'Includes' : 'Omits'} audit trail
+                    metadata
+                  </li>
+                  <li>
+                    {passwordProtect
+                      ? 'Encrypted with password'
+                      : 'Not password protected'}
+                  </li>
+                </ul>
+                <p className="mt-3 text-xs text-gray-600">
+                  The share grants below are your own notes. They give nobody
+                  access on their own — you share by handing over the package
+                  you download here.
+                </p>
+                <OtherDownloadDoors from="sharing" />
+                <button
+                  type="button"
+                  onClick={exportRecordPackage}
+                  disabled={
+                    exportBusy || (passwordProtect && !exportPassphrase.trim())
+                  }
+                  className="mt-4 inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                >
+                  <DocumentArrowDownIcon className="h-4 w-4" />
+                  {exportBusy ? 'Preparing...' : 'Download package'}
+                </button>
+                {downloadUrl ? (
+                  <a
+                    ref={downloadRef}
+                    href={downloadUrl}
+                    download={downloadName}
+                    className="hidden"
+                  >
+                    Download
+                  </a>
+                ) : null}
+              </div>
+            </div>
           </section>
 
           <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 lg:col-span-2">

@@ -49,6 +49,16 @@ export {
   formattedTitleDateMonthString,
 };
 
+/**
+ * How many complete days a scroll commits.
+ *
+ * Each page reads a 250-record batch and keeps whole days from it, so the cost
+ * of the page is the batch, not the days — asking for three of them threw away
+ * most of a read and made reaching the oldest record about twenty-five
+ * scrolls. Fifteen is several screens of timeline out of the same one batch.
+ */
+const TIMELINE_DAYS_PER_PAGE = 15;
+
 export function TimelineTab() {
   const [searchParams, setSearchParams] = useSearchParams(),
     user = useUser(),
@@ -67,10 +77,16 @@ export function TimelineTab() {
       status,
       initialized,
       loadNextPage,
+      pageCursor,
       jumpToDate,
       seekingDateKey,
       showIndividualItems,
-    } = useRecordQuery(query, enableVectorSearch, typeFilter),
+    } = useRecordQuery(
+      query,
+      enableVectorSearch,
+      typeFilter,
+      TIMELINE_DAYS_PER_PAGE,
+    ),
     timelineDateKeys = useTimelineDateKeys(query === '', typeFilter),
     hasNoRecords =
       query === '' &&
@@ -215,6 +231,7 @@ export function TimelineTab() {
               <LoadMoreSentinel
                 status={status}
                 loadNextPage={loadNextPage}
+                pageCursor={pageCursor}
                 scrollRootRef={scrollContainer}
               />
             )}
@@ -222,7 +239,7 @@ export function TimelineTab() {
       ) : (
         []
       ),
-    [yearMap, status, loadNextPage, showIndividualItems],
+    [yearMap, status, loadNextPage, pageCursor, showIndividualItems],
   );
 
   return (
@@ -400,10 +417,12 @@ function ViewToggle({
 function LoadMoreSentinel({
   status,
   loadNextPage,
+  pageCursor,
   scrollRootRef,
 }: {
   status: QueryStatus;
   loadNextPage: () => void;
+  pageCursor: number;
   scrollRootRef: React.RefObject<HTMLDivElement>;
 }) {
   const ref = useRef<HTMLDivElement | null>(null),
@@ -413,11 +432,19 @@ function LoadMoreSentinel({
     }),
     isVisible = !!entry?.isIntersecting;
 
+  // `pageCursor` is what re-arms this. The other three dependencies settle
+  // after the first page and never move again: the sentinel stays inside its
+  // own 900px margin once the reader is at the end, `loadNextPage` is stable,
+  // and `status` returns to the same SUCCESS it left. So the effect ran once,
+  // and a timeline that had paged as far as 2016 stopped there with five more
+  // years behind it. The cursor changes on every committed page, and stops
+  // changing when the pager stops making progress — which is exactly when
+  // this should stop asking.
   useEffect(() => {
     if (isVisible && status === QueryStatus.SUCCESS) {
       loadNextPage();
     }
-  }, [isVisible, loadNextPage, status]);
+  }, [isVisible, loadNextPage, pageCursor, status]);
 
   return <div ref={ref} className="h-1 w-full" aria-hidden="true" />;
 }

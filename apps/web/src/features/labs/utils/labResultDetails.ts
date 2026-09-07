@@ -1,6 +1,6 @@
 import { getFhirResource } from '../../../shared/utils/fhirResource';
 import { getReferenceRangeDisplay } from '../../timeline/utils/fhirpathParsers';
-import { LabDocument, LabGroup } from '../types';
+import { LabDocument, LabGroup, ReportLink } from '../types';
 import { formatLabValue } from './labFormatters';
 import {
   providerFromNotes,
@@ -76,11 +76,40 @@ export function getLabResultDetail(lab: LabDocument): LabResultDetail {
   };
 }
 
-export function getLabGroupInsight(group: LabGroup): LabGroupInsight {
+export function getLabGroupInsight(
+  group: LabGroup,
+  /**
+   * The reports each observation belongs to, when the caller has them.
+   *
+   * One result inside a panel usually names nobody — the performer sits on the
+   * DiagnosticReport that carries it, which is exactly what the Labs table has
+   * always shown in its "Linked report" column ("CBC W/AUTOMATED DIFF · Jan 1,
+   * 2023 — Ben Bora"). Reading only the observation left the detail page for
+   * that same row reporting "Unknown source" two clicks later: one record, two
+   * screens, different answers.
+   */
+  reportsByObservationId?: Map<string, ReportLink[]>,
+): LabGroupInsight {
   const details = group.labs.map(getLabResultDetail),
-    distinctPerformers = unique(
+    ownPerformers = unique(
       details.map((detail) => detail.performer).filter(isPresent),
-    );
+    ),
+    // Only consulted when the results themselves name nobody, so a result that
+    // does carry its own performer still speaks for itself.
+    reportPerformers = ownPerformers.length
+      ? []
+      : unique(
+          group.labs
+            .flatMap(
+              (lab) =>
+                reportsByObservationId?.get(lab.metadata?.id || '') ?? [],
+            )
+            .map((report) => report.performer)
+            .filter(isPresent),
+        ),
+    distinctPerformers = ownPerformers.length
+      ? ownPerformers
+      : reportPerformers;
 
   return {
     latest: details[0],

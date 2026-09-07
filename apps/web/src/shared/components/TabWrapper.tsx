@@ -31,6 +31,7 @@ import { NotificationCenter } from '../../features/notifications/NotificationCen
 import { CommandPalette } from './CommandPalette';
 import { TutorialOverlay } from '../../features/tutorial/TutorialOverlay';
 import { isDemoMode } from '../utils/demoMode';
+import { useRouteAnnouncement } from '../hooks/useRouteAnnouncement';
 import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import { SharedPackagePanel } from '../../features/sources/components/SharedPackagePanel';
 
@@ -69,6 +70,7 @@ export function TabWrapper() {
   // container and is only ever rendered inside the router.
   const mainRef = useRef<HTMLElement>(null);
   useScrollRestoration(mainRef);
+  const routeAnnouncement = useRouteAnnouncement(mainRef);
   const user = useUser(),
     { experimental__use_openai_rag, side_nav_collapsed } = useLocalConfig();
   const updateLocalConfig = useUpdateLocalConfig();
@@ -95,6 +97,13 @@ export function TabWrapper() {
       >
         Skip to content
       </a>
+      {/* Names the page a navigation just landed on. Off-screen and polite: it
+          waits for whatever the reader is in the middle of, and says the new
+          page's own heading. Outside `main` so that moving focus into `main`
+          does not also move the reader past the announcement. */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {routeAnnouncement}
+      </div>
       <main
         ref={mainRef}
         id="main-content"

@@ -1,12 +1,20 @@
 import type { MedicationSource, MedicationTimelineItem } from './';
 import type { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 
-export type MedicationGroup =
-  | 'current'
-  | 'planned'
-  | 'stopped'
-  | 'supplements'
-  | 'needsReview';
+/**
+ * Where a medication sits clinically: what the record says you are taking,
+ * meant to take, or have stopped.
+ *
+ * Reconciliation is deliberately not one of these. It answers a different
+ * question — how much the record can be trusted — and when it was a group of
+ * its own it outranked the clinical reading: every drug whose source never
+ * stated adherence (which is most of them, since `medication-adherence` is a
+ * Mere extension no portal writes) became `needs-review`, and the Medications
+ * page answered "what am I taking?" with **Current 0** over a list of three
+ * active prescriptions. See `needsReconciliationReview`, which is a filter
+ * across these groups rather than a sixth one.
+ */
+export type MedicationGroup = 'current' | 'planned' | 'stopped' | 'supplements';
 
 export type NutritionFact = {
   label: string;
@@ -105,9 +113,47 @@ function classifyGroup(
   ) {
     return 'planned';
   }
-  if (item.reconciliationState === 'needs-review') return 'needsReview';
-  if (item.status === 'active') return 'current';
-  return 'needsReview';
+  // Everything left is a medication the record presents as in use: `status`
+  // can only be `active` here, since every other value routes to one of the
+  // groups above.
+  return 'current';
+}
+
+/**
+ * True when the record itself is unclear, whatever the medication's clinical
+ * group — the source gave no status, or stated no adherence, or two sources
+ * disagree.
+ *
+ * A filter rather than a group, so a drug can be both Current and worth
+ * checking. The badge on the card says the same thing, so the chip and the
+ * card now agree: before this, a supplement could carry a "needs review" badge
+ * while the "Needs review" chip counted it under Supplements instead.
+ */
+export function needsReconciliationReview(item: MedicationTimelineItem) {
+  return (
+    item.reconciliationState === 'needs-review' ||
+    item.reconciliationState === 'conflicting-sources'
+  );
+}
+
+/**
+ * `all` and `needsReview` are views across the clinical groups rather than
+ * groups themselves, so the chips overlap by design — the same drug can be
+ * Current and need review, and every drug is under All.
+ */
+export type MedicationFilterId = MedicationGroup | 'all' | 'needsReview';
+
+/**
+ * One rule for both the chip counts and the list underneath them, so a chip
+ * cannot promise a number the list then fails to show.
+ */
+export function matchesMedicationFilter(
+  item: MedicationViewItem,
+  filter: MedicationFilterId,
+) {
+  if (filter === 'all') return true;
+  if (filter === 'needsReview') return needsReconciliationReview(item);
+  return item.group === filter;
 }
 
 function nutritionFactsFrom(item: MedicationTimelineItem): NutritionFact[] {

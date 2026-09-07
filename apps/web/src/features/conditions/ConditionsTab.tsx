@@ -146,9 +146,9 @@ function ConditionRow({ bundle }: { bundle: ConditionBundle }) {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="break-words text-base font-semibold text-gray-900">
+              <h2 className="break-words text-base font-semibold text-gray-900">
                 {bundle.name}
-              </h3>
+              </h2>
               <StatusBadge status={bundle.status} />
             </div>
             {bundle.topicLabels.length > 0 && (

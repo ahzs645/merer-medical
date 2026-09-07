@@ -24,8 +24,23 @@ import { arabicTranslations } from './translations';
  * Both scanners share one escape hatch, `knownUntranslated.json` (a sorted
  * JSON array): a string listed there is allowed to render in English, either
  * because the gap is a deliberate deferral or because the string must stay
- * English (a brand, a product name, a code). The intent is for that list to
- * only shrink:
+ * English (a brand, a product name, a code).
+ *
+ * The 39 entries there now are all of the second kind, and arrived together
+ * when scanner 2 was widened to see label tables rendered without a `t()` call
+ * anywhere in the rendering file. They are:
+ *
+ * - **Portal and vendor names** — MyChart, Cerner, Healow, OnPatient,
+ *   Allscripts, Veterans Affairs. A person picks their portal by the name on
+ *   the sign-in page.
+ * - **Standards and their documentation** — HL7 Eyecare IG, DICOM, FHIR
+ *   VisionPrescription, Eyefinity, Compulink. Proper nouns with no translation.
+ * - **Lab analyte names** — Glucose, TSH, HDL cholesterol, Urine ACR. These
+ *   name the same analytes as the lab rows beside them, and a record's own
+ *   content stays in the language it was recorded in; translating the graph's
+ *   unit picker but not the result under it is the disagreement, not the fix.
+ *
+ * The intent is for that list to only shrink:
  * - New user-facing string? Add an Arabic entry to `arabicTranslations` in
  *   translations.ts (preferred), or - only if it must stay English - add the
  *   exact string to knownUntranslated.json.
@@ -115,14 +130,25 @@ const DYNAMIC_T_CALL_PATTERN =
 // tables. Deliberately narrow: `name`, `value` and friends are just as often
 // identifiers, codes or clinical terms, and would flood the check with noise.
 const UI_LABEL_PROPERTY_PATTERN =
-  /\b(?:label|title|heading|description|shortLabel|subtitle)\s*:\s*(['"])((?:\\.|(?!\1)[^\\\n])*)\1/g;
+  /\b(?:label|title|heading|description|shortLabel|subtitle|blurb)\s*:\s*(['"])((?:\\.|(?!\1)[^\\\n])*)\1/g;
+
+/**
+ * A component reading one of those properties off a table — `item.blurb`,
+ * `category.label`. It is the other way a label table reaches the DOM, and the
+ * one that let all eight Records-hub blurbs ship untranslated: `RecordsHub.tsx`
+ * rendered `item.blurb` as plain JSX and called `t()` nowhere at all, so
+ * neither scanner ever opened the file that declares them.
+ */
+const RENDERED_LABEL_ACCESS_PATTERN =
+  /\b[A-Za-z_$][\w$]*\.(?:label|title|heading|description|shortLabel|subtitle|blurb)\b/;
 
 const LOCAL_IMPORT_PATTERN = /from\s+'(\.[^']+)'/g;
 
 /**
- * Files whose label tables feed a dynamic `t()`: every file that calls
- * `t(variable)` plus the local modules it imports directly (label tables are
- * routinely declared one file over from the component that renders them).
+ * Files whose label tables reach the interface: every file that calls
+ * `t(variable)` or renders a label property off an object, plus the local
+ * modules each imports directly (label tables are routinely declared one file
+ * over from the component that renders them).
  */
 function collectDynamicLabelFiles(allFiles: string[]): Set<string> {
   const known = new Set(allFiles);
@@ -130,7 +156,10 @@ function collectDynamicLabelFiles(allFiles: string[]): Set<string> {
 
   for (const file of allFiles) {
     const source = fs.readFileSync(file, 'utf8');
-    if (!DYNAMIC_T_CALL_PATTERN.test(source)) {
+    if (
+      !DYNAMIC_T_CALL_PATTERN.test(source) &&
+      !RENDERED_LABEL_ACCESS_PATTERN.test(source)
+    ) {
       continue;
     }
     result.add(file);

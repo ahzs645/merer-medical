@@ -17,6 +17,7 @@ import { ReferenceRangeDisplay } from '../../shared/components/ReferenceRangeDis
 import { referenceOverlayLabels } from '../labs/enrichment/labEnrichment';
 import { ReferenceOverlayMode } from '../labs/enrichment/types';
 import { formatResultValue } from './utils/resultNormalization';
+import { notableResultStatus, resultStatusLabel } from './utils/resultStatus';
 import { resultTotals } from './utils/resultTotals';
 import { useResultsData } from './hooks/useResultsData';
 import { useLabReferenceStandard } from '../labs/hooks/useLabReferenceStandard';
@@ -336,7 +337,7 @@ function ResultDetailPanel({
 function MetadataGrid({ detail }: { detail: ResultDetail }) {
   return (
     <section className="grid gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 sm:grid-cols-2 xl:grid-cols-3">
-      <InfoBlock label="Status" value={detail.status} />
+      <InfoBlock label="Status" value={resultStatusLabel(detail.status)} />
       <InfoBlock
         label="Collected"
         value={formatMaybeDate(detail.collectionDate)}
@@ -430,10 +431,9 @@ function InfoBlock({ label, value }: { label: string; value?: string }) {
 }
 
 /**
- * Green meant "not abnormal", which is not the same as "fine" — a result the
- * source never gave a status for came through as a green pill reading
- * "unknown", the same green as "final". An unknown status is grey; a known,
- * unremarkable one keeps the green.
+ * Nothing at all for the ordinary case — see `notableResultStatus`. A row with
+ * no badge is a finished, unremarkable result, which is what almost every row
+ * is; the badge is for the ones that are not.
  */
 function StatusBadge({
   status,
@@ -442,18 +442,18 @@ function StatusBadge({
   status: string;
   abnormal: boolean;
 }) {
-  const unknown = !status || /^(unknown|entered-in-error|null)$/i.test(status);
+  const notable = notableResultStatus(status);
+  if (!abnormal && !notable) return null;
+
   const tone = abnormal
     ? 'bg-amber-100 text-amber-800'
-    : unknown
-      ? 'bg-gray-100 text-gray-600'
-      : 'bg-emerald-100 text-emerald-800';
+    : 'bg-gray-100 text-gray-700';
 
   return (
     <span
       className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${tone}`}
     >
-      {abnormal ? 'Attention' : unknown ? 'No status' : status}
+      {abnormal ? 'Attention' : notable}
     </span>
   );
 }

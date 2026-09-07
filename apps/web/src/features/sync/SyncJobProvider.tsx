@@ -35,6 +35,7 @@ import {
 } from '../../services/fhir/ConnectionService';
 import { useUser } from '../../app/providers/UserProvider';
 import { addNotification } from '../../repositories/NotificationRepository';
+import { recordAuditEvent } from '../audit/auditLog';
 import { Routes as AppRoutes } from '../../Routes';
 import { isDemoMode } from '../../shared/utils/demoMode';
 
@@ -319,6 +320,24 @@ function OnHandleUnsubscribeJobs({ children }: PropsWithChildren) {
             console.error((x as PromiseRejectedResult).reason),
           );
           console.groupEnd();
+
+          // The audit log promises sync events and never received one: a sync
+          // wrote hundreds of records and left no trace on the page that
+          // exists to say what changed and when.
+          if (db && user?.id) {
+            void recordAuditEvent(db, {
+              userId: user.id,
+              action: 'sync.complete',
+              actor: 'local-user',
+              targetType: 'connection',
+              summary:
+                errors.length === 0
+                  ? `Synced ${successRes.length} source${
+                      successRes.length === 1 ? '' : 's'
+                    }`
+                  : `Synced ${successRes.length} of ${res.length} sources, ${errors.length} failed`,
+            });
+          }
 
           if (errors.length === 0) {
             notifyDispatch({

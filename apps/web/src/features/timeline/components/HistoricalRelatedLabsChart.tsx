@@ -21,6 +21,7 @@ import {
   getValueUnit,
 } from '../utils/fhirpathParsers';
 import { safeFormatDate } from '../../../shared/utils/dateFormatters';
+import { getChartScale } from '../../labs/utils/chartScale';
 
 /**
  * The historical chart behind a lab row's "graph" view, in its own module so
@@ -56,9 +57,9 @@ export function HistoricalRelatedLabsChart({
       }),
     [relatedLabs],
   );
-  const chartDomain = useMemo(
+  const chartScale = useMemo(
     () =>
-      getPaddedChartDomain(
+      getChartScale(
         chartData
           .flatMap((d) => [
             d.value,
@@ -71,7 +72,7 @@ export function HistoricalRelatedLabsChart({
   );
 
   return (
-    <div className="h-72 w-full [&_.recharts-surface:focus]:outline-none [&_.recharts-wrapper:focus]:outline-none [&_[tabindex]:focus]:outline-none">
+    <div className="h-64 w-full sm:h-72 [&_.recharts-surface:focus]:outline-none [&_.recharts-wrapper:focus]:outline-none [&_[tabindex]:focus]:outline-none">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={chartData}
@@ -81,13 +82,15 @@ export function HistoricalRelatedLabsChart({
           <XAxis
             dataKey="date"
             interval="preserveStartEnd"
-            tickFormatter={(value) => format(new Date(value), 'yyyy-MM')}
+            // The house date, shortened to the month — not `2012-04`.
+            tickFormatter={(value) => format(new Date(value), 'MMM yyyy')}
             tick={{ fill: '#4B5563', fontSize: 12 }}
             angle={-55}
             textAnchor="end"
           />
           <YAxis
-            domain={chartDomain}
+            domain={chartScale.domain}
+            ticks={chartScale.ticks}
             label={{
               value: chartValueUnit ? `(${chartValueUnit})` : '',
               angle: -90,
@@ -155,21 +158,6 @@ export function HistoricalRelatedLabsChart({
 
 function isNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
-}
-
-function getPaddedChartDomain(
-  values: number[],
-): [number | 'dataMin', number | 'dataMax'] {
-  if (values.length === 0) {
-    return ['dataMin', 'dataMax'];
-  }
-
-  const min = Math.min(...values),
-    max = Math.max(...values),
-    range = max - min,
-    padding = range > 0 ? range * 0.12 : Math.max(Math.abs(max) * 0.12, 1);
-
-  return [Math.max(0, min - padding), max + padding];
 }
 
 function formatChartTick(value: number) {

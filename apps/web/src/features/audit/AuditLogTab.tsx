@@ -7,7 +7,12 @@ import { useUser } from '../../app/providers/UserProvider';
 import { AppPage } from '../../shared/components/AppPage';
 import { GenericBanner } from '../../shared/components/GenericBanner';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
-import { AuditLogEntry, getAuditLog } from './auditLog';
+import {
+  auditActionLabel,
+  auditActorLabel,
+  AuditLogEntry,
+  getAuditLog,
+} from './auditLog';
 
 export function AuditLogTab() {
   const { t } = useInterfaceLanguage();
@@ -41,7 +46,8 @@ export function AuditLogTab() {
                       {entry.summary}
                     </h2>
                     <p className="mt-1 text-xs text-gray-500">
-                      {entry.action} · {entry.actor}
+                      {t(auditActionLabel(entry.action))} ·{' '}
+                      {t(auditActorLabel(entry.actor))}
                     </p>
                   </div>
                   <div className="inline-flex items-center gap-1 text-xs font-medium text-gray-500">

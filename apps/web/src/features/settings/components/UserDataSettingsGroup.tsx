@@ -97,6 +97,17 @@ function readFileAsBytes(file: File): Promise<Uint8Array> {
   });
 }
 
+/**
+ * Bytes in the unit a reader would use, which the storage line used to do
+ * inline twice — once for what is used and once for what is available.
+ */
+function formatBytes(bytes: number): string {
+  const gigabyte = 1024 * 1024 * 1024;
+  return bytes >= gigabyte
+    ? `${(bytes / gigabyte).toFixed(2)} GB`
+    : `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+}
+
 export function UserDataSettingsGroup() {
   const { t } = useInterfaceLanguage();
   const db = useRxDb(),
@@ -520,7 +531,7 @@ export function UserDataSettingsGroup() {
             <h2 className="text-primary-800 text-lg leading-6">
               {t('Storage usage')}
             </h2>
-            {/* show if persistant storage is enabled */}
+            {/* show if persistent storage is enabled */}
             <p className="pt-2 text-sm text-gray-800">
               {hasPersistentStorageEnabled
                 ? t('Persistent storage is enabled.')
@@ -542,21 +553,16 @@ export function UserDataSettingsGroup() {
               </div>
             )}
             <p className="pt-1 text-sm text-gray-800">
+              {/* A format string, for the same reason the cache line above is
+                  one: the sentence was assembled in English and could never be
+                  looked up. */}
               {quotaDetails.usage && quotaDetails.quota
-                ? `You have used ${
-                    quotaDetails.usage >= 1024 * 1024 * 1024
-                      ? `${(quotaDetails.usage / 1024 / 1024 / 1024).toFixed(
-                          2,
-                        )} GB`
-                      : `${(quotaDetails.usage / 1024 / 1024).toFixed(2)} MB`
-                  } out of ${
-                    quotaDetails.quota >= 1024 * 1024 * 1024
-                      ? `${(quotaDetails.quota / 1024 / 1024 / 1024).toFixed(
-                          2,
-                        )} GB`
-                      : `${(quotaDetails.quota / 1024 / 1024).toFixed(2)} MB`
-                  } of total storage available.`
-                : 'Storage quota not available.'}
+                ? t(
+                    'You have used {used} out of {total} of total storage available.',
+                  )
+                    .replace('{used}', formatBytes(quotaDetails.usage))
+                    .replace('{total}', formatBytes(quotaDetails.quota))
+                : t('Storage quota not available.')}
             </p>
           </div>
           <div>
@@ -574,7 +580,7 @@ export function UserDataSettingsGroup() {
                       } else {
                         notifyDispatch({
                           type: 'set_notification',
-                          message: `Persistent storage cannot be enabled. Try installing Mere as a PWA to enable persistant storage.`,
+                          message: `Persistent storage cannot be enabled. Try installing Mere as a PWA to enable persistent storage.`,
                           variant: 'error',
                         });
                       }

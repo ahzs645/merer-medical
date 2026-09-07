@@ -208,9 +208,9 @@ export function EncountersTab() {
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="break-words text-sm font-semibold text-gray-900">
+                <h2 className="break-words text-sm font-semibold text-gray-900">
                   {item.title}
-                </h3>
+                </h2>
                 <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
                   {item.classDisplay && (
                     <Badge className="capitalize">{item.classDisplay}</Badge>

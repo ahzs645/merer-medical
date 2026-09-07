@@ -16,7 +16,7 @@ import { Disclosure } from '@headlessui/react';
 import { ChartBarIcon, TableCellsIcon } from '@heroicons/react/24/outline';
 
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
-import { safeFormatDate } from '../../../shared/utils/dateFormatters';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 import uuid4 from '../../../shared/utils/UUIDUtils';
 import { useSummaryPagePreferences } from '../../summary/hooks/useSummaryPagePreferences';
 import { useRxDb } from '../../../app/providers/RxDbProvider';
@@ -237,7 +237,7 @@ export function ObservationResultRow({
                         <Fragment key={`rl-${rl.id}`}>
                           <div className="col-span-3 self-center ps-4 text-xs font-bold text-gray-600">
                             <p className="">
-                              {safeFormatDate(rl.metadata?.date, 'MM/dd/yyyy')}
+                              {formatRecordDate(rl.metadata?.date, '')}
                             </p>
                             <p className="text-xs font-light text-gray-600">
                               {getReferenceRangeString(rl)

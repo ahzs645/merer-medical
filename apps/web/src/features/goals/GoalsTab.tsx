@@ -82,9 +82,9 @@ export function GoalsTab() {
         >
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="break-words text-base font-semibold text-gray-900">
+              <h2 className="break-words text-base font-semibold text-gray-900">
                 {item.description}
-              </h3>
+              </h2>
               <div className="mt-2 flex flex-wrap gap-2">
                 {item.achievement && (
                   <span className="inline-flex items-center rounded bg-blue-50 px-2 py-0.5 text-xs font-medium capitalize text-blue-700 ring-1 ring-inset ring-blue-600/10">

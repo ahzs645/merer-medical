@@ -253,6 +253,44 @@ export type PartialResultsCallback = (partial: {
  * anchored at an arbitrary point in history rather than always starting from
  * the newest record.
  */
+/**
+ * The newest `limit` days that are known to be complete, and how many records
+ * that is.
+ *
+ * "Complete" means the fetch has already seen a record older than that day, so
+ * nothing more can arrive for it. A day still at the edge of the batch is not
+ * shown: rendering it would claim a day holds three records when the next batch
+ * has four more.
+ *
+ * The record count is what the pager advances its offset by, which is why the
+ * two are returned together — a caller that shows the days without counting the
+ * records puts the view ahead of the offset.
+ */
+function takeNewestCompleteDays(
+  records: ClinicalDocument<BundleEntry<FhirResource>>[],
+  completeDates: Set<string>,
+  limit: number,
+): {
+  records: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]>;
+  keptCount: number;
+} {
+  const grouped = groupRecordsByDate(records);
+  const dates = Object.keys(grouped)
+    .sort(compareTimelineDateKeysDesc)
+    .filter((date) => completeDates.has(date))
+    .slice(0, limit);
+
+  const kept: Record<string, ClinicalDocument<BundleEntry<FhirResource>>[]> =
+    {};
+  let keptCount = 0;
+  for (const date of dates) {
+    kept[date] = grouped[date];
+    keptCount += grouped[date].length;
+  }
+
+  return { records: kept, keptCount };
+}
+
 export async function fetchRecordsUntilCompleteDays(
   db: RxDatabase<DatabaseCollections>,
   user_id: string,
@@ -327,11 +365,30 @@ export async function fetchRecordsUntilCompleteDays(
     offset += batch.length;
 
     if (emitPartialBatches && onPartialResults) {
-      onPartialResults({
-        records: groupRecordsByDate(allRecords),
-        hasMore: true,
-        lastOffset: offset,
-      });
+      // Only the days this page will actually commit to.
+      //
+      // This used to emit every record fetched so far, which on the first
+      // load-more is a 250-record batch spanning 65 days. Those 65 days were
+      // merged into the view and stayed there, while the page that followed
+      // committed 3 complete days and moved `groupedOffset` by thirteen
+      // records. The timeline then showed five years it had never paged
+      // through, ending on a day that was still half-loaded, and every
+      // subsequent page re-fetched records already on screen — so the content
+      // stopped growing, the sentinel never moved, and scrolling stopped
+      // reaching anything older. A partial emission has to be a prefix of the
+      // commit, never a preview of records the pager has not counted.
+      const partial = takeNewestCompleteDays(
+        allRecords,
+        completeDates,
+        minDays,
+      );
+      if (partial.keptCount > 0) {
+        onPartialResults({
+          records: partial.records,
+          hasMore: true,
+          lastOffset: existingOffset + partial.keptCount,
+        });
+      }
     }
 
     if (batch.length < GROUPED_VIEW_BATCH_SIZE) {
@@ -799,6 +856,13 @@ export function useRecordQuery(
   status: QueryStatus;
   initialized: boolean;
   loadNextPage: () => void;
+  /**
+   * Advances every time a page is committed. The scroll loader re-arms on it:
+   * without it the loader is edge-triggered on the sentinel entering view, so a
+   * page that adds less content than the sentinel's 900px margin leaves the
+   * sentinel in view, nothing changes, and the timeline stops paging for good.
+   */
+  pageCursor: number;
   jumpToDate: (dateKey: string) => void;
   seekingDateKey: string | undefined;
   showIndividualItems: boolean;
@@ -919,6 +983,7 @@ export function useRecordQuery(
     status: state.status,
     initialized: state.initialized,
     loadNextPage,
+    pageCursor: isGroupedView ? state.groupedOffset : state.searchPage,
     jumpToDate,
     seekingDateKey: state.seekingDateKey,
     showIndividualItems,

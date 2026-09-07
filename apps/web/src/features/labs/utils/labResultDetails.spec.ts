@@ -92,4 +92,62 @@ describe('labResultDetails', () => {
       'AHS Edmonton Lab',
     ]);
   });
+
+  /**
+   * A single observation inside a panel usually names nobody: the performer
+   * sits on the DiagnosticReport carrying it. Reading only the observation left
+   * the detail page reporting "Unknown source" for the very row the Labs table
+   * had just credited to Ben Bora.
+   */
+  it('takes the performer from the linked report when the result names nobody', () => {
+    const group = {
+      key: 'lymphs',
+      name: 'LYMPHS',
+      labs: [
+        lab('lab-1', {
+          valueQuantity: { value: 36, unit: '%' },
+        }),
+      ],
+    };
+    const reports = new Map([
+      [
+        'lab-1',
+        [
+          {
+            id: 'report-1',
+            displayName: 'CBC W/AUTOMATED DIFF',
+            performer: 'Ben Bora',
+          },
+        ],
+      ],
+    ]);
+
+    expect(getLabGroupInsight(group).distinctPerformers).toEqual([]);
+    expect(getLabGroupInsight(group, reports).distinctPerformers).toEqual([
+      'Ben Bora',
+    ]);
+  });
+
+  it('lets a result that names its own performer speak for itself', () => {
+    const group = {
+      key: 'hemoglobin',
+      name: 'Hemoglobin',
+      labs: [
+        lab('lab-1', {
+          valueQuantity: { value: 150, unit: 'g/L' },
+          performer: [{ display: 'AHS Calgary Lab' }],
+        }),
+      ],
+    };
+    const reports = new Map([
+      [
+        'lab-1',
+        [{ id: 'report-1', displayName: 'CBC', performer: 'Ben Bora' }],
+      ],
+    ]);
+
+    expect(getLabGroupInsight(group, reports).distinctPerformers).toEqual([
+      'AHS Calgary Lab',
+    ]);
+  });
 });

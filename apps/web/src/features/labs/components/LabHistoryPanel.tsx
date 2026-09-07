@@ -55,7 +55,7 @@ export function LabHistoryPanel({
       </div>
       {view === 'GRAPH' ? (
         <div className="rounded-md bg-white p-3 ring-1 ring-gray-200">
-          <LabHistoryChart group={group} heightClassName="h-80" />
+          <LabHistoryChart group={group} heightClassName="h-64 sm:h-80" />
         </div>
       ) : (
         <LabHistoryTable

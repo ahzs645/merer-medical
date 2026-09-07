@@ -424,9 +424,9 @@ export function VitalsTab() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h3 className="break-words text-sm font-semibold text-gray-900">
+                    <h2 className="break-words text-sm font-semibold text-gray-900">
                       {group.name}
-                    </h3>
+                    </h2>
                     <div className="mt-1 flex items-baseline gap-2">
                       <span className="text-primary-700 text-2xl font-bold">
                         {group.latest.text}

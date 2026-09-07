@@ -31,6 +31,10 @@ import { AppDataProvider } from '../app/providers/AppDataProvider';
 import { TabWrapper } from '../shared/components/TabWrapper';
 import { TimelineTab } from '../features/timeline/TimelineTab';
 import { Routes as AppRoutes } from '../Routes';
+// Eager, unlike the assistant itself: this is what `/assistant` renders when
+// the assistant is switched off, and fetching a chat chunk in order to say
+// the chat is unavailable would be backwards.
+import { AssistantDisabledPage } from '../features/ai-chat/components/AssistantDisabledPage';
 import { getRouterBasename } from '../shared/utils/demoMode';
 
 /**
@@ -623,6 +627,6 @@ function AssistantRoute() {
   return experimental__use_openai_rag ? (
     <MereAITab />
   ) : (
-    <Navigate to={AppRoutes.Settings} replace />
+    <AssistantDisabledPage />
   );
 }

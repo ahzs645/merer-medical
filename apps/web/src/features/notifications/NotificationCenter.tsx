@@ -74,10 +74,15 @@ export function NotificationCenter({
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
+        // Named for what the button says, not for what the panel behind it is
+        // called. It read "Alerts" and announced itself as "Notifications", so
+        // a screen reader named a control its user could not see the name of,
+        // and "click Alerts" matched nothing in voice control (WCAG 2.5.3,
+        // Label in Name). The panel keeps its own title.
         aria-label={
           unreadCount > 0
-            ? `${t('Notifications')}, ${unreadCount} ${t('unread')}`
-            : t('Notifications')
+            ? `${t('Alerts')}, ${unreadCount} ${t('unread')}`
+            : t('Alerts')
         }
         className={`group relative flex w-24 flex-col items-center justify-center p-2 text-white duration-75 active:scale-90 sm:active:scale-95 md:m-1 md:w-auto md:flex-row md:rounded-md ${
           collapsed ? 'md:justify-center md:p-3' : 'md:justify-start md:p-4'

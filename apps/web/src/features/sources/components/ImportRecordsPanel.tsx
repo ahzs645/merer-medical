@@ -60,7 +60,11 @@ function ActionCard({
       <div>
         <div className="text-primary-600 flex items-center gap-2">
           <span className="h-5 w-5">{icon}</span>
-          <h4 className="text-sm font-bold text-gray-900">{title}</h4>
+          {/* h3: these cards sit directly inside a Sources section, whose
+              title is the page's <h2>. As <h4> the outline jumped a level, so
+              navigating Sources by heading skipped straight past "Import
+              .emrpkg" and its neighbours. */}
+          <h3 className="text-sm font-bold text-gray-900">{title}</h3>
         </div>
         <p className="mt-1 text-sm text-gray-500">{description}</p>
       </div>

@@ -1363,3 +1363,109 @@ describe('fetchTimelineDateKeys', () => {
     expect(dateKeys).toEqual(['2024-01-15']);
   });
 });
+
+/**
+ * The timeline used to stop six years short of the oldest record, and the two
+ * halves of why are both here: a page that showed days it had not counted, and
+ * a pager that then made no progress through them.
+ */
+describe('fetchRecordsUntilCompleteDays paging to the end', () => {
+  let db: RxDatabase<DatabaseCollections>;
+  let userId: string;
+
+  /** More than one 250-record batch, spread over enough days to page through. */
+  const DAYS = 80;
+  const PER_DAY = 5;
+
+  beforeEach(async () => {
+    db = await createTestDatabase();
+    const user = createDefaultTestUser();
+    userId = user.id;
+    await db.user_documents.insert(user);
+
+    const base = new Date('2024-01-15T10:00:00Z');
+    const dates: { date: string; count: number }[] = [];
+    for (let i = 0; i < DAYS; i++) {
+      const d = new Date(base);
+      d.setDate(d.getDate() - i);
+      dates.push({ date: d.toISOString(), count: PER_DAY });
+    }
+    await db.clinical_documents.bulkInsert(
+      createDocumentsWithSpecificDates(userId, dates),
+    );
+  });
+
+  afterEach(async () => {
+    await cleanupTestDatabase(db);
+  });
+
+  it('never hands the view a day the page has not committed to', async () => {
+    const partials: {
+      records: Record<string, unknown[]>;
+      lastOffset: number;
+    }[] = [];
+
+    const result = await fetchRecordsUntilCompleteDays(
+      db,
+      userId,
+      3,
+      0,
+      3000,
+      (partial) =>
+        partials.push({
+          records: partial.records as Record<string, unknown[]>,
+          lastOffset: partial.lastOffset,
+        }),
+      // The load-more path, which is the one that emits partial batches.
+      true,
+    );
+
+    const committed = new Set(Object.keys(result.records));
+    expect(committed.size).toBe(3);
+
+    for (const partial of partials) {
+      // It used to emit every record fetched so far — fifty days out of one
+      // 250-record batch — which the reducer merged and never took back.
+      expect(Object.keys(partial.records).sort()).toEqual(
+        Object.keys(partial.records)
+          .filter((date) => committed.has(date))
+          .sort(),
+      );
+      // And the offset has to count exactly the records it showed, or the next
+      // page re-reads what is already on screen.
+      const shown = Object.values(partial.records).reduce(
+        (sum, records) => sum + records.length,
+        0,
+      );
+      expect(partial.lastOffset).toBe(shown);
+    }
+  });
+
+  it('reaches the oldest record by paging', async () => {
+    const seen = new Set<string>();
+    let offset = 0;
+    let pages = 0;
+
+    while (pages < 200) {
+      pages += 1;
+      const page = await fetchRecordsUntilCompleteDays(
+        db,
+        userId,
+        3,
+        offset,
+        3000,
+        undefined,
+        pages > 1,
+      );
+      Object.keys(page.records).forEach((date) => seen.add(date));
+      // A page that commits nothing new is the stall this test is about.
+      expect(page.lastOffset).toBeGreaterThan(offset);
+      offset = page.lastOffset;
+      if (!page.hasMore) break;
+    }
+
+    expect(seen.size).toBe(DAYS);
+    expect([...seen].sort()[0]).toBe('2023-10-28');
+    expect(offset).toBe(DAYS * PER_DAY);
+  });
+});

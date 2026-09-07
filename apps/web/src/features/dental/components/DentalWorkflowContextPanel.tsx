@@ -10,8 +10,15 @@ const SHOWN = 5;
 
 export function DentalWorkflowContextPanel({
   context,
+  hasRecords,
 }: {
   context: DentalWorkflowContext;
+  /**
+   * Whether any dental record exists. "Nothing open" is a finding about a set
+   * of records, and with no records there is no set — an empty workspace was
+   * telling a new arrival that every dental record here is complete.
+   */
+  hasRecords: boolean;
 }) {
   const { t } = useInterfaceLanguage();
   const actions = context.nextActions;
@@ -35,7 +42,13 @@ export function DentalWorkflowContextPanel({
       {/* The count is the length of the list beneath it. It used to be a tally
           of active-kind records while the list was four fixed sentences, so a
           reader naturally took the four as the seven. */}
-      {actions.length === 0 ? (
+      {!hasRecords ? (
+        <p className="mt-1 text-sm text-gray-600">
+          {t(
+            'No dental records yet. Findings, treatment and cleanings will be listed here once a record arrives.',
+          )}
+        </p>
+      ) : actions.length === 0 ? (
         <p className="mt-1 text-sm text-gray-600">
           {t('Nothing open. Every dental record here is complete.')}
         </p>
