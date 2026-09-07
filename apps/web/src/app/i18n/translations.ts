@@ -226,7 +226,7 @@ export const arabicTranslations: Record<string, string> = {
   Settings: 'الإعدادات',
   Scans: 'الفحوصات',
   'Skip Tutorial': 'تخطي الدليل',
-  'Some patient portals cannot communicate directly with Mere. This option enables a seperate proxy service to handle login and sync for Mere. Disabling this setting will increase privacy but can break some connections.':
+  'Some patient portals cannot communicate directly with Mere. This option enables a separate proxy service to handle login and sync for Mere. Disabling this setting will increase privacy but can break some connections.':
     'لا تستطيع بعض بوابات المرضى التواصل مباشرة مع مير. يفعّل هذا الخيار خدمة وسيطة منفصلة للتعامل مع تسجيل الدخول والمزامنة. قد يؤدي تعطيل هذا الإعداد إلى زيادة الخصوصية ولكنه قد يعطل بعض الاتصالات.',
   Source: 'المصدر',
   Status: 'الحالة',
@@ -371,8 +371,6 @@ export const arabicTranslations: Record<string, string> = {
   'Eye exam / checkup': 'فحص عين / مراجعة',
   'Eye procedure / test': 'إجراء / اختبار عيني',
   'Eye-care record': 'سجل رعاية العين',
-  'File linking is available when the local Dexie database is enabled.':
-    'ربط الملفات متاح عند تفعيل قاعدة بيانات Dexie المحلية.',
   'FreeStyle Libre': 'FreeStyle Libre',
   'General medical': 'طبي عام',
   'Glasses prescription': 'وصفة النظارات',
@@ -765,6 +763,10 @@ export const arabicTranslations: Record<string, string> = {
     '. قد يكون الرابط قديما أو ربما نقلت الصفحة. سجلاتك لم تتغير.',
   'Browse records': 'تصفح السجلات',
   'Go to timeline': 'الانتقال إلى الخط الزمني',
+  'The assistant is switched off': 'المساعد مغلق',
+  'Mere Assistant answers questions about your records using an AI model, and is off until you turn it on. Turn on "Enable Mere Assistant" under Experimental features in Settings, and choose OpenAI or a local Ollama instance.':
+    'يجيب مساعد مير عن أسئلتك حول سجلاتك باستخدام نموذج ذكاء اصطناعي، وهو مغلق حتى تفعله. فعل "تمكين مساعد مير" ضمن الميزات التجريبية في الإعدادات، واختر OpenAI أو نسخة Ollama محلية.',
+  'Open Settings': 'فتح الإعدادات',
 
   // ---------------------------------------------------------------------
   // Records hub
@@ -823,6 +825,20 @@ export const arabicTranslations: Record<string, string> = {
   Onset: 'البداية',
   'Provenance:': 'المصدر:',
   'Source and provenance': 'المصدر والأصل',
+  'Technical details': 'تفاصيل تقنية',
+  'How it arrived': 'كيف وصل',
+  Fields: 'الحقول',
+  'Synced from a patient portal': 'تمت المزامنة من بوابة المريض',
+  'Entered by hand': 'أدخل يدويا',
+  'Imported from a file': 'استورد من ملف',
+  'Imported from a device': 'استورد من جهاز',
+  'Kept as the source wrote it': 'محفوظ كما كتبه المصدر',
+  'Mapped onto standard fields': 'مطابق للحقول القياسية',
+  'Typed into this app': 'أدخل في هذا التطبيق',
+  'Imported from a file — Mere keeps it as it arrived':
+    'استورد من ملف — يحتفظ به مير كما وصل',
+  'Imported from a device — Mere keeps it as it arrived':
+    'استورد من جهاز — يحتفظ به مير كما وصل',
   'Source type': 'نوع المصدر',
   'Source range': 'نطاق المصدر',
   'Entry method': 'طريقة الإدخال',
@@ -892,8 +908,73 @@ export const arabicTranslations: Record<string, string> = {
   'Review what was exported, shared or changed, and when.':
     'راجع ما تم تصديره أو مشاركته أو تغييره ومتى.',
   'No audit events yet': 'لا توجد أحداث تدقيق بعد',
+
+  // ---------------------------------------------------------------------
+  // Records hub — what a category holds, where a tally would be misleading.
+  // These render as plain JSX, so the runtime DOM pass is what translates
+  // them; the coverage spec now scans label tables like `recordCategories`
+  // even though the file rendering them never calls t().
+  // ---------------------------------------------------------------------
+  'Blood work and panels': 'تحاليل الدم واللوحات',
+  'Measurements over time': 'قياسات عبر الزمن',
+  'Scans and reports': 'الصور والتقارير',
+  'Everything with a result': 'كل ما له نتيجة',
+  'Medical, surgical, family, social': 'طبي وجراحي وعائلي واجتماعي',
+  'People and places': 'الأشخاص والأماكن',
+  'Teeth, hygiene, imaging': 'الأسنان والنظافة والتصوير',
+  'Eyes, prescriptions, exams': 'العيون والوصفات والفحوصات',
+  'Count unavailable': 'العدد غير متاح',
+  'Counting…': 'جارٍ العد…',
+  'This view combines several kinds of record, so it has no single tally.':
+    'يجمع هذا العرض عدة أنواع من السجلات، لذا لا يوجد له عدد واحد.',
+  'Reports, imaging and other': 'التقارير والتصوير وغيرها',
+
+  // ---------------------------------------------------------------------
+  // Label tables the widened coverage scanner reached for the first time:
+  // strings rendered off an object (`item.blurb`, `chip.label`) by a file
+  // that never calls t() itself.
+  // ---------------------------------------------------------------------
+  'Active conditions': 'الحالات النشطة',
+  'All conditions': 'كل الحالات',
+  'All documents': 'كل المستندات',
+  'All portals': 'كل البوابات',
+  'Allergy status': 'حالة الحساسية',
+  'By topic': 'حسب الموضوع',
+  Comment: 'تعليق',
+  Cylinder: 'الأسطواني',
+  'Exam metrics': 'قياسات الفحص',
+  'Family & social history': 'التاريخ العائلي والاجتماعي',
+  'Filter conditions by status': 'تصفية الحالات حسب الحالة',
+  'Filter labs': 'تصفية التحاليل',
+  'Filter medications': 'تصفية الأدوية',
+  'Heart & cardiovascular': 'القلب والأوعية الدموية',
+  Height: 'الطول',
+  'Imaging and device exports': 'صادرات التصوير والأجهزة',
+  'K value': 'قيمة K',
+  'Labs & results': 'التحاليل والنتائج',
+  'Ocular conditions': 'حالات العين',
+  'Optical retail': 'بيع البصريات',
+  Prescription: 'وصفة طبية',
+  Reminder: 'تذكير',
+  'Reproductive & hormonal': 'التناسلي والهرموني',
+  'Resolved conditions': 'الحالات المنتهية',
+  'Search All': 'البحث في الكل',
+  'Search medications': 'البحث في الأدوية',
+  Weight: 'الوزن',
+  'Cache status unavailable.': 'حالة الذاكرة المؤقتة غير متاحة.',
+  '{cached} cached lookups; {stale} stale.':
+    '{cached} عملية بحث مخزنة؛ {stale} قديمة.',
+  'You have used {used} out of {total} of total storage available.':
+    'لقد استخدمت {used} من أصل {total} من إجمالي المساحة المتاحة.',
+  'Privacy and security': 'الخصوصية والأمان',
   'Imports, edits, exports, shares, AI access, and sync events will appear here as local audit entries.':
     'ستظهر هنا عمليات الاستيراد والتعديل والتصدير والمشاركة ووصول الذكاء الاصطناعي وأحداث المزامنة كإدخالات تدقيق محلية.',
+  'Record edited': 'عدل سجل',
+  'Records imported': 'استوردت سجلات',
+  'Records exported': 'صدرت سجلات',
+  'Records shared': 'شوركت سجلات',
+  'AI access': 'وصول الذكاء الاصطناعي',
+  'On this device': 'على هذا الجهاز',
 
   // ---------------------------------------------------------------------
   // Trackers
@@ -942,6 +1023,12 @@ export const arabicTranslations: Record<string, string> = {
     'لا توجد توصيات نشطة للجدول المحدد.',
   'Everything looks up to date for the selected schedule.':
     'يبدو كل شيء محدثا بالنسبة للجدول المحدد.',
+  'No records yet': 'لا توجد سجلات بعد',
+  'No immunization records yet, so nothing below is a finding about you — it is the routine schedule for the selected country.':
+    'لا توجد سجلات تطعيم بعد، لذا لا شيء أدناه يمثل نتيجة تخصك — إنه الجدول الروتيني للبلد المحدد.',
+  'Without a birth date this list is not filtered by age, so it includes vaccines for every age group.':
+    'بدون تاريخ ميلاد لا تتم تصفية هذه القائمة حسب العمر، لذا تشمل لقاحات كل الفئات العمرية.',
+  'Add a birth date in Settings': 'أضف تاريخ ميلاد في الإعدادات',
   'Influenza vaccine': 'لقاح الإنفلونزا',
   'Recommended every flu season for almost everyone 6 months and older.':
     'يوصى به كل موسم إنفلونزا لمعظم الأشخاص من عمر ستة أشهر فما فوق.',
@@ -1739,6 +1826,10 @@ export const arabicTranslations: Record<string, string> = {
   // Dental "What to do next", which now lists the open records themselves.
   'Nothing open. Every dental record here is complete.':
     'لا يوجد شيء مفتوح. كل سجلات الأسنان هنا مكتملة.',
+  'No dental records yet. Findings, treatment and cleanings will be listed here once a record arrives.':
+    'لا توجد سجلات أسنان بعد. ستدرج هنا النتائج والعلاج والتنظيف بمجرد وصول سجل.',
+  '{count} record': '{count} سجل',
+  '{count} records': '{count} سجلات',
   '{count} record still open': 'سجل واحد ما زال مفتوحًا ({count})',
   '{count} records still open': '{count} سجلات ما زالت مفتوحة',
   '{count} more in Records': '{count} أخرى في السجلات',

@@ -18,6 +18,7 @@ import { useNotificationDispatch } from '../../../app/providers/NotificationProv
 import { importEmrpkgToRxDb, inspectEmrpkg } from '../../../services/emrpkg';
 import { ButtonLoadingSpinner } from '../../connections/components/ButtonLoadingSpinner';
 import { useIsDesktop } from '../../../shared/hooks/useIsDesktop';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 /**
  * The query parameter a shared package arrives on.
@@ -378,7 +379,12 @@ export function SharedPackagePanel() {
                 <div className="flex gap-1.5">
                   <dt>Created</dt>
                   <dd className="font-semibold">
-                    {new Date(fetched.info.createdAt).toLocaleDateString()}
+                    {/* The house date rather than the browser's numeric one:
+                        "4/8/2026" is two different days depending on where
+                        the reader is. `createdAt` is epoch milliseconds. */}
+                    {formatRecordDate(
+                      new Date(fetched.info.createdAt).toISOString(),
+                    )}
                   </dd>
                 </div>
               ) : null}

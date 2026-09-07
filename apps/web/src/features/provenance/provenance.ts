@@ -10,7 +10,11 @@ export type RecordProvenance = {
   originalFormat?: string;
   originalContentType?: string;
   mappingConfidence?: 'source' | 'mapped' | 'manual' | 'unknown';
-  entryMethod?: 'portal-sync' | 'manual-entry' | 'file-import' | 'device-import';
+  entryMethod?:
+    | 'portal-sync'
+    | 'manual-entry'
+    | 'file-import'
+    | 'device-import';
   originalFilename?: string;
   notes?: string;
 };
@@ -30,11 +34,26 @@ export function buildRecordProvenance(
     | undefined;
   const rawProvenance =
     typeof raw === 'object' && raw ? raw.provenance || {} : {};
+  // `metadata.source_type` is the record's own word for where it came from,
+  // and it was consulted for `sourceType` below but not here — so a package
+  // record saying `source_type: 'manual'` came back with `sourceType: manual`
+  // and `entryMethod: portal-sync` from the same call. The panel printed both,
+  // and the read-only note built on the second told the reader to go and edit
+  // a portal that had never held the record.
   const isManual =
     connection?.source === 'manual' ||
+    metadata.source_type === 'manual' ||
     metadata.id?.startsWith('manual:') ||
+    // Written by the manual-entry form and by the package builder. A record
+    // carrying them says it was composed by hand, whether or not the caller
+    // has the connection to hand — and without this the same record came back
+    // `manual` when a connection was passed and `portal-sync` when it was not,
+    // which is how a consent form from an imported package came to be labelled
+    // "Synced from a connected source — edit it there".
+    Boolean(metadata.manual_specialty) ||
     (typeof raw === 'object' && !!raw?.manual_kind);
-  const isFile = doc.data_record.resource_type === 'documentreference_attachment';
+  const isFile =
+    doc.data_record.resource_type === 'documentreference_attachment';
 
   return {
     sourceName:
@@ -75,4 +94,3 @@ export function buildRecordProvenance(
     notes: rawProvenance.notes || metadata.provenance_notes,
   };
 }
-

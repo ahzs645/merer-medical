@@ -19,6 +19,7 @@ import { OtherDownloadDoors } from '../../shared/components/OtherDownloadDoors';
 import { resourceTypeLabel } from '../../shared/utils/resourceTypeLabels';
 import { referencedAttachmentIds } from '../../shared/utils/standaloneAttachments';
 import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
+import { recordAuditEvent } from '../audit/auditLog';
 
 /**
  * Rows that exist in `clinical_documents` but are not records in their own
@@ -187,8 +188,25 @@ function buildHtmlSummary(
 
 export function RecordExportTab() {
   const user = useUser();
+  const db = useRxDb();
   const { docs, status } = useAllRecords();
   const [lastDownload, setLastDownload] = useState<string>();
+
+  /**
+   * Sharing and Visit prep have always recorded the packages they hand out;
+   * this page, which hands out the whole record set, recorded nothing — so an
+   * audit log that promised exports listed only two of the three doors.
+   */
+  function logExport(filename: string, kind: string) {
+    void recordAuditEvent(db, {
+      userId: user?.id,
+      action: 'record.export',
+      actor: 'local-user',
+      targetType: kind,
+      source: 'Export records',
+      summary: `Exported ${kind.toLowerCase()} as ${filename}`,
+    });
+  }
 
   const counts: Counts = useMemo(() => {
     // Attachments a DocumentReference wraps travel inside the bundle and are
@@ -251,7 +269,16 @@ export function RecordExportTab() {
     });
     return [...grouped.values()]
       .map(({ type, count }) => ({
-        label: resourceTypeLabel(type, count),
+        // "Results" is the name of a page that counts 222 where this chip
+        // counts 233, because the page leaves out vitals and other
+        // observations and this chip does not. The paragraph below explains
+        // that, but a chip carrying a page's name and a different number is
+        // read long before a paragraph is. The printed summary below already
+        // calls the same bucket "Results & vitals"; so does this now.
+        label:
+          type === 'observation'
+            ? 'Results & vitals'
+            : resourceTypeLabel(type, count),
         count,
       }))
       .sort((a, b) => b.count - a.count);
@@ -300,9 +327,9 @@ export function RecordExportTab() {
                   Every record stored on this device, counted once, so the chips
                   add up to the total above and each one matches the count its
                   own screen shows. Screens holding one slice of your library
-                  report smaller figures — Results, for example, counts lab,
-                  imaging and report results and leaves out vitals and other
-                  observations.{' '}
+                  report smaller figures — the Results page counts lab, imaging
+                  and report results and leaves out the vitals and other
+                  observations counted here.{' '}
                   {counts.attachments > 0 &&
                     `${counts.attachments} files attached to documents travel inside the FHIR Bundle but are not counted as records of their own.`}
                 </p>
@@ -324,6 +351,7 @@ export function RecordExportTab() {
                     'text/html',
                   );
                   setLastDownload(filename);
+                  logExport(filename, 'Health summary');
                 }}
               />
               <ExportButton
@@ -339,6 +367,7 @@ export function RecordExportTab() {
                     'application/fhir+json',
                   );
                   setLastDownload(filename);
+                  logExport(filename, 'FHIR Bundle');
                 }}
               />
             </div>

@@ -61,6 +61,8 @@ export function ImmunizationsTab() {
                 country={country}
                 onCountryChange={setCountry}
                 recommendations={recommendations}
+                hasRecords={records.length > 0}
+                hasBirthDate={Boolean(user?.birthday)}
               />
               {isEmpty ? (
                 <div className="rounded-xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-200">

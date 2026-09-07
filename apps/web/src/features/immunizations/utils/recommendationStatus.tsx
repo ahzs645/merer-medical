@@ -65,6 +65,23 @@ export const recommendationStatusMeta: Record<
   },
 };
 
+/**
+ * How a rule reads when there is nothing to assess it against.
+ *
+ * A forecast over an empty record set marks every routine vaccine due or
+ * overdue, because "no dose on file" and "no dose given" are the same input to
+ * it. On a brand-new install that told somebody who may be fully vaccinated
+ * that five vaccines needed attention. The rule still belongs on screen — it
+ * is the schedule — but as a schedule, not as a finding about this person.
+ */
+export const notAssessedStatusMeta: RecommendationStatusMeta = {
+  label: 'No records yet',
+  icon: ArchiveBoxIcon,
+  badge: 'bg-gray-100 text-gray-600 ring-gray-500/20',
+  accent: 'border-l-gray-300',
+  order: 4,
+};
+
 export function recommendationStatusOf(
   status: RecommendationStatus,
 ): RecommendationStatusMeta {

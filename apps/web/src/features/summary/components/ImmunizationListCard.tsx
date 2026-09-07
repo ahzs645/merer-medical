@@ -1,6 +1,6 @@
 import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import { format, parseISO } from 'date-fns';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 import { BundleEntry, Immunization } from 'fhir/r2';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { CardBase } from '../../connections/components/CardBase';
@@ -88,14 +88,10 @@ export function ImmunizationListCard({
                                 <ul className="truncate ps-2 text-sm font-medium text-gray-800">
                                   {item.map((x) => (
                                     <li key={x.id}>
-                                      {`• ${
-                                        x.metadata?.date
-                                          ? format(
-                                              parseISO(x.metadata.date),
-                                              'MM/dd/yyyy',
-                                            )
-                                          : ''
-                                      }`}
+                                      {`• ${formatRecordDate(
+                                        x.metadata?.date,
+                                        '',
+                                      )}`}
                                     </li>
                                   ))}
                                 </ul>

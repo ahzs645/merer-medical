@@ -134,8 +134,13 @@ export function RecordPageHeader<Id extends string = string>({
             {count && <p className="mt-1 text-sm text-primary-100">{count}</p>}
           </div>
 
+          {/* The action row wraps rather than overflowing. `shrink-0` here
+              pinned it to its max-content width, so `flex-wrap` never got the
+              chance: Visit prep's three actions measured 334px in a 320px
+              viewport — the one row in the app that would not reflow at 400%
+              zoom. The buttons keep their own `shrink-0`, so they wrap whole. */}
           {action && (
-            <div className="ms-auto flex shrink-0 flex-wrap items-center justify-end gap-2">
+            <div className="ms-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
               {action}
             </div>
           )}

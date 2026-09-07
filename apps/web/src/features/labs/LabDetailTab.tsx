@@ -62,8 +62,9 @@ export function LabDetailTab() {
       }));
   }, [group, conditionBundles]);
   const labInsight = useMemo(
-    () => (group ? getLabGroupInsight(group) : undefined),
-    [group],
+    () =>
+      group ? getLabGroupInsight(group, reportsByObservationId) : undefined,
+    [group, reportsByObservationId],
   );
   const referenceOverlays = useMemo(() => {
     if (!group || !latestLab) return [];
@@ -255,7 +256,7 @@ export function LabDetailTab() {
                 <div className="mt-3">
                   <LabHistoryChart
                     group={group}
-                    heightClassName="h-96"
+                    heightClassName="h-64 sm:h-96"
                     referenceOverlays={enabledReferenceOverlays}
                     showReferenceRange={false}
                     targetUnit={activeGraphUnit}

@@ -104,7 +104,7 @@ export function PrivacyAndSecuritySettingsGroup() {
                   </Switch.Label>
                   <Switch.Description className="pt-2 text-sm text-gray-800">
                     Some patient portals cannot communicate directly with Mere.
-                    This option enables a seperate proxy service to handle login
+                    This option enables a separate proxy service to handle login
                     and sync for Mere. Disabling this setting will increase
                     privacy but can break some connections.
                   </Switch.Description>

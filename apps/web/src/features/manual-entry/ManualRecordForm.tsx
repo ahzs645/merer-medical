@@ -569,7 +569,14 @@ export function ManualRecordForm({
               </div>
             )}
 
-            {!isDeviceImportType && (
+            {/* Only offered where it works. Attachments live in the Dexie
+                storage backend, which is off by default and switchable only
+                from a localStorage key — so every reader of this form met a
+                disabled file picker under a sentence naming an internal
+                database library ("the local Dexie database"), with nothing
+                they could do about either. A control nobody can use, explained
+                in terms nobody can act on, is worse than no control. */}
+            {!isDeviceImportType && canLinkSourceFile && (
               <div>
                 <label
                   htmlFor="manual-record-source-file"
@@ -585,7 +592,6 @@ export function ManualRecordForm({
                 <input
                   id="manual-record-source-file"
                   type="file"
-                  disabled={!canLinkSourceFile}
                   onChange={(event) => {
                     const file = event.target.files?.[0];
                     if (!file) {
@@ -608,13 +614,6 @@ export function ManualRecordForm({
                 {linkedFile && (
                   <p className="mt-2 text-xs font-medium text-gray-600">
                     {t('Linked')}: {linkedFile.filename}
-                  </p>
-                )}
-                {!canLinkSourceFile && (
-                  <p className="mt-2 text-xs font-medium text-gray-500">
-                    {t(
-                      'File linking is available when the local Dexie database is enabled.',
-                    )}
                   </p>
                 )}
               </div>

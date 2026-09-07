@@ -3,12 +3,15 @@ import { DentalWorkflowContextPanel } from '../components/DentalWorkflowContextP
 import { useDentalContext } from '../hooks/useDentalContext';
 
 export function DentalOverviewTab() {
-  const { counts, workflowContext } = useDentalContext();
+  const { counts, records, workflowContext } = useDentalContext();
 
   return (
     <>
       <DentalSummaryPanel counts={counts} />
-      <DentalWorkflowContextPanel context={workflowContext} />
+      <DentalWorkflowContextPanel
+        context={workflowContext}
+        hasRecords={records.length > 0}
+      />
     </>
   );
 }

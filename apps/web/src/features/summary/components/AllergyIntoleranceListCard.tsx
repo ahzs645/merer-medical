@@ -1,6 +1,6 @@
 import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import { format, parseISO } from 'date-fns';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 import { AllergyIntolerance, BundleEntry } from 'fhir/r2';
 import { Fragment } from 'react';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
@@ -78,9 +78,7 @@ export function AllergyIntoleranceListCard({
                           ))}
                         </p>
                         <p className="truncate text-xs font-medium text-gray-800 md:text-sm">
-                          {item.metadata?.date
-                            ? format(parseISO(item.metadata.date), 'MM/dd/yyyy')
-                            : ''}
+                          {formatRecordDate(item.metadata?.date, '')}
                         </p>
                       </div>
                     ))}

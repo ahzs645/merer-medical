@@ -33,14 +33,15 @@ import {
 } from './';
 import {
   humanize,
-  type MedicationGroup,
+  matchesMedicationFilter,
+  type MedicationFilterId,
   type MedicationViewItem,
   sourceLabel,
 } from './medicationViewModel';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 type FilterChip = {
-  id: MedicationGroup | 'all';
+  id: MedicationFilterId;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 };
@@ -77,13 +78,12 @@ export function MedicationsTab() {
   const counts = useMemo(() => {
     return FILTERS.reduce(
       (acc, filter) => {
-        acc[filter.id] =
-          filter.id === 'all'
-            ? items.length
-            : items.filter((item) => item.group === filter.id).length;
+        acc[filter.id] = items.filter((item) =>
+          matchesMedicationFilter(item, filter.id),
+        ).length;
         return acc;
       },
-      {} as Record<FilterChip['id'], number>,
+      {} as Record<MedicationFilterId, number>,
     );
   }, [items]);
 
@@ -500,7 +500,11 @@ function MedicationCard({ item }: { item: MedicationViewItem }) {
         {item.dose && <Detail label="Dose" value={item.dose} />}
         {item.frequency && <Detail label="Frequency" value={item.frequency} />}
         {item.route && <Detail label="Route" value={item.route} />}
-        {item.adherence && (
+        {/* "Adherence: unknown" is the absence of a finding, printed as one —
+            and since no portal writes the adherence extension, it was on
+            every card. The reconciliation badge above already says the record
+            is incomplete; a field repeating it four columns wide does not. */}
+        {item.adherence && item.adherence !== 'unknown' && (
           <Detail label="Adherence" value={humanize(item.adherence)} />
         )}
       </dl>

@@ -506,7 +506,16 @@ function WalletSection({
                 <span className="font-medium">{item.name}</span>
                 {item.detail && (
                   <span className="block text-xs text-gray-500">
-                    {item.detail}
+                    {/* The screen gets the wallet-sized summary; paper gets the
+                        whole instruction. `condenseSig` cuts at 44 characters
+                        and the tooltip carrying the rest does not survive a
+                        printer — so a card handed to a clinician read "1
+                        capsule 1 time each day in the morning. D…" and never
+                        got to "Do not crush or chew." */}
+                    <span className="print:hidden">{item.detail}</span>
+                    <span className="hidden print:inline">
+                      {item.fullDetail || item.detail}
+                    </span>
                   </span>
                 )}
               </li>

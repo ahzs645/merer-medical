@@ -18,6 +18,7 @@ import { packEmrpkg, unpackEmrpkg, inspectEmrpkg } from '@mere/local-dexie';
 import type { DatabaseCollections } from '../../app/providers/DatabaseCollections';
 import { createExportPrfKey, deriveImportPrfKey } from './webauthnPrf';
 import { backfillSourceDocumentLinks } from '../../repositories/sourceLinkBackfill';
+import { recordAuditEvent } from '../../features/audit/auditLog';
 
 export const RXDB_COLLECTIONS_IN_PACKAGE = [
   'user_documents',
@@ -180,6 +181,28 @@ export async function importEmrpkgToRxDb(
       console.warn('[emrpkg] source-document link backfill failed', err);
     }
   }
+
+  // Logged here rather than at each door. Six screens import a package —
+  // Settings, Sources, the shared-package panel, the tutorial and two more —
+  // and none of them wrote an audit entry, so a page promising "Imports,
+  // edits, exports, shares, AI access, and sync events" recorded no import
+  // that had ever happened. After the restore, so a replacing import (which
+  // clears `workflow_records` along with everything else) does not erase it.
+  const importedRecords = Object.values(counts).reduce(
+    (total, count) => total + (count || 0),
+    0,
+  );
+  await recordAuditEvent(db, {
+    action: 'record.import',
+    actor: 'local-user',
+    targetType: 'Record package',
+    source: replace
+      ? 'Replaced everything on this device'
+      : 'Added to this app',
+    summary: `Imported ${importedRecords} row${
+      importedRecords === 1 ? '' : 's'
+    } from a record package`,
+  });
 
   return { counts, unknownTables };
 }
