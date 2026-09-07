@@ -1,5 +1,6 @@
 import { ReferenceRangeDisplay } from '../../../shared/components/ReferenceRangeDisplay';
 import { ReferenceOverlayMode, LabReferenceOverlay } from '../enrichment/types';
+import { partitionReferenceOverlays } from '../utils/referenceOverlays';
 
 const preferredOrder: ReferenceOverlayMode[] = [
   'canadian',
@@ -20,9 +21,25 @@ export function LabReferenceOverlayControls({
   const orderedOverlays = [...overlays].sort(
     (a, b) => preferredOrder.indexOf(a.mode) - preferredOrder.indexOf(b.mode),
   );
-  const availableModes = orderedOverlays.map((overlay) => overlay.mode);
+  // Only the overlays that can put a line on the chart get a checkbox. The rest
+  // said something worth keeping and nothing worth toggling, so they become a
+  // line of text.
+  const { plottable, unplottable } =
+    partitionReferenceOverlays(orderedOverlays);
+  const availableModes = plottable.map((overlay) => overlay.mode);
 
-  if (orderedOverlays.length === 0) return null;
+  if (plottable.length === 0) {
+    if (unplottable.length === 0) return null;
+
+    return (
+      <p className="text-xs leading-5 text-gray-600">
+        <span className="font-semibold text-gray-700">
+          No reference range to draw for this test.
+        </span>{' '}
+        {describeUnplottable(unplottable)}
+      </p>
+    );
+  }
 
   return (
     <div className="rounded-md border border-gray-200 bg-gray-50 p-3">
@@ -30,28 +47,30 @@ export function LabReferenceOverlayControls({
         <strong className="text-sm font-semibold text-gray-900">
           Reference overlays
         </strong>
-        <div className="flex flex-wrap gap-1.5">
-          <OverlayButton
-            label="All"
-            onClick={() => setEnabledModes(availableModes)}
-          />
-          <OverlayButton
-            label="Canadian"
-            onClick={() =>
-              setEnabledModes(
-                availableModes.includes('canadian') ? ['canadian'] : [],
-              )
-            }
-          />
-          <OverlayButton label="None" onClick={() => setEnabledModes([])} />
-        </div>
+        {/* Three buttons that all do the same thing is not a choice. They earn
+            their room once there is more than one overlay to choose between. */}
+        {plottable.length > 1 ? (
+          <div className="flex flex-wrap gap-1.5">
+            <OverlayButton
+              label="All"
+              onClick={() => setEnabledModes(availableModes)}
+            />
+            {availableModes.includes('canadian') ? (
+              <OverlayButton
+                label="Canadian"
+                onClick={() => setEnabledModes(['canadian'])}
+              />
+            ) : null}
+            <OverlayButton label="None" onClick={() => setEnabledModes([])} />
+          </div>
+        ) : null}
       </div>
       <div
         role="group"
         aria-label="Reference overlays"
         className="mt-2 flex flex-wrap gap-x-4 gap-y-2"
       >
-        {orderedOverlays.map((overlay) => {
+        {plottable.map((overlay) => {
           const checked = enabledModes.includes(overlay.mode);
 
           return (
@@ -90,8 +109,25 @@ export function LabReferenceOverlayControls({
           );
         })}
       </div>
+      {unplottable.length > 0 ? (
+        <p className="mt-2 border-t border-gray-200 pt-2 text-xs leading-5 text-gray-600">
+          {describeUnplottable(unplottable)}
+        </p>
+      ) : null}
     </div>
   );
+}
+
+/**
+ * What the standards that cannot be drawn actually said, in one line —
+ * "Canadian: Use absolute count · Original: Not Estab.". Two lines of a grey
+ * panel become one line of prose, and the reader still learns why the chart has
+ * no band on it.
+ */
+function describeUnplottable(overlays: LabReferenceOverlay[]) {
+  return overlays
+    .map((overlay) => `${overlay.label}: ${overlay.display}`)
+    .join(' · ');
 }
 
 function OverlayButton({

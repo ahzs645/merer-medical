@@ -37,7 +37,7 @@ export function LabHistoryChart({
   group,
   history,
   className = '',
-  heightClassName = 'h-72',
+  heightClassName = 'h-64 sm:h-72',
   showReferenceRange = true,
   referenceOverlays = [],
   targetUnit,
@@ -60,6 +60,9 @@ export function LabHistoryChart({
 
   const chartDisplayName =
     group?.name || labs[0]?.metadata?.display_name || 'Lab result';
+  // A phone gives the plot about 345px of width. The y axis was taking 84 of
+  // them — a fixed 64px gutter plus a 20px margin — to print "55".
+  const compact = chartSize.width > 0 && chartSize.width < 480;
 
   const chartScale = useMemo(
     () =>
@@ -102,7 +105,7 @@ export function LabHistoryChart({
         <ComposedChart
           data={chartData}
           height={chartSize.height}
-          margin={{ top: 16, right: 16, bottom: 36, left: 20 }}
+          margin={{ top: 16, right: 16, bottom: 36, left: compact ? 0 : 20 }}
           width={chartSize.width}
         >
           <CartesianGrid stroke="#E5E7EB" strokeDasharray="3 3" />
@@ -128,7 +131,7 @@ export function LabHistoryChart({
             }}
             tick={{ fill: '#4B5563', fontSize: 12 }}
             tickFormatter={formatChartTick}
-            width={64}
+            width={compact ? 46 : 64}
           />
           <Tooltip
             content={({ active, label, payload }) => {

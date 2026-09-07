@@ -72,7 +72,7 @@ export function HistoricalRelatedLabsChart({
   );
 
   return (
-    <div className="h-72 w-full [&_.recharts-surface:focus]:outline-none [&_.recharts-wrapper:focus]:outline-none [&_[tabindex]:focus]:outline-none">
+    <div className="h-64 w-full sm:h-72 [&_.recharts-surface:focus]:outline-none [&_.recharts-wrapper:focus]:outline-none [&_[tabindex]:focus]:outline-none">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={chartData}

@@ -256,7 +256,7 @@ export function LabDetailTab() {
                 <div className="mt-3">
                   <LabHistoryChart
                     group={group}
-                    heightClassName="h-96"
+                    heightClassName="h-64 sm:h-96"
                     referenceOverlays={enabledReferenceOverlays}
                     showReferenceRange={false}
                     targetUnit={activeGraphUnit}
