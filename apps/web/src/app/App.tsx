@@ -315,6 +315,15 @@ const routes = [
     element: <TabWrapper />,
     children: [
       {
+        // The root has no page of its own, but it is where people arrive: the
+        // installed app's `start_url`, the end of the tutorial, and `/demo`
+        // (the router's basename, so `/` inside it). When the catch-all
+        // stopped redirecting to the timeline, all three opened on "Page not
+        // found"; the redirect now belongs to the one address that needs it.
+        index: true,
+        element: <Navigate to={AppRoutes.Timeline} replace />,
+      },
+      {
         path: AppRoutes.Timeline,
         element: <TimelineTab />,
       },
