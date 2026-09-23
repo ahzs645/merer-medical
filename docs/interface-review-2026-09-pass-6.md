@@ -1,7 +1,9 @@
 # Interface review, sixth pass — what the device brings
 
-> **Status:** §1 is fixed in the commit that adds this document. Everything else
-> is open and written up to be picked off in the order at the foot.
+> **Status:** all twelve findings are fixed — see "What shipped" and "Tested
+> again" at the foot. The findings are kept as written. Two were overstated on
+> inspection and are corrected where they stand (§5's dental row, §12's first
+> sentence); one follow-on in §12, `share_target`, is left open and says why.
 
 Companion to [`interface-review-2026-09-pass-5.md`](./interface-review-2026-09-pass-5.md).
 The first five passes asked about the page: is it drawn right, readable, true,
@@ -129,13 +131,13 @@ attribute. A tap does nothing; there is no hover on glass.
 The same pattern hides smaller things elsewhere — information that only a mouse
 can reach:
 
-| Where              | Hover-only text                                  |
-| ------------------ | ------------------------------------------------ |
-| Wallet card        | the full instruction, per medication             |
-| Records hub (×8)   | why a category has no count                      |
-| Sources (×5)       | exact sync time ("November 14, 2023 at 3:39 AM") |
-| Dental chart (×32) | each tooth's FDI number                          |
-| Settings           | what "Repair source links" does                  |
+| Where                  | Hover-only text                                                                                                                                                            |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wallet card            | the full instruction, per medication                                                                                                                                       |
+| Records hub (×8)       | why a category has no count                                                                                                                                                |
+| Sources (×5)           | exact sync time ("November 14, 2023 at 3:39 AM")                                                                                                                           |
+| ~~Dental chart (×32)~~ | ~~each tooth's FDI number~~ — **withdrawn:** the FDI number is printed under each tooth's own number; the probe read the `title` as extra because it adds the word "Tooth" |
+| Settings               | what "Repair source links" does                                                                                                                                            |
 
 **Fix:** for the wallet card, let the instruction wrap on screen (it is two
 lines, not ten) or make the row expand on tap. For the rest, move the text into
@@ -224,7 +226,11 @@ possible in the installed app.
 ## 12. Desktop: files only go in through a picker
 
 Thirteen file inputs (package import, document attachments, CSVs, profile
-photo) and none accept a drop. On a desktop the natural move with an `.emrpkg`
+photo). ~~None accept a drop~~ — **corrected:** the visible ones on the
+add-record form take a drop natively; the package imports on Sources, Settings
+and the tutorial are hidden inputs behind buttons, and those do not. And a file
+dropped anywhere else replaces the app with the file, taking any half-filled
+form with it. On a desktop the natural move with an `.emrpkg`
 or a PDF from a portal is to drag it onto the window.
 
 Two larger follow-ons for the installed app: `file_handlers` in the manifest so
@@ -267,3 +273,91 @@ against the production server with gzip on (§8's are computed from sizes).
 8. The PWA head (§10).
 9. Then the ones that want a design decision: keyboard-up chrome (§7),
    landscape layout (§11), drag-and-drop and file handlers (§12).
+
+---
+
+## What shipped
+
+| #   | Was                                                                                                    | Is                                                                                                                                                                                                                                                                                                                                                       |
+| --- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `/demo`, the end of the tutorial, a returning `/` and the installed app all opened on "Page not found" | An index route sends `/` to the timeline. The shell's own routes — root, retired addresses, 404 — moved to `app/shellRoutes.tsx` so a spec can render them without booting the database                                                                                                                                                                  |
+| 2   | `"orientation": "portrait"`                                                                            | Gone                                                                                                                                                                                                                                                                                                                                                     |
+| 3   | Four `w-24` tabs (rem-sized): at 200% text, 768px of tabs in a 393px bar, More two-thirds off-screen   | Tabs share the bar equally; labels stop growing at 18px (150%) so four words always fit. More fully on screen at 100–250%                                                                                                                                                                                                                                |
+| 4   | 14px fields on Sharing, every search box, passphrases                                                  | A coarse-pointer rule raises text fields to `max(1rem, 16px)`: 0 of 27 phone fields under 16px. Desktop keeps its 14px                                                                                                                                                                                                                                   |
+| 5   | Wallet card "…in the morning. D…", rest in a `title`; four other hover-only texts                      | The instruction is condensed, not clamped, and wraps. Sources prints the exact sync date; Settings' repair button has a visible hint; the Records hub drops a tooltip the blurb already covers. 0 hover-only texts on the probed pages                                                                                                                   |
+| 6   | Back with a sheet or palette open left the page underneath                                             | `useCloseOnBack` gives each open overlay its own history entry — More sheet, ⌘K palette, `Modal`, `FormSheet`, confirm dialogs, user switcher, notifications, comments, the phone package sheet. An overlay closing because its own link navigates says so (`closeForNavigation`) and navigates with `replace`, so Back from the destination is one step |
+| 7   | With the keyboard up, tab bar + tool picker + back bar took 40% of what was left                       | `useSoftKeyboardOpen` (a text field focused _and_ the viewport well under its tallest) marks the shell; the tab bar, Utilities tool picker and "All records" bar step aside on phone widths until the field blurs or the keyboard closes                                                                                                                 |
+| 8   | 786 KB entry script + 1.04 MB TTF                                                                      | Entry 593 KB gzipped (−25%): `fhirpath` + ANTLR + UCUM swapped for a 30-line path walker checked against fhirpath on every path used; `console-feed` loaded only in developer mode; the record edit sheet fetched on first Edit. Fonts are WOFF2 split Latin (51 KB) / extended, fetched by `unicode-range`                                              |
+| 9   | Offline in the system font                                                                             | All four WOFF2 files precached; offline screens render in Source Sans                                                                                                                                                                                                                                                                                    |
+| 10  | Second manifest in Vue green, no `theme-color`, no iPhone icon                                         | `manifest: false`; `theme-color`, `apple-touch-icon` (180px), `apple-mobile-web-app-title`, `color-scheme: light`                                                                                                                                                                                                                                        |
+| 11  | A sideways phone got the 16rem rail and a banner ending at y≈372 of 393                                | A `short:` screen (max-height 500px): the rail starts collapsed (expanding lasts the session and does not overwrite the desktop preference); the banner tightens and drops its description; chips scroll in one row. Banner ends at y≈225                                                                                                                |
+| 12  | Hidden import inputs took no drop; a stray drop replaced the app                                       | The window takes file drops: a `.emrpkg` goes to the same review a shared link gets, nothing imported until accepted; anything else is refused with a sentence. `file_handlers` in the manifest, read through `launchQueue`, sends "Open with Mere" to the same review                                                                                   |
+
+Also: `darkMode: 'class'` makes the stray `dark:` classes inert.
+
+### What the fixing turned up
+
+**The rail never fitted a short window.** Checking §11 showed the desktop rail
+is ~770px of items with no scrolling, clipped by the shell. On any window under
+that — a 1280 × 600 laptop browser as much as a sideways phone — the profile
+link, and at 393px Settings too, sat below the edge with no way to reach them.
+It now scrolls on windows under 800px tall; only there, because scrolling one
+axis clips the other and the collapsed rail's name bubbles hang off its side.
+
+**Enter did nothing in ⌘K.** Testing §6 through the palette found that the
+only way from the search box to a result was Tab, past the close button. Enter
+now runs the first result and ↓ steps into the list.
+
+**A `back()` can race the router.** The first version of the Back hook took
+its entry off with `history.back()` a task after closing. The palette closes
+and then navigates, the router's push landed after that task, and the `back()`
+undid the navigation — ⌘K → Settings stayed on Labs. Overlays closing for a
+navigation now say so, and never send a `back()`.
+
+### Left open
+
+- **`share_target`** ("Share → Mere" on Android). It needs a service-worker
+  route that accepts the POSTed file, and a decision about what a shared PDF or
+  photo becomes, since only packages have a review screen today. Nothing here
+  could test it; it wants a real Android device.
+- **`core-js/stable`** is 174 KB of the entry script, imported whole by
+  `polyfills.ts`. Vite already targets browsers that need little of it, but
+  which of its features the code relies on (`Array.prototype.at`,
+  `structuredClone`, …) is an audit, not a deletion.
+
+## Tested again
+
+Same build, same probes, same widths, against the fixed build at the head of
+this branch.
+
+| Probe                                                  | Before                        | After                                                               |
+| ------------------------------------------------------ | ----------------------------- | ------------------------------------------------------------------- |
+| `/demo`, after Skip Tutorial, returning `/`            | Page not found                | `/timeline` (unknown paths still 404; `/labs/:key` still redirects) |
+| Manifest orientation · manifests linked                | portrait · 2                  | none · 1, with `file_handlers`                                      |
+| "More" at 200% / 250% text                             | 33% visible / —               | fully visible, labels whole                                         |
+| Phone text fields under 16px                           | 27 of 27                      | **0** of 27 (desktop unchanged at 14px)                             |
+| Wallet card on a phone                                 | "…morning. D…"                | "…morning. Do not crush or chew."                                   |
+| Hover-only texts on the probed pages                   | 16                            | **0**                                                               |
+| More sheet on Labs, then Back                          | Records                       | Labs, sheet closed                                                  |
+| More → Settings, then Back                             | —                             | Labs                                                                |
+| ⌘K, then Back · ⌘K → Settings, then Back               | Records · (Enter did nothing) | Labs · Settings, then Labs                                          |
+| Keyboard up on Sharing                                 | tab bar + tool picker shown   | both hidden, back on blur                                           |
+| Slow 4G + 4× CPU, gzip: first paint                    | 5.3 s                         | **4.2 s**                                                           |
+| … bytes before the first heading                       | 802 KB                        | 615 KB                                                              |
+| … until text is in Source Sans                         | 9.9 s, 1.69 MB                | **5.8 s, 0.92 MB**                                                  |
+| Offline typeface                                       | system fallback               | Source Sans                                                         |
+| Landscape Medications: banner ends at                  | y ≈ 372 of 393                | y ≈ 225                                                             |
+| Profile / Settings in the rail at 852×393 and 1280×600 | below the edge                | reachable (scrolls)                                                 |
+| `.emrpkg` dropped on the window                        | browser opens the file        | review panel, nothing imported                                      |
+| PDF dropped outside a file field                       | app replaced by the PDF       | refused, with where it can go                                       |
+| Sideways overflow at 320 / 393 / 852×393 / 1440        | none                          | none                                                                |
+| Console errors                                         | 0                             | 0                                                                   |
+
+Timings are medians of three runs of each build served locally with gzip,
+Chromium throttled to 1.6 Mbps / 150 ms and a 4× slower CPU, service workers
+off so every run is a first visit.
+
+**Baseline:** 789 tests in 94 suites, all passing (was 758 in 90). `tsc` clean;
+`eslint` reports no errors, and no warnings in the new files. New specs cover the
+shell routes, `useCloseOnBack`, `useSoftKeyboardOpen`, the path walker against
+fhirpath, and a dropped package in the review panel.
