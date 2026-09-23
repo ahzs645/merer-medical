@@ -19,6 +19,10 @@ import { importEmrpkgToRxDb, inspectEmrpkg } from '../../../services/emrpkg';
 import { ButtonLoadingSpinner } from '../../connections/components/ButtonLoadingSpinner';
 import { useIsDesktop } from '../../../shared/hooks/useIsDesktop';
 import { useCloseOnBack } from '../../../shared/hooks/useCloseOnBack';
+import {
+  SHARE_TARGET_PARAM,
+  takeSharedPackage,
+} from '../../../shared/utils/shareTarget';
 import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 /**
@@ -61,7 +65,8 @@ export function isTrustedPackageOrigin(origin: string): boolean {
  *
  * Three ways a file arrives with no picker in front of it: dropped on the
  * window, opened with Mere from the desktop (`file_handlers` in the manifest,
- * delivered through `launchQueue`), or a future share target. All three want
+ * delivered through `launchQueue`), or shared to the installed app from
+ * another one (`share_target`, parked by the service worker). All three want
  * the same thing a link gets — read it, say what is in it and whose it is,
  * and import nothing until somebody says so.
  */
@@ -152,6 +157,21 @@ export function SharedPackagePanel() {
     next.delete(SHARED_PACKAGE_AUTOLOAD_PARAM);
     setSearchParams(next, { replace: true });
   }, [param, autoloadParam, searchParams, setSearchParams]);
+
+  // A file shared to the installed app arrives as `?shared-package=1`, with
+  // the file itself parked by the service worker (shared/utils/shareTarget).
+  const sharedParam = searchParams.get(SHARE_TARGET_PARAM);
+  useEffect(() => {
+    if (!sharedParam) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete(SHARE_TARGET_PARAM);
+    setSearchParams(next, { replace: true });
+    takeSharedPackage()
+      .then((shared) => {
+        if (shared) setClaimed({ file: shared, autoload: false });
+      })
+      .catch(() => undefined);
+  }, [sharedParam, searchParams, setSearchParams]);
 
   useEffect(() => {
     const onOffer = (event: Event) => {
@@ -277,7 +297,7 @@ export function SharedPackagePanel() {
     return () => {
       cancelled = true;
     };
-  }, [raw, autoloadRequested]);
+  }, [file, raw, autoloadRequested]);
 
   const runImport = useCallback(
     async (replace: boolean) => {

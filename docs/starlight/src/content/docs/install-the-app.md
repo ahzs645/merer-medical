@@ -31,3 +31,14 @@ The prompt you might see on your Android device will differ depending on which d
 ## Chrome
 
 Go to the [Mere App Web Page](https://app.meremedical.co) and look at the URL bar in the top right. These browsers will show an install badge (icon) in the URL bar (see the image below), stating that the app is installable.
+
+## What installing adds
+
+Installed, Mere behaves more like an app than a tab:
+
+- **It works offline.** Once it has loaded, pages and the typeface are kept on the device, so it opens with no connection.
+- **It turns with your device.** Portrait or landscape, on a phone or a tablet.
+- **Open with Mere** (Chrome or Edge on a desktop): a `.emrpkg` record package can be opened from your file manager straight into the app.
+- **Share → Mere** (Android): share a `.emrpkg` from email or a messaging app and pick Mere in the share sheet.
+
+Either way — and when you drag a package onto the window — Mere shows what is in the package and whose records they are first. Nothing is imported until you choose to.

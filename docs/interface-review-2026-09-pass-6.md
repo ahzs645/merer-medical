@@ -3,7 +3,9 @@
 > **Status:** all twelve findings are fixed — see "What shipped" and "Tested
 > again" at the foot. The findings are kept as written. Two were overstated on
 > inspection and are corrected where they stand (§5's dental row, §12's first
-> sentence); one follow-on in §12, `share_target`, is left open and says why.
+> sentence). The two follow-ons first left open — `share_target` and the
+> `core-js` audit — are done too; what is left needs a real phone, and is listed
+> under "Still to check on a device".
 
 Companion to [`interface-review-2026-09-pass-5.md`](./interface-review-2026-09-pass-5.md).
 The first five passes asked about the page: is it drawn right, readable, true,
@@ -278,20 +280,20 @@ against the production server with gzip on (§8's are computed from sizes).
 
 ## What shipped
 
-| #   | Was                                                                                                    | Is                                                                                                                                                                                                                                                                                                                                                       |
-| --- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | `/demo`, the end of the tutorial, a returning `/` and the installed app all opened on "Page not found" | An index route sends `/` to the timeline. The shell's own routes — root, retired addresses, 404 — moved to `app/shellRoutes.tsx` so a spec can render them without booting the database                                                                                                                                                                  |
-| 2   | `"orientation": "portrait"`                                                                            | Gone                                                                                                                                                                                                                                                                                                                                                     |
-| 3   | Four `w-24` tabs (rem-sized): at 200% text, 768px of tabs in a 393px bar, More two-thirds off-screen   | Tabs share the bar equally; labels stop growing at 18px (150%) so four words always fit. More fully on screen at 100–250%                                                                                                                                                                                                                                |
-| 4   | 14px fields on Sharing, every search box, passphrases                                                  | A coarse-pointer rule raises text fields to `max(1rem, 16px)`: 0 of 27 phone fields under 16px. Desktop keeps its 14px                                                                                                                                                                                                                                   |
-| 5   | Wallet card "…in the morning. D…", rest in a `title`; four other hover-only texts                      | The instruction is condensed, not clamped, and wraps. Sources prints the exact sync date; Settings' repair button has a visible hint; the Records hub drops a tooltip the blurb already covers. 0 hover-only texts on the probed pages                                                                                                                   |
-| 6   | Back with a sheet or palette open left the page underneath                                             | `useCloseOnBack` gives each open overlay its own history entry — More sheet, ⌘K palette, `Modal`, `FormSheet`, confirm dialogs, user switcher, notifications, comments, the phone package sheet. An overlay closing because its own link navigates says so (`closeForNavigation`) and navigates with `replace`, so Back from the destination is one step |
-| 7   | With the keyboard up, tab bar + tool picker + back bar took 40% of what was left                       | `useSoftKeyboardOpen` (a text field focused _and_ the viewport well under its tallest) marks the shell; the tab bar, Utilities tool picker and "All records" bar step aside on phone widths until the field blurs or the keyboard closes                                                                                                                 |
-| 8   | 786 KB entry script + 1.04 MB TTF                                                                      | Entry 593 KB gzipped (−25%): `fhirpath` + ANTLR + UCUM swapped for a 30-line path walker checked against fhirpath on every path used; `console-feed` loaded only in developer mode; the record edit sheet fetched on first Edit. Fonts are WOFF2 split Latin (51 KB) / extended, fetched by `unicode-range`                                              |
-| 9   | Offline in the system font                                                                             | All four WOFF2 files precached; offline screens render in Source Sans                                                                                                                                                                                                                                                                                    |
-| 10  | Second manifest in Vue green, no `theme-color`, no iPhone icon                                         | `manifest: false`; `theme-color`, `apple-touch-icon` (180px), `apple-mobile-web-app-title`, `color-scheme: light`                                                                                                                                                                                                                                        |
-| 11  | A sideways phone got the 16rem rail and a banner ending at y≈372 of 393                                | A `short:` screen (max-height 500px): the rail starts collapsed (expanding lasts the session and does not overwrite the desktop preference); the banner tightens and drops its description; chips scroll in one row. Banner ends at y≈225                                                                                                                |
-| 12  | Hidden import inputs took no drop; a stray drop replaced the app                                       | The window takes file drops: a `.emrpkg` goes to the same review a shared link gets, nothing imported until accepted; anything else is refused with a sentence. `file_handlers` in the manifest, read through `launchQueue`, sends "Open with Mere" to the same review                                                                                   |
+| #   | Was                                                                                                    | Is                                                                                                                                                                                                                                                                                                                                                                     |
+| --- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `/demo`, the end of the tutorial, a returning `/` and the installed app all opened on "Page not found" | An index route sends `/` to the timeline. The shell's own routes — root, retired addresses, 404 — moved to `app/shellRoutes.tsx` so a spec can render them without booting the database                                                                                                                                                                                |
+| 2   | `"orientation": "portrait"`                                                                            | Gone                                                                                                                                                                                                                                                                                                                                                                   |
+| 3   | Four `w-24` tabs (rem-sized): at 200% text, 768px of tabs in a 393px bar, More two-thirds off-screen   | Tabs share the bar equally; labels stop growing at 18px (150%) so four words always fit. More fully on screen at 100–250%                                                                                                                                                                                                                                              |
+| 4   | 14px fields on Sharing, every search box, passphrases                                                  | A coarse-pointer rule raises text fields to `max(1rem, 16px)`: 0 of 27 phone fields under 16px. Desktop keeps its 14px                                                                                                                                                                                                                                                 |
+| 5   | Wallet card "…in the morning. D…", rest in a `title`; four other hover-only texts                      | The instruction is condensed, not clamped, and wraps. Sources prints the exact sync date; Settings' repair button has a visible hint; the Records hub drops a tooltip the blurb already covers. 0 hover-only texts on the probed pages                                                                                                                                 |
+| 6   | Back with a sheet or palette open left the page underneath                                             | `useCloseOnBack` gives each open overlay its own history entry — More sheet, ⌘K palette, `Modal`, `FormSheet`, confirm dialogs, user switcher, notifications, comments, the phone package sheet. An overlay closing because its own link navigates says so (`closeForNavigation`) and navigates with `replace`, so Back from the destination is one step               |
+| 7   | With the keyboard up, tab bar + tool picker + back bar took 40% of what was left                       | `useSoftKeyboardOpen` (a text field focused _and_ the viewport well under its tallest) marks the shell; the tab bar, Utilities tool picker and "All records" bar step aside on phone widths until the field blurs or the keyboard closes                                                                                                                               |
+| 8   | 786 KB entry script + 1.04 MB TTF                                                                      | Entry 524 KB gzipped (−34%): `fhirpath` + ANTLR + UCUM swapped for a 30-line path walker checked against fhirpath on every path used; `console-feed` loaded only in developer mode; the record edit sheet fetched on first Edit; the whole-library `core-js/stable` import removed (below). Fonts are WOFF2 split Latin (51 KB) / extended, fetched by `unicode-range` |
+| 9   | Offline in the system font                                                                             | All four WOFF2 files precached; offline screens render in Source Sans                                                                                                                                                                                                                                                                                                  |
+| 10  | Second manifest in Vue green, no `theme-color`, no iPhone icon                                         | `manifest: false`; `theme-color`, `apple-touch-icon` (180px), `apple-mobile-web-app-title`, `color-scheme: light`                                                                                                                                                                                                                                                      |
+| 11  | A sideways phone got the 16rem rail and a banner ending at y≈372 of 393                                | A `short:` screen (max-height 500px): the rail starts collapsed (expanding lasts the session and does not overwrite the desktop preference); the banner tightens and drops its description; chips scroll in one row. Banner ends at y≈225                                                                                                                              |
+| 12  | Hidden import inputs took no drop; a stray drop replaced the app                                       | The window takes file drops: a `.emrpkg` goes to the same review a shared link gets, nothing imported until accepted; anything else is refused with a sentence. `file_handlers` in the manifest, read through `launchQueue`, "sends "Open with Mere" to the same review, and `share_target` does the same for "Share → Mere" on Android (below)                        |
 
 Also: `darkMode: 'class'` makes the stray `dark:` classes inert.
 
@@ -314,16 +316,51 @@ and then navigates, the router's push landed after that task, and the `back()`
 undid the navigation — ⌘K → Settings stayed on Labs. Overlays closing for a
 navigation now say so, and never send a `back()`.
 
-### Left open
+### The two follow-ons, done after all
 
-- **`share_target`** ("Share → Mere" on Android). It needs a service-worker
-  route that accepts the POSTed file, and a decision about what a shared PDF or
-  photo becomes, since only packages have a review screen today. Nothing here
-  could test it; it wants a real Android device.
-- **`core-js/stable`** is 174 KB of the entry script, imported whole by
-  `polyfills.ts`. Vite already targets browsers that need little of it, but
-  which of its features the code relies on (`Array.prototype.at`,
-  `structuredClone`, …) is an audit, not a deletion.
+- **"Share → Mere" (`share_target`).** The share sheet POSTs the file; the
+  service worker parks it in a `mere-share-target` cache and redirects to
+  `timeline?shared-package=1`, where the review panel takes it — once. Scoped
+  to packages: a shared PDF has no review screen to go to, and Android offers
+  Mere for any `application/octet-stream`, so anything that is not a package
+  is opened, found not to be one, and said so. Tested end to end by submitting
+  the share form to the installed worker in Chromium; a real share sheet still
+  wants a real Android phone. See also
+  [`sharing-a-package-by-link.md`](./sharing-a-package-by-link.md#other-ways-a-package-arrives).
+- **`core-js/stable`.** 174 KB imported whole for the browsers in
+  `.browserslistrc` — current Chrome, Edge, Firefox ESR, the last two Safari
+  and iOS majors — which ship all of it. A build without it was searched for
+  every newer built-in: `Promise.withResolvers` and `Float16Array` are
+  feature-tested before use; `structuredClone`, `Object.hasOwn` and
+  `Array.prototype.at` have been in every supported browser since 2022; the
+  only `regeneratorRuntime` is the package defining itself. `polyfills.ts` is
+  gone and `main.tsx` says why. The `core-js` and `regenerator-runtime`
+  entries in `package.json` are now unused by the app and can come out with
+  the next lockfile update.
+
+### Documented
+
+- [`sharing-a-package-by-link.md`](./sharing-a-package-by-link.md) — the four
+  routes a package arrives by, all through one review.
+- The user docs: _Installing Mere as an App_ gains "What installing adds"
+  (offline, any orientation, Open with Mere, Share → Mere); _What can Mere
+  Medical do?_ gains "Bring in a Record Package" and the ⌘K / Ctrl+K search.
+
+### Still to check on a device
+
+A headless Chromium stood in for every phone here. Before calling these done
+on hardware:
+
+- [ ] iPhone, Safari and installed: tapping Sharing and search fields does not
+      zoom (§4); the home-screen icon is Mere's (§10)
+- [ ] iPhone: the `.emrpkg` picker in Sources lets a package be chosen (the
+      `accept` list names a type iOS does not know)
+- [ ] Android, installed: the back gesture closes the More sheet and dialogs
+      (§6); turning the phone rotates the app (§2)
+- [ ] Android: share a `.emrpkg` from email to Mere (§12)
+- [ ] Both: with the keyboard up, the tab bar steps aside and returns (§7)
+- [ ] Desktop Chrome, installed: double-click a `.emrpkg` → Open with Mere
+- [ ] VoiceOver and TalkBack across the tab bar, the More sheet and ⌘K
 
 ## Tested again
 
@@ -333,7 +370,7 @@ this branch.
 | Probe                                                  | Before                        | After                                                               |
 | ------------------------------------------------------ | ----------------------------- | ------------------------------------------------------------------- |
 | `/demo`, after Skip Tutorial, returning `/`            | Page not found                | `/timeline` (unknown paths still 404; `/labs/:key` still redirects) |
-| Manifest orientation · manifests linked                | portrait · 2                  | none · 1, with `file_handlers`                                      |
+| Manifest orientation · manifests linked                | portrait · 2                  | none · 1, with `file_handlers` and `share_target`                   |
 | "More" at 200% / 250% text                             | 33% visible / —               | fully visible, labels whole                                         |
 | Phone text fields under 16px                           | 27 of 27                      | **0** of 27 (desktop unchanged at 14px)                             |
 | Wallet card on a phone                                 | "…morning. D…"                | "…morning. Do not crush or chew."                                   |
@@ -342,9 +379,10 @@ this branch.
 | More → Settings, then Back                             | —                             | Labs                                                                |
 | ⌘K, then Back · ⌘K → Settings, then Back               | Records · (Enter did nothing) | Labs · Settings, then Labs                                          |
 | Keyboard up on Sharing                                 | tab bar + tool picker shown   | both hidden, back on blur                                           |
-| Slow 4G + 4× CPU, gzip: first paint                    | 5.3 s                         | **4.2 s**                                                           |
-| … bytes before the first heading                       | 802 KB                        | 615 KB                                                              |
-| … until text is in Source Sans                         | 9.9 s, 1.69 MB                | **5.8 s, 0.92 MB**                                                  |
+| Slow 4G + 4× CPU, gzip: first paint                    | 5.3 s                         | **3.7 s**                                                           |
+| … bytes before the first heading                       | 802 KB                        | 549 KB                                                              |
+| … until text is in Source Sans                         | 9.9 s, 1.69 MB                | **5.5 s, 0.85 MB**                                                  |
+| "Share → Mere" (form POST to the installed worker)     | no such route                 | review panel on the timeline; the parked file used once             |
 | Offline typeface                                       | system fallback               | Source Sans                                                         |
 | Landscape Medications: banner ends at                  | y ≈ 372 of 393                | y ≈ 225                                                             |
 | Profile / Settings in the rail at 852×393 and 1280×600 | below the edge                | reachable (scrolls)                                                 |
@@ -357,7 +395,7 @@ Timings are medians of three runs of each build served locally with gzip,
 Chromium throttled to 1.6 Mbps / 150 ms and a 4× slower CPU, service workers
 off so every run is a first visit.
 
-**Baseline:** 789 tests in 94 suites, all passing (was 758 in 90). `tsc` clean;
+**Baseline:** 791 tests in 95 suites, all passing (was 758 in 90). `tsc` clean;
 `eslint` reports no errors, and no warnings in the new files. New specs cover the
 shell routes, `useCloseOnBack`, `useSoftKeyboardOpen`, the path walker against
-fhirpath, and a dropped package in the review panel.
+fhirpath, a dropped package in the review panel, and the share-target handoff.

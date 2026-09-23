@@ -4,6 +4,14 @@
 import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching';
 import { clientsClaim, setCacheNameDetails } from 'workbox-core';
 import { pageCache, imageCache, staticResourceCache } from 'workbox-recipes';
+import {
+  SHARE_TARGET_ACTION,
+  SHARE_TARGET_CACHE,
+  SHARE_TARGET_ENTRY,
+  SHARE_TARGET_FIELD,
+  SHARE_TARGET_NAME_HEADER,
+  SHARE_TARGET_PARAM,
+} from './shared/utils/shareTarget';
 
 // ServiceWorkerGlobalScope is a type from the workbox-precaching module
 declare const self: Window & ServiceWorkerGlobalScope;
@@ -23,6 +31,50 @@ cleanupOutdatedCaches();
  * The `BroadcastUpdatePlugin` can't be used to broadcast information about `workbox-precaching`'s updates. `BroadcastUpdatePlugin` detects when a previously cached URL has been overwritten with new contents. `workbox-precaching` creates cache entries with URLs that uniquely correspond to the contents, so it will never overwrite existing cache entries.
  */
 // addPlugins([new BroadcastUpdatePlugin()]);
+/**
+ * "Share → Mere": the system share sheet POSTs the file here (see
+ * `share_target` in manifest.json and shared/utils/shareTarget.ts). Registered
+ * before Workbox's routes so it answers first. The file is parked, not
+ * imported; the app offers it for review on the page this redirects to.
+ */
+self.addEventListener('fetch', (rawEvent: Event) => {
+  const event = rawEvent as FetchEvent;
+  const url = new URL(event.request.url);
+  if (
+    event.request.method !== 'POST' ||
+    !url.pathname.endsWith(`/${SHARE_TARGET_ACTION}`)
+  ) {
+    return;
+  }
+  event.respondWith(
+    (async () => {
+      const scope = self.registration.scope;
+      try {
+        const form = await event.request.formData();
+        const file = form.get(SHARE_TARGET_FIELD);
+        if (file instanceof File) {
+          const cache = await caches.open(SHARE_TARGET_CACHE);
+          await cache.put(
+            new URL(SHARE_TARGET_ENTRY, scope).href,
+            new Response(file, {
+              headers: {
+                'content-type': file.type || 'application/octet-stream',
+                [SHARE_TARGET_NAME_HEADER]: encodeURIComponent(file.name),
+              },
+            }),
+          );
+        }
+      } catch (error) {
+        console.error('Could not read the shared file', error);
+      }
+      return Response.redirect(
+        new URL(`timeline?${SHARE_TARGET_PARAM}=1`, scope).href,
+        303,
+      );
+    })(),
+  );
+});
+
 precacheAndRoute(self.__WB_MANIFEST);
 
 // Tells the Service Worker to skip the waiting state and become active.
