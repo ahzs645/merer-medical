@@ -7,6 +7,7 @@ import { ClinicalTimelineComment } from '../../../models/clinical-timeline-comme
 import { CATEGORY_COLOR } from './types';
 import { LaneCategory } from './types';
 import { CommentTarget } from './useTimelineComments';
+import { useCloseOnBack } from '../../../shared/hooks/useCloseOnBack';
 
 function safeTime(iso: string): string {
   const d = new Date(iso);
@@ -29,6 +30,7 @@ export function CommentModal({
   const { t } = useInterfaceLanguage();
   const [body, setBody] = useState('');
   const [show, setShow] = useState(true);
+  useCloseOnBack(show, () => setShow(false));
   const accent = CATEGORY_COLOR[target.category as LaneCategory] || '#0071e3';
   const dateLabel = (() => {
     const d = new Date(`${target.dayKey}T00:00:00`);

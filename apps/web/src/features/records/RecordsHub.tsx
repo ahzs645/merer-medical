@@ -142,16 +142,7 @@ export function RecordsHub() {
                                   gray-400 at 12px is 2.54:1 on white, well
                                   under the 4.5 AA asks for small text; gray-600
                                   clears it at 7:1. */}
-                              <span
-                                className="block text-xs text-gray-600"
-                                title={
-                                  count.kind === 'uncounted'
-                                    ? t(
-                                        'This view combines several kinds of record, so it has no single tally.',
-                                      )
-                                    : undefined
-                                }
-                              >
+                              <span className="block text-xs text-gray-600">
                                 {countText(count, item.blurb, t)}
                               </span>
                             </span>

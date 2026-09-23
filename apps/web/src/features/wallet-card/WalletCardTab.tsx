@@ -319,10 +319,12 @@ function condenseSig(text?: string): string | undefined {
     .replace(/\s+([,.;])/g, '$1')
     .replace(/\s{2,}/g, ' ')
     .trim();
-  if (!condensed) return undefined;
-  return condensed.length > 44
-    ? `${condensed.slice(0, 43).trimEnd()}…`
-    : condensed;
+  // Condensed, not clamped. It used to stop at 44 characters with an
+  // ellipsis, and the part that fell off was the warning — "1 capsule 1 time
+  // each day in the morning. D…" — with the rest only in a tooltip no phone
+  // can open. Dropping the restated strength and the route is what makes it
+  // wallet-sized; the instruction itself wraps.
+  return condensed || undefined;
 }
 
 function reactionText(resource: Record<string, unknown>): string | undefined {
@@ -494,7 +496,6 @@ function WalletSection({
             {items.map((item, index) => (
               <li
                 key={item.id}
-                title={item.fullDetail}
                 // Rows past the cap stay in the DOM and only leave the screen
                 // card, so the printed copy is still the complete record.
                 className={
@@ -506,12 +507,8 @@ function WalletSection({
                 <span className="font-medium">{item.name}</span>
                 {item.detail && (
                   <span className="block text-xs text-gray-500">
-                    {/* The screen gets the wallet-sized summary; paper gets the
-                        whole instruction. `condenseSig` cuts at 44 characters
-                        and the tooltip carrying the rest does not survive a
-                        printer — so a card handed to a clinician read "1
-                        capsule 1 time each day in the morning. D…" and never
-                        got to "Do not crush or chew." */}
+                    {/* The screen gets the condensed instruction; paper gets
+                        it word for word, strength and route included. */}
                     <span className="print:hidden">{item.detail}</span>
                     <span className="hidden print:inline">
                       {item.fullDetail || item.detail}

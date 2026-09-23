@@ -1,12 +1,12 @@
-import { BundleEntry, Observation } from 'fhir/r2';
-import * as fhirpath from 'fhirpath';
+import { BundleEntry, Observation, Quantity } from 'fhir/r2';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { getFhirResource } from '../../../shared/utils/fhirResource';
+import { fhirPathFirst } from '../../../shared/utils/fhirPathValues';
 
 export function getReferenceRangeString(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
-  return fhirpath.evaluate(getFhirResource(item), 'referenceRange.text')?.[0];
+  return fhirPathFirst<string>(getFhirResource(item), 'referenceRange.text');
 }
 
 export function getReferenceRangeDisplay(
@@ -31,20 +31,20 @@ export function getReferenceRangeDisplay(
 export function getReferenceRangeLow(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
-  return fhirpath.evaluate(getFhirResource(item), 'referenceRange.low')?.[0];
+  return fhirPathFirst<Quantity>(getFhirResource(item), 'referenceRange.low');
 }
 
 export function getReferenceRangeHigh(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
-  return fhirpath.evaluate(getFhirResource(item), 'referenceRange.high')?.[0];
+  return fhirPathFirst<Quantity>(getFhirResource(item), 'referenceRange.high');
 }
 
 export function getValueUnit(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ): string | undefined {
   return (
-    fhirpath.evaluate(getFhirResource(item), 'valueQuantity.unit')?.[0] ||
+    fhirPathFirst<string>(getFhirResource(item), 'valueQuantity.unit') ||
     undefined
   );
 }
@@ -52,10 +52,10 @@ export function getValueUnit(
 export function getValueQuantity(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ): number | undefined {
-  const val: number | undefined = fhirpath.evaluate(
+  const val: number | undefined = fhirPathFirst<number>(
     getFhirResource(item),
     'valueQuantity.value',
-  )?.[0];
+  );
 
   return val;
 }
@@ -75,23 +75,23 @@ export function getValueString(
 ) {
   const resource = getFhirResource(item);
   return (
-    fhirpath.evaluate(resource, 'valueString')?.[0] ||
-    fhirpath.evaluate(resource, 'valueCodeableConcept.text')?.[0] ||
-    fhirpath.evaluate(resource, 'valueCodeableConcept.coding.display')?.[0] ||
-    fhirpath.evaluate(resource, 'dataAbsentReason.text')?.[0] ||
-    fhirpath.evaluate(resource, 'dataAbsentReason.coding.display')?.[0] ||
-    fhirpath.evaluate(resource, 'dataAbsentReason.coding.code')?.[0]
+    fhirPathFirst<string>(resource, 'valueString') ||
+    fhirPathFirst<string>(resource, 'valueCodeableConcept.text') ||
+    fhirPathFirst<string>(resource, 'valueCodeableConcept.coding.display') ||
+    fhirPathFirst<string>(resource, 'dataAbsentReason.text') ||
+    fhirPathFirst<string>(resource, 'dataAbsentReason.coding.display') ||
+    fhirPathFirst<string>(resource, 'dataAbsentReason.coding.code')
   );
 }
 
 export function getComments(item: ClinicalDocument<BundleEntry<Observation>>) {
-  return fhirpath.evaluate(getFhirResource(item), 'comments')?.[0];
+  return fhirPathFirst<string>(getFhirResource(item), 'comments');
 }
 
 export function getInterpretationText(
   item: ClinicalDocument<BundleEntry<Observation>>,
 ) {
-  return fhirpath.evaluate(getFhirResource(item), 'interpretation.text')?.[0];
+  return fhirPathFirst<string>(getFhirResource(item), 'interpretation.text');
 }
 
 export type ObservationInterpretationFlag =

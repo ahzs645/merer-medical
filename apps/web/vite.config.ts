@@ -34,6 +34,7 @@ function copyWebAssets(): Plugin {
     '.jpeg': 'image/jpeg',
     '.jpg': 'image/jpeg',
     '.ttf': 'font/ttf',
+    '.woff2': 'font/woff2',
     '.csv': 'text/csv',
   };
 
@@ -174,8 +175,19 @@ export default defineConfig(({ command, mode }) => {
         strategies: 'injectManifest',
         srcDir: 'src',
         filename: 'service-worker.ts',
+        // The manifest is `src/manifest.json`, linked from index.html. Left to
+        // its default the plugin also wrote and linked a second one — named
+        // after the npm package, themed in Vue green, with no icons — which
+        // only stayed inert because browsers read the first link.
+        manifest: false,
         injectManifest: {
           maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
+          // The default is js, css and html, which left the typeface out: the
+          // app worked offline, in the system font. The hashed woff2 files are
+          // what the CSS points at; the unhashed copies under assets/fonts are
+          // the sources `copyWebAssets` carries along and nothing loads.
+          globPatterns: ['**/*.{js,css,html,woff2}'],
+          globIgnores: ['assets/fonts/**'],
         },
       }),
     ],

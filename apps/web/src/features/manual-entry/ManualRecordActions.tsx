@@ -5,9 +5,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
-import { MouseEvent, useEffect, useState } from 'react';
-
-import { ManualRecordModal } from './ManualRecordModal';
+import { lazy, MouseEvent, Suspense, useEffect, useState } from 'react';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { useNotificationDispatch } from '../../app/providers/NotificationProvider';
@@ -35,6 +33,20 @@ import { ManualSourceDocumentLink } from './ManualSourceDocumentLink';
  */
 export const manualRecordActionRowClass = 'mt-3 flex flex-wrap gap-2';
 
+/**
+ * The edit sheet, fetched the first time somebody presses Edit.
+ *
+ * Every timeline card carries these actions, and the timeline is the landing
+ * page, so a static import put the whole record form — builders, terminology
+ * lookups, the lab table — into the first script every visitor downloads, for
+ * a sheet most visits never open.
+ */
+const ManualRecordModal = lazy(() =>
+  import('./ManualRecordModal').then((module) => ({
+    default: module.ManualRecordModal,
+  })),
+);
+
 export function ManualRecordActions({
   item,
   inline = false,
@@ -56,6 +68,11 @@ export function ManualRecordActions({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  // Mounted from the first open onward, so closing still animates out.
+  const [editRequested, setEditRequested] = useState(false);
+  useEffect(() => {
+    if (isEditOpen) setEditRequested(true);
+  }, [isEditOpen]);
   const [linkedFiles, setLinkedFiles] = useState<
     Array<{ id: string; filename?: string }>
   >([]);
@@ -238,12 +255,16 @@ export function ManualRecordActions({
         <TrashIcon className="h-4 w-4" />
         {t(isDeleting ? 'Deleting' : 'Delete')}
       </button>
-      <ManualRecordModal
-        open={isEditOpen}
-        recordId={item.id}
-        onClose={() => setIsEditOpen(false)}
-        onSaved={notifyRecordsChanged}
-      />
+      {editRequested && (
+        <Suspense fallback={null}>
+          <ManualRecordModal
+            open={isEditOpen}
+            recordId={item.id}
+            onClose={() => setIsEditOpen(false)}
+            onSaved={notifyRecordsChanged}
+          />
+        </Suspense>
+      )}
       <ConfirmDeleteDialog
         open={isConfirmOpen}
         busy={isDeleting}

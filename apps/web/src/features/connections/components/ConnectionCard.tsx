@@ -357,7 +357,8 @@ export function ConnectionCard({
 
 /**
  * A bare "synced on Nov 14" cannot tell a two-week-old sync from a two-year-old
- * one, so show the relative age and keep the exact timestamp on hover/focus.
+ * one, so lead with the relative age — and print the date beside it rather than
+ * in a hover tooltip, which a phone cannot open.
  */
 function RelativeSyncTime({ isoDate }: { isoDate: string }) {
   let relative = isoDate;
@@ -367,12 +368,11 @@ function RelativeSyncTime({ isoDate }: { isoDate: string }) {
     // Fall back to the raw value rather than crashing the card.
   }
   return (
-    <time
-      dateTime={isoDate}
-      title={safeFormatDate(isoDate, "MMMM d, yyyy 'at' h:mm a", isoDate)}
-      className="underline decoration-dotted underline-offset-2"
-    >
-      {relative}
+    <time dateTime={isoDate}>
+      {relative}{' '}
+      <span className="whitespace-nowrap">
+        ({safeFormatDate(isoDate, "MMM d, yyyy 'at' h:mm a", isoDate)})
+      </span>
     </time>
   );
 }

@@ -5,6 +5,7 @@ import { ButtonLoadingSpinner } from '../../connections/components/ButtonLoading
 import { ProfileRow } from './ProfileRow';
 import { useUserSwitchLogic } from '../hooks/useUserSwitchLogic';
 import { useUser, useAllUsers } from '../../../app/providers/UserProvider';
+import { useCloseOnBack } from '../../../shared/hooks/useCloseOnBack';
 
 interface UserSwitchModalProps {
   open: boolean;
@@ -26,6 +27,7 @@ export function UserSwitchModal({
     handleSwitchClick,
     resetSelection,
   } = useUserSwitchLogic(onClose);
+  useCloseOnBack(open, onClose);
 
   useEffect(() => {
     if (open) {

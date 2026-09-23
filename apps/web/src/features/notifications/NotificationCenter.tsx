@@ -16,6 +16,7 @@ import { MereNotification } from '../../models/notification/Notification.type';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { useNotifications } from './useNotifications';
 import { NavTooltip } from '../../shared/components/TabButton';
+import { useCloseOnBack } from '../../shared/hooks/useCloseOnBack';
 
 function variantIcon(variant: MereNotification['variant']) {
   switch (variant) {
@@ -56,6 +57,7 @@ export function NotificationCenter({
     dismissAll,
   } = useNotifications();
   const [open, setOpen] = useState(false);
+  useCloseOnBack(open, () => setOpen(false));
   const navigate = useNavigate();
   const { language, t } = useInterfaceLanguage();
 

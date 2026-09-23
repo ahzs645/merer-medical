@@ -5,33 +5,35 @@ import { AllergyIntolerance, BundleEntry } from 'fhir/r2';
 import { Fragment } from 'react';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { CardBase } from '../../connections/components/CardBase';
-import * as fhirpath from 'fhirpath';
+import {
+  fhirPathFirst,
+  fhirPathValues,
+} from '../../../shared/utils/fhirPathValues';
 
 function getAllergyText(
   item: ClinicalDocument<BundleEntry<AllergyIntolerance>>,
 ) {
-  return fhirpath.evaluate(
-    item.data_record.raw.resource,
-    '(substance.text | code.text)',
-  )?.[0];
+  // Was `(substance.text | code.text)`: the first of either.
+  const resource = item.data_record.raw.resource;
+  return (
+    fhirPathFirst<string>(resource, 'substance.text') ??
+    fhirPathFirst<string>(resource, 'code.text')
+  );
 }
 
 function hasAllergyReactions(
   item: ClinicalDocument<BundleEntry<AllergyIntolerance>>,
 ) {
-  return fhirpath.evaluate(
-    item.data_record.raw.resource,
-    'reaction.exists()',
-  )?.[0];
+  return fhirPathValues(item.data_record.raw.resource, 'reaction').length > 0;
 }
 
 function getAllergyReactions(
   item: ClinicalDocument<BundleEntry<AllergyIntolerance>>,
 ) {
-  return fhirpath.evaluate(
+  return fhirPathValues(
     item.data_record.raw.resource,
     'reaction.manifestation.text',
-  );
+  ) as string[];
 }
 
 export function AllergyIntoleranceListCard({

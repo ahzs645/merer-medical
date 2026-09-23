@@ -43,7 +43,7 @@ function RecordsShell() {
           inner overflow-x-auto strips stretch the page sideways on phones. */}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         {!atRoot && !pageHasBackLink && (
-          <div className="border-b border-gray-200 bg-white px-3 lg:hidden">
+          <div className="hide-when-typing border-b border-gray-200 bg-white px-3 lg:hidden">
             <Link
               to={AppRoutes.Records}
               className="text-primary-700 hover:text-primary-900 -mx-2 inline-flex min-h-[44px] items-center gap-1 px-2 text-sm font-medium"

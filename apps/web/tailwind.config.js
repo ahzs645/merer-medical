@@ -3,6 +3,11 @@ const { join } = require('path');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  // Light-only. Tailwind's default `media` strategy applied the handful of
+  // stray `dark:` classes (spinners, a search icon) under an OS dark theme
+  // while the rest of the app stayed light; nothing sets the class, so they
+  // stay inert until someone builds dark mode on purpose.
+  darkMode: 'class',
   future: {
     // Wrap `hover:` utilities in `@media (hover: hover)`. Without this, tapping
     // a card or button on a touch device leaves its hover style stuck until
@@ -47,6 +52,10 @@ module.exports = {
       },
       screens: {
         xs: '480px',
+        // A phone held sideways: `md` and up by width, but under 500px tall.
+        // Declared last so it overrides the width breakpoints it overlaps.
+        // Mirrors SHORT_VIEWPORT_QUERY in shared/hooks/useMediaQuery.ts.
+        short: { raw: '(max-height: 500px)' },
       },
       fontFamily: {
         sans: [

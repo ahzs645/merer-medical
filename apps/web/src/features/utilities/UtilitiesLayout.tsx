@@ -15,7 +15,7 @@ export function UtilitiesLayout() {
   return (
     <div className="flex h-full flex-col overflow-hidden bg-gray-50">
       {!onHub && (
-        <div className="border-b border-gray-200 bg-white px-3 print:hidden sm:px-6 lg:px-8">
+        <div className="hide-when-typing border-b border-gray-200 bg-white px-3 print:hidden sm:px-6 lg:px-8">
           <UtilitiesToolNav />
         </div>
       )}

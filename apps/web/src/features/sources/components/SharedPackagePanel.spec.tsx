@@ -1,11 +1,17 @@
 /**
  * @jest-environment jsdom
  */
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { strToU8, zipSync } from 'fflate';
 
-import { SharedPackagePanel } from './SharedPackagePanel';
+import { offerPackageFile, SharedPackagePanel } from './SharedPackagePanel';
 
 const mockImport = jest.fn(async () => ({
   counts: { clinical_documents: 3 },
@@ -290,6 +296,63 @@ describe('SharedPackagePanel', () => {
     await waitFor(() =>
       expect(
         screen.getByText(/does not point at a Mere package/i),
+      ).toBeTruthy(),
+    );
+    expect(mockImport).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * A file dropped on the window, or opened with Mere from the desktop, goes
+ * through the same review a link does.
+ */
+describe('SharedPackagePanel with a file', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockAllUsers = [profile('patient-1')];
+    mockCurrentUser = { id: 'patient-1' };
+  });
+
+  function renderEmpty() {
+    return render(
+      <MemoryRouter initialEntries={['/timeline']}>
+        <SharedPackagePanel />
+      </MemoryRouter>,
+    );
+  }
+
+  /** jsdom's File has no `arrayBuffer`; the bytes are what the panel reads. */
+  function packageFile(bytes: Uint8Array, name: string) {
+    const file = new File([bytes], name);
+    Object.defineProperty(file, 'arrayBuffer', {
+      value: async () => bytes.buffer,
+    });
+    return file;
+  }
+
+  it('describes a dropped package by its file name, and imports nothing', async () => {
+    renderEmpty();
+    act(() => offerPackageFile(packageFile(packageBytes(), 'records.emrpkg')));
+
+    await waitFor(() =>
+      expect(screen.getByText('records.emrpkg')).toBeTruthy(),
+    );
+    expect(
+      screen.getAllByText('Open this record package?').length,
+    ).toBeGreaterThan(0);
+    expect(screen.getByText('42')).toBeTruthy();
+    expect(mockImport).not.toHaveBeenCalled();
+  });
+
+  it('says so when the file is not a package', async () => {
+    renderEmpty();
+    act(() =>
+      offerPackageFile(packageFile(strToU8('hello there'), 'notes.emrpkg')),
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.getByText(/notes.emrpkg is not a Mere package/),
       ).toBeTruthy(),
     );
     expect(mockImport).not.toHaveBeenCalled();
