@@ -925,8 +925,6 @@ export const arabicTranslations: Record<string, string> = {
   'Eyes, prescriptions, exams': 'العيون والوصفات والفحوصات',
   'Count unavailable': 'العدد غير متاح',
   'Counting…': 'جارٍ العد…',
-  'This view combines several kinds of record, so it has no single tally.':
-    'يجمع هذا العرض عدة أنواع من السجلات، لذا لا يوجد له عدد واحد.',
   'Reports, imaging and other': 'التقارير والتصوير وغيرها',
 
   // ---------------------------------------------------------------------

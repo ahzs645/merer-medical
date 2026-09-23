@@ -33,6 +33,7 @@ import { ALL_RECORD_CATEGORIES } from '../../features/records/recordCategories';
 import { TIMELINE_QUERY_PARAM } from '../../features/timeline/timelineQueryParam';
 import { resourceTypeLabel } from '../utils/resourceTypeLabels';
 import { useRecordSearch } from './useRecordSearch';
+import { useCloseOnBack } from '../hooks/useCloseOnBack';
 
 type CommandPaletteItem = {
   title: string;
@@ -256,6 +257,7 @@ export function CommandPalette({
   const setOpen = onOpenChange ?? setInternalOpen;
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const resultsRef = useRef<HTMLDivElement | null>(null);
   const { hits: recordHits, searching: searchingRecords } =
     useRecordSearch(query);
 
@@ -312,15 +314,25 @@ export function CommandPalette({
       .map(({ item }) => item);
   }, [query]);
 
+  const closeForNavigation = useCloseOnBack(open, () => setOpen(false));
+
+  // `replace`: while the palette is open, the current history entry is the
+  // one `useCloseOnBack` pushed for it, and `closeForNavigation` leaves it for
+  // the navigation to take over. Replacing that entry leaves history as
+  // [page, destination]; pushing would leave a copy of the page between them,
+  // and Back from the destination would appear to do nothing.
   function runCommand(item: CommandPaletteItem) {
+    closeForNavigation();
     setOpen(false);
-    navigate(item.route);
+    navigate(item.route, { replace: true });
   }
 
   function openRecord(name: string) {
+    closeForNavigation();
     setOpen(false);
     navigate(
       `${AppRoutes.Timeline}?${TIMELINE_QUERY_PARAM}=${encodeURIComponent(name)}`,
+      { replace: true },
     );
   }
 
@@ -374,6 +386,22 @@ export function CommandPalette({
                     ref={inputRef}
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
+                    // Enter runs the first result and the down arrow steps into
+                    // the list, as a search box that answers as you type is
+                    // expected to. Before, Enter did nothing: the only way to a
+                    // result from the keyboard was Tab, past the close button.
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' && query.trim()) {
+                        event.preventDefault();
+                        if (recordHits[0]) openRecord(recordHits[0].name);
+                        else if (results[0]) runCommand(results[0]);
+                      } else if (event.key === 'ArrowDown') {
+                        event.preventDefault();
+                        resultsRef.current
+                          ?.querySelector<HTMLButtonElement>('button')
+                          ?.focus();
+                      }
+                    }}
                     placeholder={t('Search records, pages, and actions')}
                     className="min-w-0 flex-1 border-0 p-0 text-base text-gray-900 placeholder:text-gray-400 focus:ring-0"
                   />
@@ -386,7 +414,10 @@ export function CommandPalette({
                     <XMarkIcon className="h-5 w-5" />
                   </button>
                 </div>
-                <div className="max-h-[60vh] overflow-y-auto p-2">
+                <div
+                  ref={resultsRef}
+                  className="max-h-[60vh] overflow-y-auto p-2"
+                >
                   {/* Records first: the input asks for "records, pages, and
                       actions", and for a while it only ever answered with
                       pages — typing a lab name returned the Labs page rather

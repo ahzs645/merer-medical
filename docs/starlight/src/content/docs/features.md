@@ -27,7 +27,7 @@ Clicking on the summary tab will give you an overview about your health.
 
 ## Search for Specific Health Records
 
-You can use the search bar to find specific records.
+You can use the search bar to find specific records. On a computer, press <kbd>Ctrl</kbd>+<kbd>K</kbd> (<kbd>⌘</kbd>+<kbd>K</kbd> on a Mac) from anywhere to search your records, pages and actions — <kbd>Enter</kbd> opens the first result.
 <video controls width="100%">
 
   <source src="/docs/vid/see-labs.webm" type="video/webm"/>
@@ -72,6 +72,10 @@ Your data is yours - you can back up and export your data to JSON at any point.
 </video>
 <br/>
 <br/>
+
+## Bring in a Record Package
+
+A `.emrpkg` package — a backup from Mere, or records someone has shared with you — can be imported from Sources, or simply dragged onto the Mere window. In the installed app you can also open one with Mere from your file manager, or share one to Mere on Android. Mere always shows you what is inside and whose records they are before anything is imported.
 
 ## Store your Data Locally, Skip the Cloud
 

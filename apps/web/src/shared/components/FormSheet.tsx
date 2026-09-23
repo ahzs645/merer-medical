@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useCloseOnBack } from '../hooks/useCloseOnBack';
 
 /**
  * One panel, two shapes: a sheet sitting on the bottom edge of a phone, and the
@@ -28,6 +29,7 @@ export function FormSheet({
   children: ReactNode;
   closeLabel?: string;
 }) {
+  useCloseOnBack(open, onRequestClose);
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-dialog" onClose={onRequestClose}>

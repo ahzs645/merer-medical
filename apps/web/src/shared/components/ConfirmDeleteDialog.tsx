@@ -1,6 +1,7 @@
 import { Fragment, useRef, type ReactNode } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { useCloseOnBack } from '../hooks/useCloseOnBack';
 
 /**
  * The one "are you sure" in the app, for deletes that cannot be undone.
@@ -39,6 +40,9 @@ export function ConfirmDeleteDialog({
   onCancel: () => void;
 }) {
   const cancelRef = useRef<HTMLButtonElement>(null);
+  useCloseOnBack(open, () => {
+    if (!busy) onCancel();
+  });
 
   return (
     <Transition.Root show={open} as={Fragment}>

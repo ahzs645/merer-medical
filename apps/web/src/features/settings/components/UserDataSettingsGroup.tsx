@@ -516,13 +516,22 @@ export function UserDataSettingsGroup() {
               type="button"
               disabled={emrpkgBusy}
               onClick={handleRepairSourceLinks}
-              title={t(
-                'Link records imported from an offline builder to their stored source documents',
-              )}
+              aria-describedby="repair-source-links-hint"
               className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:bg-gray-200"
             >
               {t('Repair source links')}
             </button>
+            {/* On screen rather than in a `title`: a tooltip is the one place
+                a phone cannot reach, and without it the button's name does not
+                say what it repairs. */}
+            <p
+              id="repair-source-links-hint"
+              className="basis-full text-xs text-gray-600"
+            >
+              {t(
+                'Link records imported from an offline builder to their stored source documents',
+              )}
+            </p>
           </div>
         </li>
         {/* Show storage usage  */}

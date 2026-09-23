@@ -99,11 +99,13 @@ export function RecordPageHeader<Id extends string = string>({
     // Tighter on a phone than it was: `py-4` + `gap-4` between four rows spent
     // 80px of a 852px screen on air. The busiest banner in the app (Labs) took
     // 309px before its first result; from `sm` up, where the rows collapse onto
-    // fewer lines anyway, the original spacing stands.
+    // fewer lines anyway, the original spacing stands — except on a phone
+    // held sideways (`short:`), which is `sm` by width and 393px tall, and
+    // spent all but 21px of its first screen on this banner.
     <div
-      className={`bg-primary-800 px-4 py-3 text-white sm:px-6 sm:py-5 lg:px-8 ${className}`}
+      className={`bg-primary-800 px-4 py-3 text-white sm:px-6 sm:py-5 lg:px-8 short:py-3 ${className}`}
     >
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-2.5 sm:gap-4">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-2.5 sm:gap-4 short:gap-2.5">
         {/* `flex-wrap` + a 10rem floor on the title is what decides inline vs.
             own-row: one button fits beside a title on a 390px phone, two or
             three do not, and the group drops whole rather than half. */}
@@ -120,14 +122,14 @@ export function RecordPageHeader<Id extends string = string>({
             )}
             <div className="flex items-center gap-2">
               {Icon && <Icon className="h-7 w-7 shrink-0" />}
-              <h1 className="min-w-0 break-words text-2xl font-bold sm:text-3xl">
+              <h1 className="min-w-0 break-words text-2xl font-bold sm:text-3xl short:text-2xl">
                 {title}
               </h1>
             </div>
             {description && (
               // `sr-only` rather than `hidden`: a phone spends no pixels on it,
               // a screen reader still hears it.
-              <p className="sr-only sm:not-sr-only sm:mt-1 sm:max-w-3xl sm:text-sm sm:text-primary-100">
+              <p className="sr-only sm:not-sr-only sm:mt-1 sm:max-w-3xl sm:text-sm sm:text-primary-100 short:sr-only">
                 {description}
               </p>
             )}
@@ -220,7 +222,7 @@ function HeaderFilters<Id extends string>({
       ref={rowRef}
       role="group"
       aria-label={label}
-      className="scrollbar-hide -mx-1 flex gap-2 overflow-x-auto px-1 py-0.5 sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0"
+      className="scrollbar-hide -mx-1 flex gap-2 overflow-x-auto px-1 py-0.5 sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0 short:flex-nowrap short:overflow-x-auto"
     >
       {items.map((filter) => {
         const Icon = filter.icon;

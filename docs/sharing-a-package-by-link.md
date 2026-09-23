@@ -18,6 +18,7 @@ no reason to trust. **A link can offer records; it cannot write them.**
 - [What the reader sees](#what-the-reader-sees)
 - [Auto-loading](#auto-loading)
 - [Encrypting a shared package](#encrypting-a-shared-package)
+- [Other ways a package arrives](#other-ways-a-package-arrives)
 - [Before you publish one](#before-you-publish-one)
 
 ## Hosting one
@@ -156,6 +157,28 @@ passphrase before importing.
 The one thing it cannot do is show the contents first: the manifest is inside
 the ciphertext, so the panel says the package is encrypted rather than showing
 an empty summary. Send the passphrase by some other route than the link.
+
+## Other ways a package arrives
+
+A link is one of four ways a package reaches the app without the Sources file
+picker in front of it. All four open the same panel, with the same wait — the
+panel reads the file, says whose records they are and how many, and imports
+nothing until someone accepts.
+
+| Route                 | Where                                    | How it reaches the panel                                                                                                                                                                   |
+| --------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A link                | Any browser                              | `?package=<url>`, as above                                                                                                                                                                 |
+| Dropped on the window | Any desktop browser                      | `useWindowFileDrop` hands a `.emrpkg` to `offerPackageFile`. Anything else dropped outside a file field is refused with a message, rather than replacing the app with the file             |
+| **Open with Mere**    | Installed app, Chrome or Edge on desktop | `file_handlers` in the manifest; the file comes through `launchQueue`                                                                                                                      |
+| **Share → Mere**      | Installed app on Android                 | `share_target` in the manifest. The service worker takes the POST, parks the file in the `mere-share-target` cache and redirects to `?shared-package=1`; the app takes it from there, once |
+
+A file never auto-loads, whatever the route: `autoload` is a property of a link
+from a trusted origin, and a file has no origin to trust. The panel names the
+file instead of a host ("From records.emrpkg").
+
+Android's share sheet matches on type, and a `.emrpkg` usually travels as
+`application/octet-stream`, so Mere is offered for other binary files too. They
+are opened, found not to be packages, and said so — nothing is imported.
 
 ## Before you publish one
 

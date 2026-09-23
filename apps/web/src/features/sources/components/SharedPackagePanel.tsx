@@ -18,6 +18,11 @@ import { useNotificationDispatch } from '../../../app/providers/NotificationProv
 import { importEmrpkgToRxDb, inspectEmrpkg } from '../../../services/emrpkg';
 import { ButtonLoadingSpinner } from '../../connections/components/ButtonLoadingSpinner';
 import { useIsDesktop } from '../../../shared/hooks/useIsDesktop';
+import { useCloseOnBack } from '../../../shared/hooks/useCloseOnBack';
+import {
+  SHARE_TARGET_PARAM,
+  takeSharedPackage,
+} from '../../../shared/utils/shareTarget';
 import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 /**
@@ -54,6 +59,33 @@ export function isTrustedPackageOrigin(origin: string): boolean {
     .filter(Boolean)
     .includes(origin);
 }
+
+/**
+ * Hand the panel a package file instead of a link.
+ *
+ * Three ways a file arrives with no picker in front of it: dropped on the
+ * window, opened with Mere from the desktop (`file_handlers` in the manifest,
+ * delivered through `launchQueue`), or shared to the installed app from
+ * another one (`share_target`, parked by the service worker). All three want
+ * the same thing a link gets — read it, say what is in it and whose it is,
+ * and import nothing until somebody says so.
+ */
+export const OFFER_PACKAGE_EVENT = 'mere:offer-package';
+
+export function offerPackageFile(file: File): void {
+  window.dispatchEvent(
+    new CustomEvent<File>(OFFER_PACKAGE_EVENT, { detail: file }),
+  );
+}
+
+/** What the desktop's "Open with" hands over, where the browser supports it. */
+type LaunchQueue = {
+  setConsumer(
+    consumer: (params: {
+      files?: ReadonlyArray<{ getFile(): Promise<File> }>;
+    }) => void,
+  ): void;
+};
 
 /** Anything larger is not something to pull into a browser tab unannounced. */
 const MAX_BYTES = 64 * 1024 * 1024;
@@ -109,9 +141,10 @@ export function SharedPackagePanel() {
    * record from riding along in the address bar.
    */
   const [claimed, setClaimed] = useState<
-    { raw: string; autoload: boolean } | undefined
+    { raw?: string; file?: File; autoload: boolean } | undefined
   >();
   const raw = claimed?.raw;
+  const file = claimed?.file;
   const autoloadRequested = claimed?.autoload;
 
   const param = searchParams.get(SHARED_PACKAGE_PARAM);
@@ -124,6 +157,38 @@ export function SharedPackagePanel() {
     next.delete(SHARED_PACKAGE_AUTOLOAD_PARAM);
     setSearchParams(next, { replace: true });
   }, [param, autoloadParam, searchParams, setSearchParams]);
+
+  // A file shared to the installed app arrives as `?shared-package=1`, with
+  // the file itself parked by the service worker (shared/utils/shareTarget).
+  const sharedParam = searchParams.get(SHARE_TARGET_PARAM);
+  useEffect(() => {
+    if (!sharedParam) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete(SHARE_TARGET_PARAM);
+    setSearchParams(next, { replace: true });
+    takeSharedPackage()
+      .then((shared) => {
+        if (shared) setClaimed({ file: shared, autoload: false });
+      })
+      .catch(() => undefined);
+  }, [sharedParam, searchParams, setSearchParams]);
+
+  useEffect(() => {
+    const onOffer = (event: Event) => {
+      const offered = (event as CustomEvent<File>).detail;
+      if (offered) setClaimed({ file: offered, autoload: false });
+    };
+    window.addEventListener(OFFER_PACKAGE_EVENT, onOffer);
+    // The browser holds a launch until a consumer is set, so a file opened
+    // with Mere before this mounted is not lost.
+    const launchQueue = (window as Window & { launchQueue?: LaunchQueue })
+      .launchQueue;
+    launchQueue?.setConsumer(async ({ files }) => {
+      const first = files?.[0];
+      if (first) offerPackageFile(await first.getFile());
+    });
+    return () => window.removeEventListener(OFFER_PACKAGE_EVENT, onOffer);
+  }, []);
 
   const [fetched, setFetched] = useState<Fetched | undefined>();
   const [error, setError] = useState<string | undefined>();
@@ -140,6 +205,42 @@ export function SharedPackagePanel() {
   }, []);
 
   useEffect(() => {
+    if (!file) return;
+    let cancelled = false;
+    setLoading(true);
+    setError(undefined);
+    setFetched(undefined);
+    (async () => {
+      try {
+        if (file.size > MAX_BYTES) {
+          throw new Error(
+            `That file is ${Math.round(file.size / 1024 / 1024)} MB, larger than this app will open this way. Import it from Sources instead.`,
+          );
+        }
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const info = await inspectEmrpkg(bytes);
+        if (!info.encrypted && info.formatVersion === 0) {
+          throw new Error(
+            `${file.name} is not a Mere package — no manifest was found inside it.`,
+          );
+        }
+        if (cancelled) return;
+        // A file on the reader's own disk: its name is the provenance.
+        setFetched({ bytes, info, origin: file.name });
+      } catch (readError) {
+        if (cancelled) return;
+        setError((readError as Error).message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [file]);
+
+  useEffect(() => {
+    if (file) return;
     if (!raw) {
       setFetched(undefined);
       setError(undefined);
@@ -196,7 +297,7 @@ export function SharedPackagePanel() {
     return () => {
       cancelled = true;
     };
-  }, [raw, autoloadRequested]);
+  }, [file, raw, autoloadRequested]);
 
   const runImport = useCallback(
     async (replace: boolean) => {
@@ -247,9 +348,16 @@ export function SharedPackagePanel() {
     void runImport(false);
   }, [autoloading, fetched, importing, runImport]);
 
-  if (!raw) return null;
-  const open = Boolean(raw);
+  // On a phone the offer is a modal sheet, and Back should close it like any
+  // other; on a desktop it is a card in the corner that Back leaves alone.
+  useCloseOnBack(Boolean(raw || file) && !isDesktop, dismiss);
 
+  if (!raw && !file) return null;
+  const open = Boolean(raw || file);
+
+  const heading = file
+    ? 'Open this record package?'
+    : 'Someone shared records with you';
   const counts = fetched?.info.counts;
   const clinical = counts?.['clinical_documents'];
   const needsPassphrase =
@@ -313,12 +421,16 @@ export function SharedPackagePanel() {
       <LinkIcon className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
       <div className="min-w-0 flex-1">
         <h3 className="text-base font-semibold text-gray-900 sm:text-sm">
-          Someone shared records with you
+          {heading}
         </h3>
 
         {loading && (
           <p className="mt-1 text-sm text-gray-700">
-            Reading the package from {parsePackageUrl(raw)?.host ?? raw}…
+            {file
+              ? `Reading ${file.name}…`
+              : `Reading the package from ${
+                  (raw && parsePackageUrl(raw)?.host) ?? raw
+                }…`}
           </p>
         )}
 
@@ -483,7 +595,7 @@ export function SharedPackagePanel() {
         <div
           role="dialog"
           aria-modal="false"
-          aria-label="Someone shared records with you"
+          aria-label={heading}
           className="pointer-events-auto w-full max-w-sm rounded-lg border border-amber-300 bg-amber-50 p-4 shadow-lg"
         >
           {body}

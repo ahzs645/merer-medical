@@ -23,7 +23,11 @@ export function TabButton({
         ? location.startsWith(AppRoutes.Utilities)
         : location === route;
 
-  const linkClassName = `group relative flex w-24 flex-col items-center justify-center p-2 text-white duration-75 active:scale-90 sm:active:scale-95 md:m-1 md:w-auto md:flex-row md:rounded-md ${
+  // On the phone the four tabs share the bar equally. They were `w-24` each,
+  // and `rem`-sized: at 200% text that is 768px of tabs in a 393px bar, and the
+  // last one — More, the only way to Utilities, Sources and Settings — was
+  // pushed two-thirds off the screen.
+  const linkClassName = `group relative flex min-w-0 flex-1 flex-col items-center justify-center px-0.5 py-2 text-white duration-75 active:scale-90 sm:active:scale-95 md:m-1 md:w-auto md:flex-none md:flex-row md:rounded-md ${
     collapsed ? 'md:justify-center md:p-3' : 'md:justify-start md:p-4'
   } ${
     isActive
@@ -31,7 +35,11 @@ export function TabButton({
       : ''
   }`;
 
-  const labelClass = `pt-1 text-xs md:pt-0 md:text-base md:text-white ${
+  // The phone labels stop growing at 18px — 150% of their normal 12px. Four
+  // equal tabs are ~98px each, and past that "Summary" no longer fits and
+  // splits mid-word. The page keeps growing with the text setting; the bar
+  // stays four readable words, and browser zoom still scales all of it.
+  const labelClass = `max-w-full break-words pt-1 text-center text-[length:min(0.75rem,18px)] leading-tight md:pt-0 md:text-start md:text-base md:text-white ${
     isActive ? 'text-primary font-bold' : 'text-slate-800'
   } ${collapsed ? 'md:hidden' : ''}`;
 

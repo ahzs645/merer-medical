@@ -5,11 +5,9 @@ import {
   createBrowserRouter,
   Navigate,
   RouterProvider,
-  useParams,
 } from 'react-router-dom';
 
 import { ErrorBoundary } from '../shared/components/ErrorBoundary';
-import { NotFoundPage } from '../shared/components/NotFoundPage';
 import { useConsoleLogEasterEgg } from '../shared/hooks/useConsoleLogEasterEgg';
 import { DeveloperLogsProvider } from '../app/providers/DeveloperLogsProvider';
 import {
@@ -36,6 +34,11 @@ import { Routes as AppRoutes } from '../Routes';
 // the chat is unavailable would be backwards.
 import { AssistantDisabledPage } from '../features/ai-chat/components/AssistantDisabledPage';
 import { getRouterBasename } from '../shared/utils/demoMode';
+import {
+  legacyRedirectRoutes,
+  notFoundRoute,
+  rootRedirectRoute,
+} from './shellRoutes';
 
 /**
  * Every route below this line is fetched when it is first opened.
@@ -314,6 +317,7 @@ const routes = [
   {
     element: <TabWrapper />,
     children: [
+      rootRedirectRoute,
       {
         path: AppRoutes.Timeline,
         element: <TimelineTab />,
@@ -570,57 +574,13 @@ const routes = [
         path: AppRoutes.HealowCallback,
         element: <HealowRedirect />,
       },
-      {
-        path: '/labs',
-        element: <Navigate to={AppRoutes.Labs} replace />,
-      },
-      {
-        path: '/labs/:labKey',
-        element: <LegacyLabDetailRedirect />,
-      },
-      {
-        path: '/records/visit-prep',
-        element: <Navigate to={AppRoutes.VisitPrep} replace />,
-      },
-      {
-        path: '/records/sharing',
-        element: <Navigate to={AppRoutes.Sharing} replace />,
-      },
-      {
-        path: '/records/audit-log',
-        element: <Navigate to={AppRoutes.AuditLog} replace />,
-      },
-      {
-        path: '/imaging',
-        element: <Navigate to={AppRoutes.Imaging} replace />,
-      },
-      {
-        path: '/dental',
-        element: <Navigate to={AppRoutes.Dental} replace />,
-      },
-      {
-        path: '/optometry',
-        element: <Navigate to={AppRoutes.Optometry} replace />,
-      },
-      {
-        path: '*',
-        element: <NotFoundPage />,
-      },
+      ...legacyRedirectRoutes,
+      notFoundRoute,
     ],
   },
 ];
 
 const router = createBrowserRouter(routes, { basename: getRouterBasename() });
-
-function LegacyLabDetailRedirect() {
-  const { labKey } = useParams();
-  return (
-    <Navigate
-      to={`${AppRoutes.Labs}/${encodeURIComponent(labKey || '')}`}
-      replace
-    />
-  );
-}
 
 function AssistantRoute() {
   const { experimental__use_openai_rag } = useLocalConfig();

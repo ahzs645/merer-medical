@@ -34,6 +34,10 @@ import { isDemoMode } from '../utils/demoMode';
 import { useRouteAnnouncement } from '../hooks/useRouteAnnouncement';
 import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import { SharedPackagePanel } from '../../features/sources/components/SharedPackagePanel';
+import { useCloseOnBack } from '../hooks/useCloseOnBack';
+import { useSoftKeyboardOpen } from '../hooks/useSoftKeyboardOpen';
+import { SHORT_VIEWPORT_QUERY, useMediaQuery } from '../hooks/useMediaQuery';
+import { useWindowFileDrop } from '../hooks/useWindowFileDrop';
 
 /**
  * Suspense fallback for a route whose chunk hasn't arrived yet.
@@ -76,16 +80,34 @@ export function TabWrapper() {
   const updateLocalConfig = useUpdateLocalConfig();
   const [moreOpen, setMoreOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const softKeyboardOpen = useSoftKeyboardOpen();
+  const draggingFile = useWindowFileDrop();
   // Only the `md`+ rail collapses. Below that the same markup is the bottom
   // bar, which has nothing to collapse, so every collapsed style is `md:`.
-  const collapsed = Boolean(side_nav_collapsed);
-  const toggleNav = () => updateLocalConfig({ side_nav_collapsed: !collapsed });
+  //
+  // A phone held sideways (852 x 393) is past `md` by width, so it gets the
+  // rail — 16rem of an 852px screen. On a viewport that short the rail starts
+  // collapsed whatever the saved preference, and expanding it lasts for the
+  // session rather than overwriting the choice made on a real desktop.
+  const shortViewport = useMediaQuery(SHORT_VIEWPORT_QUERY);
+  const [expandedWhileShort, setExpandedWhileShort] = useState(false);
+  const collapsed = shortViewport
+    ? !expandedWhileShort
+    : Boolean(side_nav_collapsed);
+  const toggleNav = () =>
+    shortViewport
+      ? setExpandedWhileShort(collapsed)
+      : updateLocalConfig({ side_nav_collapsed: !collapsed });
   const userName = user?.first_name
     ? `${user.first_name} ${user.last_name}`
     : 'Unknown User';
 
   return (
-    <div className="mobile-full-height relative flex min-h-0 max-w-[100vw] flex-col overflow-hidden md:flex-row-reverse">
+    <div
+      className="mobile-full-height relative flex min-h-0 max-w-[100vw] flex-col overflow-hidden md:flex-row-reverse"
+      // Read by `.hide-when-typing` in styles.css.
+      data-soft-keyboard={softKeyboardOpen ? 'open' : undefined}
+    >
       {!isDemoMode() && <TutorialOverlay />}
       {/* First stop in the tab order on every route, and the only way past the
           secondary navigation some pages open with — the timeline's date rail,
@@ -124,9 +146,28 @@ export function TabWrapper() {
           dismissing. It renders fixed either way — a sheet on a phone, a card
           in the corner on a wider screen. */}
       <SharedPackagePanel />
-      <div className="flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 print:hidden md:relative md:bottom-auto md:top-0 md:h-full md:w-auto">
+      {draggingFile && (
+        // Says what letting go will do before anyone does it. Pointer events
+        // pass through, so the drop still lands on whatever is underneath —
+        // a visible file field keeps its own drop.
         <div
-          className={`pb-safe md:pb-0 mx-auto flex w-full max-w-3xl justify-around md:h-full md:flex-col md:justify-start motion-safe:md:transition-[width] motion-safe:md:duration-200 ${
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-3 z-dialog flex items-center justify-center rounded-xl border-2 border-dashed border-primary-600 bg-primary-50/90 p-6 text-center print:hidden"
+        >
+          <p className="max-w-sm text-base font-semibold text-primary-900">
+            Drop a .emrpkg package to review it before anything is imported
+          </p>
+        </div>
+      )}
+      <div className="hide-when-typing flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 print:hidden md:relative md:bottom-auto md:top-0 md:h-full md:w-auto">
+        {/* The rail is ~770px of items and the shell clips anything taller
+            than the window, so in a shorter one — a 1280x600 laptop browser,
+            a phone held sideways — the profile link, and at 393px Settings
+            too, sat below the edge with no way to reach them. It scrolls on
+            short windows only: scrolling on one axis clips the other, and the
+            collapsed rail's name bubbles hang off its side. */}
+        <div
+          className={`pb-safe md:pb-0 mx-auto flex w-full max-w-3xl justify-around md:h-full md:flex-col md:justify-start md:[@media(max-height:800px)]:overflow-y-auto motion-safe:md:transition-[width] motion-safe:md:duration-200 ${
             collapsed ? 'md:w-[4.5rem]' : 'md:w-64'
           }`}
         >
@@ -363,6 +404,13 @@ function MobileMoreButton({
   // finished closing — otherwise the sheet's focus-restore fires after the
   // palette focuses its input and steals focus back (mobile focus race).
   const pendingSearch = useRef(false);
+  // Back closes the sheet rather than leaving the page under it.
+  const closeForNavigation = useCloseOnBack(open, () => setOpen(false));
+  // Every link in the sheet navigates as it closes.
+  const leaveSheet = () => {
+    closeForNavigation();
+    setOpen(false);
+  };
   const moreRoutes = [
     AppRoutes.Utilities,
     AppRoutes.MereAIAssistant,
@@ -380,7 +428,7 @@ function MobileMoreButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`flex w-24 flex-col items-center justify-center p-2 text-white duration-75 active:scale-90 sm:active:scale-95 md:hidden ${
+        className={`flex min-w-0 flex-1 flex-col items-center justify-center px-0.5 py-2 text-white duration-75 active:scale-90 sm:active:scale-95 md:hidden ${
           isActive ? 'bg-gray-0 border-primary border-t-2' : ''
         }`}
         aria-label="More navigation"
@@ -393,7 +441,7 @@ function MobileMoreButton({
           <EllipsisHorizontalIcon />
         </span>
         <span
-          className={`pt-1 text-xs ${
+          className={`max-w-full break-words pt-1 text-center text-[length:min(0.75rem,18px)] leading-tight ${
             isActive ? 'text-primary font-bold' : 'text-slate-800'
           }`}
         >
@@ -460,7 +508,7 @@ function MobileMoreButton({
                     to={addRecordPath}
                     title="Add record"
                     icon={<PlusIcon />}
-                    onClick={() => setOpen(false)}
+                    onClick={leaveSheet}
                   />
                   <button
                     type="button"
@@ -479,27 +527,27 @@ function MobileMoreButton({
                     route={AppRoutes.Utilities}
                     title="Utilities"
                     icon={<WrenchScrewdriverIcon />}
-                    onClick={() => setOpen(false)}
+                    onClick={leaveSheet}
                   />
                   {showAssistant && (
                     <MobileMoreLink
                       route={AppRoutes.MereAIAssistant}
                       title="Assistant"
                       icon={<SparklesIcon />}
-                      onClick={() => setOpen(false)}
+                      onClick={leaveSheet}
                     />
                   )}
                   <MobileMoreLink
                     route={AppRoutes.AddConnection}
                     title="Sources"
                     icon={<PlusCircleIcon />}
-                    onClick={() => setOpen(false)}
+                    onClick={leaveSheet}
                   />
                   <MobileMoreLink
                     route={AppRoutes.Settings}
                     title="Settings"
                     icon={<Cog6ToothIcon />}
-                    onClick={() => setOpen(false)}
+                    onClick={leaveSheet}
                   />
                   <div className="col-span-2 [&>button]:w-full [&>button]:rounded-lg [&>button]:border [&>button]:border-gray-200 [&>button]:bg-gray-50 [&>button]:p-3 [&>button]:text-slate-800">
                     <NotificationCenter />
@@ -542,6 +590,9 @@ function MobileMoreLink({
   return (
     <Link
       to={to ?? route}
+      // The sheet's own history entry is the current one while it is open;
+      // replacing it keeps Back from the destination one step, not two.
+      replace
       onClick={onClick}
       className={`flex items-center gap-3 rounded-lg border p-3 text-sm font-semibold ${
         isActive

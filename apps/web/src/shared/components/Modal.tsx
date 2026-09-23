@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
+import { useCloseOnBack } from '../hooks/useCloseOnBack';
 
 export function Modal({
   open,
@@ -18,6 +19,7 @@ export function Modal({
   overflowXHidden?: boolean;
   flex?: boolean;
 }>) {
+  useCloseOnBack(open, () => setOpen(false));
   return (
     <Transition.Root show={open} as={Fragment} afterLeave={afterLeave} appear>
       <Dialog as="div" className="relative z-dialog" onClose={setOpen}>
