@@ -253,16 +253,39 @@ export function isClaimResourceType(resourceType: string): boolean {
 }
 
 // Coverage / claim / EOB documents do not always carry dental-specific terms,
-// so they may not pass `isDentalDocument`. Recognise them by resource type (or
-// manual claim metadata) so the dental claims panel can surface them.
+// so they may not pass `isDentalDocument`. They used to qualify by resource
+// type alone, which listed a medical "Extended Health" plan and a cancelled
+// medical plan under "Claims and EOBs" on the dental page. Now a coverage,
+// claim or EOB counts when something in it says dental: its type, class,
+// payor or insurer, a dental procedure code (CDT D-codes, Canadian USC&LS
+// five-digit codes), or manual claim metadata.
+const DENTAL_COVERAGE_PATTERN =
+  /\bdental\b|\bdentist|\bcdcp\b|canadian dental care plan|\bodontolog|\bortho(?:dontic)?\b|"code":"D\d{4}"/i;
+
 export function isDentalClaimDocument(
   document: ClinicalDocument<unknown>,
 ): boolean {
-  if (isClaimResourceType(document.data_record.resource_type)) return true;
   const details = getDentalDetails(document);
-  return (
-    !!details?.claimStatus || !!details?.carrierName || !!details?.eobAttachment
-  );
+  if (
+    details?.specialty === 'dental' &&
+    (!!details?.claimStatus ||
+      !!details?.carrierName ||
+      !!details?.eobAttachment)
+  ) {
+    return true;
+  }
+  if (!isClaimResourceType(document.data_record.resource_type)) return false;
+  const resource = getResource(document);
+  const text = [
+    document.metadata?.display_name,
+    JSON.stringify(resource?.type || ''),
+    JSON.stringify(resource?.class || ''),
+    JSON.stringify(resource?.payor || ''),
+    JSON.stringify(resource?.insurer || ''),
+    JSON.stringify(resource?.item || ''),
+    JSON.stringify(resource?.subType || ''),
+  ].join(' ');
+  return DENTAL_COVERAGE_PATTERN.test(text);
 }
 
 // Pull claim/coverage fields from manual specialty details first, then fall

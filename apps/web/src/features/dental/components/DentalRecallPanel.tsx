@@ -12,7 +12,7 @@ export function DentalRecallPanel({
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <h2 className="text-base font-semibold text-gray-900">
-        {t('Recall and scheduling')}
+        {t('Recalls from your dental office')}
       </h2>
       {recalls.length > 0 ? (
         <div className="mt-3 grid gap-2">
@@ -26,11 +26,13 @@ export function DentalRecallPanel({
                   {formatRecordDate(recall.dueDate, t('No due date'))}
                 </span>
               </div>
-              <p className="mt-1 text-sm text-gray-700">
-                {[recall.provider, recall.location]
-                  .filter(Boolean)
-                  .join(' · ') || t('Recall record')}
-              </p>
+              {(recall.provider || recall.location) && (
+                <p className="mt-1 text-sm text-gray-700">
+                  {[recall.provider, recall.location]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </p>
+              )}
             </article>
           ))}
         </div>

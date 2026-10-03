@@ -210,6 +210,20 @@ export type DentalClaimSummary = {
   eobAttachment?: string;
 };
 
+/**
+ * When the next cleaning is due, and how we know. `basis` says where the due
+ * date came from, so the screen can say "your practice set this" apart from
+ * "six months after your last cleaning".
+ */
+export type DentalNextCleaning = {
+  lastCleaning?: DentalRecord;
+  dueDate?: string;
+  scheduledDate?: string;
+  intervalMonths?: number;
+  basis: 'recall' | 'stated-interval' | 'usual-interval' | 'none';
+  state: 'overdue' | 'due-soon' | 'scheduled' | 'not-due' | 'unknown';
+};
+
 export type DentalRecallItem = {
   id: string;
   record: DentalRecord;
@@ -270,6 +284,7 @@ export type DentalWorkspaceData = {
   imagingMounts: DentalImagingMount[];
   claimSummaries: DentalClaimSummary[];
   recallItems: DentalRecallItem[];
+  nextCleaning: DentalNextCleaning;
   workflowContext: DentalWorkflowContext;
   counts: {
     conditions: number;

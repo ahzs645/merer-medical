@@ -1,8 +1,11 @@
+import { addMonths, differenceInCalendarDays, parseISO } from 'date-fns';
+
 import {
   DentalActionLevel,
   DentalClaimSummary,
   DentalImagingMount,
   DentalNextAction,
+  DentalNextCleaning,
   DentalPerioMeasurement,
   DentalRecallItem,
   DentalRecord,
@@ -259,11 +262,12 @@ export function buildClaimSummaries(
   return records
     .filter(
       (record) =>
+        // A coverage, claim or EOB, or a record that states a claim. A
+        // procedure that merely names its carrier, or a note that says
+        // "benefit", is not one.
         isClaimResourceType(record.document.data_record.resource_type) ||
         !!record.details?.claimStatus ||
-        !!record.details?.carrierName ||
-        !!record.details?.eobAttachment ||
-        hasAnyTerm(record, ['claim', 'eob', 'benefit', 'deductible']),
+        !!record.details?.eobAttachment,
     )
     .map((record) => ({
       id: record.id,
@@ -272,23 +276,130 @@ export function buildClaimSummaries(
     }));
 }
 
+/**
+ * Recall records: what a practice set as the next due visit. Past cleanings
+ * used to qualify by mentioning "recall" or "prophy", so the panel listed
+ * three visits that had already happened, each reading "No due date".
+ */
 export function buildRecallItems(records: DentalRecord[]): DentalRecallItem[] {
   return records
     .filter(
       (record) =>
-        !!record.details?.recallType ||
-        !!record.details?.recallDueDate ||
-        !!record.details?.dentalRecall ||
-        hasAnyTerm(record, ['recall', 'prophy', 'periodontal maintenance']),
+        record.status !== 'cancelled' &&
+        record.kind !== 'cleaning' &&
+        (record.details?.subtype === 'recall' ||
+          !!record.details?.recallType ||
+          !!record.details?.recallDueDate),
     )
     .map((record) => ({
       id: record.id,
       record,
       type: record.details?.recallType || record.details?.dentalRecall,
-      dueDate: record.details?.recallDueDate || record.details?.dentalFollowUp,
+      dueDate: isoDay(record.details?.recallDueDate),
       provider: record.details?.dentalProvider,
       location: record.details?.dentalLocation,
     }));
+}
+
+/** The usual interval when nothing says otherwise. NICE CG19 allows 3–24. */
+const USUAL_RECALL_MONTHS = 6;
+const DUE_SOON_DAYS = 30;
+
+function isoDay(value?: string): string | undefined {
+  const match = value?.match(/^\d{4}-\d{2}-\d{2}/);
+  return match ? match[0] : undefined;
+}
+
+/** "Six-month recall", "recall in 4 months", "annual exam" → months. */
+export function statedRecallMonths(text: string): number | undefined {
+  const words: Record<string, number> = {
+    three: 3,
+    four: 4,
+    six: 6,
+    nine: 9,
+    twelve: 12,
+    eighteen: 18,
+    'twenty-four': 24,
+  };
+  const match = text
+    .toLowerCase()
+    .match(
+      /\b(\d{1,2}|three|four|six|nine|twelve|eighteen|twenty-four)[- ]?months?\b[^.]{0,30}\b(recall|cleaning|hygiene|check|exam|visit)|\b(recall|cleaning|hygiene|return|review)\b[^.]{0,30}?\b(\d{1,2}|three|four|six|nine|twelve|eighteen|twenty-four)[- ]?months?\b/,
+    );
+  if (match) {
+    const value = match[1] || match[4];
+    const months = words[value] ?? Number(value);
+    return months >= 1 && months <= 24 ? months : undefined;
+  }
+  if (
+    /\b(annual|yearly|12-month)\b[^.]{0,20}\b(recall|cleaning|exam)/i.test(text)
+  )
+    return 12;
+  return undefined;
+}
+
+/**
+ * When the next cleaning is due. A recall record from the practice wins,
+ * unless a cleaning has happened since it was due; then the interval the
+ * last cleaning's note states; then the usual six months. "Overdue" is only
+ * said when nothing is booked.
+ */
+export function buildNextCleaning(
+  records: DentalRecord[],
+  today: Date = new Date(),
+): DentalNextCleaning {
+  const lastCleaning = records
+    .filter(
+      (record) =>
+        record.kind === 'cleaning' && record.status === 'done' && !!record.date,
+    )
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+  const lastDay = isoDay(lastCleaning?.date);
+
+  const recall = buildRecallItems(records)
+    .filter((item) => !!item.dueDate && item.record.status !== 'resolved')
+    .filter((item) => !lastDay || (item.dueDate as string) > lastDay)
+    .sort((a, b) =>
+      (a.dueDate as string).localeCompare(b.dueDate as string),
+    )[0];
+
+  let dueDate: string | undefined;
+  let basis: DentalNextCleaning['basis'] = 'none';
+  let intervalMonths: number | undefined;
+  let scheduledDate: string | undefined;
+
+  if (recall) {
+    dueDate = recall.dueDate;
+    basis = 'recall';
+    const scheduled = isoDay(recall.record.details?.dentalFollowUp);
+    if (scheduled && scheduled !== dueDate) scheduledDate = scheduled;
+  } else if (lastCleaning && lastDay) {
+    const stated = statedRecallMonths(
+      [
+        lastCleaning.title,
+        lastCleaning.summary,
+        lastCleaning.details?.dentalRecall,
+      ]
+        .filter(Boolean)
+        .join('. '),
+    );
+    intervalMonths = stated ?? USUAL_RECALL_MONTHS;
+    basis = stated ? 'stated-interval' : 'usual-interval';
+    dueDate = addMonths(parseISO(lastDay), intervalMonths)
+      .toISOString()
+      .slice(0, 10);
+  }
+
+  const todayDay = today.toISOString().slice(0, 10);
+  let state: DentalNextCleaning['state'] = 'unknown';
+  if (scheduledDate && scheduledDate >= todayDay) state = 'scheduled';
+  else if (dueDate) {
+    const days = differenceInCalendarDays(parseISO(dueDate), today);
+    state =
+      days < 0 ? 'overdue' : days <= DUE_SOON_DAYS ? 'due-soon' : 'not-due';
+  }
+
+  return { lastCleaning, dueDate, scheduledDate, intervalMonths, basis, state };
 }
 
 /** Where a record of each kind is read in full. */

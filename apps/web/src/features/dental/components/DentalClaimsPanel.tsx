@@ -11,7 +11,7 @@ export function DentalClaimsPanel({
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <h2 className="text-base font-semibold text-gray-900">
-        {t('Claims and EOBs')}
+        {t('Dental coverage and claims')}
       </h2>
       {claims.length > 0 ? (
         <>

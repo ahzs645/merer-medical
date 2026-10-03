@@ -1,6 +1,7 @@
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import {
   buildRecordsByTooth,
+  isDentalClaimDocument,
   mapDentalDocument,
   resolveToothNumber,
 } from './dentalRecords';
@@ -8,7 +9,9 @@ import {
   buildOdontogramStatuses,
   buildToothTimeline,
   buildTreatmentPlan,
+  buildNextCleaning,
   buildWorkflowContext,
+  statedRecallMonths,
 } from './dentalClinicalModels';
 
 let sequence = 0;
@@ -296,5 +299,132 @@ describe('tooth state over time', () => {
     expect(
       buildTreatmentPlan([planned, cancelled]).map((item) => item.id),
     ).toEqual([planned.id]);
+  });
+});
+
+describe('next cleaning', () => {
+  const cleaning = (date: string, note?: string) =>
+    doc(
+      'Procedure',
+      {
+        status: 'completed',
+        code: { text: 'Routine dental cleaning and exam' },
+        note: note ? [{ text: note }] : undefined,
+      },
+      { date: `${date}T12:00:00.000Z` },
+    );
+  const today = new Date('2026-10-03T12:00:00.000Z');
+
+  it('uses the interval the last cleaning states, and says overdue', () => {
+    const records = [
+      cleaning('2025-08-14', 'Six-month recall recommended.'),
+      cleaning('2025-02-06'),
+    ].map((document) => map(document));
+    const next = buildNextCleaning(records, today);
+    expect(next.lastCleaning?.date).toContain('2025-08-14');
+    expect(next.dueDate).toBe('2026-02-14');
+    expect(next.basis).toBe('stated-interval');
+    expect(next.state).toBe('overdue');
+  });
+
+  it('prefers the practice recall, and a booking over "overdue"', () => {
+    const recall = doc(
+      'CarePlan',
+      { status: 'active', title: 'Prophy' },
+      {
+        date: '2026-02-10T12:00:00.000Z',
+        manual_specialty_details: {
+          specialty: 'dental',
+          subtype: 'recall',
+          recallType: 'Prophy',
+          recallDueDate: '2026-08-10',
+          dentalFollowUp: '2026-10-20',
+        },
+      },
+    );
+    const next = buildNextCleaning(
+      [recall, cleaning('2026-02-10')].map((document) => map(document)),
+      today,
+    );
+    expect(next.basis).toBe('recall');
+    expect(next.dueDate).toBe('2026-08-10');
+    expect(next.scheduledDate).toBe('2026-10-20');
+    expect(next.state).toBe('scheduled');
+  });
+
+  it('ignores a recall a later cleaning has already met', () => {
+    const recall = doc(
+      'CarePlan',
+      { status: 'active' },
+      {
+        manual_specialty_details: {
+          specialty: 'dental',
+          subtype: 'recall',
+          recallDueDate: '2026-03-01',
+        },
+      },
+    );
+    const next = buildNextCleaning(
+      [recall, cleaning('2026-04-01')].map((document) => map(document)),
+      today,
+    );
+    expect(next.basis).toBe('usual-interval');
+    expect(next.dueDate).toBe('2026-10-01');
+    expect(next.state).toBe('overdue');
+  });
+
+  it('knows nothing without a cleaning or a recall', () => {
+    expect(buildNextCleaning([], today)).toEqual({
+      lastCleaning: undefined,
+      dueDate: undefined,
+      scheduledDate: undefined,
+      intervalMonths: undefined,
+      basis: 'none',
+      state: 'unknown',
+    });
+  });
+
+  it.each([
+    ['Six-month recall recommended.', 6],
+    ['Recall in 4 months for perio maintenance.', 4],
+    ['3-month periodontal maintenance recall', 3],
+    ['Annual exam and cleaning', 12],
+    ['Light plaque, no calculus.', undefined],
+    ['Wear aligners 22 hours, change every 10 days for 18 months', undefined],
+  ])('reads "%s" as %s months', (text, months) => {
+    expect(statedRecallMonths(text)).toBe(months);
+  });
+});
+
+describe('dental coverage', () => {
+  it('keeps dental plans and leaves medical ones out', () => {
+    const coverage = (payor: string, plan: string) =>
+      doc('Coverage', {
+        status: 'active',
+        payor: [{ display: payor }],
+        class: [{ type: { coding: [{ code: 'plan' }] }, name: plan }],
+      });
+    expect(
+      isDentalClaimDocument(
+        coverage('NorthBridge Dental Benefits', 'Family Dental'),
+      ),
+    ).toBe(true);
+    expect(
+      isDentalClaimDocument(coverage('Pacific Blue Health', 'Extended Health')),
+    ).toBe(false);
+    expect(
+      isDentalClaimDocument(
+        coverage('Sun Life', 'Canadian Dental Care Plan (CDCP)'),
+      ),
+    ).toBe(true);
+  });
+
+  it('counts an EOB whose lines carry dental procedure codes', () => {
+    const eob = doc('ExplanationOfBenefit', {
+      status: 'active',
+      insurer: { display: 'Acme Benefits' },
+      item: [{ productOrService: { coding: [{ code: 'D1110' }] } }],
+    });
+    expect(isDentalClaimDocument(eob)).toBe(true);
   });
 });

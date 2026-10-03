@@ -1524,6 +1524,22 @@ export const arabicTranslations: Record<string, string> = {
   'Patient portion': 'حصة المريض',
   EOB: 'بيان المزايا',
   'Claims and EOBs': 'المطالبات وبيانات المزايا',
+  'Next cleaning': 'التنظيف القادم',
+  'Booked for {date}': 'محجوز في {date}',
+  'Overdue — it was due {date}': 'متأخر — كان موعده {date}',
+  'No cleaning on record yet': 'لا يوجد تنظيف مسجل بعد',
+  'Due {date}': 'موعده {date}',
+  'Set by your dental office’s recall.': 'حدده موعد المراجعة من عيادة الأسنان.',
+  '{months} months after your last cleaning, as its note recommends.':
+    'بعد {months} أشهر من آخر تنظيف، كما توصي ملاحظته.',
+  'Six months after your last cleaning — the usual interval. Your dentist may set a different one.':
+    'بعد ستة أشهر من آخر تنظيف — وهي المدة المعتادة. قد يحدد طبيب أسنانك مدة مختلفة.',
+  'Add a cleaning or a recall to see when the next one is due.':
+    'أضف تنظيفًا أو موعد مراجعة لمعرفة موعد التنظيف القادم.',
+  'Last cleaning': 'آخر تنظيف',
+  'Last X-rays or scans': 'آخر صور أشعة أو مسح',
+  'Recalls from your dental office': 'مواعيد المراجعة من عيادة الأسنان',
+  'Dental coverage and claims': 'تغطية الأسنان والمطالبات',
   'Payer address': 'عنوان الجهة الدافعة',
   'Payer phone': 'هاتف الجهة الدافعة',
   'Use the Name field above for the payer or insurer.':

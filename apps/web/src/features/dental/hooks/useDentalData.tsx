@@ -23,6 +23,7 @@ import {
   buildImagingMounts,
   buildPerioOverview,
   buildRecallItems,
+  buildNextCleaning,
   buildTreatmentPlan,
   buildToothTimeline,
   buildWorkflowContext,
@@ -138,6 +139,7 @@ export function useDentalData() {
       imagingMounts: buildImagingMounts(allDentalRecords),
       claimSummaries: buildClaimSummaries(claimRecords),
       recallItems: buildRecallItems(records),
+      nextCleaning: buildNextCleaning(records),
       workflowContext: buildWorkflowContext(records, imaging.length),
       counts: buildDentalCounts(records, imaging),
     };
