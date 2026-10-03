@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../../Routes';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { useToothNumbering } from '../hooks/useToothNumbering';
+import { formatTeeth } from '../utils/dentalReferenceData';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { DentalRecord } from '../types';
@@ -18,6 +20,7 @@ const surgeryTracks = [
 
 export function DentalSurgeryPanel({ records }: { records: DentalRecord[] }) {
   const { t } = useInterfaceLanguage();
+  const [numbering] = useToothNumbering();
   const surgeryRecords = records
     .filter((record) => record.kind === 'surgery')
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -56,8 +59,8 @@ export function DentalSurgeryPanel({ records }: { records: DentalRecord[] }) {
               </div>
               <p className="mt-1 text-sm text-gray-600">
                 {record.toothNumbers.length > 0
-                  ? `${t('Teeth')}: ${record.toothNumbers.join(', ')}`
-                  : t('No tooth number detected')}
+                  ? `${t('Teeth')}: ${formatTeeth(record.toothNumbers, numbering)}`
+                  : ''}
                 {record.details?.procedureCode
                   ? ` · ${t('Code')}: ${record.details.procedureCode}`
                   : ''}

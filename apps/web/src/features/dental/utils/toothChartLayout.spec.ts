@@ -3,7 +3,7 @@ import {
   DECIDUOUS_TEETH,
   UNIVERSAL_TEETH,
 } from './dentalReferenceData';
-import { orderArchForDisplay } from './toothChartLayout';
+import { buildArchRows, orderArchForDisplay } from './toothChartLayout';
 
 /**
  * The chart used to render the lower arch in stored order (Universal 17→32),
@@ -57,5 +57,38 @@ describe('orderArchForDisplay', () => {
       expect(lower[column].side).toBe(tooth.side);
       expect(lower[column].fdi.slice(1)).toBe(tooth.fdi.slice(1));
     });
+  });
+});
+
+describe('buildArchRows', () => {
+  const ids = (row: ({ universal: string } | null)[]) =>
+    row.map((slot) => slot?.universal ?? '·');
+
+  it('puts each primary tooth under the permanent tooth that replaces it', () => {
+    const [permanent, primary] = buildArchRows(ALL_TEETH, 'upper', 'mixed');
+    expect(primary).toHaveLength(16);
+    expect(
+      permanent[primary.findIndex((s) => s?.universal === 'A')]?.universal,
+    ).toBe('4');
+    expect(
+      permanent[primary.findIndex((s) => s?.universal === 'J')]?.universal,
+    ).toBe('13');
+  });
+
+  it('draws the lower primary row above the lower permanent row', () => {
+    const [primary, permanent] = buildArchRows(ALL_TEETH, 'lower', 'mixed');
+    expect(ids(primary).slice(0, 4)).toEqual(['·', '·', '·', 'T']);
+    expect(permanent[3].universal).toBe('29');
+    expect(permanent[12].universal).toBe('20');
+    expect(primary[12]?.universal).toBe('K');
+  });
+
+  it('gives a single dentition one unpadded row', () => {
+    expect(buildArchRows(UNIVERSAL_TEETH, 'upper', 'permanent')).toHaveLength(
+      1,
+    );
+    expect(
+      ids(buildArchRows(DECIDUOUS_TEETH, 'upper', 'deciduous')[0]),
+    ).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']);
   });
 });

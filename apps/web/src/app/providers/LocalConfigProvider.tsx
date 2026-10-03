@@ -43,6 +43,12 @@ interface LocalConfig {
   medication_interactions_enabled?: boolean;
   /** Desktop side nav shown as icons only. Ignored below `md`. */
   side_nav_collapsed?: boolean;
+  /**
+   * How teeth are numbered on screen and read from the add-record form:
+   * Universal (US) or FDI (most other countries, Canada included). Unset
+   * means "follow the browser's region".
+   */
+  tooth_numbering?: 'universal' | 'fdi';
   medication_interactions_provider?: 'ddinter';
 }
 

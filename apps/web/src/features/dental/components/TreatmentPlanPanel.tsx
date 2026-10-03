@@ -1,8 +1,11 @@
 import { TreatmentPlanItem } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { useToothNumbering } from '../hooks/useToothNumbering';
+import { formatTeeth } from '../utils/dentalReferenceData';
 
 export function TreatmentPlanPanel({ items }: { items: TreatmentPlanItem[] }) {
   const { t } = useInterfaceLanguage();
+  const [numbering] = useToothNumbering();
 
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
@@ -30,7 +33,11 @@ export function TreatmentPlanPanel({ items }: { items: TreatmentPlanItem[] }) {
                   <span className="text-primary-700">{t(item.status)}</span>
                 </div>
               </div>
-              <p className="mt-1 text-sm text-gray-600">{t(item.label)}</p>
+              {item.toothNumbers.length > 0 && (
+                <p className="mt-1 text-sm text-gray-600">
+                  {t('Teeth')}: {formatTeeth(item.toothNumbers, numbering)}
+                </p>
+              )}
               {[
                 item.record.details?.procedureCode &&
                   `${t('Code')}: ${item.record.details.procedureCode}`,

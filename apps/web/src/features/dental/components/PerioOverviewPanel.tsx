@@ -1,9 +1,12 @@
 import { PerioOverview } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { useToothNumbering } from '../hooks/useToothNumbering';
+import { formatTeeth } from '../utils/dentalReferenceData';
 import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 export function PerioOverviewPanel({ overview }: { overview: PerioOverview }) {
   const { t } = useInterfaceLanguage();
+  const [numbering] = useToothNumbering();
 
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
@@ -45,7 +48,7 @@ export function PerioOverviewPanel({ overview }: { overview: PerioOverview }) {
                   <p className="font-semibold text-gray-900">
                     {formatRecordDate(measurement.date, t('Undated'))}
                     {measurement.teeth.length > 0
-                      ? ` · ${t('Teeth')}: ${measurement.teeth.join(', ')}`
+                      ? ` · ${t('Teeth')}: ${formatTeeth(measurement.teeth, numbering)}`
                       : ''}
                   </p>
                   <p className="mt-1 text-xs text-gray-600">

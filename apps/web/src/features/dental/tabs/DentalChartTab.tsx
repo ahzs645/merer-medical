@@ -1,22 +1,15 @@
-import { OdontogramStatusPanel } from '../components/OdontogramStatusPanel';
 import { ToothChartPanel } from '../components/ToothChartPanel';
-import { ToothTimelinePanel } from '../components/ToothTimelinePanel';
 import { useDentalContext } from '../hooks/useDentalContext';
 
 export function DentalChartTab() {
-  const { odontogramStatuses, recordsByTooth, toothTimeline } =
-    useDentalContext();
+  const { odontogramStatuses, recordsByTooth } = useDentalContext();
 
+  // One panel: the chart, and beside it the selected tooth's history. The
+  // two cards that used to follow it repeated the same teeth twice over.
   return (
-    <>
-      {/* The tab is named for the chart, so the chart leads it; the status and
-          timeline cards below read as detail on whichever tooth you picked. */}
-      <ToothChartPanel
-        recordsByTooth={recordsByTooth}
-        statuses={odontogramStatuses}
-      />
-      <OdontogramStatusPanel statuses={odontogramStatuses} />
-      <ToothTimelinePanel items={toothTimeline} />
-    </>
+    <ToothChartPanel
+      recordsByTooth={recordsByTooth}
+      statuses={odontogramStatuses}
+    />
   );
 }

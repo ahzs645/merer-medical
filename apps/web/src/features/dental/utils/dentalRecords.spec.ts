@@ -7,10 +7,10 @@ import {
 } from './dentalRecords';
 import {
   buildOdontogramStatuses,
-  buildToothTimeline,
   buildTreatmentPlan,
   buildNextCleaning,
   buildWorkflowContext,
+  recordActionLevel,
   statedRecallMonths,
 } from './dentalClinicalModels';
 
@@ -272,12 +272,11 @@ describe('tooth state over time', () => {
     );
     const records = [pocket, crownPrep].map((document) => map(document));
     const byTooth = buildRecordsByTooth(records);
-    const timeline = buildToothTimeline(
-      buildOdontogramStatuses(byTooth),
-      byTooth,
-    );
     const level = (title: string) =>
-      timeline.find((item) => item.record.title.startsWith(title))?.actionLevel;
+      recordActionLevel(
+        records.find((record) => record.title.startsWith(title))!,
+        byTooth,
+      );
     expect(level('Periodontal')).toBe('active');
     expect(level('Crown')).toBe('complete');
   });

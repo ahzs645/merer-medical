@@ -1,5 +1,7 @@
 import { DentalImagingMount } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { useToothNumbering } from '../hooks/useToothNumbering';
+import { formatTeeth } from '../utils/dentalReferenceData';
 import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 export function DentalImagingMountsPanel({
@@ -8,6 +10,7 @@ export function DentalImagingMountsPanel({
   mounts: DentalImagingMount[];
 }) {
   const { t } = useInterfaceLanguage();
+  const [numbering] = useToothNumbering();
 
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
@@ -31,7 +34,7 @@ export function DentalImagingMountsPanel({
                   mount.modality,
                   formatRecordDate(mount.acquisitionDate, ''),
                   mount.toothNumbers.length
-                    ? `${t('Teeth')}: ${mount.toothNumbers.join(', ')}`
+                    ? `${t('Teeth')}: ${formatTeeth(mount.toothNumbers, numbering)}`
                     : undefined,
                 ]
                   .filter(Boolean)

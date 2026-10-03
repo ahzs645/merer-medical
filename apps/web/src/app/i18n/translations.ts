@@ -1524,6 +1524,25 @@ export const arabicTranslations: Record<string, string> = {
   'Patient portion': 'حصة المريض',
   EOB: 'بيان المزايا',
   'Claims and EOBs': 'المطالبات وبيانات المزايا',
+  'Drawn as your dentist sees you: your right side is on the left.':
+    'مرسوم كما يراك طبيب أسنانك: جانبك الأيمن على اليسار.',
+  Numbering: 'الترقيم',
+  'The small number is the US (Universal) number.':
+    'الرقم الصغير هو رقم النظام العالمي الأمريكي.',
+  'The small number is the international (FDI) number.':
+    'الرقم الصغير هو الرقم الدولي (FDI).',
+  'Universal (US)': 'النظام العالمي (الولايات المتحدة)',
+  'FDI (international)': 'نظام FDI (دولي)',
+  Adult: 'دائمة',
+  Baby: 'لبنية',
+  Both: 'كلاهما',
+  'Your right': 'يمينك',
+  'Your left': 'يسارك',
+  'No records': 'لا توجد سجلات',
+  'Teeth that need something': 'أسنان تحتاج إلى متابعة',
+  'No record names a tooth yet.': 'لا يذكر أي سجل سنًا بعد.',
+  'Nothing open. Select a tooth to see its history.':
+    'لا شيء مفتوح. اختر سنًا لعرض سجله.',
   'Next cleaning': 'التنظيف القادم',
   'Booked for {date}': 'محجوز في {date}',
   'Overdue — it was due {date}': 'متأخر — كان موعده {date}',

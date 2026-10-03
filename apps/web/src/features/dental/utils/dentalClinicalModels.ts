@@ -9,7 +9,6 @@ import {
   DentalPerioMeasurement,
   DentalRecallItem,
   DentalRecord,
-  DentalToothTimelineItem,
   DentalWorkflowContext,
   OdontogramToothStatus,
   PerioOverview,
@@ -25,19 +24,6 @@ import {
 } from './dentalRecords';
 
 const ACTIVE_KINDS = new Set(['condition', 'finding', 'perio', 'referral']);
-
-const HIGH_PRIORITY_TERMS = [
-  'abscess',
-  'acute',
-  'bleeding',
-  'caries',
-  'cavity',
-  'cracked',
-  'fracture',
-  'infection',
-  'pain',
-  'urgent',
-];
 
 const PERIO_RISK_TERMS = [
   'attachment loss',
@@ -155,11 +141,14 @@ export function buildTreatmentPlan(
       id: record.id,
       record,
       status: inferTreatmentStatus(record),
-      priority: hasAnyTerm(record, HIGH_PRIORITY_TERMS) ? 'high' : 'routine',
+      // Priority as the practice stated it. Matching "pain" or "bleeding"
+      // anywhere in the note made "no pain reported" a high-priority plan.
+      priority: /urgent|high|emergen|asap/i.test(
+        record.details?.treatmentPriority || '',
+      )
+        ? 'high'
+        : 'routine',
       toothNumbers: record.toothNumbers,
-      label: record.toothNumbers.length
-        ? `Teeth ${record.toothNumbers.join(', ')}`
-        : 'No tooth number detected',
       date: record.date,
     }));
 }
@@ -193,32 +182,6 @@ export function buildPerioOverview(records: DentalRecord[]): PerioOverview {
     maintenanceRecords,
     latestMeasurements: buildPerioMeasurements(perioRecords).slice(0, 6),
   };
-}
-
-/**
- * Each tooth's history, newest first, with every row showing its own
- * standing. It used to list only open and planned records and stamp each with
- * the tooth's level, so a completed crown prep on a tooth with an open pocket
- * read "ACTIVE".
- */
-export function buildToothTimeline(
-  statuses: OdontogramToothStatus[],
-  recordsByTooth: Map<string, DentalRecord[]>,
-): DentalToothTimelineItem[] {
-  return statuses.flatMap((status) =>
-    (recordsByTooth.get(status.tooth) || [])
-      .filter((record) => record.status !== 'cancelled')
-      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
-      .slice(0, 4)
-      .map((record) => ({
-        id: `${status.tooth}-${record.id}`,
-        tooth: status.tooth,
-        record,
-        date: record.date,
-        actionLevel: recordActionLevel(record, recordsByTooth),
-        label: status.label,
-      })),
-  );
 }
 
 export function buildImagingMounts(
@@ -414,13 +377,6 @@ const ROUTE_BY_KIND: Record<string, string> = {
   procedure: '/records/dental/treatment',
 };
 
-function describeTeeth(record: DentalRecord): string {
-  if (record.toothNumbers.length === 0) return '';
-  if (record.toothNumbers.length === 1)
-    return `tooth ${record.toothNumbers[0]}`;
-  return `teeth ${record.toothNumbers.join(', ')}`;
-}
-
 /**
  * The open items on the dental overview, each named as the record it is.
  *
@@ -437,7 +393,6 @@ function buildNextActions(records: DentalRecord[]): DentalNextAction[] {
     )
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
     .map((record) => {
-      const teeth = describeTeeth(record);
       const kindLabel = isOpenPlan(record)
         ? record.kind === 'surgery'
           ? 'Planned surgery or consult'
@@ -450,7 +405,9 @@ function buildNextActions(records: DentalRecord[]): DentalNextAction[] {
       return {
         id: record.id,
         label: record.title,
-        detail: [kindLabel, teeth, record.date].filter(Boolean).join(' · '),
+        reason: kindLabel,
+        teeth: record.toothNumbers,
+        date: record.date,
         to: ROUTE_BY_KIND[record.kind] ?? '/records/dental/records',
       };
     });

@@ -2,11 +2,14 @@ import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { DentalRecord } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { useToothNumbering } from '../hooks/useToothNumbering';
+import { formatTeeth } from '../utils/dentalReferenceData';
 
 const MAX_VISIBLE_RECORDS = 12;
 
 export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
   const { t } = useInterfaceLanguage();
+  const [numbering] = useToothNumbering();
 
   // Cleanings are surfaced in the hygiene workspace, so exclude them here. Do
   // the filtering up front so a patient who only has cleanings falls through to
@@ -50,8 +53,8 @@ export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
                   </div>
                   <p className="mt-1 text-sm text-gray-600">
                     {record.toothNumbers.length > 0
-                      ? `${t('Teeth')}: ${record.toothNumbers.join(', ')}`
-                      : t('No tooth number detected')}
+                      ? `${t('Teeth')}: ${formatTeeth(record.toothNumbers, numbering)}`
+                      : ''}
                     {record.surfaces.length > 0
                       ? ` · ${t('Surfaces')}: ${record.surfaces.join(', ')}`
                       : ''}

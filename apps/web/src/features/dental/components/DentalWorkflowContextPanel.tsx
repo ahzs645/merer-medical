@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { Routes as AppRoutes } from '../../../Routes';
 import { DentalWorkflowContext } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { useToothNumbering } from '../hooks/useToothNumbering';
+import { formatTeeth } from '../utils/dentalReferenceData';
 import { safeFormatDate } from '../../../shared/utils/dateFormatters';
 
 /** Enough to act on without turning the overview into the records list. */
@@ -21,6 +23,7 @@ export function DentalWorkflowContextPanel({
   hasRecords: boolean;
 }) {
   const { t } = useInterfaceLanguage();
+  const [numbering] = useToothNumbering();
   const actions = context.nextActions;
   const shown = actions.slice(0, SHOWN);
 
@@ -72,7 +75,17 @@ export function DentalWorkflowContextPanel({
                     {action.label}
                   </span>
                   <span className="text-xs text-gray-600">
-                    {formatDetail(action.detail)}
+                    {[
+                      t(action.reason),
+                      action.teeth.length
+                        ? `${t(action.teeth.length === 1 ? 'Tooth' : 'Teeth')} ${formatTeeth(action.teeth, numbering)}`
+                        : undefined,
+                      action.date
+                        ? safeFormatDate(action.date, 'PP', action.date)
+                        : undefined,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
                   </span>
                 </Link>
               </li>
@@ -99,16 +112,4 @@ export function DentalWorkflowContextPanel({
       )}
     </section>
   );
-}
-
-/**
- * The detail line carries an ISO date as its last part, because that is what
- * sorts; the house format is what reads.
- */
-function formatDetail(detail: string): string {
-  const parts = detail.split(' · ');
-  const last = parts[parts.length - 1];
-  if (!/^\d{4}-\d{2}-\d{2}/.test(last)) return detail;
-  const formatted = safeFormatDate(last, 'PP', last);
-  return [...parts.slice(0, -1), formatted].join(' · ');
 }

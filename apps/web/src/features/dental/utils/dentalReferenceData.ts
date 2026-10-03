@@ -241,3 +241,32 @@ export function findToothByNotation(tooth: string): DentalTooth | undefined {
       item.palmer.toUpperCase() === normalized,
   );
 }
+
+/**
+ * A tooth as a reader should see it: the number in their system first, the
+ * other system second, and its name. Teeth are stored by Universal id.
+ */
+export function describeTooth(
+  universal: string,
+  numbering: 'universal' | 'fdi' = 'universal',
+): { primary: string; secondary: string; name: string } {
+  const tooth = ALL_TEETH.find((item) => item.universal === universal);
+  if (!tooth) return { primary: universal, secondary: '', name: '' };
+  return numbering === 'fdi'
+    ? { primary: tooth.fdi, secondary: `#${tooth.universal}`, name: tooth.name }
+    : {
+        primary: tooth.universal,
+        secondary: `FDI ${tooth.fdi}`,
+        name: tooth.name,
+      };
+}
+
+/** "14, 19" in the reader's numbering. */
+export function formatTeeth(
+  universalTeeth: string[],
+  numbering: 'universal' | 'fdi' = 'universal',
+): string {
+  return universalTeeth
+    .map((tooth) => describeTooth(tooth, numbering).primary)
+    .join(', ');
+}

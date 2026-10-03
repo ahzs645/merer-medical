@@ -25,7 +25,6 @@ import {
   buildRecallItems,
   buildNextCleaning,
   buildTreatmentPlan,
-  buildToothTimeline,
   buildWorkflowContext,
 } from '../utils/dentalClinicalModels';
 
@@ -135,7 +134,6 @@ export function useDentalData() {
       odontogramStatuses,
       treatmentPlan: buildTreatmentPlan(records),
       perioOverview: buildPerioOverview(records),
-      toothTimeline: buildToothTimeline(odontogramStatuses, recordsByTooth),
       imagingMounts: buildImagingMounts(allDentalRecords),
       claimSummaries: buildClaimSummaries(claimRecords),
       recallItems: buildRecallItems(records),

@@ -133,15 +133,6 @@ export type DentalToothSurfaceModel = {
   source?: DentalSourceMapping;
 };
 
-export type DentalToothTimelineItem = {
-  id: string;
-  tooth: string;
-  record: DentalRecord;
-  date?: string;
-  actionLevel: DentalActionLevel;
-  label: string;
-};
-
 export type OdontogramToothStatus = {
   tooth: string;
   fdi: string;
@@ -160,7 +151,6 @@ export type TreatmentPlanItem = {
   status: 'proposed' | 'scheduled' | 'active' | 'completed';
   priority: 'high' | 'routine';
   toothNumbers: string[];
-  label: string;
   date?: string;
 };
 
@@ -247,8 +237,11 @@ export type DentalNextAction = {
   id: string;
   /** The record, in its own words: "Occlusal caries on tooth 30". */
   label: string;
-  /** Why it is on the list: "Active finding · tooth 30 · Feb 12, 2026". */
-  detail: string;
+  /** Why it is on the list: "Active finding". */
+  reason: string;
+  /** Universal ids; shown in the reader's numbering. */
+  teeth: string[];
+  date?: string;
   /** The tab that holds it, so the row is a way in rather than a statement. */
   to: string;
 };
@@ -280,7 +273,6 @@ export type DentalWorkspaceData = {
   odontogramStatuses: OdontogramToothStatus[];
   treatmentPlan: TreatmentPlanItem[];
   perioOverview: PerioOverview;
-  toothTimeline: DentalToothTimelineItem[];
   imagingMounts: DentalImagingMount[];
   claimSummaries: DentalClaimSummary[];
   recallItems: DentalRecallItem[];
