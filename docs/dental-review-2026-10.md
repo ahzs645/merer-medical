@@ -1,8 +1,10 @@
 # Dental review — what the workspace tells you about your teeth
 
-> **Status:** findings only; nothing here is fixed yet. Part 1 (§1–§10) is the
-> screens; Part 2 (§11–§15) is how dental data gets in. Ordered by how much a
-> wrong answer would mislead the person reading it, not by how hard it is to fix.
+> **Status:** fourteen of the fifteen findings are fixed, and §14 is
+> documented rather than built — see "What shipped" at the foot. The findings
+> are kept as written. Part 1 (§1–§10) is the screens; Part 2 (§11–§15) is how
+> dental data gets in. Ordered by how much a wrong answer would mislead the
+> person reading it, not by how hard it is to fix.
 
 Companion to the six interface-review passes. Those walked every surface and
 asked whether it was drawn right, true, usable over time, reachable, and what
@@ -638,3 +640,52 @@ segmentation (labelled by tooth) as structured input to the chart.
 5. **§13 transpose `dental` section.** Most real dental data is documents.
 6. **§14/§15 storage decisions:** one dental source of truth; binary
    attachments; DICOM via CBCTer.
+
+---
+
+## What shipped
+
+Nine commits on `claude/dental-review-desktop-mobile`, in the order the two
+"suggested order" lists gave. 838 web unit tests and 28 `tools/` tests pass;
+every change was also checked in a production build at 1440 px and 393 px.
+
+| §   | Finding                                  | What changed                                                                                                                                                                                                                                   |
+| --- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Two charts disagree                      | The odontogram drawing is gone (and `react-odontogram` with it). The grid is the chart: upper over lower, your right on the left and labelled, primary teeth under their successors, sideways scroll on a phone, 44 px targets, spoken labels. |
+| 2   | FDI read as the wrong tooth              | Numbers can't run into another digit; 33–48/51–85 are FDI; a Universal/FDI switch on the chart (default FDI outside the US) drives display and the form; coded `bodySite` teeth win over prose.                                                |
+| 3   | A filled cavity stays red                | Every record has its own status from FHIR or the stated status; a finding closes when resolved or when a completed procedure on the same tooth follows it.                                                                                     |
+| 4   | X-rays and a PDF as open problems        | Resource type decides kind before keywords. Demo "What to do next": 9 rows → 5 real ones (the implant consult now counts as planned).                                                                                                          |
+| 5   | No next-cleaning date                    | Overview leads with it: recall, else the last cleaning's stated interval, else six months; "overdue" only when nothing is booked. Demo: "Overdue — it was due Feb 14, 2026".                                                                   |
+| 6   | Medical plans as dental claims           | A coverage, claim or EOB is dental only when something in it says so (type, class, payor, CDT codes, CDCP).                                                                                                                                    |
+| 7   | Fake 3-D teeth                           | Stored STL/PLY files are drawn with three.js's own loaders and can be turned; files without bytes are listed as such. The empty "Ungrouped" mount card is hidden.                                                                              |
+| 8   | Machine words, unopenable list           | Human headings and kind labels, dates on rows, "Show all N records". Records still don't open to a detail view — see below.                                                                                                                    |
+| 9   | Two panels repeating the chart           | Replaced by one side panel: the tapped tooth's history, each record with its own standing; one vocabulary with marks as well as colours.                                                                                                       |
+| 10  | Perio as counts                          | Reads probing depths and says what they mean (≤3 healthy, 4 borderline, ≥5 gum disease), with deepest pocket, sites 4 mm+, bleeding, and change since the last exam.                                                                           |
+| 11  | Open Dental importer                     | All eight `ProcStat` values mapped (planned is planned; deleted and inactive skipped; conditions are Conditions); perio decoded per `PerioSequenceType`; recalls are due dates; plans carry line items; `--patient` required.                  |
+| 12  | Form asks for free text                  | Fields per record kind, status as a fixed choice that sets the FHIR status, "Next cleaning due", numbering saved per record, tooth findings no longer vital signs or lab values.                                                               |
+| 13  | Coded teeth ignored; no dental transpose | `bodySite` codings read first; a `dentalRecords` transpose section with required `numberingSystem`, FDI-coded output, an example and tests.                                                                                                    |
+| 14  | Unread dental tables                     | Documented, not built: the incorporation doc now says which path is live and to use the tables' field names in the projection meanwhile.                                                                                                       |
+| 15  | Scans inline, no CBCT                    | Partly: scans render from the bytes already stored. Binary attachments, multi-file/DICOM-folder upload and the CBCTer hand-off are not built.                                                                                                  |
+
+Also fixed from "Also noticed": developer-voice subtitles, buttons-that-aren't
+in the empty ortho and surgery panels, the untranslated "Tooth-by-tooth status"
+(its panel is gone), keyword-driven "high priority", 24 px dentition buttons,
+and "implant"/"crown" pulling medical records into Dental.
+
+### Still open
+
+- **Record detail.** Dental rows still don't open to a full record; the app's
+  only detail route is for documents. A dental record view (or reuse of
+  `/records/documents/detail/:id` for any clinical document) is its own change.
+- **Timeline calls every Observation "Labs".** `timelineCategories.ts` labels by
+  resource type, so a dental finding (now correctly an `exam` observation) is
+  still grouped under Labs on the Timeline. That mapping is shared by every
+  feature and wants its own pass.
+- **§15 storage**: attachments out of the JSON, DICOM folders in, CBCTer for
+  CBCT.
+- **Header pluralisation** in `DentalHeader.tsx` still patches an Arabic phrase
+  by string replacement.
+- **Unlabelled free-text tooth numbers 11–32** from portals are still read as
+  Universal unless the record or the reader's setting says FDI only for
+  manual entries. Per-connection numbering (a Canadian portal is FDI) would
+  close it.

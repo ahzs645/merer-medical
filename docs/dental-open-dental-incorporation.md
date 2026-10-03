@@ -4,6 +4,17 @@ This note documents how Open Dental-style concepts are incorporated into Mere wi
 
 ## Storage Direction
 
+> **What is live (October 2026).** The app reads dental data only from
+> `clinical_documents` (RxDB), with dental fields in
+> `metadata.manual_specialty_details`. The `dental_*` tables below exist in
+> `packages/local-dexie` with schemas and commands, but nothing in `apps/web`
+> reads them, and `tools/build-opendental-emrpkg.mjs` writes
+> `clinical_documents`, not these tables. Until the Dexie move, structured
+> dental data (perio sites, recall due dates, plan line items) goes into
+> `manual_specialty_details` under the same field names the tables use, so the
+> move is a copy rather than a re-mapping. The tables are the plan; the
+> projection fields are what ships.
+
 Mere keeps patient portal imports in FHIR-shaped `ClinicalDocument` rows, but Open Dental demo/practice-management data has a separate local model. This prevents Open Dental billing, scheduling, and tooth-chart data from being forced into generic FHIR documents just to keep provenance.
 
 The Open Dental-facing tables are:
@@ -193,7 +204,13 @@ The dental section should stay patient-facing:
 - Dental type model: `apps/web/src/features/dental/types.ts`
 - Dental record mapping: `apps/web/src/features/dental/utils/dentalRecords.ts`
 - Dental projections: `apps/web/src/features/dental/utils/dentalClinicalModels.ts`
-- Dental workspace UI: `apps/web/src/features/dental/DentalTab.tsx`
+- Dental workspace UI: `apps/web/src/features/dental/DentalLayout.tsx` and `tabs/`
+- Open Dental → `.emrpkg`: `tools/build-opendental-emrpkg.mjs`, with its mapping
+  rules in `tools/lib/opendental-mapping.mjs` (tested against
+  `tools/fixtures/opendental-mini`). Pass `--patient <PatNum>`: a practice
+  export holds every patient.
+- Dental letters and estimates → `.emrpkg`: the `dentalRecords` section of the
+  transpose format (`docs/clinical-transpose-format.md`).
 
 Future import work should write normalized metadata into the same projection fields rather than adding parallel one-off fields.
 
