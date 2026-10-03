@@ -450,7 +450,7 @@ Dental's own schema documentation (v24.3). The manual form was driven in the
 browser at both widths. A record was saved and followed to every page it
 reached.
 
-## The seven doors
+## The eight doors
 
 | Door                                       | Where                                               | State                                                               |
 | ------------------------------------------ | --------------------------------------------------- | ------------------------------------------------------------------- |
