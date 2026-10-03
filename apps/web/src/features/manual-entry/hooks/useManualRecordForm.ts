@@ -14,6 +14,7 @@ import { useLocalConfig } from '../../../app/providers/LocalConfigProvider';
 import { useNotificationDispatch } from '../../../app/providers/NotificationProvider';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { useUser } from '../../../app/providers/UserProvider';
+import { useToothNumbering } from '../../dental/hooks/useToothNumbering';
 import { Routes as AppRoutes } from '../../../Routes';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import {
@@ -113,6 +114,9 @@ type DentalFields = {
   dentalFollowUp: string;
   dentalSurfaces: string[];
   dentalRecall: string;
+  recallDueDate: string;
+  /** '' until a saved record says otherwise; then the reader's preference. */
+  numberingSystem: '' | 'universal' | 'fdi';
   orthoPhase: string;
   orthoArch: string;
   orthoAppliance: string;
@@ -236,6 +240,8 @@ const initialDentalFields: DentalFields = {
   dentalFollowUp: '',
   dentalSurfaces: [],
   dentalRecall: '',
+  recallDueDate: '',
+  numberingSystem: '',
   orthoPhase: '',
   orthoArch: '',
   orthoAppliance: '',
@@ -532,6 +538,8 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     dentalFollowUp,
     dentalSurfaces,
     dentalRecall,
+    recallDueDate,
+    numberingSystem: savedNumberingSystem,
     orthoPhase,
     orthoArch,
     orthoAppliance,
@@ -616,6 +624,12 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     });
   const setDentalRecall = (dentalRecall: string) =>
     setDentalFields({ dentalRecall });
+  const setRecallDueDate = (recallDueDate: string) =>
+    setDentalFields({ recallDueDate });
+  // A record keeps the numbering it was entered in. A new one takes the
+  // reader's; an old one with none was always read as Universal.
+  const [preferredNumbering] = useToothNumbering();
+  const toothNumbering = savedNumberingSystem || preferredNumbering;
   const setOrthoPhase = (orthoPhase: string) => setDentalFields({ orthoPhase });
   const setOrthoArch = (orthoArch: string) => setDentalFields({ orthoArch });
   const setOrthoAppliance = (orthoAppliance: string) =>
@@ -1017,6 +1031,10 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         setDentalFollowUp(manualDetails.dentalFollowUp || '');
         setDentalFields({ dentalSurfaces: manualDetails.dentalSurfaces || [] });
         setDentalRecall(manualDetails.dentalRecall || '');
+        setRecallDueDate(manualDetails.recallDueDate || '');
+        setDentalFields({
+          numberingSystem: manualDetails.numberingSystem || 'universal',
+        });
         setOrthoPhase(manualDetails.orthoPhase || '');
         setOrthoArch(manualDetails.orthoArch || '');
         setOrthoAppliance(manualDetails.orthoAppliance || '');
@@ -1141,6 +1159,8 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         dentalFollowUp,
         dentalSurfaces,
         dentalRecall,
+        recallDueDate,
+        numberingSystem: toothNumbering,
         orthoPhase,
         orthoArch,
         orthoAppliance,
@@ -1475,6 +1495,9 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     setDentalSurfaces,
     dentalRecall,
     setDentalRecall,
+    recallDueDate,
+    setRecallDueDate,
+    toothNumbering,
     orthoPhase,
     setOrthoPhase,
     orthoArch,

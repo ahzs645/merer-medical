@@ -1527,6 +1527,15 @@ export const arabicTranslations: Record<string, string> = {
   'Drawn as your dentist sees you: your right side is on the left.':
     'مرسوم كما يراك طبيب أسنانك: جانبك الأيمن على اليسار.',
   Numbering: 'الترقيم',
+  'FDI numbers, as most dentists outside the US write them. Switch on the tooth chart.':
+    'أرقام FDI، كما يكتبها معظم أطباء الأسنان خارج الولايات المتحدة. يمكنك التبديل من مخطط الأسنان.',
+  'Universal (US) numbers, 1–32. Switch to FDI on the tooth chart.':
+    'أرقام النظام العالمي الأمريكي، من 1 إلى 32. يمكنك التبديل إلى FDI من مخطط الأسنان.',
+  Universal: 'النظام العالمي',
+  'More tooth details': 'تفاصيل إضافية عن السن',
+  'Next cleaning due': 'موعد التنظيف القادم',
+  'Recall interval': 'الفترة بين المراجعات',
+  'Not stated': 'غير محدد',
   'The small number is the US (Universal) number.':
     'الرقم الصغير هو رقم النظام العالمي الأمريكي.',
   'The small number is the international (FDI) number.':

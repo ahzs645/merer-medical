@@ -370,6 +370,13 @@ function inferDentalKind(
   const subtype = details?.subtype;
 
   if (subtype) {
+    // A procedure entered or exported as planned is planned treatment.
+    if (
+      subtype === 'procedure' &&
+      getResource(document)?.status === 'preparation'
+    ) {
+      return 'treatmentPlan';
+    }
     if (SUBTYPE_KINDS[subtype]) return SUBTYPE_KINDS[subtype];
     if (subtype.startsWith('orthodontic')) return 'orthodontic';
   }

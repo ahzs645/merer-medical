@@ -16,6 +16,7 @@ export function ManualObservationSection({
     isObservationType,
     isSocialHistoryType,
     isDeviceImportType,
+    specialty,
     recordType,
     isEditing,
     valueKind,
@@ -38,7 +39,13 @@ export function ManualObservationSection({
     setInterpretation,
   } = form;
 
-  return (isObservationType || isSocialHistoryType) && !isDeviceImportType ? (
+  // A tooth finding is saved as an observation, but it has no value, unit or
+  // reference range; those fields made a cavity look like a lab result.
+  const isDentalFinding = specialty === 'dental';
+
+  return (isObservationType || isSocialHistoryType) &&
+    !isDeviceImportType &&
+    !isDentalFinding ? (
     <div className="grid gap-4 sm:grid-cols-2">
       {recordType === 'lab' && !isEditing && (
         <ManualLabRowsSection form={form} />

@@ -1,6 +1,7 @@
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { isLaboratoryObservation } from '../labs/hooks/useLabsData';
 import { mapReferralDocs } from '../referrals/referralRecords';
+import { mapDentalDocument } from '../dental/utils/dentalRecords';
 import {
   appendSpecialtyNotes,
   buildClinicalDocument,
@@ -43,6 +44,8 @@ describe('manual record builders', () => {
       dentalFollowUp: '',
       dentalSurfaces: ['M', 'O'],
       dentalRecall: '',
+      recallDueDate: '',
+      numberingSystem: 'fdi',
       orthoPhase: '',
       orthoArch: '',
       orthoAppliance: '',
@@ -98,6 +101,7 @@ describe('manual record builders', () => {
       dentalSeverity: 'moderate',
       procedureCode: 'D1110',
       dentalSurfaces: ['M', 'O'],
+      numberingSystem: 'fdi',
     });
   });
 
@@ -376,5 +380,69 @@ describe('manual record builders', () => {
     expect(normalizeAbsentReason('n/a')).toBe('not-applicable');
     expect(normalizeAbsentReason('unknown')).toBe('unknown');
     expect(normalizeAbsentReason(undefined)).toBe('pending');
+  });
+});
+
+describe('manual dental records read back as entered', () => {
+  const base = {
+    connectionId: 'conn-1',
+    userId: 'user-1',
+    recordDate: '2026-10-01T12:00:00.000Z',
+    notes: '',
+    fileName: '',
+    fileContentType: '',
+  };
+
+  it('a tooth finding is an exam finding on the tooth meant, with its status', () => {
+    const doc = buildClinicalDocument({
+      ...base,
+      recordType: 'vital',
+      title: 'Caries',
+      specialtyDetails: {
+        specialty: 'dental',
+        subtype: 'finding',
+        toothNumber: '26',
+        numberingSystem: 'fdi',
+        dentalStatus: 'Resolved',
+      },
+    });
+    const resource = resourceOf(doc);
+    expect(isVitalSign(resource)).toBe(false);
+    expect(JSON.stringify(resource.category)).toContain('"exam"');
+
+    const record = mapDentalDocument(doc);
+    expect(record.toothNumbers).toEqual(['14']);
+    expect(record.status).toBe('resolved');
+  });
+
+  it('a planned procedure is saved in preparation, not final', () => {
+    const doc = buildClinicalDocument({
+      ...base,
+      recordType: 'procedure',
+      title: 'Composite filling',
+      specialtyDetails: {
+        specialty: 'dental',
+        subtype: 'procedure',
+        toothNumber: '30',
+        numberingSystem: 'universal',
+        dentalStatus: 'Planned',
+      },
+    });
+    expect(resourceOf(doc).status).toBe('preparation');
+    expect(mapDentalDocument(doc).kind).toBe('treatmentPlan');
+  });
+
+  it('a resolved dental condition carries clinicalStatus', () => {
+    const doc = buildClinicalDocument({
+      ...base,
+      recordType: 'condition',
+      title: 'Gingivitis',
+      specialtyDetails: {
+        specialty: 'dental',
+        subtype: 'condition',
+        dentalStatus: 'Resolved',
+      },
+    });
+    expect(resourceOf(doc).clinicalStatus.coding[0].code).toBe('resolved');
   });
 });

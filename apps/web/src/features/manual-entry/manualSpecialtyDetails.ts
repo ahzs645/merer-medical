@@ -23,6 +23,13 @@ export type ManualSpecialtyDetails = {
   dentalFollowUp?: string;
   dentalSurfaces?: string[];
   dentalRecall?: string;
+  /** When the next cleaning is due (YYYY-MM-DD), for a cleaning record. */
+  recallDueDate?: string;
+  /**
+   * How the tooth numbers on this record are written. Saved with every
+   * record so a later change of preference doesn't reread old entries.
+   */
+  numberingSystem?: 'universal' | 'fdi';
   orthoPhase?: string;
   orthoArch?: string;
   orthoAppliance?: string;
@@ -73,8 +80,9 @@ export type ManualImagingDetails = {
 };
 
 export type ManualSpecialtyFormValues = Required<
-  Omit<ManualSpecialtyDetails, 'subtype' | 'dentalSurfaces'>
+  Omit<ManualSpecialtyDetails, 'subtype' | 'dentalSurfaces' | 'numberingSystem'>
 > & {
+  numberingSystem: 'universal' | 'fdi';
   dentalSurfaces: string[];
   dentalEntryKind: DentalEntryKind;
   optometryEntryKind: OptometryEntryKind;
@@ -103,6 +111,8 @@ export function buildSpecialtyDetails(
       dentalFollowUp: params.dentalFollowUp.trim(),
       dentalSurfaces: params.dentalSurfaces,
       dentalRecall: params.dentalRecall.trim(),
+      recallDueDate: params.recallDueDate.trim(),
+      numberingSystem: params.numberingSystem,
       orthoPhase: params.orthoPhase.trim(),
       orthoArch: params.orthoArch.trim(),
       orthoAppliance: params.orthoAppliance.trim(),

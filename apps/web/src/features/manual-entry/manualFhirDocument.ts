@@ -84,7 +84,13 @@ function buildObservationCategory(
   recordType: ClinicalManualRecordKind,
   details?: ManualSpecialtyDetails,
 ) {
-  const standard = OBSERVATION_CATEGORIES[recordType];
+  // A tooth finding is entered through the observation form, but it is an
+  // exam finding, not a vital sign: categorised `vital-signs`, it was a vital
+  // to every page that reads the coding.
+  const standard =
+    details?.specialty === 'dental' && recordType === 'vital'
+      ? { code: 'exam', display: 'Exam' }
+      : OBSERVATION_CATEGORIES[recordType];
   // The specialty entry stays alongside the standard coding rather than
   // instead of it: the dental and optometry pages search the serialized
   // category, so dropping it would hide a tooth finding from its own tab.
@@ -369,7 +375,12 @@ function buildManualFhirEntry(
     (medicationData.dose.trim() ||
       medicationData.frequency.trim() ||
       medicationData.route.trim());
-  const observationValue = buildObservationValue(observationData);
+  // A dental finding has no measured value. Writing the form's default
+  // "pending" absent-reason would show "Pending" as its result.
+  const observationValue =
+    specialtyDetails?.specialty === 'dental'
+      ? {}
+      : buildObservationValue(observationData);
   return {
     fullUrl: `manual:${id}`,
     manual_kind: recordType,
@@ -433,7 +444,10 @@ function buildManualFhirEntry(
       effectiveDateTime: date,
       date,
       issued: date,
-      status: recordType === 'careplan' ? 'active' : 'final',
+      status:
+        dentalFhirStatus(recordType, specialtyDetails) ??
+        (recordType === 'careplan' ? 'active' : 'final'),
+      clinicalStatus: dentalClinicalStatus(recordType, specialtyDetails),
       class: recordType === 'encounter' ? 'manual' : undefined,
       location:
         specialtyDetails?.specialty === 'dental' &&
@@ -744,4 +758,55 @@ function toFhirResourceType(recordType: ClinicalManualRecordKind) {
     default:
       return recordType.charAt(0).toUpperCase() + recordType.slice(1);
   }
+}
+
+/**
+ * The FHIR status for a dental record's chosen status. Without it every
+ * procedure was saved `final` (not a Procedure status) and every plan
+ * `active`, whatever was chosen.
+ */
+export function dentalFhirStatus(
+  recordType: ClinicalManualRecordKind,
+  details?: ManualSpecialtyDetails,
+): string | undefined {
+  if (details?.specialty !== 'dental' || !details.dentalStatus)
+    return undefined;
+  const status = details.dentalStatus.toLowerCase();
+  if (recordType === 'procedure') {
+    if (/done|complete/.test(status)) return 'completed';
+    if (/cancel|declin/.test(status)) return 'not-done';
+    if (/plan|propos|accept|schedul/.test(status)) return 'preparation';
+  }
+  if (recordType === 'careplan') {
+    if (/done|complete/.test(status)) return 'completed';
+    if (/cancel|declin/.test(status)) return 'revoked';
+    if (/propos/.test(status)) return 'draft';
+    return 'active';
+  }
+  return undefined;
+}
+
+function dentalClinicalStatus(
+  recordType: ClinicalManualRecordKind,
+  details?: ManualSpecialtyDetails,
+) {
+  if (recordType !== 'condition' || details?.specialty !== 'dental') {
+    return undefined;
+  }
+  const status = details.dentalStatus?.toLowerCase() || '';
+  const code = /resolv/.test(status)
+    ? 'resolved'
+    : /active/.test(status)
+      ? 'active'
+      : undefined;
+  return code
+    ? {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/condition-clinical',
+            code,
+          },
+        ],
+      }
+    : undefined;
 }

@@ -58,6 +58,9 @@ export function ManualSpecialtySection({
     toggleDentalSurface,
     dentalRecall,
     setDentalRecall,
+    recallDueDate,
+    setRecallDueDate,
+    toothNumbering,
     isOrthodonticDentalEntry,
     orthoPhase,
     setOrthoPhase,
@@ -117,6 +120,8 @@ export function ManualSpecialtySection({
   // reads as a stray container around a dropdown that sits under an unboxed
   // one.
   const hasSubKind = specialty === 'dental' || specialty === 'optometry';
+  const dentalShows = dentalFieldsFor(dentalEntryKind);
+  const statusOptions = dentalStatusOptions(dentalEntryKind, dentalStatus);
 
   return !isDeviceImportType ? (
     <div
@@ -198,70 +203,89 @@ export function ManualSpecialtySection({
 
       {specialty === 'dental' && (
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          {/* Only the fields this kind of record has. Every dental type used
+              to show all fourteen, so logging a cleaning meant scrolling past
+              tooth range, quadrant, arch, dentition, severity and surfaces. */}
+          {dentalShows.teeth && (
+            <>
+              <div>
+                <label
+                  htmlFor="manual-record-tooth"
+                  className="block text-sm font-semibold text-gray-900"
+                >
+                  {t('Tooth')} (
+                  {toothNumbering === 'fdi' ? 'FDI' : t('Universal')})
+                </label>
+                <input
+                  id="manual-record-tooth"
+                  type="text"
+                  inputMode="numeric"
+                  value={toothNumber}
+                  aria-describedby="manual-record-tooth-hint"
+                  placeholder={toothNumbering === 'fdi' ? 'e.g. 26' : 'e.g. 14'}
+                  onChange={(event) => setToothNumber(event.target.value)}
+                  className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                />
+                <p
+                  id="manual-record-tooth-hint"
+                  className="mt-1 text-xs text-gray-600"
+                >
+                  {toothNumbering === 'fdi'
+                    ? t(
+                        'FDI numbers, as most dentists outside the US write them. Switch on the tooth chart.',
+                      )
+                    : t(
+                        'Universal (US) numbers, 1–32. Switch to FDI on the tooth chart.',
+                      )}
+                </p>
+              </div>
+              <SpecialtyTextInput
+                label={t('Multiple teeth')}
+                value={dentalTeeth}
+                placeholder={
+                  toothNumbering === 'fdi'
+                    ? 'e.g. 16, 26, 36'
+                    : 'e.g. 3, 14, 19'
+                }
+                onChange={setDentalTeeth}
+              />
+            </>
+          )}
           <div>
             <label
-              htmlFor="manual-record-tooth"
+              htmlFor="manual-record-dental-status"
               className="block text-sm font-semibold text-gray-900"
             >
-              {t('Tooth')}
+              {t('Status')}
             </label>
-            <input
-              id="manual-record-tooth"
-              type="text"
-              value={toothNumber}
-              placeholder={t('e.g. 14')}
-              onChange={(event) => setToothNumber(event.target.value)}
-              className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+            <StylizedSelect
+              id="manual-record-dental-status"
+              value={dentalStatus}
+              onChange={setDentalStatus}
+              className="mt-2"
+              buttonClassName="text-base"
+              options={statusOptions.map((option) => ({
+                value: option,
+                label: option ? t(option) : t('Not stated'),
+              }))}
             />
           </div>
-          <SpecialtyTextInput
-            label={t('Multiple teeth')}
-            value={dentalTeeth}
-            placeholder={t('e.g. 3, 14, 19')}
-            onChange={setDentalTeeth}
-          />
-          <SpecialtyTextInput
-            label={t('Tooth range')}
-            value={toothRange}
-            placeholder={t('e.g. 12-15')}
-            onChange={setToothRange}
-          />
-          <SpecialtyTextInput
-            label={t('Quadrant')}
-            value={dentalQuadrant}
-            placeholder={t('UR, UL, LR, LL')}
-            onChange={setDentalQuadrant}
-          />
-          <SpecialtyTextInput
-            label={t('Arch')}
-            value={dentalArch}
-            placeholder={t('Maxillary, mandibular, both')}
-            onChange={setDentalArch}
-          />
-          <SpecialtyTextInput
-            label={t('Dentition')}
-            value={dentition}
-            placeholder={t('Permanent, primary, mixed')}
-            onChange={setDentition}
-          />
-          <SpecialtyTextInput
-            label={t('Status')}
-            value={dentalStatus}
-            placeholder={t('Planned, active, complete')}
-            onChange={setDentalStatus}
-          />
-          <SpecialtyTextInput
-            label={t('Severity')}
-            value={dentalSeverity}
-            placeholder={t('Mild, moderate, severe')}
-            onChange={setDentalSeverity}
-          />
-          <SpecialtyTextInput
-            label={t('Procedure code')}
-            value={procedureCode}
-            placeholder={t('CDT, ADA, clinic code')}
-            onChange={setProcedureCode}
-          />
+          {dentalShows.severity && (
+            <SpecialtyTextInput
+              label={t('Severity')}
+              value={dentalSeverity}
+              placeholder={t('Mild, moderate, severe')}
+              onChange={setDentalSeverity}
+            />
+          )}
+          {dentalShows.code && (
+            <SpecialtyTextInput
+              label={t('Procedure code')}
+              value={procedureCode}
+              placeholder={t('CDT, ADA, clinic code')}
+              onChange={setProcedureCode}
+            />
+          )}
           <SpecialtyTextInput
             label={t('Provider')}
             value={dentalProvider}
@@ -274,49 +298,97 @@ export function ManualSpecialtySection({
             placeholder={t('Clinic, room, chair')}
             onChange={setDentalLocation}
           />
-          <SpecialtyTextInput
-            label={t('Follow-up')}
-            value={dentalFollowUp}
-            placeholder={t('e.g. restoration review in 2 weeks')}
-            onChange={setDentalFollowUp}
-          />
-          <div className="sm:col-span-2">
-            <p className="block text-sm font-semibold text-gray-900">
-              {t('Surfaces')}
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {toothSurfaces.map((surface) => (
-                <button
-                  key={surface}
-                  type="button"
-                  onClick={() => toggleDentalSurface(surface)}
-                  className={`h-9 min-w-9 rounded-md border px-3 text-sm font-semibold ${
-                    dentalSurfaces.includes(surface)
-                      ? 'border-primary-600 bg-primary-50 text-primary-800'
-                      : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
-                  }`}
+          {dentalEntryKind === 'cleaning' ? (
+            <>
+              <div>
+                <label
+                  htmlFor="manual-record-recall-due"
+                  className="block text-sm font-semibold text-gray-900"
                 >
-                  {surface}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="sm:col-span-3">
-            <label
-              htmlFor="manual-record-dental-recall"
-              className="block text-sm font-semibold text-gray-900"
-            >
-              {t('Recall or follow-up')}
-            </label>
-            <input
-              id="manual-record-dental-recall"
-              type="text"
-              value={dentalRecall}
-              placeholder={t('e.g. 6-month cleaning recall')}
-              onChange={(event) => setDentalRecall(event.target.value)}
-              className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                  {t('Next cleaning due')}
+                </label>
+                <input
+                  id="manual-record-recall-due"
+                  type="date"
+                  value={recallDueDate}
+                  onChange={(event) => setRecallDueDate(event.target.value)}
+                  className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                />
+              </div>
+              <SpecialtyTextInput
+                label={t('Recall interval')}
+                value={dentalRecall}
+                placeholder={t('e.g. 6-month cleaning recall')}
+                onChange={setDentalRecall}
+              />
+            </>
+          ) : (
+            <SpecialtyTextInput
+              label={t('Follow-up')}
+              value={dentalFollowUp}
+              placeholder={t('e.g. restoration review in 2 weeks')}
+              onChange={setDentalFollowUp}
             />
-          </div>
+          )}
+          {dentalShows.surfaces && (
+            <div className="sm:col-span-2">
+              <p className="block text-sm font-semibold text-gray-900">
+                {t('Surfaces')}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {toothSurfaces.map((surface) => (
+                  <button
+                    key={surface}
+                    type="button"
+                    aria-pressed={dentalSurfaces.includes(surface)}
+                    onClick={() => toggleDentalSurface(surface)}
+                    className={`min-h-[44px] min-w-[44px] rounded-md border px-3 text-sm font-semibold ${
+                      dentalSurfaces.includes(surface)
+                        ? 'border-primary-600 bg-primary-50 text-primary-800'
+                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {surface}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {dentalShows.teeth && (
+            <details className="sm:col-span-3">
+              <summary className="min-h-[44px] cursor-pointer py-2 text-sm font-semibold text-primary-700">
+                {t('More tooth details')}
+              </summary>
+              <div className="mt-2 grid gap-4 sm:grid-cols-3">
+                <SpecialtyTextInput
+                  label={t('Tooth range')}
+                  value={toothRange}
+                  placeholder={
+                    toothNumbering === 'fdi' ? 'e.g. 34-36' : 'e.g. 12-15'
+                  }
+                  onChange={setToothRange}
+                />
+                <SpecialtyTextInput
+                  label={t('Quadrant')}
+                  value={dentalQuadrant}
+                  placeholder={t('UR, UL, LR, LL')}
+                  onChange={setDentalQuadrant}
+                />
+                <SpecialtyTextInput
+                  label={t('Arch')}
+                  value={dentalArch}
+                  placeholder={t('Maxillary, mandibular, both')}
+                  onChange={setDentalArch}
+                />
+                <SpecialtyTextInput
+                  label={t('Dentition')}
+                  value={dentition}
+                  placeholder={t('Permanent, primary, mixed')}
+                  onChange={setDentition}
+                />
+              </div>
+            </details>
+          )}
           {isOrthodonticDentalEntry && (
             <>
               <SpecialtyTextInput
@@ -525,4 +597,57 @@ export function ManualSpecialtySection({
       )}
     </div>
   ) : null;
+}
+
+const TOOTH_KINDS = new Set<DentalEntryKind>([
+  'finding',
+  'condition',
+  'procedure',
+  'treatmentPlan',
+  'imaging',
+  'oralSurgeryConsult',
+  'oralSurgeryProcedure',
+  'extraction',
+  'implantSurgery',
+  'postOpSurgery',
+  'orthodonticAppliance',
+]);
+
+/** Which dental fields a record of this kind has. */
+export function dentalFieldsFor(kind: DentalEntryKind) {
+  return {
+    teeth: TOOTH_KINDS.has(kind),
+    severity: kind === 'finding' || kind === 'condition',
+    surfaces: ['finding', 'condition', 'procedure', 'treatmentPlan'].includes(
+      kind,
+    ),
+    code: ![
+      'finding',
+      'condition',
+      'imaging',
+      'cephalometricAnalysis',
+    ].includes(kind),
+  };
+}
+
+/**
+ * Status as a fixed choice, so it can be read back as a status. Typed free
+ * text ("resolved") used to be saved and then ignored. The words are the
+ * ones the dental pages read: active/resolved for findings, proposed through
+ * done for plans, done/planned/cancelled for work. A value saved before this
+ * list existed stays selectable.
+ */
+export function dentalStatusOptions(
+  kind: DentalEntryKind,
+  current = '',
+): string[] {
+  const options =
+    kind === 'finding' || kind === 'condition'
+      ? ['', 'Active', 'Resolved']
+      : kind === 'treatmentPlan' || kind === 'orthodonticTreatmentPlan'
+        ? ['', 'Proposed', 'Accepted', 'Scheduled', 'Done', 'Declined']
+        : ['', 'Done', 'Planned', 'Cancelled'];
+  return current && !options.includes(current)
+    ? [...options, current]
+    : options;
 }
