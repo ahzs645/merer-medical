@@ -1,132 +1,152 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js';
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
+export type ScanFormat = 'stl' | 'ply';
+
+/** base64 (with or without a data: prefix) → bytes. */
+export function base64ToArrayBuffer(data: string): ArrayBuffer {
+  const binary = atob(data.replace(/^data:[^,]*,/, '').replace(/\s/g, ''));
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
 /**
- * The WebGL half of the dental scan preview, alone in its own module so that
- * three.js is fetched only once there is a scan to draw.
+ * The person's own intraoral scan, drawn with three.js's STL/PLY loaders.
+ * Drag to turn it, pinch or scroll to zoom.
  *
- * `DentalScanPreview` imported three.js at the top level, which put the whole
- * renderer in the Imaging tab's chunk: opening "Imaging & scans" downloaded
- * ~500 KB of 3D engine whether or not any scan file existed, and before the
- * split it sat in the app's single entry chunk, where every phone paid for it
- * on first load.
+ * This used to draw "demo geometry" — fourteen capsules on an arch — beside
+ * the patient's real STL files, with a caption most people would not read.
+ * A picture of somebody's teeth next to yours is the wrong default for a
+ * medical record, so it is gone: either the file's own bytes are drawn, or
+ * nothing is.
  *
- * Everything around the canvas — the heading, the add link, the detected-files
- * list, and the no-WebGL placeholder — stays in the parent, so a browser
- * without WebGL never loads this at all.
+ * Alone in its own module so three.js is fetched only when there is a scan
+ * with stored bytes to draw.
  */
 export function DentalScanCanvas({
+  data,
+  format,
   onUnavailable,
 }: {
+  /** The file's bytes, base64. */
+  data: string;
+  format: ScanFormat;
   /** Called when this browser can't give us a WebGL context after all. */
   onUnavailable: () => void;
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
-  const [failed, setFailed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { t } = useInterfaceLanguage();
 
   useEffect(() => {
     const mount = mountRef.current;
-    if (!mount || failed) return;
+    if (!mount) return;
 
-    const width = mount.clientWidth || 320;
-    const height = 220;
+    let geometry: THREE.BufferGeometry;
+    try {
+      const buffer = base64ToArrayBuffer(data);
+      geometry =
+        format === 'ply'
+          ? new PLYLoader().parse(buffer)
+          : new STLLoader().parse(buffer);
+    } catch {
+      setError(t('This scan file could not be read.'));
+      return;
+    }
+    if (!geometry.getAttribute('position')?.count) {
+      setError(t('This scan file has no surface to draw.'));
+      return;
+    }
 
     let renderer: THREE.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true });
     } catch {
-      setFailed(true);
       onUnavailable();
       return;
     }
 
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf8fafc);
-
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-    camera.position.set(0, 1.8, 6);
-    camera.lookAt(0, 0, 0);
-
+    const width = mount.clientWidth || 320;
+    const height = mount.clientHeight || 320;
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     mount.appendChild(renderer.domElement);
 
-    const light = new THREE.HemisphereLight(0xffffff, 0x94a3b8, 2.1);
-    scene.add(light);
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf8fafc);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x94a3b8, 2.2));
+    const key = new THREE.DirectionalLight(0xffffff, 1.2);
+    key.position.set(1, 2, 3);
+    scene.add(key);
+
+    geometry.computeVertexNormals();
+    geometry.center();
+    geometry.computeBoundingSphere();
+    const radius = geometry.boundingSphere?.radius || 1;
 
     const material = new THREE.MeshStandardMaterial({
-      color: 0xe2e8f0,
-      roughness: 0.55,
-      metalness: 0.04,
-    });
-    const highlightMaterial = new THREE.MeshStandardMaterial({
-      color: 0x38bdf8,
-      roughness: 0.5,
+      color: 0xf1f5f9,
+      roughness: 0.6,
       metalness: 0.02,
+      // PLY scans carry the scanner's colour per vertex.
+      vertexColors: !!geometry.getAttribute('color'),
     });
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
 
-    const group = new THREE.Group();
-    const toothGeometry = new THREE.CapsuleGeometry(0.17, 0.38, 4, 10);
-
-    for (let i = 0; i < 14; i++) {
-      const angle = Math.PI * (0.18 + (i / 13) * 0.64);
-      const x = Math.cos(angle) * 2.1;
-      const z = Math.sin(angle) * 0.7;
-      const tooth = new THREE.Mesh(
-        toothGeometry,
-        i === 4 || i === 9 ? highlightMaterial : material,
-      );
-      tooth.position.set(x, 0, z);
-      tooth.rotation.z = -x * 0.12;
-      tooth.rotation.x = 0.2;
-      group.add(tooth);
-    }
-
-    const archGeometry = new THREE.TorusGeometry(1.45, 0.04, 8, 80, Math.PI);
-    const arch = new THREE.Mesh(
-      archGeometry,
-      new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.7 }),
+    const camera = new THREE.PerspectiveCamera(
+      40,
+      width / height,
+      radius / 100,
+      radius * 20,
     );
-    arch.position.set(0, -0.18, 0.12);
-    arch.rotation.z = Math.PI;
-    group.add(arch);
+    camera.position.set(0, radius * 0.6, radius * 2.6);
+    camera.lookAt(0, 0, 0);
 
-    scene.add(group);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
 
-    let frame = 0;
-    const animate = () => {
-      group.rotation.y = Math.sin(frame / 90) * 0.18;
-      group.rotation.x = -0.2 + Math.sin(frame / 120) * 0.04;
+    let requestId = 0;
+    const render = () => {
+      controls.update();
       renderer.render(scene, camera);
-      frame += 1;
-      requestId = requestAnimationFrame(animate);
+      requestId = requestAnimationFrame(render);
     };
-
-    let requestId = requestAnimationFrame(animate);
+    render();
 
     return () => {
       cancelAnimationFrame(requestId);
-      renderer.dispose();
-      toothGeometry.dispose();
-      archGeometry.dispose();
+      controls.dispose();
+      geometry.dispose();
       material.dispose();
-      highlightMaterial.dispose();
+      renderer.dispose();
       if (renderer.domElement.parentNode === mount) {
         mount.removeChild(renderer.domElement);
       }
     };
-  }, [failed, onUnavailable]);
+  }, [data, format, onUnavailable, t]);
+
+  if (error) {
+    return (
+      <div className="flex h-full items-center justify-center px-6 text-center text-sm text-slate-700">
+        {error}
+      </div>
+    );
+  }
 
   return (
-    <>
-      <div className="absolute start-3 top-3 z-10 rounded-md bg-white/90 px-2 py-1 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200">
-        {t('Demo geometry')}
-      </div>
-      <div ref={mountRef} className="h-full w-full" />
-    </>
+    <div
+      ref={mountRef}
+      className="h-full w-full touch-none"
+      role="img"
+      aria-label={t('3D view of your scan. Drag to turn it.')}
+    />
   );
 }
 

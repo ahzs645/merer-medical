@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Routes as AppRoutes } from '../../../Routes';
 import { ImagingItem } from '../../imaging/types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 export function DentalImagingPanel({ items }: { items: ImagingItem[] }) {
   const { t } = useInterfaceLanguage();
@@ -35,9 +36,9 @@ export function DentalImagingPanel({ items }: { items: ImagingItem[] }) {
                 {item.title}
               </p>
               <p className="mt-1 text-xs text-gray-600">
-                {[item.modality, item.bodySite, item.attachmentType]
+                {[item.modality, item.bodySite, formatRecordDate(item.date, '')]
                   .filter(Boolean)
-                  .join(' · ') || item.type}
+                  .join(' · ')}
               </p>
             </div>
           ))}

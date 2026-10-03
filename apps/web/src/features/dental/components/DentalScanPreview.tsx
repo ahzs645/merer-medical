@@ -5,18 +5,23 @@ import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguagePr
 import { ImagingItem } from '../../imaging/types';
 
 const DentalScanCanvas = lazy(() => import('./DentalScanCanvas'));
+type ScanFormat = 'stl' | 'ply';
 
 type ScanSource = {
   id: string;
   title: string;
   contentType?: string;
   source?: string;
+  /** The file's bytes, base64, when the record stores them. */
+  data?: string;
+  format?: ScanFormat;
 };
 
 type ScanAttachment = {
   title?: string;
   contentType?: string;
   url?: string;
+  data?: string;
 };
 
 type ScanResource = {
@@ -30,7 +35,10 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
   );
   const { t } = useInterfaceLanguage();
   const scanSources = getDentalScanSources(imaging);
-  const hasScanSources = scanSources.length > 0;
+  const viewable = scanSources.filter((source) => source.data && source.format);
+  const [selectedId, setSelectedId] = useState<string | undefined>();
+  const selected =
+    viewable.find((source) => source.id === selectedId) ?? viewable[0];
   const markUnavailable = useCallback(() => setWebGlUnavailable(true), []);
 
   return (
@@ -38,95 +46,88 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-base font-semibold text-gray-900">
-            {hasScanSources
-              ? t('Detected dental scan sources')
-              : t('Dental scans')}
+            {t('3D scans')}
           </h2>
           <p className="text-sm text-gray-600">
-            {hasScanSources
+            {scanSources.length === 0
               ? t(
-                  'Uploaded STL, PLY, or OBJ files are listed below. The preview is demo geometry until patient scan rendering is implemented.',
+                  'No 3D scan file yet. Intraoral scans are usually STL or PLY files; your dental office can export them.',
                 )
-              : t(
-                  'No dental scan source file is attached yet. Add a dental image/scan to store the source file with the record.',
-                )}
+              : viewable.length === 0
+                ? t(
+                    'These scan files are listed by name only: the record does not hold the file itself, so there is nothing to draw.',
+                  )
+                : t('Drag to turn the scan; pinch or scroll to zoom.')}
           </p>
         </div>
         <Link
           to={`${AppRoutes.AddRecord}?specialty=dental&dental=imaging`}
-          className="inline-flex w-fit shrink-0 items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+          className="inline-flex min-h-[44px] w-fit shrink-0 items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
         >
           {t('Add dental image/scan')}
         </Link>
       </div>
-      {hasScanSources ? (
-        <div className="relative mt-3 h-[220px] overflow-hidden rounded-md border border-gray-200">
-          {/* three.js arrives with this component, so a browser with no WebGL
-              — and a tab with no scan files — never fetches it. */}
-          {!webGlUnavailable && (
-            <Suspense fallback={null}>
-              <DentalScanCanvas onUnavailable={markUnavailable} />
+      {selected && (
+        <div className="relative mt-3 h-[320px] overflow-hidden rounded-md border border-gray-200 bg-slate-50">
+          {webGlUnavailable ? (
+            <div className="flex h-full items-center justify-center px-6 text-center text-sm text-slate-700">
+              {t(
+                'This browser cannot draw 3D (WebGL is off or unavailable). The file is still saved with the record.',
+              )}
+            </div>
+          ) : (
+            <Suspense
+              fallback={
+                <div
+                  role="status"
+                  className="flex h-full items-center justify-center text-sm text-slate-600"
+                >
+                  {t('Loading the scan…')}
+                </div>
+              }
+            >
+              <DentalScanCanvas
+                key={selected.id}
+                data={selected.data as string}
+                format={selected.format as ScanFormat}
+                onUnavailable={markUnavailable}
+              />
             </Suspense>
           )}
-          {webGlUnavailable && (
-            <div className="flex h-full items-center justify-center bg-slate-50 px-6">
-              <div className="w-full max-w-sm">
-                <div className="relative mx-auto h-28 w-64 max-w-full rounded-b-full border-b-4 border-slate-300">
-                  {Array.from({ length: 10 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="absolute top-7 h-11 w-5 rounded-full bg-slate-200 ring-1 ring-slate-300"
-                      style={{
-                        left: `${12 + index * 8}%`,
-                        transform: `translateX(-50%) rotate(${(index - 4.5) * 3}deg)`,
-                      }}
-                    />
-                  ))}
-                  <div className="absolute left-[36%] top-7 h-11 w-5 rounded-full bg-sky-300 ring-1 ring-sky-400" />
-                  <div className="absolute left-[64%] top-7 h-11 w-5 rounded-full bg-sky-300 ring-1 ring-sky-400" />
-                </div>
-                <p className="mt-4 text-center text-sm font-medium text-slate-700">
-                  {t('3D preview unavailable')}
-                </p>
-                <p className="mt-1 text-center text-xs text-slate-500">
-                  {t(
-                    'Showing a static placeholder because WebGL is not available in this browser.',
-                  )}
-                </p>
-              </div>
-            </div>
-          )}
         </div>
-      ) : null}
-      {scanSources.length > 0 ? (
-        <div className="mt-3 rounded-md bg-slate-50 p-3">
-          <p className="text-sm font-semibold text-slate-900">
-            {t('Detected scan source files')}
-          </p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
-            {scanSources.slice(0, 4).map((source) => (
-              <div
-                key={source.id}
-                className="min-w-0 rounded-md bg-white p-2 ring-1 ring-slate-200"
-              >
-                <p className="truncate text-sm font-medium text-slate-900">
-                  {source.title}
-                </p>
-                <p className="mt-1 truncate text-xs text-slate-600">
-                  {[source.contentType, source.source]
-                    .filter(Boolean)
-                    .join(' · ') || t('Scan file')}
-                </p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-2 text-xs text-slate-600">
-            {t(
-              'These files are source attachments. The preview above remains demo geometry until patient scan rendering is implemented.',
-            )}
-          </p>
-        </div>
-      ) : null}
+      )}
+      {scanSources.length > 0 && (
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+          {scanSources.map((source) => {
+            const canView = !!(source.data && source.format);
+            const isSelected = canView && selected?.id === source.id;
+            return (
+              <li key={source.id} className="min-w-0">
+                <button
+                  type="button"
+                  disabled={!canView}
+                  aria-pressed={canView ? isSelected : undefined}
+                  onClick={() => setSelectedId(source.id)}
+                  className={`flex min-h-[44px] w-full flex-col items-start rounded-md p-2 text-start ring-1 ${
+                    isSelected
+                      ? 'bg-primary-50 ring-primary-300'
+                      : 'bg-white ring-slate-200'
+                  } ${canView ? 'hover:bg-slate-50' : 'cursor-default'}`}
+                >
+                  <span className="w-full truncate text-sm font-medium text-slate-900">
+                    {source.title}
+                  </span>
+                  <span className="mt-0.5 text-xs text-slate-600">
+                    {canView
+                      ? `${(source.format as string).toUpperCase()} · ${t('View in 3D')}`
+                      : t('Listed by name; file not stored here')}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }
@@ -143,8 +144,43 @@ function isWebGlAvailable() {
   }
 }
 
+function scanFormat(...values: (string | undefined)[]): ScanFormat | undefined {
+  const text = values.filter(Boolean).join(' ');
+  if (/\.ply(?:$|[?#\s])|model\/ply/i.test(text)) return 'ply';
+  if (
+    /\.stl(?:$|[?#\s])|model\/stl|application\/(sla|vnd\.ms-pki\.stl)/i.test(
+      text,
+    )
+  )
+    return 'stl';
+  return undefined;
+}
+
 function getDentalScanSources(imaging: ImagingItem[]): ScanSource[] {
   return imaging.flatMap((item) => {
+    const raw = item.document.data_record.raw;
+    const filename = item.document.metadata?.original_filename;
+    // A file added through the form is stored whole: the record's raw data
+    // is the file, base64.
+    if (typeof raw === 'string') {
+      const format = scanFormat(
+        filename,
+        item.document.data_record.content_type,
+        item.title,
+      );
+      if (!format) return [];
+      return [
+        {
+          id: item.id,
+          title: item.title,
+          contentType: item.document.data_record.content_type,
+          source: filename,
+          data: raw,
+          format,
+        },
+      ];
+    }
+
     const resource = getResource(item);
     const attachments = [
       ...(Array.isArray(resource?.content)
@@ -159,9 +195,7 @@ function getDentalScanSources(imaging: ImagingItem[]): ScanSource[] {
           id: item.id,
           title: item.title,
           contentType: item.attachmentType,
-          source:
-            item.document.metadata?.original_filename ||
-            item.document.metadata?.id,
+          source: filename || item.document.metadata?.id,
         },
       ];
     }
@@ -172,10 +206,13 @@ function getDentalScanSources(imaging: ImagingItem[]): ScanSource[] {
         id: `${item.id}:${index}`,
         title: attachment.title || item.title,
         contentType: attachment.contentType || item.attachmentType,
-        source:
-          attachment.url ||
-          item.document.metadata?.original_filename ||
-          item.document.metadata?.id,
+        source: attachment.url || filename || item.document.metadata?.id,
+        data: attachment.data,
+        format: scanFormat(
+          attachment.title,
+          attachment.url,
+          attachment.contentType,
+        ),
       }));
   });
 }
@@ -214,6 +251,7 @@ function isScanFileName(value?: string) {
 }
 
 function getResource(item: ImagingItem): ScanResource {
+  if (typeof item.document.data_record.raw === 'string') return {};
   const raw = item.document.data_record.raw as
     | (ScanResource & { resource?: ScanResource })
     | undefined;

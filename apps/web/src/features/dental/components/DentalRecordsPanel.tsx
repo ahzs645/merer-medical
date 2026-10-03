@@ -1,11 +1,29 @@
+import { useState } from 'react';
+
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
-import { DentalRecord } from '../types';
+import { DentalRecord, DentalRecordKind } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { useToothNumbering } from '../hooks/useToothNumbering';
 import { formatTeeth } from '../utils/dentalReferenceData';
+import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
 const MAX_VISIBLE_RECORDS = 12;
+
+/** What each kind is called on screen; the type names are the model's. */
+export const KIND_LABELS: Record<DentalRecordKind, string> = {
+  condition: 'Condition',
+  finding: 'Finding',
+  cleaning: 'Cleaning',
+  orthodontic: 'Orthodontics',
+  procedure: 'Procedure',
+  treatmentPlan: 'Treatment plan',
+  perio: 'Gum (perio) record',
+  surgery: 'Surgery',
+  note: 'Note',
+  referral: 'Referral',
+  image: 'Image or scan',
+};
 
 export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
   const { t } = useInterfaceLanguage();
@@ -17,12 +35,15 @@ export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
   const projectedRecords = records.filter(
     (record) => record.kind !== 'cleaning',
   );
-  const visibleRecords = projectedRecords.slice(0, MAX_VISIBLE_RECORDS);
+  const [showAll, setShowAll] = useState(false);
+  const visibleRecords = showAll
+    ? projectedRecords
+    : projectedRecords.slice(0, MAX_VISIBLE_RECORDS);
 
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <h2 className="text-base font-semibold text-gray-900">
-        {t('Dental records projection')}
+        {t('All dental records')}
       </h2>
       {visibleRecords.length > 0 ? (
         <>
@@ -47,8 +68,11 @@ export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
                     <h3 className="text-sm font-semibold text-gray-900">
                       {record.title}
                     </h3>
-                    <span className="text-xs font-medium uppercase text-gray-500">
-                      {record.kind}
+                    <span className="shrink-0 text-xs font-medium text-gray-600">
+                      {t(KIND_LABELS[record.kind])}
+                      {record.date
+                        ? ` · ${formatRecordDate(record.date, '')}`
+                        : ''}
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-gray-600">
@@ -76,12 +100,21 @@ export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
               );
             })}
           </div>
-          {projectedRecords.length > visibleRecords.length && (
-            <p className="mt-2 text-xs text-gray-500">
-              {t('Showing {visible} of {total} records')
-                .replace('{visible}', `${visibleRecords.length}`)
-                .replace('{total}', `${projectedRecords.length}`)}
-            </p>
+          {projectedRecords.length > MAX_VISIBLE_RECORDS && (
+            // It used to say "Showing 12 of 18 records" with no way to see
+            // the other six.
+            <button
+              type="button"
+              onClick={() => setShowAll((value) => !value)}
+              className="mt-2 inline-flex min-h-[44px] items-center text-sm font-medium text-primary-700 hover:text-primary-900"
+            >
+              {showAll
+                ? t('Show fewer')
+                : t('Show all {total} records').replace(
+                    '{total}',
+                    `${projectedRecords.length}`,
+                  )}
+            </button>
           )}
         </>
       ) : (

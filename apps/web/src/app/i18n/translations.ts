@@ -1527,6 +1527,31 @@ export const arabicTranslations: Record<string, string> = {
   'Drawn as your dentist sees you: your right side is on the left.':
     'مرسوم كما يراك طبيب أسنانك: جانبك الأيمن على اليسار.',
   Numbering: 'الترقيم',
+  '3D scans': 'المسوح ثلاثية الأبعاد',
+  '3D view of your scan. Drag to turn it.':
+    'عرض ثلاثي الأبعاد لمسحك. اسحب لتدويره.',
+  'Drag to turn the scan; pinch or scroll to zoom.':
+    'اسحب لتدوير المسح، وقرّب بإصبعين أو بعجلة الفأرة.',
+  'Listed by name; file not stored here':
+    'مدرج بالاسم فقط؛ الملف غير محفوظ هنا',
+  'Loading the scan…': 'جارٍ تحميل المسح…',
+  'No 3D scan file yet. Intraoral scans are usually STL or PLY files; your dental office can export them.':
+    'لا يوجد ملف مسح ثلاثي الأبعاد بعد. مسوح الفم عادةً ملفات STL أو PLY، ويمكن لعيادة الأسنان تصديرها.',
+  'These scan files are listed by name only: the record does not hold the file itself, so there is nothing to draw.':
+    'ملفات المسح هذه مدرجة بالاسم فقط: السجل لا يحتوي على الملف نفسه، فلا يوجد ما يُعرض.',
+  'This browser cannot draw 3D (WebGL is off or unavailable). The file is still saved with the record.':
+    'لا يستطيع هذا المتصفح عرض الرسوم ثلاثية الأبعاد (WebGL متوقف أو غير متاح). الملف لا يزال محفوظًا مع السجل.',
+  'This scan file could not be read.': 'تعذرت قراءة ملف المسح هذا.',
+  'This scan file has no surface to draw.':
+    'لا يحتوي ملف المسح هذا على سطح يمكن عرضه.',
+  'View in 3D': 'عرض ثلاثي الأبعاد',
+  'All dental records': 'كل سجلات الأسنان',
+  'Show all {total} records': 'عرض كل السجلات ({total})',
+  'Show fewer': 'عرض أقل',
+  Finding: 'نتيجة فحص',
+  'Gum (perio) record': 'سجل اللثة',
+  Note: 'ملاحظة',
+  'Image or scan': 'صورة أو مسح',
   'FDI numbers, as most dentists outside the US write them. Switch on the tooth chart.':
     'أرقام FDI، كما يكتبها معظم أطباء الأسنان خارج الولايات المتحدة. يمكنك التبديل من مخطط الأسنان.',
   'Universal (US) numbers, 1–32. Switch to FDI on the tooth chart.':

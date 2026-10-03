@@ -184,6 +184,8 @@ export function buildPerioOverview(records: DentalRecord[]): PerioOverview {
   };
 }
 
+export const UNGROUPED_MOUNT = 'Ungrouped dental imaging';
+
 export function buildImagingMounts(
   records: DentalRecord[],
 ): DentalImagingMount[] {
@@ -195,7 +197,7 @@ export function buildImagingMounts(
       record.details?.imagingMount ||
       record.details?.dicomStudyUid ||
       record.details?.imagingModality ||
-      'Ungrouped dental imaging';
+      UNGROUPED_MOUNT;
     grouped.set(key, [...(grouped.get(key) || []), record]);
   }
 
