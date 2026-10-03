@@ -121,6 +121,7 @@ because a day/month swap puts about half of all dates in the future.
 | Stated allergies                                                        | `allergies`          |
 | Family history table                                                    | `familyHistory`      |
 | Alcohol, smoking, exercise, diet, occupation, sleep, living situation   | `socialHistory`      |
+| Anything dental — findings, fillings, estimates, perio charts, recalls  | `dentalRecords`      |
 
 Group lab results into the panels the document itself names. If it prints one
 flat table but its commentary talks about "the liver panel" and "the kidney
@@ -155,6 +156,15 @@ imaging vocabulary, so an ECG lands on Results and correctly not on Imaging. If
 a report really is a scan but reads too tersely for that test, set
 `imaging: true`. (`imagingReports` still works as an alias for the section's old
 name.)
+
+**Dental: say which numbering the teeth are in.** "Caries on 26" is the
+upper-left first molar in FDI and a lower-right incisor in Universal. Every
+`dentalRecords` row that names teeth needs `numberingSystem`; read it off the
+letterhead (US practices write Universal 1–32, almost everyone else FDI 11–48),
+write the teeth exactly as printed, and record the reasoning in
+`audit.interpretations`. Never convert tooth numbers yourself — the builder
+does. Statuses are fixed words per kind (a planned filling is `planned`, not
+`done`); see the format doc's dental section.
 
 ## Before you hand it over
 

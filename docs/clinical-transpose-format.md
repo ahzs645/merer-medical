@@ -291,6 +291,61 @@ fallback and mostly behaves; coding it is what makes it reliable.
 One row per topic: alcohol, smoking, exercise, diet, occupation, sleep, living
 situation, and so on.
 
+### `dentalRecords` → `Observation`, `Condition`, `Procedure`, `CarePlan` or `ServiceRequest`
+
+**`id`**, **`kind`**, **`name`**, plus `date`, `numberingSystem`, `teeth`,
+`surfaces`, `status`, `code`, `provider`, `location`, `note`, and by kind
+`recallDueDate`, `intervalMonths`, `fee`, `insuranceEstimate`,
+`patientPortion`, `priority`, `perio`.
+
+| `kind`          | Becomes                             | `status` words                                          |
+| --------------- | ----------------------------------- | ------------------------------------------------------- |
+| `finding`       | `Observation`, category `exam`      | `active`, `resolved`                                    |
+| `condition`     | `Condition`                         | `active`, `resolved`                                    |
+| `procedure`     | `Procedure`                         | `done`, `planned`, `cancelled`                          |
+| `treatmentPlan` | `CarePlan`                          | `proposed`, `accepted`, `scheduled`, `done`, `declined` |
+| `cleaning`      | `Procedure`                         | `done`                                                  |
+| `recall`        | `CarePlan` (needs `recallDueDate`)  | `due`, `scheduled`, `cancelled`                         |
+| `perioExam`     | `Observation` (needs `perio.sites`) | `done`                                                  |
+| `referral`      | `ServiceRequest`                    | `open`, `done`, `cancelled`                             |
+
+**Teeth carry their numbering.** `teeth` are written exactly as the document
+prints them (`["36"]`, `["A"]`), and any row with teeth must say
+`numberingSystem: "fdi"` or `"universal"`. The same number is a different tooth
+in each: FDI 26 is the upper-left first molar, Universal 26 a lower-right
+incisor. Canada, the UK, Europe and Australia write FDI; US practices write
+Universal. Decide from the letterhead, say why in `audit.interpretations`, and
+let `validate` reject a tooth that does not exist in the system you chose. The
+builder writes every tooth as an FDI-coded `bodySite`
+(`http://terminology.hl7.org/CodeSystem/ex-tooth`), which the app reads before
+any prose.
+
+`surfaces` are single letters (`M`, `O`, `D`, `B`, `L`, `I`, `F`). `code` is a
+coding as printed — CDT in the US, the CDA's USC&LS codes in Canada.
+
+A perio chart is one `perioExam` row:
+
+```json
+{
+  "id": "perio-2026-09-15",
+  "kind": "perioExam",
+  "name": "Periodontal charting",
+  "date": "2026-09-15",
+  "numberingSystem": "fdi",
+  "perio": {
+    "sites": [{ "tooth": "16", "MB": 3, "B": 2, "DB": 5, "ML": 3, "L": 2, "DL": 3 }],
+    "bleeding": [{ "tooth": "16", "sites": ["DB"] }]
+  }
+}
+```
+
+Depths are millimetres as printed. Only teeth with a 4 mm+ site or a bleeding
+site are named on the exam, so a full-mouth chart doesn't mark every tooth.
+
+A recall card or "next visit due" line is a `recall` row with `recallDueDate`;
+a future due date is expected there and does not trip the day/month warning.
+`tools/fixtures/example-dental-transpose.json` has one of each.
+
 ## Source documents and attachments
 
 Any section can carry `sourceImage`. The first record to name a given file

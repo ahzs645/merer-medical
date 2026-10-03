@@ -14,6 +14,7 @@
  */
 
 import { CONVENTIONS } from './source-dates.mjs';
+import { DENTAL_KINDS, validateDentalRow } from './dental-transpose.mjs';
 
 /** Sections the builder reads. Anything else in the file is ignored. */
 export const SECTIONS = [
@@ -29,6 +30,7 @@ export const SECTIONS = [
   'allergies',
   'familyHistory',
   'socialHistory',
+  'dentalRecords',
 ];
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -123,6 +125,19 @@ const SECTION_RULES = {
     required: ['id', 'topic'],
     dates: ['recordedDate'],
   },
+  // Rules beyond these — teeth need a numberingSystem, status words per kind,
+  // perio sites in mm — are in dental-transpose.mjs.
+  dentalRecords: {
+    required: ['id', 'kind', 'name'],
+    dates: ['date', 'recallDueDate'],
+    // A recall is due in the future by definition; it is not a swapped date.
+    futureDates: ['recallDueDate'],
+    enums: {
+      kind: DENTAL_KINDS,
+      numberingSystem: ['fdi', 'universal'],
+    },
+    validate: validateDentalRow,
+  },
 };
 
 /**
@@ -204,6 +219,7 @@ export function validateRecords(records) {
       const at = `${section}[${index}]`;
       total += 1;
       checkRow(row, rules, at, errors, seenIds, section, horizon, futureDates);
+      if (rules.validate) errors.push(...rules.validate(row, at));
 
       if (rules.children) {
         const kids = row[rules.children.key];
@@ -307,7 +323,11 @@ function checkRow(
       errors.push(
         `${at}.${field}: expected YYYY-MM-DD, got ${JSON.stringify(value)}`,
       );
-    } else if (horizon && `${value}` > horizon) {
+    } else if (
+      horizon &&
+      `${value}` > horizon &&
+      !(rules.futureDates || []).includes(field)
+    ) {
       futureDates.push(`${at}.${field} = ${value}`);
     }
   }

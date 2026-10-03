@@ -1,5 +1,12 @@
 #!/usr/bin/env node
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from 'node:fs';
+import { buildDentalRow } from './lib/dental-transpose.mjs';
 import { basename, dirname, extname, join, resolve } from 'node:path';
 import { strToU8, zipSync } from 'fflate';
 
@@ -175,7 +182,7 @@ const ADHERENCE_CODES = {
   'taking-as-directed': 'Taking as directed',
   'not-taking': 'Patient reported not taking',
   'not-yet-started': 'Not yet started',
-  'stopped': 'Stopped',
+  stopped: 'Stopped',
 };
 const args = parseArgs(process.argv.slice(2));
 
@@ -275,7 +282,9 @@ for (const panel of records.labPanels || []) {
             // observations under it did not, so every lab read "Reported by:
             // Unknown source" two inches above a note saying "Provider:
             // Cleveland Clinic London".
-            performer: panel.provider ? [{ display: panel.provider }] : undefined,
+            performer: panel.provider
+              ? [{ display: panel.provider }]
+              : undefined,
             ...observationValue(result.value, result.unit),
             referenceRange: buildReferenceRange(result),
             extension: buildLabExtensions(result, nutritionRelevance),
@@ -419,7 +428,9 @@ for (const panel of records.labPanels || []) {
           issued: atNoon(panel.collectedAt),
           performer: [{ display: panel.provider }],
           result: resultRefs,
-          presentedForm: sourceDocument ? [sourceDocument.attachment] : undefined,
+          presentedForm: sourceDocument
+            ? [sourceDocument.attachment]
+            : undefined,
           text: {
             status: 'generated',
             div: [
@@ -552,7 +563,9 @@ for (const report of [
           issued: atNoon(report.studyDate),
           performer: [{ display: report.provider }],
           result: imagingFindingRefs,
-          presentedForm: sourceDocument ? [sourceDocument.attachment] : undefined,
+          presentedForm: sourceDocument
+            ? [sourceDocument.attachment]
+            : undefined,
           conclusion: report.findings?.join('\n'),
           extension: [
             {
@@ -743,14 +756,16 @@ for (const encounter of records.clinicalEncounters || []) {
             ]),
           },
           note: buildNotes(
-            (encounter.sections || []).flatMap((section) => [
-              section.title,
-              ...(section.items || []).map((item) => `- ${item}`),
-            ]).concat(
-              sourceDocument
-                ? [`Source document: ${sourceDocument.documentReferenceId}`]
-                : [],
-            ),
+            (encounter.sections || [])
+              .flatMap((section) => [
+                section.title,
+                ...(section.items || []).map((item) => `- ${item}`),
+              ])
+              .concat(
+                sourceDocument
+                  ? [`Source document: ${sourceDocument.documentReferenceId}`]
+                  : [],
+              ),
           ),
         },
       },
@@ -853,7 +868,9 @@ for (const allergy of records.allergies || []) {
             ? [
                 {
                   manifestation: [
-                    { text: allergy.reaction.manifestation || allergy.reaction },
+                    {
+                      text: allergy.reaction.manifestation || allergy.reaction,
+                    },
                   ],
                   severity: allergy.reaction.severity,
                 },
@@ -877,7 +894,8 @@ for (const allergy of records.allergies || []) {
 for (const family of records.familyHistory || []) {
   const familyId = stableId(`family-history-${family.id}`);
   const familyDate = family.recordedDate || family.date;
-  const familyConditions = family.conditions || (family.condition ? [family.condition] : []);
+  const familyConditions =
+    family.conditions || (family.condition ? [family.condition] : []);
   const sourceDocument = getOrCreateSourceDocument({
     sourceImage: family.sourceImage,
     date: familyDate,
@@ -1033,7 +1051,11 @@ for (const panel of records.vitals || []) {
               ? {
                   text: vital.display,
                   coding: [
-                    { system: 'http://loinc.org', code: vital.code, display: vital.display },
+                    {
+                      system: 'http://loinc.org',
+                      code: vital.code,
+                      display: vital.display,
+                    },
                   ],
                 }
               : { text: measure.name },
@@ -1185,7 +1207,9 @@ for (const procedure of records.procedures || []) {
           resourceType: 'Procedure',
           id: procedureId,
           status: procedure.status || 'completed',
-          category: procedure.category ? { text: procedure.category } : undefined,
+          category: procedure.category
+            ? { text: procedure.category }
+            : undefined,
           code: {
             text: procedure.name,
             coding: procedure.code ? [procedure.code] : undefined,
@@ -1193,14 +1217,18 @@ for (const procedure of records.procedures || []) {
           performedDateTime: procedure.performedDate
             ? atNoon(procedure.performedDate)
             : undefined,
-          bodySite: procedure.bodySite ? [{ text: procedure.bodySite }] : undefined,
+          bodySite: procedure.bodySite
+            ? [{ text: procedure.bodySite }]
+            : undefined,
           outcome: procedure.outcome ? { text: procedure.outcome } : undefined,
           performer: procedure.provider
             ? [{ actor: { display: procedure.provider } }]
             : undefined,
           note: buildNotes([
             procedure.provider ? `Provider: ${procedure.provider}` : undefined,
-            procedure.laterality ? `Laterality: ${procedure.laterality}` : undefined,
+            procedure.laterality
+              ? `Laterality: ${procedure.laterality}`
+              : undefined,
             procedure.datePrecision === 'unknown'
               ? 'Date not stated in the source document'
               : undefined,
@@ -1216,6 +1244,66 @@ for (const procedure of records.procedures || []) {
   );
 }
 
+for (const row of records.dentalRecords || []) {
+  const rowId = stableId(`dental-${row.id}`);
+  const { resourceType, resource, details } = buildDentalRow(row);
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: row.sourceImage,
+    date: row.date,
+    title: row.name,
+    provider: row.provider,
+    audit: row.audit,
+  });
+  const date = row.date || records.audit?.documentDate;
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: rowId,
+      resourceType,
+      date,
+      displayName: row.name,
+      raw: {
+        fullUrl: `manual:${rowId}`,
+        manual_kind: `dental-${row.kind}`,
+        source_image: row.sourceImage,
+        audit: row.audit,
+        resource: {
+          ...resource,
+          id: rowId,
+          effectiveDateTime:
+            resource.resourceType === 'Observation' && date
+              ? atNoon(date)
+              : undefined,
+          performedDateTime:
+            resource.resourceType === 'Procedure' &&
+            resource.status === 'completed' &&
+            row.date
+              ? atNoon(row.date)
+              : undefined,
+          recordedDate:
+            resource.resourceType === 'Condition' && date
+              ? atNoon(date)
+              : undefined,
+          performer: row.provider
+            ? [{ actor: { display: row.provider } }]
+            : undefined,
+          note: buildNotes([
+            row.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+      metadata: {
+        manual_specialty: 'dental',
+        manual_subtype: details.subtype,
+        manual_specialty_details: details,
+        ...sourceMeta(sourceDocument),
+      },
+    }),
+  );
+}
+
 /**
  * `title` is whatever the first record to cite this file happened to be called,
  * which is an accident of section order — a letter whose labs are processed
@@ -1224,7 +1312,8 @@ for (const procedure of records.procedures || []) {
  */
 function sourceDocumentTitle(sourceImage, fallback) {
   const titles = records.audit?.sourceDocumentTitles;
-  const stated = titles && typeof titles === 'object' ? titles[sourceImage] : undefined;
+  const stated =
+    titles && typeof titles === 'object' ? titles[sourceImage] : undefined;
   return stated || fallback;
 }
 
@@ -1240,7 +1329,11 @@ function allergySubstance(allergy) {
     return {
       text: allergy.substance || coding[1],
       coding: [
-        { system: 'http://snomed.info/sct', code: coding[0], display: coding[1] },
+        {
+          system: 'http://snomed.info/sct',
+          code: coding[0],
+          display: coding[1],
+        },
       ],
     };
   }
@@ -1250,7 +1343,13 @@ function allergySubstance(allergy) {
   };
 }
 
-function getOrCreateSourceDocument({ sourceImage, date, title, provider, audit }) {
+function getOrCreateSourceDocument({
+  sourceImage,
+  date,
+  title,
+  provider,
+  audit,
+}) {
   if (!sourceImage) return undefined;
   title = sourceDocumentTitle(sourceImage, title);
 
@@ -1381,7 +1480,10 @@ files['manifest.json'] = strToU8(
       format: FORMAT_NAME,
       version: FORMAT_VERSION,
       createdAt: now,
-      app: { name: 'mere-medical', version: args.appVersion || 'diabetes-record-transpose' },
+      app: {
+        name: 'mere-medical',
+        version: args.appVersion || 'diabetes-record-transpose',
+      },
       schema: { version: 1 },
       tables: Object.keys(tables),
       counts,
@@ -1472,11 +1574,7 @@ function sourceImageToFilename(sourceImage) {
 }
 
 function normalizeAssetName(value) {
-  return `${value}`
-    .normalize('NFKC')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase();
+  return `${value}`.normalize('NFKC').replace(/\s+/g, ' ').trim().toLowerCase();
 }
 
 function contentTypeForPath(path) {
@@ -1793,7 +1891,6 @@ function labObservationCode(name) {
   return { system: 'http://loinc.org', code: hit[0], display: hit[1] };
 }
 
-
 function vitalObservationCode(name) {
   const key = `${name || ''}`.trim().toLowerCase();
   const hit = VITAL_LOINC[key];
@@ -1817,7 +1914,11 @@ function buildVitalComponents(measure) {
         ? {
             text: coded.display,
             coding: [
-              { system: 'http://loinc.org', code: coded.code, display: coded.display },
+              {
+                system: 'http://loinc.org',
+                code: coded.code,
+                display: coded.display,
+              },
             ],
           }
         : { text: component.name },
@@ -2192,7 +2293,6 @@ function inferMedicationCategory(item) {
     display,
   };
 }
-
 
 /**
  * A stated `adherence` wins over the note-sniffing below.

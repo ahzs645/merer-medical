@@ -1,0 +1,84 @@
+{
+  "_comment": "A synthetic dental example: a Canadian recall letter and treatment estimate, teeth in FDI. Invented data, no real patient. Build it with: node tools/transpose.mjs build tools/fixtures/example-dental-transpose.json --output /tmp/dental.emrpkg --profile-id dental-example",
+  "subject": { "dateOfBirth": "1984-09-30", "sex": "female" },
+  "audit": {
+    "sourceDocument": "example-dental-letter.pdf",
+    "sourceDescription": "Synthetic recall letter with a treatment estimate and a perio chart summary",
+    "dateConvention": "DMY",
+    "transposedAt": "2026-10-03",
+    "sourceDocumentTitles": {
+      "example-dental-letter.pdf": "Example Dental Centre — recall letter and estimate"
+    },
+    "interpretations": [
+      "The letterhead is Canadian and the chart uses two-digit tooth numbers from 11 to 48, so teeth are read as FDI.",
+      "'Fee' and 'Est. insurance' columns are copied as printed, including the currency sign."
+    ]
+  },
+  "dentalRecords": [
+    {
+      "id": "exam-2026-09-15",
+      "kind": "cleaning",
+      "name": "Recall exam and scaling",
+      "date": "2026-09-15",
+      "status": "done",
+      "provider": "Example Dental Centre",
+      "intervalMonths": 6,
+      "code": {
+        "system": "urn:oid:2.16.124.10.101.1.60.1",
+        "code": "11111",
+        "display": "Scaling, 1 unit"
+      },
+      "sourceImage": "example-dental-letter.pdf"
+    },
+    {
+      "id": "recall-2027-03",
+      "kind": "recall",
+      "name": "Hygiene recall",
+      "date": "2026-09-15",
+      "recallDueDate": "2027-03-15",
+      "status": "due",
+      "sourceImage": "example-dental-letter.pdf"
+    },
+    {
+      "id": "caries-36",
+      "kind": "finding",
+      "name": "Occlusal caries",
+      "date": "2026-09-15",
+      "numberingSystem": "fdi",
+      "teeth": ["36"],
+      "surfaces": ["O"],
+      "status": "active",
+      "sourceImage": "example-dental-letter.pdf"
+    },
+    {
+      "id": "filling-36",
+      "kind": "procedure",
+      "name": "Composite restoration, 1 surface, posterior",
+      "date": "2026-09-15",
+      "numberingSystem": "fdi",
+      "teeth": ["36"],
+      "surfaces": ["O"],
+      "status": "planned",
+      "fee": "$185.00",
+      "insuranceEstimate": "$148.00",
+      "patientPortion": "$37.00",
+      "sourceImage": "example-dental-letter.pdf"
+    },
+    {
+      "id": "perio-2026-09-15",
+      "kind": "perioExam",
+      "name": "Periodontal charting",
+      "date": "2026-09-15",
+      "numberingSystem": "fdi",
+      "status": "done",
+      "perio": {
+        "sites": [
+          { "tooth": "16", "MB": 3, "B": 2, "DB": 4, "ML": 3, "L": 2, "DL": 3 },
+          { "tooth": "26", "MB": 2, "B": 2, "DB": 3, "ML": 2, "L": 2, "DL": 2 }
+        ],
+        "bleeding": [{ "tooth": "16", "sites": ["DB"] }]
+      },
+      "sourceImage": "example-dental-letter.pdf"
+    }
+  ]
+}
