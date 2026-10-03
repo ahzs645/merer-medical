@@ -9,15 +9,6 @@ import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { DentalRecord } from '../types';
 import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
-const surgeryTracks = [
-  'consult',
-  'extraction',
-  'implant surgery',
-  'bone graft',
-  'post-op',
-  'referral',
-];
-
 export function DentalSurgeryPanel({ records }: { records: DentalRecord[] }) {
   const { t } = useInterfaceLanguage();
   const [numbering] = useToothNumbering();
@@ -77,15 +68,13 @@ export function DentalSurgeryPanel({ records }: { records: DentalRecord[] }) {
           ))}
         </div>
       ) : (
-        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {surgeryTracks.map((item) => (
-            <div key={item} className="rounded-md bg-gray-50 p-3">
-              <p className="text-sm font-semibold capitalize text-gray-900">
-                {t(item)}
-              </p>
-            </div>
-          ))}
-        </div>
+        // Tiles naming each category, with nothing behind them, read as
+        // buttons that did nothing.
+        <p className="mt-3 text-sm leading-6 text-gray-600">
+          {t(
+            'No dental surgery records yet. Consults, extractions, implants and post-op notes will be listed here.',
+          )}
+        </p>
       )}
     </section>
   );

@@ -7,17 +7,6 @@ import { DentalRecord } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { formatRecordDate } from '../../../shared/utils/dateFormatters';
 
-const orthodonticOrder = [
-  'diagnosis',
-  'treatment plan',
-  'appliance',
-  'aligner',
-  'adjustment',
-  'cephalometric',
-  'retention',
-  'consent',
-];
-
 export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
   const { t } = useInterfaceLanguage();
   const orthodonticRecords = records
@@ -107,15 +96,13 @@ export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
           ))}
         </div>
       ) : (
-        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          {orthodonticOrder.map((item) => (
-            <div key={item} className="rounded-md bg-gray-50 p-3">
-              <p className="text-sm font-semibold capitalize text-gray-900">
-                {t(item)}
-              </p>
-            </div>
-          ))}
-        </div>
+        // Tiles naming each category, with nothing behind them, read as
+        // buttons that did nothing.
+        <p className="mt-3 text-sm leading-6 text-gray-600">
+          {t(
+            'No orthodontic records yet. Assessments, brace or aligner visits and retainers will be listed here.',
+          )}
+        </p>
       )}
     </section>
   );

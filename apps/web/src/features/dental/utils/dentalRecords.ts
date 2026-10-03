@@ -28,13 +28,11 @@ const DENTAL_TERMS = [
   'bruxism',
   'caries',
   'cbct',
-  'crown',
   'dental',
   'dentition',
   'endodontic',
   'gingiva',
   'gingival',
-  'implant',
   'intraoral',
   'aligner',
   'braces',
@@ -159,13 +157,26 @@ const SURFACE_SYSTEMS = [
   'http://terminology.hl7.org/codesystem/ex-surface',
 ];
 
+// Words that are dental only in company: "implant" is also a pacemaker,
+// cochlear or contraceptive implant, and "crown" the crown-rump length of an
+// obstetric ultrasound. They count only alongside a tooth number or another
+// dental word.
+const SUPPORTING_TERMS = ['crown', 'implant', 'filling', 'abutment', 'veneer'];
+const supportingTermMatchers = SUPPORTING_TERMS.map(
+  (term) => new RegExp(`\\b${term}\\b(?!-rump)`, 'i'),
+);
+
 const dentalTermMatchers = DENTAL_TERMS.map(
   (term) =>
     new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i'),
 );
 
 function matchesDentalTerm(text: string): boolean {
-  return dentalTermMatchers.some((matcher) => matcher.test(text));
+  if (dentalTermMatchers.some((matcher) => matcher.test(text))) return true;
+  return (
+    supportingTermMatchers.some((matcher) => matcher.test(text)) &&
+    extractToothNumbers(text).length > 0
+  );
 }
 
 export function isDentalDocument(document: ClinicalDocument<unknown>): boolean {

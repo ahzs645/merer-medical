@@ -1527,6 +1527,14 @@ export const arabicTranslations: Record<string, string> = {
   'Drawn as your dentist sees you: your right side is on the left.':
     'مرسوم كما يراك طبيب أسنانك: جانبك الأيمن على اليسار.',
   Numbering: 'الترقيم',
+  'Dental X-rays, CBCT, intraoral photos and scans. They also appear under Imaging.':
+    'صور الأشعة السنية والتصوير المقطعي وصور ومسوح الفم. تظهر أيضًا ضمن التصوير.',
+  'No dental X-rays or photos yet. Imaging records that mention teeth or the mouth will be listed here.':
+    'لا توجد صور أشعة أو صور للأسنان بعد. ستُدرج هنا سجلات التصوير التي تذكر الأسنان أو الفم.',
+  'No dental surgery records yet. Consults, extractions, implants and post-op notes will be listed here.':
+    'لا توجد سجلات جراحة أسنان بعد. ستُدرج هنا الاستشارات والخلع والزراعة وملاحظات ما بعد الجراحة.',
+  'No orthodontic records yet. Assessments, brace or aligner visits and retainers will be listed here.':
+    'لا توجد سجلات تقويم بعد. ستُدرج هنا التقييمات وزيارات التقويم أو المصففات والمثبتات.',
   'Gums (perio)': 'اللثة',
   'Last measured {date}': 'آخر قياس في {date}',
   'Deepest pocket': 'أعمق جيب',

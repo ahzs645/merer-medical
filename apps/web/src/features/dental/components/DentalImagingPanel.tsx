@@ -17,7 +17,7 @@ export function DentalImagingPanel({ items }: { items: ImagingItem[] }) {
           </h2>
           <p className="text-sm text-gray-600">
             {t(
-              'Dental X-rays, CBCT, intraoral photos, and scans remain connected to the Imaging workspace.',
+              'Dental X-rays, CBCT, intraoral photos and scans. They also appear under Imaging.',
             )}
           </p>
         </div>
@@ -46,7 +46,7 @@ export function DentalImagingPanel({ items }: { items: ImagingItem[] }) {
       ) : (
         <p className="mt-3 text-sm leading-6 text-gray-600">
           {t(
-            'No dental imaging has been detected yet. The dental workspace will pull from imaging records tagged by oral/dental terms.',
+            'No dental X-rays or photos yet. Imaging records that mention teeth or the mouth will be listed here.',
           )}
         </p>
       )}

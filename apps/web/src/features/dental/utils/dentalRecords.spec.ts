@@ -2,6 +2,7 @@ import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocu
 import {
   buildRecordsByTooth,
   isDentalClaimDocument,
+  isDentalDocument,
   mapDentalDocument,
   resolveToothNumber,
 } from './dentalRecords';
@@ -493,5 +494,21 @@ describe('gum (perio) summary', () => {
       bleedingSites: 1,
     });
     expect(overview.previousExam?.deepest?.depth).toBe(6);
+  });
+});
+
+describe('what counts as dental', () => {
+  it.each([
+    ['Dual-chamber pacemaker implant', false],
+    ['Obstetric ultrasound — crown-rump length 45 mm', false],
+    ['Implant placement tooth 19', true],
+    ['Porcelain crown #14', true],
+    ['Dental implant consultation', true],
+  ])('%s → %s', (text, expected) => {
+    expect(
+      isDentalDocument(
+        doc('Procedure', { code: { text } }, { display_name: text }),
+      ),
+    ).toBe(expected);
   });
 });
