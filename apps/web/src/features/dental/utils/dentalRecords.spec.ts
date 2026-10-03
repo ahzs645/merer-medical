@@ -1,0 +1,300 @@
+import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
+import {
+  buildRecordsByTooth,
+  mapDentalDocument,
+  resolveToothNumber,
+} from './dentalRecords';
+import {
+  buildOdontogramStatuses,
+  buildToothTimeline,
+  buildTreatmentPlan,
+  buildWorkflowContext,
+} from './dentalClinicalModels';
+
+let sequence = 0;
+
+function doc(
+  resourceType: string,
+  resource: Record<string, unknown>,
+  metadata: Record<string, unknown> = {},
+): ClinicalDocument<unknown> {
+  sequence += 1;
+  return {
+    id: `doc-${sequence}`,
+    user_id: 'user',
+    connection_record_id: 'connection',
+    data_record: {
+      raw: { resource: { resourceType, ...resource } },
+      format: 'FHIR.R4',
+      content_type: 'application/json',
+      resource_type: resourceType.toLowerCase(),
+      version_history: [],
+    },
+    metadata: { id: `${resourceType}/${sequence}`, ...metadata },
+  } as unknown as ClinicalDocument<unknown>;
+}
+
+const map = (
+  document: ClinicalDocument<unknown>,
+  numbering?: 'universal' | 'fdi',
+) => mapDentalDocument(document, { numbering });
+
+describe('tooth numbers', () => {
+  it.each([
+    ['Occlusal caries tooth 36', ['19']],
+    ['Extraction of tooth 48', ['32']],
+    ['Crown tooth 46', ['30']],
+    ['Root canal tooth 11', ['11']],
+    ['Composite tooth #14 MOD', ['14']],
+    ['Teeth 3-5 scaling', ['3', '4', '5']],
+    ['Implant planning teeth 34-36', ['19', '20', '21']],
+  ])('reads "%s" as Universal %j', (text, expected) => {
+    const record = map(
+      doc('Condition', { code: { text } }, { display_name: text }),
+    );
+    expect(record.toothNumbers).toEqual(expected);
+  });
+
+  it('does not read an invoice number as a tooth', () => {
+    const record = map(
+      doc(
+        'Procedure',
+        { code: { text: 'Dental cleaning' } },
+        {
+          display_name: 'Dental cleaning invoice #2024-118',
+        },
+      ),
+    );
+    expect(record.toothNumbers).toEqual([]);
+  });
+
+  it('reads 11–32 as FDI when the reader numbers in FDI', () => {
+    const text = 'Caries on tooth 26';
+    expect(
+      map(doc('Condition', { code: { text } }), 'fdi').toothNumbers,
+    ).toEqual(['14']);
+    expect(
+      map(doc('Condition', { code: { text } }), 'universal').toothNumbers,
+    ).toEqual(['26']);
+  });
+
+  it('prefers a coded FHIR bodySite over the prose', () => {
+    const record = map(
+      doc('Condition', {
+        code: { text: 'Caries (see tooth 3 in the narrative)' },
+        bodySite: [
+          {
+            coding: [
+              {
+                system: 'http://terminology.hl7.org/CodeSystem/ex-tooth',
+                code: '36',
+              },
+            ],
+          },
+          {
+            coding: [
+              {
+                system: 'http://terminology.hl7.org/CodeSystem/FDI-surface',
+                code: 'MO',
+              },
+            ],
+          },
+        ],
+      }),
+    );
+    expect(record.toothNumbers).toEqual(['19']);
+    expect(record.surfaces).toEqual(['M', 'O']);
+  });
+
+  it('leaves Universal supernumerary teeth off the chart', () => {
+    const record = map(
+      doc(
+        'Procedure',
+        { status: 'completed', code: { text: 'Extraction' } },
+        {
+          manual_specialty_details: {
+            specialty: 'dental',
+            numberingSystem: 'universal',
+            dentalTeeth: '51',
+          },
+        },
+      ),
+    );
+    expect(record.toothNumbers).toEqual([]);
+  });
+
+  it('resolves numbers that exist in only one system', () => {
+    expect(resolveToothNumber('3')).toBe('3');
+    expect(resolveToothNumber('38')).toBe('17');
+    expect(resolveToothNumber('55')).toBe('A');
+    expect(resolveToothNumber('49')).toBeUndefined();
+    expect(resolveToothNumber('0')).toBeUndefined();
+  });
+});
+
+describe('record kind', () => {
+  it('files imaging as imaging, not as an active finding', () => {
+    expect(
+      map(doc('ImagingStudy', { description: 'Dental CBCT mandible' })).kind,
+    ).toBe('image');
+    expect(
+      map(
+        doc('DiagnosticReport', {
+          code: { text: 'Panoramic dental radiograph report' },
+        }),
+      ).kind,
+    ).toBe('image');
+  });
+
+  it('does not call a plan document a perio measurement', () => {
+    const record = map(
+      doc(
+        'DocumentReference',
+        {
+          description: 'Dental treatment plan summary',
+          content: [{ attachment: { contentType: 'application/pdf' } }],
+        },
+        {
+          display_name:
+            'Dental treatment plan summary — bleeding on probing teeth 14, 19',
+        },
+      ),
+    );
+    expect(record.kind).toBe('note');
+  });
+
+  it('keeps a completed procedure done, whatever its note plans next', () => {
+    const record = map(
+      doc('Procedure', {
+        status: 'completed',
+        code: { text: 'Crown preparation tooth 14' },
+        note: [{ text: 'Final crown delivery planned.' }],
+      }),
+    );
+    expect(record.kind).toBe('procedure');
+    expect(record.status).toBe('done');
+  });
+
+  it('reads perio, recall and referral subtypes from an importer', () => {
+    const subtype = (value: string) =>
+      map(
+        doc(
+          'Observation',
+          { status: 'final' },
+          {
+            manual_specialty_details: { specialty: 'dental', subtype: value },
+          },
+        ),
+      ).kind;
+    expect(subtype('perio')).toBe('perio');
+    expect(subtype('recall')).toBe('note');
+    expect(subtype('referral')).toBe('referral');
+  });
+});
+
+describe('record status', () => {
+  it('reads Condition.clinicalStatus', () => {
+    const resolved = map(
+      doc('Condition', {
+        code: { text: 'Caries tooth 30' },
+        clinicalStatus: { coding: [{ code: 'resolved' }] },
+      }),
+    );
+    expect(resolved.status).toBe('resolved');
+  });
+
+  it('lets a typed status win over the fixed status the form writes', () => {
+    const record = map(
+      doc(
+        'Observation',
+        { status: 'final', code: { text: 'Caries' } },
+        {
+          manual_specialty_details: {
+            specialty: 'dental',
+            subtype: 'finding',
+            toothNumber: '30',
+            dentalStatus: 'resolved',
+          },
+        },
+      ),
+    );
+    expect(record.status).toBe('resolved');
+  });
+});
+
+describe('tooth state over time', () => {
+  const caries = doc(
+    'Condition',
+    {
+      code: { text: 'Occlusal caries tooth 30' },
+      clinicalStatus: { coding: [{ code: 'active' }] },
+    },
+    { date: '2023-03-01T00:00:00.000Z' },
+  );
+  const filling = doc(
+    'Procedure',
+    { status: 'completed', code: { text: 'Composite filling tooth 30' } },
+    { date: '2023-03-08T00:00:00.000Z' },
+  );
+
+  it('a cavity that was later filled is no longer "needs attention"', () => {
+    const records = [caries, filling].map((document) => map(document));
+    const [tooth30] = buildOdontogramStatuses(buildRecordsByTooth(records));
+    expect(tooth30.tooth).toBe('30');
+    expect(tooth30.actionLevel).toBe('complete');
+    expect(buildWorkflowContext(records, 0).nextActions).toEqual([]);
+  });
+
+  it('a cavity filled before it was found is still open', () => {
+    const later = doc(
+      'Condition',
+      { code: { text: 'Recurrent caries tooth 30' } },
+      { date: '2024-01-01T00:00:00.000Z' },
+    );
+    const records = [later, filling].map((document) => map(document));
+    const [tooth30] = buildOdontogramStatuses(buildRecordsByTooth(records));
+    expect(tooth30.actionLevel).toBe('active');
+  });
+
+  it('timeline rows carry their own standing, not the tooth’s', () => {
+    const pocket = doc(
+      'Observation',
+      { status: 'final', code: { text: 'Periodontal pocketing tooth 14' } },
+      { date: '2026-02-12T00:00:00.000Z' },
+    );
+    const crownPrep = doc(
+      'Procedure',
+      { status: 'completed', code: { text: 'Crown preparation tooth 14' } },
+      { date: '2026-01-20T00:00:00.000Z' },
+    );
+    const records = [pocket, crownPrep].map((document) => map(document));
+    const byTooth = buildRecordsByTooth(records);
+    const timeline = buildToothTimeline(
+      buildOdontogramStatuses(byTooth),
+      byTooth,
+    );
+    const level = (title: string) =>
+      timeline.find((item) => item.record.title.startsWith(title))?.actionLevel;
+    expect(level('Periodontal')).toBe('active');
+    expect(level('Crown')).toBe('complete');
+  });
+
+  it('planned procedures are plans; cancelled ones drop out', () => {
+    const planned = map(
+      doc('Procedure', {
+        status: 'preparation',
+        code: { text: 'Composite tooth 19' },
+      }),
+    );
+    const cancelled = map(
+      doc('ServiceRequest', {
+        status: 'revoked',
+        code: { text: 'Treatment plan crown tooth 3' },
+      }),
+    );
+    expect(planned.kind).toBe('treatmentPlan');
+    expect(
+      buildTreatmentPlan([planned, cancelled]).map((item) => item.id),
+    ).toEqual([planned.id]);
+  });
+});

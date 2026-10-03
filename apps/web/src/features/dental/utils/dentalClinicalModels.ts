@@ -15,14 +15,13 @@ import {
 } from '../types';
 import { ALL_TEETH } from './dentalReferenceData';
 import {
+  buildRecordsByTooth,
   compareTeeth,
   extractClaimFields,
   isClaimResourceType,
 } from './dentalRecords';
 
 const ACTIVE_KINDS = new Set(['condition', 'finding', 'perio', 'referral']);
-const PLANNED_KINDS = new Set(['treatmentPlan']);
-const COMPLETE_KINDS = new Set(['procedure', 'cleaning', 'surgery']);
 
 const HIGH_PRIORITY_TERMS = [
   'abscess',
@@ -49,21 +48,78 @@ const PERIO_RISK_TERMS = [
   'suppuration',
 ];
 
+const TREATING_KINDS = new Set(['procedure', 'surgery']);
+
+/**
+ * Whether a record still asks something of the reader. An active finding,
+ * condition, perio measurement or referral is open until its own status says
+ * otherwise — or, for a finding on specific teeth, until a completed
+ * procedure on every one of those teeth on or after its date. A filling is
+ * how a cavity stops being a problem; without this, a 2023 cavity filled the
+ * same week kept its tooth red for good.
+ */
+export function isOpenIssue(
+  record: DentalRecord,
+  recordsByTooth: Map<string, DentalRecord[]>,
+): boolean {
+  if (!ACTIVE_KINDS.has(record.kind) || record.status !== 'open') return false;
+  if (record.toothNumbers.length === 0 || !record.date) return true;
+  const recordDate = record.date;
+  const treated = record.toothNumbers.every((tooth) =>
+    (recordsByTooth.get(tooth) || []).some(
+      (other) =>
+        other.id !== record.id &&
+        TREATING_KINDS.has(other.kind) &&
+        other.status === 'done' &&
+        !!other.date &&
+        other.date.slice(0, 10) >= recordDate.slice(0, 10),
+    ),
+  );
+  return !treated;
+}
+
+/** Kinds whose `planned` status is not an outstanding piece of work. */
+const NOT_A_PLAN = new Set(['note', 'image', 'cleaning']);
+
+/**
+ * Work that is proposed, accepted or booked but not done: a treatment plan,
+ * a planned procedure, a pending surgical consult or ortho phase. A recall
+ * (kind `note`) is planned too, but it is a due date with its own line.
+ */
+export function isOpenPlan(record: DentalRecord): boolean {
+  return (
+    record.status === 'planned' &&
+    !NOT_A_PLAN.has(record.kind) &&
+    !ACTIVE_KINDS.has(record.kind)
+  );
+}
+
+/** The level one record holds on its own, for timeline rows and lists. */
+export function recordActionLevel(
+  record: DentalRecord,
+  recordsByTooth: Map<string, DentalRecord[]>,
+): DentalActionLevel {
+  if (isOpenIssue(record, recordsByTooth)) return 'active';
+  if (isOpenPlan(record)) return 'planned';
+  if (record.status === 'done') return 'complete';
+  return 'watch';
+}
+
 export function buildOdontogramStatuses(
   recordsByTooth: Map<string, DentalRecord[]>,
 ): OdontogramToothStatus[] {
   // Map across the full dentition (permanent + deciduous) so paediatric tooth
   // records surface too. Teeth without records are filtered out below.
   return ALL_TEETH.map((tooth) => {
-    const records = recordsByTooth.get(tooth.universal) || [];
+    const records = (recordsByTooth.get(tooth.universal) || []).filter(
+      (record) => record.status !== 'cancelled',
+    );
     const activeRecords = records.filter((record) =>
-      ACTIVE_KINDS.has(record.kind),
+      isOpenIssue(record, recordsByTooth),
     );
-    const plannedRecords = records.filter((record) =>
-      PLANNED_KINDS.has(record.kind),
-    );
-    const completeRecords = records.filter((record) =>
-      COMPLETE_KINDS.has(record.kind),
+    const plannedRecords = records.filter(isOpenPlan);
+    const completeRecords = records.filter(
+      (record) => record.status === 'done',
     );
 
     return {
@@ -88,7 +144,10 @@ export function buildTreatmentPlan(
   records: DentalRecord[],
 ): TreatmentPlanItem[] {
   return records
-    .filter((record) => record.kind === 'treatmentPlan')
+    .filter(
+      (record) =>
+        record.kind === 'treatmentPlan' && record.status !== 'cancelled',
+    )
     .map((record) => ({
       id: record.id,
       record,
@@ -133,11 +192,19 @@ export function buildPerioOverview(records: DentalRecord[]): PerioOverview {
   };
 }
 
+/**
+ * Each tooth's history, newest first, with every row showing its own
+ * standing. It used to list only open and planned records and stamp each with
+ * the tooth's level, so a completed crown prep on a tooth with an open pocket
+ * read "ACTIVE".
+ */
 export function buildToothTimeline(
   statuses: OdontogramToothStatus[],
+  recordsByTooth: Map<string, DentalRecord[]>,
 ): DentalToothTimelineItem[] {
   return statuses.flatMap((status) =>
-    [...status.activeRecords, ...status.plannedRecords]
+    (recordsByTooth.get(status.tooth) || [])
+      .filter((record) => record.status !== 'cancelled')
       .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
       .slice(0, 4)
       .map((record) => ({
@@ -145,7 +212,7 @@ export function buildToothTimeline(
         tooth: status.tooth,
         record,
         date: record.date,
-        actionLevel: status.actionLevel,
+        actionLevel: recordActionLevel(record, recordsByTooth),
         label: status.label,
       })),
   );
@@ -231,6 +298,9 @@ const ROUTE_BY_KIND: Record<string, string> = {
   perio: '/records/dental/hygiene',
   referral: '/records/dental/records',
   treatmentPlan: '/records/dental/treatment',
+  surgery: '/records/dental/treatment',
+  orthodontic: '/records/dental/treatment',
+  procedure: '/records/dental/treatment',
 };
 
 function describeTeeth(record: DentalRecord): string {
@@ -249,16 +319,18 @@ function describeTeeth(record: DentalRecord): string {
  * "you own some imaging".
  */
 function buildNextActions(records: DentalRecord[]): DentalNextAction[] {
+  const recordsByTooth = buildRecordsByTooth(records);
   return records
     .filter(
-      (record) =>
-        ACTIVE_KINDS.has(record.kind) || PLANNED_KINDS.has(record.kind),
+      (record) => isOpenIssue(record, recordsByTooth) || isOpenPlan(record),
     )
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
     .map((record) => {
       const teeth = describeTeeth(record);
-      const kindLabel = PLANNED_KINDS.has(record.kind)
-        ? 'Planned treatment'
+      const kindLabel = isOpenPlan(record)
+        ? record.kind === 'surgery'
+          ? 'Planned surgery or consult'
+          : 'Planned treatment'
         : record.kind === 'perio'
           ? 'Periodontal measurement'
           : record.kind === 'referral'
@@ -277,12 +349,11 @@ export function buildWorkflowContext(
   records: DentalRecord[],
   imagingCount: number,
 ): DentalWorkflowContext {
+  const recordsByTooth = buildRecordsByTooth(records);
   const openDentalIssues = records.filter((record) =>
-    ACTIVE_KINDS.has(record.kind),
+    isOpenIssue(record, recordsByTooth),
   ).length;
-  const plannedTreatmentCount = records.filter(
-    (record) => record.kind === 'treatmentPlan',
-  ).length;
+  const plannedTreatmentCount = records.filter(isOpenPlan).length;
   const perioRecordCount = records.filter(
     (record) => record.kind === 'perio',
   ).length;
@@ -346,24 +417,27 @@ function collectSurfaces(records: DentalRecord[]): ToothSurface[] {
   return [...surfaces];
 }
 
+/**
+ * A plan's stage from its stated status only. It used to fall back to the
+ * prose, so a completed crown prep whose note said "final crown delivery
+ * planned" was "proposed", and an accepted aligner plan, whose note did not
+ * say "active", was too.
+ */
 function inferTreatmentStatus(
   record: DentalRecord,
 ): TreatmentPlanItem['status'] {
-  const structuredStatus = record.details?.dentalStatus?.toLowerCase();
-  if (structuredStatus?.includes('complete')) return 'completed';
-  if (structuredStatus?.includes('scheduled')) return 'scheduled';
-  if (
-    structuredStatus?.includes('active') ||
-    structuredStatus?.includes('progress')
-  ) {
-    return 'active';
-  }
-
-  if (hasAnyTerm(record, ['completed', 'complete', 'done'])) return 'completed';
-  if (hasAnyTerm(record, ['scheduled', 'booked', 'appointment'])) {
-    return 'scheduled';
-  }
-  if (hasAnyTerm(record, ['active', 'in progress', 'started'])) return 'active';
+  if (record.status === 'done') return 'completed';
+  const stated = [
+    record.details?.dentalStatus,
+    record.details?.treatmentStatus,
+    record.details?.orthoStatus,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  if (/complete/.test(stated)) return 'completed';
+  if (/scheduled|booked/.test(stated)) return 'scheduled';
+  if (/active|progress|accepted|started|tracking/.test(stated)) return 'active';
   return 'proposed';
 }
 

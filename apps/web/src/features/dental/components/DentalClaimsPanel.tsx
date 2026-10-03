@@ -15,47 +15,48 @@ export function DentalClaimsPanel({
       </h2>
       {claims.length > 0 ? (
         <>
-        <div className="mt-3 grid gap-2">
-          {claims.slice(0, 5).map((claim) => (
-            <article key={claim.id} className="rounded-md bg-gray-50 p-3">
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {claim.record.title}
-                </h3>
-                {claim.status && (
-                  <span className="text-xs font-semibold uppercase text-primary-700">
-                    {t(claim.status)}
-                  </span>
-                )}
-              </div>
-              <p className="mt-1 text-sm text-gray-700">
-                {[
-                  claim.carrier,
-                  claim.plan,
-                  claim.patientPortion &&
-                    `${t('Patient portion')}: ${claim.patientPortion}`,
-                  claim.deductible && `${t('Deductible')}: ${claim.deductible}`,
-                  claim.annualMaximum &&
-                    `${t('Annual max')}: ${claim.annualMaximum}`,
-                ]
-                  .filter(Boolean)
-                  .join(' · ') || t('Dental claim or benefit record')}
-              </p>
-              {claim.eobAttachment && (
-                <p className="mt-2 text-xs text-gray-500">
-                  {t('EOB')}: {claim.eobAttachment}
+          <div className="mt-3 grid gap-2">
+            {claims.slice(0, 5).map((claim) => (
+              <article key={claim.id} className="rounded-md bg-gray-50 p-3">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    {claim.record.title}
+                  </h3>
+                  {claim.status && (
+                    <span className="text-xs font-semibold uppercase text-primary-700">
+                      {t(claim.status)}
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 text-sm text-gray-700">
+                  {[
+                    claim.carrier,
+                    claim.plan,
+                    claim.patientPortion &&
+                      `${t('Patient portion')}: ${claim.patientPortion}`,
+                    claim.deductible &&
+                      `${t('Deductible')}: ${claim.deductible}`,
+                    claim.annualMaximum &&
+                      `${t('Annual max')}: ${claim.annualMaximum}`,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ') || t('Dental claim or benefit record')}
                 </p>
-              )}
-            </article>
-          ))}
-        </div>
-        {claims.length > 5 && (
-          <p className="mt-2 text-xs text-gray-500">
-            {t('Showing {visible} of {total} records')
-              .replace('{visible}', '5')
-              .replace('{total}', `${claims.length}`)}
-          </p>
-        )}
+                {claim.eobAttachment && (
+                  <p className="mt-2 text-xs text-gray-500">
+                    {t('EOB')}: {claim.eobAttachment}
+                  </p>
+                )}
+              </article>
+            ))}
+          </div>
+          {claims.length > 5 && (
+            <p className="mt-2 text-xs text-gray-500">
+              {t('Showing {visible} of {total} records')
+                .replace('{visible}', '5')
+                .replace('{total}', `${claims.length}`)}
+            </p>
+          )}
         </>
       ) : (
         <p className="mt-3 text-sm leading-6 text-gray-600">

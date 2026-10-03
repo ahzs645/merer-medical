@@ -1,9 +1,11 @@
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { ImagingItem } from '../../imaging/types';
 import {
+  DentalNumberingSystem,
   DentalRecord,
   DentalRecordDetails,
   DentalRecordKind,
+  DentalRecordStatus,
   DentalToothSurfaceModel,
   ToothSurface,
 } from '../types';
@@ -136,11 +138,26 @@ const SURFACE_CONTEXT_PATTERN =
 // ("trays 1 to 24") and cephalometric values ("ANB 4") become phantom teeth.
 // The captured group also allows comma / "and" / range lists so that
 // "Teeth 4, 18" and "tooth 1-4" resolve to all referenced teeth.
-const TOOTH_NUMBER = '(?:3[0-2]|[12][0-9]|[1-9])';
+//
+// A number is one or two digits and must not run on into another digit:
+// without that, "tooth 36" (FDI, lower left first molar) was read as tooth 3
+// and "#2024-118" as tooth 20. Which system a number is in is decided in
+// `resolveToothNumber`, not here.
+const TOOTH_NUMBER = '\\d{1,2}(?!\\d)';
 const TOOTH_MARKER_PATTERN = new RegExp(
   `(?:#|\\b(?:tooth|teeth)(?:\\s*(?:no\\.?|number))?)\\s*[:#]?\\s*(${TOOTH_NUMBER}(?:\\s*(?:,|and|&|-|–|to)\\s*${TOOTH_NUMBER})*)`,
   'gi',
 );
+
+/** FHIR code systems whose codes are FDI tooth numbers. */
+const FDI_TOOTH_SYSTEMS = [
+  'http://terminology.hl7.org/codesystem/ex-tooth',
+  'https://www.fdiworlddental.org',
+];
+const SURFACE_SYSTEMS = [
+  'http://terminology.hl7.org/codesystem/fdi-surface',
+  'http://terminology.hl7.org/codesystem/ex-surface',
+];
 
 const dentalTermMatchers = DENTAL_TERMS.map(
   (term) =>
@@ -158,22 +175,37 @@ export function isDentalDocument(document: ClinicalDocument<unknown>): boolean {
   return matchesDentalTerm(searchableText(document));
 }
 
+export type DentalMappingOptions = {
+  /**
+   * How to read a bare tooth number from 11 to 32, which is a valid tooth in
+   * both systems. Records that declare their own `numberingSystem`, and
+   * numbers that only exist in one system (33–48, 51–85), ignore it.
+   */
+  numbering?: DentalNumberingSystem;
+};
+
 export function mapDentalDocument(
   document: ClinicalDocument<unknown>,
+  options: DentalMappingOptions = {},
 ): DentalRecord {
   const text = searchableText(document);
   const details = getDentalDetails(document);
+  const numbering = details?.numberingSystem || options.numbering;
+  const kind = inferDentalKind(document, text, details);
+  const toothNumbers = getToothNumbers(document, details, text, numbering);
+  const surfaces = getSurfaces(document, details, text);
   return {
     id: document.id,
     document,
-    kind: inferDentalKind(document, text, details),
+    kind,
+    status: inferRecordStatus(document, kind, details),
     title: getTitle(document),
     date: document.metadata?.date,
-    toothNumbers: getToothNumbers(details, text),
-    surfaces: getSurfaces(details, text),
+    toothNumbers,
+    surfaces,
     summary: getSummary(document, details),
     details,
-    dentalModel: buildDentalToothSurfaceModel(details, text),
+    dentalModel: buildDentalToothSurfaceModel(details, toothNumbers, surfaces),
   };
 }
 
@@ -229,9 +261,7 @@ export function isDentalClaimDocument(
   if (isClaimResourceType(document.data_record.resource_type)) return true;
   const details = getDentalDetails(document);
   return (
-    !!details?.claimStatus ||
-    !!details?.carrierName ||
-    !!details?.eobAttachment
+    !!details?.claimStatus || !!details?.carrierName || !!details?.eobAttachment
   );
 }
 
@@ -260,6 +290,51 @@ export function extractClaimFields(document: ClinicalDocument<unknown>) {
   };
 }
 
+const IMAGING_TERMS = [
+  'bitewing',
+  'cbct',
+  'cephalometric radiograph',
+  'cone beam',
+  'intraoral photo',
+  'intraoral scan',
+  'panoramic',
+  'periapical',
+  'photograph',
+  'radiograph',
+  'x-ray',
+  'xray',
+];
+
+const SUBTYPE_KINDS: Record<string, DentalRecordKind> = {
+  cleaning: 'cleaning',
+  treatmentPlan: 'treatmentPlan',
+  orthodonticTreatmentPlan: 'treatmentPlan',
+  imaging: 'image',
+  perio: 'perio',
+  referral: 'referral',
+  // A recall is a due date. It is read by the Recall panel through its
+  // `recallDueDate`; as a record it is neither a visit nor an open issue.
+  recall: 'note',
+  oralSurgeryConsult: 'surgery',
+  oralSurgeryProcedure: 'surgery',
+  extraction: 'surgery',
+  implantSurgery: 'surgery',
+  postOpSurgery: 'surgery',
+  alignerCase: 'orthodontic',
+  cephalometricAnalysis: 'orthodontic',
+  retention: 'orthodontic',
+  condition: 'condition',
+  procedure: 'procedure',
+  finding: 'finding',
+};
+
+/**
+ * What a record is. The resource type decides first, and keywords only
+ * choose within it: matching keywords across every type in a fixed order made
+ * a treatment-plan PDF that mentions "bleeding" a perio measurement, a CBCT
+ * study an "active finding", and a completed crown prep whose note said
+ * "delivery planned" a proposed treatment.
+ */
 function inferDentalKind(
   document: ClinicalDocument<unknown>,
   text: string,
@@ -267,87 +342,273 @@ function inferDentalKind(
 ): DentalRecordKind {
   const resourceType = document.data_record.resource_type;
   const normalized = text.toLowerCase();
+  const has = (terms: string[]) =>
+    terms.some((term) => normalized.includes(term));
   const subtype = details?.subtype;
 
   if (subtype) {
-    if (subtype === 'cleaning') return 'cleaning';
-    if (subtype === 'treatmentPlan' || subtype === 'orthodonticTreatmentPlan') {
-      return 'treatmentPlan';
-    }
-    if (subtype === 'imaging') return 'image';
-    if (
-      [
-        'oralSurgeryConsult',
-        'oralSurgeryProcedure',
-        'extraction',
-        'implantSurgery',
-        'postOpSurgery',
-      ].includes(subtype)
-    ) {
-      return 'surgery';
-    }
-    if (
-      subtype.startsWith('orthodontic') ||
-      ['alignerCase', 'cephalometricAnalysis', 'retention'].includes(subtype)
-    ) {
-      return 'orthodontic';
-    }
-    if (subtype === 'condition') return 'condition';
-    if (subtype === 'procedure') return 'procedure';
-    if (subtype === 'finding') return 'finding';
+    if (SUBTYPE_KINDS[subtype]) return SUBTYPE_KINDS[subtype];
+    if (subtype.startsWith('orthodontic')) return 'orthodontic';
   }
 
-  if (
-    resourceType === 'procedure' &&
-    CLEANING_TERMS.some((term) => normalized.includes(term))
-  ) {
-    return 'cleaning';
+  switch (resourceType) {
+    case 'imagingstudy':
+    case 'media':
+      return 'image';
+    case 'diagnosticreport':
+      return has(IMAGING_TERMS) ? 'image' : 'finding';
+    case 'documentreference':
+    case 'documentreference_attachment':
+      if (hasImageAttachment(document)) return 'image';
+      if (has(ORTHODONTIC_TERMS)) return 'orthodontic';
+      return 'note';
+    case 'condition':
+      return has(ORTHODONTIC_TERMS) ? 'orthodontic' : 'condition';
+    case 'observation':
+      if (has(ORTHODONTIC_TERMS)) return 'orthodontic';
+      return has(PERIO_TERMS) ? 'perio' : 'finding';
+    case 'procedure': {
+      if (getResource(document)?.status === 'preparation') {
+        return 'treatmentPlan';
+      }
+      if (has(ORTHODONTIC_TERMS)) return 'orthodontic';
+      if (has(SURGERY_TERMS)) return 'surgery';
+      if (has(CLEANING_TERMS)) return 'cleaning';
+      return 'procedure';
+    }
+    case 'servicerequest':
+      if (has(SURGERY_TERMS)) return 'surgery';
+      if (has(REFERRAL_TERMS)) return 'referral';
+      return 'treatmentPlan';
+    case 'careplan':
+      return has(ORTHODONTIC_TERMS) ? 'orthodontic' : 'treatmentPlan';
+    case 'encounter':
+      if (has(ORTHODONTIC_TERMS)) return 'orthodontic';
+      if (has(CLEANING_TERMS)) return 'cleaning';
+      return 'note';
+    default:
+      return 'note';
   }
-  if (ORTHODONTIC_TERMS.some((term) => normalized.includes(term))) {
-    return 'orthodontic';
-  }
-  if (SURGERY_TERMS.some((term) => normalized.includes(term))) {
-    return 'surgery';
-  }
-  if (PERIO_TERMS.some((term) => normalized.includes(term))) return 'perio';
-  if (REFERRAL_TERMS.some((term) => normalized.includes(term))) {
-    return 'referral';
-  }
-  if (
-    normalized.includes('treatment plan') ||
-    normalized.includes('planned') ||
-    resourceType === 'servicerequest'
-  ) {
-    return 'treatmentPlan';
-  }
-  if (resourceType === 'condition') return 'condition';
-  if (resourceType === 'procedure') return 'procedure';
-  if (resourceType === 'observation') return 'finding';
-  if (resourceType === 'documentreference') return 'note';
-  return 'finding';
 }
 
-function extractToothNumbers(text: string): string[] {
+function hasImageAttachment(document: ClinicalDocument<unknown>): boolean {
+  const resource = getResource(document);
+  const attachments = [
+    ...(Array.isArray(resource?.content)
+      ? resource.content.map((content: any) => content?.attachment)
+      : []),
+    resource?.attachment,
+  ].filter(Boolean);
+  return attachments.some(
+    (attachment: any) =>
+      /^(image|model)\//i.test(attachment?.contentType || '') ||
+      /\.(stl|ply|obj|jpe?g|png|dcm)(?:$|[?#])/i.test(
+        `${attachment?.title || ''} ${attachment?.url || ''}`,
+      ),
+  );
+}
+
+const codeOf = (value: any): string | undefined =>
+  (value?.coding?.[0]?.code || value?.text || value)?.toString().toLowerCase();
+
+/**
+ * Where a record stands. A status somebody typed or a practice system
+ * exported (`dentalStatus`, `treatmentStatus`) is read first, because the
+ * manual form writes a fixed FHIR status whatever was typed; then the FHIR
+ * status; then the kind's usual meaning.
+ */
+function inferRecordStatus(
+  document: ClinicalDocument<unknown>,
+  kind: DentalRecordKind,
+  details?: DentalRecordDetails,
+): DentalRecordStatus {
+  const stated = [details?.dentalStatus, details?.treatmentStatus]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  if (stated) {
+    if (/entered.in.error|cancel|declin|revoked|deleted|abandon/.test(stated))
+      return 'cancelled';
+    if (/resolv|healed|inactive|remission|no longer/.test(stated))
+      return 'resolved';
+    if (
+      /\b(complete|completed|done|existing|performed|delivered)\b/.test(stated)
+    )
+      return 'done';
+    if (/plan|propos|scheduled|accepted|booked|referred|pending/.test(stated))
+      return 'planned';
+    if (/\bactive\b|ongoing|present|open/.test(stated)) {
+      return kind === 'treatmentPlan' ? 'planned' : 'open';
+    }
+  }
+
+  const resource = getResource(document);
+  const resourceType = document.data_record.resource_type;
+  if (codeOf(resource?.verificationStatus)?.match(/entered-in-error|refuted/)) {
+    return 'cancelled';
+  }
+  const status = codeOf(resource?.status);
+  switch (resourceType) {
+    case 'condition': {
+      const clinical = codeOf(resource?.clinicalStatus);
+      if (clinical?.match(/resolved|inactive|remission/)) return 'resolved';
+      if (clinical?.match(/active|recurrence|relapse/)) return 'open';
+      break;
+    }
+    case 'procedure':
+      if (status === 'completed') return 'done';
+      if (status?.match(/preparation|in-progress|on-hold/)) return 'planned';
+      if (status?.match(/not-done|stopped|entered-in-error/))
+        return 'cancelled';
+      break;
+    case 'servicerequest':
+    case 'careplan':
+      if (status === 'completed') return 'done';
+      if (status?.match(/revoked|entered-in-error/)) return 'cancelled';
+      if (status?.match(/active|draft|on-hold/)) {
+        return kind === 'referral' ? 'open' : 'planned';
+      }
+      break;
+    case 'observation':
+    case 'diagnosticreport':
+      if (status?.match(/cancelled|entered-in-error/)) return 'cancelled';
+      break;
+  }
+
+  switch (kind) {
+    case 'condition':
+    case 'finding':
+    case 'perio':
+    case 'referral':
+      return 'open';
+    case 'treatmentPlan':
+      return 'planned';
+    case 'procedure':
+    case 'cleaning':
+    case 'surgery':
+      return 'done';
+    default:
+      return 'unknown';
+  }
+}
+
+function extractToothNumbers(
+  text: string,
+  numbering?: DentalRecordDetails['numberingSystem'],
+): string[] {
   const teeth = new Set<string>();
   for (const match of text.matchAll(TOOTH_MARKER_PATTERN)) {
-    addToothRun(teeth, match[1]);
+    addToothRun(teeth, match[1], numbering);
   }
   return [...teeth];
 }
 
 // Parse the number run that follows a tooth marker, e.g. "4, 18" or "1-4".
-function addToothRun(teeth: Set<string>, run: string) {
+function addToothRun(
+  teeth: Set<string>,
+  run: string,
+  numbering?: DentalRecordDetails['numberingSystem'],
+) {
   for (const part of run.split(/\s*(?:,|and|&)\s*/i)) {
-    const range = part.match(
-      /(3[0-2]|[12][0-9]|[1-9])\s*(?:-|–|to)\s*(3[0-2]|[12][0-9]|[1-9])/i,
-    );
+    const range = part.match(/(\d{1,2})\s*(?:-|–|to)\s*(\d{1,2})/i);
     if (range) {
-      addToothRange(teeth, `${range[1]}-${range[2]}`);
+      addResolvedRange(teeth, range[1], range[2], numbering);
       continue;
     }
-    const single = part.match(/\b(3[0-2]|[12][0-9]|[1-9])\b/);
-    if (single) teeth.add(`${Number(single[1])}`);
+    const single = part.match(/\b(\d{1,2})\b/);
+    const tooth = single && resolveToothNumber(single[1], numbering);
+    if (tooth) teeth.add(tooth);
   }
+}
+
+const isFdi = (value: string) => ALL_TEETH.some((tooth) => tooth.fdi === value);
+
+/**
+ * One tooth number → its Universal identifier, or undefined if it names no
+ * tooth. A number that exists only in FDI (33–48, 51–85) is FDI whatever the
+ * record says; 1–10 exist only in Universal; 11–32 are both, and follow the
+ * record's numbering (Universal unless told otherwise).
+ */
+export function resolveToothNumber(
+  value: string,
+  numbering?: DentalRecordDetails['numberingSystem'],
+): string | undefined {
+  const number = Number(value);
+  if (!Number.isInteger(number) || number < 1) return undefined;
+  const text = `${number}`;
+  const fdi = ALL_TEETH.find((tooth) => tooth.fdi === text);
+  if (fdi && (number > 32 || numbering === 'fdi')) return fdi.universal;
+  if (number <= 32) return text;
+  return undefined;
+}
+
+function addResolvedRange(
+  teeth: Set<string>,
+  startValue: string,
+  endValue: string,
+  numbering?: DentalRecordDetails['numberingSystem'],
+) {
+  const start = Number(startValue);
+  const end = Number(endValue);
+  const fdiRange =
+    isFdi(`${start}`) &&
+    isFdi(`${end}`) &&
+    Math.floor(start / 10) === Math.floor(end / 10) &&
+    (numbering === 'fdi' || start > 32 || end > 32);
+  if (fdiRange) {
+    // FDI ranges stay within one quadrant: "34-36" is 34, 35, 36.
+    for (let n = Math.min(start, end); n <= Math.max(start, end); n += 1) {
+      const tooth = resolveToothNumber(`${n}`, 'fdi');
+      if (tooth) teeth.add(tooth);
+    }
+    return;
+  }
+  if (start <= 32 && end <= 32) addToothRange(teeth, `${start}-${end}`);
+}
+
+type Coding = { system?: string; code?: string; display?: string };
+
+function bodySiteCodings(document: ClinicalDocument<unknown>): Coding[] {
+  const resource = getResource(document);
+  const sites = [
+    ...(Array.isArray(resource?.bodySite)
+      ? resource.bodySite
+      : resource?.bodySite
+        ? [resource.bodySite]
+        : []),
+    // Claim / EOB lines carry teeth on `item[].bodySite` (R4) too.
+    ...(Array.isArray(resource?.item)
+      ? resource.item.map((item: any) => item?.bodySite).filter(Boolean)
+      : []),
+  ];
+  return sites.flatMap((site: any) =>
+    Array.isArray(site?.coding) ? site.coding : [],
+  );
+}
+
+const systemIn = (coding: Coding, systems: string[]) =>
+  !!coding.system && systems.includes(coding.system.toLowerCase());
+
+/** Teeth stated as codes, which outrank anything read from prose. */
+function getCodedTeeth(document: ClinicalDocument<unknown>): string[] {
+  const teeth = new Set<string>();
+  for (const coding of bodySiteCodings(document)) {
+    if (!systemIn(coding, FDI_TOOTH_SYSTEMS) || !coding.code) continue;
+    const tooth = ALL_TEETH.find((item) => item.fdi === `${coding.code}`);
+    if (tooth) teeth.add(tooth.universal);
+  }
+  return [...teeth];
+}
+
+function getCodedSurfaces(document: ClinicalDocument<unknown>): ToothSurface[] {
+  const surfaces = new Set<ToothSurface>();
+  for (const coding of bodySiteCodings(document)) {
+    if (!systemIn(coding, SURFACE_SYSTEMS) || !coding.code) continue;
+    for (const surface of coding.code.toUpperCase().split('')) {
+      if (isToothSurface(surface)) surfaces.add(surface);
+    }
+  }
+  return [...surfaces];
 }
 
 function extractSurfaces(text: string): ToothSurface[] {
@@ -447,17 +708,22 @@ function getDentalDetails(
 }
 
 function getToothNumbers(
+  document: ClinicalDocument<unknown>,
   details: DentalRecordDetails | undefined,
   text: string,
+  numbering?: DentalRecordDetails['numberingSystem'],
 ): string[] {
-  const numberingSystem = details?.numberingSystem;
-  const teeth = new Set<string>();
-  addToothList(teeth, details?.toothNumber, numberingSystem);
-  addToothList(teeth, details?.dentalTeeth, numberingSystem);
-  addToothRange(teeth, details?.toothRange);
+  const teeth = new Set<string>(getCodedTeeth(document));
 
   if (teeth.size === 0) {
-    extractToothNumbers(text).forEach((tooth) => teeth.add(tooth));
+    addToothList(teeth, details?.toothNumber, numbering);
+    addToothList(teeth, details?.dentalTeeth, numbering);
+    const range = details?.toothRange?.match(/(\d{1,2})\s*-\s*(\d{1,2})/);
+    if (range) addResolvedRange(teeth, range[1], range[2], numbering);
+  }
+
+  if (teeth.size === 0) {
+    extractToothNumbers(text, numbering).forEach((tooth) => teeth.add(tooth));
   }
 
   return [...teeth].sort(compareTeeth);
@@ -492,19 +758,23 @@ function normalizeTooth(
   );
   if (byUniversal) return byUniversal.universal;
 
+  // In Universal records (Open Dental among them) 51–82 are supernumerary
+  // teeth — tooth number plus 50 — not FDI primary teeth. There is no place
+  // for them on the chart, so they are left off rather than drawn as a
+  // baby tooth.
+  if (numberingSystem === 'universal' && /^\d+$/.test(normalized)) {
+    const number = Number(normalized);
+    if (number >= 51 && number <= 82) return undefined;
+  }
+
   const byNotation = findToothByNotation(value);
   if (byNotation) return byNotation.universal;
 
-  // Fall back to a bare Universal number embedded in a noisier token (e.g.
-  // "#14" or "14MOD") to preserve the previous regex-based extraction.
-  if (numberingSystem !== 'fdi' && numberingSystem !== 'palmer') {
-    const numeric = normalized.match(/(?:3[0-2]|[12][0-9]|[1-9])/);
-    if (numeric) {
-      const universal = `${Number(numeric[0])}`;
-      if (ALL_TEETH.some((tooth) => tooth.universal === universal)) {
-        return universal;
-      }
-    }
+  // Fall back to a number embedded in a noisier token (e.g. "#14" or
+  // "14MOD"), read by the same rules as free text.
+  if (numberingSystem !== 'palmer') {
+    const numeric = normalized.match(/(?<!\d)\d{1,2}(?!\d)/);
+    if (numeric) return resolveToothNumber(numeric[0], numberingSystem);
   }
 
   return undefined;
@@ -524,10 +794,12 @@ export function compareTeeth(a: string, b: string): number {
 }
 
 function getSurfaces(
+  document: ClinicalDocument<unknown>,
   details: DentalRecordDetails | undefined,
   text: string,
 ): ToothSurface[] {
-  const surfaces = new Set<ToothSurface>();
+  const surfaces = new Set<ToothSurface>(getCodedSurfaces(document));
+  if (surfaces.size > 0) return [...surfaces];
 
   for (const surface of details?.dentalSurfaces || []) {
     if (isToothSurface(surface)) surfaces.add(surface);
@@ -542,14 +814,14 @@ function getSurfaces(
 
 function buildDentalToothSurfaceModel(
   details: DentalRecordDetails | undefined,
-  text: string,
+  teeth: string[],
+  surfaces: ToothSurface[],
 ): DentalToothSurfaceModel {
-  const teeth = getToothNumbers(details, text);
   return {
     numberingSystem: details?.numberingSystem || 'universal',
     dentition: details?.dentition,
     teeth,
-    surfaces: getSurfaces(details, text),
+    surfaces,
     quadrant: details?.dentalQuadrant,
     arch: details?.dentalArch,
     status: details?.dentalStatus,

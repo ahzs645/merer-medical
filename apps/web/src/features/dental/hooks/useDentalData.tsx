@@ -107,7 +107,7 @@ export function useDentalData() {
     );
     const allDentalRecords = documents
       .filter(isDentalDocument)
-      .map(mapDentalDocument);
+      .map((document) => mapDentalDocument(document));
     const records = allDentalRecords.filter(
       (record) => record.kind !== 'image',
     );
@@ -124,7 +124,7 @@ export function useDentalData() {
           (document) =>
             isDentalClaimDocument(document) && !seenIds.has(document.id),
         )
-        .map(mapDentalDocument),
+        .map((document) => mapDentalDocument(document)),
     ];
 
     return {
@@ -134,7 +134,7 @@ export function useDentalData() {
       odontogramStatuses,
       treatmentPlan: buildTreatmentPlan(records),
       perioOverview: buildPerioOverview(records),
-      toothTimeline: buildToothTimeline(odontogramStatuses),
+      toothTimeline: buildToothTimeline(odontogramStatuses, recordsByTooth),
       imagingMounts: buildImagingMounts(allDentalRecords),
       claimSummaries: buildClaimSummaries(claimRecords),
       recallItems: buildRecallItems(records),

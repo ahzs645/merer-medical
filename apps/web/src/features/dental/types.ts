@@ -16,10 +16,28 @@ export type DentalRecordKind =
   | 'referral'
   | 'image';
 
+/**
+ * Where a single record stands, read from its FHIR status (or the status a
+ * person typed or a source system exported), not from its wording.
+ * `open` is an unresolved finding, condition or referral; `planned` is
+ * proposed or scheduled work; `done` is performed work; `resolved` and
+ * `cancelled` are records that no longer ask anything of the reader.
+ */
+export type DentalRecordStatus =
+  | 'open'
+  | 'planned'
+  | 'done'
+  | 'resolved'
+  | 'cancelled'
+  | 'unknown';
+
+export type DentalNumberingSystem = 'universal' | 'fdi';
+
 export type DentalRecord = {
   id: string;
   document: ClinicalDocument<unknown>;
   kind: DentalRecordKind;
+  status: DentalRecordStatus;
   title: string;
   date?: string;
   toothNumbers: string[];
@@ -70,6 +88,10 @@ export type DentalRecordDetails = {
   perioMobility?: string;
   perioFurcation?: string;
   perioSuppuration?: string;
+  perioCalculus?: string;
+  perioDeepestPocket?: string;
+  perioSitesProbed?: string;
+  perioSitesFourPlus?: string;
   imagingMount?: string;
   imagingModality?: string;
   dicomStudyUid?: string;
@@ -81,6 +103,7 @@ export type DentalRecordDetails = {
   insuranceEstimate?: string;
   patientPortion?: string;
   signatureStatus?: string;
+  treatmentPlanItems?: string;
   recallType?: string;
   recallDueDate?: string;
   claimStatus?: string;
