@@ -6,11 +6,11 @@ import {
   DentalImagingMount,
   DentalNextAction,
   DentalNextCleaning,
-  DentalPerioMeasurement,
   DentalRecallItem,
   DentalRecord,
   DentalWorkflowContext,
   OdontogramToothStatus,
+  PerioExamSummary,
   PerioOverview,
   ToothSurface,
   TreatmentPlanItem,
@@ -24,18 +24,6 @@ import {
 } from './dentalRecords';
 
 const ACTIVE_KINDS = new Set(['condition', 'finding', 'perio', 'referral']);
-
-const PERIO_RISK_TERMS = [
-  'attachment loss',
-  'bleeding',
-  'calculus',
-  'furcation',
-  'mobility',
-  'pocket',
-  'probing',
-  'recession',
-  'suppuration',
-];
 
 const TREATING_KINDS = new Set(['procedure', 'surgery']);
 
@@ -153,6 +141,98 @@ export function buildTreatmentPlan(
     }));
 }
 
+type SiteDepth = { tooth?: string; depth: number };
+
+/**
+ * Pocket depths and bleeding from one perio record, from whichever shape it
+ * carries: an importer's per-site string ("tooth 3 MB:3/B:2/DB:5…"), FHIR
+ * components ("Pocket depth MB" = 5 mm; "Bleeding on probing" = true), or a
+ * plain valueQuantity in mm.
+ */
+export function readPerioSites(record: DentalRecord): {
+  depths: SiteDepth[];
+  bleedingSites?: number;
+} {
+  const depths: SiteDepth[] = [];
+  let bleedingSites: number | undefined;
+  const fallbackTooth =
+    record.toothNumbers.length === 1 ? record.toothNumbers[0] : undefined;
+
+  for (const segment of (record.details?.perioPocketDepths || '').split(';')) {
+    const match = segment.match(/tooth\s+(\w+)\s+(.*)/i);
+    if (!match) continue;
+    for (const site of match[2].matchAll(/[A-Z]{1,2}:(-?\d+(?:\.\d+)?)/g)) {
+      depths.push({ tooth: match[1], depth: Number(site[1]) });
+    }
+  }
+  if (record.details?.perioBleeding) {
+    bleedingSites = record.details.perioBleeding
+      .split(';')
+      .map((segment) => segment.replace(/tooth\s+\w+/i, ''))
+      .reduce(
+        (total, segment) =>
+          total + segment.split(',').filter((site) => site.trim()).length,
+        0,
+      );
+  }
+
+  const raw = record.document.data_record.raw as any;
+  const resource = raw?.resource || raw || {};
+  const label = (item: any) =>
+    `${item?.code?.text || ''} ${item?.code?.coding?.[0]?.display || ''}`.toLowerCase();
+  const mm = (quantity: any) =>
+    quantity && /^mm$|millimet/i.test(quantity.unit || quantity.code || '')
+      ? Number(quantity.value)
+      : undefined;
+
+  if (depths.length === 0) {
+    for (const component of Array.isArray(resource.component)
+      ? resource.component
+      : []) {
+      const name = label(component);
+      const depth = mm(component.valueQuantity);
+      if (/pocket|probing depth/.test(name) && depth !== undefined) {
+        depths.push({ tooth: fallbackTooth, depth });
+      }
+      if (/bleeding/.test(name) && component.valueBoolean === true) {
+        bleedingSites = (bleedingSites || 0) + 1;
+      }
+    }
+    const value = mm(resource.valueQuantity);
+    if (value !== undefined && /pocket|probing/.test(label(resource))) {
+      depths.push({ tooth: fallbackTooth, depth: value });
+    }
+  }
+
+  return { depths, bleedingSites };
+}
+
+function summarizePerioExam(
+  record: DentalRecord,
+): PerioExamSummary | undefined {
+  const { depths, bleedingSites } = readPerioSites(record);
+  if (depths.length === 0) return undefined;
+  const max = Math.max(...depths.map((site) => site.depth));
+  return {
+    record,
+    date: record.date,
+    sitesProbed: depths.length,
+    sitesFourPlus: depths.filter((site) => site.depth >= 4).length,
+    sitesFivePlus: depths.filter((site) => site.depth >= 5).length,
+    deepest: {
+      depth: max,
+      teeth: [
+        ...new Set(
+          depths
+            .filter((site) => site.depth === max && site.tooth)
+            .map((site) => site.tooth as string),
+        ),
+      ].sort(compareTeeth),
+    },
+    bleedingSites,
+  };
+}
+
 export function buildPerioOverview(records: DentalRecord[]): PerioOverview {
   const perioRecords = records.filter((record) => record.kind === 'perio');
   const maintenanceRecords = records.filter(
@@ -164,23 +244,17 @@ export function buildPerioOverview(records: DentalRecord[]): PerioOverview {
         'root planing',
       ]),
   );
-  const affectedTeeth = new Set<string>();
-  const riskSignals = new Set<string>();
-
-  for (const record of perioRecords) {
-    record.toothNumbers.forEach((tooth) => affectedTeeth.add(tooth));
-    for (const term of PERIO_RISK_TERMS) {
-      if (hasAnyTerm(record, [term])) riskSignals.add(term);
-    }
-  }
+  const exams = perioRecords
+    .map(summarizePerioExam)
+    .filter((exam): exam is PerioExamSummary => !!exam)
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
   return {
+    latestExam: exams[0],
+    previousExam: exams[1],
     recordCount: perioRecords.length,
     latestRecord: perioRecords[0],
-    riskSignals: [...riskSignals],
-    affectedTeeth: [...affectedTeeth].sort(compareTeeth),
     maintenanceRecords,
-    latestMeasurements: buildPerioMeasurements(perioRecords).slice(0, 6),
   };
 }
 
@@ -437,35 +511,6 @@ export function buildWorkflowContext(
     imagingCount,
     nextActions,
   };
-}
-
-function buildPerioMeasurements(
-  records: DentalRecord[],
-): DentalPerioMeasurement[] {
-  return records
-    .map((record) => ({
-      record,
-      date: record.date,
-      teeth: record.toothNumbers,
-      pocketDepths: record.details?.perioPocketDepths,
-      recession: record.details?.perioRecession,
-      bleeding: record.details?.perioBleeding,
-      plaque: record.details?.perioPlaque,
-      mobility: record.details?.perioMobility,
-      furcation: record.details?.perioFurcation,
-      suppuration: record.details?.perioSuppuration,
-    }))
-    .filter((measurement) =>
-      [
-        measurement.pocketDepths,
-        measurement.recession,
-        measurement.bleeding,
-        measurement.plaque,
-        measurement.mobility,
-        measurement.furcation,
-        measurement.suppuration,
-      ].some(Boolean),
-    );
 }
 
 function getActionLevel(

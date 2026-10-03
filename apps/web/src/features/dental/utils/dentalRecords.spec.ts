@@ -9,6 +9,7 @@ import {
   buildOdontogramStatuses,
   buildTreatmentPlan,
   buildNextCleaning,
+  buildPerioOverview,
   buildWorkflowContext,
   recordActionLevel,
   statedRecallMonths,
@@ -425,5 +426,72 @@ describe('dental coverage', () => {
       item: [{ productOrService: { coding: [{ code: 'D1110' }] } }],
     });
     expect(isDentalClaimDocument(eob)).toBe(true);
+  });
+});
+
+describe('gum (perio) summary', () => {
+  it('reads FHIR pocket-depth components and bleeding', () => {
+    const exam = map(
+      doc(
+        'Observation',
+        {
+          status: 'final',
+          code: { text: 'Periodontal probing depth tooth 14' },
+          component: [
+            {
+              code: { text: 'Pocket depth MB' },
+              valueQuantity: { value: 5, unit: 'mm' },
+            },
+            { code: { text: 'Bleeding on probing' }, valueBoolean: true },
+          ],
+        },
+        { date: '2026-02-12T00:00:00.000Z' },
+      ),
+    );
+    const { latestExam } = buildPerioOverview([exam]);
+    expect(latestExam).toMatchObject({
+      sitesProbed: 1,
+      sitesFivePlus: 1,
+      deepest: { depth: 5, teeth: ['14'] },
+      bleedingSites: 1,
+    });
+  });
+
+  it('reads an importer’s per-site string and compares exams', () => {
+    const exam = (date: string, depths: string, bleeding: string) =>
+      map(
+        doc(
+          'Observation',
+          { status: 'final' },
+          {
+            date: `${date}T00:00:00.000Z`,
+            manual_specialty_details: {
+              specialty: 'dental',
+              subtype: 'perio',
+              perioPocketDepths: depths,
+              perioBleeding: bleeding,
+            },
+          },
+        ),
+      );
+    const overview = buildPerioOverview([
+      exam(
+        '2025-06-01',
+        'tooth 3 MB:3/B:2/DB:6/ML:3/L:2/DL:4',
+        'tooth 3 MB, DB',
+      ),
+      exam(
+        '2026-06-01',
+        'tooth 3 MB:3/B:2/DB:4/ML:3/L:2/DL:3; tooth 14 MB:2/B:2/DB:3',
+        'tooth 3 DB',
+      ),
+    ]);
+    expect(overview.latestExam).toMatchObject({
+      sitesProbed: 9,
+      sitesFourPlus: 1,
+      deepest: { depth: 4, teeth: ['3'] },
+      bleedingSites: 1,
+    });
+    expect(overview.previousExam?.deepest?.depth).toBe(6);
   });
 });

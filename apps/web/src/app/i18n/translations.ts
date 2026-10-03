@@ -1527,6 +1527,35 @@ export const arabicTranslations: Record<string, string> = {
   'Drawn as your dentist sees you: your right side is on the left.':
     'مرسوم كما يراك طبيب أسنانك: جانبك الأيمن على اليسار.',
   Numbering: 'الترقيم',
+  'Gums (perio)': 'اللثة',
+  'Last measured {date}': 'آخر قياس في {date}',
+  'Deepest pocket': 'أعمق جيب',
+  'Sites 4 mm+': 'مواضع 4 مم فأكثر',
+  'Bleeding sites': 'مواضع النزيف',
+  'One site': 'موضع واحد',
+  '{n} sites': '{n} مواضع',
+  'Healthy: every site measured was 3 mm or less.':
+    'سليمة: كل موضع قيس كان 3 مم أو أقل.',
+  'Mostly healthy. {count} at 4 mm, which dentists keep an eye on.':
+    'سليمة في الغالب. {count} بعمق 4 مم، وهو ما يتابعه أطباء الأسنان.',
+  '{count} at 5 mm or deeper — deepest {depth} mm, tooth {teeth}. Pockets this deep go with gum disease your dentist will want to follow.':
+    '{count} بعمق 5 مم أو أكثر — أعمقها {depth} مم عند السن {teeth}. الجيوب بهذا العمق ترتبط بأمراض اللثة وسيرغب طبيبك في متابعتها.',
+  '{count} at 5 mm or deeper — deepest {depth} mm. Pockets this deep go with gum disease your dentist will want to follow.':
+    '{count} بعمق 5 مم أو أكثر — أعمقها {depth} مم. الجيوب بهذا العمق ترتبط بأمراض اللثة وسيرغب طبيبك في متابعتها.',
+  'Better than last time: deepest was {depth} mm on {date}.':
+    'أفضل من المرة السابقة: كان الأعمق {depth} مم في {date}.',
+  'Deeper than last time: deepest was {depth} mm on {date}.':
+    'أعمق من المرة السابقة: كان الأعمق {depth} مم في {date}.',
+  'Same deepest pocket as last time ({depth} mm on {date}).':
+    'أعمق جيب كما في المرة السابقة ({depth} مم في {date}).',
+  'Pocket depth: 1–3 mm is healthy, 4 mm is borderline, 5 mm or more is a sign of gum disease.':
+    'عمق الجيب: من 1 إلى 3 مم سليم، و4 مم حدّي، و5 مم أو أكثر علامة على مرض اللثة.',
+  'Your gum records have no pocket measurements to show — only notes.':
+    'سجلات اللثة لديك لا تحتوي على قياسات للجيوب — ملاحظات فقط.',
+  'No gum measurements yet. A periodontal exam measures the pocket around each tooth in millimetres.':
+    'لا توجد قياسات للثة بعد. يقيس فحص اللثة الجيب حول كل سن بالمليمتر.',
+  'Gum maintenance visits on record: {count}':
+    'زيارات صيانة اللثة المسجلة: {count}',
   '3D scans': 'المسوح ثلاثية الأبعاد',
   '3D view of your scan. Drag to turn it.':
     'عرض ثلاثي الأبعاد لمسحك. اسحب لتدويره.',

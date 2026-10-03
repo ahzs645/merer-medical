@@ -154,26 +154,24 @@ export type TreatmentPlanItem = {
   date?: string;
 };
 
-export type PerioOverview = {
-  recordCount: number;
-  latestRecord?: DentalRecord;
-  riskSignals: string[];
-  affectedTeeth: string[];
-  maintenanceRecords: DentalRecord[];
-  latestMeasurements: DentalPerioMeasurement[];
-};
-
-export type DentalPerioMeasurement = {
+/** One gum exam, reduced to what a reader needs: how deep, where, bleeding. */
+export type PerioExamSummary = {
   record: DentalRecord;
   date?: string;
-  teeth: string[];
-  pocketDepths?: string;
-  recession?: string;
-  bleeding?: string;
-  plaque?: string;
-  mobility?: string;
-  furcation?: string;
-  suppuration?: string;
+  sitesProbed: number;
+  sitesFourPlus: number;
+  sitesFivePlus: number;
+  deepest?: { depth: number; teeth: string[] };
+  bleedingSites?: number;
+};
+
+export type PerioOverview = {
+  /** Newest exam with measurements, and the one before it to compare. */
+  latestExam?: PerioExamSummary;
+  previousExam?: PerioExamSummary;
+  recordCount: number;
+  latestRecord?: DentalRecord;
+  maintenanceRecords: DentalRecord[];
 };
 
 export type DentalImagingMount = {
