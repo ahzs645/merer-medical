@@ -1,6 +1,7 @@
 # Dental review — what the workspace tells you about your teeth
 
-> **Status:** findings only; nothing here is fixed yet. Ordered by how much a
+> **Status:** findings only; nothing here is fixed yet. Part 1 (§1–§10) is the
+> screens; Part 2 (§11–§15) is how dental data gets in. Ordered by how much a
 > wrong answer would mislead the person reading it, not by how hard it is to fix.
 
 Companion to the six interface-review passes. Those walked every surface and
@@ -433,3 +434,207 @@ either — tap an arch or quadrant to zoom, or lead with the grid (§1).
 4. **§6** — dental-only coverage; benefits remaining when present.
 5. **§8 + §9** — openable records, human labels, one tooth-history panel.
 6. **§7 + §10** — real scan rendering; perio in plain language.
+
+---
+
+# Part 2 — How dental data gets in
+
+Part 1 found a lot wrong in the screens' inference layer. Most of it starts
+upstream: the screens guess because the inputs don't carry what they need to
+know. This part follows each way a dental record can enter the app, and checks
+what survives the trip.
+
+**Setup:** same build. The Open Dental builder was run on a small fixture (2
+patients, 3 procedures, 1 perio exam with 4 measure rows) written against Open
+Dental's own schema documentation (v24.3). The manual form was driven in the
+browser at both widths. A record was saved and followed to every page it
+reached.
+
+## The seven doors
+
+| Door                                       | Where                                               | State                                                               |
+| ------------------------------------------ | --------------------------------------------------- | ------------------------------------------------------------------- |
+| Bundled demo                               | `assets/demo/…dental-demo-connection.json`          | hand-written FHIR; the only source with complete data               |
+| Manual entry (18 dental types)             | `features/manual-entry`                             | works; free-text fields only (§12)                                  |
+| Open Dental → `.emrpkg`                    | `tools/build-opendental-emrpkg.mjs`                 | CLI; reads `.schema` + `.tsv`; status and perio mapping wrong (§11) |
+| Open Dental MySQL → JSON                   | `tools/export-open-dental-demo-json.mjs`            | writes JSON for "a later importer" that doesn't exist               |
+| 15 `dental_*` tables                       | `packages/local-dexie/src/db.ts`                    | schema, types and commands, but the app never reads them (§14)      |
+| Document → `.emrpkg` (transpose skill)     | `.claude/skills/transpose-…`, `tools/transpose.mjs` | no dental section, so a dental letter has nowhere to go (§13)       |
+| Patient-portal FHIR sync (Epic, Cerner, …) | `services/fhir/*`                                   | dental only by keyword; coded teeth ignored (§13)                   |
+| Image / scan upload                        | "Dental image / scan" in the form                   | one file, stored inline as base64 (§15)                             |
+
+Two importers aimed at the same source, with different input formats (TSV vs a
+live MySQL), and a third storage model that neither feeds. Pick one route.
+
+## 11. The Open Dental importer marks planned work as done
+
+Running `build-opendental-emrpkg.mjs` on the fixture:
+
+| Open Dental `ProcStatus` | Imported as                                  | Should be                                                 |
+| ------------------------ | -------------------------------------------- | --------------------------------------------------------- |
+| 1 — Treatment plan       | **completed** Procedure, subtype `procedure` | `ServiceRequest`/Procedure `preparation`, `treatmentPlan` |
+| 6 — Deleted              | **completed** Procedure                      | skipped                                                   |
+| 7 — Condition            | **completed** Procedure named "Caries"       | `Condition`, active                                       |
+| 8 — TP inactive          | **completed** Procedure                      | skipped, or an inactive plan                              |
+
+The cause is one string comparison: `procedureStatus()` returns
+`'treatment-planned'`, and both the subtype and the FHIR status test for
+`status === 'planned'`, which nothing returns. Status 7 and 8 aren't in the
+lookup table (schema: "7- Condition. 8- Treatment Plan inactive"). So **every
+proposed treatment shows as completed work**, and the Treatment plan panel is
+always empty for an Open Dental import. A deleted procedure, which the practice
+removed, also comes back as done, and so does an existing cavity (a condition).
+
+**Perio is worse.** Open Dental stores one row per _measurement type_ per tooth
+(`PerioSequenceType`: Mobility 0, Furcation 1, GingMargin 2, MGJ 3, Probing 4,
+SkipTooth 5, BleedSupPlaqCalc 6, CAL 7). The builder:
+
+- puts **every** row into `perioPocketDepths`, so "pocket depths" for tooth 3
+  read `MB:3/B:2/DB:5…; MB:1/B:0/DB:5…; MB:102/B:101/DB:100…`. The second set is
+  bleeding flags; the third is gingival margin, where 102 means −2 mm;
+- shows bleeding as a raw flag sum (5 = bleeding + plaque) laid out as if it
+  were millimetres;
+- reads mobility from sequence type **8**, which doesn't exist, so mobility is
+  never imported;
+- files the exam as subtype `finding`. The app therefore never treats it as
+  perio: it's absent from the Perio overview, it turns every probed tooth (all
+  28–32) red as an "Active finding", and it adds an item to "What to do next".
+
+Also in the builder:
+
+- **It imports the whole practice.** There's no `--patient` filter. Every row in
+  `patient` becomes a user in the package, and the first is selected. Run
+  against a real practice export it would put hundreds of other people's
+  records into one person's health record. For a personal record that's a
+  privacy failure, not a feature.
+- **Each recall becomes a cleaning visit.** It's subtype `cleaning`, dated by
+  its _due_ date, so Cleaning history lists future visits that haven't
+  happened.
+- **Appointments are emitted as `appointment` resources,** which Dental doesn't
+  query (`DENTAL_RESOURCE_TYPES`). The one source that knows your next
+  appointment is the one the screen never reads.
+- **The treatment-plan header doesn't connect to its line items.**
+  `treatplanattach` and `proctp` aren't read, so a plan has no procedures and
+  no total.
+- **Supernumerary teeth (51–82)** are written as Universal. The app's
+  `normalizeTooth` then reads 51 as FDI 51, which is primary tooth A.
+- **Undated rows get the import time** (`toIso(date) || nowIso`): a fabricated
+  date.
+
+**Fix:** map all eight statuses; skip 6 and 8; emit 7 as a Condition. Group
+perio measures by `SequenceType` into separate fields: probing in mm, recession
+decoded from the 100+ form, bleeding/suppuration/plaque/calculus as booleans
+per site, mobility from sequence 0. Give the exam subtype `perio`. Require
+`--patient <PatNum>`. Emit recalls as a CarePlan with `period.end` = due date,
+not as a cleaning. Add `appointment` to the dental query. Attach plan line
+items. Leave undated rows undated. All of this is unit-testable with the
+fixture used here, so add it to `tools/fixtures`.
+
+## 12. The form asks for free text where the screens need a fact
+
+The "Add dental record" form shows the same 14 fields for all 18 record types.
+A cleaning asks for tooth, tooth range, quadrant, arch, dentition, severity
+and surfaces. All of them are free-text boxes:
+
+- **Tooth** says "e.g. 14" and has no numbering choice. Saved in the browser:
+  tooth **"26"** (a Canadian writing the upper-left first molar) was charted as
+  **#26 / FDI 42**, a lower-right incisor, and painted red.
+- **Status** is free text ("Planned, active, complete"). Saved as **"resolved"**,
+  the tooth still showed **ACTIVE**, because the screens never read it as a
+  status (§3), and the FHIR resource is written with a fixed status
+  (`'final'`, or `'active'` for care plans) whatever was typed.
+- **No recall due date.** "Recall or follow-up" is prose ("e.g. 6-month
+  cleaning recall"). The field the Recall panel reads, `recallDueDate`, can't be
+  set from the form, so a manually entered cleaning can never say when the next
+  one is due (§5).
+- **No perio type.** Of the 18 types none is a perio exam. Pocket depths have
+  no field, so manual perio can only arrive as a keyword the classifier happens
+  to catch.
+- **"Tooth finding" is stored as a vital-sign Observation.** On the Timeline it
+  appears under **"Your Labs"** with a "Labs" chip.
+- On a phone the form is 23 fields deep before "Save".
+
+**Fix:** fields per type. A cleaning needs date, provider, "next due"; a
+finding needs tooth, surface and status. Use a **tooth picker** (the Part 1
+grid, in the user's notation) rather than three text boxes. Make status a fixed
+choice that writes the matching FHIR status. Add a **Perio exam** type with a
+compact 6-site entry, or at least "deepest pocket" and "bleeding sites". Store
+`numberingSystem` with every record. Give dental findings their own category so
+the Timeline stops calling them labs.
+
+## 13. Coded teeth are thrown away; letters have nowhere to go
+
+**From patient portals:** the FHIR way to say which tooth is `bodySite`, coded
+with `ex-tooth` (FDI) or SNOMED CT (see the research). The app never reads a
+coding. It runs the free-text pattern over the JSON instead, and on
+`{"system":"…/ex-tooth","code":"36"}` and on SNOMED "Structure of mandibular
+left first molar tooth" that pattern finds **nothing**. A portal that does
+everything right gets no tooth on the chart.
+
+**From documents:** most people's dental history is a PDF: a treatment
+estimate, a referral letter, a perio chart printout, an insurer's EOB. The
+transpose skill turns documents into packages, but its "Where things go" table
+and `clinical-transpose-format.md` have no dental section. Nothing in it covers
+a tooth, a surface or a numbering system, so a transposed dental letter becomes
+generic procedures with teeth in prose. That is the exact input that trips
+§2 and §4.
+
+**Fix:** read `bodySite.coding` first (ex-tooth, SNOMED, FDI-surface), then
+manual details, then free text. Add a `dental` section to the transpose format
+(tooth with `numberingSystem`, surfaces, status, recall due, perio sites, plan
+items with fee/insurance/patient share), and a dental row to the skill's table.
+`tools/transpose.mjs validate` should reject a tooth number without a system.
+
+## 14. Fifteen dental tables nobody reads
+
+`packages/local-dexie` declares `dental_patient_profiles`, `dental_tooth_charts`,
+`dental_perio_exams`, `dental_treatment_plans`, `dental_recall_records` and ten
+more, with zod schemas in `@mere/domain` and commands in
+`clinicalDemo.ts`. The web app reads only RxDB `clinical_documents`, and
+`packages/README.md` says the packages "are not imported by apps/web".
+`docs/dental-open-dental-incorporation.md` describes this storage as the plan
+("the Open Dental demo importer should write to the separate dental tables
+first"). Today the Open Dental builder writes `clinical_documents`, the doc
+describes tables, and the screens read neither the tables nor the doc's
+projection fields consistently.
+
+That's not wrong as a scaffold, but it is a fork. The structured shape the
+screens need (perio sites, recall due dates, plan line items) already exists
+in `DentalPerioExam`, `DentalRecallRecord` and `DentalTreatmentPlan`, unused.
+
+**Fix:** decide which is the source of truth for dental. Until the Dexie move
+happens, write the structured fields into
+`metadata.manual_specialty_details` using those same type names, so the move
+later is a copy and not a re-mapping. Update the incorporation doc to say
+which path is live.
+
+## 15. Scans: one file, inline, and no CBCT
+
+"Dental image / scan" takes one file of any type and stores it as base64 inside
+the record's JSON. Consequences:
+
+- A full-arch STL (≈11 MB median) becomes ≈15 MB of base64 in one IndexedDB
+  document, and again in every `.emrpkg` export. The emrpkg code says the
+  `attachments/` folder is "reserved for future extraction".
+- Browsers often report `.stl` as `""` → `application/octet-stream`; detection
+  survives only because the filename is also checked.
+- A CBCT is a _folder_ of hundreds of DICOM slices. There's no way to add one,
+  and the "Dental CBCT" demo record has no images behind it.
+
+**Fix:** store binaries as attachments (the Dexie path already has a table),
+accept multiple files and folders (`webkitdirectory`) for DICOM, and record
+`model/stl` / `model/ply` explicitly. For CBCT, this is where CBCTer fits:
+accept a DICOM folder, hand it to CBCTer's viewer, and keep its tooth
+segmentation (labelled by tooth) as structured input to the chart.
+
+## Input pipeline — suggested order
+
+1. **§11 status mapping + `--patient` filter.** A two-line bug and a privacy
+   guard, both with a fixture test.
+2. **§13 read `bodySite` codings.** Small, and it makes correct sources work.
+3. **§12 tooth picker + numbering + status choice + recall due date.** This
+   removes most of what Part 1's classifier has to guess.
+4. **§11 perio decoding** together with Part 1 §10 (perio in plain language).
+5. **§13 transpose `dental` section.** Most real dental data is documents.
+6. **§14/§15 storage decisions:** one dental source of truth; binary
+   attachments; DICOM via CBCTer.
