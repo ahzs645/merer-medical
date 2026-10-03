@@ -1,0 +1,8 @@
+RecallNum:bigint
+PatNum:bigint
+RecallTypeNum:bigint
+DateDue:date
+DatePrevious:date
+DateScheduled:date
+IsDisabled:tinyint
+Note:text

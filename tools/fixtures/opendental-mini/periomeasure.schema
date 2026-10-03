@@ -1,0 +1,11 @@
+PerioMeasureNum:bigint
+PerioExamNum:bigint
+SequenceType:tinyint
+IntTooth:smallint
+ToothValue:smallint
+MBvalue:smallint
+Bvalue:smallint
+DBvalue:smallint
+MLvalue:smallint
+Lvalue:smallint
+DLvalue:smallint

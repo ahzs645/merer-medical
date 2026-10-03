@@ -2,6 +2,13 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { strToU8, zipSync } from 'fflate';
+import {
+  PERIO_SEQUENCE_NAMES,
+  decodeSiteValue,
+  procedureDisposition,
+  selectPatients,
+  summarizePerioMeasures,
+} from './lib/opendental-mapping.mjs';
 
 const FORMAT_NAME = 'mere-emr-package';
 const FORMAT_VERSION = 1;
@@ -14,10 +21,15 @@ if (!args.source || !args.output) {
   node tools/build-opendental-emrpkg.mjs \\
     --source /Users/ahmadjalil/Downloads/EMR/extracted_data \\
     --output /Users/ahmadjalil/Downloads/EMR/opendental.emrpkg \\
+    --patient <PatNum>[,<PatNum>…] | --all-patients
     [--profile-id opendental-demo] [--connection-name "Open Dental import"]
 
 Reads extracted OpenDental-style .schema + .tsv files and writes a Mere .emrpkg.
-The package preserves original source rows in each FHIR-like resource.`);
+The package preserves original source rows in each FHIR-like resource.
+
+A practice export holds every patient in the practice. --patient picks the one
+(or few) whose record this is; --all-patients builds every patient as its own
+profile, which is only for demo data.`);
   process.exit(1);
 }
 
@@ -51,14 +63,25 @@ for (const table of [
   'perioexam',
   'periomeasure',
   'toothinitial',
+  'treatplanattach',
 ]) {
   tables.set(table, readTable(table));
 }
 
-const patients = table('patient');
-if (patients.length === 0) {
+const allPatients = table('patient');
+if (allPatients.length === 0) {
   throw new Error(`No patient rows found in ${join(sourceDir, 'patient.tsv')}`);
 }
+const patients = selectPatients(allPatients, {
+  patientIds:
+    typeof args.patient === 'string'
+      ? args.patient
+          .split(',')
+          .map((id) => id.trim())
+          .filter(Boolean)
+      : [],
+  all: args.allPatients === true,
+});
 
 const providerById = byKey(table('provider'), 'ProvNum');
 const procedureCodeById = byKey(table('procedurecode'), 'CodeNum');
@@ -74,6 +97,8 @@ const claimProcsByProc = groupBy(table('claimproc'), 'ProcNum');
 const benefitsByPlan = groupBy(table('benefit'), 'PlanNum');
 const patPlansByPat = groupBy(table('patplan'), 'PatNum');
 const perioMeasuresByExam = groupBy(table('periomeasure'), 'PerioExamNum');
+const procedureById = byKey(table('procedurelog'), 'ProcNum');
+const attachmentsByPlan = groupBy(table('treatplanattach'), 'TreatPlanNum');
 
 const userDocuments = patients.map((patient, index) =>
   buildUser(patient, index === 0),
@@ -93,7 +118,8 @@ for (const provider of table('provider')) {
 
 for (const procedure of table('procedurelog')) {
   if (!hasPatient(procedure.PatNum)) continue;
-  clinicalDocuments.push(procedureClinicalDocument(procedure));
+  const document = procedureClinicalDocument(procedure);
+  if (document) clinicalDocuments.push(document);
 }
 
 for (const appointment of table('appointment')) {
@@ -327,29 +353,28 @@ function practitionerClinicalDocument(provider, patient) {
 
 function procedureClinicalDocument(procedure) {
   const code = procedureCodeById.get(procedure.CodeNum);
+  const disposition = procedureDisposition(procedure.ProcStatus, {
+    isHygiene: code?.IsHygiene === '1',
+  });
+  if (disposition.skip) return undefined;
+
   const provider = providerById.get(procedure.ProvNum);
   const claimProc = claimProcsByProc.get(procedure.ProcNum)?.[0];
   const claim = claimProc?.ClaimNum
     ? claimById.get(claimProc.ClaimNum)
     : undefined;
-  const status = procedureStatus(procedure.ProcStatus);
   const title =
     code?.Descript ||
     code?.AbbrDesc ||
     procedure.OldCode ||
     `Dental procedure ${procedure.ProcNum}`;
   const details = dentalDetails({
-    subtype:
-      status === 'planned'
-        ? 'treatmentPlan'
-        : code?.IsHygiene === '1'
-          ? 'cleaning'
-          : 'procedure',
+    subtype: disposition.subtype,
     procedureCode: code?.ProcCode || procedure.OldCode,
     dentalTeeth: procedure.ToothNum,
     toothRange: procedure.ToothRange,
     dentalSurfaces: surfaces(procedure.Surf),
-    dentalStatus: status,
+    dentalStatus: disposition.status,
     dentalProvider: providerName(provider),
     sourceTable: 'procedurelog',
     sourceId: procedure.ProcNum,
@@ -361,7 +386,67 @@ function procedureClinicalDocument(procedure) {
     claimStatus: claim?.ClaimStatus && claimStatus(claim.ClaimStatus),
     carrierName: carrierNameForPlan(claim?.PlanNum || claimProc?.PlanNum),
   });
+  const coding = code?.ProcCode
+    ? [
+        {
+          system: 'http://www.ada.org/cdt',
+          code: code.ProcCode,
+          display: code.Descript,
+        },
+      ]
+    : undefined;
+  const note = notes([
+    code?.DefaultNote,
+    procedure.BillingNote,
+    procedure.ClaimNote,
+  ]);
+  const extension = sourceExtensions(
+    'procedurelog',
+    procedure.ProcNum,
+    procedure,
+  );
+  const metadata = {
+    manual_specialty: 'dental',
+    manual_subtype: details.subtype,
+    manual_specialty_details: details,
+  };
 
+  // A charted condition (ProcStatus 7) is something found, not something
+  // done: it is a Condition, so it is never shown as completed treatment.
+  if (disposition.resourceType === 'condition') {
+    return clinicalDocument({
+      patientNum: procedure.PatNum,
+      resourceId: `Condition/procedurelog-${procedure.ProcNum}`,
+      resourceType: 'condition',
+      date: procedureDate(procedure),
+      displayName: title,
+      raw: {
+        resource: {
+          resourceType: 'Condition',
+          id: `procedurelog-${procedure.ProcNum}`,
+          clinicalStatus: {
+            coding: [
+              {
+                system:
+                  'http://terminology.hl7.org/CodeSystem/condition-clinical',
+                code: disposition.clinicalStatus,
+              },
+            ],
+          },
+          category: [{ text: 'Dental condition' }],
+          code: { text: title, coding },
+          bodySite: dentalBodySite(details),
+          subject: patientRef(procedure.PatNum),
+          recordedDate: toIso(procedureDate(procedure)),
+          note,
+          extension,
+        },
+      },
+      metadata,
+    });
+  }
+
+  const performed = disposition.fhirStatus === 'completed';
   return clinicalDocument({
     patientNum: procedure.PatNum,
     resourceId: `Procedure/${procedure.ProcNum}`,
@@ -372,21 +457,14 @@ function procedureClinicalDocument(procedure) {
       resource: {
         resourceType: 'Procedure',
         id: `${procedure.ProcNum}`,
-        status: status === 'planned' ? 'preparation' : 'completed',
+        status: disposition.fhirStatus,
         subject: patientRef(procedure.PatNum),
-        performedDateTime: toIso(procedureDate(procedure)),
-        code: {
-          text: title,
-          coding: code?.ProcCode
-            ? [
-                {
-                  system: 'http://www.ada.org/cdt',
-                  code: code.ProcCode,
-                  display: code.Descript,
-                },
-              ]
-            : undefined,
-        },
+        // Planned or referred work has not been performed; its date is when
+        // it was charted, which stays on the document's metadata.
+        performedDateTime: performed
+          ? toIso(procedureDate(procedure))
+          : undefined,
+        code: { text: title, coding },
         bodySite: dentalBodySite(details),
         performer: provider
           ? [
@@ -398,23 +476,11 @@ function procedureClinicalDocument(procedure) {
               },
             ]
           : undefined,
-        note: notes([
-          code?.DefaultNote,
-          procedure.BillingNote,
-          procedure.ClaimNote,
-        ]),
-        extension: sourceExtensions(
-          'procedurelog',
-          procedure.ProcNum,
-          procedure,
-        ),
+        note,
+        extension,
       },
     },
-    metadata: {
-      manual_specialty: 'dental',
-      manual_subtype: details.subtype,
-      manual_specialty_details: details,
-    },
+    metadata,
   });
 }
 
@@ -633,8 +699,10 @@ function claimClinicalDocument(claim) {
 
 function recallClinicalDocument(recall) {
   const type = recallTypeById.get(recall.RecallTypeNum);
+  // A recall is a due date, not a visit. Filed as `cleaning` it appeared in
+  // Cleaning history, dated by when it was due — visits that never happened.
   const details = dentalDetails({
-    subtype: 'cleaning',
+    subtype: 'recall',
     sourceTable: 'recall',
     sourceId: recall.RecallNum,
     recallType: type?.Description,
@@ -647,7 +715,8 @@ function recallClinicalDocument(recall) {
     patientNum: recall.PatNum,
     resourceId: `Recall/${recall.RecallNum}`,
     resourceType: 'careplan',
-    date: recall.DateDue || recall.DatePrevious,
+    // Dated by the visit that set it; the due date is in `recallDueDate`.
+    date: recall.DatePrevious || recall.DateDue,
     displayName:
       `${type?.Description || 'Dental recall'} due ${cleanDate(recall.DateDue) || ''}`.trim(),
     raw: {
@@ -671,18 +740,48 @@ function recallClinicalDocument(recall) {
     },
     metadata: {
       manual_specialty: 'dental',
-      manual_subtype: 'cleaning',
+      manual_subtype: 'recall',
       manual_specialty_details: details,
     },
   });
 }
 
 function treatmentPlanClinicalDocument(treatPlan) {
+  // Line items live in treatplanattach (active/inactive plans). Saved plans
+  // keep frozen copies in proctp, which this exporter does not read.
+  const items = (attachmentsByPlan.get(treatPlan.TreatPlanNum) || [])
+    .map((attach) => procedureById.get(attach.ProcNum))
+    .filter(Boolean)
+    .filter((procedure) => !procedureDisposition(procedure.ProcStatus).skip);
+  const total = items.reduce(
+    (sum, procedure) => sum + Number(procedure.ProcFee || 0),
+    0,
+  );
+  const teeth = [
+    ...new Set(items.map((procedure) => procedure.ToothNum).filter(Boolean)),
+  ];
   const details = dentalDetails({
     subtype: 'treatmentPlan',
     sourceTable: 'treatplan',
     sourceId: treatPlan.TreatPlanNum,
     treatmentStatus: treatPlan.TPStatus === '1' ? 'active' : 'proposed',
+    dentalTeeth: teeth.join(', ') || undefined,
+    estimatedCost: items.length ? money(total) : undefined,
+    treatmentPlanItems: items.length
+      ? items
+          .map((procedure) => {
+            const code = procedureCodeById.get(procedure.CodeNum);
+            return [
+              procedure.ToothNum && `#${procedure.ToothNum}`,
+              code?.ProcCode,
+              code?.Descript || code?.AbbrDesc,
+              money(procedure.ProcFee),
+            ]
+              .filter(Boolean)
+              .join(' ');
+          })
+          .join('; ')
+      : undefined,
     signatureStatus:
       treatPlan.DateTSigned && cleanDate(treatPlan.DateTSigned)
         ? 'signed'
@@ -704,6 +803,11 @@ function treatmentPlanClinicalDocument(treatPlan) {
         subject: patientRef(treatPlan.PatNum),
         created: cleanDate(treatPlan.DateTP || treatPlan.SecDateEntry),
         title: treatPlan.Heading,
+        activity: items.length
+          ? items.map((procedure) => ({
+              reference: { reference: `Procedure/${procedure.ProcNum}` },
+            }))
+          : undefined,
         description: treatPlan.Note,
         extension: sourceExtensions(
           'treatplan',
@@ -723,24 +827,16 @@ function treatmentPlanClinicalDocument(treatPlan) {
 function perioExamClinicalDocument(exam) {
   const provider = providerById.get(exam.ProvNum);
   const measures = perioMeasuresByExam.get(exam.PerioExamNum) || [];
-  const teeth = measures.map((measure) => measure.IntTooth).filter(Boolean);
+  const { perioTeethOfConcern, ...perio } = summarizePerioMeasures(measures);
+  // `perio`, not `finding`: as a finding, every probed tooth — usually the
+  // whole mouth — was marked "Needs attention" and the exam never reached the
+  // Perio overview.
   const details = dentalDetails({
-    subtype: 'finding',
+    subtype: 'perio',
     sourceTable: 'perioexam',
     sourceId: exam.PerioExamNum,
-    dentalTeeth: [...new Set(teeth)].join(', '),
-    perioPocketDepths: measures
-      .map(formatPerioMeasure)
-      .filter(Boolean)
-      .join('; '),
-    perioBleeding: measures
-      .filter((measure) => measure.SequenceType === '6')
-      .map(formatPerioMeasure)
-      .join('; '),
-    perioMobility: measures
-      .filter((measure) => measure.SequenceType === '8')
-      .map(formatPerioMeasure)
-      .join('; '),
+    dentalTeeth: perioTeethOfConcern,
+    ...perio,
     dentalProvider: providerName(provider),
   });
   return clinicalDocument({
@@ -770,7 +866,7 @@ function perioExamClinicalDocument(exam) {
     },
     metadata: {
       manual_specialty: 'dental',
-      manual_subtype: 'finding',
+      manual_subtype: 'perio',
       manual_specialty_details: details,
     },
   });
@@ -1010,19 +1106,6 @@ function procedureDate(procedure) {
   );
 }
 
-function procedureStatus(value) {
-  return (
-    {
-      1: 'treatment-planned',
-      2: 'completed',
-      3: 'existing-current',
-      4: 'existing-other',
-      5: 'referred',
-      6: 'deleted',
-    }[value] || 'unknown'
-  );
-}
-
 function appointmentStatus(value) {
   return (
     {
@@ -1103,29 +1186,28 @@ function notes(values) {
 }
 
 function formatPerioMeasure(measure) {
-  const values = [
-    'MBvalue',
-    'Bvalue',
-    'DBvalue',
-    'MLvalue',
-    'Lvalue',
-    'DLvalue',
-  ]
-    .map((key) =>
-      measure[key] !== undefined && Number(measure[key]) >= 0
-        ? `${key.replace('value', '')}:${measure[key]}`
-        : undefined,
-    )
+  if (['0', '5'].includes(`${measure.SequenceType}`)) {
+    const value = decodeSiteValue(measure.ToothValue);
+    return value === undefined
+      ? undefined
+      : `tooth ${measure.IntTooth} ${value}`;
+  }
+  const values = ['MB', 'B', 'DB', 'ML', 'L', 'DL']
+    .map((site) => {
+      const value = decodeSiteValue(measure[`${site}value`]);
+      return value === undefined ? undefined : `${site}:${value}`;
+    })
     .filter(Boolean)
     .join('/');
   return values ? `tooth ${measure.IntTooth} ${values}` : undefined;
 }
 
 function perioComponent(measure) {
+  const name =
+    PERIO_SEQUENCE_NAMES[measure.SequenceType] ||
+    `sequence ${measure.SequenceType}`;
   return {
-    code: {
-      text: `Perio sequence ${measure.SequenceType} tooth ${measure.IntTooth}`,
-    },
+    code: { text: `Perio ${name}, tooth ${measure.IntTooth}` },
     valueString: formatPerioMeasure(measure),
   };
 }

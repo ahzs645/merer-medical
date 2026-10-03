@@ -1,0 +1,5 @@
+PatNum:bigint
+LName:varchar
+FName:varchar
+Birthdate:date
+Gender:tinyint

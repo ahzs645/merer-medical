@@ -1,0 +1,3 @@
+RecallTypeNum:bigint
+Description:varchar
+Procedures:varchar

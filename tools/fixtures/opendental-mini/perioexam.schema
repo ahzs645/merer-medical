@@ -1,0 +1,4 @@
+PerioExamNum:bigint
+PatNum:bigint
+ExamDate:date
+ProvNum:bigint

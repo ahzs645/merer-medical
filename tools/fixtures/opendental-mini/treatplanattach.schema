@@ -1,0 +1,4 @@
+TreatPlanAttachNum:bigint
+TreatPlanNum:bigint
+ProcNum:bigint
+Priority:bigint

@@ -1,0 +1,7 @@
+TreatPlanNum:bigint
+PatNum:bigint
+DateTP:date
+Heading:varchar
+Note:text
+TPStatus:tinyint
+DateTSigned:datetime

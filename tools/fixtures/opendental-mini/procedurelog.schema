@@ -1,0 +1,8 @@
+ProcNum:bigint
+PatNum:bigint
+CodeNum:bigint
+ProcStatus:tinyint
+ToothNum:varchar
+Surf:varchar
+ProcDate:date
+ProcFee:double

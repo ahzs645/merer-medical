@@ -1,0 +1,4 @@
+CodeNum:bigint
+ProcCode:varchar
+Descript:varchar
+IsHygiene:tinyint
