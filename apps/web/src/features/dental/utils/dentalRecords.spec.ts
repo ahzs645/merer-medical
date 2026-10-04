@@ -569,3 +569,16 @@ describe("reading a source's numbering from its own records", () => {
     ).toEqual({ system: 'fdi', basis: 'reader' });
   });
 });
+
+describe('CBCT viewer address', () => {
+  it('asks the viewer to wait for a folder, keeping its own path', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { handoffUrl } = require('../components/CbctViewerDialog');
+    expect(handoffUrl('https://ahzs645.github.io/CBCTer/')).toBe(
+      'https://ahzs645.github.io/CBCTer/?handoff=postmessage',
+    );
+    expect(handoffUrl('http://localhost:5173/?lang=en')).toBe(
+      'http://localhost:5173/?lang=en&handoff=postmessage',
+    );
+  });
+});

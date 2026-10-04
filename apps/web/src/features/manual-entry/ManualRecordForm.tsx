@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { DentalScanFilePicker } from './components/DentalScanFilePicker';
+import { relativePathOf } from '../../shared/storage/fileStore';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 import { Routes as AppRoutes } from '../../Routes';
@@ -83,6 +85,11 @@ export function ManualRecordForm({
     setRoute,
     fileName,
     setFileName,
+    specialty,
+    dentalEntryKind,
+    storedFiles,
+    setStoredFiles,
+    existingFileSet,
     setFileContentType,
     setFileData,
     linkedFile,
@@ -518,56 +525,79 @@ export function ManualRecordForm({
               </div>
             )}
 
-            {isDocumentType && (
-              <div>
-                <label
-                  htmlFor="manual-record-file"
-                  className="block text-sm font-semibold text-gray-900"
-                >
-                  {t('File')}
-                </label>
-                <input
-                  id="manual-record-file"
-                  type="file"
-                  aria-invalid={submitAttempted && fileMissing}
-                  onChange={(event) => {
-                    const file = event.target.files?.[0];
-                    if (!file) return;
-                    setFileName(file.name);
-                    setFileContentType(file.type || 'application/octet-stream');
-                    if (
-                      file.type.startsWith('text/') ||
-                      file.type.includes('xml') ||
-                      file.type.includes('html')
-                    ) {
-                      file.text().then(setFileData);
-                    } else {
-                      const reader = new FileReader();
-                      reader.onload = () => {
-                        const result = `${reader.result || ''}`;
-                        setFileData(result.split(',')[1] || result);
-                      };
-                      reader.readAsDataURL(file);
+            {isDocumentType &&
+              specialty === 'dental' &&
+              dentalEntryKind === 'imaging' && (
+                <DentalScanFilePicker
+                  storedFiles={storedFiles}
+                  existingFileSet={existingFileSet}
+                  missing={submitAttempted && fileMissing}
+                  onChange={(files) => {
+                    setStoredFiles(files);
+                    if (!title.trim() && files.length > 0) {
+                      const path = relativePathOf(files[0]);
+                      setTitle(
+                        files.length > 1 && path.includes('/')
+                          ? path.split('/')[0]
+                          : files[0].name,
+                      );
                     }
-                    if (!title.trim()) setTitle(file.name);
                   }}
-                  className="mt-2 block w-full text-sm text-gray-900 file:me-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-primary-700"
                 />
-                {fileName && (
-                  <p className="mt-2 text-xs font-medium text-gray-600">
-                    {fileName}
-                  </p>
-                )}
-                {submitAttempted && fileMissing && (
-                  <p
-                    role="alert"
-                    className="mt-1 text-xs font-medium text-red-600"
+              )}
+            {isDocumentType &&
+              !(specialty === 'dental' && dentalEntryKind === 'imaging') && (
+                <div>
+                  <label
+                    htmlFor="manual-record-file"
+                    className="block text-sm font-semibold text-gray-900"
                   >
-                    {t('Select a file before saving this document.')}
-                  </p>
-                )}
-              </div>
-            )}
+                    {t('File')}
+                  </label>
+                  <input
+                    id="manual-record-file"
+                    type="file"
+                    aria-invalid={submitAttempted && fileMissing}
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (!file) return;
+                      setFileName(file.name);
+                      setFileContentType(
+                        file.type || 'application/octet-stream',
+                      );
+                      if (
+                        file.type.startsWith('text/') ||
+                        file.type.includes('xml') ||
+                        file.type.includes('html')
+                      ) {
+                        file.text().then(setFileData);
+                      } else {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          const result = `${reader.result || ''}`;
+                          setFileData(result.split(',')[1] || result);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                      if (!title.trim()) setTitle(file.name);
+                    }}
+                    className="mt-2 block w-full text-sm text-gray-900 file:me-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-primary-700"
+                  />
+                  {fileName && (
+                    <p className="mt-2 text-xs font-medium text-gray-600">
+                      {fileName}
+                    </p>
+                  )}
+                  {submitAttempted && fileMissing && (
+                    <p
+                      role="alert"
+                      className="mt-1 text-xs font-medium text-red-600"
+                    >
+                      {t('Select a file before saving this document.')}
+                    </p>
+                  )}
+                </div>
+              )}
 
             {/* Only offered where it works. Attachments live in the Dexie
                 storage backend, which is off by default and switchable only

@@ -1,6 +1,7 @@
 import { DentalImagingMountsPanel } from '../components/DentalImagingMountsPanel';
 import { DentalImagingPanel } from '../components/DentalImagingPanel';
 import { DentalScanPreview } from '../components/DentalScanPreview';
+import { DentalStudiesPanel } from '../components/DentalStudiesPanel';
 import { useDentalContext } from '../hooks/useDentalContext';
 import { UNGROUPED_MOUNT } from '../utils/dentalClinicalModels';
 
@@ -15,6 +16,7 @@ export function DentalImagingTab() {
       {imagingMounts.some((mount) => mount.id !== UNGROUPED_MOUNT) && (
         <DentalImagingMountsPanel mounts={imagingMounts} />
       )}
+      <DentalStudiesPanel imaging={imaging} />
       <DentalScanPreview imaging={imaging} />
       <DentalImagingPanel items={imaging} />
     </>

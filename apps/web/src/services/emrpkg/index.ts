@@ -8,8 +8,8 @@
  *
  * Format note for v1: attachments embedded in clinical document FHIR JSON
  * (e.g. DocumentReference.content[].attachment.data) are left in place as
- * base64. The `attachments/` folder in the zip is reserved for future
- * extraction; the JSON dump already contains the bytes.
+ * base64. Files kept in the file store (dental scans, CBCT folders) go under
+ * `attachments/<id>`, named by the `file_store` table.
  */
 
 import { RxDatabase } from 'rxdb';
@@ -19,6 +19,15 @@ import type { DatabaseCollections } from '../../app/providers/DatabaseCollection
 import { createExportPrfKey, deriveImportPrfKey } from './webauthnPrf';
 import { backfillSourceDocumentLinks } from '../../repositories/sourceLinkBackfill';
 import { recordAuditEvent } from '../../features/audit/auditLog';
+import {
+  deleteAllFiles,
+  listAllFiles,
+  putStoredFiles,
+  type StoredFile,
+} from '../../shared/storage/fileStore';
+
+/** The table in a package that names the files under `attachments/`. */
+export const FILE_STORE_TABLE = 'file_store';
 
 export const RXDB_COLLECTIONS_IN_PACKAGE = [
   'user_documents',
@@ -67,6 +76,7 @@ export async function exportEmrpkgFromRxDb(
 ): Promise<Uint8Array> {
   const tableFiles: Record<string, Uint8Array> = {};
   const counts: Record<string, number> = {};
+  const fileSetIds = new Set<string>();
 
   for (const name of RXDB_COLLECTIONS_IN_PACKAGE) {
     const collection = db[name as keyof DatabaseCollections];
@@ -78,8 +88,33 @@ export async function exportEmrpkgFromRxDb(
       opts,
     );
     if (rows.length === 0 && shouldOmitEmptyExportTable(name, opts)) continue;
+    if (name === 'clinical_documents') {
+      for (const row of rows as Array<{
+        metadata?: { file_set?: { id?: string } };
+      }>) {
+        if (row.metadata?.file_set?.id)
+          fileSetIds.add(row.metadata.file_set.id);
+      }
+    }
     counts[name] = rows.length;
     tableFiles[name] = strToU8(JSON.stringify(rows));
+  }
+
+  // Files kept outside the records (dental scans, CBCT folders) travel as
+  // `attachments/<id>` with a `file_store` table naming them, so a backup
+  // restores the scan and not only the record that points at it.
+  const attachments: Record<string, Uint8Array> = {};
+  if (opts.exportNotes?.includeAttachments !== false && fileSetIds.size > 0) {
+    const stored = (await listAllFiles()).filter((row) =>
+      fileSetIds.has(row.setId),
+    );
+    for (const row of stored) {
+      attachments[row.id] = new Uint8Array(await row.blob.arrayBuffer());
+    }
+    tableFiles[FILE_STORE_TABLE] = strToU8(
+      JSON.stringify(stored.map(({ blob: _blob, ...meta }) => meta)),
+    );
+    counts[FILE_STORE_TABLE] = stored.length;
   }
 
   const packInput = {
@@ -89,11 +124,11 @@ export async function exportEmrpkgFromRxDb(
       schema: { version: 1 },
       tables: Object.keys(tableFiles),
       counts,
-      attachmentCount: 0,
+      attachmentCount: Object.keys(attachments).length,
       exportNotes: opts.exportNotes,
     },
     tableFiles,
-    attachments: {},
+    attachments,
   };
 
   if (opts.useWebauthn) {
@@ -111,7 +146,7 @@ export async function importEmrpkgToRxDb(
   opts: ImportEmrpkgOptions = {},
 ): Promise<ImportEmrpkgResult> {
   const replace = opts.replace ?? true;
-  const { manifest, tableFiles } = await unpackEmrpkg(bytes, {
+  const { manifest, tableFiles, attachments } = await unpackEmrpkg(bytes, {
     passphrase: opts.passphrase,
     getKey: (header) => deriveImportPrfKey(header),
   });
@@ -120,7 +155,23 @@ export async function importEmrpkgToRxDb(
   const unknownTables: string[] = [];
   const known = new Set<string>(RXDB_COLLECTIONS_IN_PACKAGE);
 
+  if (replace) await deleteAllFiles();
+  if (tableFiles[FILE_STORE_TABLE]) {
+    const meta = JSON.parse(strFromU8(tableFiles[FILE_STORE_TABLE])) as Array<
+      Omit<StoredFile, 'blob'>
+    >;
+    await putStoredFiles(
+      meta
+        .filter((row) => attachments[row.id])
+        .map((row) => ({
+          ...row,
+          blob: new Blob([attachments[row.id]], { type: row.mime }),
+        })),
+    );
+  }
+
   for (const tableName of manifest.tables) {
+    if (tableName === FILE_STORE_TABLE) continue;
     if (!known.has(tableName)) {
       unknownTables.push(tableName);
       continue;

@@ -1,8 +1,13 @@
-import { lazy, Suspense, useCallback, useState } from 'react';
+import { lazy, Suspense, useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Routes as AppRoutes } from '../../../Routes';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { ImagingItem } from '../../imaging/types';
+import {
+  getFileSet,
+  getRecordFileSet,
+} from '../../../shared/storage/fileStore';
+import { base64ToArrayBuffer } from '../utils/base64';
 
 const DentalScanCanvas = lazy(() => import('./DentalScanCanvas'));
 type ScanFormat = 'stl' | 'ply';
@@ -12,8 +17,8 @@ type ScanSource = {
   title: string;
   contentType?: string;
   source?: string;
-  /** The file's bytes, base64, when the record stores them. */
-  data?: string;
+  /** Fetch the file's bytes, when the app holds them. */
+  load?: () => Promise<ArrayBuffer>;
   format?: ScanFormat;
 };
 
@@ -34,8 +39,10 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
     () => !isWebGlAvailable(),
   );
   const { t } = useInterfaceLanguage();
-  const scanSources = getDentalScanSources(imaging);
-  const viewable = scanSources.filter((source) => source.data && source.format);
+  // Memoised so each source's `load` keeps its identity and the canvas
+  // doesn't refetch on every render.
+  const scanSources = useMemo(() => getDentalScanSources(imaging), [imaging]);
+  const viewable = scanSources.filter((source) => source.load && source.format);
   const [selectedId, setSelectedId] = useState<string | undefined>();
   const selected =
     viewable.find((source) => source.id === selectedId) ?? viewable[0];
@@ -88,7 +95,7 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
             >
               <DentalScanCanvas
                 key={selected.id}
-                data={selected.data as string}
+                load={selected.load as () => Promise<ArrayBuffer>}
                 format={selected.format as ScanFormat}
                 onUnavailable={markUnavailable}
               />
@@ -99,7 +106,7 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
       {scanSources.length > 0 && (
         <ul className="mt-3 grid gap-2 sm:grid-cols-2">
           {scanSources.map((source) => {
-            const canView = !!(source.data && source.format);
+            const canView = !!(source.load && source.format);
             const isSelected = canView && selected?.id === source.id;
             return (
               <li key={source.id} className="min-w-0">
@@ -157,9 +164,30 @@ function scanFormat(...values: (string | undefined)[]): ScanFormat | undefined {
 }
 
 function getDentalScanSources(imaging: ImagingItem[]): ScanSource[] {
-  return imaging.flatMap((item) => {
+  return imaging.flatMap((item): ScanSource[] => {
     const raw = item.document.data_record.raw;
     const filename = item.document.metadata?.original_filename;
+    // Files kept in the file store: one source per 3D mesh in the set.
+    const fileSet = getRecordFileSet(item.document);
+    if (fileSet) {
+      if (fileSet.kind !== 'mesh') return [];
+      return fileSet.sample
+        .map((path) => ({ path, format: scanFormat(path) }))
+        .filter((entry) => entry.format)
+        .map(({ path, format }) => ({
+          id: `${item.id}:${path}`,
+          title: fileSet.count > 1 ? path.split('/').pop() || path : item.title,
+          source: path,
+          format,
+          load: async () => {
+            const file = (await getFileSet(fileSet.id)).find(
+              (row) => row.relativePath === path,
+            );
+            if (!file) throw new Error('missing file');
+            return file.blob.arrayBuffer();
+          },
+        }));
+    }
     // A file added through the form is stored whole: the record's raw data
     // is the file, base64.
     if (typeof raw === 'string') {
@@ -175,7 +203,7 @@ function getDentalScanSources(imaging: ImagingItem[]): ScanSource[] {
           title: item.title,
           contentType: item.document.data_record.content_type,
           source: filename,
-          data: raw,
+          load: async () => base64ToArrayBuffer(raw),
           format,
         },
       ];
@@ -207,7 +235,9 @@ function getDentalScanSources(imaging: ImagingItem[]): ScanSource[] {
         title: attachment.title || item.title,
         contentType: attachment.contentType || item.attachmentType,
         source: attachment.url || filename || item.document.metadata?.id,
-        data: attachment.data,
+        load: attachment.data
+          ? async () => base64ToArrayBuffer(attachment.data as string)
+          : undefined,
         format: scanFormat(
           attachment.title,
           attachment.url,

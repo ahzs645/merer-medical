@@ -91,6 +91,18 @@ export interface ClinicalDocument<T = unknown> {
       | 'file-import'
       | 'device-import';
     original_filename?: string;
+    /**
+     * Files kept outside the record (a scan, a DICOM folder), in the file
+     * store under `id`. See shared/storage/fileStore.ts.
+     */
+    file_set?: {
+      id: string;
+      kind: 'dicom' | 'mesh' | 'files';
+      label: string;
+      count: number;
+      totalSize: number;
+      sample: string[];
+    };
     mapping_confidence?: 'source' | 'mapped' | 'manual' | 'unknown';
     provenance_notes?: string;
   };

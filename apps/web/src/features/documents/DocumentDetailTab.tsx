@@ -31,6 +31,11 @@ import {
   countAbnormal,
 } from '../timeline/components/ObservationResultsTable';
 import { ProvenancePanel } from '../provenance/ProvenancePanel';
+import { StoredFilesSummary } from '../dental/components/StoredFilesSummary';
+import {
+  getRecordFileSet,
+  type FileSetSummary,
+} from '../../shared/storage/fileStore';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
 import type { ManualRecordKind } from '../manual-entry/manualRecordTypes';
@@ -409,7 +414,11 @@ export function DocumentDetailTab() {
                           </div>
                         )}
                       </div>
-                      {attachment || attachmentMeta?.data ? (
+                      {document && getRecordFileSet(document) ? (
+                        <StoredFilesSummary
+                          fileSet={getRecordFileSet(document) as FileSetSummary}
+                        />
+                      ) : attachment || attachmentMeta?.data ? (
                         <EmbeddedAttachmentViewer
                           attachment={{
                             contentType,

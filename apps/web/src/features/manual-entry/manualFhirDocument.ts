@@ -136,6 +136,7 @@ export function buildClinicalDocument({
   linkedAttachmentId,
   terminology,
   loadedDocument,
+  fileSet,
 }: {
   connectionId: string;
   userId: string;
@@ -170,13 +171,17 @@ export function buildClinicalDocument({
   linkedAttachmentId?: string;
   terminology?: TerminologyEntry;
   loadedDocument?: ClinicalDocument | null;
+  /** Files kept in the file store rather than inline (dental scans, DICOM). */
+  fileSet?: NonNullable<ClinicalDocument['metadata']>['file_set'];
 }): ClinicalDocument {
   const nextRecordId =
     loadedDocument?.metadata?.id?.replace(/^manual:/, '') || uuid4();
   const resourceType = getClinicalResourceType(recordType);
   const raw =
     recordType === 'document'
-      ? fileData || ''
+      ? fileSet
+        ? ''
+        : fileData || ''
       : buildManualFhirEntry(
           nextRecordId,
           recordType,
@@ -207,7 +212,9 @@ export function buildClinicalDocument({
           : 'FHIR.DSTU2',
       content_type:
         recordType === 'document'
-          ? fileContentType || 'application/octet-stream'
+          ? fileSet?.kind === 'dicom'
+            ? 'application/dicom'
+            : fileContentType || 'application/octet-stream'
           : 'application/json',
       resource_type: resourceType,
       version_history: loadedDocument ? [loadedDocument.data_record.raw] : [],
@@ -234,6 +241,7 @@ export function buildClinicalDocument({
       retrieved_at: new Date().toISOString(),
       entry_method: recordType === 'document' ? 'file-import' : 'manual-entry',
       original_filename: fileName || undefined,
+      file_set: fileSet,
       mapping_confidence: recordType === 'document' ? 'source' : 'manual',
       provenance_notes:
         recordType === 'document'

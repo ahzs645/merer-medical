@@ -1,4 +1,5 @@
 import { RxDatabase } from 'rxdb';
+import { deleteFileSet } from '../shared/storage/fileStore';
 import { DatabaseCollections } from '../app/providers/DatabaseCollections';
 import {
   clinicalDocumentId,
@@ -118,7 +119,11 @@ export async function deleteClinicalDocument(
 
   const doc = (await db.clinical_documents.findByIds([id])).get(id);
   if (!doc || doc.get('user_id') !== userId) return;
+  const fileSetId = doc.get('metadata.file_set.id') as string | undefined;
   await doc.remove();
+  // A scan or CBCT kept in the file store goes with its record; left behind it
+  // is hundreds of megabytes nothing points at.
+  if (fileSetId) await deleteFileSet(fileSetId);
 }
 
 export async function findClinicalDocuments(

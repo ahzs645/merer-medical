@@ -8,14 +8,6 @@ import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguagePr
 
 export type ScanFormat = 'stl' | 'ply';
 
-/** base64 (with or without a data: prefix) → bytes. */
-export function base64ToArrayBuffer(data: string): ArrayBuffer {
-  const binary = atob(data.replace(/^data:[^,]*,/, '').replace(/\s/g, ''));
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
-  return bytes.buffer;
-}
-
 /**
  * The person's own intraoral scan, drawn with three.js's STL/PLY loaders.
  * Drag to turn it, pinch or scroll to zoom.
@@ -30,12 +22,12 @@ export function base64ToArrayBuffer(data: string): ArrayBuffer {
  * with stored bytes to draw.
  */
 export function DentalScanCanvas({
-  data,
+  load,
   format,
   onUnavailable,
 }: {
-  /** The file's bytes, base64. */
-  data: string;
+  /** Fetch the file's bytes — from the file store, or a record's base64. */
+  load: () => Promise<ArrayBuffer>;
   format: ScanFormat;
   /** Called when this browser can't give us a WebGL context after all. */
   onUnavailable: () => void;
@@ -44,13 +36,28 @@ export function DentalScanCanvas({
   const [error, setError] = useState<string | null>(null);
   const { t } = useInterfaceLanguage();
 
+  const [buffer, setBuffer] = useState<ArrayBuffer | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    load()
+      .then((bytes) => {
+        if (!cancelled) setBuffer(bytes);
+      })
+      .catch(() => {
+        if (!cancelled) setError(t('This scan file could not be read.'));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [load, t]);
+
   useEffect(() => {
     const mount = mountRef.current;
-    if (!mount) return;
+    if (!mount || !buffer) return;
 
     let geometry: THREE.BufferGeometry;
     try {
-      const buffer = base64ToArrayBuffer(data);
       geometry =
         format === 'ply'
           ? new PLYLoader().parse(buffer)
@@ -130,7 +137,7 @@ export function DentalScanCanvas({
         mount.removeChild(renderer.domElement);
       }
     };
-  }, [data, format, onUnavailable, t]);
+  }, [buffer, format, onUnavailable, t]);
 
   if (error) {
     return (

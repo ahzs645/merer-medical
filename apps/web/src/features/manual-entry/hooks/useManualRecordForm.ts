@@ -14,6 +14,8 @@ import { useLocalConfig } from '../../../app/providers/LocalConfigProvider';
 import { useNotificationDispatch } from '../../../app/providers/NotificationProvider';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { useUser } from '../../../app/providers/UserProvider';
+import { putFileSet } from '../../../shared/storage/fileStore';
+import uuid4 from '../../../shared/utils/UUIDUtils';
 import { useToothNumbering } from '../../dental/hooks/useToothNumbering';
 import { Routes as AppRoutes } from '../../../Routes';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
@@ -787,6 +789,16 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     setDocumentFileFields({ fileData });
   const setLinkedFile = (linkedFile: LinkedAttachmentFile | null) =>
     setDocumentFileFields({ linkedFile });
+  // Files that go to the file store rather than inline: a dental scan or a
+  // whole DICOM folder. Kept as File objects until save.
+  const [storedFiles, setStoredFilesState] = useState<File[]>([]);
+  const setStoredFiles = (files: File[]) => {
+    setStoredFilesState(files);
+    setDocumentFileFields({
+      fileData: undefined,
+      fileName: files.length === 1 ? files[0].name : fileName,
+    });
+  };
   const [labRowsFields, patchLabRowsFields] = useReducer(
     patchReducer<LabRowsFields>,
     undefined,
@@ -828,7 +840,9 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
   const isNewLabEntry = recordType === 'lab' && !isEditing;
   const titleMissing =
     isNewLabEntry || isDeviceImportType ? false : !title.trim();
-  const fileMissing = isDocumentType && !fileData;
+  const existingFileSet = loadedDocument?.metadata?.file_set;
+  const fileMissing =
+    isDocumentType && !fileData && storedFiles.length === 0 && !existingFileSet;
   const labRowsMissing = isNewLabEntry && completedLabRows.length === 0;
   const terminologyProfile = localConfig.terminology_profile || 'canada';
   const terminologyLanguage = localConfig.terminology_language || 'en';
@@ -1209,6 +1223,14 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
         },
       });
       const enrichedNotes = appendSpecialtyNotes(notes, specialtyDetails);
+      const fileSet =
+        isDocumentType && storedFiles.length > 0
+          ? await putFileSet(
+              existingFileSet?.id || uuid4(),
+              storedFiles,
+              title.trim() || undefined,
+            )
+          : existingFileSet;
       const docs =
         recordType === 'lab' && !loadedDocument
           ? completedLabRows.map((row) =>
@@ -1296,6 +1318,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
                 linkedDocumentId: options.linkedDocumentId,
                 linkedAttachmentId: options.linkedAttachmentId,
                 loadedDocument,
+                fileSet,
               }),
             ];
 
@@ -1646,6 +1669,9 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     setFileContentType,
     fileData,
     setFileData,
+    storedFiles,
+    setStoredFiles,
+    existingFileSet,
     linkedFile,
     setLinkedFile,
     loadedDocument,

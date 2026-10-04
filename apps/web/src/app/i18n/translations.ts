@@ -1527,6 +1527,33 @@ export const arabicTranslations: Record<string, string> = {
   'Drawn as your dentist sees you: your right side is on the left.':
     'مرسوم كما يراك طبيب أسنانك: جانبك الأيمن على اليسار.',
   Numbering: 'الترقيم',
+  'An X-ray, photo or 3D scan (STL, PLY), or a whole CBCT folder of DICOM files.':
+    'صورة أشعة أو صورة أو مسح ثلاثي الأبعاد (STL أو PLY)، أو مجلد CBCT كامل من ملفات DICOM.',
+  'CBCT and image files': 'ملفات CBCT والصور',
+  'CBCT viewer': 'عارض CBCT',
+  'Choose a file or a folder before saving.': 'اختر ملفًا أو مجلدًا قبل الحفظ.',
+  'Choose a folder': 'اختيار مجلد',
+  'Choose files': 'اختيار ملفات',
+  'DICOM study': 'دراسة DICOM',
+  'Download (.zip)': 'تنزيل (zip.)',
+  'Getting the scan ready…': 'جارٍ تجهيز المسح…',
+  'Open in CBCT viewer': 'فتح في عارض CBCT',
+  'Opening the viewer…': 'جارٍ فتح العارض…',
+  'Preparing…': 'جارٍ التجهيز…',
+  'Saved: {label}, {count} files · {size}. Choose new files to replace them.':
+    'محفوظ: {label}، {count} ملفات · {size}. اختر ملفات جديدة لاستبدالها.',
+  'Scan sent to the viewer. It runs in this browser; nothing is uploaded.':
+    'أُرسل المسح إلى العارض. يعمل في هذا المتصفح؛ لا يُرفع أي شيء.',
+  'The scan files could not be found on this device.':
+    'تعذر العثور على ملفات المسح على هذا الجهاز.',
+  'The viewer did not answer. Download the scan and open it in the viewer yourself, or check the viewer address.':
+    'لم يستجب العارض. نزّل المسح وافتحه في العارض بنفسك، أو تحقق من عنوان العارض.',
+  'Viewer address': 'عنوان العارض',
+  'Where CBCTer is served (self-hosted copies work too)':
+    'مكان استضافة CBCTer (تعمل النسخ المستضافة ذاتيًا أيضًا)',
+  '{count} file': '{count} ملف',
+  '{count} files · {size}': '{count} ملفات · {size}',
+  '{count} files': '{count} ملفات',
   'Tooth numbers read as {system}.': 'أرقام الأسنان مقروءة بنظام {system}.',
   'The record states its tooth numbering.': 'يذكر السجل نظام ترقيم الأسنان.',
   'Its source writes teeth this way in its other records.':

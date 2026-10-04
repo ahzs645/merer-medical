@@ -49,6 +49,8 @@ interface LocalConfig {
    * means "follow the browser's region".
    */
   tooth_numbering?: 'universal' | 'fdi';
+  /** Where the CBCT viewer (CBCTer) is served; unset means the public one. */
+  cbct_viewer_url?: string;
   medication_interactions_provider?: 'ddinter';
 }
 
