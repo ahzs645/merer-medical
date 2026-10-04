@@ -672,20 +672,34 @@ in the empty ortho and surgery panels, the untranslated "Tooth-by-tooth status"
 (its panel is gone), keyword-driven "high priority", 24 px dentition buttons,
 and "implant"/"crown" pulling medical records into Dental.
 
-### Still open
+### Still open — since closed
 
-- **Record detail.** Dental rows still don't open to a full record; the app's
-  only detail route is for documents. A dental record view (or reuse of
-  `/records/documents/detail/:id` for any clinical document) is its own change.
-- **Timeline calls every Observation "Labs".** `timelineCategories.ts` labels by
-  resource type, so a dental finding (now correctly an `exam` observation) is
-  still grouped under Labs on the Timeline. That mapping is shared by every
-  feature and wants its own pass.
-- **§15 storage**: attachments out of the JSON, DICOM folders in, CBCTer for
-  CBCT.
-- **Header pluralisation** in `DentalHeader.tsx` still patches an Arabic phrase
-  by string replacement.
-- **Unlabelled free-text tooth numbers 11–32** from portals are still read as
-  Universal unless the record or the reader's setting says FDI only for
-  manual entries. Per-connection numbering (a Canadian portal is FDI) would
-  close it.
+The four items left open above were done in a second round:
+
+- **Record detail.** `/records/dental/record/:id` shows one record in full —
+  standing, teeth with names in the reader's numbering, status, provider,
+  codes, costs, recall date, perio and ortho fields, notes, source document,
+  edit/delete for manual entries, provenance. Every dental list, the tooth
+  history and "What to do next" link to it.
+- **Timeline "Labs".** Observations are grouped by their FHIR category
+  (laboratory, vital-signs, exam, survey, social-history), with Labs only for
+  an uncategorised result. Dental findings read as "Exam findings".
+- **Portal tooth numbering.** Each source's records are judged together:
+  numbers that exist only in one system (1–10, 19, 20, 29, 30 Universal;
+  33–48, 51–85 FDI) decide how that source's ambiguous 11–32 are read; with
+  no evidence the reader's setting decides. The record page says which.
+- **§15 storage and CBCT.** A file store keeps scans and DICOM folders out of
+  the record JSON; uploads take files or a folder; studies download as a zip
+  and open in CBCTer embedded in the page (postMessage handoff — CBCTer's
+  COOP header rules out a popup). Exports carry the files.
+
+**Depends on CBCTer.** The handoff needs CBCTer's `claude/mere-cbct-handoff`
+branch (ahzs645/cbcter) merged and deployed; until then the public viewer
+won't answer, and Mere says so and offers the zip, which CBCTer opens as an
+archive. CBCTer picks a DICOM folder by `.dcm` extension, so Mere adds it to
+extensionless slices that carry the DICOM signature; sniffing in CBCTer
+itself would be the better long-term fix.
+
+Still not done: header pluralisation in `DentalHeader.tsx` (string-replaces
+an Arabic phrase), and a viewer-address field in Settings (it lives in the
+viewer dialog for now).
