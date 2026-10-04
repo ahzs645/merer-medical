@@ -193,7 +193,51 @@ export type DentalMappingOptions = {
    * numbers that only exist in one system (33–48, 51–85), ignore it.
    */
   numbering?: DentalNumberingSystem;
+  /** Why `numbering` is what it is, shown beside the teeth. */
+  numberingBasis?: 'source' | 'reader';
 };
+
+/**
+ * The tooth numbers a record writes in prose, as written — before deciding
+ * which system they are in. Records that code their teeth or declare their
+ * numbering have nothing to infer, so they give none.
+ */
+export function freeTextToothTokens(
+  document: ClinicalDocument<unknown>,
+): string[] {
+  const details = getDentalDetails(document);
+  if (details?.numberingSystem || getCodedTeeth(document).length > 0) return [];
+  const tokens: string[] = [];
+  for (const match of searchableText(document).matchAll(TOOTH_MARKER_PATTERN)) {
+    tokens.push(...(match[1].match(/\d{1,2}/g) || []));
+  }
+  return tokens;
+}
+
+/**
+ * Which system a source writes teeth in, judged from the numbers it uses.
+ * Many numbers exist in only one system: 1–10 and 19, 20, 29, 30 are teeth
+ * only in Universal; 33–48 and 51–85 only in FDI. A source whose records use
+ * only one kind tells you how to read its ambiguous 11–32 too. A source with
+ * both, or neither, decides nothing.
+ */
+export function inferSourceNumbering(
+  tokens: string[],
+): DentalNumberingSystem | undefined {
+  let universal = 0;
+  let fdi = 0;
+  for (const token of tokens) {
+    const number = Number(token);
+    if (!Number.isInteger(number) || number < 1) continue;
+    const isFdiTooth = isFdi(`${number}`);
+    const isUniversalTooth = number <= 32;
+    if (isUniversalTooth && !isFdiTooth) universal += 1;
+    else if (isFdiTooth && !isUniversalTooth) fdi += 1;
+  }
+  if (fdi > 0 && universal === 0) return 'fdi';
+  if (universal > 0 && fdi === 0) return 'universal';
+  return undefined;
+}
 
 export function mapDentalDocument(
   document: ClinicalDocument<unknown>,
@@ -201,7 +245,12 @@ export function mapDentalDocument(
 ): DentalRecord {
   const text = searchableText(document);
   const details = getDentalDetails(document);
-  const numbering = details?.numberingSystem || options.numbering;
+  const declared =
+    details?.numberingSystem === 'fdi' ||
+    details?.numberingSystem === 'universal'
+      ? details.numberingSystem
+      : undefined;
+  const numbering = declared || options.numbering;
   const kind = inferDentalKind(document, text, details);
   const toothNumbers = getToothNumbers(document, details, text, numbering);
   const surfaces = getSurfaces(document, details, text);
@@ -217,6 +266,10 @@ export function mapDentalDocument(
     summary: getSummary(document, details),
     details,
     dentalModel: buildDentalToothSurfaceModel(details, toothNumbers, surfaces),
+    numbering: {
+      system: numbering === 'fdi' ? 'fdi' : 'universal',
+      basis: declared ? 'record' : options.numberingBasis || 'reader',
+    },
   };
 }
 

@@ -1527,6 +1527,12 @@ export const arabicTranslations: Record<string, string> = {
   'Drawn as your dentist sees you: your right side is on the left.':
     'مرسوم كما يراك طبيب أسنانك: جانبك الأيمن على اليسار.',
   Numbering: 'الترقيم',
+  'Tooth numbers read as {system}.': 'أرقام الأسنان مقروءة بنظام {system}.',
+  'The record states its tooth numbering.': 'يذكر السجل نظام ترقيم الأسنان.',
+  'Its source writes teeth this way in its other records.':
+    'مصدره يكتب الأسنان بهذه الطريقة في سجلاته الأخرى.',
+  'Nothing in the record says which numbering it uses, so your setting on the tooth chart decides.':
+    'لا شيء في السجل يحدد نظام الترقيم، لذا يحدده إعدادك في مخطط الأسنان.',
   'Open the source document': 'فتح المستند المصدر',
   'Record not found': 'السجل غير موجود',
   'This record is not among your dental records. It may have been deleted.':

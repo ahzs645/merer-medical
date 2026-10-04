@@ -2,6 +2,8 @@ import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocu
 import {
   buildRecordsByTooth,
   isDentalClaimDocument,
+  freeTextToothTokens,
+  inferSourceNumbering,
   isDentalDocument,
   mapDentalDocument,
   resolveToothNumber,
@@ -510,5 +512,60 @@ describe('what counts as dental', () => {
         doc('Procedure', { code: { text } }, { display_name: text }),
       ),
     ).toBe(expected);
+  });
+});
+
+describe("reading a source's numbering from its own records", () => {
+  const text = (value: string) =>
+    doc('Condition', { code: { text: value } }, { display_name: value });
+
+  it('a source that writes 36 and 46 writes FDI, so its 26 is FDI too', () => {
+    const tokens = [
+      'Caries tooth 36',
+      'Crown tooth 46',
+      'Sealant tooth 26',
+    ].flatMap((value) => freeTextToothTokens(text(value)));
+    expect(inferSourceNumbering(tokens)).toBe('fdi');
+    expect(
+      mapDentalDocument(text('Sealant tooth 26'), {
+        numbering: 'fdi',
+        numberingBasis: 'source',
+      }).toothNumbers,
+    ).toEqual(['14']);
+  });
+
+  it('a source that writes 19 and 30 writes Universal', () => {
+    const tokens = ['Implant tooth 19', 'Caries tooth 30', 'Tooth 14'].flatMap(
+      (value) => freeTextToothTokens(text(value)),
+    );
+    expect(inferSourceNumbering(tokens)).toBe('universal');
+  });
+
+  it('decides nothing when only ambiguous numbers, or both kinds, appear', () => {
+    expect(inferSourceNumbering(['14', '26'])).toBeUndefined();
+    expect(inferSourceNumbering(['3', '36'])).toBeUndefined();
+  });
+
+  it('records with declared or coded teeth give no evidence', () => {
+    const declared = doc(
+      'Condition',
+      { code: { text: 'Caries tooth 26' } },
+      {
+        manual_specialty_details: {
+          specialty: 'dental',
+          numberingSystem: 'fdi',
+        },
+      },
+    );
+    expect(freeTextToothTokens(declared)).toEqual([]);
+  });
+
+  it('says how the numbers were read', () => {
+    expect(
+      mapDentalDocument(text('Tooth 14'), {
+        numbering: 'fdi',
+        numberingBasis: 'reader',
+      }).numbering,
+    ).toEqual({ system: 'fdi', basis: 'reader' });
   });
 });

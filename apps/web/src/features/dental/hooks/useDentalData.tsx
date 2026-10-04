@@ -12,11 +12,15 @@ import {
   DENTAL_CLAIM_RESOURCE_TYPES,
   buildDentalCounts,
   buildRecordsByTooth,
+  DentalMappingOptions,
   filterDentalImaging,
+  freeTextToothTokens,
+  inferSourceNumbering,
   isDentalClaimDocument,
   isDentalDocument,
   mapDentalDocument,
 } from '../utils/dentalRecords';
+import { useToothNumbering } from './useToothNumbering';
 import {
   buildOdontogramStatuses,
   buildClaimSummaries,
@@ -50,6 +54,7 @@ export function useDentalData() {
     // in the tooth chart and counts derived from it — until a reload.
     recordChangeTick = useRecordChangeTick(),
     [documents, setDocuments] = useState<ClinicalDocument<unknown>[]>([]),
+    [readerNumbering] = useToothNumbering(),
     [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading'),
     [error, setError] = useState<Error | null>(null);
 
@@ -105,9 +110,14 @@ export function useDentalData() {
         )
         .map(mapImagingDocument),
     );
-    const allDentalRecords = documents
-      .filter(isDentalDocument)
-      .map((document) => mapDentalDocument(document));
+    const dentalDocuments = documents.filter(isDentalDocument);
+    const numberingFor = buildNumberingBySource(
+      dentalDocuments,
+      readerNumbering,
+    );
+    const allDentalRecords = dentalDocuments.map((document) =>
+      mapDentalDocument(document, numberingFor(document)),
+    );
     const records = allDentalRecords.filter(
       (record) => record.kind !== 'image',
     );
@@ -124,7 +134,7 @@ export function useDentalData() {
           (document) =>
             isDentalClaimDocument(document) && !seenIds.has(document.id),
         )
-        .map((document) => mapDentalDocument(document)),
+        .map((document) => mapDentalDocument(document, numberingFor(document))),
     ];
 
     return {
@@ -141,7 +151,43 @@ export function useDentalData() {
       workflowContext: buildWorkflowContext(records, imaging.length),
       counts: buildDentalCounts(records, imaging),
     };
-  }, [documents]);
+  }, [documents, readerNumbering]);
 
   return { ...dentalData, status, error };
+}
+
+/**
+ * How to read each record's unlabelled tooth numbers. A portal or practice
+ * writes teeth one way, so its records are judged together: if the numbers it
+ * uses only exist in FDI (or only in Universal), that is how its ambiguous
+ * 11–32 are read too. A source that gives nothing away falls back to the
+ * reader's setting — except hand-entered records saved before the form
+ * stored a numbering, which were always meant as Universal.
+ */
+function buildNumberingBySource(
+  documents: ClinicalDocument<unknown>[],
+  readerNumbering: 'universal' | 'fdi',
+): (document: ClinicalDocument<unknown>) => DentalMappingOptions {
+  const tokensBySource = new Map<string, string[]>();
+  for (const document of documents) {
+    const source = document.connection_record_id || '';
+    tokensBySource.set(source, [
+      ...(tokensBySource.get(source) || []),
+      ...freeTextToothTokens(document),
+    ]);
+  }
+  const inferred = new Map(
+    [...tokensBySource].map(([source, tokens]) => [
+      source,
+      inferSourceNumbering(tokens),
+    ]),
+  );
+  return (document) => {
+    const fromSource = inferred.get(document.connection_record_id || '');
+    if (fromSource) return { numbering: fromSource, numberingBasis: 'source' };
+    if (document.metadata?.entry_method === 'manual-entry') {
+      return { numbering: 'universal', numberingBasis: 'source' };
+    }
+    return { numbering: readerNumbering, numberingBasis: 'reader' };
+  };
 }

@@ -145,6 +145,12 @@ export function DentalRecordDetailTab() {
           </ul>
         )}
 
+        {record.toothNumbers.length > 0 && record.numbering && (
+          <p className="mt-2 text-xs text-gray-600">
+            {numberingNote(record.numbering, t)}
+          </p>
+        )}
+
         <dl className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2">
           {facts
             .filter(([, value]) => value)
@@ -209,4 +215,25 @@ function statusWord(record: DentalRecord): string | undefined {
     default:
       return undefined;
   }
+}
+
+/**
+ * A tooth number is only as good as the reading of it, so the page says how
+ * it was read: stated by the record, given away by the rest of the source's
+ * records, or — with nothing to go on — the reader's own setting.
+ */
+function numberingNote(
+  numbering: NonNullable<DentalRecord['numbering']>,
+  t: (text: string) => string,
+): string {
+  const system = numbering.system === 'fdi' ? 'FDI' : t('Universal (US)');
+  const reason =
+    numbering.basis === 'record'
+      ? t('The record states its tooth numbering.')
+      : numbering.basis === 'source'
+        ? t('Its source writes teeth this way in its other records.')
+        : t(
+            'Nothing in the record says which numbering it uses, so your setting on the tooth chart decides.',
+          );
+  return `${t('Tooth numbers read as {system}.').replace('{system}', system)} ${reason}`;
 }

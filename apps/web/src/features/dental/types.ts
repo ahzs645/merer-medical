@@ -45,6 +45,11 @@ export type DentalRecord = {
   summary?: string;
   details?: DentalRecordDetails;
   dentalModel: DentalToothSurfaceModel;
+  /** How this record's tooth numbers were read, and why. */
+  numbering?: {
+    system: DentalNumberingSystem;
+    basis: 'record' | 'source' | 'reader';
+  };
 };
 
 export type DentalActionLevel = 'watch' | 'active' | 'planned' | 'complete';
