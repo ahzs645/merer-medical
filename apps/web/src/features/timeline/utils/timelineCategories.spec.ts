@@ -3,6 +3,7 @@ import { BundleEntry, FhirResource } from 'fhir/r2';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import {
   buildTimelineCardTitle,
+  getObservationGroup,
   getTimelineCategories,
 } from './timelineCategories';
 
@@ -80,12 +81,68 @@ describe('buildTimelineCardTitle', () => {
     expect(buildTimelineCardTitle(['Labs', 'Documents'])).toBe(
       'Your Labs & Documents',
     );
-    expect(
-      buildTimelineCardTitle(['Conditions', 'Procedures', 'Labs']),
-    ).toBe('Your Conditions, Procedures, and 1 more');
+    expect(buildTimelineCardTitle(['Conditions', 'Procedures', 'Labs'])).toBe(
+      'Your Conditions, Procedures, and 1 more',
+    );
   });
 
   it('has nothing to say about a day with no renderable category', () => {
     expect(buildTimelineCardTitle([], t)).toBe('');
+  });
+});
+
+describe('observation groups', () => {
+  const observation = (
+    category: unknown,
+    metadata: Record<string, unknown> = {},
+  ) =>
+    ({
+      id: `obs-${JSON.stringify(category)}`,
+      data_record: {
+        resource_type: 'observation',
+        raw: { resource: { resourceType: 'Observation', category } },
+      },
+      metadata: { display_name: 'An observation', ...metadata },
+    }) as unknown as ClinicalDocument<BundleEntry<FhirResource>>;
+  const coded = (code: string) => [
+    {
+      coding: [
+        {
+          system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+          code,
+        },
+      ],
+    },
+  ];
+
+  it.each([
+    ['laboratory', 'Labs'],
+    ['vital-signs', 'Vitals'],
+    ['exam', 'Exam findings'],
+    ['survey', 'Assessments'],
+    ['social-history', 'Social history'],
+  ])('reads category %s as %s', (code, group) => {
+    expect(getObservationGroup(observation(coded(code)))).toBe(group);
+  });
+
+  it('keeps an uncategorised result under Labs', () => {
+    expect(getObservationGroup(observation(undefined))).toBe('Labs');
+  });
+
+  it('files a dental finding with no category as an exam finding', () => {
+    expect(
+      getObservationGroup(
+        observation(undefined, { manual_specialty: 'dental' }),
+      ),
+    ).toBe('Exam findings');
+  });
+
+  it('titles a day of a tooth finding and a lab as both, not "Labs"', () => {
+    expect(
+      getTimelineCategories([
+        observation(coded('exam')),
+        observation(coded('laboratory')),
+      ]),
+    ).toEqual(['Labs', 'Exam findings']);
   });
 });

@@ -74,7 +74,10 @@ import DOMPurify from 'dompurify';
 import { getTimelineRecordElementId } from '../../utils/timelineAnchors';
 import {
   buildTimelineCardTitle,
+  getObservationGroup,
   getTimelineCategories,
+  OBSERVATION_GROUPS,
+  type ObservationGroup,
 } from '../../utils/timelineCategories';
 import { useInterfaceLanguage } from '../../../../app/providers/InterfaceLanguageProvider';
 
@@ -182,6 +185,14 @@ function DispayDocumentReferencesOrAttachmentTimelineItem(props: {
     </div>
   );
 }
+
+const OBSERVATION_GROUP_COLORS: Record<ObservationGroup, string> = {
+  Labs: 'text-sky-700',
+  Vitals: 'text-rose-700',
+  'Exam findings': 'text-amber-800',
+  Assessments: 'text-indigo-700',
+  'Social history': 'text-stone-700',
+};
 
 export const ElementsByDateListCard = memo(function ElementsByDateListCard({
   itemList,
@@ -691,28 +702,35 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
             </ul>
           </div>
         )}
-        {observations.length > 0 && (
-          <div className="mb-2 ms-2">
-            <TimelineCardCategoryTitle title={'Labs'} color="text-sky-700" />
-            <ul className="list-disc list-inside">
-              {observations.slice(0, 5).map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name
-                    ?.replace(/- final result/gi, '')
-                    .replace(/- final/gi, '')}
-                </li>
-              ))}
-              <p className="text-xs font-medium md:text-sm text-gray-900">
-                {observations.length > 5
-                  ? `... and ${observations.length - 5} more`
-                  : null}
-              </p>
-            </ul>
-          </div>
-        )}
+        {OBSERVATION_GROUPS.map((group) => {
+          const items = observations.filter(
+            (item) => getObservationGroup(item) === group,
+          );
+          if (items.length === 0) return null;
+          return (
+            <div key={group} className="mb-2 ms-2">
+              <TimelineCardCategoryTitle
+                title={group}
+                color={OBSERVATION_GROUP_COLORS[group]}
+              />
+              <ul className="list-disc list-inside">
+                {items.slice(0, 5).map((item) => (
+                  <li
+                    className="text-xs font-medium md:text-sm text-gray-900"
+                    key={item.id}
+                  >
+                    {item.metadata?.display_name
+                      ?.replace(/- final result/gi, '')
+                      .replace(/- final/gi, '')}
+                  </li>
+                ))}
+                <p className="text-xs font-medium md:text-sm text-gray-900">
+                  {items.length > 5 ? `... and ${items.length - 5} more` : null}
+                </p>
+              </ul>
+            </div>
+          );
+        })}
         {immunizations.length > 0 && (
           <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle

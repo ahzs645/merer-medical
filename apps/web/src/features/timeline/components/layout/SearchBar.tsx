@@ -12,7 +12,8 @@ const recordTypeOptions: {
 }[] = [
   { value: 'all', label: 'All records' },
   { value: 'encounter', label: 'Encounters' },
-  { value: 'observation', label: 'Labs' },
+  // The filter is by resource type, so it holds vitals and exam findings too.
+  { value: 'observation', label: 'Labs & observations' },
   { value: 'diagnosticreport', label: 'Reports' },
   { value: 'documentreference', label: 'Documents' },
   { value: 'condition', label: 'Conditions' },

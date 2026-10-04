@@ -1527,6 +1527,9 @@ export const arabicTranslations: Record<string, string> = {
   'Drawn as your dentist sees you: your right side is on the left.':
     'مرسوم كما يراك طبيب أسنانك: جانبك الأيمن على اليسار.',
   Numbering: 'الترقيم',
+  'Labs & observations': 'التحاليل والملاحظات',
+  'Exam findings': 'نتائج الفحص',
+  Assessments: 'التقييمات',
   'Dental X-rays, CBCT, intraoral photos and scans. They also appear under Imaging.':
     'صور الأشعة السنية والتصوير المقطعي وصور ومسوح الفم. تظهر أيضًا ضمن التصوير.',
   'No dental X-rays or photos yet. Imaging records that mention teeth or the mouth will be listed here.':

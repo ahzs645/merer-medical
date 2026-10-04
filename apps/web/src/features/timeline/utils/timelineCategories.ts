@@ -17,6 +17,10 @@ const CATEGORY_ORDER = [
   'Procedures',
   'Consents',
   'Labs',
+  'Vitals',
+  'Exam findings',
+  'Assessments',
+  'Social history',
   'Medications',
   'Lab Panels',
   'Documents',
@@ -56,6 +60,61 @@ const CATEGORY_BY_RESOURCE_TYPE: Record<string, string> = {
   servicerequest: 'Referrals',
 };
 
+/** Observation categories, in the order the card lists them. */
+export const OBSERVATION_GROUPS = [
+  'Labs',
+  'Vitals',
+  'Exam findings',
+  'Assessments',
+  'Social history',
+] as const;
+
+export type ObservationGroup = (typeof OBSERVATION_GROUPS)[number];
+
+const OBSERVATION_GROUP_BY_CODE: Record<string, ObservationGroup> = {
+  laboratory: 'Labs',
+  'vital-signs': 'Vitals',
+  exam: 'Exam findings',
+  survey: 'Assessments',
+  'social-history': 'Social history',
+};
+
+/**
+ * Which heading an Observation sits under on a timeline card. Every
+ * Observation used to be "Labs" because the card grouped by resource type,
+ * so a tooth finding, a blood pressure and a smoking history all read as lab
+ * results. The FHIR category says what it is; "Labs" is only the fallback for
+ * an observation that carries none, which is what portals mostly send for
+ * results.
+ */
+export function getObservationGroup(
+  item: ClinicalDocument<unknown>,
+): ObservationGroup {
+  const raw = item.data_record?.raw as
+    | { resource?: { category?: unknown } }
+    | { category?: unknown }
+    | undefined;
+  const resource =
+    raw && 'resource' in raw && raw.resource ? raw.resource : raw;
+  const category = (resource as { category?: unknown } | undefined)?.category;
+  const categories = Array.isArray(category)
+    ? category
+    : category
+      ? [category]
+      : [];
+  for (const entry of categories as Array<{
+    coding?: Array<{ code?: string }>;
+    text?: string;
+  }>) {
+    for (const coding of entry?.coding || []) {
+      const group = coding?.code && OBSERVATION_GROUP_BY_CODE[coding.code];
+      if (group) return group;
+    }
+  }
+  if (item.metadata?.manual_specialty === 'dental') return 'Exam findings';
+  return 'Labs';
+}
+
 /**
  * Categories that will actually render content for a day's records. Used both
  * for the card title and to decide whether a card is worth rendering at all —
@@ -77,7 +136,10 @@ export function getTimelineCategories(
     ) {
       continue;
     }
-    const category = CATEGORY_BY_RESOURCE_TYPE[resourceType];
+    const category =
+      resourceType === 'observation'
+        ? getObservationGroup(item)
+        : CATEGORY_BY_RESOURCE_TYPE[resourceType];
     if (category) {
       present.add(category);
     }
