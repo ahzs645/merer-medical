@@ -21,6 +21,7 @@ export enum Routes {
   DentalHygiene = '/records/dental/hygiene',
   DentalImaging = '/records/dental/imaging',
   DentalRecords = '/records/dental/records',
+  DentalRecord = '/records/dental/record/:recordId',
   Optometry = '/records/optometry',
   OptometryPrescriptions = '/records/optometry/prescriptions',
   OptometryExams = '/records/optometry/exams',

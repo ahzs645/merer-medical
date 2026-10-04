@@ -140,6 +140,10 @@ const DentalRecordsTab = lazyNamed(
   () => import('../features/dental/tabs/DentalRecordsTab'),
   'DentalRecordsTab',
 );
+const DentalRecordDetailTab = lazyNamed(
+  () => import('../features/dental/tabs/DentalRecordDetailTab'),
+  'DentalRecordDetailTab',
+);
 const DentalTreatmentTab = lazyNamed(
   () => import('../features/dental/tabs/DentalTreatmentTab'),
   'DentalTreatmentTab',
@@ -413,6 +417,10 @@ const routes = [
               {
                 path: 'records',
                 element: <DentalRecordsTab />,
+              },
+              {
+                path: 'record/:recordId',
+                element: <DentalRecordDetailTab />,
               },
             ],
           },

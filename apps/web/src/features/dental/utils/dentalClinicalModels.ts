@@ -16,6 +16,7 @@ import {
   TreatmentPlanItem,
 } from '../types';
 import { ALL_TEETH } from './dentalReferenceData';
+import { dentalRecordPath } from './dentalRecordPath';
 import {
   buildRecordsByTooth,
   compareTeeth,
@@ -441,18 +442,6 @@ export function buildNextCleaning(
   return { lastCleaning, dueDate, scheduledDate, intervalMonths, basis, state };
 }
 
-/** Where a record of each kind is read in full. */
-const ROUTE_BY_KIND: Record<string, string> = {
-  condition: '/records/dental/chart',
-  finding: '/records/dental/chart',
-  perio: '/records/dental/hygiene',
-  referral: '/records/dental/records',
-  treatmentPlan: '/records/dental/treatment',
-  surgery: '/records/dental/treatment',
-  orthodontic: '/records/dental/treatment',
-  procedure: '/records/dental/treatment',
-};
-
 /**
  * The open items on the dental overview, each named as the record it is.
  *
@@ -484,7 +473,9 @@ function buildNextActions(records: DentalRecord[]): DentalNextAction[] {
         reason: kindLabel,
         teeth: record.toothNumbers,
         date: record.date,
-        to: ROUTE_BY_KIND[record.kind] ?? '/records/dental/records',
+        // The row opens the record itself; it used to open the tab its kind
+        // lives on, where an untoothed record (a CBCT) did not appear.
+        to: dentalRecordPath(record.id),
       };
     });
 }

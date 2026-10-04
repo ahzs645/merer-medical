@@ -2,6 +2,7 @@ import { TreatmentPlanItem } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { useToothNumbering } from '../hooks/useToothNumbering';
 import { formatTeeth } from '../utils/dentalReferenceData';
+import { RecordTitleLink } from './RecordTitleLink';
 
 export function TreatmentPlanPanel({ items }: { items: TreatmentPlanItem[] }) {
   const { t } = useInterfaceLanguage();
@@ -18,7 +19,7 @@ export function TreatmentPlanPanel({ items }: { items: TreatmentPlanItem[] }) {
             <article key={item.id} className="rounded-md bg-gray-50 p-3">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                 <h3 className="text-sm font-semibold text-gray-900">
-                  {item.record.title}
+                  <RecordTitleLink record={item.record} />
                 </h3>
                 <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase">
                   <span

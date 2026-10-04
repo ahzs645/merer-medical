@@ -7,6 +7,7 @@ import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguagePr
 import { useToothNumbering } from '../hooks/useToothNumbering';
 import { formatTeeth } from '../utils/dentalReferenceData';
 import { formatRecordDate } from '../../../shared/utils/dateFormatters';
+import { RecordTitleLink } from './RecordTitleLink';
 
 const MAX_VISIBLE_RECORDS = 12;
 
@@ -66,7 +67,7 @@ export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
                 <article key={record.id} className="rounded-md bg-gray-50 p-3">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                     <h3 className="text-sm font-semibold text-gray-900">
-                      {record.title}
+                      <RecordTitleLink record={record} />
                     </h3>
                     <span className="shrink-0 text-xs font-medium text-gray-600">
                       {t(KIND_LABELS[record.kind])}

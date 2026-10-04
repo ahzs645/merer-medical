@@ -6,6 +6,7 @@ import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { DentalRecord } from '../types';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { formatRecordDate } from '../../../shared/utils/dateFormatters';
+import { RecordTitleLink } from './RecordTitleLink';
 
 export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
   const { t } = useInterfaceLanguage();
@@ -39,7 +40,7 @@ export function OrthodonticPanel({ records }: { records: DentalRecord[] }) {
             <article key={record.id} className="rounded-md bg-gray-50 p-3">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                 <h3 className="text-sm font-semibold text-gray-900">
-                  {record.title}
+                  <RecordTitleLink record={record} />
                 </h3>
                 <span className="text-xs font-medium uppercase text-gray-500">
                   {formatRecordDate(record.date, t('Undated'))}

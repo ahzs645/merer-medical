@@ -22,6 +22,7 @@ import { recordActionLevel } from '../utils/dentalClinicalModels';
 import { useToothNumbering } from '../hooks/useToothNumbering';
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { formatRecordDate } from '../../../shared/utils/dateFormatters';
+import { RecordTitleLink } from './RecordTitleLink';
 
 const DENTITION_OPTIONS: { value: ChartDentition; label: string }[] = [
   { value: 'permanent', label: 'Adult' },
@@ -525,9 +526,10 @@ function ToothDetail({
           {records.map((record) => (
             <li key={record.id} className="rounded-md bg-white p-2">
               <div className="flex items-start justify-between gap-2">
-                <p className="text-sm font-medium text-gray-900">
-                  {record.title}
-                </p>
+                <RecordTitleLink
+                  record={record}
+                  className="text-sm font-medium text-gray-900"
+                />
                 <LevelBadge level={recordActionLevel(record, recordsByTooth)} />
               </div>
               <p className="mt-0.5 text-xs text-gray-600">

@@ -1527,6 +1527,15 @@ export const arabicTranslations: Record<string, string> = {
   'Drawn as your dentist sees you: your right side is on the left.':
     'مرسوم كما يراك طبيب أسنانك: جانبك الأيمن على اليسار.',
   Numbering: 'الترقيم',
+  'Open the source document': 'فتح المستند المصدر',
+  'Record not found': 'السجل غير موجود',
+  'This record is not among your dental records. It may have been deleted.':
+    'هذا السجل ليس ضمن سجلات أسنانك. ربما حُذف.',
+  Fee: 'الرسوم',
+  'Insurance estimate': 'تقدير التأمين',
+  'Planned items': 'البنود المخططة',
+  Open: 'مفتوح',
+  Cancelled: 'ملغى',
   'Labs & observations': 'التحاليل والملاحظات',
   'Exam findings': 'نتائج الفحص',
   Assessments: 'التقييمات',
