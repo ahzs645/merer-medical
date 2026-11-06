@@ -437,14 +437,20 @@ function CareResourceRow({ item }: { item: CareDocument }) {
     item.metadata?.date || resource?.authoredOn || resource?.statusDate;
   const status =
     resource?.status || resource?.lifecycleStatus || resource?.intent || '';
+  const name = displayName(item);
+  const description =
+    typeof resource?.description === 'string'
+      ? resource.description
+      : resource?.description?.text;
 
   return (
     <article className="px-4 py-3">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+      {/* No per-row "CARE PLANS" / "GOALS" tag: every row sits under a section
+          heading that already says it, so the tag repeated the heading once a
+          row, eight times down the page. */}
+      <div>
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900">
-            {displayName(item)}
-          </h3>
+          <h3 className="text-sm font-semibold text-gray-900">{name}</h3>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-600">
             {status && (
               <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 font-medium text-gray-700">
@@ -459,15 +465,12 @@ function CareResourceRow({ item }: { item: CareDocument }) {
             )}
           </div>
         </div>
-        <span className="shrink-0 text-xs font-medium uppercase text-gray-500">
-          {sectionLabel(item.data_record.resource_type)}
-        </span>
       </div>
-      {resource?.description && (
+      {/* A goal's description is often its name — "Lower hemoglobin A1c below
+          7%" printed as the title and again as the line under it. */}
+      {description && description.trim() !== name.trim() && (
         <p className="mt-2 whitespace-pre-line text-sm text-gray-600">
-          {typeof resource.description === 'string'
-            ? resource.description
-            : resource.description.text}
+          {description}
         </p>
       )}
       <ManualRecordActions item={item} />

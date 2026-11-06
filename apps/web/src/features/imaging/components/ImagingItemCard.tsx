@@ -12,6 +12,7 @@ import { ModalHeader } from '../../../shared/components/ModalHeader';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { resourceTypeLabel } from '../../../shared/utils/resourceTypeLabels';
 import {
+  actionChipClass,
   ManualRecordActions,
   manualRecordActionRowClass,
 } from '../../manual-entry/ManualRecordActions';
@@ -72,7 +73,9 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
                 {item.bodySite && <Badge>{item.bodySite}</Badge>}
                 {item.laterality && <Badge>{item.laterality}</Badge>}
                 {item.studyType && <Badge>{item.studyType}</Badge>}
-                {item.attachmentType && <Badge>{item.attachmentType}</Badge>}
+                {item.attachmentType && (
+                  <Badge>{fileTypeLabel(item.attachmentType)}</Badge>
+                )}
                 {item.categories.includes('dental') && (
                   <Badge>{t('Dental')}</Badge>
                 )}
@@ -101,14 +104,15 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
         {/* One row for everything you can do to this card. "Open record" used
             to sit inside the card body as a text hint on its own line, above
             an Edit/Delete row it had nothing to do with — three controls, two
-            rows, no relationship. It is a button now, at the same height as
-            the other two, and the card stays clickable for anyone who taps the
-            body. */}
+            rows, no relationship. It is a button now, drawn by the same class
+            as View source, Edit and Delete beside it — it was 44px tall in a
+            row of 32px chips — and the card stays clickable for anyone who
+            taps the body. */}
         <div className={manualRecordActionRowClass}>
           <button
             type="button"
             onClick={() => setExpanded(true)}
-            className="inline-flex min-h-[44px] items-center gap-1 rounded-md border border-primary-200 px-3 py-1 text-xs font-semibold text-primary-700 shadow-sm hover:bg-primary-50"
+            className={`${actionChipClass} border-primary-200 text-primary-700 hover:bg-primary-50`}
           >
             <ArrowTopRightOnSquareIcon className="h-4 w-4" />
             {t('Open record')}
@@ -315,4 +319,30 @@ function Badge({ children }: { children: React.ReactNode }) {
       {children}
     </span>
   );
+}
+
+/**
+ * A file's media type as a person would name it. The card printed the raw
+ * MIME string — "application/pdf" — as a chip beside "Eye care" and "OCT".
+ * The record details keep the exact type for anyone who needs it.
+ */
+const FILE_TYPE_LABELS: Record<string, string> = {
+  'application/pdf': 'PDF',
+  'application/dicom': 'DICOM',
+  'application/sla': 'STL model',
+  'model/stl': 'STL model',
+  'text/html': 'Web page',
+  'text/plain': 'Text',
+  'text/xml': 'XML',
+  'application/xml': 'XML',
+};
+
+export function fileTypeLabel(contentType: string): string {
+  const type = contentType.split(';')[0].trim().toLowerCase();
+  if (FILE_TYPE_LABELS[type]) return FILE_TYPE_LABELS[type];
+  const [major, minor = ''] = type.split('/');
+  if (major === 'image')
+    return `${minor.replace(/^x-/, '').toUpperCase()} image`;
+  if (major === 'video') return 'Video';
+  return minor ? minor.replace(/^(x-|vnd\.)/, '').toUpperCase() : contentType;
 }

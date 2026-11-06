@@ -839,6 +839,8 @@ export const arabicTranslations: Record<string, string> = {
     'استورد من ملف — يحتفظ به مير كما وصل',
   'Imported from a device — Mere keeps it as it arrived':
     'استورد من جهاز — يحتفظ به مير كما وصل',
+  'Entered by hand elsewhere — Mere keeps it as it arrived':
+    'أدخل يدويا في مكان آخر — يحتفظ به مير كما وصل',
   'Source type': 'نوع المصدر',
   'Source range': 'نطاق المصدر',
   'Entry method': 'طريقة الإدخال',
@@ -1945,6 +1947,8 @@ export const arabicTranslations: Record<string, string> = {
   'Jump To': 'الانتقال إلى',
   'Filter timeline records': 'تصفية سجلات الخط الزمني',
   'View More': 'عرض المزيد',
+  'View more': 'عرض المزيد',
+  'View less': 'عرض أقل',
   'Lab Panels': 'لوحات المختبر',
   Coverage: 'التغطية',
   'Family History': 'التاريخ العائلي',

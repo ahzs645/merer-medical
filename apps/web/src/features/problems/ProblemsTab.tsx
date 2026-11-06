@@ -36,6 +36,7 @@ import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import { getManualRecordNote } from '../../shared/utils/manualRecordUtils';
 import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
+import { sourceTypeLabel } from '../provenance/provenanceLabels';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 type ProblemStatus = 'active' | 'resolved' | 'unknown';
@@ -374,22 +375,21 @@ function ProblemCard({ item }: { item: ProblemItem }) {
         </div>
       </div>
 
-      <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Two columns on a phone: the dates are short, and one per row made a
+          condition card taller than the screen. Source carries the
+          provenance — it was printed twice, once as "Source: ClearView
+          Optometry" and again as "Provenance: ClearView Optometry · Manual"
+          right under it. */}
+      <dl className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Detail label="Onset" value={formatProblemDate(item.onsetDate)} />
         <Detail label="Recorded" value={formatProblemDate(item.recordedDate)} />
         <Detail
           label="Resolved"
           value={formatProblemDate(item.abatementDate)}
         />
-        <Detail label="Source" value={item.source} />
+        <Detail label="Source" value={item.provenance || item.source} />
       </dl>
 
-      {item.provenance && (
-        <p className="mt-3 break-words text-sm text-gray-700">
-          <span className="font-medium text-gray-900">Provenance:</span>{' '}
-          {item.provenance}
-        </p>
-      )}
       {item.note && (
         <p className="mt-3 whitespace-pre-line rounded-md bg-gray-50 p-3 text-sm text-gray-700">
           {item.note}
@@ -493,9 +493,12 @@ function getProvenanceSummary(
   // condition card read "ClearView Optometry · Manual · FHIR.R4 ·
   // Condition/demo-dry-eye", and a Cerner one printed the whole endpoint URL.
   // The provenance panel is where that belongs; this is the sentence version.
+  // `manual` is the absence of a source, not one: "ClearView Optometry ·
+  // Manual" read as a clinic with a department called Manual.
+  const sourceType = sourceTypeLabel(connection?.source);
   const parts = [
     connection?.name,
-    connection?.source ? humanize(connection.source) : undefined,
+    sourceType ? humanize(sourceType) : undefined,
   ].filter(Boolean);
 
   return parts.length > 0 ? parts.join(' · ') : undefined;

@@ -29,6 +29,7 @@ import { useNotificationDispatch } from '../../app/providers/NotificationProvide
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
+import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import {
   listClinicalDocumentAttachments,
   downloadClinicalDocumentAttachment,
@@ -84,6 +85,7 @@ export function ManualRecordActions({
   item,
   inline = false,
   explainReadOnly = false,
+  connection,
 }: {
   item: ClinicalDocument;
   /** Render the buttons only, for a caller supplying the row around them. */
@@ -93,6 +95,14 @@ export function ManualRecordActions({
    * record; a list would repeat the note once per row.
    */
   explainReadOnly?: boolean;
+  /**
+   * The record's connection, when the page has it. Pass the same one given to
+   * the page's `ProvenancePanel`: the read-only note and the panel's "How it
+   * arrived" are answers to one question, and with the connection only on the
+   * panel's side, Insurance said "Entered by hand" an inch below "Synced from
+   * a connected source — edit it there".
+   */
+  connection?: Partial<ConnectionDocument>;
 }) {
   const db = useRxDb();
   const user = useUser();
@@ -162,7 +172,7 @@ export function ManualRecordActions({
             to every record the app cannot edit — including ones that arrived
             in an imported package and were never near one, which then carried
             a provenance panel saying so directly underneath. */}
-        {t(readOnlyReason(buildRecordProvenance(item).entryMethod))}
+        {t(readOnlyReason(buildRecordProvenance(item, connection).entryMethod))}
       </span>
     );
     const readOnly = (

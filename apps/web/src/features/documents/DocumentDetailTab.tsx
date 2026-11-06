@@ -384,7 +384,11 @@ export function DocumentDetailTab() {
                   <div className="flex flex-col gap-4 lg:sticky lg:top-4">
                     {document && (
                       <div className="rounded-md bg-white p-2 shadow-sm ring-1 ring-gray-200">
-                        <ManualRecordActions item={document} explainReadOnly />
+                        <ManualRecordActions
+                          item={document}
+                          connection={connection}
+                          explainReadOnly
+                        />
                       </div>
                     )}
 

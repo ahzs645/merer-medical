@@ -222,7 +222,9 @@ function InsurancePlanCard({
             </h2>
             <InsuranceStateBadge state={item.state} />
           </div>
-          <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+          {/* Two columns at every width: four short facts stacked one per
+              row made each plan a screen tall on a phone. */}
+          <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
             <Fact label="Member ID" value={item.subscriberId} />
             <Fact label="Relationship" value={item.relationship} />
             <Fact label="Type" value={item.type} />
@@ -252,7 +254,7 @@ function InsuranceDetails({ item }: { item: InsuranceItem }) {
           </div>
         </div>
         <dl className="mt-5 grid gap-4 sm:grid-cols-2">
-          <Detail label="Status" value={item.state} />
+          <Detail label="Status" value={formatDisplayText(item.state)} />
           <Detail label="Member ID" value={item.subscriberId} />
           <Detail label="Relationship" value={item.relationship} />
           <Detail label="Plan type" value={item.type} />
@@ -262,7 +264,11 @@ function InsuranceDetails({ item }: { item: InsuranceItem }) {
         </dl>
         {/* The detail panel shows one plan, so it is worth saying why a synced
             one has no Edit — otherwise the page reads as add-only. */}
-        <ManualRecordActions item={item.document} explainReadOnly />
+        <ManualRecordActions
+          item={item.document}
+          connection={item.connection}
+          explainReadOnly
+        />
       </div>
 
       {item.sourceText && (

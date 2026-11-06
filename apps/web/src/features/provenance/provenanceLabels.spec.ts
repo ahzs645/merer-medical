@@ -50,7 +50,7 @@ describe('readOnlyReason', () => {
       'Imported from a file — Mere keeps it as it arrived',
     );
     expect(readOnlyReason('manual-entry')).toBe(
-      'Imported from a file — Mere keeps it as it arrived',
+      'Entered by hand elsewhere — Mere keeps it as it arrived',
     );
     expect(readOnlyReason('device-import')).toBe(
       'Imported from a device — Mere keeps it as it arrived',

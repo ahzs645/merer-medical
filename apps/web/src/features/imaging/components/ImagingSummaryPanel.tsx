@@ -49,7 +49,9 @@ export function ImagingSummaryPanel({
   return (
     <div>
       <div
-        className={`grid gap-3 sm:grid-cols-2 ${
+        // Two across on a phone too: one per row, the four counts filled the
+        // whole first screen before a single study.
+        className={`grid grid-cols-2 gap-3 ${
           COLUMN_CLASSES[stats.length] ?? 'lg:grid-cols-5'
         }`}
       >

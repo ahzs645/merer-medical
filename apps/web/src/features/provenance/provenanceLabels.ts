@@ -69,8 +69,12 @@ export function readOnlyReason(
 ): string {
   switch (entryMethod) {
     case 'file-import':
-    case 'manual-entry':
       return 'Imported from a file — Mere keeps it as it arrived';
+    // Typed in by hand, but not on this device — a seeded or shared record.
+    // It read "Imported from a file" right above a provenance panel saying
+    // "How it arrived: Entered by hand".
+    case 'manual-entry':
+      return 'Entered by hand elsewhere — Mere keeps it as it arrived';
     case 'device-import':
       return 'Imported from a device — Mere keeps it as it arrived';
     default:

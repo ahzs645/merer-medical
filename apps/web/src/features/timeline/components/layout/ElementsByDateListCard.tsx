@@ -973,15 +973,19 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
             <div className="w-full border-t border-gray-300" />
           </div>
           <div className="relative flex justify-center">
+            {/* Sentence case like every other button, and drawn at 32px with
+                the invisible 44px tap area the card actions use — at a full
+                44px this pill was the tallest control on every timeline card. */}
             <button
               type="button"
-              className="inline-flex min-h-[44px] items-center gap-x-1.5 rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              className="relative inline-flex min-h-8 items-center gap-x-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[''] hover:bg-gray-50"
               onClick={() => setExpanded(!expanded)}
+              aria-expanded={expanded}
             >
-              {expanded ? 'View Less' : 'View More'}
+              {expanded ? 'View less' : 'View more'}
 
               <ChevronDownIcon
-                className={`-ms-1 -me-0.5 h-5 w-5 text-gray-400 duration-150 active:scale-95 active:bg-slate-50 ${expanded ? 'rotate-180 transform' : ''}`}
+                className={`-me-0.5 h-4 w-4 text-gray-400 duration-150 active:scale-95 active:bg-slate-50 ${expanded ? 'rotate-180 transform' : ''}`}
                 aria-hidden="true"
               />
             </button>
