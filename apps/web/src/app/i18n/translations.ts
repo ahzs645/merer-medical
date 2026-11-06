@@ -1445,6 +1445,9 @@ export const arabicTranslations: Record<string, string> = {
   daily: 'يوميا',
   Adherence: 'الالتزام بالدواء',
   'History and details': 'التاريخ والتفاصيل',
+  'Show details': 'إظهار التفاصيل',
+  'Hide details': 'إخفاء التفاصيل',
+  'Taking as prescribed': 'يتناوله كما وصف',
   'Not on File': 'غير مسجل',
   'No Known Allergies': 'لا توجد حساسيات معروفة',
 

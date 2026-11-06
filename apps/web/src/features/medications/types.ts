@@ -96,4 +96,3 @@ export type MedicationTimelineItem = {
   history: MedicationHistoryEvent[];
   reconciliationState: MedicationReconciliationState;
 };
-

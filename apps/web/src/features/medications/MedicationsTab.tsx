@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useId, useMemo, useState, type ReactNode } from 'react';
 import { AllergyIntolerance, BundleEntry, FhirResource } from 'fhir/r2';
 import {
   BeakerIcon,
@@ -24,7 +24,11 @@ import {
 import { isAllergyNegation } from '../../shared/utils/allergyNegation';
 import { getAllergyIntoleranceDisplayName } from '../../shared/utils/fhirAccessHelpers';
 import { getFhirResource } from '../../shared/utils/fhirResource';
-import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
+import {
+  actionChipClass,
+  ManualRecordActions,
+  manualRecordActionRowClass,
+} from '../manual-entry/ManualRecordActions';
 import { useMedicationsData } from './hooks/useMedicationsData';
 import { useMedicationInteractions } from './hooks/useMedicationInteractions';
 import {
@@ -247,7 +251,12 @@ function AllergySafetyPanel({ allergies }: { allergies: ClinicalDocument[] }) {
       aria-labelledby="allergy-safety-heading"
       className="rounded-md bg-amber-50/60 px-3 py-2.5 ring-1 ring-amber-200"
     >
-      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+      {/* Centred, not baseline-aligned: the heading is an icon and a label in
+          an inline-flex, whose baseline is the icon's bottom edge, so on one
+          line "ALLERGIES" rode high and "All allergies" — padded to 44px —
+          sat low. The link keeps a 44px tap area, drawn by an invisible
+          pseudo-element so it no longer makes the strip twice as tall. */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <h2
           id="allergy-safety-heading"
           className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-amber-900"
@@ -273,14 +282,17 @@ function AllergySafetyPanel({ allergies }: { allergies: ClinicalDocument[] }) {
             allergy&rdquo; statements.
           </p>
         )}
-        <Link
-          to={AppRoutes.Allergies}
-          className="ms-auto inline-flex min-h-[44px] items-center text-sm font-medium text-primary-700 underline"
-        >
-          {negationCount > 0
-            ? `All allergies (+${negationCount} “none” records)`
-            : 'All allergies'}
-        </Link>
+        {/* The strip names every active allergen, so a link to "all
+            allergies" led to the same list. It stays only when something was
+            left out: the "no known allergy" records. */}
+        {negationCount > 0 && (
+          <Link
+            to={AppRoutes.Allergies}
+            className="relative ms-auto text-sm font-medium text-primary-700 underline after:absolute after:-inset-x-2 after:-inset-y-3 after:content-['']"
+          >
+            {`+${negationCount} “none” ${negationCount === 1 ? 'record' : 'records'}`}
+          </Link>
+        )}
       </div>
     </section>
   );
@@ -303,7 +315,7 @@ function MedicationInteractionPanel({
           DDInter medication interaction plugin
         </h2>
         <Badge tone={bundleReadinessTone(bundleStatus.readiness)}>
-          {bundleStatus.readiness}
+          {humanize(bundleStatus.readiness || 'unknown')}
         </Badge>
       </div>
       {status === 'error' ? (
@@ -358,7 +370,7 @@ function MedicationInteractionPanel({
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge tone={interactionSeverityTone(interaction.severity)}>
-                      {interaction.severity}
+                      {humanize(interaction.severity)}
                     </Badge>
                     <p className="text-sm font-semibold text-gray-900">
                       {interaction.drugs.join(' + ')}
@@ -472,23 +484,34 @@ function MedicationSection({
 }
 
 function MedicationCard({ item }: { item: MedicationViewItem }) {
+  const { t } = useInterfaceLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
+  const detailsId = useId();
+  // On a phone the four labelled fields stacked one per row, then Why, then
+  // Source: a single medication ran past a screen, and a list of seventy-three
+  // became something to scroll rather than read. Collapsed, a phone card is
+  // the name, the chips, and the one line a person scans for — how much, how
+  // often. Desktop has the width to show the fields at a glance, so only the
+  // history and record details wait behind the toggle there.
+  const summary = [item.dose, item.frequency].filter(Boolean).join(' · ');
+  const showAdherence = Boolean(item.adherence && item.adherence !== 'unknown');
+  const hasFields = Boolean(
+    item.dose || item.frequency || item.route || showAdherence,
+  );
 
   return (
     <article className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="break-words text-base font-semibold text-gray-900">
-              {item.name}
-            </h3>
-            <ReconciliationBadge state={item.reconciliationState} />
-          </div>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <h3 className="break-words text-base font-semibold text-gray-900">
+            {item.name}
+          </h3>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             <Badge tone={statusTone(item.status)}>
               {humanize(item.status)}
             </Badge>
             <Badge>{humanize(item.category || item.resourceType)}</Badge>
+            <ReconciliationBadge state={item.reconciliationState} />
           </div>
         </div>
         <div className="shrink-0 text-sm text-gray-500">
@@ -496,57 +519,78 @@ function MedicationCard({ item }: { item: MedicationViewItem }) {
         </div>
       </div>
 
-      <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {item.dose && <Detail label="Dose" value={item.dose} />}
-        {item.frequency && <Detail label="Frequency" value={item.frequency} />}
-        {item.route && <Detail label="Route" value={item.route} />}
-        {/* "Adherence: unknown" is the absence of a finding, printed as one —
-            and since no portal writes the adherence extension, it was on
-            every card. The reconciliation badge above already says the record
-            is incomplete; a field repeating it four columns wide does not. */}
-        {item.adherence && item.adherence !== 'unknown' && (
-          <Detail label="Adherence" value={humanize(item.adherence)} />
-        )}
-      </dl>
+      {summary && !isExpanded && (
+        <p className="mt-3 line-clamp-2 break-words text-sm text-gray-800 sm:hidden">
+          {summary}
+        </p>
+      )}
 
-      <div className="mt-4 grid gap-2 text-sm text-gray-700">
-        {item.conditionReason && (
-          <InlineFact label="Why" value={item.conditionReason} />
+      <div id={detailsId} className={isExpanded ? 'block' : 'hidden sm:block'}>
+        {hasFields && (
+          <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {item.dose && <Detail label="Dose" value={item.dose} />}
+            {item.frequency && (
+              <Detail label="Frequency" value={item.frequency} />
+            )}
+            {item.route && <Detail label="Route" value={item.route} />}
+            {/* "Adherence: unknown" is the absence of a finding, printed as
+                one — and since no portal writes the adherence extension, it
+                was on every card. The reconciliation badge above already says
+                the record is incomplete; a field repeating it does not. */}
+            {showAdherence && (
+              <Detail label="Adherence" value={humanize(item.adherence!)} />
+            )}
+          </dl>
         )}
-        {item.source.label && (
-          <InlineFact label="Source" value={sourceLabel(item.source)} />
-        )}
-        {item.conditionalInstructions && (
-          <InlineFact label="Condition" value={item.conditionalInstructions} />
-        )}
-        {item.stopReason && (
-          <InlineFact label="Stopped because" value={item.stopReason} />
+
+        <div className="mt-4 grid gap-2 text-sm text-gray-700">
+          {item.conditionReason && (
+            <InlineFact label="Why" value={item.conditionReason} />
+          )}
+          {item.source.label && (
+            <InlineFact label="Source" value={sourceLabel(item.source)} />
+          )}
+          {item.conditionalInstructions && (
+            <InlineFact
+              label="Condition"
+              value={item.conditionalInstructions}
+            />
+          )}
+          {item.stopReason && (
+            <InlineFact label="Stopped because" value={item.stopReason} />
+          )}
+        </div>
+
+        {isExpanded && (
+          <div className="mt-4 grid gap-4 border-t border-gray-200 pt-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)]">
+            <HistoryList events={item.history} />
+            <DetailPanel item={item} />
+          </div>
         )}
       </div>
 
-      <button
-        type="button"
-        className="mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-        onClick={() => setIsExpanded((value) => !value)}
-        aria-expanded={isExpanded}
-      >
-        <ChevronDownIcon
-          className={[
-            'h-4 w-4 transition-transform',
-            isExpanded ? 'rotate-180' : '',
-          ].join(' ')}
-        />
-        History and details
-      </button>
-
-      {isExpanded && (
-        <div className="mt-4 grid gap-4 border-t border-gray-200 pt-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.7fr)]">
-          <HistoryList events={item.history} />
-          <DetailPanel item={item} />
-        </div>
-      )}
-
-      <ManualRecordActions item={item.document} />
+      {/* The toggle used to be a 44px button on a line of its own, above a
+          row of 32px actions — two sizes of button, one after the other. It
+          is one of the row now, drawn the same way. */}
+      <div className={manualRecordActionRowClass}>
+        <button
+          type="button"
+          className={`${actionChipClass} border-gray-300 text-gray-800 hover:bg-gray-50`}
+          onClick={() => setIsExpanded((value) => !value)}
+          aria-expanded={isExpanded}
+          aria-controls={detailsId}
+        >
+          <ChevronDownIcon
+            aria-hidden="true"
+            className={[
+              'h-4 w-4 transition-transform motion-reduce:transition-none',
+              isExpanded ? 'rotate-180' : '',
+            ].join(' ')}
+          />
+          {t(isExpanded ? 'Hide details' : 'Show details')}
+        </button>
+        <ManualRecordActions item={item.document} inline />
+      </div>
     </article>
   );
 }
@@ -659,7 +703,7 @@ function Badge({
   return (
     <span
       className={[
-        'rounded-md px-2 py-1 text-xs font-medium',
+        'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium',
         classes[tone],
       ].join(' ')}
     >

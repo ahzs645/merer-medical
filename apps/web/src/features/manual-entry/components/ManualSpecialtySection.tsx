@@ -129,7 +129,9 @@ export function ManualSpecialtySection({
         hasSubKind ? 'rounded-md border border-gray-200 bg-gray-50 p-4' : ''
       }
     >
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/* Two columns only when a second select shares the row; alone, a
+          half-width Section sat ragged under a full-width Type and Name. */}
+      <div className={`grid gap-4 ${hasSubKind ? 'sm:grid-cols-2' : ''}`}>
         <div>
           <label
             htmlFor="manual-record-specialty"

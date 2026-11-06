@@ -20,9 +20,16 @@ export const PAGE_SIZE = 50;
  * section, the type filter offers "Care plans", and the Records section links
  * to them, so excluding them here only made the category unreachable from the
  * unfiltered timeline.
+ *
+ * `device` is equipment a person lives with — a glucose monitor, a CPAP, a
+ * hearing aid — not something that happened on a day. Its date is when the
+ * record was written, so every device turned up as a card on whatever day the
+ * summary was printed, between the visit and the labs it had nothing to do
+ * with. Devices have their own page under Records.
  */
 export const NON_TIMELINE_RESOURCE_TYPES = [
   'patient',
+  'device',
   'provenance',
   'location',
   'practitioner',

@@ -170,14 +170,19 @@ export function ManualRecordForm({
 
   const containerClass = embedded
     ? 'px-4 py-4'
-    : 'h-full overflow-y-auto bg-slate-50 px-4 py-6 sm:px-6 lg:px-8';
+    : 'h-full overflow-y-auto bg-slate-50 px-4 pt-6 sm:px-6 lg:px-8';
 
   return (
     <div className={containerClass}>
+      {/* The bottom padding lives on this inner box, not the scroller: a
+          sticky element stops short of its scroller's padding, so with
+          `py-6` on the scroller the pinned Save bar floated 24px above the
+          bottom edge and the fields scrolling past showed through beneath
+          it. */}
       <div
         className={`mx-auto flex w-full flex-col gap-5 ${
-          pickerOpen ? 'max-w-3xl' : 'max-w-2xl'
-        }`}
+          embedded ? '' : 'pb-6'
+        } ${pickerOpen ? 'max-w-3xl' : 'max-w-2xl'}`}
       >
         {pickerOpen ? (
           <ManualRecordTypePicker
@@ -378,59 +383,6 @@ export function ManualRecordForm({
               </div>
             )}
 
-            {isMedicationType && !isDeviceImportType && (
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div>
-                  <label
-                    htmlFor="manual-record-dose"
-                    className="block text-sm font-semibold text-gray-900"
-                  >
-                    {t('Dose')}
-                  </label>
-                  <input
-                    id="manual-record-dose"
-                    type="text"
-                    value={dose}
-                    placeholder={t('e.g. 10 mg')}
-                    onChange={(event) => setDose(event.target.value)}
-                    className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="manual-record-frequency"
-                    className="block text-sm font-semibold text-gray-900"
-                  >
-                    {t('Frequency')}
-                  </label>
-                  <input
-                    id="manual-record-frequency"
-                    type="text"
-                    value={frequency}
-                    placeholder={t('e.g. twice daily')}
-                    onChange={(event) => setFrequency(event.target.value)}
-                    className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="manual-record-route"
-                    className="block text-sm font-semibold text-gray-900"
-                  >
-                    {t('Route')}
-                  </label>
-                  <input
-                    id="manual-record-route"
-                    type="text"
-                    value={route}
-                    placeholder={t('e.g. oral')}
-                    onChange={(event) => setRoute(event.target.value)}
-                    className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
-                  />
-                </div>
-              </div>
-            )}
-
             {isCoverageType && <ManualCoverageSection form={form} />}
 
             {isFamilyHistoryType && (
@@ -522,6 +474,63 @@ export function ManualRecordForm({
                     {t('A name is required.')}
                   </p>
                 )}
+              </div>
+            )}
+
+            {/* Dose, frequency and route follow the name. They came first, so
+                "Add medication" opened on "Dose" with nothing yet to dose, and
+                the one required field sat below them, under the fold on a
+                phone. */}
+            {isMedicationType && !isDeviceImportType && (
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div>
+                  <label
+                    htmlFor="manual-record-dose"
+                    className="block text-sm font-semibold text-gray-900"
+                  >
+                    {t('Dose')}
+                  </label>
+                  <input
+                    id="manual-record-dose"
+                    type="text"
+                    value={dose}
+                    placeholder={t('e.g. 10 mg')}
+                    onChange={(event) => setDose(event.target.value)}
+                    className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="manual-record-frequency"
+                    className="block text-sm font-semibold text-gray-900"
+                  >
+                    {t('Frequency')}
+                  </label>
+                  <input
+                    id="manual-record-frequency"
+                    type="text"
+                    value={frequency}
+                    placeholder={t('e.g. twice daily')}
+                    onChange={(event) => setFrequency(event.target.value)}
+                    className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="manual-record-route"
+                    className="block text-sm font-semibold text-gray-900"
+                  >
+                    {t('Route')}
+                  </label>
+                  <input
+                    id="manual-record-route"
+                    type="text"
+                    value={route}
+                    placeholder={t('e.g. oral')}
+                    onChange={(event) => setRoute(event.target.value)}
+                    className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-base text-gray-900 shadow-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
+                  />
+                </div>
               </div>
             )}
 

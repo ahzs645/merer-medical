@@ -8,6 +8,7 @@ import {
 } from '../../../test-utils/createTestDatabase';
 import { createTestClinicalDocument } from '../../../test-utils/clinicalDocumentTestData';
 import { createDefaultTestUser } from '../../../test-utils/userTestData';
+import { buildTimelineSelector } from '../hooks/useRecordQuery';
 import { fetchRecords } from './timelineRecords';
 
 function createSearchableDocument(
@@ -135,5 +136,41 @@ describe('fetchRecords', () => {
       '2016-05-25',
     ]);
     expect(records['2016-05-27'][0].metadata?.display_name).toBe('Panel B');
+  });
+
+  /**
+   * A device is something a person lives with, not something that happened on
+   * a day; its date is when the summary listing it was printed. It has its own
+   * Records page, so the unfiltered timeline leaves it out.
+   */
+  it('leaves devices off the timeline', async () => {
+    await db.clinical_documents.bulkInsert([
+      createSearchableDocument(
+        userId,
+        '2024-01-15T10:00:00Z',
+        'observation',
+        'Glucose',
+      ),
+      createSearchableDocument(
+        userId,
+        '2024-01-15T10:00:00Z',
+        'device',
+        'Glucose monitor',
+      ),
+    ]);
+
+    const timeline = await db.clinical_documents
+      .find({ selector: buildTimelineSelector(userId) })
+      .exec();
+    const search = await fetchRecords(db, userId, 'Glucose');
+
+    expect(timeline.map((doc) => doc.data_record.resource_type)).toEqual([
+      'observation',
+    ]);
+    expect(
+      Object.values(search)
+        .flat()
+        .map((record) => record.data_record.resource_type),
+    ).toEqual(['observation']);
   });
 });

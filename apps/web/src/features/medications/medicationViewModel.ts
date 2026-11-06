@@ -76,14 +76,20 @@ export function sourceLabel(source: MedicationTimelineItem['source']) {
   // "·", the separator the rest of the app uses between facts on one line, and
   // a capital on the type so "Blessings Clinic · imported record" does not read
   // as a proper noun trailing off into lower case.
-  const type = source.type && humanize(source.type);
-  return [source.label, type && type.charAt(0).toUpperCase() + type.slice(1)]
+  return [source.label, source.type && humanize(source.type)]
     .filter(Boolean)
     .join(' · ');
 }
 
+/**
+ * A coded value as a label: separators to spaces, first letter capitalised.
+ * The chips on a medication card ("active", "prescription", "on hold") were
+ * printed in the lower case the FHIR code arrived in, beside a title in
+ * sentence case, so they read as raw data rather than labels.
+ */
 export function humanize(value: string) {
-  return value.replace(/[-_]/g, ' ');
+  const spaced = value.replace(/[-_]/g, ' ');
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
 function classifyGroup(
