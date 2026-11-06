@@ -64,14 +64,14 @@ export function RecordHistoryModal({
   const title = item.metadata?.display_name || t('Record');
 
   return (
-    <Modal open={open} setOpen={setOpen}>
-      <div className="flex max-h-[85vh] flex-col">
+    <Modal open={open} setOpen={setOpen} flex>
+      <div className="flex min-h-0 flex-1 flex-col sm:max-h-[85vh]">
         <ModalHeader
           title={t('Record history')}
           subtitle={title}
           setClose={setOpen}
         />
-        <div className="grid gap-4 overflow-y-auto p-4 text-sm">
+        <div className="grid min-h-0 gap-4 overflow-y-auto overscroll-contain p-4 text-sm">
           {(documentTitle || fileName) && (
             <section>
               <Heading icon={DocumentTextIcon} text={t('Source document')} />
