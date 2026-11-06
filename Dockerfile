@@ -23,6 +23,11 @@ COPY package*.json /app/
 RUN npm install -g npm@11.7.0
 RUN npm ci
 COPY ./ /app/
+# packages/immunization-forecast is a git submodule. A checkout without it
+# fails much later, inside the test and build steps, as an unresolved import;
+# say what is missing here instead.
+RUN test -f packages/immunization-forecast/src/index.ts || \
+  (echo "packages/immunization-forecast is missing: run 'git submodule update --init --recursive' (or check out with submodules: recursive) before building." >&2; exit 1)
 COPY ./nginx.conf /nginx.conf
 
 

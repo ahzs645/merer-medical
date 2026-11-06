@@ -26,6 +26,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # packages/immunization-forecast is a submodule the web app
+          # imports; without it `nx test web` and `nx build web` fail.
+          submodules: recursive
 
       - name: Generate CalVer env var
         env:
@@ -124,6 +127,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # packages/immunization-forecast is a submodule the web app
+          # imports; without it `nx test web` and `nx build web` fail.
+          submodules: recursive
 
       - name: Generate CalVer env var
         env:
