@@ -1,6 +1,7 @@
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { splitClinicalNote } from '../../shared/utils/clinicalNotes';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
 
 export interface ReferralItem {
@@ -35,8 +36,9 @@ export function mapReferralDocs(
       : undefined;
     const notes = Array.isArray(r['note'])
       ? (r['note'] as Array<Record<string, unknown>>)
-          .map((n) => firstText(n['text']))
-          .filter((t): t is string => Boolean(t))
+          // A note can hold several provenance lines in one blob, and the
+          // builder's `Source document:` pointer is a record id, not text.
+          .flatMap((n) => splitClinicalNote(firstText(n['text'])))
       : [];
     return {
       id: d.id,

@@ -30,6 +30,7 @@ export enum Routes {
   OptometryRecords = '/records/optometry/records',
   Histories = '/records/histories',
   Goals = '/records/goals',
+  Devices = '/records/devices',
   Procedures = '/records/procedures',
   Allergies = '/records/allergies',
   Vitals = '/records/vitals',

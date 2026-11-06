@@ -464,7 +464,7 @@ function CareResourceRow({ item }: { item: CareDocument }) {
         </span>
       </div>
       {resource?.description && (
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="mt-2 whitespace-pre-line text-sm text-gray-600">
           {typeof resource.description === 'string'
             ? resource.description
             : resource.description.text}

@@ -83,6 +83,10 @@ const GoalsTab = lazyNamed(
   () => import('../features/goals/GoalsTab'),
   'GoalsTab',
 );
+const DevicesTab = lazyNamed(
+  () => import('../features/devices/DevicesTab'),
+  'DevicesTab',
+);
 const GrowthChartsTab = lazyNamed(
   () => import('../features/growth-charts/GrowthChartsTab'),
   'GrowthChartsTab',
@@ -461,6 +465,10 @@ const routes = [
           {
             path: 'goals',
             element: <GoalsTab />,
+          },
+          {
+            path: 'devices',
+            element: <DevicesTab />,
           },
           {
             path: 'procedures',

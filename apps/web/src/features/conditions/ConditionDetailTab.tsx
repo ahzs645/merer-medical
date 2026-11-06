@@ -125,7 +125,7 @@ function ConditionDetail({ bundle }: { bundle: ConditionBundle }) {
         </dl>
         {bundle.aliases.length > 0 && (
           <p className="mt-3 text-xs text-gray-500">
-            Also recorded as: {bundle.aliases.join(' · ')}
+            <span>Also recorded as:</span> {bundle.aliases.join(' · ')}
           </p>
         )}
       </section>
@@ -183,7 +183,7 @@ function RelatedSection({
 }) {
   return (
     <section>
-      <SectionHeading icon={icon} title={`${title} (${items.length})`} />
+      <SectionHeading icon={icon} title={title} count={items.length} />
       <div className="grid gap-2">
         {items.map((item) => (
           <article
@@ -224,7 +224,8 @@ function NotesSection({ notes }: { notes: ConditionNote[] }) {
     <section>
       <SectionHeading
         icon={ChatBubbleLeftEllipsisIcon}
-        title={`History & comments (${notes.length})`}
+        title="History & comments"
+        count={notes.length}
       />
       <ol className="grid gap-2">
         {ordered.map((note, index) => (
@@ -299,18 +300,25 @@ function buildTimeline(bundle: ConditionBundle): TimelineEvent[] {
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 }
 
+/**
+ * The count is its own text node: the Arabic interface translates whole text
+ * nodes, so "Medications (8)" built as one string never matched "Medications".
+ */
 function SectionHeading({
   icon: Icon,
   title,
+  count,
 }: {
   icon: typeof BeakerIcon;
   title: string;
+  count?: number;
 }) {
   return (
     <div className="mb-2 flex items-center gap-2">
       <Icon className="h-5 w-5 text-gray-500" />
       <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-700">
-        {title}
+        <span>{title}</span>
+        {count !== undefined && <span> ({count})</span>}
       </h2>
     </div>
   );

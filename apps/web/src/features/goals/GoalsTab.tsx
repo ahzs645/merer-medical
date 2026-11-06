@@ -29,6 +29,42 @@ interface GoalItem {
   achievement?: string;
   addresses: string[];
   startDate?: string;
+  /** "Hemoglobin A1c: < 6.5 %" — what counts as reaching the goal. */
+  target?: string;
+  dueDate?: string;
+}
+
+/**
+ * A goal's target, as one line. FHIR keeps it in `target[]` (a measure plus a
+ * detail quantity, string or range), and without it a goal named "Weight" reads
+ * as an intention with no number.
+ */
+function goalTarget(r: Record<string, unknown>): {
+  target?: string;
+  dueDate?: string;
+} {
+  const first = Array.isArray(r['target']) ? r['target'][0] : undefined;
+  if (!isRecord(first)) return {};
+  const quantity = isRecord(first['detailQuantity'])
+    ? [
+        first['detailQuantity']['comparator'],
+        first['detailQuantity']['value'],
+        first['detailQuantity']['unit'],
+      ]
+        .filter((part) => part !== undefined && part !== null && part !== '')
+        .join(' ')
+    : undefined;
+  const detail =
+    (typeof first['detailString'] === 'string'
+      ? first['detailString']
+      : undefined) || quantity;
+  const measure = firstText(first['measure']);
+  const target = [measure, detail].filter(Boolean).join(': ') || undefined;
+  return {
+    target,
+    dueDate:
+      typeof first['dueDate'] === 'string' ? first['dueDate'] : undefined,
+  };
 }
 
 function mapGoalDocs(docs: ClinicalDocument[]): GoalItem[] {
@@ -48,6 +84,7 @@ function mapGoalDocs(docs: ClinicalDocument[]): GoalItem[] {
       achievement: firstText(r['achievementStatus']),
       addresses,
       startDate: (r['startDate'] as string) || d.metadata?.date,
+      ...goalTarget(r),
     };
   });
 }
@@ -94,6 +131,14 @@ export function GoalsTab() {
                 {item.status && (
                   <span className="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium capitalize text-gray-700">
                     {item.status}
+                  </span>
+                )}
+                {item.target && (
+                  <span className="inline-flex items-center rounded bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                    Target: {item.target}
+                    {item.dueDate
+                      ? ` by ${safeFormatDate(item.dueDate, 'PP', item.dueDate)}`
+                      : ''}
                   </span>
                 )}
                 {item.addresses.map((address) => (

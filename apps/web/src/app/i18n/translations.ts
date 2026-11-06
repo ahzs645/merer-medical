@@ -2114,6 +2114,19 @@ export const arabicTranslations: Record<string, string> = {
 
   // Immunization recommendation status
   'On record': 'مسجل',
+  // Condition history, explicit links, devices
+  Devices: 'الأجهزة',
+  'Referrals & follow-up': 'الإحالات والمتابعة',
+  'History & comments': 'التاريخ والتعليقات',
+  'Also recorded as:': 'مسجلة أيضاً باسم:',
+  'Prescribed for this condition': 'موصوف لهذه الحالة',
+  'Performed for this condition': 'أُجري لهذه الحالة',
+  'Follow-up for this condition': 'متابعة لهذه الحالة',
+  'Target:': 'الهدف:',
+  'Loading devices…': 'جارٍ تحميل الأجهزة…',
+  'Unable to load devices.': 'تعذّر تحميل الأجهزة.',
+  'No devices recorded yet. Glucose monitors, CPAP machines and other devices appear here as your records arrive.':
+    'لا توجد أجهزة مسجلة بعد. تظهر هنا أجهزة مراقبة السكر وأجهزة CPAP وغيرها عند وصول سجلاتك.',
 };
 
 export function getInterfaceLanguageDirection(language: InterfaceLanguage) {

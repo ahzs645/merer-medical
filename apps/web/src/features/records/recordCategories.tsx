@@ -5,6 +5,7 @@ import {
   ChartPieIcon,
   ClipboardDocumentCheckIcon,
   ClipboardDocumentListIcon,
+  CpuChipIcon,
   DocumentTextIcon,
   ExclamationTriangleIcon,
   EyeIcon,
@@ -174,6 +175,12 @@ export const RECORD_GROUPS: RecordGroup[] = [
         label: 'Goals',
         icon: FlagIcon,
         resourceTypes: ['goal'],
+      },
+      {
+        to: AppRoutes.Devices,
+        label: 'Devices',
+        icon: CpuChipIcon,
+        resourceTypes: ['device'],
       },
       {
         to: AppRoutes.Histories,
