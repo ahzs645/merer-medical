@@ -102,6 +102,76 @@ describe('medication grouping', () => {
     expect(matchesMedicationFilter(supplement, 'supplements')).toBe(true);
   });
 
+  it('does not ask for review of a drug that is over, or one the record says is not yet started', () => {
+    const adherence = (code: string) => [
+      {
+        url: 'https://mere.health/fhir/StructureDefinition/medication-adherence',
+        valueCodeableConcept: { coding: [{ code }] },
+      },
+    ];
+    const stopped = viewItem({
+      resourceType: 'MedicationStatement',
+      status: 'completed',
+      medicationCodeableConcept: { text: 'Dutasteride 0.5 MG capsule' },
+      extension: adherence('stopped'),
+    });
+    const planned = viewItem({
+      resourceType: 'MedicationStatement',
+      status: 'intended',
+      medicationCodeableConcept: { text: 'Metformin 1000 MG tablet' },
+      extension: adherence('not-yet-started'),
+    });
+    const pastWithoutAdherence = viewItem({
+      resourceType: 'MedicationStatement',
+      status: 'completed',
+      medicationCodeableConcept: { text: 'Vibegron 75 MG tablet' },
+    });
+    // "Stopped" on a drug the record still calls active is a contradiction,
+    // not an answer, so that one keeps its review flag.
+    const contradictory = viewItem({
+      resourceType: 'MedicationStatement',
+      status: 'active',
+      medicationCodeableConcept: { text: 'Lisinopril 10 MG tablet' },
+      extension: adherence('stopped'),
+    });
+
+    expect(stopped.group).toBe('stopped');
+    expect(needsReconciliationReview(stopped)).toBe(false);
+    expect(planned.group).toBe('planned');
+    expect(needsReconciliationReview(planned)).toBe(false);
+    expect(needsReconciliationReview(pastWithoutAdherence)).toBe(false);
+    expect(needsReconciliationReview(contradictory)).toBe(true);
+  });
+
+  it('reads a transposed drug by its stated plan, not by words in its notes', () => {
+    const planStatus = {
+      url: 'https://mere.health/fhir/StructureDefinition/medication-plan-status',
+      valueCodeableConcept: { text: 'active' },
+    };
+    const postOp = viewItem({
+      resourceType: 'MedicationStatement',
+      status: 'active',
+      medicationCodeableConcept: { text: 'Metronidazole 500 MG tablet' },
+      extension: [planStatus],
+      note: [{ text: 'Post-operative course after hemorrhoidectomy.' }],
+    });
+    const waiting = viewItem({
+      resourceType: 'MedicationStatement',
+      status: 'active',
+      medicationCodeableConcept: { text: 'Glimepiride 2 MG tablet' },
+      extension: [
+        planStatus,
+        {
+          url: 'https://mere.health/fhir/StructureDefinition/medication-start-condition',
+          valueString: 'Begin after 3 days of higher-carbohydrate intake',
+        },
+      ],
+    });
+
+    expect(postOp.group).toBe('current');
+    expect(waiting.group).toBe('planned');
+  });
+
   it('leaves a fully-described medication out of the review chip', () => {
     const item = viewItem({
       resourceType: 'MedicationStatement',

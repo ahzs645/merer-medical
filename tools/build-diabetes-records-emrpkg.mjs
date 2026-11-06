@@ -23,6 +23,14 @@ const FORMAT_VERSION = 1;
  * initialization` and no package is ever written.
  */
 
+const MEDICATION_CATEGORY_DISPLAY = {
+  prescription: 'Prescription medication',
+  otc: 'OTC medication',
+  supplement: 'Supplement',
+  vitamin: 'Vitamin',
+  herbal: 'Herbal product',
+};
+
 const LAB_LOINC = {
   // CBC
   'white blood cells': ['6690-2', 'Leukocytes [#/volume] in Blood'],
@@ -2777,8 +2785,21 @@ function buildMedicationExtensions(item, group) {
   return extensions.length ? extensions : undefined;
 }
 
+/**
+ * An item's own `category` wins. Otherwise the drug's name decides — not its
+ * note, which is prose about anything: a "therapy completed" tramadol whose
+ * note mentioned a multivitamin was filed as a vitamin.
+ */
 function inferMedicationCategory(item) {
-  const text = [item.medication, item.note, item.sourceSection].join(' ');
+  const stated = `${item.category || ''}`.toLowerCase();
+  if (MEDICATION_CATEGORY_DISPLAY[stated]) {
+    return {
+      system: 'https://mere.health/fhir/CodeSystem/medication-category',
+      code: stated,
+      display: MEDICATION_CATEGORY_DISPLAY[stated],
+    };
+  }
+  const text = `${item.medication}`;
   const categories = [
     ['vitamin', /vitamin|b12|d3|folate/i, 'Vitamin'],
     ['supplement', /supplement|omega|fish oil|coq10/i, 'Supplement'],

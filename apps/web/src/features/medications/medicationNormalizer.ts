@@ -85,7 +85,12 @@ export function normalizeMedicationDocument(
       source,
       notes,
     }),
-    reconciliationState: getReconciliationState(status, adherence, notes),
+    reconciliationState: getReconciliationState(
+      status,
+      adherence,
+      notes,
+      adherenceIsAnswered(resource, status),
+    ),
   };
 
   return item;
@@ -407,6 +412,33 @@ const ADHERENCE_EXTENSION =
  * `stopped`) are left to fall through — the FHIR `status` already routes those
  * to the Planned and Stopped buckets, both of which are tested earlier still.
  */
+/**
+ * `stopped` and `not-yet-started` have no counterpart in this module's
+ * adherence vocabulary, so they normalize to `unknown` — which used to put every
+ * past and planned drug of a transposed list under Needs review, beside the
+ * drugs that genuinely lack an answer. A record that says outright "stopped"
+ * on a stopped drug, or "not yet started" on a planned one, has answered the
+ * question — and a drug that is over (stopped, completed) has nothing left to
+ * reconcile about how it is taken. Only an unstated adherence on a drug in use
+ * or planned still needs a look.
+ */
+function adherenceIsAnswered(
+  resource: AnyRecord,
+  status: MedicationTimelineStatus,
+): boolean {
+  if (status === 'stopped' || status === 'completed') return true;
+  const extensions = resource.extension;
+  if (!Array.isArray(extensions)) return false;
+  const code = extensions.find(
+    (extension: AnyRecord) => extension?.url === ADHERENCE_EXTENSION,
+  )?.valueCodeableConcept?.coding?.[0]?.code;
+
+  if (code === 'not-yet-started') {
+    return status === 'intended' || status === 'on-hold';
+  }
+  return false;
+}
+
 function getAdherenceFromExtension(
   resource: AnyRecord,
 ): MedicationAdherence | undefined {
@@ -455,15 +487,39 @@ function getAdherence(
   return 'unknown';
 }
 
+const START_CONDITION_EXTENSION =
+  'https://mere.health/fhir/StructureDefinition/medication-start-condition';
+const PLAN_STATUS_EXTENSION =
+  'https://mere.health/fhir/StructureDefinition/medication-plan-status';
+
+/**
+ * A transposed record says outright when a drug waits on a condition — the
+ * `medication-start-condition` extension — and carries a plan status saying it
+ * is in use. Scanning its notes for "after" or "if" as well filed a five-day
+ * post-operative antibiotic ("course after hemorrhoidectomy") under Planned.
+ * So a record with Mere's plan status is read by its extension and dosage
+ * instructions only; free-text sniffing stays for portal records, which have
+ * nothing better.
+ */
 function getConditionalInstructions(
   resource: AnyRecord,
   notes: string[],
 ): string | undefined {
+  const extensions: AnyRecord[] = Array.isArray(resource.extension)
+    ? resource.extension
+    : [];
+  const stated = extensions.find(
+    (extension) => extension?.url === START_CONDITION_EXTENSION,
+  )?.valueString;
+  if (stated) return stated;
+  const explicit = extensions.some(
+    (extension) => extension?.url === PLAN_STATUS_EXTENSION,
+  );
   const candidates = [
     resource.substitution?.reason?.text,
     getPrimaryDosage(resource)?.patientInstruction,
     getPrimaryDosage(resource)?.additionalInstruction?.[0]?.text,
-    ...notes,
+    ...(explicit ? [] : notes),
   ].filter(Boolean);
 
   return candidates.find((text) =>
@@ -583,6 +639,7 @@ function getReconciliationState(
   status: MedicationTimelineStatus,
   adherence: MedicationAdherence,
   notes: string[],
+  answered = false,
 ): MedicationReconciliationState {
   const text = notes.join(' ').toLowerCase();
 
@@ -591,7 +648,8 @@ function getReconciliationState(
     return 'conflicting-sources';
   }
   if (/\b(verified|reconciled|confirmed)\b/.test(text)) return 'verified';
-  if (status === 'unknown' || adherence === 'unknown') return 'needs-review';
+  if (status === 'unknown') return 'needs-review';
+  if (adherence === 'unknown' && !answered) return 'needs-review';
   return 'unknown';
 }
 
