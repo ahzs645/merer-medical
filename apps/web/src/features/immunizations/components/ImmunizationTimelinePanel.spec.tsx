@@ -68,14 +68,17 @@ function renderPanel(records: ImmunizationRecord[]) {
  * be removed at all.
  */
 describe('ImmunizationTimelinePanel manual record actions', () => {
-  it('offers edit and delete on a hand-entered dose at a 44px target', () => {
+  it('offers edit and delete on a hand-entered dose at a 44px tap target', () => {
     renderPanel([MANUAL]);
 
     const edit = screen.getByRole('button', { name: 'Edit' });
     const remove = screen.getByRole('button', { name: 'Delete' });
 
-    expect(edit.className).toContain('min-h-[44px]');
-    expect(remove.className).toContain('min-h-[44px]');
+    // Drawn at 32px, with an invisible tap area reaching 44px.
+    for (const button of [edit, remove]) {
+      expect(button.className).toContain('min-h-8');
+      expect(button.className).toContain('after:-inset-y-1.5');
+    }
   });
 
   it('no longer sends the correction through the full-page edit route', () => {

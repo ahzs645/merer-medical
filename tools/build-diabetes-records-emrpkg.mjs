@@ -1972,6 +1972,23 @@ function clinicalDocument({
   raw,
   metadata = {},
 }) {
+  // Say how the record arrived. Without it the app reads a `manual:` id as
+  // typed in by hand, and a transposed Mayo lab result showed "How it arrived:
+  // Entered by hand · Fields: Typed into this app" in its history.
+  if (
+    raw &&
+    typeof raw === 'object' &&
+    raw.source_image &&
+    !raw.provenance &&
+    resourceType !== 'documentreference_attachment'
+  ) {
+    raw.provenance = {
+      entryMethod: 'file-import',
+      mappingConfidence: 'mapped',
+      originalFilename: sourceImageToFilename(raw.source_image),
+      notes: 'Transposed from the source document into structured fields.',
+    };
+  }
   return {
     id: `${connectionId}|${userId}|manual:${id}`,
     connection_record_id: connectionId,

@@ -1,11 +1,28 @@
+import { Menu, Transition } from '@headlessui/react';
 import {
+  ClockIcon,
   DocumentArrowDownIcon,
+  DocumentMagnifyingGlassIcon,
+  EllipsisHorizontalIcon,
   EyeIcon,
+  LinkIcon,
   LockClosedIcon,
   PencilSquareIcon,
   TrashIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { lazy, MouseEvent, Suspense, useEffect, useState } from 'react';
+import {
+  ComponentType,
+  Fragment,
+  lazy,
+  MouseEvent,
+  ReactNode,
+  SVGProps,
+  Suspense,
+  useEffect,
+  useId,
+  useState,
+} from 'react';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { useNotificationDispatch } from '../../app/providers/NotificationProvider';
@@ -24,14 +41,30 @@ import { isManualRecord } from '../../shared/utils/manualRecordUtils';
 import { buildRecordProvenance } from '../provenance/provenance';
 import { readOnlyReason } from '../provenance/provenanceLabels';
 import { ConfirmDeleteDialog } from '../../shared/components/ConfirmDeleteDialog';
-import { ManualSourceDocumentLink } from './ManualSourceDocumentLink';
+import { useSourceDocumentLink } from './ManualSourceDocumentLink';
+import { RecordHistoryModal } from './RecordHistoryModal';
 
 /**
  * The class the actions row wears, exported so a card that has an action of
  * its own — Imaging's "Open record" — can host one row rather than stranding
  * its button on a line above Edit and Delete.
  */
-export const manualRecordActionRowClass = 'mt-3 flex flex-wrap gap-2';
+export const manualRecordActionRowClass =
+  'mt-3 flex flex-wrap items-center gap-2';
+
+/**
+ * One size for every action on a card. They used to come in two — Edit and
+ * Delete at 44px, the source chips at 28px — so on a phone the row wrapped into
+ * a short line and a tall one. Each button now draws at 32px and carries an
+ * invisible 44px tap area (`after:` inset six pixels above and below), so the
+ * row is compact without shrinking what a thumb has to hit.
+ */
+export const actionTapAreaClass =
+  "relative after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-['']";
+export const actionChipClass = `${actionTapAreaClass} inline-flex min-h-8 items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold shadow-sm disabled:cursor-not-allowed disabled:opacity-60`;
+const neutralChip = `${actionChipClass} border-gray-300 text-gray-800 hover:bg-gray-50`;
+const primaryChip = `${actionChipClass} border-primary-200 text-primary-700 hover:bg-primary-50`;
+const dangerChip = `${actionChipClass} border-red-200 text-red-700 hover:bg-red-50`;
 
 /**
  * The edit sheet, fetched the first time somebody presses Edit.
@@ -73,6 +106,12 @@ export function ManualRecordActions({
   useEffect(() => {
     if (isEditOpen) setEditRequested(true);
   }, [isEditOpen]);
+  const source = useSourceDocumentLink(item);
+  const stop = (event: MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [linkedFiles, setLinkedFiles] = useState<
     Array<{ id: string; filename?: string }>
   >([]);
@@ -126,8 +165,33 @@ export function ManualRecordActions({
         {t(readOnlyReason(buildRecordProvenance(item).entryMethod))}
       </span>
     );
-    if (inline) return note;
-    return <div className={manualRecordActionRowClass}>{note}</div>;
+    const readOnly = (
+      <>
+        {note}
+        <button
+          type="button"
+          onClick={(event) => {
+            stop(event);
+            setHistoryOpen(true);
+          }}
+          className={neutralChip}
+        >
+          <ClockIcon className="h-4 w-4" aria-hidden="true" />
+          {t('History')}
+        </button>
+        {historyOpen && (
+          <RecordHistoryModal
+            item={item}
+            open={historyOpen}
+            setOpen={setHistoryOpen}
+            documentTitle={source.documentTitle}
+            fileName={source.fileName}
+          />
+        )}
+      </>
+    );
+    if (inline) return readOnly;
+    return <div className={manualRecordActionRowClass}>{readOnly}</div>;
   }
 
   function onRequestDelete(event: MouseEvent<HTMLButtonElement>) {
@@ -168,13 +232,7 @@ export function ManualRecordActions({
     }
   }
 
-  async function onOpenAttachment(
-    event: MouseEvent<HTMLButtonElement>,
-    attachmentId: string,
-  ) {
-    event.preventDefault();
-    event.stopPropagation();
-
+  async function onOpenAttachment(attachmentId: string) {
     try {
       await openClinicalDocumentAttachment(attachmentId);
     } catch (error) {
@@ -187,13 +245,7 @@ export function ManualRecordActions({
     }
   }
 
-  async function onDownloadAttachment(
-    event: MouseEvent<HTMLButtonElement>,
-    attachmentId: string,
-  ) {
-    event.preventDefault();
-    event.stopPropagation();
-
+  async function onDownloadAttachment(attachmentId: string) {
     try {
       await downloadClinicalDocumentAttachment(attachmentId);
     } catch (error) {
@@ -206,55 +258,96 @@ export function ManualRecordActions({
     }
   }
 
-  // Edit and Delete carry the 44px minimum the rest of the app applies to
-  // banner actions, filter chips and back links; the row stretches its other
-  // chips to match, so the source-document controls come up with them.
+  // On a card: what a person does with a record — read its source, correct
+  // it, remove it. Everything else (its history, re-pointing or dropping the
+  // source link, files attached by hand) is one tap further, in the menu.
   const actions = (
     <>
-      {linkedFiles.map((file) => (
-        <span key={file.id} className="inline-flex gap-1">
-          <button
-            type="button"
-            onClick={(event) => onOpenAttachment(event, file.id)}
-            className="inline-flex items-center gap-1 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 shadow-sm hover:bg-primary-50"
-            title={file.filename || 'Open linked file'}
-          >
-            <EyeIcon className="h-4 w-4" />
-            {t('Open source')}
-          </button>
-          <button
-            type="button"
-            onClick={(event) => onDownloadAttachment(event, file.id)}
-            className="inline-flex items-center gap-1 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 shadow-sm hover:bg-primary-50"
-            title={file.filename || 'Download linked file'}
-          >
-            <DocumentArrowDownIcon className="h-4 w-4" />
-            {t('Download')}
-          </button>
-        </span>
-      ))}
-      <ManualSourceDocumentLink item={item} />
+      {source.canView && (
+        <SourceButton
+          title={source.documentTitle}
+          fileName={source.fileName}
+          onClick={(event) => {
+            stop(event);
+            source.openViewer();
+          }}
+        />
+      )}
       <button
         type="button"
         onClick={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
+          stop(event);
           setIsEditOpen(true);
         }}
-        className="inline-flex min-h-[44px] items-center gap-1 rounded-md border border-gray-300 px-3 py-1 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
+        className={neutralChip}
       >
-        <PencilSquareIcon className="h-4 w-4" />
+        <PencilSquareIcon className="h-4 w-4" aria-hidden="true" />
         {t('Edit')}
       </button>
       <button
         type="button"
         disabled={isDeleting}
         onClick={onRequestDelete}
-        className="inline-flex min-h-[44px] items-center gap-1 rounded-md border border-red-200 px-3 py-1 text-xs font-semibold text-red-700 shadow-sm hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+        className={dangerChip}
       >
-        <TrashIcon className="h-4 w-4" />
+        <TrashIcon className="h-4 w-4" aria-hidden="true" />
         {t(isDeleting ? 'Deleting' : 'Delete')}
       </button>
+      <MoreMenu label={t('More actions')}>
+        <MenuAction
+          icon={ClockIcon}
+          onSelect={() => setHistoryOpen(true)}
+          label={t('History')}
+        />
+        {!source.isSourceItself && (
+          <MenuAction
+            icon={LinkIcon}
+            disabled={source.busy}
+            onSelect={source.openPicker}
+            label={t(source.isLinked ? 'Change source' : 'Link source')}
+          />
+        )}
+        {!source.isSourceItself && source.isLinked && (
+          <MenuAction
+            icon={XMarkIcon}
+            disabled={source.busy}
+            onSelect={source.unlink}
+            label={t('Unlink source')}
+          />
+        )}
+        {linkedFiles.map((file) => (
+          <Fragment key={file.id}>
+            <MenuAction
+              icon={EyeIcon}
+              onSelect={() => onOpenAttachment(file.id)}
+              label={`${t('Open')} ${file.filename || t('linked file')}`}
+            />
+            <MenuAction
+              icon={DocumentArrowDownIcon}
+              onSelect={() => onDownloadAttachment(file.id)}
+              label={`${t('Download')} ${file.filename || t('linked file')}`}
+            />
+          </Fragment>
+        ))}
+      </MoreMenu>
+      {source.dialogs}
+      {historyOpen && (
+        <RecordHistoryModal
+          item={item}
+          open={historyOpen}
+          setOpen={setHistoryOpen}
+          documentTitle={source.documentTitle}
+          fileName={source.fileName}
+          onViewSource={
+            source.canView
+              ? () => {
+                  setHistoryOpen(false);
+                  source.openViewer();
+                }
+              : undefined
+          }
+        />
+      )}
       {editRequested && (
         <Suspense fallback={null}>
           <ManualRecordModal
@@ -286,4 +379,112 @@ export function ManualRecordActions({
 
   if (inline) return actions;
   return <div className={manualRecordActionRowClass}>{actions}</div>;
+}
+
+/**
+ * View source, naming the document on hover and keyboard focus. The browser's
+ * own `title` tooltip waits a second and never shows on a phone, and it said
+ * only the file name ("H.E. Mr. … 4-281-518.pdf"); this one says what the
+ * document is, then which file. On touch, the History view names it.
+ */
+function SourceButton({
+  title,
+  fileName,
+  onClick,
+}: {
+  title?: string;
+  fileName?: string;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
+}) {
+  const { t } = useInterfaceLanguage();
+  const tooltipId = useId();
+  const described = Boolean(title || fileName);
+  return (
+    <span className="group relative inline-flex">
+      <button
+        type="button"
+        onClick={onClick}
+        className={primaryChip}
+        aria-describedby={described ? tooltipId : undefined}
+      >
+        <DocumentMagnifyingGlassIcon className="h-4 w-4" aria-hidden="true" />
+        {t('View source')}
+      </button>
+      {described && (
+        <span
+          id={tooltipId}
+          role="tooltip"
+          className="pointer-events-none invisible absolute bottom-full start-0 z-30 mb-2 w-max max-w-[18rem] rounded-md bg-gray-900 px-2.5 py-1.5 text-xs font-normal text-white opacity-0 shadow-lg transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100"
+        >
+          {title && <span className="block font-semibold">{title}</span>}
+          {fileName && fileName !== title && (
+            <span className="block break-all text-gray-300">{fileName}</span>
+          )}
+        </span>
+      )}
+    </span>
+  );
+}
+
+function MoreMenu({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <Menu as="div" className="relative inline-flex">
+      <Menu.Button
+        className={`${neutralChip} px-2`}
+        onClick={(event: MouseEvent<HTMLButtonElement>) =>
+          event.stopPropagation()
+        }
+      >
+        <span className="sr-only">{label}</span>
+        <EllipsisHorizontalIcon className="h-4 w-4" aria-hidden="true" />
+      </Menu.Button>
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-100"
+        enterFrom="opacity-0 scale-95"
+        enterTo="opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="opacity-100 scale-100"
+        leaveTo="opacity-0 scale-95"
+      >
+        <Menu.Items className="absolute end-0 top-full z-30 mt-1 w-60 origin-top-right rounded-lg bg-white p-1 shadow-lg ring-1 ring-black/5 focus:outline-none">
+          {children}
+        </Menu.Items>
+      </Transition>
+    </Menu>
+  );
+}
+
+function MenuAction({
+  icon: Icon,
+  label,
+  onSelect,
+  disabled,
+}: {
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  label: string;
+  onSelect: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <Menu.Item disabled={disabled}>
+      {({ active }) => (
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            onSelect();
+          }}
+          className={`flex min-h-[44px] w-full items-center gap-2 rounded-md px-2.5 py-2 text-start text-sm disabled:opacity-60 ${
+            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
+          }`}
+        >
+          <Icon className="h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
+          <span className="min-w-0 break-words">{label}</span>
+        </button>
+      )}
+    </Menu.Item>
+  );
 }

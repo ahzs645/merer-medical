@@ -2127,6 +2127,24 @@ export const arabicTranslations: Record<string, string> = {
   'Unable to load devices.': 'تعذّر تحميل الأجهزة.',
   'No devices recorded yet. Glucose monitors, CPAP machines and other devices appear here as your records arrive.':
     'لا توجد أجهزة مسجلة بعد. تظهر هنا أجهزة مراقبة السكر وأجهزة CPAP وغيرها عند وصول سجلاتك.',
+  // Record actions and history
+  'More actions': 'إجراءات أخرى',
+  History: 'السجل',
+  'Change source': 'تغيير المصدر',
+  'Link source': 'ربط مصدر',
+  'Unlink source': 'إلغاء ربط المصدر',
+  'linked file': 'ملف مرتبط',
+  'Record history': 'سجل التغييرات',
+  'Source document': 'المستند المصدر',
+  'Review and assumptions': 'المراجعة والافتراضات',
+  'Review status': 'حالة المراجعة',
+  Assumption: 'افتراض',
+  'No activity recorded.': 'لا يوجد نشاط مسجل.',
+  'Earlier versions': 'الإصدارات السابقة',
+  changes: 'تغييرات',
+  'Date of the record': 'تاريخ السجل',
+  'View source': 'عرض المصدر',
+  Record: 'سجل',
 };
 
 export function getInterfaceLanguageDirection(language: InterfaceLanguage) {

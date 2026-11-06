@@ -1,17 +1,12 @@
 import {
   Dispatch,
-  MouseEvent,
+  ReactNode,
   SetStateAction,
   useCallback,
   useEffect,
   useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  DocumentMagnifyingGlassIcon,
-  LinkIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
@@ -39,15 +34,35 @@ type SourceOption = {
   subtitle?: string;
 };
 
-const chipClass =
-  'inline-flex items-center gap-1 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 shadow-sm hover:bg-primary-50 disabled:opacity-60';
+export interface SourceDocumentLink {
+  /** A source document or its attachment is itself the origin. */
+  isSourceItself: boolean;
+  isLinked: boolean;
+  /** True once the embedded file has loaded, so View source can open it. */
+  canView: boolean;
+  /** The document's own title ("Mayo Clinic Rochester — records release…"). */
+  documentTitle?: string;
+  /** The file it was embedded from ("H.E. Mr. … 4-281-518.pdf"). */
+  fileName?: string;
+  busy: boolean;
+  openViewer: () => void;
+  openPicker: () => void;
+  unlink: () => void;
+  /** The viewer and picker; render once, outside any menu. */
+  dialogs: ReactNode;
+}
 
 /**
  * View, change, link, or unlink the source document a record points at. A
  * record references its source through `metadata.source_document_id` (the
  * DocumentReference) and `metadata.source_attachment_id` (the embedded bytes).
+ *
+ * A hook rather than a row of buttons, so the caller decides where each action
+ * lives: View source stays on the card, Change and Unlink go into its menu.
  */
-export function ManualSourceDocumentLink({ item }: { item: ClinicalDocument }) {
+export function useSourceDocumentLink(
+  item: ClinicalDocument,
+): SourceDocumentLink {
   const db = useRxDb();
   const user = useUser();
   const navigate = useNavigate();
@@ -59,24 +74,29 @@ export function ManualSourceDocumentLink({ item }: { item: ClinicalDocument }) {
   const sourceAttachmentId = getMetaString(item, 'source_attachment_id');
   const sourceDocumentId = getMetaString(item, 'source_document_id');
   const attachment = useClinicalDoc(sourceAttachmentId);
+  const sourceDocument = useClinicalDoc(sourceDocumentId);
 
-  // A source document (or its attachment) is itself the origin, so it has no
-  // "source" to link/unlink — don't render the controls on those records.
   const resourceType = item.data_record?.resource_type;
   const isSourceItself =
     resourceType === 'documentreference' ||
     resourceType === 'documentreference_attachment';
 
   const isLinked = Boolean(sourceDocumentId || sourceAttachmentId);
-  const title =
+  const fileName =
     getMetaString(item, 'source_image') ||
     attachment?.get('metadata.display_name') ||
-    'Source document';
-
-  const stop = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
+    undefined;
+  // The DocumentReference's type is the title a person gave the document; its
+  // display name adds " source document", which is the builder talking.
+  const documentTitle =
+    (sourceDocument?.get('data_record.raw.resource.type.text') as
+      | string
+      | undefined) ||
+    (
+      sourceDocument?.get('metadata.display_name') as string | undefined
+    )?.replace(/ source document$/, '') ||
+    undefined;
+  const viewerTitle = documentTitle || fileName || 'Source document';
 
   const applyLink = useCallback(
     async (link: { documentId: string; attachmentId?: string } | null) => {
@@ -105,72 +125,22 @@ export function ManualSourceDocumentLink({ item }: { item: ClinicalDocument }) {
     [busy, db, item.id, navigate, notifyDispatch, user.id],
   );
 
-  if (isSourceItself) return null;
-
-  return (
+  const dialogs = (
     <>
-      {isLinked && attachment && (
-        <button
-          type="button"
-          onClick={(event) => {
-            stop(event);
-            setViewerOpen(true);
-          }}
-          className={chipClass}
-          title={`View source: ${title}`}
-        >
-          <DocumentMagnifyingGlassIcon className="h-4 w-4" />
-          View source
-        </button>
-      )}
-      <button
-        type="button"
-        disabled={busy}
-        onClick={(event) => {
-          stop(event);
-          setPickerOpen(true);
-        }}
-        className={chipClass}
-        title={
-          isLinked
-            ? 'Link a different source document'
-            : 'Link a source document'
-        }
-      >
-        <LinkIcon className="h-4 w-4" />
-        {isLinked ? 'Change source' : 'Link source'}
-      </button>
-      {isLinked && (
-        <button
-          type="button"
-          disabled={busy}
-          onClick={(event) => {
-            stop(event);
-            applyLink(null);
-          }}
-          className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-60"
-          title="Remove the source-document link from this record"
-        >
-          <XMarkIcon className="h-4 w-4" />
-          Unlink
-        </button>
-      )}
-
       {viewerOpen && attachment && (
         <Modal open={viewerOpen} setOpen={setViewerOpen}>
           <div className="flex flex-col">
-            <ModalHeader title={title} setClose={setViewerOpen} />
+            <ModalHeader title={viewerTitle} setClose={setViewerOpen} />
             <EmbeddedAttachmentViewer
               attachment={{
                 contentType: attachment.get('data_record.content_type'),
                 raw: attachment.get('data_record.raw'),
-                title,
+                title: viewerTitle,
               }}
             />
           </div>
         </Modal>
       )}
-
       {pickerOpen && (
         <SourceDocumentPickerModal
           open={pickerOpen}
@@ -180,6 +150,49 @@ export function ManualSourceDocumentLink({ item }: { item: ClinicalDocument }) {
           onPick={applyLink}
         />
       )}
+    </>
+  );
+
+  return {
+    isSourceItself,
+    isLinked,
+    canView: isLinked && Boolean(attachment),
+    documentTitle,
+    fileName,
+    busy,
+    openViewer: () => setViewerOpen(true),
+    openPicker: () => setPickerOpen(true),
+    unlink: () => applyLink(null),
+    dialogs,
+  };
+}
+
+/**
+ * View source on its own, for a statement that is not a full record card —
+ * "No known allergies" keeps a way through to the document that said so
+ * without the edit/delete row a real allergen carries.
+ */
+export function ManualSourceDocumentLink({ item }: { item: ClinicalDocument }) {
+  const source = useSourceDocumentLink(item);
+  if (source.isSourceItself || !source.canView) return null;
+  const description = [source.documentTitle, source.fileName]
+    .filter(Boolean)
+    .join(' — ');
+  return (
+    <>
+      <button
+        type="button"
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          source.openViewer();
+        }}
+        title={description || undefined}
+        className="relative mt-2 inline-flex min-h-8 items-center gap-1 rounded-md border border-primary-200 px-2.5 py-1 text-xs font-semibold text-primary-700 shadow-sm after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[''] hover:bg-primary-50"
+      >
+        View source
+      </button>
+      {source.dialogs}
     </>
   );
 }

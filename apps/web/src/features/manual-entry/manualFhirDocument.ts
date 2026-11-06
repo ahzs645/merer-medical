@@ -217,7 +217,15 @@ export function buildClinicalDocument({
             : fileContentType || 'application/octet-stream'
           : 'application/json',
       resource_type: resourceType,
-      version_history: loadedDocument ? [loadedDocument.data_record.raw] : [],
+      // Every saved version, oldest first. It held only the one before this
+      // save, so a second edit erased the first and the record's history
+      // could never show more than its last change.
+      version_history: loadedDocument
+        ? [
+            ...(loadedDocument.data_record.version_history || []),
+            loadedDocument.data_record.raw,
+          ]
+        : [],
     },
     metadata: {
       id: `manual:${nextRecordId}`,

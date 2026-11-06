@@ -21,7 +21,7 @@
  * and times are read; any account identifiers in a JSON export are ignored.
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { basename, dirname, resolve } from 'node:path';
 import { strToU8, zipSync } from 'fflate';
 
 const GLUCOSE_LOINC_CODE = '2339-0';
@@ -83,6 +83,11 @@ for (const reading of readings) {
       resource_type: 'observation',
       version_history: [],
       raw: {
+        provenance: {
+          entryMethod: 'device-import',
+          mappingConfidence: 'source',
+          originalFilename: basename(args.source),
+        },
         resource: {
           resourceType: 'Observation',
           id: sourceId,
