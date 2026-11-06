@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import {
   BeakerIcon,
+  ArrowTopRightOnSquareIcon,
   CalendarDaysIcon,
+  ChatBubbleLeftEllipsisIcon,
   ClipboardDocumentCheckIcon,
   ClipboardDocumentListIcon,
   FlagIcon,
@@ -15,7 +17,12 @@ import { AppPage } from '../../shared/components/AppPage';
 import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { useConditionsData } from './hooks/useConditionsData';
-import { ConditionBundle, RelatedKind, RelatedRecord } from './types';
+import {
+  ConditionBundle,
+  ConditionNote,
+  RelatedKind,
+  RelatedRecord,
+} from './types';
 
 const SECTIONS: {
   kind: RelatedKind;
@@ -31,6 +38,11 @@ const SECTIONS: {
   },
   { kind: 'goal', title: 'Goals', icon: FlagIcon },
   { kind: 'procedure', title: 'Procedures', icon: ScissorsIcon },
+  {
+    kind: 'referral',
+    title: 'Referrals & follow-up',
+    icon: ArrowTopRightOnSquareIcon,
+  },
 ];
 
 function formatDate(date?: string): string {
@@ -111,7 +123,14 @@ function ConditionDetail({ bundle }: { bundle: ConditionBundle }) {
             value={bundle.codes.slice(0, 3).join(', ') || 'None'}
           />
         </dl>
+        {bundle.aliases.length > 0 && (
+          <p className="mt-3 text-xs text-gray-500">
+            Also recorded as: {bundle.aliases.join(' · ')}
+          </p>
+        )}
       </section>
+
+      {bundle.notes.length > 0 && <NotesSection notes={bundle.notes} />}
 
       {bundle.related.length === 0 ? (
         <Placeholder text="No related medications, labs, or care plans were found for this condition yet." />
@@ -188,6 +207,43 @@ function RelatedSection({
           </article>
         ))}
       </div>
+    </section>
+  );
+}
+
+/**
+ * What each source said about this problem, oldest first, so the history
+ * reads in the order it happened. Undated notes (a problem-list entry with no
+ * date) go first: they are background, not events.
+ */
+function NotesSection({ notes }: { notes: ConditionNote[] }) {
+  const ordered = [...notes].sort((a, b) =>
+    (a.time || '').localeCompare(b.time || ''),
+  );
+  return (
+    <section>
+      <SectionHeading
+        icon={ChatBubbleLeftEllipsisIcon}
+        title={`History & comments (${notes.length})`}
+      />
+      <ol className="grid gap-2">
+        {ordered.map((note, index) => (
+          <li
+            key={`${note.time || 'undated'}-${index}`}
+            className="rounded-md bg-white p-3 shadow-sm ring-1 ring-gray-200"
+          >
+            {(note.time || note.author) && (
+              <p className="mb-1 text-xs text-gray-500">
+                {note.time ? formatDate(note.time) : 'Undated'}
+                {note.author ? ` · ${note.author}` : ''}
+              </p>
+            )}
+            <p className="whitespace-pre-line break-words text-sm text-gray-900">
+              {note.text}
+            </p>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }

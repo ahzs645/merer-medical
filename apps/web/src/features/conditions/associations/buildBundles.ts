@@ -1,12 +1,19 @@
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../../models/connection-document/ConnectionDocument.type';
 import { getFhirResource } from '../../../shared/utils/fhirResource';
-import { ConditionBundle, ConditionStatus, RelatedRecord } from '../types';
+import {
+  ConditionBundle,
+  ConditionNote,
+  ConditionStatus,
+  RelatedKind,
+  RelatedRecord,
+} from '../types';
 import { ConditionTopic, resolveConditionTopics } from './conditionTopics';
 import {
   addressedConditionRefs,
   conceptCodes,
   firstText,
+  reasonConditionRefs,
   summarizeRecord,
 } from './recordSummary';
 
@@ -19,6 +26,8 @@ export interface BundleInput {
   procedures: ClinicalDocument[];
   carePlans: ClinicalDocument[];
   goals: ClinicalDocument[];
+  /** Referrals and orders (ServiceRequest). Optional so older callers keep working. */
+  serviceRequests?: ClinicalDocument[];
   connectionsById: Map<string, ConnectionDocument>;
 }
 
@@ -29,9 +38,71 @@ function normalizeName(value: string): string {
     .trim();
 }
 
-function conditionRefId(document: ClinicalDocument): string | undefined {
-  const id = document.metadata?.id;
-  return id?.match(/Condition\/(.+)$/)?.[1] || id;
+/**
+ * Every id a reference to this condition might use. Portal records keep
+ * `Condition/{id}` in `metadata.id`; packaged records keep `manual:{id}` there
+ * and the bare id on the resource — and a `reasonReference` written by the same
+ * package says `Condition/{id}`. Matching on one form alone silently drops the
+ * link.
+ */
+function conditionRefIds(
+  document: ClinicalDocument,
+  resource: FhirRecord,
+): Set<string> {
+  const ids = new Set<string>();
+  const metaId = document.metadata?.id;
+  if (metaId) {
+    ids.add(metaId);
+    const fromRef = metaId.match(/Condition\/(.+)$/)?.[1];
+    if (fromRef) ids.add(fromRef);
+    const fromManual = metaId.match(/^manual:(.+)$/)?.[1];
+    if (fromManual) ids.add(fromManual);
+  }
+  if (typeof resource['id'] === 'string') ids.add(resource['id']);
+  return ids;
+}
+
+function isCgmReading(document: ClinicalDocument): boolean {
+  const category = getFhirResource<FhirRecord>(document)['category'];
+  return firstText(category) === 'Continuous glucose monitoring';
+}
+
+function conditionNotes(resource: FhirRecord): ConditionNote[] {
+  const notes = resource['note'];
+  if (!Array.isArray(notes)) return [];
+  return notes
+    .filter((note): note is FhirRecord => typeof note === 'object' && !!note)
+    .map((note) => {
+      const authorRef = note['authorReference'];
+      return {
+        text: typeof note['text'] === 'string' ? note['text'] : '',
+        author:
+          (typeof note['authorString'] === 'string'
+            ? note['authorString']
+            : undefined) ||
+          firstText(
+            authorRef && typeof authorRef === 'object'
+              ? (authorRef as FhirRecord)['display']
+              : undefined,
+          ),
+        time: typeof note['time'] === 'string' ? note['time'] : undefined,
+      };
+    })
+    .filter((note) => note.text.trim().length > 0);
+}
+
+function conditionAliases(resource: FhirRecord): string[] {
+  const extensions = resource['extension'];
+  if (!Array.isArray(extensions)) return [];
+  return extensions
+    .filter(
+      (ext): ext is FhirRecord =>
+        typeof ext === 'object' &&
+        !!ext &&
+        String((ext as FhirRecord)['url'] || '').endsWith('/condition-alias'),
+    )
+    .map((ext) => ext['valueString'])
+    .filter((value): value is string => typeof value === 'string');
 }
 
 function getConditionStatus(
@@ -75,13 +146,22 @@ export function buildConditionBundles(input: BundleInput): ConditionBundle[] {
     doc,
     summary: summarizeRecord(doc, 'medicationstatement'),
   }));
-  const obs = input.observations.map((doc) => ({
-    doc,
-    summary: summarizeRecord(doc, 'observation'),
-  }));
+  // Individual CGM readings are thousands of points of one series; the Labs
+  // page charts them. Listing each under "Type 2 diabetes" buried the
+  // condition's real results (and its AGP summary) under 3,000 glucose rows.
+  const obs = input.observations
+    .filter((doc) => !isCgmReading(doc))
+    .map((doc) => ({
+      doc,
+      summary: summarizeRecord(doc, 'observation'),
+    }));
   const procs = input.procedures.map((doc) => ({
     doc,
     summary: summarizeRecord(doc, 'procedure'),
+  }));
+  const referrals = (input.serviceRequests ?? []).map((doc) => ({
+    doc,
+    summary: summarizeRecord(doc, 'servicerequest'),
   }));
 
   return input.conditions.map((document) => {
@@ -108,8 +188,11 @@ export function buildConditionBundles(input: BundleInput): ConditionBundle[] {
       document.metadata?.date;
 
     const topics = resolveConditionTopics(codes, name);
-    const refId = conditionRefId(document);
-    const normalizedName = normalizeName(name);
+    const refIds = conditionRefIds(document, resource);
+    const aliases = conditionAliases(resource);
+    const names = new Set(
+      [name, ...aliases].map(normalizeName).filter(Boolean),
+    );
 
     const related: RelatedRecord[] = [];
     const seen = new Set<string>();
@@ -121,12 +204,13 @@ export function buildConditionBundles(input: BundleInput): ConditionBundle[] {
     };
 
     // 1. Explicit links: care plans / goals that address this condition.
+    const matchesRef = (ref: { id?: string; display?: string }) =>
+      (ref.id && refIds.has(ref.id)) ||
+      (ref.display && names.has(normalizeName(ref.display)));
     const matchesAddress = (doc: ClinicalDocument): boolean =>
-      addressedConditionRefs(doc).some(
-        (ref) =>
-          (ref.id && refId && ref.id === refId) ||
-          (ref.display && normalizeName(ref.display) === normalizedName),
-      );
+      addressedConditionRefs(doc).some(matchesRef);
+    const matchesReason = (doc: ClinicalDocument): boolean =>
+      reasonConditionRefs(doc).some(matchesRef);
 
     input.carePlans.filter(matchesAddress).forEach((doc) => {
       const summary = summarizeRecord(doc, 'careplan');
@@ -155,6 +239,34 @@ export function buildConditionBundles(input: BundleInput): ConditionBundle[] {
         confidence: 'linked',
       });
     });
+
+    // 1b. Explicit links: medications, procedures and referrals whose
+    // reasonReference names this condition.
+    const linkByReason = (
+      candidates: {
+        doc: ClinicalDocument;
+        summary: ReturnType<typeof summarizeRecord>;
+      }[],
+      kind: RelatedKind,
+      reason: string,
+    ) =>
+      candidates
+        .filter(({ doc }) => matchesReason(doc))
+        .forEach(({ doc, summary }) =>
+          add({
+            id: doc.id,
+            document: doc,
+            kind,
+            name: summary.name,
+            date: summary.date,
+            codes: summary.codes,
+            reason,
+            confidence: 'linked',
+          }),
+        );
+    linkByReason(meds, 'medication', 'Prescribed for this condition');
+    linkByReason(procs, 'procedure', 'Performed for this condition');
+    linkByReason(referrals, 'referral', 'Follow-up for this condition');
 
     if (topics.length > 0) {
       const medKeywords = collect(topics, (t) => t.medKeywords);
@@ -231,6 +343,8 @@ export function buildConditionBundles(input: BundleInput): ConditionBundle[] {
         connectionsById.get(document.connection_record_id)?.name ||
         document.metadata?.source_name,
       topicLabels: topics.map((t) => t.label),
+      aliases,
+      notes: conditionNotes(resource),
       related,
     };
   });

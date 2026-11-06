@@ -138,12 +138,36 @@ export function summarizeRecord(
 export function addressedConditionRefs(
   document: ClinicalDocument,
 ): { id?: string; display?: string }[] {
+  return conditionRefsIn(document, 'addresses');
+}
+
+/**
+ * Conditions a medication, procedure or referral names as its reason
+ * (`reasonReference`). This is the explicit counterpart of the keyword match:
+ * a clinician who wrote "tamsulosin — for BPH" has said so, and the record
+ * should sit under that condition as linked rather than merely related.
+ */
+export function reasonConditionRefs(
+  document: ClinicalDocument,
+): { id?: string; display?: string }[] {
+  return conditionRefsIn(document, 'reasonReference');
+}
+
+function conditionRefsIn(
+  document: ClinicalDocument,
+  field: 'addresses' | 'reasonReference',
+): { id?: string; display?: string }[] {
   const resource = getFhirResource<FhirRecord>(document);
-  const addresses = resource['addresses'];
-  if (!Array.isArray(addresses)) return [];
-  return addresses.filter(isRecord).map((ref) => {
+  const refs = resource[field];
+  if (!Array.isArray(refs)) return [];
+  const out: { id?: string; display?: string }[] = [];
+  refs.filter(isRecord).forEach((ref) => {
     const reference = str(ref['reference']);
+    // A reasonReference may point at an Observation or a Procedure too;
+    // only Condition references belong on a condition's page.
+    if (reference && !/Condition\//.test(reference)) return;
     const id = reference?.match(/Condition\/([^/]+)$/)?.[1];
-    return { id, display: str(ref['display']) };
+    out.push({ id, display: str(ref['display']) });
   });
+  return out;
 }

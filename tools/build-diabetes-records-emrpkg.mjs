@@ -4,6 +4,7 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
+  statSync,
   writeFileSync,
 } from 'node:fs';
 import { buildDentalRow } from './lib/dental-transpose.mjs';
@@ -185,6 +186,21 @@ const ADHERENCE_CODES = {
   stopped: 'Stopped',
 };
 const args = parseArgs(process.argv.slice(2));
+/**
+ * Rows the builder can derive rather than copy, both off unless asked for:
+ *
+ * --derive-nutrition         a "nutrition relevance" Observation beside every
+ *                            vitamin D / B12 / iron / magnesium… result.
+ * --derive-imaging-findings  measurement Observations pattern-matched out of a
+ *                            report's prose ("right lobe 18 x 15 x 45 mm").
+ *
+ * Neither is in the source document. Written by default they read as results a
+ * lab reported, and the pattern match guesses body sites from nearby words — a
+ * gallbladder wall thickness came out coded as urinary bladder. A records file
+ * that wants measurements should list them as results, with their sites.
+ */
+args.deriveNutrition = Boolean(args.deriveNutrition);
+args.deriveImagingFindings = Boolean(args.deriveImagingFindings);
 
 if (!args.source || !args.output) {
   console.error(`Usage:
@@ -244,6 +260,47 @@ const connection = {
 const clinicalDocuments = [];
 const sourceDocumentsByKey = new Map();
 
+/**
+ * Every condition the file declares, addressable by its id, its name or any of
+ * its aliases. Medications, procedures, goals, care plans and referrals name
+ * the condition they are for (`reasonConditions`, `addressesConditions`), and
+ * this turns that name into a real `Condition/{id}` reference — so the
+ * condition's page can show them as linked, not merely keyword-related.
+ */
+const conditionIndex = new Map();
+for (const condition of records.conditions || []) {
+  const ref = {
+    reference: `Condition/${stableId(`condition-${condition.id}`)}`,
+    display: condition.name,
+  };
+  for (const key of [
+    condition.id,
+    condition.name,
+    ...(condition.aliases || []),
+  ]) {
+    if (key) conditionIndex.set(conditionKey(key), ref);
+  }
+}
+
+function conditionKey(value) {
+  return `${value}`
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+/**
+ * Turn a list of condition ids or names into references. A name the file does
+ * not declare still becomes a display-only reference — the app matches those
+ * by name — rather than being dropped.
+ */
+function conditionRefs(list) {
+  if (!Array.isArray(list) || list.length === 0) return undefined;
+  return list.map(
+    (key) => conditionIndex.get(conditionKey(key)) || { display: `${key}` },
+  );
+}
+
 for (const panel of records.labPanels || []) {
   const sourceDocument = getOrCreateSourceDocument({
     sourceImage: panel.sourceImage,
@@ -256,8 +313,10 @@ for (const panel of records.labPanels || []) {
   for (const result of panel.results || []) {
     const observationId = stableId(`lab-${panel.id}-${result.id}`);
     resultRefs.push({ reference: `Observation/${observationId}` });
-    const nutritionRelevance = nutritionRelevanceForLab(result);
-    const labLoinc = labObservationCode(result.name);
+    const nutritionRelevance = args.deriveNutrition
+      ? nutritionRelevanceForLab(result)
+      : undefined;
+    const labLoinc = labObservationCode(result.name, result.loinc);
     clinicalDocuments.push(
       clinicalDocument({
         id: observationId,
@@ -471,7 +530,10 @@ for (const report of [
     audit: report.audit,
   });
   const imagingFindingRefs = [];
-  for (const finding of extractImagingFindings(report)) {
+  const derivedFindings = args.deriveImagingFindings
+    ? extractImagingFindings(report)
+    : [];
+  for (const finding of derivedFindings) {
     const findingId = stableId(`imaging-finding-${report.id}-${finding.id}`);
     imagingFindingRefs.push({ reference: `Observation/${findingId}` });
     clinicalDocuments.push(
@@ -570,7 +632,7 @@ for (const report of [
           extension: [
             {
               url: 'https://mere.health/fhir/StructureDefinition/imaging-findings',
-              extension: extractImagingFindings(report).map((finding) =>
+              extension: derivedFindings.map((finding) =>
                 imagingFindingExtension(finding),
               ),
             },
@@ -635,6 +697,7 @@ for (const group of records.medicationPlans || []) {
             informationSource: buildMedicationInformationSource(item, group),
             medicationCodeableConcept: buildMedicationCode(item.medication),
             reasonCode: buildMedicationReason(item),
+            reasonReference: conditionRefs(item.reasonConditions),
             statusReason: buildMedicationStatusReason(item),
             extension: buildMedicationExtensions(item, group),
             dosage: [
@@ -811,19 +874,33 @@ for (const condition of records.conditions || []) {
           onsetDateTime: condition.onsetDate
             ? atNoon(condition.onsetDate)
             : undefined,
+          abatementDateTime: condition.abatementDate
+            ? atNoon(condition.abatementDate)
+            : undefined,
           dateRecorded: condition.recordedDate
             ? atNoon(condition.recordedDate)
             : undefined,
-          note: buildNotes([
-            condition.provider ? `Provider: ${condition.provider}` : undefined,
-            condition.sourceImage
-              ? `Source: ${condition.sourceImage}`
-              : undefined,
-            condition.note,
-            sourceDocument
-              ? `Source document: ${sourceDocument.documentReferenceId}`
-              : undefined,
-          ]),
+          recordedDate: condition.recordedDate
+            ? atNoon(condition.recordedDate)
+            : undefined,
+          bodySite: condition.bodySite
+            ? [{ text: condition.bodySite }]
+            : undefined,
+          extension: conditionExtensions(condition),
+          note: Array.isArray(condition.notes)
+            ? conditionSourceNotes(condition)
+            : buildNotes([
+                condition.provider
+                  ? `Provider: ${condition.provider}`
+                  : undefined,
+                condition.sourceImage
+                  ? `Source: ${condition.sourceImage}`
+                  : undefined,
+                condition.note,
+                sourceDocument
+                  ? `Source document: ${sourceDocument.documentReferenceId}`
+                  : undefined,
+              ]),
         },
       },
       metadata: { ...sourceMeta(sourceDocument) },
@@ -1221,6 +1298,7 @@ for (const procedure of records.procedures || []) {
             ? [{ text: procedure.bodySite }]
             : undefined,
           outcome: procedure.outcome ? { text: procedure.outcome } : undefined,
+          reasonReference: conditionRefs(procedure.reasonConditions),
           performer: procedure.provider
             ? [{ actor: { display: procedure.provider } }]
             : undefined,
@@ -1242,6 +1320,384 @@ for (const procedure of records.procedures || []) {
       metadata: { ...sourceMeta(sourceDocument) },
     }),
   );
+}
+
+/**
+ * Goals — "repeat HbA1c with a goal below 6.5%", "gain weight from 70 to 80 kg".
+ * A goal is a stated intention with a target, which is neither a result nor a
+ * plan item, and the Goals page and a condition's page both read it.
+ */
+for (const goal of records.goals || []) {
+  const goalId = stableId(`goal-${goal.id}`);
+  const goalDate = goal.startDate || goal.date;
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: goal.sourceImage,
+    date: goalDate,
+    title: goal.description,
+    provider: goal.provider,
+    audit: goal.audit,
+  });
+  const target = goal.target
+    ? [
+        {
+          measure: goal.target.measure
+            ? { text: goal.target.measure }
+            : undefined,
+          detailString:
+            [goal.target.comparator, goal.target.value, goal.target.unit]
+              .filter(Boolean)
+              .join(' ') || undefined,
+          dueDate: goal.dueDate,
+        },
+      ]
+    : goal.dueDate
+      ? [{ dueDate: goal.dueDate }]
+      : undefined;
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: goalId,
+      resourceType: 'goal',
+      date: goalDate,
+      displayName: goal.description,
+      raw: {
+        fullUrl: `manual:${goalId}`,
+        manual_kind: 'goal',
+        source_image: goal.sourceImage,
+        audit: goal.audit,
+        resource: {
+          resourceType: 'Goal',
+          id: goalId,
+          lifecycleStatus: goal.status || 'active',
+          description: { text: goal.description },
+          startDate: goalDate,
+          target,
+          addresses: conditionRefs(goal.addressesConditions),
+          expressedBy: goal.provider ? { display: goal.provider } : undefined,
+          note: buildNotes([
+            goal.provider ? `Set by: ${goal.provider}` : undefined,
+            goal.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+      metadata: { ...sourceMeta(sourceDocument) },
+    }),
+  );
+}
+
+/**
+ * Care plans — the "Plan:" list under each problem in an assessment, or a
+ * diet / exercise programme. One plan per problem keeps each list next to the
+ * condition it serves.
+ */
+for (const plan of records.carePlans || []) {
+  const planId = stableId(`careplan-${plan.id}`);
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: plan.sourceImage,
+    date: plan.date,
+    title: plan.title,
+    provider: plan.provider,
+    audit: plan.audit,
+  });
+  const activities = plan.activities || [];
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: planId,
+      resourceType: 'careplan',
+      date: plan.date,
+      displayName: plan.title,
+      raw: {
+        fullUrl: `manual:${planId}`,
+        manual_kind: 'careplan',
+        source_image: plan.sourceImage,
+        audit: plan.audit,
+        resource: {
+          resourceType: 'CarePlan',
+          id: planId,
+          status: plan.status || 'active',
+          intent: 'plan',
+          title: plan.title,
+          description: activities.length
+            ? activities.map((activity) => `• ${activity}`).join('\n')
+            : plan.note,
+          period: plan.date ? { start: atNoon(plan.date) } : undefined,
+          created: plan.date ? atNoon(plan.date) : undefined,
+          author: plan.provider ? { display: plan.provider } : undefined,
+          addresses: conditionRefs(plan.addressesConditions),
+          activity: activities.length
+            ? activities.map((activity) => ({
+                detail: { description: activity, status: 'not-started' },
+              }))
+            : undefined,
+          note: buildNotes([
+            plan.provider ? `Provider: ${plan.provider}` : undefined,
+            plan.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+      metadata: { ...sourceMeta(sourceDocument) },
+    }),
+  );
+}
+
+/**
+ * Referrals and follow-ups — "Neurology assessment of facial small fiber
+ * neuropathy", "continue follow-up with local Urology". A ServiceRequest, which
+ * is what the Referrals page reads; dental referrals keep their own section.
+ */
+const REFERRAL_STATUS = {
+  open: 'active',
+  active: 'active',
+  done: 'completed',
+  completed: 'completed',
+  cancelled: 'revoked',
+};
+for (const referral of records.referrals || []) {
+  const referralId = stableId(`referral-${referral.id}`);
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: referral.sourceImage,
+    date: referral.date,
+    title: referral.name,
+    provider: referral.provider,
+    audit: referral.audit,
+  });
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: referralId,
+      resourceType: 'servicerequest',
+      date: referral.date,
+      displayName: referral.name,
+      raw: {
+        fullUrl: `manual:${referralId}`,
+        manual_kind: 'referral',
+        source_image: referral.sourceImage,
+        audit: referral.audit,
+        resource: {
+          resourceType: 'ServiceRequest',
+          id: referralId,
+          status: REFERRAL_STATUS[referral.status] || 'active',
+          intent: 'order',
+          category: [{ text: referral.category || 'Referral' }],
+          code: { text: referral.name },
+          authoredOn: referral.date ? atNoon(referral.date) : undefined,
+          requester: referral.provider
+            ? { display: referral.provider }
+            : undefined,
+          performer: referral.specialty
+            ? [{ display: referral.specialty }]
+            : undefined,
+          reasonCode: referral.reason ? [{ text: referral.reason }] : undefined,
+          reasonReference: conditionRefs(referral.addressesConditions),
+          note: buildNotes([
+            referral.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+      metadata: { ...sourceMeta(sourceDocument) },
+    }),
+  );
+}
+
+/**
+ * Care team — who looks after this patient, in which role, where. A letter
+ * names a dozen clinicians across its consultations; without this the only
+ * place they live is free text.
+ */
+for (const team of records.careTeam || []) {
+  const teamId = stableId(`careteam-${team.id}`);
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: team.sourceImage,
+    date: team.date,
+    title: team.name,
+    provider: team.provider,
+    audit: team.audit,
+  });
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: teamId,
+      resourceType: 'careteam',
+      date: team.date,
+      displayName: team.name,
+      raw: {
+        fullUrl: `manual:${teamId}`,
+        manual_kind: 'careteam',
+        source_image: team.sourceImage,
+        audit: team.audit,
+        resource: {
+          resourceType: 'CareTeam',
+          id: teamId,
+          status: team.status || 'active',
+          name: team.name,
+          period: team.date ? { start: atNoon(team.date) } : undefined,
+          participant: (team.members || []).map((member) => ({
+            role: member.role ? [{ text: member.role }] : undefined,
+            member: { display: member.name },
+            onBehalfOf: member.organization
+              ? { display: member.organization }
+              : undefined,
+          })),
+          note: buildNotes([
+            team.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+      metadata: { ...sourceMeta(sourceDocument) },
+    }),
+  );
+}
+
+/**
+ * Devices the patient uses — a CGM sensor, a CPAP. A device is not a
+ * medication, and filing a Dexcom receiver as one (as a pharmacy list does)
+ * hides it from anyone looking for "what is he wearing".
+ */
+for (const device of records.devices || []) {
+  const deviceId = stableId(`device-${device.id}`);
+  const deviceDate = device.startDate || device.date;
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: device.sourceImage,
+    date: deviceDate,
+    title: device.name,
+    provider: device.provider,
+    audit: device.audit,
+  });
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: deviceId,
+      resourceType: 'device',
+      date: deviceDate,
+      displayName: device.name,
+      raw: {
+        fullUrl: `manual:${deviceId}`,
+        manual_kind: 'device',
+        source_image: device.sourceImage,
+        audit: device.audit,
+        resource: {
+          resourceType: 'Device',
+          id: deviceId,
+          status: device.status || 'active',
+          deviceName: [{ name: device.name, type: 'user-friendly-name' }],
+          type: device.type ? { text: device.type } : undefined,
+          manufacturer: device.manufacturer,
+          note: buildNotes([
+            deviceDate ? `In use from: ${deviceDate}` : undefined,
+            device.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+      metadata: { ...sourceMeta(sourceDocument) },
+    }),
+  );
+}
+
+for (const shot of records.immunizations || []) {
+  const shotId = stableId(`immunization-${shot.id}`);
+  const sourceDocument = getOrCreateSourceDocument({
+    sourceImage: shot.sourceImage,
+    date: shot.date,
+    title: shot.vaccine,
+    provider: shot.provider,
+    audit: shot.audit,
+  });
+  clinicalDocuments.push(
+    clinicalDocument({
+      id: shotId,
+      resourceType: 'immunization',
+      date: shot.date,
+      displayName: shot.vaccine,
+      raw: {
+        fullUrl: `manual:${shotId}`,
+        manual_kind: 'immunization',
+        source_image: shot.sourceImage,
+        audit: shot.audit,
+        resource: {
+          resourceType: 'Immunization',
+          id: shotId,
+          status: shot.status || 'completed',
+          vaccineCode: {
+            text: shot.vaccine,
+            coding: shot.code ? [shot.code] : undefined,
+          },
+          occurrenceDateTime: shot.date ? atNoon(shot.date) : undefined,
+          date: shot.date ? atNoon(shot.date) : undefined,
+          lotNumber: shot.lotNumber,
+          site: shot.site ? { text: shot.site } : undefined,
+          performer: shot.provider
+            ? [{ actor: { display: shot.provider } }]
+            : undefined,
+          note: buildNotes([
+            shot.note,
+            sourceDocument
+              ? `Source document: ${sourceDocument.documentReferenceId}`
+              : undefined,
+          ]),
+        },
+      },
+      metadata: { ...sourceMeta(sourceDocument) },
+    }),
+  );
+}
+
+/**
+ * One FHIR note per source statement. `authorString` carries who said it and
+ * in which document, `time` when — the condition page lists them in order, so
+ * a problem seen by five clinicians reads as its own history.
+ */
+function conditionSourceNotes(condition) {
+  return condition.notes
+    .filter((note) => note && note.text)
+    .map((note) => {
+      if (note.source) {
+        // Make sure each cited file exists as a document in the package.
+        getOrCreateSourceDocument({
+          sourceImage: note.source,
+          date: note.date,
+          title: condition.name,
+          provider: note.author,
+        });
+      }
+      return {
+        text: note.text,
+        time: note.date ? atNoon(note.date) : undefined,
+        authorString:
+          [note.author, note.source].filter(Boolean).join(' — ') || undefined,
+      };
+    });
+}
+
+function conditionExtensions(condition) {
+  const extensions = [
+    ...(condition.aliases || []).map((alias) => ({
+      url: 'https://mere.health/fhir/StructureDefinition/condition-alias',
+      valueString: alias,
+    })),
+    ...[
+      ...new Set(
+        [
+          condition.sourceImage,
+          ...(condition.notes || []).map((n) => n?.source),
+        ].filter(Boolean),
+      ),
+    ].map((source) => ({
+      url: 'https://mere.health/fhir/StructureDefinition/condition-source',
+      valueString: source,
+    })),
+  ];
+  return extensions.length ? extensions : undefined;
 }
 
 for (const row of records.dentalRecords || []) {
@@ -1548,9 +2004,12 @@ function buildSourceAssetIndex(root) {
 function collectFiles(dir, files) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const fullPath = join(dir, entry.name);
-    if (entry.isDirectory()) {
+    // Follow symlinks, so an assets folder can link to the source files where
+    // they already live instead of copying them.
+    const stat = entry.isSymbolicLink() ? statSync(fullPath) : entry;
+    if (stat.isDirectory()) {
       collectFiles(fullPath, files);
-    } else if (entry.isFile() && entry.name !== '.DS_Store') {
+    } else if (stat.isFile() && entry.name !== '.DS_Store') {
       files.push(fullPath);
     }
   }
@@ -1590,6 +2049,10 @@ function contentTypeForPath(path) {
       return 'image/webp';
     case '.txt':
       return 'text/plain';
+    case '.json':
+      return 'application/json';
+    case '.vtt':
+      return 'text/vtt';
     case '.html':
     case '.htm':
       return 'text/html';
@@ -1726,7 +2189,7 @@ function parseRange(range, unit) {
 }
 
 function buildObservationCode(result) {
-  const coded = labObservationCode(result.name);
+  const coded = labObservationCode(result.name, result.loinc);
   return {
     text: result.name,
     coding: coded ? [coded] : undefined,
@@ -1884,7 +2347,22 @@ function parseSemiQuantitativeValue(value, unit) {
 // across same-analyte results so the app can group a measure's history and draw
 // trends; standard LOINC codes are used where well established.
 
-function labObservationCode(name) {
+/**
+ * A result may name its LOINC code outright (`"loinc": "751-8"` or
+ * `{ "code", "display" }`). That wins over the name table, which can only
+ * guess: Mayo prints an absolute neutrophil count as plain "Neutrophils", and
+ * the table — written for labs that print a percentage under that name — would
+ * code it as one.
+ */
+function labObservationCode(name, explicit) {
+  if (explicit) {
+    const code = typeof explicit === 'string' ? explicit : explicit.code;
+    const display =
+      (typeof explicit === 'object' && explicit.display) ||
+      Object.values(LAB_LOINC).find(([c]) => c === code)?.[1] ||
+      name;
+    return { system: 'http://loinc.org', code, display };
+  }
   const normalized = name.toLowerCase().trim();
   const hit = LAB_LOINC[normalized];
   if (!hit) return undefined;
@@ -2159,11 +2637,19 @@ function buildMedicationEffectivePeriod(item, group) {
   return period;
 }
 
+/**
+ * FHIR's statusReason is *why* the status is what it is, and the Medications
+ * page shows it as "Stopped because". Writing the plan status itself there
+ * ("active", "current") put "Stopped because: active" on every drug a patient
+ * is taking. Only a real stop reason goes here; the plan status is kept in the
+ * `medication-plan-status` extension.
+ */
 function buildMedicationStatusReason(item) {
-  const statusText = item.status || 'active';
   const reason = stopReason(item);
+  if (!reason) return undefined;
+  const statusText = item.status || 'stopped';
   return {
-    text: reason ? `${statusText}: ${reason}` : statusText,
+    text: reason,
     coding: [
       {
         system: 'https://mere.health/fhir/CodeSystem/medication-plan-status',
@@ -2212,6 +2698,21 @@ function buildMedicationExtensions(item, group) {
     valueCodeableConcept: {
       text: category.display,
       coding: [category],
+    },
+  });
+
+  const planStatus = item.status || 'active';
+  extensions.push({
+    url: 'https://mere.health/fhir/StructureDefinition/medication-plan-status',
+    valueCodeableConcept: {
+      text: planStatus,
+      coding: [
+        {
+          system: 'https://mere.health/fhir/CodeSystem/medication-plan-status',
+          code: stableId(planStatus),
+          display: planStatus,
+        },
+      ],
     },
   });
 

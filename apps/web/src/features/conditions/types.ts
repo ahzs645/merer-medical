@@ -7,7 +7,8 @@ export type RelatedKind =
   | 'lab'
   | 'careplan'
   | 'goal'
-  | 'procedure';
+  | 'procedure'
+  | 'referral';
 
 /** A single record pivoted under a condition. */
 export interface RelatedRecord {
@@ -23,6 +24,17 @@ export interface RelatedRecord {
   confidence: 'linked' | 'related';
 }
 
+/**
+ * One comment on a condition, as a source wrote it. A problem seen by several
+ * clinicians accumulates one of these per statement, so the condition page can
+ * show the history of what each of them said rather than the last word only.
+ */
+export interface ConditionNote {
+  text: string;
+  author?: string;
+  time?: string;
+}
+
 /** A condition plus everything pivoted around it. */
 export interface ConditionBundle {
   id: string;
@@ -35,5 +47,8 @@ export interface ConditionBundle {
   source?: string;
   /** Human topic labels matched for this condition. */
   topicLabels: string[];
+  /** Other names this problem has been recorded under. */
+  aliases: string[];
+  notes: ConditionNote[];
   related: RelatedRecord[];
 }

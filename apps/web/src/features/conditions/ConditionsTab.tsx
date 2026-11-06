@@ -26,6 +26,7 @@ const KIND_LABEL: Record<RelatedKind, [string, string]> = {
   careplan: ['care plan', 'care plans'],
   goal: ['goal', 'goals'],
   procedure: ['procedure', 'procedures'],
+  referral: ['referral', 'referrals'],
 };
 
 // Same record, same word as Problems. The two pages are two views of one pile

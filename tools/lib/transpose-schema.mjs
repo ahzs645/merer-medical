@@ -31,6 +31,12 @@ export const SECTIONS = [
   'familyHistory',
   'socialHistory',
   'dentalRecords',
+  'goals',
+  'carePlans',
+  'referrals',
+  'careTeam',
+  'devices',
+  'immunizations',
 ];
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -92,7 +98,8 @@ const SECTION_RULES = {
   },
   conditions: {
     required: ['id', 'name'],
-    dates: ['onsetDate', 'recordedDate'],
+    dates: ['onsetDate', 'recordedDate', 'abatementDate'],
+    validate: validateConditionNotes,
   },
   pendingResults: {
     required: ['id', 'name'],
@@ -124,6 +131,46 @@ const SECTION_RULES = {
   socialHistory: {
     required: ['id', 'topic'],
     dates: ['recordedDate'],
+  },
+  // Due dates are targets, so a future one is expected.
+  goals: {
+    required: ['id', 'description'],
+    dates: ['startDate', 'dueDate'],
+    futureDates: ['dueDate'],
+    enums: {
+      status: [
+        'proposed',
+        'planned',
+        'active',
+        'on-hold',
+        'achieved',
+        'cancelled',
+        'completed',
+      ],
+    },
+  },
+  carePlans: {
+    required: ['id', 'title', 'date'],
+    dates: ['date'],
+    enums: { status: ['draft', 'active', 'on-hold', 'completed', 'revoked'] },
+  },
+  referrals: {
+    required: ['id', 'name', 'date'],
+    dates: ['date'],
+    enums: { status: ['open', 'active', 'done', 'completed', 'cancelled'] },
+  },
+  careTeam: {
+    required: ['id', 'name'],
+    dates: ['date'],
+  },
+  devices: {
+    required: ['id', 'name'],
+    dates: ['startDate'],
+    enums: { status: ['active', 'inactive', 'entered-in-error', 'unknown'] },
+  },
+  immunizations: {
+    required: ['id', 'vaccine', 'date'],
+    dates: ['date'],
   },
   // Rules beyond these — teeth need a numberingSystem, status words per kind,
   // perio sites in mm — are in dental-transpose.mjs.
@@ -180,7 +227,32 @@ export function validateRecords(records) {
       );
     }
     const convention = records.audit.dateConvention;
-    if (convention === undefined) {
+    // A records file that combines several documents declares a convention
+    // per source file instead: a Mayo letter writes 10/20/2026, a Kyiv lab
+    // 20.01.2026, and one value for both would be wrong for one of them.
+    const bySource = records.audit.dateConventionBySource;
+    if (bySource !== undefined) {
+      if (
+        !bySource ||
+        typeof bySource !== 'object' ||
+        Array.isArray(bySource)
+      ) {
+        errors.push(
+          'audit.dateConventionBySource: expected an object of { "file name": "DMY" | "MDY" | "YMD" | "ISO" }',
+        );
+      } else {
+        for (const [file, value] of Object.entries(bySource)) {
+          if (!CONVENTIONS.includes(value)) {
+            errors.push(
+              `audit.dateConventionBySource[${JSON.stringify(file)}]: expected one of ${CONVENTIONS.join(', ')}, got ${JSON.stringify(value)}`,
+            );
+          }
+        }
+      }
+    }
+    if (convention === undefined && bySource !== undefined) {
+      // Declared per source; nothing more to say.
+    } else if (convention === undefined) {
       warnings.push(
         'audit.dateConvention: missing — say how the source writes dates (DMY, MDY, YMD or ISO). Without it nobody can tell whether 03/08/2026 was read as 3 August or 8 March.',
       );
@@ -250,6 +322,8 @@ export function validateRecords(records) {
       }
     });
   }
+
+  warnings.push(...checkConditionLinks(records));
 
   // JSON has no comment syntax, so an underscore prefix is the convention for
   // notes-to-the-reader inside a records file. They are not sections and are
@@ -350,4 +424,75 @@ function checkRow(
     }
     seenIds.add(key);
   }
+}
+
+/**
+ * A condition's `notes` are one entry per source statement. Each needs text,
+ * and a date that is a date — they are what the condition page orders by.
+ */
+function validateConditionNotes(row, at) {
+  const errors = [];
+  if (row.notes === undefined) return errors;
+  if (!Array.isArray(row.notes)) return [`${at}.notes: expected an array`];
+  row.notes.forEach((note, index) => {
+    if (!note || typeof note !== 'object' || !`${note.text ?? ''}`.trim()) {
+      errors.push(`${at}.notes[${index}].text: required`);
+    } else if (note.date !== undefined && !ISO_DATE.test(`${note.date}`)) {
+      errors.push(
+        `${at}.notes[${index}].date: expected YYYY-MM-DD, got ${JSON.stringify(note.date)}`,
+      );
+    }
+  });
+  return errors;
+}
+
+/**
+ * `reasonConditions` / `addressesConditions` name a condition by id, name or
+ * alias. One that names nothing in this file still builds — as a display-only
+ * reference matched by name — but it is usually a typo, so say so.
+ */
+function checkConditionLinks(records) {
+  const known = new Set();
+  const key = (v) =>
+    `${v}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  for (const c of records.conditions || []) {
+    [c.id, c.name, ...(c.aliases || [])]
+      .filter(Boolean)
+      .forEach((v) => known.add(key(v)));
+  }
+  const warnings = [];
+  const check = (list, at) => {
+    if (list === undefined) return;
+    if (!Array.isArray(list)) {
+      warnings.push(`${at}: expected an array of condition ids or names`);
+      return;
+    }
+    list
+      .filter((name) => !known.has(key(name)))
+      .forEach((name) =>
+        warnings.push(
+          `${at}: "${name}" is not a condition in this file — it will link by name only`,
+        ),
+      );
+  };
+  (records.medicationPlans || []).forEach((group, g) =>
+    (group.items || []).forEach((item, i) =>
+      check(
+        item.reasonConditions,
+        `medicationPlans[${g}].items[${i}].reasonConditions`,
+      ),
+    ),
+  );
+  (records.procedures || []).forEach((row, i) =>
+    check(row.reasonConditions, `procedures[${i}].reasonConditions`),
+  );
+  for (const section of ['goals', 'carePlans', 'referrals']) {
+    (records[section] || []).forEach((row, i) =>
+      check(row.addressesConditions, `${section}[${i}].addressesConditions`),
+    );
+  }
+  return warnings;
 }

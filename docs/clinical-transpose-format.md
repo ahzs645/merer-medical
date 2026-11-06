@@ -59,6 +59,12 @@ machine-readable definition.
   "allergies": [],
   "familyHistory": [],
   "socialHistory": [],
+  "goals": [],
+  "carePlans": [],
+  "referrals": [],
+  "careTeam": [],
+  "devices": [],
+  "immunizations": [],
 }
 ```
 
@@ -70,10 +76,11 @@ without comment — and `validate` warns about the rest.
 
 `audit` also carries two fields the tooling acts on:
 
-| Field                  | Effect                                                                                                                                                         |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `dateConvention`       | `DMY`, `MDY`, `YMD` or `ISO`. Declares how the _source_ writes dates. `validate` warns when it is absent.                                                      |
-| `sourceDocumentTitles` | `{ "Letter.pdf": "…" }`. Names the DocumentReference for a file. Without it the title is whichever record cited the file first — an accident of section order. |
+| Field                    | Effect                                                                                                                                                         |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dateConvention`         | `DMY`, `MDY`, `YMD` or `ISO`. Declares how the _source_ writes dates. `validate` warns when it is absent.                                                      |
+| `dateConventionBySource` | `{ "Letter.pdf": "MDY", "Lab.pdf": "DMY" }`. For a file that combines several documents written in different conventions; replaces `dateConvention`.           |
+| `sourceDocumentTitles`   | `{ "Letter.pdf": "…" }`. Names the DocumentReference for a file. Without it the title is whichever record cited the file first — an accident of section order. |
 
 ## Dates
 
@@ -119,6 +126,12 @@ Each result: **`id`**, **`name`**, and one of `value` / `note`. Plus `unit`,
 `flag` (`low` | `high` | `abnormal`), `originalFlag` (as printed: `L`, `H`),
 `originalReferenceRange` (as printed), `referenceNote`, `shortName`, `note`.
 
+A result may also carry `loinc` — a code (`"751-8"`) or `{ code, display }` —
+which wins over the name table. Use it when the printed name is not in the table
+("White blood cells WBC") or would be coded wrongly by it: Mayo prints an
+absolute neutrophil count as plain "Neutrophils", which the table reads as a
+percentage. Only set codes you are certain of; an uncoded result is honest.
+
 Values are strings, copied exactly — `">256.0"`, `"<1"`, `"Negative"`,
 `"Not Seen"` are all valid. The builder parses comparators and ranges itself;
 do not pre-digest them.
@@ -131,6 +144,13 @@ panel of their own. They are measurements with a value and a date, and a panel
 puts them on Results where they can be found. A score the document declines to
 calculate is still a result worth keeping: record the reason verbatim as the
 value ("Not validated whilst using a statin") rather than dropping the row.
+
+The builder can also derive two kinds of row no source printed, both **off by
+default**: `--derive-nutrition` adds a "nutrition relevance" Observation beside
+vitamin D / B12 / iron results, and `--derive-imaging-findings` pattern-matches
+measurements out of report prose (it guesses body sites — a gallbladder wall
+came out as urinary bladder). A measurement worth keeping belongs in a
+`labPanels` result with its site in the name.
 
 ### `vitals` → `Observation` with the `vital-signs` category
 
@@ -205,6 +225,15 @@ right, the wording is the app's to sharpen.)
 **`id`**, `encounterDate`, `items[]`. Each item: **`id`**, **`medication`**,
 plus `dose`, `route`, `frequency`, `status`, `assignedDate`, `note`.
 
+`reasonConditions` names the condition(s) the drug is for — a condition `id`,
+`name` or alias from this file. It becomes `reasonReference`, and the drug then
+sits under that condition as **Linked** rather than keyword-related. Set it only
+where the source ties the drug to the problem. `indication` keeps the printed
+reason ("as needed for dry eyes").
+
+`statusReason` is written only when there is a real stop reason: the app shows
+it as "Stopped because".
+
 `status` maps: `stopped`/`not-taking` → stopped, `historical` → completed,
 `assigned`/`planned` → intended, anything else → active.
 
@@ -238,6 +267,28 @@ statement.
 Use `verificationStatus: "provisional"` for anything the document raises without
 putting on the problem list.
 
+A problem seen by several clinicians is **one** condition with a note per
+statement, not one condition per document:
+
+```jsonc
+{
+  "id": "bph",
+  "name": "Benign prostatic hyperplasia with lower urinary tract symptoms",
+  "aliases": ["Symptomatic prostatomegaly", "Prostatic cyst"],
+  "notes": [
+    { "text": "'Prostate … Weight - 40 grams (N=20 grams).'", "source": "Lab.pdf", "date": "2026-01-20", "author": "Institute of Cell Therapy" },
+    { "text": "PSA 0.71 ng/mL …", "source": "Mayo.pdf", "date": "2026-10-23", "author": "Dr Saadiq" },
+  ],
+}
+```
+
+Each note becomes a FHIR `note` with `time` and `authorString`; the condition
+page lists them in date order under **History & comments**. `notes[].source`
+must be a bare file name — it creates that file's DocumentReference — so put
+page numbers in the text. `aliases` are the names other documents used; records
+that name the condition by an alias still link. Also: `abatementDate`,
+`bodySite`.
+
 ### `procedures` → `Procedure`
 
 **`id`**, **`name`**, plus `status` (default `completed`), `category`,
@@ -248,6 +299,8 @@ Surgical histories usually give no date. Set `recordedDate` to when it was
 written down and leave `performedDate` out: the record files under the
 documenting date while `performedDateTime` stays unset, which is what actually
 says the date is unknown. Never infer laterality from elsewhere in the document.
+
+Procedures take `reasonConditions` too.
 
 ### `allergies` → `AllergyIntolerance`
 
@@ -290,6 +343,43 @@ fallback and mostly behaves; coding it is what makes it reliable.
 
 One row per topic: alcohol, smoking, exercise, diet, occupation, sleep, living
 situation, and so on.
+
+### `goals` → `Goal`
+
+**`id`**, **`description`**, plus `status` (`proposed`, `active`, `achieved`,
+`cancelled`…), `startDate`, `dueDate` (a future one is expected),
+`target: { measure, comparator, value, unit }`, `addressesConditions`,
+`provider`, `note`. Do not compute a due date from "in three months".
+
+### `carePlans` → `CarePlan`
+
+**`id`**, **`title`**, **`date`**, plus `status`, `activities[]` (one per plan
+line, as printed), `addressesConditions`, `provider`, `note`. One plan per
+problem keeps each list on its condition's page.
+
+### `referrals` → `ServiceRequest`
+
+**`id`**, **`name`**, **`date`**, plus `status` (`open`, `done`, `cancelled`),
+`specialty`, `reason`, `addressesConditions`, `provider`, `note`. Follow-ups and
+referrals; the Referrals page and the condition page read them.
+
+### `careTeam` → `CareTeam`
+
+**`id`**, **`name`**, plus `date`, `members[]` of `{ name, role, organization }`.
+
+### `devices` → `Device`
+
+**`id`**, **`name`**, plus `type`, `manufacturer`, `status`, `startDate`, `note`.
+A CGM is a device even when a pharmacy list files it as a medication.
+
+### `immunizations` → `Immunization`
+
+**`id`**, **`vaccine`**, **`date`**, plus `status`, `lotNumber`, `site`,
+`provider`, `note`.
+
+`addressesConditions` (goals, care plans, referrals) works like
+`reasonConditions`: ids, names or aliases of conditions in this file. `validate`
+warns about a name that matches none.
 
 ### `dentalRecords` → `Observation`, `Condition`, `Procedure`, `CarePlan` or `ServiceRequest`
 
@@ -369,6 +459,21 @@ instead:
 
 The Documents page groups by that title, so a well-named letter files under
 "Letters and referrals" rather than "Reports and visit records".
+
+## CGM readings
+
+A LibreView export is thousands of readings, not a document to transpose. Build
+it as its own package and merge it in:
+
+```sh
+node tools/build-libre-emrpkg.mjs --source glucose_readings.csv \
+  --output libre.emrpkg --profile-id <same id> --device "FreeStyle Libre"
+```
+
+It writes the records the app's own FreeStyle Libre import writes, under a
+`freestyle_libre` connection, so the Labs page charts them. Transpose the
+LibreView PDF's printed AGP figures (time in range, GMI, CV) as a `labPanels`
+panel as usual.
 
 ## Combining packages
 

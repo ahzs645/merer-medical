@@ -106,26 +106,48 @@ because a day/month swap puts about half of all dates in the future.
 
 ## Where things go
 
-| In the document                                                         | Section              |
-| ----------------------------------------------------------------------- | -------------------- |
-| Result tables, blood tests, urinalysis, ECG measurements                | `labPanels`          |
-| Computed risk scores — QRISK3, QDiabetes, ASCVD, FRAX                   | `labPanels`          |
-| BP, weight, height, BMI, temperature, SpO2, pulse, respiratory rate     | `vitals`             |
-| Body composition — fat mass, visceral fat, muscle mass, vendor scores   | `vitals`             |
-| Radiology, ultrasound, stress test, any narrative investigation report  | `diagnosticReports`  |
-| Tests the document says are ordered but not yet resulted                | `pendingResults`     |
-| Current medication list, prescriptions, supplements                     | `medicationPlans`    |
-| The visit itself — findings, recommendations, follow-up, systems review | `clinicalEncounters` |
-| Problem list, past medical history, diagnoses                           | `conditions`         |
-| Past surgical history, operations                                       | `procedures`         |
-| Stated allergies                                                        | `allergies`          |
-| Family history table                                                    | `familyHistory`      |
-| Alcohol, smoking, exercise, diet, occupation, sleep, living situation   | `socialHistory`      |
-| Anything dental — findings, fillings, estimates, perio charts, recalls  | `dentalRecords`      |
+| In the document                                                         | Section                                      |
+| ----------------------------------------------------------------------- | -------------------------------------------- |
+| Result tables, blood tests, urinalysis, ECG measurements                | `labPanels`                                  |
+| Computed risk scores — QRISK3, QDiabetes, ASCVD, FRAX                   | `labPanels`                                  |
+| BP, weight, height, BMI, temperature, SpO2, pulse, respiratory rate     | `vitals`                                     |
+| Body composition — fat mass, visceral fat, muscle mass, vendor scores   | `vitals`                                     |
+| Radiology, ultrasound, stress test, any narrative investigation report  | `diagnosticReports`                          |
+| Tests the document says are ordered but not yet resulted                | `pendingResults`                             |
+| Current medication list, prescriptions, supplements                     | `medicationPlans`                            |
+| The visit itself — findings, recommendations, follow-up, systems review | `clinicalEncounters`                         |
+| Problem list, past medical history, diagnoses                           | `conditions`                                 |
+| Past surgical history, operations                                       | `procedures`                                 |
+| Stated allergies                                                        | `allergies`                                  |
+| Family history table                                                    | `familyHistory`                              |
+| Alcohol, smoking, exercise, diet, occupation, sleep, living situation   | `socialHistory`                              |
+| Anything dental — findings, fillings, estimates, perio charts, recalls  | `dentalRecords`                              |
+| Targets — "A1c below 6.5%", "gain weight to 80 kg"                      | `goals`                                      |
+| The "Plan:" list under each problem; diet or exercise programmes        | `carePlans`                                  |
+| Referrals and follow-ups — "Neurology review", "local Urology"          | `referrals`                                  |
+| Who looks after the patient, in which role                              | `careTeam`                                   |
+| CGM sensors, receivers, CPAP — even when listed among medications       | `devices`                                    |
+| Vaccines given                                                          | `immunizations`                              |
+| A CGM export (LibreView CSV/JSON) — thousands of readings               | `tools/build-libre-emrpkg.mjs`, then `merge` |
 
 Group lab results into the panels the document itself names. If it prints one
 flat table but its commentary talks about "the liver panel" and "the kidney
 panel", grouping by those names is fair — say so in `audit.interpretations`.
+
+## One problem, one condition
+
+When several documents describe the same problem — a 2024 dermatology note's
+"burning sensation of the lip", a 2025 neurology letter's "suspected small fiber
+neuropathy", a 2026 summary's "facial dysesthesia" — write **one** condition
+under the most current name, list the other names as `aliases`, and give it one
+`notes` entry per statement: the source's own words, its author, date and file.
+The condition page shows them as that problem's history. Then link each drug,
+procedure, goal, plan and referral to it with `reasonConditions` /
+`addressesConditions`, but only where a source says what the drug is for.
+
+When a newer document carries the current medication list, older lists keep
+their rows as `historical`, with a note giving the status they had on their own
+date — otherwise Current shows every list ever written.
 
 ## Things worth knowing before you write
 

@@ -191,7 +191,16 @@
       "category": "Past medical history",
       "recordedDate": "2026-02-14",
       "sourceImage": "example-clinic-letter.pdf",
-      "note": "No onset date stated in the source."
+      "note": "No onset date stated in the source.",
+      "aliases": ["Underactive thyroid"],
+      "notes": [
+        {
+          "text": "Diagnosed 2019; stable on levothyroxine.",
+          "source": "example-clinic-letter.pdf",
+          "date": "2026-02-14",
+          "author": "Dr Example"
+        }
+      ]
     }
   ],
   "procedures": [
@@ -259,6 +268,83 @@
       "purpose": "Bowel cancer screening",
       "sourceImage": "example-clinic-letter.pdf",
       "note": "Ordered on the day; no result at the time of the letter."
+    }
+  ],
+  "goals": [
+    {
+      "id": "goal-tsh",
+      "description": "TSH within the reference range",
+      "status": "active",
+      "startDate": "2026-02-14",
+      "target": {
+        "measure": "TSH",
+        "value": "0.4-4.0",
+        "unit": "mIU/L"
+      },
+      "addressesConditions": ["hypothyroidism"],
+      "provider": "Dr Example, Example Clinic",
+      "sourceImage": "example-clinic-letter.pdf"
+    }
+  ],
+  "carePlans": [
+    {
+      "id": "plan-thyroid",
+      "title": "Plan — hypothyroidism",
+      "date": "2026-02-14",
+      "status": "active",
+      "addressesConditions": ["Underactive thyroid"],
+      "activities": [
+        "Continue current medication.",
+        "Repeat bloods in 12 months."
+      ],
+      "provider": "Dr Example, Example Clinic",
+      "sourceImage": "example-clinic-letter.pdf"
+    }
+  ],
+  "referrals": [
+    {
+      "id": "ref-endo",
+      "name": "Endocrinology review if TSH rises",
+      "date": "2026-02-14",
+      "status": "open",
+      "specialty": "Endocrinology",
+      "addressesConditions": ["hypothyroidism"],
+      "provider": "Dr Example, Example Clinic",
+      "sourceImage": "example-clinic-letter.pdf"
+    }
+  ],
+  "careTeam": [
+    {
+      "id": "team",
+      "name": "Example Clinic",
+      "date": "2026-02-14",
+      "members": [
+        {
+          "name": "Dr Example",
+          "role": "General practitioner",
+          "organization": "Example Clinic"
+        }
+      ],
+      "sourceImage": "example-clinic-letter.pdf"
+    }
+  ],
+  "devices": [
+    {
+      "id": "bp-monitor",
+      "name": "Home blood pressure monitor",
+      "type": "Sphygmomanometer",
+      "status": "active",
+      "startDate": "2026-02-14",
+      "sourceImage": "example-clinic-letter.pdf"
+    }
+  ],
+  "immunizations": [
+    {
+      "id": "flu-2025",
+      "vaccine": "Influenza vaccine",
+      "date": "2025-10-01",
+      "status": "completed",
+      "sourceImage": "example-clinic-letter.pdf"
     }
   ]
 }

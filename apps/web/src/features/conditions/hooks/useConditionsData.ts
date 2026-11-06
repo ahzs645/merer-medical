@@ -59,6 +59,7 @@ export function useConditionsData() {
         procedures,
         carePlans,
         goals,
+        serviceRequests,
         connectionDocs,
       ] = await Promise.all([
         find(db, user.id, 'condition'),
@@ -67,6 +68,7 @@ export function useConditionsData() {
         find(db, user.id, 'procedure'),
         find(db, user.id, 'careplan'),
         find(db, user.id, 'goal'),
+        find(db, user.id, 'servicerequest'),
         db.connection_documents.find({ selector: { user_id: user.id } }).exec(),
       ]);
 
@@ -86,6 +88,7 @@ export function useConditionsData() {
         procedures,
         carePlans,
         goals,
+        serviceRequests,
         connectionsById,
       });
 
