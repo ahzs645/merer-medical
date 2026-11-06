@@ -1,13 +1,19 @@
 import {
   ChangeEvent,
   FormEvent,
+  useCallback,
   useEffect,
   useMemo,
   useReducer,
   useRef,
   useState,
 } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useLocalConfig } from '../../../app/providers/LocalConfigProvider';
@@ -44,7 +50,7 @@ import {
   ManualObservationValueKind,
   TerminologyEntry,
 } from '../clinicalTerminology';
-import { safeReturnTo } from '../addRecordPath';
+import { formExitTarget, safeReturnTo } from '../addRecordPath';
 import {
   createLabRow,
   dentalEntryTypes,
@@ -366,6 +372,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
   const recordId = options.recordId ?? params['recordId'];
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const localConfig = useLocalConfig();
   const notifyDispatch = useNotificationDispatch();
   const { t } = useInterfaceLanguage();
@@ -415,14 +422,23 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
       : requestedSpecialty === 'optometry'
         ? t('Add eye-care record')
         : undefined;
-  // Where to go after a successful save: the host's callback, else back to the
-  // page that sent you here, else the timeline. Landing on the Timeline after
-  // adding a lab from the Labs page reads as a failure — you asked for one
-  // page, you were thrown to another, and the row you just typed is nowhere in
-  // front of you.
+  // Where to go when leaving the form — saved, cancelled, discarded, or the
+  // record failed to load: the page named by `returnTo`, else the page you
+  // were on before (a step back in history), else — only when the form was
+  // the first page opened, with nothing behind it — the timeline. Cancel and
+  // Discard used to go straight to the Timeline whatever page sent you, and
+  // a link without `returnTo` did the same on save: "Add medication" from
+  // Medications, cancelled, landed on the home page. Landing on the Timeline
+  // after adding a lab from the Labs page reads as a failure too — you asked
+  // for one page, you were thrown to another, and the row you just typed is
+  // nowhere in front of you.
   const returnTo = safeReturnTo(searchParams.get('returnTo'));
-  const complete =
-    options.onComplete ?? (() => navigate(returnTo ?? AppRoutes.Timeline));
+  const leave = useCallback(() => {
+    const target = formExitTarget(returnTo, location.key);
+    if (target === -1) navigate(-1);
+    else navigate(target);
+  }, [location.key, navigate, returnTo]);
+  const complete = options.onComplete ?? leave;
   // Tracks whether the user has entered content since the form was last
   // pristine (fresh, reset, or hydrated from a loaded record) so hosts can
   // confirm before discarding it. Programmatic writes (presets, edit-load,
@@ -1015,7 +1031,9 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
             message: t('Manual record not found'),
             variant: 'error',
           });
-          navigate(AppRoutes.Timeline);
+          // `complete`, not `leave`: in the edit dialog it closes the dialog
+          // rather than stepping the page behind it back through history.
+          complete();
           return;
         }
         setLoadedDocument(doc);
@@ -1132,7 +1150,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
           message: `${t('Unable to load record')}: ${(error as Error).message}`,
           variant: 'error',
         });
-        navigate(AppRoutes.Timeline);
+        complete();
       });
 
     return () => {
@@ -1482,6 +1500,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     hasTypePreset,
     presetAddTitle,
     returnTo,
+    leave,
     specialty,
     setSpecialty,
     recordType,

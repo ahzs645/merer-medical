@@ -49,3 +49,22 @@ export function safeReturnTo(value: string | null | undefined): string | null {
   if (value.startsWith('//')) return null;
   return value;
 }
+
+/**
+ * Where leaving the record form goes — on save, Cancel, or Discard. The page
+ * named by `returnTo`; else one step back, to whatever page opened the form;
+ * else, when the form is the first page of the session (`locationKey` is
+ * React Router's `'default'`) and back would leave the app, the timeline.
+ *
+ * Cancel and Discard used to go to the Timeline unconditionally, so "Add
+ * medication" opened from Medications and then cancelled dropped you on the
+ * home page.
+ */
+export function formExitTarget(
+  returnTo: string | null,
+  locationKey: string,
+): string | -1 {
+  if (returnTo) return returnTo;
+  if (locationKey !== 'default') return -1;
+  return AppRoutes.Timeline;
+}

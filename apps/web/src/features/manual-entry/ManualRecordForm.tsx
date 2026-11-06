@@ -3,7 +3,6 @@ import { DentalScanFilePicker } from './components/DentalScanFilePicker';
 import { relativePathOf } from '../../shared/storage/fileStore';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
-import { Routes as AppRoutes } from '../../Routes';
 import { ConfirmDeleteDialog } from '../../shared/components/ConfirmDeleteDialog';
 import { StylizedSelect } from '../../shared/components/StylizedSelect';
 import { prepareLinkedAttachmentFile } from '../../repositories/AttachmentRepository';
@@ -48,7 +47,7 @@ export function ManualRecordForm({
   const {
     t,
     notifyDispatch,
-    navigate,
+    leave,
     isEditing,
     hasTypePreset,
     recordType,
@@ -150,7 +149,7 @@ export function ManualRecordForm({
         setDiscardOpen(true);
         return;
       }
-      navigate(AppRoutes.Timeline);
+      leave();
     });
 
   // A blocked submit scrolls the first invalid control into view so the
@@ -768,7 +767,7 @@ export function ManualRecordForm({
         cancelLabel={t('Keep editing')}
         onConfirm={() => {
           setDiscardOpen(false);
-          navigate(AppRoutes.Timeline);
+          leave();
         }}
         onCancel={() => setDiscardOpen(false)}
       />

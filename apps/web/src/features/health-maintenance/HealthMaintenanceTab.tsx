@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
 import { Routes as AppRoutes } from '../../Routes';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { AppPage } from '../../shared/components/AppPage';
 import { GenericBanner } from '../../shared/components/GenericBanner';
@@ -194,9 +195,11 @@ function addRecordTarget(rule: MaintenanceRule): string {
       : rule.labLoinc?.length
         ? 'lab'
         : 'procedure';
-  return `${AppRoutes.AddRecord}?type=${type}&title=${encodeURIComponent(
-    rule.title,
-  )}`;
+  return buildAddRecordPath({
+    type,
+    title: rule.title,
+    returnTo: AppRoutes.HealthMaintenance,
+  });
 }
 
 function dismissedStorageKey(userId: string) {

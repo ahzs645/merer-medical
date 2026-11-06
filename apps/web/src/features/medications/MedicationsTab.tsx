@@ -43,6 +43,7 @@ import {
   sourceLabel,
 } from './medicationViewModel';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 
 type FilterChip = {
   id: MedicationFilterId;
@@ -63,7 +64,10 @@ const FILTERS: FilterChip[] = [
   },
 ];
 
-const ADD_MEDICATION_PATH = `${AppRoutes.AddRecord}?type=medicationstatement`;
+const ADD_MEDICATION_PATH = buildAddRecordPath({
+  type: 'medicationstatement',
+  returnTo: AppRoutes.Medications,
+});
 
 export function MedicationsTab() {
   // Search and filter live in the URL, so the view survives Back, can be

@@ -164,12 +164,14 @@ function ResultGroupSection({
   selectedId?: string;
   onSelect: (id: string) => void;
 }) {
-  // Most groups hold exactly one result, and the group's title is that result's
-  // title — so the list printed every name twice in a row, header then row. A
-  // one-result group keeps the date as its header and lets the row say the name
-  // once; a group that genuinely collects several still gets its heading.
-  const namesOneResult =
-    group.results.length === 1 && group.results[0]?.title === group.title;
+  // Most groups hold exactly one result. Its heading is the order name when
+  // there is one, else the result's own title — so the list either printed
+  // every name twice, header then row, or, where the two differed ("OCT RNFL
+  // report" over "OCT RNFL diagnostic report"), hung a second name for the
+  // same item over it as if it headed a group. A one-result group keeps the
+  // date as its header and lets the row say the name once; a group that
+  // genuinely collects several still gets its heading.
+  const namesOneResult = group.results.length === 1;
 
   return (
     <div className="border-b border-gray-100 last:border-b-0">

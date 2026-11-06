@@ -14,6 +14,7 @@ import { useUser } from '../../app/providers/UserProvider';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
 import { Routes as AppRoutes } from '../../Routes';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { AppPage } from '../../shared/components/AppPage';
 import {
   RecordHeaderLink,
@@ -24,6 +25,11 @@ import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { useRecordChangeTick } from '../../shared/utils/recordChangeSignal';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
+
+const ADD_DOCUMENT_PATH = buildAddRecordPath({
+  type: 'document',
+  returnTo: AppRoutes.Documents,
+});
 
 type DocumentRecord = ClinicalDocument<BundleEntry<DocumentReference>>;
 type AttachmentRecord = ClinicalDocument<string | Blob>;
@@ -93,7 +99,7 @@ export function DocumentsTab() {
           }}
           action={
             <RecordHeaderLink
-              to={`${AppRoutes.AddRecord}?type=document`}
+              to={ADD_DOCUMENT_PATH}
               label={t('Upload document')}
               icon={DocumentPlusIcon}
               compact
@@ -127,7 +133,7 @@ export function DocumentsTab() {
                 )}
               </p>
               <Link
-                to={`${AppRoutes.AddRecord}?type=document`}
+                to={ADD_DOCUMENT_PATH}
                 className="mt-4 inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
               >
                 <DocumentPlusIcon className="h-5 w-5" />

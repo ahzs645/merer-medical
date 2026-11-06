@@ -37,6 +37,7 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
   const { t } = useInterfaceLanguage();
   const canManageRecord = isManualRecord(item.document as ClinicalDocument);
   const thumbnailUrl = getInlineImageUrl(item.document as ClinicalDocument);
+  const studyType = splitStudyType(item);
 
   return (
     <>
@@ -72,7 +73,7 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
                 {item.modality && <Badge>{item.modality}</Badge>}
                 {item.bodySite && <Badge>{item.bodySite}</Badge>}
                 {item.laterality && <Badge>{item.laterality}</Badge>}
-                {item.studyType && <Badge>{item.studyType}</Badge>}
+                {studyType.chip && <Badge>{studyType.chip}</Badge>}
                 {item.attachmentType && (
                   <Badge>{fileTypeLabel(item.attachmentType)}</Badge>
                 )}
@@ -83,6 +84,11 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
                   <Badge>{t('Eye care')}</Badge>
                 )}
               </div>
+              {studyType.text && (
+                <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-700">
+                  {studyType.text}
+                </p>
+              )}
               {item.summary && (
                 <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-700">
                   {item.summary}
@@ -345,4 +351,22 @@ export function fileTypeLabel(contentType: string): string {
     return `${minor.replace(/^x-/, '').toUpperCase()} image`;
   if (major === 'video') return 'Video';
   return minor ? minor.replace(/^(x-|vnd\.)/, '').toUpperCase() : contentType;
+}
+
+/**
+ * Where the study type belongs on the card. It falls back to the resource's
+ * free-text description, so it is sometimes a type ("OCT RNFL report"),
+ * sometimes a sentence ("Humphrey visual field 24-2 OU. Reliability
+ * acceptable; no glaucomatous defects.") and sometimes the title again. A
+ * sentence squeezed into a chip read as a tag; it is a line of text instead.
+ * A repeat of the title or the summary is dropped, not printed twice.
+ */
+function splitStudyType(item: ImagingItem): { chip?: string; text?: string } {
+  const value = item.studyType?.trim();
+  if (!value) return {};
+  const same = (other?: string) =>
+    Boolean(other) && other!.trim().toLowerCase() === value.toLowerCase();
+  if (same(item.title) || same(item.summary)) return {};
+  const isSentence = value.length > 40 || /[.;:]\s/.test(value);
+  return isSentence ? { text: value } : { chip: value };
 }

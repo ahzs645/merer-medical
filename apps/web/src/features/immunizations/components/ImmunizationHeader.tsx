@@ -2,6 +2,7 @@ import { ShieldCheckIcon } from '@heroicons/react/24/outline';
 
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 import { Routes as AppRoutes } from '../../../Routes';
+import { buildAddRecordPath } from '../../manual-entry/addRecordPath';
 import {
   RecordHeaderLink,
   RecordPageHeader,
@@ -21,7 +22,10 @@ export function ImmunizationHeader({ recordCount }: { recordCount: number }) {
       }
       action={
         <RecordHeaderLink
-          to={`${AppRoutes.AddRecord}?type=immunization`}
+          to={buildAddRecordPath({
+            type: 'immunization',
+            returnTo: AppRoutes.Immunizations,
+          })}
           label={t('Add immunization')}
           compact
         />
