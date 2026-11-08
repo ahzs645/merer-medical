@@ -106,7 +106,11 @@ export function TabWrapper() {
 
   return (
     <div
-      className="mobile-full-height relative flex min-h-0 max-w-[100vw] flex-col overflow-hidden md:flex-row-reverse"
+      // Native fragment navigation can scroll overflow-hidden ancestors and
+      // lift the profile strip and navigation out of view. This shell only
+      // clips; main and the route content own scrolling. Keep hidden as the
+      // fallback for engines without overflow: clip support.
+      className="mobile-full-height relative flex min-h-0 max-w-[100vw] flex-col overflow-hidden supports-[overflow:clip]:overflow-clip md:flex-row-reverse"
       // Read by `.hide-when-typing` in styles.css.
       data-soft-keyboard={softKeyboardOpen ? 'open' : undefined}
     >

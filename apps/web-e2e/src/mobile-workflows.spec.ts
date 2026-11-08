@@ -50,10 +50,16 @@ async function dismissDemoNotification(page: Page) {
   if ((await page.getByRole('dialog').count()) > 0) return;
   const notificationClose = page
     .locator('[aria-live="assertive"]')
-    .getByRole('button', { name: 'Close', exact: true });
+    .getByRole('button')
+    .first();
   if (await notificationClose.isVisible()) {
-    await notificationClose.click();
-    await expect(notificationClose).toHaveCount(0);
+    try {
+      await notificationClose.click({ timeout: 2_000 });
+    } catch (error) {
+      // The notification may finish its automatic dismissal during the click.
+      if (await notificationClose.isVisible()) throw error;
+    }
+    await expect(notificationClose).toBeHidden({ timeout: 3_000 });
   }
 }
 

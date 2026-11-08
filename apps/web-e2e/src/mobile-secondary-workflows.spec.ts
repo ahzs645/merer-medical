@@ -15,7 +15,15 @@ async function dismissDemoNotification(page: Page) {
     // The notification's first button is its close control in every language.
     .getByRole('button')
     .first();
-  if (await toast.isVisible()) await toast.click();
+  if (!(await toast.isVisible())) return;
+  try {
+    await toast.click({ timeout: 2_000 });
+  } catch (error) {
+    // Its own dismissal timer can remove it between the visibility check and
+    // Playwright's actionability check. A still-visible obstruction is a failure.
+    if (await toast.isVisible()) throw error;
+  }
+  await expect(toast).toBeHidden({ timeout: 3_000 });
 }
 
 async function fits(page: Page) {
