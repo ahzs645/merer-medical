@@ -5,6 +5,7 @@ async function openDemo(page: Page, path: string, title: string) {
   await expect(
     page.getByRole('heading', { level: 1, name: title, exact: true }),
   ).toBeVisible();
+  await dismissDemoNotification(page);
 }
 
 async function expectNoHorizontalOverflow(page: Page) {
@@ -43,9 +44,10 @@ async function expectReachableTouchTarget(control: Locator) {
   expect(box.height).toBeGreaterThanOrEqual(44);
 }
 
-async function captureDemoEvidence(page: Page, name: string) {
-  // Dismiss the synthetic demo/import toast through its actual close control
-  // so it does not cover the record content in the review evidence.
+async function dismissDemoNotification(page: Page) {
+  // A modal correctly blocks background controls. Clear the welcome toast
+  // before opening one, and leave background notifications alone while it is open.
+  if ((await page.getByRole('dialog').count()) > 0) return;
   const notificationClose = page
     .locator('[aria-live="assertive"]')
     .getByRole('button', { name: 'Close', exact: true });
@@ -53,6 +55,11 @@ async function captureDemoEvidence(page: Page, name: string) {
     await notificationClose.click();
     await expect(notificationClose).toHaveCount(0);
   }
+}
+
+async function captureDemoEvidence(page: Page, name: string) {
+  // Import can produce another synthetic toast after the demo first opens.
+  await dismissDemoNotification(page);
   await page.screenshot({
     path: test.info().outputPath(`${name}.png`),
     fullPage: true,
