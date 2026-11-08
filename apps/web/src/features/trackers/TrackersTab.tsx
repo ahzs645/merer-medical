@@ -181,7 +181,7 @@ export function TrackersTab() {
                   <button
                     type="button"
                     onClick={() => setAddOpen(true)}
-                    className="bg-primary hover:bg-primary-700 mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-md px-4 text-sm font-semibold text-white shadow-sm"
+                    className="bg-primary hover:bg-primary-700 mt-4 inline-flex min-h-9 items-center gap-2 rounded-md px-4 text-sm font-semibold text-white shadow-sm"
                   >
                     <PlusIcon className="h-5 w-5" />
                     Add entry
@@ -269,7 +269,7 @@ function TrackerEntryRow({
               type="button"
               onClick={() => onDelete(entry.id)}
               aria-label={`Delete entry: ${entry.label}`}
-              className="inline-flex min-h-[44px] items-center rounded-md px-2 text-xs font-medium text-red-700 hover:bg-red-50 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-600"
+              className="inline-flex min-h-9 items-center rounded-md px-2 text-xs font-medium text-red-700 hover:bg-red-50 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-600"
             >
               Delete
             </button>

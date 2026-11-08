@@ -41,7 +41,7 @@ export function EmptyState({
  * hand-rolled.
  */
 const emptyActionClass =
-  'inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700';
+  'inline-flex min-h-9 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700';
 
 export function EmptyStateLink({ to, label }: { to: string; label: string }) {
   return (

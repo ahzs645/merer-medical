@@ -116,7 +116,7 @@ export function ExperimentalSettingsGroup() {
               }}
               className={classNames(
                 experimental__use_openai_rag ? 'bg-primary-500' : 'bg-gray-200',
-                'focus:ring-primary-500 relative ms-4 inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
+                'focus:ring-primary-500 relative ms-4 inline-flex h-6 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
               )}
             >
               <span
@@ -412,7 +412,7 @@ export function ExperimentalSettingsGroup() {
                     experimental__openmed_enabled
                       ? 'bg-primary-500'
                       : 'bg-gray-200',
-                    'focus:ring-primary-500 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
+                    'focus:ring-primary-500 relative inline-flex h-6 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
                   )}
                 >
                   <span
@@ -504,7 +504,7 @@ export function ExperimentalSettingsGroup() {
                         experimental__openmed_deidentify_cloud_ai
                           ? 'bg-primary-500'
                           : 'bg-gray-200',
-                        'focus:ring-primary-500 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
+                        'focus:ring-primary-500 relative inline-flex h-6 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2',
                       )}
                     >
                       <span

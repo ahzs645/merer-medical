@@ -51,7 +51,7 @@ export function PreviewCard({
           aria-expanded={isOpen}
           aria-controls="visit-preview-panel"
           onClick={() => setIsOpen((open) => !open)}
-          className="inline-flex min-h-[44px] items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+          className="inline-flex min-h-9 items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-primary-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
         >
           {isOpen ? t('Hide preview') : t('Show preview')}
         </button>
@@ -68,7 +68,7 @@ export function PreviewCard({
                 type="button"
                 onClick={() => setPreviewMode('packet')}
                 aria-pressed={previewMode === 'packet'}
-                className={`min-h-[44px] rounded-md px-3 py-2 text-sm font-semibold ${
+                className={`min-h-9 rounded-md px-3 py-2 text-sm font-semibold ${
                   previewMode === 'packet'
                     ? 'bg-primary text-white'
                     : 'bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50'
@@ -80,7 +80,7 @@ export function PreviewCard({
                 type="button"
                 onClick={() => setPreviewMode('file')}
                 aria-pressed={previewMode === 'file'}
-                className={`min-h-[44px] rounded-md px-3 py-2 text-sm font-semibold ${
+                className={`min-h-9 rounded-md px-3 py-2 text-sm font-semibold ${
                   previewMode === 'file'
                     ? 'bg-primary text-white'
                     : 'bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50'

@@ -63,7 +63,7 @@ export function ProvenancePanel({
       </dl>
       {technical.length > 0 && (
         <details className="mt-3">
-          <summary className="inline-flex min-h-[44px] cursor-pointer items-center text-sm font-medium text-gray-600 hover:text-gray-900">
+          <summary className="inline-flex min-h-9 cursor-pointer items-center text-sm font-medium text-gray-600 hover:text-gray-900">
             {t('Technical details')}
           </summary>
           <dl className="mt-1 grid gap-2 text-sm sm:grid-cols-2">

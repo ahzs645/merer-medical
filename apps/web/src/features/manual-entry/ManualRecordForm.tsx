@@ -33,7 +33,7 @@ const actionRowClass =
   'sticky bottom-0 -mx-4 -mb-4 flex items-center gap-3 rounded-b-lg border-t border-gray-200 bg-white px-4 py-3 sm:-mx-6 sm:-mb-6 sm:px-6';
 
 const secondaryButtonClass =
-  'inline-flex min-h-[44px] items-center justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50';
+  'inline-flex min-h-9 items-center justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50';
 
 export function ManualRecordForm({
   form,
@@ -729,7 +729,7 @@ export function ManualRecordForm({
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="inline-flex min-h-[44px] items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                    className="inline-flex min-h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                   >
                     {t(
                       isSaving

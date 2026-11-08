@@ -522,7 +522,7 @@ function WalletSection({
             <button
               type="button"
               onClick={() => setExpanded(!expanded)}
-              className="mt-1.5 inline-flex min-h-[44px] items-center text-xs font-semibold text-primary-700 hover:text-primary-900 print:hidden"
+              className="mt-1.5 inline-flex min-h-9 items-center text-xs font-semibold text-primary-700 hover:text-primary-900 print:hidden"
             >
               {expanded ? 'Show fewer' : `+${overflowCount} more`}
             </button>

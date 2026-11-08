@@ -176,21 +176,21 @@ export function CbctViewerDialog({
               <button
                 type="button"
                 onClick={() => void downloadFileSet(fileSet)}
-                className="inline-flex min-h-[44px] items-center rounded-md px-3 text-sm font-medium text-primary-700 hover:bg-gray-100"
+                className="inline-flex min-h-9 items-center rounded-md px-3 text-sm font-medium text-primary-700 hover:bg-gray-100"
               >
                 {t('Download (.zip)')}
               </button>
               <button
                 type="button"
                 onClick={() => setEditingUrl((value) => !value)}
-                className="inline-flex min-h-[44px] items-center rounded-md px-3 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                className="inline-flex min-h-9 items-center rounded-md px-3 text-sm font-medium text-gray-700 hover:bg-gray-100"
               >
                 {t('Viewer address')}
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex min-h-[44px] items-center rounded-md bg-primary-800 px-3 text-sm font-semibold text-white hover:bg-primary-700"
+                className="inline-flex min-h-9 items-center rounded-md bg-primary-800 px-3 text-sm font-semibold text-white hover:bg-primary-700"
               >
                 {t('Close')}
               </button>
@@ -222,7 +222,7 @@ export function CbctViewerDialog({
               </label>
               <button
                 type="submit"
-                className="min-h-[44px] rounded-md bg-primary-800 px-3 text-sm font-semibold text-white"
+                className="min-h-9 rounded-md bg-primary-800 px-3 text-sm font-semibold text-white"
               >
                 {t('Save')}
               </button>

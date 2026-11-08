@@ -210,7 +210,7 @@ const SettingsTab: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setShowUserSwitcher(true)}
-                      className="text-primary-600 hover:text-primary-700 hover:bg-primary-50 -me-2 inline-flex min-h-[44px] items-center rounded-md px-3 text-sm font-medium transition-colors"
+                      className="text-primary-600 hover:text-primary-700 hover:bg-primary-50 -me-2 inline-flex min-h-9 items-center rounded-md px-3 text-sm font-medium transition-colors"
                     >
                       {t('Switch user')}
                     </button>

@@ -69,7 +69,7 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
         </div>
         <Link
           to={`${AppRoutes.AddRecord}?specialty=dental&dental=imaging`}
-          className="inline-flex min-h-[44px] w-fit shrink-0 items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+          className="inline-flex min-h-9 w-fit shrink-0 items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
         >
           {t('Add dental image/scan')}
         </Link>
@@ -115,7 +115,7 @@ export function DentalScanPreview({ imaging }: { imaging: ImagingItem[] }) {
                   disabled={!canView}
                   aria-pressed={canView ? isSelected : undefined}
                   onClick={() => setSelectedId(source.id)}
-                  className={`flex min-h-[44px] w-full flex-col items-start rounded-md p-2 text-start ring-1 ${
+                  className={`flex min-h-9 w-full flex-col items-start rounded-md p-2 text-start ring-1 ${
                     isSelected
                       ? 'bg-primary-50 ring-primary-300'
                       : 'bg-white ring-slate-200'

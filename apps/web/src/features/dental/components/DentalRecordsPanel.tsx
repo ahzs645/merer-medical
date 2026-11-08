@@ -107,7 +107,7 @@ export function DentalRecordsPanel({ records }: { records: DentalRecord[] }) {
             <button
               type="button"
               onClick={() => setShowAll((value) => !value)}
-              className="mt-2 inline-flex min-h-[44px] items-center text-sm font-medium text-primary-700 hover:text-primary-900"
+              className="mt-2 inline-flex min-h-9 items-center text-sm font-medium text-primary-700 hover:text-primary-900"
             >
               {showAll
                 ? t('Show fewer')

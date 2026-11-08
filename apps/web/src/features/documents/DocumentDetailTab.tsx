@@ -456,7 +456,7 @@ export function DocumentDetailTab() {
                             <button
                               type="button"
                               onClick={() => openDoc(false)}
-                              className="inline-flex min-h-[44px] items-center gap-1 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-50"
+                              className="inline-flex min-h-9 items-center gap-1 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-50"
                             >
                               <ArrowTopRightOnSquareIcon className="h-4 w-4" />
                               Open
@@ -464,7 +464,7 @@ export function DocumentDetailTab() {
                             <button
                               type="button"
                               onClick={() => openDoc(true)}
-                              className="inline-flex min-h-[44px] items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                              className="inline-flex min-h-9 items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50"
                             >
                               <ArrowDownTrayIcon className="h-4 w-4" />
                               Download
@@ -512,7 +512,7 @@ export function DocumentDetailTab() {
                       <button
                         type="button"
                         onClick={() => openAdd(undefined)}
-                        className="inline-flex min-h-[44px] w-fit shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+                        className="inline-flex min-h-9 w-fit shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
                       >
                         <PlusIcon className="h-4 w-4" />
                         Add linked record
@@ -524,7 +524,7 @@ export function DocumentDetailTab() {
                           key={quick.kind}
                           type="button"
                           onClick={() => openAdd(quick.kind)}
-                          className="min-h-[44px] rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100"
+                          className="min-h-9 rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100"
                         >
                           + {quick.label}
                         </button>

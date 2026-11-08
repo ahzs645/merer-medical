@@ -6,7 +6,7 @@ import { Routes as AppRoutes } from '../../Routes';
 import { findActiveTool, UTILITY_TOOLS } from './utilityTools';
 
 const PILL_BASE =
-  'inline-flex min-h-[44px] items-center gap-2 rounded-md px-3 text-sm font-medium';
+  'inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-sm font-medium';
 
 function pillClass(isActive: boolean): string {
   return `${PILL_BASE} ${
@@ -44,9 +44,9 @@ function ToolLinks() {
  *
  * The nine entries add up to a ~900px strip, so the shared horizontal
  * ScrollableTabNav clipped labels mid-word behind its scroll chevrons on
- * phones. Instead: a disclosure menu below `lg` (one 44px control naming the
+ * phones. Instead: a disclosure menu below `lg` (one 36px control naming the
  * open tool) and a wrapping — never scrolling — pill row from `lg` up, so no
- * label is ever truncated and every target clears 44px.
+ * label is ever truncated and every target clears 36px.
  */
 export function UtilitiesToolNav() {
   const location = useLocation();
@@ -65,7 +65,7 @@ export function UtilitiesToolNav() {
           onClick={() => setOpen((current) => !current)}
           aria-expanded={open}
           aria-controls="utilities-tool-menu"
-          className="flex min-h-[44px] w-full items-center gap-2 rounded-md px-3 text-start text-sm font-medium text-gray-800 ring-1 ring-gray-200 hover:bg-gray-50"
+          className="flex min-h-9 w-full items-center gap-2 rounded-md px-3 text-start text-sm font-medium text-gray-800 ring-1 ring-gray-200 hover:bg-gray-50"
         >
           <ActiveIcon className="text-primary-700 h-5 w-5 shrink-0" />
           <span className="min-w-0 flex-1 break-words">

@@ -344,7 +344,7 @@ export function ManualSpecialtySection({
                     type="button"
                     aria-pressed={dentalSurfaces.includes(surface)}
                     onClick={() => toggleDentalSurface(surface)}
-                    className={`min-h-[44px] min-w-[44px] rounded-md border px-3 text-sm font-semibold ${
+                    className={`min-h-9 min-w-9 rounded-md border px-3 text-sm font-semibold ${
                       dentalSurfaces.includes(surface)
                         ? 'border-primary-600 bg-primary-50 text-primary-800'
                         : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
@@ -358,7 +358,7 @@ export function ManualSpecialtySection({
           )}
           {dentalShows.teeth && (
             <details className="sm:col-span-3">
-              <summary className="min-h-[44px] cursor-pointer py-2 text-sm font-semibold text-primary-700">
+              <summary className="min-h-9 cursor-pointer py-2 text-sm font-semibold text-primary-700">
                 {t('More tooth details')}
               </summary>
               <div className="mt-2 grid gap-4 sm:grid-cols-3">

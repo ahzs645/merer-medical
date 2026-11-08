@@ -37,13 +37,13 @@ export function AssistantDisabledPage() {
             <div className="mt-5 flex flex-wrap gap-3">
               <Link
                 to={AppRoutes.Settings}
-                className="bg-primary hover:bg-primary-700 inline-flex min-h-[44px] items-center rounded-md px-4 text-sm font-semibold text-white shadow-sm"
+                className="bg-primary hover:bg-primary-700 inline-flex min-h-9 items-center rounded-md px-4 text-sm font-semibold text-white shadow-sm"
               >
                 {t('Open Settings')}
               </Link>
               <Link
                 to={AppRoutes.Timeline}
-                className="inline-flex min-h-[44px] items-center rounded-md px-4 text-sm font-semibold text-gray-800 ring-1 ring-gray-300 hover:bg-gray-50"
+                className="inline-flex min-h-9 items-center rounded-md px-4 text-sm font-semibold text-gray-800 ring-1 ring-gray-300 hover:bg-gray-50"
               >
                 {t('Go to timeline')}
               </Link>

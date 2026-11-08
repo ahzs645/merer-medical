@@ -42,7 +42,7 @@ export function StoredFilesSummary({ fileSet }: { fileSet: FileSetSummary }) {
           <button
             type="button"
             onClick={() => setViewing(true)}
-            className="inline-flex min-h-[44px] items-center rounded-md bg-primary-800 px-3 text-sm font-semibold text-white hover:bg-primary-700"
+            className="inline-flex min-h-9 items-center rounded-md bg-primary-800 px-3 text-sm font-semibold text-white hover:bg-primary-700"
           >
             {t('Open in CBCT viewer')}
           </button>
@@ -58,7 +58,7 @@ export function StoredFilesSummary({ fileSet }: { fileSet: FileSetSummary }) {
               setBusy(false);
             }
           }}
-          className="inline-flex min-h-[44px] items-center rounded-md px-3 text-sm font-medium text-primary-700 ring-1 ring-primary-200 hover:bg-gray-50 disabled:opacity-60"
+          className="inline-flex min-h-9 items-center rounded-md px-3 text-sm font-medium text-primary-700 ring-1 ring-primary-200 hover:bg-gray-50 disabled:opacity-60"
         >
           {busy ? t('Preparing…') : t('Download (.zip)')}
         </button>

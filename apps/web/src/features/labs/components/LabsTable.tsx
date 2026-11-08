@@ -153,7 +153,7 @@ function LabMobileRow({
           type="button"
           onClick={onToggle}
           aria-expanded={expanded}
-          className="-my-1 flex h-11 w-11 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+          className="-my-1 flex h-9 w-9 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
           aria-label={`${expanded ? t('Collapse') : t('Expand')} ${group.name}`}
         >
           {expanded ? (
@@ -288,7 +288,7 @@ function LabTableRow({
             type="button"
             onClick={onToggle}
             aria-expanded={expanded}
-            className="relative z-10 mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+            className="relative z-10 mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
             aria-label={`${expanded ? t('Collapse') : t('Expand')} ${
               group.name
             }`}

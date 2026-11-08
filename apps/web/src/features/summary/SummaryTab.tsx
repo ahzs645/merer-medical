@@ -791,7 +791,7 @@ function ForYouFeed({
         </div>
         <Link
           to={AppRoutes.Timeline}
-          className="inline-flex min-h-[44px] items-center text-sm font-semibold text-primary-700 hover:text-primary-900"
+          className="inline-flex min-h-9 items-center text-sm font-semibold text-primary-700 hover:text-primary-900"
         >
           {t('Open timeline')}
         </Link>

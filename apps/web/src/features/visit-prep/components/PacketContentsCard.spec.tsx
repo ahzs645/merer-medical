@@ -92,7 +92,7 @@ describe('PacketContentsCard', () => {
     );
   });
 
-  it('keeps every chip a 44px target', () => {
+  it('keeps every chip a 36px target', () => {
     const { container } = render(
       <PacketContentsCard
         packetOptions={ALL_ON}
@@ -101,7 +101,7 @@ describe('PacketContentsCard', () => {
     );
 
     container.querySelectorAll('label > span').forEach((chip) => {
-      expect(chip.getAttribute('class')).toContain('min-h-[44px]');
+      expect(chip.getAttribute('class')).toContain('min-h-9');
     });
   });
 });

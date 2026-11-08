@@ -84,7 +84,7 @@ export function FormSheet({
                   <button
                     type="button"
                     onClick={onRequestClose}
-                    className="-me-1 inline-flex h-11 w-11 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                    className="-me-1 inline-flex h-9 w-9 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                     aria-label={closeLabel}
                   >
                     <XMarkIcon className="h-5 w-5" />

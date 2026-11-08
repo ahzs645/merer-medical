@@ -261,7 +261,7 @@ export function ConnectionCard({
           aria-label={`Details and options for ${displayName}`}
           title="Details and options"
           onClick={() => setShowDetail(true)}
-          className="-me-2 -mt-1 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          className="-me-2 -mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
         >
           <InformationCircleIcon className="h-6 w-6" aria-hidden="true" />
         </button>
@@ -276,7 +276,7 @@ export function ConnectionCard({
               type="button"
               disabled={syncing}
               onClick={handleFix}
-              className="inline-flex min-h-[44px] items-center gap-2 rounded-md px-3 text-sm font-bold text-amber-700 hover:bg-amber-50 disabled:text-gray-400"
+              className="inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-sm font-bold text-amber-700 hover:bg-amber-50 disabled:text-gray-400"
             >
               <WrenchScrewdriverIcon className="h-4 w-4" aria-hidden="true" />
               Fix connection
@@ -286,7 +286,7 @@ export function ConnectionCard({
             type="button"
             disabled={syncing || deleting}
             onClick={handleFetchData}
-            className="text-primary-700 hover:bg-primary-50 inline-flex min-h-[44px] items-center gap-2 rounded-md px-3 text-sm font-bold disabled:text-gray-400"
+            className="text-primary-700 hover:bg-primary-50 inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-sm font-bold disabled:text-gray-400"
           >
             {syncing ? (
               <ButtonLoadingSpinner />
@@ -334,14 +334,14 @@ export function ConnectionCard({
         <div className="m-4 flex flex-wrap justify-end gap-3">
           <button
             type="button"
-            className="inline-flex min-h-[44px] items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm hover:bg-gray-50"
+            className="inline-flex min-h-9 items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm hover:bg-gray-50"
             onClick={() => setShowModal(false)}
           >
             Cancel
           </button>
           <button
             type="button"
-            className="inline-flex min-h-[44px] items-center justify-center rounded-md border border-red-700 bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-700"
+            className="inline-flex min-h-9 items-center justify-center rounded-md border border-red-700 bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-700"
             onClick={() => {
               removeDocument(item);
               setShowModal(false);

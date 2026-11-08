@@ -74,10 +74,10 @@ function ActionCard({
 }
 
 const buttonClass =
-  'bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex min-h-[44px] w-full items-center justify-center rounded-md border border-transparent px-3 py-2 text-sm font-bold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-400';
+  'bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex min-h-9 w-full items-center justify-center rounded-md border border-transparent px-3 py-2 text-sm font-bold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-400';
 
 const secondaryButtonClass =
-  'inline-flex min-h-[44px] w-full items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-800 shadow-sm hover:bg-gray-50 disabled:bg-gray-100';
+  'inline-flex min-h-9 w-full items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-800 shadow-sm hover:bg-gray-50 disabled:bg-gray-100';
 
 /**
  * Surfaces the app's local data portability features (import/export) as a
@@ -213,7 +213,7 @@ export function ImportRecordsPanel({
         <input
           type="password"
           placeholder="Passphrase (for encrypted .emrpkg)"
-          className="focus:ring-primary-500 focus:border-primary-500 block min-h-[44px] w-full min-w-0 rounded-md border-gray-300 text-sm shadow-sm"
+          className="focus:ring-primary-500 focus:border-primary-500 block min-h-9 w-full min-w-0 rounded-md border-gray-300 text-sm shadow-sm"
           value={passphrase}
           onChange={(e) => setPassphrase(e.target.value)}
           autoComplete="new-password"
@@ -225,7 +225,7 @@ export function ImportRecordsPanel({
         <select
           value={importMode}
           onChange={(e) => setImportMode(e.target.value as 'merge' | 'replace')}
-          className="focus:ring-primary-500 focus:border-primary-500 min-h-[44px] w-full rounded-md border-gray-300 text-sm shadow-sm"
+          className="focus:ring-primary-500 focus:border-primary-500 min-h-9 w-full rounded-md border-gray-300 text-sm shadow-sm"
           disabled={busy}
         >
           <option value="merge">Add to this app</option>

@@ -277,7 +277,7 @@ const ConnectionTab: React.FC = () => {
         {task ? (
           <Link
             to={taskPath(null)}
-            className="text-primary-700 hover:bg-primary-50 -ms-2 mb-2 inline-flex min-h-[44px] items-center gap-2 rounded-md px-2 text-sm font-semibold"
+            className="text-primary-700 hover:bg-primary-50 -ms-2 mb-2 inline-flex min-h-9 items-center gap-2 rounded-md px-2 text-sm font-semibold"
           >
             <ArrowLeftIcon
               className="h-4 w-4 shrink-0 rtl:rotate-180"
@@ -336,7 +336,7 @@ const ConnectionTab: React.FC = () => {
             <div className="mt-5 border-t border-gray-200 pt-3">
               <Link
                 to={taskPath('manage')}
-                className="text-primary-700 hover:bg-primary-50 -ms-2 inline-flex min-h-[44px] items-center gap-2 rounded-md px-2 text-sm font-semibold"
+                className="text-primary-700 hover:bg-primary-50 -ms-2 inline-flex min-h-9 items-center gap-2 rounded-md px-2 text-sm font-semibold"
               >
                 {t('Manage sources')}
                 <ChevronRightIcon
@@ -374,7 +374,7 @@ const ConnectionTab: React.FC = () => {
             </p>
             <button
               type="button"
-              className="bg-primary-600 hover:bg-primary-700 mt-4 inline-flex min-h-[44px] w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-bold text-white sm:w-auto"
+              className="bg-primary-600 hover:bg-primary-700 mt-4 inline-flex min-h-9 w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-bold text-white sm:w-auto"
               onClick={() => setOpenSelectModal(true)}
             >
               {t('Find a patient portal')}
@@ -384,7 +384,7 @@ const ConnectionTab: React.FC = () => {
             </div>
             <Link
               to={taskPath('manage')}
-              className="text-primary-700 mt-3 inline-flex min-h-[44px] items-center text-sm font-semibold"
+              className="text-primary-700 mt-3 inline-flex min-h-9 items-center text-sm font-semibold"
             >
               {t('Manage connected sources')}
             </Link>
@@ -453,7 +453,7 @@ const ConnectionTab: React.FC = () => {
               )}
               <Link
                 to={taskPath('portal')}
-                className="text-primary-700 mt-2 inline-flex min-h-[44px] items-center text-sm font-semibold"
+                className="text-primary-700 mt-2 inline-flex min-h-9 items-center text-sm font-semibold"
               >
                 {t('Connect a patient portal')}
               </Link>
@@ -484,7 +484,7 @@ const ConnectionTab: React.FC = () => {
               )}
               <Link
                 to={taskPath('import')}
-                className="text-primary-700 mt-2 inline-flex min-h-[44px] items-center text-sm font-semibold"
+                className="text-primary-700 mt-2 inline-flex min-h-9 items-center text-sm font-semibold"
               >
                 {t('Import a file')}
               </Link>

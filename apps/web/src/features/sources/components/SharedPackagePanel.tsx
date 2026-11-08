@@ -444,10 +444,10 @@ export function SharedPackagePanel() {
     <button
       type="button"
       onClick={dismiss}
-      // Negative margins pull the 44px target back over the card's own padding
+      // Negative margins pull the 36px target back over the card's own padding
       // so it reaches the corner without pushing the heading onto its own line.
       // The body is far taller than the button, so the row does not stretch.
-      className="-me-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-gray-500 hover:text-gray-700"
+      className="-me-2 -mt-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-500 hover:text-gray-700"
     >
       <span className="sr-only">Close</span>
       <XMarkIcon className="h-5 w-5" aria-hidden="true" />
@@ -565,7 +565,7 @@ export function SharedPackagePanel() {
                 type="button"
                 disabled={importing}
                 onClick={() => runImport(false)}
-                className="bg-primary-700 hover:bg-primary-800 inline-flex min-h-[44px] w-full items-center justify-center rounded-md px-3 py-2 text-sm font-medium text-white disabled:opacity-60 sm:w-auto"
+                className="bg-primary-700 hover:bg-primary-800 inline-flex min-h-9 w-full items-center justify-center rounded-md px-3 py-2 text-sm font-medium text-white disabled:opacity-60 sm:w-auto"
               >
                 {importing && <ButtonLoadingSpinner />}
                 {importing ? 'Opening records…' : acceptLabel}

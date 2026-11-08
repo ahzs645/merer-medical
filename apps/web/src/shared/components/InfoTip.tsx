@@ -28,11 +28,11 @@ export function InfoTip({
 }) {
   return (
     <Popover as="span" className="inline-flex">
-      {/* 44px of target, 20px of layout: `-my-3` pulls the button's own height
+      {/* 36px of target, 20px of layout: `-my-2` pulls the button's own height
           back out of the line so an ⓘ costs a glyph's worth of row, not a
           control's. Callers need 12px of clearance under the line — less than
           that and the target starts stealing taps from whatever is below. */}
-      <Popover.Button className="focus-visible:ring-primary-500 -my-3 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2">
+      <Popover.Button className="focus-visible:ring-primary-500 -my-2 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2">
         <InformationCircleIcon className="h-5 w-5" aria-hidden="true" />
         <span className="sr-only">{label}</span>
       </Popover.Button>

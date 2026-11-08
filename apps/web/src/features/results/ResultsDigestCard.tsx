@@ -82,7 +82,7 @@ export function ResultsDigestCard() {
         </div>
         <Link
           to={AppRoutes.Results}
-          className="text-primary-700 hover:text-primary-900 inline-flex min-h-[44px] shrink-0 items-center gap-1 rounded-md px-2 py-1.5 text-sm font-semibold"
+          className="text-primary-700 hover:text-primary-900 inline-flex min-h-9 shrink-0 items-center gap-1 rounded-md px-2 py-1.5 text-sm font-semibold"
         >
           {t('Open all results')}
           <ArrowRightIcon className="h-4 w-4" />
@@ -107,7 +107,7 @@ export function ResultsDigestCard() {
               <li key={result.detailId}>
                 <Link
                   to={destination}
-                  className="grid min-h-[44px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-3 py-2.5 hover:bg-blue-50"
+                  className="grid min-h-9 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-3 py-2.5 hover:bg-blue-50"
                 >
                   <Icon className="text-primary-700 h-5 w-5" />
                   <span className="min-w-0">

@@ -53,7 +53,7 @@ export function LibreCgmPanel({ labs }: { labs: LabDocument[] }) {
           aria-expanded={expanded}
           aria-controls={reportId}
           onClick={() => setExpanded((open) => !open)}
-          className="inline-flex min-h-[44px] max-w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-start text-sm font-semibold text-primary-800 hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
+          className="inline-flex min-h-9 max-w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-start text-sm font-semibold text-primary-800 hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
         >
           <span className="min-w-0 break-words">
             {expanded ? 'Hide glucose report' : 'Show glucose report'}

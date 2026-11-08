@@ -88,7 +88,7 @@ export function CommentModal({
                 <button
                   type="button"
                   onClick={() => setShow(false)}
-                  className="group ms-3 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full"
+                  className="group ms-3 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full"
                   aria-label={t('Close')}
                 >
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 text-gray-600 group-hover:bg-gray-300">
@@ -155,7 +155,7 @@ export function CommentModal({
                           <button
                             type="button"
                             onClick={() => onDelete(c.id)}
-                            className="min-h-[44px] rounded-md px-2 text-[11px] font-medium text-gray-600 hover:text-red-600"
+                            className="min-h-9 rounded-md px-2 text-[11px] font-medium text-gray-600 hover:text-red-600"
                             aria-label={t('Delete comment')}
                           >
                             {t('Delete')}

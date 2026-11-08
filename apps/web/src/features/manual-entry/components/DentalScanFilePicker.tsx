@@ -7,7 +7,7 @@ import {
 
 const inputClass = 'sr-only';
 const buttonClass =
-  'inline-flex min-h-[44px] cursor-pointer items-center rounded-md border border-primary-300 bg-white px-3 text-sm font-semibold text-primary-800 shadow-sm hover:bg-primary-50 focus-within:ring-2 focus-within:ring-primary-500';
+  'inline-flex min-h-9 cursor-pointer items-center rounded-md border border-primary-300 bg-white px-3 text-sm font-semibold text-primary-800 shadow-sm hover:bg-primary-50 focus-within:ring-2 focus-within:ring-primary-500';
 
 /**
  * Files for a dental image or scan: one or several (an X-ray, a photo, an

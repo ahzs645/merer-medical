@@ -138,7 +138,7 @@ describe('VitalsTab history disclosure', () => {
     expect(historyDisclosure().open).toBe(false);
   });
 
-  it('says how many readings the trigger opens, and reaches 44px', async () => {
+  it('says how many readings the trigger opens, and reaches 36px', async () => {
     mockDocsByType['observation'] = bmiHistory([2026, 2025, 2024]);
 
     renderTab();
@@ -150,10 +150,10 @@ describe('VitalsTab history disclosure', () => {
     expect(summary.getAttribute('aria-label')).toBe(
       '2 earlier readings for Body Mass Index',
     );
-    // 14px of padding around the 16px line is the 44px target, reached
-    // exactly rather than by a minimum — with `min-h-[44px]` the slack fell
+    // 10px of padding around the 16px line is the 36px target, reached
+    // exactly rather than by a minimum — with `min-h-9` the slack fell
     // entirely below the text and the card read as bottom-heavy.
-    expect(summary.className).toContain('py-3.5');
+    expect(summary.className).toContain('py-2.5');
   });
 
   it('counts one hidden reading in the singular', async () => {

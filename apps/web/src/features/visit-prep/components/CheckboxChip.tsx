@@ -27,7 +27,7 @@ export function CheckboxChip({
       {/* The chip itself is the control's face, so the box is taken out of the
           layout rather than stretched over it: the forms plugin paints a
           checked box with its own fill, which at chip size covers the label.
-          The 44px target is the chip, which the label makes clickable. */}
+          The 36px target is the chip, which the label makes clickable. */}
       <input
         type="checkbox"
         checked={checked}
@@ -35,7 +35,7 @@ export function CheckboxChip({
         className="peer sr-only"
       />
       <span
-        className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3.5 text-sm font-medium transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-primary-600 peer-focus-visible:ring-offset-1 ${
+        className={`inline-flex min-h-9 items-center gap-2 rounded-full border px-3.5 text-sm font-medium transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-primary-600 peer-focus-visible:ring-offset-1 ${
           checked
             ? 'border-primary-300 bg-primary-50 text-primary-900'
             : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'

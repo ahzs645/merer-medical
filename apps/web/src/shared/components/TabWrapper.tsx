@@ -121,7 +121,7 @@ export function TabWrapper() {
           `main` is here and not inside each page: one landmark, 46 routes. */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-dialog focus:inline-flex focus:min-h-[44px] focus:items-center focus:rounded-md focus:bg-white focus:px-4 focus:text-sm focus:font-semibold focus:text-primary-800 focus:shadow-lg focus:ring-2 focus:ring-primary-600"
+        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-dialog focus:inline-flex focus:min-h-9 focus:items-center focus:rounded-md focus:bg-white focus:px-4 focus:text-sm focus:font-semibold focus:text-primary-800 focus:shadow-lg focus:ring-2 focus:ring-primary-600"
       >
         Skip to content
       </a>
@@ -140,7 +140,7 @@ export function TabWrapper() {
         <Link
           to={AppRoutes.Settings}
           aria-label={`Records for ${userName}. Manage profiles`}
-          className="flex min-h-[44px] min-w-0 flex-1 items-center gap-2 rounded-md py-1 text-primary-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600"
+          className="flex min-h-9 min-w-0 flex-1 items-center gap-2 rounded-md py-1 text-primary-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600"
         >
           <UserCircleIcon
             className="hidden h-6 w-6 shrink-0 sm:block"
@@ -163,10 +163,10 @@ export function TabWrapper() {
           aria-haspopup="dialog"
           aria-expanded={searchOpen}
           title="Search"
-          className="inline-flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-md text-sm font-semibold text-primary-800 hover:bg-primary-50 sm:w-auto sm:gap-1.5 sm:px-2"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-sm font-semibold text-primary-800 hover:bg-primary-50 sm:w-auto sm:gap-1.5 sm:px-2"
         >
           <MagnifyingGlassIcon
-            className="h-[24px] w-[24px] shrink-0"
+            className="h-5 w-5 shrink-0"
             aria-hidden="true"
           />
           <span className="hidden sm:inline">Search</span>
@@ -367,7 +367,7 @@ export function TabWrapper() {
                 </div>
                 <div className={`ms-3 ${collapsed ? 'md:hidden' : ''}`}>
                   <p className="text-base font-medium text-white">{userName}</p>
-                  <span className="-my-1 inline-flex min-h-[44px] items-center text-sm font-medium text-indigo-200 group-hover:text-white">
+                  <span className="-my-1 inline-flex min-h-9 items-center text-sm font-medium text-indigo-200 group-hover:text-white">
                     {user?.first_name ? 'View details' : 'Add User Details'}
                   </span>
                 </div>
@@ -422,11 +422,11 @@ function RailAddRecordButton({ collapsed }: { collapsed: boolean }) {
       to={addRecordPath}
       className={`group text-primary-800 ring-primary-100 hover:bg-primary-50 relative hidden items-center rounded-md bg-white text-sm font-semibold shadow-sm ring-1 ring-inset md:flex ${
         collapsed
-          ? 'md:mx-auto md:my-3 md:h-11 md:w-11 md:justify-center'
+          ? 'md:mx-auto md:my-3 md:h-10 md:w-9 md:justify-center'
           : // 44px expanded as well as collapsed: `py-2.5` around a 20px line
             // is 40px, and this app's own audit counts a 38px Save button as a
             // defect.
-            'md:mx-3 md:my-3 md:min-h-[44px] md:gap-2 md:px-3 md:py-2.5'
+            'md:mx-3 md:my-3 md:min-h-9 md:gap-2 md:px-3 md:py-2.5'
       }`}
     >
       <PlusIcon className="h-5 w-5 flex-shrink-0" />
@@ -565,7 +565,7 @@ export function MobileMoreButton({
                     type="button"
                     onClick={() => setOpen(false)}
                     aria-label="Close navigation"
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100"
                   >
                     <XMarkIcon className="h-5 w-5" aria-hidden="true" />
                   </button>
@@ -584,7 +584,7 @@ export function MobileMoreButton({
                       pendingSearch.current = true;
                       setOpen(false);
                     }}
-                    className="flex min-h-[44px] items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm font-semibold text-slate-800"
+                    className="flex min-h-9 items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm font-semibold text-slate-800"
                   >
                     <span className="h-5 w-5 flex-shrink-0">
                       <MagnifyingGlassIcon />
@@ -668,7 +668,7 @@ function MobileMoreLink({
       // replacing it keeps Back from the destination one step, not two.
       replace
       onClick={onClick}
-      className={`flex min-h-[44px] min-w-0 items-center gap-3 rounded-lg border p-3 text-sm font-semibold ${
+      className={`flex min-h-9 min-w-0 items-center gap-3 rounded-lg border p-3 text-sm font-semibold ${
         isActive
           ? 'border-primary bg-primary-50 text-primary'
           : 'border-gray-200 bg-gray-50 text-slate-800'

@@ -110,7 +110,7 @@ export function UserCard() {
             </p>
             <button
               type="button"
-              className="focus:ring-primary-500 -me-2 inline-flex min-h-[44px] flex-shrink-0 items-center gap-1.5 rounded-md px-3 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2"
+              className="focus:ring-primary-500 -me-2 inline-flex min-h-9 flex-shrink-0 items-center gap-1.5 rounded-md px-3 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2"
               onClick={() => {
                 setOpenEditUserModal(true);
               }}

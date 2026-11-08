@@ -36,7 +36,7 @@ export function DentalWorkflowContextPanel({
         {/* The chart moved to its own tab, so point people at it from here. */}
         <Link
           to={AppRoutes.DentalChart}
-          className="text-primary-700 hover:text-primary-900 inline-flex min-h-[44px] items-center text-sm font-medium"
+          className="text-primary-700 hover:text-primary-900 inline-flex min-h-9 items-center text-sm font-medium"
         >
           {t('Open your tooth chart')}
         </Link>
@@ -69,7 +69,7 @@ export function DentalWorkflowContextPanel({
                 {/* A row you can open, not a sentence about a category. */}
                 <Link
                   to={action.to}
-                  className="focus:ring-primary-600 flex min-h-[44px] flex-col justify-center gap-0.5 rounded-md px-3 py-2 hover:bg-gray-100 focus:outline-none focus:ring-2"
+                  className="focus:ring-primary-600 flex min-h-9 flex-col justify-center gap-0.5 rounded-md px-3 py-2 hover:bg-gray-100 focus:outline-none focus:ring-2"
                 >
                   <span className="text-sm font-medium text-gray-900">
                     {action.label}
@@ -94,7 +94,7 @@ export function DentalWorkflowContextPanel({
           {actions.length > shown.length && (
             <Link
               to={AppRoutes.DentalRecords}
-              className="text-primary-700 hover:text-primary-900 mt-2 inline-flex min-h-[44px] items-center text-sm font-medium"
+              className="text-primary-700 hover:text-primary-900 mt-2 inline-flex min-h-9 items-center text-sm font-medium"
             >
               {t('{count} more in Records').replace(
                 '{count}',

@@ -340,7 +340,7 @@ export function CommandPalette({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mx-1 my-1 flex h-11 min-h-[44px] w-11 min-w-[44px] items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
+        className="mx-1 my-1 flex h-10 min-h-9 w-9 min-w-9 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
         aria-expanded={open}
         aria-label={t('Search')}
         title={t('Search')}
@@ -411,7 +411,7 @@ export function CommandPalette({
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                     aria-label={t('Close search')}
                   >
                     <XMarkIcon className="h-5 w-5" />

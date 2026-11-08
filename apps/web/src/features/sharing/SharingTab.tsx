@@ -449,7 +449,7 @@ export function SharingTab() {
                       setProxyDraft((draft) => ({ ...draft, notes: value }))
                     }
                   />
-                  <button className="inline-flex min-h-[44px] w-fit items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+                  <button className="inline-flex min-h-9 w-fit items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700">
                     <PlusIcon className="h-4 w-4" />
                     {t('Add caregiver')}
                   </button>
@@ -587,7 +587,7 @@ export function SharingTab() {
                         exportBusy ||
                         (passwordProtect && !exportPassphrase.trim())
                       }
-                      className="mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                      className="mt-4 inline-flex min-h-9 items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                     >
                       <DocumentArrowDownIcon className="h-4 w-4" />
                       {exportBusy ? 'Preparing...' : 'Download package'}
@@ -604,7 +604,7 @@ export function SharingTab() {
                         ref={downloadRef}
                         href={downloadUrl}
                         download={downloadName}
-                        className="mt-2 inline-flex min-h-[44px] items-center rounded-md px-2 text-primary-700 underline"
+                        className="mt-2 inline-flex min-h-9 items-center rounded-md px-2 text-primary-700 underline"
                       >
                         {t('Download again')}
                       </a>
@@ -660,8 +660,8 @@ export function SharingTab() {
                       {CATEGORY_OPTIONS.map((category) => (
                         <label
                           key={category}
-                          // min-h keeps the whole row a 44px touch target.
-                          className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm"
+                          // min-h keeps the whole row a 36px touch target.
+                          className="inline-flex min-h-9 items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm"
                         >
                           <input
                             type="checkbox"
@@ -691,7 +691,7 @@ export function SharingTab() {
                     }
                   />
                   <div className="flex items-end">
-                    <button className="inline-flex min-h-[44px] items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+                    <button className="inline-flex min-h-9 items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700">
                       <PlusIcon className="h-4 w-4" />
                       {t('Record a share')}
                     </button>
@@ -773,7 +773,7 @@ function SharingSection({
       <summary
         aria-labelledby={`sharing-${id}-title`}
         aria-describedby={`sharing-${id}-description`}
-        className="flex min-h-[44px] cursor-pointer list-none items-start gap-3 rounded-md p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden"
+        className="flex min-h-9 cursor-pointer list-none items-start gap-3 rounded-md p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden"
       >
         <Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary-700" />
         <span className="min-w-0 flex-1">
@@ -816,7 +816,7 @@ function TextField({
       <span className="text-sm font-medium text-gray-700">{label}</span>
       <input
         type={type}
-        className="mt-1 min-h-[44px] w-full rounded-md border-gray-300 text-base sm:text-sm shadow-sm focus:border-primary focus:ring-primary"
+        className="mt-1 min-h-9 w-full rounded-md border-gray-300 text-base sm:text-sm shadow-sm focus:border-primary focus:ring-primary"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
@@ -834,7 +834,7 @@ function CheckboxField({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm">
+    <label className="inline-flex min-h-9 items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm">
       <input
         type="checkbox"
         className="rounded border-gray-300 text-primary focus:ring-primary"
@@ -859,8 +859,8 @@ function RadioCard({
 }) {
   return (
     <label
-      // min-h keeps the whole card a 44px touch target.
-      className={`block min-h-[44px] cursor-pointer rounded-md border p-3 ${
+      // min-h keeps the whole card a 36px touch target.
+      className={`block min-h-9 cursor-pointer rounded-md border p-3 ${
         checked
           ? 'border-primary-500 bg-primary-50 ring-1 ring-primary-200'
           : 'border-gray-200 bg-white'
@@ -911,7 +911,7 @@ function ItemList<T extends { id: string }>({
           <div className="min-w-0 flex-1">{render(item)}</div>
           <button
             type="button"
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center self-start rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-red-700"
+            className="flex min-h-9 min-w-9 items-center justify-center self-start rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-red-700"
             onClick={() => onRemove(item.id)}
             aria-label="Remove"
           >

@@ -45,7 +45,7 @@ export function DentalRecordDetailTab() {
         </p>
         <Link
           to={AppRoutes.DentalRecords}
-          className="mt-2 inline-flex min-h-[44px] items-center text-sm font-medium text-primary-700"
+          className="mt-2 inline-flex min-h-9 items-center text-sm font-medium text-primary-700"
         >
           {t('All dental records')}
         </Link>
@@ -106,7 +106,7 @@ export function DentalRecordDetailTab() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="inline-flex min-h-[44px] items-center text-sm font-medium text-primary-700 hover:text-primary-900"
+          className="inline-flex min-h-9 items-center text-sm font-medium text-primary-700 hover:text-primary-900"
         >
           ← {t('Back')}
         </button>
@@ -181,7 +181,7 @@ export function DentalRecordDetailTab() {
               ':documentId',
               encodeURIComponent(sourceDocumentId),
             )}
-            className="mt-3 inline-flex min-h-[44px] items-center text-sm font-medium text-primary-700 hover:text-primary-900"
+            className="mt-3 inline-flex min-h-9 items-center text-sm font-medium text-primary-700 hover:text-primary-900"
           >
             {t('Open the source document')}
           </Link>

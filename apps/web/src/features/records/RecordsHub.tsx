@@ -147,7 +147,7 @@ export function RecordsHub() {
                       <li key={hit.id}>
                         <Link
                           to={hit.path}
-                          className="hover:bg-primary-50 flex min-h-[44px] flex-col gap-1 px-4 py-3"
+                          className="hover:bg-primary-50 flex min-h-9 flex-col gap-1 px-4 py-3"
                         >
                           <span className="break-words text-sm font-semibold text-gray-900">
                             {hit.name}
@@ -162,7 +162,7 @@ export function RecordsHub() {
                   </ul>
                   <Link
                     to={`${AppRoutes.Timeline}?${TIMELINE_QUERY_PARAM}=${encodeURIComponent(query.trim())}`}
-                    className="text-primary-700 mt-2 inline-flex min-h-[44px] items-center text-sm font-semibold underline"
+                    className="text-primary-700 mt-2 inline-flex min-h-9 items-center text-sm font-semibold underline"
                   >
                     {t('Search Timeline')}
                   </Link>
@@ -187,7 +187,10 @@ export function RecordsHub() {
                     <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
                       {group.heading}
                     </h2>
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3">
+                    {/* Columns are sized in rem, so enlarged phone text drops
+                        to one column instead of squeezing "Measurements" out
+                        of a half-width card. */}
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,8.5rem),1fr))] gap-2 sm:gap-3 lg:grid-cols-3">
                       {group.items.map((item) => {
                         const Icon = item.icon;
                         const count = categoryCount(item, recordCounts);
@@ -200,7 +203,7 @@ export function RecordsHub() {
                             <span className="bg-primary-50 text-primary-700 flex h-9 w-9 shrink-0 items-center justify-center rounded-full sm:h-10 sm:w-10">
                               <Icon className="h-5 w-5" />
                             </span>
-                            <span className="min-w-0">
+                            <span className="min-w-0 break-words">
                               <span className="block text-sm font-semibold leading-snug text-gray-900">
                                 {item.label}
                               </span>

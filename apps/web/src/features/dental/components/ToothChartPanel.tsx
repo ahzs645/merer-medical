@@ -228,7 +228,7 @@ function SegmentedControl<T extends string>({
             type="button"
             aria-pressed={value === option.value}
             onClick={() => onChange(option.value)}
-            className={`min-h-[44px] rounded px-3 text-sm font-medium ${
+            className={`min-h-9 rounded px-3 text-sm font-medium ${
               value === option.value
                 ? 'bg-primary-800 text-white'
                 : 'text-gray-700 hover:bg-gray-100'
@@ -388,7 +388,7 @@ function ToothButton({
       aria-pressed={selected}
       aria-label={description}
       onClick={onSelect}
-      className={`relative flex min-h-[44px] flex-col items-center justify-center rounded-md border text-center leading-tight focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+      className={`relative flex min-h-9 flex-col items-center justify-center rounded-md border text-center leading-tight focus:outline-none focus:ring-2 focus:ring-primary-500 ${
         selected
           ? 'border-primary-700 bg-primary-700 text-white'
           : style
@@ -465,7 +465,7 @@ function ToothDetail({
                   <button
                     type="button"
                     onClick={() => onSelect(status.tooth)}
-                    className="flex min-h-[44px] w-full flex-col items-start rounded-md bg-white p-2 text-start ring-1 ring-gray-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="flex min-h-9 w-full flex-col items-start rounded-md bg-white p-2 text-start ring-1 ring-gray-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <span className="flex w-full items-center justify-between gap-2">
                       <span className="text-sm font-semibold text-gray-900">
@@ -512,7 +512,7 @@ function ToothDetail({
         <button
           type="button"
           onClick={() => onSelect(null)}
-          className="min-h-[44px] rounded-md px-2 text-sm font-medium text-primary-700 hover:bg-gray-100"
+          className="min-h-9 rounded-md px-2 text-sm font-medium text-primary-700 hover:bg-gray-100"
         >
           {t('Clear')}
         </button>

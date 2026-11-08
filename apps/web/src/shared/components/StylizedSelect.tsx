@@ -38,7 +38,7 @@ export function StylizedSelect<T extends string>({
         <Listbox.Button
           id={id}
           className={classNames(
-            'relative min-h-[44px] w-full cursor-default rounded-md border border-gray-300 bg-white py-2 ps-3 pe-10 text-start text-sm text-gray-900 shadow-sm transition-colors focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
+            'relative min-h-9 w-full cursor-default rounded-md border border-gray-300 bg-white py-2 ps-3 pe-10 text-start text-sm text-gray-900 shadow-sm transition-colors focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400',
             buttonClassName ?? '',
           )}
         >

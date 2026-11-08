@@ -125,7 +125,7 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
           type="button"
           onClick={() => setShowReferencePicker((shown) => !shown)}
           aria-expanded={showReferencePicker}
-          className={`${selectedId ? 'hidden' : 'flex'} min-h-[44px] items-center justify-between gap-2 rounded-md border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-800 shadow-sm sm:hidden`}
+          className={`${selectedId ? 'hidden' : 'flex'} min-h-9 items-center justify-between gap-2 rounded-md border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-800 shadow-sm sm:hidden`}
         >
           <span>Reference standard</span>
           <span className="font-normal text-gray-600">

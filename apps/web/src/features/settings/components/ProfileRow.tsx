@@ -89,10 +89,10 @@ export function ProfileRow({
         <button
           type="button"
           onClick={() => setConfirming(true)}
-          // 44px wide as well as tall: on a phone this sits beside a row the
+          // 36px wide as well as tall: on a phone this sits beside a row the
           // whole width of the screen, and a narrow target next to a large one
           // is how you delete a profile you meant to switch to.
-          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border-2 border-gray-200 text-gray-500 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-700"
+          className="flex min-h-9 min-w-9 items-center justify-center rounded-lg border-2 border-gray-200 text-gray-500 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-700"
           aria-label={`Delete ${name}`}
         >
           <TrashIcon className="h-5 w-5" />

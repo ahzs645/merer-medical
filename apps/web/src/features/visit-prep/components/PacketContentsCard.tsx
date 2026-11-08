@@ -47,7 +47,7 @@ export function PacketContentsCard({
                 updatePacketOption(section.key, !allSelected);
               }
             }}
-            className="-me-1 inline-flex min-h-[44px] items-center rounded-md px-1 text-sm font-medium text-primary-700 hover:text-primary-800"
+            className="-me-1 inline-flex min-h-9 items-center rounded-md px-1 text-sm font-medium text-primary-700 hover:text-primary-800"
           >
             {allSelected ? 'Clear all' : 'Select all'}
           </button>

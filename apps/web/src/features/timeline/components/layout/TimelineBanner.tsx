@@ -9,10 +9,10 @@ export function TimelineBanner({
 }) {
   return (
     <div className={`bg-primary flex flex-col items-stretch px-4 pb-3 sm:pb-4`}>
-      <div className="h-6 sm:h-4 w-full" />
+      <div className="h-3 sm:h-4 w-full" />
       <div className="flex flex-row items-stretch">
         <div className="flex h-full items-center justify-center ps-2 pe-4">
-          <div className="aspect-square h-12 rounded-full border-2 border-solid border-white bg-gray-100 md:hidden">
+          <div className="aspect-square h-[48px] shrink-0 rounded-full border-2 border-solid border-white bg-gray-100 md:hidden">
             {image ? (
               <img
                 alt="profile"
@@ -34,7 +34,7 @@ export function TimelineBanner({
           {/* h1 so the default landing route exposes a page title, matching
               GenericBanner on every other tab. */}
           <h1 className="text-xl font-bold text-white sm:text-2xl">{text}</h1>
-          <p className="text-md text-white">{subtext}</p>
+          <p className="text-sm text-white sm:text-base">{subtext}</p>
         </div>
       </div>
     </div>

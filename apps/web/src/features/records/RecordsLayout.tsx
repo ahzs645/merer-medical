@@ -46,7 +46,7 @@ function RecordsShell() {
           <div className="hide-when-typing border-b border-gray-200 bg-white px-3 lg:hidden">
             <Link
               to={AppRoutes.Records}
-              className="text-primary-700 hover:text-primary-900 -mx-2 inline-flex min-h-[44px] items-center gap-1 px-2 text-sm font-medium"
+              className="text-primary-700 hover:text-primary-900 -mx-2 inline-flex min-h-9 items-center gap-1 px-2 text-sm font-medium"
             >
               <ChevronLeftIcon className="h-4 w-4 rtl:rotate-180" />
               All records

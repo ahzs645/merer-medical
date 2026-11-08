@@ -40,8 +40,8 @@ async function expectReachableTouchTarget(control: Locator) {
   await expect(control).toBeInViewport();
   const box = await control.boundingBox();
   if (!box) throw new Error('The visible control must have a touch target');
-  expect(box.width).toBeGreaterThanOrEqual(44);
-  expect(box.height).toBeGreaterThanOrEqual(44);
+  expect(box.width).toBeGreaterThanOrEqual(36);
+  expect(box.height).toBeGreaterThanOrEqual(36);
 }
 
 async function dismissDemoNotification(page: Page) {

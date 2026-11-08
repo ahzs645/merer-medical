@@ -259,8 +259,8 @@ export function TimelineTab() {
       }
     >
       <div className="flex h-full w-full flex-col">
-        {/* No vertical padding: the 44px buttons set the band's height, so it
-            matches the year rail's 45px instead of standing 20px taller. */}
+        {/* No vertical padding: the 36px buttons set the band's height, so it
+            matches the year rail instead of standing 20px taller. */}
         <div className="flex flex-shrink-0 items-center justify-center border-b border-gray-200 bg-white px-3">
           <ViewToggle view={view} setView={setView} />
         </div>
@@ -386,7 +386,7 @@ function ViewToggle({
   setView: (view: 'cards' | 'trends') => void;
 }) {
   return (
-    // Same shape as the year rail directly beneath it: the 44px target is the
+    // Same shape as the year rail directly beneath it: the 36px target is the
     // button, the paint is a 28px pill inside it. The toggle used to wear a
     // grey track around 44px slabs in a `py-2` band — 65px against the rail's
     // 45px, two control strips stacked and visibly unrelated.
@@ -397,7 +397,7 @@ function ViewToggle({
           type="button"
           aria-pressed={view === value}
           onClick={() => setView(value)}
-          className="inline-flex min-h-[44px] items-center px-0.5 text-sm font-medium"
+          className="inline-flex min-h-9 items-center px-0.5 text-sm font-medium"
         >
           <span
             className={`inline-flex items-center rounded-md px-3 py-1 transition ${

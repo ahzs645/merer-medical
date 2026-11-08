@@ -77,7 +77,7 @@ export function RecordPackageCard({
           type="button"
           onClick={downloadRecordPackage}
           disabled={exportBusy || (passwordProtect && !exportPassphrase.trim())}
-          className="mt-1 inline-flex min-h-[44px] w-fit items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+          className="mt-1 inline-flex min-h-9 w-fit items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
         >
           <DocumentArrowDownIcon className="h-4 w-4" />
           {exportBusy ? 'Preparing...' : 'Download .emrpkg'}

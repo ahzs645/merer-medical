@@ -263,7 +263,7 @@ export function CarePlansTab() {
                     id={`${formFieldId}-title`}
                     value={title}
                     onChange={(event) => setTitle(event.target.value)}
-                    className="mt-1 min-h-[44px] w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="mt-1 min-h-9 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -300,7 +300,7 @@ export function CarePlansTab() {
                       type="date"
                       value={dueDate}
                       onChange={(event) => setDueDate(event.target.value)}
-                      className="mt-1 min-h-[44px] w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="mt-1 min-h-9 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
                 </div>
@@ -324,7 +324,7 @@ export function CarePlansTab() {
                 </div>
                 <button
                   type="submit"
-                  className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+                  className="inline-flex min-h-9 items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
                 >
                   <PlusIcon className="h-5 w-5" />
                   Add item

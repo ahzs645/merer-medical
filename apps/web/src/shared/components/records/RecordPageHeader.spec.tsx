@@ -17,7 +17,7 @@ function renderHeader(node: ReactElement) {
 
 /**
  * Guards the two rules every record banner has to keep as tabs come and go:
- * exactly one page `<h1>`, and no interactive control under the 44px touch
+ * exactly one page `<h1>`, and no interactive control under the 36px touch
  * target. Both were fixed app-wide recently and are easy to lose again.
  */
 describe('RecordPageHeader', () => {
@@ -31,7 +31,7 @@ describe('RecordPageHeader', () => {
     expect(container.querySelectorAll('a, button')).toHaveLength(0);
   });
 
-  it('renders every slot with a single h1 and 44px touch targets', () => {
+  it('renders every slot with a single h1 and 36px touch targets', () => {
     const { container } = renderHeader(
       <RecordPageHeader
         title="Imaging & Scans"
@@ -81,7 +81,7 @@ describe('RecordPageHeader', () => {
 
     container.querySelectorAll('a, button, input').forEach((element) => {
       const classes = element.getAttribute('class') ?? '';
-      expect(/min-h-\[44px\]|\bh-11\b/.test(classes)).toBe(true);
+      expect(/\bmin-h-9\b|\bh-(9|10)\b/.test(classes)).toBe(true);
     });
   });
 

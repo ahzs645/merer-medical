@@ -61,11 +61,11 @@ function YearJumpBarUnmemo({
             aria-current={year === activeYear ? 'location' : undefined}
             aria-busy={loading || undefined}
             onClick={() => onJumpToDate?.(dateKey)}
-            // The tap target stays 44px tall; the highlight does not. Painting
+            // The tap target stays 36px tall; the highlight does not. Painting
             // the selected year across the full target made a pill twice the
             // height of its own text, which read as a block of colour rather
             // than as "this is where you are".
-            className="inline-flex min-h-[44px] flex-shrink-0 items-center px-0.5 text-sm font-medium"
+            className="inline-flex min-h-9 flex-shrink-0 items-center px-0.5 text-sm font-medium"
           >
             <span
               className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 ${

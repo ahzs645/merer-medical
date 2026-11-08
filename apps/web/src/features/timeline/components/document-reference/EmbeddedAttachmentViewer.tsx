@@ -211,7 +211,7 @@ function EmbeddedPdf({ url, title }: { url: string; title: string }) {
       <button
         type="button"
         onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
-        className="flex min-h-[44px] w-full min-w-0 items-center gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 text-start hover:bg-gray-100"
+        className="flex min-h-9 w-full min-w-0 items-center gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 text-start hover:bg-gray-100"
       >
         <DocumentTextIcon className="h-8 w-8 shrink-0 text-gray-500" />
         <span className="min-w-0 flex-1">

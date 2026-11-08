@@ -49,7 +49,7 @@ export function OtherDownloadDoors({ from }: { from: Door }) {
           <li key={key}>
             <Link
               to={DOORS[key].to}
-              className="flex min-h-[44px] items-center justify-between gap-3 rounded-md border border-gray-200 px-3 py-2 text-primary-800 hover:bg-primary-50"
+              className="flex min-h-9 items-center justify-between gap-3 rounded-md border border-gray-200 px-3 py-2 text-primary-800 hover:bg-primary-50"
             >
               <span className="min-w-0">
                 <span className="block font-semibold">{DOORS[key].label}</span>

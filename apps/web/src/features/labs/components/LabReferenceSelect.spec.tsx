@@ -25,10 +25,10 @@ describe('LabReferenceSelect', () => {
     ]);
   });
 
-  it('keeps the 44px touch target it had inside the card', () => {
+  it('keeps the 40px touch target it had inside the card', () => {
     render(<LabReferenceSelect mode="uk" setMode={() => undefined} />);
 
-    expect(screen.getByLabelText('Reference').className).toContain('h-11');
+    expect(screen.getByLabelText('Reference').className).toContain('h-10');
   });
 
   it('reports the standard the reader picked', () => {

@@ -54,13 +54,15 @@ export const manualRecordActionRowClass =
   'mt-3 flex flex-wrap items-center gap-2';
 
 /**
- * Phone actions have a visible 44px target. Extending a 32px button with a
- * pseudo-element made wrapped rows' hit areas overlap, so the border did not
- * show which action a tap would choose. Wider screens keep the compact style.
+ * Phone actions are drawn at 36px: tall enough to tap, short enough that View
+ * source, Edit, Delete and the overflow button share one row on a 390px phone
+ * instead of stacking into a block of thick buttons. Extending a smaller button
+ * with a pseudo-element made wrapped rows' hit areas overlap, so the border
+ * shows the whole target. Wider screens keep the 32px compact style.
  */
 export const actionTapAreaClass =
   "relative sm:after:absolute sm:after:inset-x-0 sm:after:-inset-y-1.5 sm:after:content-['']";
-export const actionChipClass = `${actionTapAreaClass} inline-flex min-h-[44px] items-center gap-1 rounded-md border px-2.5 py-1 text-sm font-semibold shadow-sm disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-8 sm:text-xs`;
+export const actionChipClass = `${actionTapAreaClass} inline-flex min-h-9 items-center gap-1 rounded-md border px-2 py-1 text-sm font-semibold shadow-sm disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-8 sm:px-2.5 sm:text-xs`;
 const neutralChip = `${actionChipClass} border-gray-300 text-gray-800 hover:bg-gray-50`;
 const primaryChip = `${actionChipClass} border-primary-200 text-primary-700 hover:bg-primary-50`;
 const dangerChip = `${actionChipClass} border-red-200 text-red-700 hover:bg-red-50`;
@@ -438,7 +440,7 @@ function MoreMenu({ label, children }: { label: string; children: ReactNode }) {
   return (
     <Menu as="div" className="relative inline-flex">
       <Menu.Button
-        className={`${neutralChip} min-w-[44px] justify-center px-2`}
+        className={`${neutralChip} min-w-9 justify-center px-2`}
         onClick={(event: MouseEvent<HTMLButtonElement>) =>
           event.stopPropagation()
         }
@@ -485,7 +487,7 @@ function MenuAction({
             event.stopPropagation();
             onSelect();
           }}
-          className={`flex min-h-[44px] w-full items-center gap-2 rounded-md px-2.5 py-2 text-start text-sm disabled:opacity-60 ${
+          className={`flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 py-2 text-start text-sm disabled:opacity-60 ${
             active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
           }`}
         >

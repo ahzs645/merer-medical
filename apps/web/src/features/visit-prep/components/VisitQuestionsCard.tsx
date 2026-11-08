@@ -44,7 +44,7 @@ export function VisitQuestionsCard({
         <label className="block text-sm font-medium text-gray-700">
           {t('Visit purpose')}
           <input
-            className="mt-1 min-h-[44px] w-full rounded-md border-gray-300 text-base shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+            className="mt-1 min-h-9 w-full rounded-md border-gray-300 text-base shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
             value={visitPurpose}
             onChange={(event) => updateVisitPurpose(event.target.value)}
             placeholder={t('What is this visit about?')}
@@ -77,7 +77,7 @@ export function VisitQuestionsCard({
           <button
             type="button"
             onClick={saveQuestions}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+            className="inline-flex min-h-9 items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
           >
             <CheckIcon className="h-4 w-4" aria-hidden="true" />
             {t('Save visit notes')}

@@ -247,7 +247,7 @@ function EmptyState() {
           to go somewhere else under another name to type the same record. */}
       <Link
         to={ADD_CONDITION_PATH}
-        className="mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+        className="mt-5 inline-flex min-h-9 items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
       >
         <PlusIcon className="h-5 w-5 shrink-0" />
         Add condition

@@ -17,7 +17,9 @@ describe('InfoTip', () => {
 
     expect(screen.queryByText(hint)).toBeNull();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Why these lab tests' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Why these lab tests' }),
+    );
 
     expect(screen.getByText(hint)).toBeTruthy();
   });
@@ -26,8 +28,8 @@ describe('InfoTip', () => {
     render(<InfoTip label="Why these lab tests">{hint}</InfoTip>);
 
     const button = screen.getByRole('button', { name: 'Why these lab tests' });
-    // 44px of target even though it only spends a line's worth of height.
-    expect(button.className).toContain('h-11');
-    expect(button.className).toContain('w-11');
+    // 36px of target even though it only spends a line's worth of height.
+    expect(button.className).toContain('h-9');
+    expect(button.className).toContain('w-9');
   });
 });

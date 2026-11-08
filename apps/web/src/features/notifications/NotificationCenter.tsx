@@ -155,7 +155,7 @@ export function NotificationCenter({
                     <button
                       type="button"
                       onClick={() => void markAllRead()}
-                      className="inline-flex min-h-[44px] items-center px-2 text-xs font-semibold text-primary-700 hover:underline"
+                      className="inline-flex min-h-9 items-center px-2 text-xs font-semibold text-primary-700 hover:underline"
                     >
                       {t('Mark all read')}
                     </button>
@@ -164,7 +164,7 @@ export function NotificationCenter({
                     <button
                       type="button"
                       onClick={() => void dismissAll()}
-                      className="inline-flex min-h-[44px] items-center px-2 text-xs font-semibold text-gray-500 hover:underline"
+                      className="inline-flex min-h-9 items-center px-2 text-xs font-semibold text-gray-500 hover:underline"
                     >
                       {t('Clear all')}
                     </button>
@@ -173,7 +173,7 @@ export function NotificationCenter({
                     type="button"
                     onClick={() => setOpen(false)}
                     aria-label={t('Close notifications')}
-                    className="flex h-11 w-11 items-center justify-center rounded-md text-gray-500 hover:text-gray-700"
+                    className="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 hover:text-gray-700"
                   >
                     <XMarkIcon className="h-5 w-5" />
                   </button>
@@ -221,7 +221,7 @@ export function NotificationCenter({
                           type="button"
                           onClick={() => void dismiss(notification.id)}
                           aria-label={t('Dismiss notification')}
-                          className="flex h-11 w-11 flex-shrink-0 items-center justify-center text-gray-500 hover:text-gray-700"
+                          className="flex h-9 w-9 flex-shrink-0 items-center justify-center text-gray-500 hover:text-gray-700"
                         >
                           <XMarkIcon className="h-4 w-4" />
                         </button>

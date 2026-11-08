@@ -131,7 +131,7 @@ export function HorizontalChoiceScroller({
     });
   };
 
-  const controlClass = `flex h-11 w-11 shrink-0 items-center justify-center rounded-md ring-1 ring-inset disabled:opacity-30 ${
+  const controlClass = `flex h-9 w-9 shrink-0 items-center justify-center rounded-md ring-1 ring-inset disabled:opacity-30 ${
     tone === 'dark'
       ? 'bg-white/10 text-white ring-white/30 hover:bg-white/20'
       : 'bg-white text-gray-700 ring-gray-200 hover:bg-gray-100'

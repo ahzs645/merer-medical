@@ -27,7 +27,7 @@ export function TabButton({
   // and `rem`-sized: at 200% text that is 768px of tabs in a 393px bar, and the
   // last one — More, the only way to Utilities, Sources and Settings — was
   // pushed two-thirds off the screen.
-  const linkClassName = `group relative flex min-w-0 flex-1 flex-col items-center justify-center px-0.5 py-2 text-white duration-75 active:scale-90 sm:active:scale-95 md:m-1 md:w-auto md:flex-none md:flex-row md:rounded-md ${
+  const linkClassName = `group relative flex min-w-0 flex-1 flex-col items-center justify-center px-0.5 py-[6px] text-white duration-75 active:scale-90 sm:active:scale-95 md:m-1 md:w-auto md:flex-none md:flex-row md:rounded-md ${
     collapsed ? 'md:justify-center md:p-3' : 'md:justify-start md:p-4'
   } ${
     isActive
@@ -50,7 +50,7 @@ export function TabButton({
       aria-current={isActive ? 'page' : undefined}
     >
       <p
-        className={`font-xs h-5 w-5 text-base md:h-8 md:w-8 md:text-white ${
+        className={`font-xs h-[20px] w-[20px] text-base md:h-8 md:w-8 md:text-white ${
           collapsed ? 'md:me-0' : 'md:me-4'
         } ${isActive ? 'text-primary font-bold' : 'text-slate-800'}`}
       >

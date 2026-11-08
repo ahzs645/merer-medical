@@ -8,8 +8,8 @@ export function CheckboxField({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    // min-h keeps the whole row a 44px touch target.
-    <label className="flex min-h-[44px] items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700">
+    // min-h keeps the whole row a 36px touch target.
+    <label className="flex min-h-9 items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700">
       <input
         type="checkbox"
         checked={checked}

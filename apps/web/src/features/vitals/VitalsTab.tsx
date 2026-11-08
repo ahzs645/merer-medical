@@ -457,11 +457,11 @@ export function VitalsTab() {
                 {group.readings.length > 1 && (
                   <details className="-mb-4 mt-3 border-t border-gray-100">
                     <summary
-                      // 14px of padding around a 16px line is the 44px target exactly. With
-                      // `py-3` + `min-h-[44px]` the 4px of slack all fell below the
+                      // 10px of padding around a 16px line is a 36px target exactly. With
+                      // `py-3` + `min-h-9` the 4px of slack all fell below the
                       // text, and the card's own 16px of padding fell under that:
                       // 32px of white under the label against 12px above it.
-                      className="text-primary-700 hover:text-primary-800 cursor-pointer py-3.5 text-xs font-semibold"
+                      className="text-primary-700 hover:text-primary-800 cursor-pointer py-2.5 text-xs font-semibold"
                       // Every card offers the same phrase, so the spoken name
                       // adds the vital — as a suffix, so the visible label is
                       // still the start of it.

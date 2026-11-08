@@ -100,7 +100,7 @@ export function ConfirmDeleteDialog({
                     type="button"
                     disabled={busy}
                     onClick={onCancel}
-                    className="inline-flex min-h-[44px] items-center justify-center rounded-md border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-600 disabled:opacity-60"
+                    className="inline-flex min-h-9 items-center justify-center rounded-md border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-600 disabled:opacity-60"
                   >
                     {cancelLabel}
                   </button>
@@ -108,7 +108,7 @@ export function ConfirmDeleteDialog({
                     type="button"
                     disabled={busy}
                     onClick={onConfirm}
-                    className="inline-flex min-h-[44px] items-center justify-center rounded-md bg-red-700 px-4 text-sm font-semibold text-white shadow-sm hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2 disabled:opacity-60"
+                    className="inline-flex min-h-9 items-center justify-center rounded-md bg-red-700 px-4 text-sm font-semibold text-white shadow-sm hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2 disabled:opacity-60"
                   >
                     {busy ? 'Deleting…' : confirmLabel}
                   </button>

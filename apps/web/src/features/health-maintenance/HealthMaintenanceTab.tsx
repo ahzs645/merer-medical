@@ -371,7 +371,7 @@ export function HealthMaintenanceTab() {
                   <button
                     type="button"
                     onClick={() => persistDismissed([])}
-                    className="text-primary-700 hover:text-primary-900 -me-2 inline-flex min-h-[44px] items-center px-2 font-semibold"
+                    className="text-primary-700 hover:text-primary-900 -me-2 inline-flex min-h-9 items-center px-2 font-semibold"
                   >
                     Reset
                   </button>
@@ -419,7 +419,7 @@ function ReminderCard({
           {meta.label}
         </span>
       </div>
-      {/* Status line and actions share a row: the actions already stand 44px
+      {/* Status line and actions share a row: the actions already stand 36px
           tall, so a separate divided footer only added dead height. */}
       <div className="mt-1 flex flex-wrap items-center justify-between gap-x-3">
         <p className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
@@ -430,7 +430,7 @@ function ReminderCard({
           <div className="flex items-center gap-1">
             <Link
               to={addRecordTarget(reminder.rule)}
-              className="bg-primary hover:bg-primary-700 inline-flex min-h-[44px] items-center gap-1.5 rounded-md px-3 text-xs font-semibold text-white shadow-sm"
+              className="bg-primary hover:bg-primary-700 inline-flex min-h-9 items-center gap-1.5 rounded-md px-3 text-xs font-semibold text-white shadow-sm"
             >
               <PlusIcon className="h-4 w-4" />
               Log record
@@ -438,7 +438,7 @@ function ReminderCard({
             <button
               type="button"
               onClick={() => onDismiss(reminder.rule.id)}
-              className="inline-flex min-h-[44px] items-center rounded-md px-3 text-xs font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              className="inline-flex min-h-9 items-center rounded-md px-3 text-xs font-semibold text-gray-500 hover:bg-gray-100 hover:text-gray-700"
             >
               Dismiss
             </button>

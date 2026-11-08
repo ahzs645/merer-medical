@@ -110,15 +110,15 @@ export function RecordPageHeader<Id extends string = string>({
       className={`bg-primary-800 px-4 py-3 text-white sm:px-6 sm:py-5 lg:px-8 short:py-3 ${className}`}
     >
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-2.5 sm:gap-4 short:gap-2.5">
-        {/* `flex-wrap` + a 10rem floor on the title is what decides inline vs.
+        {/* `flex-wrap` + an 8rem floor on the title is what decides inline vs.
             own-row: one button fits beside a title on a 390px phone, two or
             three do not, and the group drops whole rather than half. */}
         <div className="flex flex-wrap items-start gap-x-3 gap-y-2">
-          <div className="min-w-0 flex-1 basis-40">
+          <div className="min-w-0 flex-1 basis-32">
             {backLink && (
               <Link
                 to={backLink.to}
-                className="-mt-1 mb-1 inline-flex min-h-[44px] w-fit items-center gap-1.5 text-sm font-medium text-primary-100 hover:text-white"
+                className="-mt-1 mb-1 inline-flex min-h-9 w-fit items-center gap-1.5 text-sm font-medium text-primary-100 hover:text-white"
               >
                 <ArrowLeftIcon className="h-4 w-4 shrink-0 rtl:rotate-180" />
                 {backLink.label}
@@ -191,8 +191,7 @@ function HeaderSearch({
         value={query}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        // h-11 is the 44px minimum touch target.
-        className="h-11 w-full rounded-md border-0 bg-white pe-3 ps-10 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+        className="h-10 w-full rounded-md border-0 bg-white pe-3 ps-10 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
       />
     </label>
   );
@@ -222,7 +221,7 @@ function HeaderFilters<Id extends string>({
             type="button"
             onClick={() => onSelect(filter.id)}
             aria-pressed={isSelected}
-            className={`inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-md px-3 text-sm font-medium shadow-sm ring-1 ring-inset ${
+            className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-md px-3 text-sm font-medium shadow-sm ring-1 ring-inset ${
               isSelected
                 ? 'bg-white text-primary-800 ring-white'
                 : 'bg-white/10 text-white ring-white/30 hover:bg-white/20'
@@ -251,7 +250,7 @@ function HeaderFilters<Id extends string>({
  * a filled `primary-700`). Two are enough: `solid` for the page's primary
  * action, `subtle` for anything sitting next to it.
  *
- * `compact` drops the label below `sm`, leaving a 44px square icon that keeps
+ * `compact` drops the label below `sm`, leaving a 36px square icon that keeps
  * the title's line on a phone. Every page with a single action passes it, so
  * the phone banner reads the same everywhere instead of spelling the action
  * out on Labs and abbreviating it on Medications. It stays opt-in for the one
@@ -260,7 +259,7 @@ function HeaderFilters<Id extends string>({
  * is back on every one of them.
  */
 function actionClass(variant: 'solid' | 'subtle'): string {
-  return `inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ${
+  return `inline-flex min-h-9 min-w-9 shrink-0 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ${
     variant === 'solid'
       ? 'bg-white text-primary-800 ring-primary-100 hover:bg-primary-50'
       : 'bg-white/15 text-white ring-white/30 hover:bg-white/25'

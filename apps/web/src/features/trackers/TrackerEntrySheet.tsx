@@ -87,7 +87,7 @@ export function TrackerEntrySheet({
   }
 
   const fieldClass =
-    'min-h-[44px] w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary';
+    'min-h-9 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary';
   const labelClass = 'block text-sm font-medium text-gray-700';
 
   return (
@@ -186,14 +186,14 @@ export function TrackerEntrySheet({
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex min-h-[44px] items-center rounded-md border border-gray-300 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            className="inline-flex min-h-9 items-center rounded-md border border-gray-300 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={!value.trim() || saving}
-            className="bg-primary hover:bg-primary-700 inline-flex min-h-[44px] items-center gap-2 rounded-md px-4 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+            className="bg-primary hover:bg-primary-700 inline-flex min-h-9 items-center gap-2 rounded-md px-4 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
           >
             <PlusIcon className="h-5 w-5" />
             {saving ? 'Adding…' : 'Add entry'}

@@ -107,7 +107,7 @@ export function ImmunizationByTypePanel({
                       {t(statusMeta.label)}
                     </span>
                   )}
-                  <span className="inline-flex min-h-[44px] items-center rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
+                  <span className="inline-flex min-h-9 items-center rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
                     {row.doses.length}{' '}
                     {row.doses.length === 1 ? t('dose') : t('doses')}
                   </span>
@@ -119,11 +119,11 @@ export function ImmunizationByTypePanel({
                     <button
                       type="button"
                       onClick={() => onSelectDose(dose)}
-                      // 44px tall, like the "N doses" chip above it and every
+                      // 36px tall, like the "N doses" chip above it and every
                       // other tappable thing in the app. These open a dose's
                       // detail, and at 24px they were the smallest targets on
                       // the page.
-                      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-gray-50 px-2.5 py-1 text-xs ring-1 ring-inset ring-gray-200 transition-colors hover:bg-gray-100 hover:ring-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-200"
+                      className="inline-flex min-h-9 items-center gap-1.5 rounded-md bg-gray-50 px-2.5 py-1 text-xs ring-1 ring-inset ring-gray-200 transition-colors hover:bg-gray-100 hover:ring-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-200"
                     >
                       <span className="font-medium text-gray-600">
                         {dose.doseNumber ?? index + 1}

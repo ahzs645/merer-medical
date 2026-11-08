@@ -175,7 +175,7 @@ export function VisitPrepTab() {
           </section>
 
           <details className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 print:hidden">
-            <summary className="min-h-[44px] cursor-pointer py-2 text-sm font-semibold text-primary-700">
+            <summary className="min-h-9 cursor-pointer py-2 text-sm font-semibold text-primary-700">
               {t('Download a record package instead')}
             </summary>
             <div className="mt-2">

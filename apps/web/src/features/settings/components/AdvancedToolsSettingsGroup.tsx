@@ -22,7 +22,7 @@ export function AdvancedToolsSettingsGroup() {
         <button
           type="button"
           aria-pressed={localConfig.experimental_features_enabled}
-          className="focus:ring-primary-500 inline-flex min-h-[44px] items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
+          className="focus:ring-primary-500 inline-flex min-h-9 items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
           onClick={() =>
             updateLocalConfig({
               experimental_features_enabled:
@@ -37,7 +37,7 @@ export function AdvancedToolsSettingsGroup() {
         <button
           type="button"
           aria-pressed={localConfig.developer_mode_enabled}
-          className="focus:ring-primary-500 inline-flex min-h-[44px] items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
+          className="focus:ring-primary-500 inline-flex min-h-9 items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
           onClick={() =>
             updateLocalConfig({
               developer_mode_enabled: !localConfig.developer_mode_enabled,

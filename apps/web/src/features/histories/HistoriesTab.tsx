@@ -336,7 +336,7 @@ function HistorySection({
           <Link
             to={addPath}
             title={addLabel}
-            className="inline-flex min-h-[44px] items-center gap-1 rounded-md px-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+            className="inline-flex min-h-9 items-center gap-1 rounded-md px-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
           >
             <PlusIcon className="h-4 w-4 shrink-0" />
             <span className="sr-only">{addLabel}</span>
@@ -380,7 +380,7 @@ function HistorySection({
         // way there.
         <Link
           to={home.to}
-          className="mt-3 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-900"
+          className="mt-3 inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-900"
         >
           {hidden > 0
             ? `${hidden} more in ${home.label}`
