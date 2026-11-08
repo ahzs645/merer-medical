@@ -88,15 +88,35 @@ These broader reorganizations are recorded as follow-up design work. This branch
 
 ## Validation and evidence
 
-The final production build and application TypeScript check passed. All 276 focused tests across 25 suites passed, covering package import handoff/failure, record routing and literal search terms, exact result selection, CGM disclosure, Timeline previews, dialog transitions, and document decoding/download fidelity. Browser acceptance is pending the pull-request CI run; its result and evidence will be recorded here after it completes.
+The production build and application TypeScript check passed for application commit `6950359dc18ef8a7e323cf6d4efca556be6dbaef`. All **276 focused tests across 25 suites passed**, covering package import handoff/failure, record routing and literal search terms, exact result selection, CGM disclosure, Timeline previews, dialog transitions, and document decoding/download fidelity.
+
+The [dedicated mobile production job](https://github.com/ahzs645/merer-medical/actions/runs/42525404118/job/128867883218) passed **all 24 browser cases in 1.1 minutes, with no retries or failures**, on the same application commit. The final evidence update adds only this review and screenshots; it does not change application code.
 
 The dedicated mobile Playwright suite contains 24 cases (eight journeys across three viewports) and runs the production static preview with synthetic `/demo` data at 320×640, 390×844, and 844×390. The 390px project uses normal motion; the other two use reduced motion. It exercises navigation/dismissal, More-to-Search handoff, direct Search, record search/detail/Back (including a condition name with parentheses), Labs search/detail/Back, dirty-form cancellation, a generated LibreView import, exact Results selection/list/Back behavior, and a read-only category/settings route sweep. It saves screenshots and traces as CI artifacts.
 
-Local automated Chromium could not start because this workspace denies a required browser socket. No browser assertions ran in that attempt. The pull-request workflow is the alternative execution environment; a test collection or successful build is not counted as a browser pass.
+Local automated Chromium could not start because this workspace denies a required browser socket. The passing browser results came from the pull-request CI environment, running the production build.
 
-Baseline evidence uses the live synthetic demo:
+The separate existing full-stack job is not included in these passing results. Earlier logs showed Vite and Nest starting without the Playwright runner starting. Its unchanged `web:serve-all` configuration waits for `No errors found.`, a message absent from those logs; this suggests a readiness wait, but is not a confirmed diagnosis of that runner. The dedicated mobile job runs a static production preview and completed independently.
 
-![Before: a clinical search only filters record categories](before-record-search.jpg)
+### Verified screenshots
+
+These are unaltered browser captures using synthetic demo records. The baseline comes from the live application; the after images come from the successful production test run. Both search captures use the same query at 390×844.
+
+| Before: the query only filters categories                              | After: matching stored records appear                                   |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| ![Before: LYMPHS finds no record categories](before-record-search.jpg) | ![After: LYMPHS returns stored record matches](after-record-search.png) |
+
+| Optional glucose report at 390px                                         | Exact selected result at 390px                                      |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| ![Labs begins with a collapsed glucose report](after-labs-collapsed.png) | ![Selected report starts at its heading](after-selected-result.png) |
+
+| Readable lab detail at 320px                                    | Dismissible More menu at 320px                                                 |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| ![Lab history detail and return link](after-lab-detail-320.png) | ![More navigation with a visible Close control](after-more-navigation-320.png) |
+
+The literal-name search also reaches the selected condition in a short landscape viewport:
+
+![Selected Timeline condition in landscape](after-timeline-landscape.png)
 
 ### Remaining device checks
 
