@@ -12,6 +12,8 @@ import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { useResultsData } from './hooks/useResultsData';
 import { ResultSummary, ResultType } from './types';
+import { recordSearchPath } from '../../shared/utils/recordSearchPath';
+import { resultDetailPath } from './utils/resultRoute';
 
 const HIGHLIGHT_COUNT = 4;
 
@@ -29,14 +31,14 @@ function digestIcon(type: ResultType) {
 
 /**
  * Compact results digest for the Summary page: headline counts plus the few
- * results that most likely need a look, linking to the full Results hub at
- * /records/results. Replaces the previous approach of embedding the entire
+ * results that most likely need a look. Each highlight opens its own detail
+ * view; the header links to all results. Replaces the previous approach of embedding the entire
  * master–detail Results hub (stat tiles, reference-standard picker and all)
  * inside Summary, so "results" has one canonical home.
  */
 export function ResultsDigestCard() {
   const { t } = useInterfaceLanguage();
-  const { groups, status } = useResultsData('canadian');
+  const { groups, detailsById, status } = useResultsData('canadian');
 
   const { totals, highlights } = useMemo(() => {
     const results = groups.flatMap((group) => group.results);
@@ -80,7 +82,7 @@ export function ResultsDigestCard() {
         </div>
         <Link
           to={AppRoutes.Results}
-          className="text-primary-700 hover:text-primary-900 inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1.5 text-sm font-semibold"
+          className="text-primary-700 hover:text-primary-900 inline-flex min-h-[44px] shrink-0 items-center gap-1 rounded-md px-2 py-1.5 text-sm font-semibold"
         >
           {t('Open all results')}
           <ArrowRightIcon className="h-4 w-4" />
@@ -95,11 +97,16 @@ export function ResultsDigestCard() {
         <ul className="mt-3 divide-y divide-gray-100 rounded-md border border-gray-200 bg-white shadow-sm">
           {highlights.map((result) => {
             const Icon = digestIcon(result.type);
+            const detail = detailsById.get(result.detailId);
+            const destination =
+              detail && (result.type === 'lab' || result.type === 'document')
+                ? recordSearchPath(detail.document)
+                : resultDetailPath(result.detailId);
             return (
               <li key={result.detailId}>
                 <Link
-                  to={AppRoutes.Results}
-                  className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-3 py-2.5 hover:bg-blue-50"
+                  to={destination}
+                  className="grid min-h-[44px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-3 py-2.5 hover:bg-blue-50"
                 >
                   <Icon className="text-primary-700 h-5 w-5" />
                   <span className="min-w-0">

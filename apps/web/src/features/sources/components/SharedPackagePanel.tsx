@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ExclamationTriangleIcon,
   LinkIcon,
@@ -24,6 +24,7 @@ import {
   takeSharedPackage,
 } from '../../../shared/utils/shareTarget';
 import { formatRecordDate } from '../../../shared/utils/dateFormatters';
+import { Routes } from '../../../Routes';
 
 /**
  * The query parameter a shared package arrives on.
@@ -129,6 +130,7 @@ export function SharedPackagePanel() {
   const { removeEmptyPlaceholders } = useUserManagement();
   const isDesktop = useIsDesktop();
   const notifyDispatch = useNotificationDispatch();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   /**
    * The link is read once and then held.
@@ -143,6 +145,14 @@ export function SharedPackagePanel() {
   const [claimed, setClaimed] = useState<
     { raw?: string; file?: File; autoload: boolean } | undefined
   >();
+  // An import can finish after the reader closes its offer or opens another
+  // one. Completion may notify them, but only the still-active offer can
+  // change the page they are reading.
+  const offerVersion = useRef(0);
+  const claimOffer = useCallback((offer: NonNullable<typeof claimed>) => {
+    offerVersion.current += 1;
+    setClaimed(offer);
+  }, []);
   const raw = claimed?.raw;
   const file = claimed?.file;
   const autoloadRequested = claimed?.autoload;
@@ -151,12 +161,12 @@ export function SharedPackagePanel() {
   const autoloadParam = searchParams.get(SHARED_PACKAGE_AUTOLOAD_PARAM);
   useEffect(() => {
     if (!param) return;
-    setClaimed({ raw: param, autoload: Boolean(autoloadParam) });
+    claimOffer({ raw: param, autoload: Boolean(autoloadParam) });
     const next = new URLSearchParams(searchParams);
     next.delete(SHARED_PACKAGE_PARAM);
     next.delete(SHARED_PACKAGE_AUTOLOAD_PARAM);
     setSearchParams(next, { replace: true });
-  }, [param, autoloadParam, searchParams, setSearchParams]);
+  }, [param, autoloadParam, searchParams, setSearchParams, claimOffer]);
 
   // A file shared to the installed app arrives as `?shared-package=1`, with
   // the file itself parked by the service worker (shared/utils/shareTarget).
@@ -168,15 +178,15 @@ export function SharedPackagePanel() {
     setSearchParams(next, { replace: true });
     takeSharedPackage()
       .then((shared) => {
-        if (shared) setClaimed({ file: shared, autoload: false });
+        if (shared) claimOffer({ file: shared, autoload: false });
       })
       .catch(() => undefined);
-  }, [sharedParam, searchParams, setSearchParams]);
+  }, [sharedParam, searchParams, setSearchParams, claimOffer]);
 
   useEffect(() => {
     const onOffer = (event: Event) => {
       const offered = (event as CustomEvent<File>).detail;
-      if (offered) setClaimed({ file: offered, autoload: false });
+      if (offered) claimOffer({ file: offered, autoload: false });
     };
     window.addEventListener(OFFER_PACKAGE_EVENT, onOffer);
     // The browser holds a launch until a consumer is set, so a file opened
@@ -188,7 +198,7 @@ export function SharedPackagePanel() {
       if (first) offerPackageFile(await first.getFile());
     });
     return () => window.removeEventListener(OFFER_PACKAGE_EVENT, onOffer);
-  }, []);
+  }, [claimOffer]);
 
   const [fetched, setFetched] = useState<Fetched | undefined>();
   const [error, setError] = useState<string | undefined>();
@@ -199,6 +209,7 @@ export function SharedPackagePanel() {
   const panelRef = useRef<HTMLDivElement>(null);
 
   const dismiss = useCallback(() => {
+    offerVersion.current += 1;
     setClaimed(undefined);
     setFetched(undefined);
     setError(undefined);
@@ -299,10 +310,19 @@ export function SharedPackagePanel() {
     };
   }, [file, raw, autoloadRequested]);
 
+  // A phone sheet owns a temporary history entry. Replace it when opening the
+  // imported records so Back cannot undo the navigation or reopen the offer.
+  const closeForNavigation = useCloseOnBack(
+    Boolean(raw || file) && !isDesktop,
+    dismiss,
+  );
+
   const runImport = useCallback(
     async (replace: boolean) => {
       if (!fetched) return;
+      const importingOffer = offerVersion.current;
       setImporting(true);
+      setError(undefined);
       try {
         const needsPassphrase =
           fetched.info.encrypted && fetched.info.kdf !== 'webauthn-prf';
@@ -310,13 +330,15 @@ export function SharedPackagePanel() {
           passphrase: needsPassphrase ? passphrase : undefined,
           replace,
         });
-        const total = Object.values(counts).reduce<number>(
-          (a, b) => a + (b ?? 0),
-          0,
-        );
+        // Match the preview's clinical-record count. Profiles and connection
+        // metadata are also imported, but they are not extra medical records.
+        const clinicalCount = counts['clinical_documents'];
+        const total =
+          clinicalCount ??
+          Object.values(counts).reduce<number>((a, b) => a + (b ?? 0), 0);
         notifyDispatch({
           type: 'set_notification',
-          message: `Imported ${total} records from ${fetched.origin}.${
+          message: `Imported ${total} ${clinicalCount === undefined ? 'items' : 'clinical records'} from ${fetched.origin}.${
             replace ? ' Reloading…' : ''
           }`,
           variant: 'success',
@@ -325,9 +347,19 @@ export function SharedPackagePanel() {
         // once real records arrive under a patient of their own. Left alone it
         // sits in the switcher as "Unnamed User" for good.
         await removeEmptyPlaceholders().catch(() => 0);
-        dismiss();
-        if (replace) setTimeout(() => window.location.reload(), 1500);
+        if (importingOffer !== offerVersion.current) return;
+        if (replace) {
+          dismiss();
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          closeForNavigation();
+          dismiss();
+          navigate(Routes.Summary, { replace: !isDesktop });
+        }
       } catch (importError) {
+        if (importingOffer === offerVersion.current) {
+          setError(`Import failed: ${(importError as Error).message}`);
+        }
         notifyDispatch({
           type: 'set_notification',
           message: `Import failed: ${(importError as Error).message}`,
@@ -337,7 +369,17 @@ export function SharedPackagePanel() {
         setImporting(false);
       }
     },
-    [db, dismiss, fetched, notifyDispatch, passphrase, removeEmptyPlaceholders],
+    [
+      closeForNavigation,
+      db,
+      dismiss,
+      fetched,
+      isDesktop,
+      navigate,
+      notifyDispatch,
+      passphrase,
+      removeEmptyPlaceholders,
+    ],
   );
 
   // Kept out of the fetch effect so the import runs against the same callback
@@ -347,10 +389,6 @@ export function SharedPackagePanel() {
     setAutoloading(false);
     void runImport(false);
   }, [autoloading, fetched, importing, runImport]);
-
-  // On a phone the offer is a modal sheet, and Back should close it like any
-  // other; on a desktop it is a card in the corner that Back leaves alone.
-  useCloseOnBack(Boolean(raw || file) && !isDesktop, dismiss);
 
   if (!raw && !file) return null;
   const open = Boolean(raw || file);
@@ -417,7 +455,7 @@ export function SharedPackagePanel() {
   );
 
   const body = (
-    <div className="flex items-start gap-3">
+    <div className="flex items-start gap-3" aria-busy={importing}>
       <LinkIcon className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
       <div className="min-w-0 flex-1">
         <h3 className="text-base font-semibold text-gray-900 sm:text-sm">
@@ -436,7 +474,9 @@ export function SharedPackagePanel() {
 
         {error && (
           <>
-            <p className="mt-1 text-sm text-gray-800">{error}</p>
+            <p role="alert" className="mt-1 break-words text-sm text-gray-800">
+              {error}
+            </p>
           </>
         )}
 
@@ -446,7 +486,7 @@ export function SharedPackagePanel() {
                   trust what follows, so it is the first thing said and it is
                   said in full — a link that arrived in a message is not a file
                   someone chose off their own disk. */}
-            <p className="mt-1 text-sm text-gray-800">
+            <p className="mt-1 break-words text-sm text-gray-800">
               From <span className="font-medium">{fetched.origin}</span>
               {fetched.info.appVersion ? ` · ${fetched.info.appVersion}` : ''}
             </p>
@@ -525,10 +565,10 @@ export function SharedPackagePanel() {
                 type="button"
                 disabled={importing}
                 onClick={() => runImport(false)}
-                className="bg-primary-700 hover:bg-primary-800 inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
+                className="bg-primary-700 hover:bg-primary-800 inline-flex min-h-[44px] w-full items-center justify-center rounded-md px-3 py-2 text-sm font-medium text-white disabled:opacity-60 sm:w-auto"
               >
                 {importing && <ButtonLoadingSpinner />}
-                {acceptLabel}
+                {importing ? 'Opening records…' : acceptLabel}
               </button>
             </div>
 

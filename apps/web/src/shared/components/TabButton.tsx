@@ -44,7 +44,11 @@ export function TabButton({
   } ${collapsed ? 'md:hidden' : ''}`;
 
   return (
-    <Link to={route} className={linkClassName}>
+    <Link
+      to={route}
+      className={linkClassName}
+      aria-current={isActive ? 'page' : undefined}
+    >
       <p
         className={`font-xs h-5 w-5 text-base md:h-8 md:w-8 md:text-white ${
           collapsed ? 'md:me-0' : 'md:me-4'

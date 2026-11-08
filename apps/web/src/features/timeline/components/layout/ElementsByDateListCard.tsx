@@ -21,6 +21,7 @@ import {
   Goal,
   Appointment,
   Specimen,
+  ServiceRequest,
 } from 'fhir/r4';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -62,6 +63,7 @@ import { MedicationRequestCard } from '../cards/MedicationRequestCard';
 import { ObservationCard } from '../cards/ObservationCard';
 import { ProcedureCard } from '../cards/ProcedureCard';
 import { SpecimenCard } from '../cards/SpecimenCard';
+import { ServiceRequestCard } from '../cards/ServiceRequestCard';
 import { TimelineCardCategoryTitle } from '../TimelineCardCategoryTitle';
 import { TimelineCardTitle } from '../TimelineCardTitle';
 import { useClinicalDoc } from '../../../../shared/hooks/useClinicalDoc';
@@ -80,6 +82,11 @@ import {
   type ObservationGroup,
 } from '../../utils/timelineCategories';
 import { useInterfaceLanguage } from '../../../../app/providers/InterfaceLanguageProvider';
+import {
+  TIMELINE_PREVIEW_LIMIT,
+  TimelinePreviewList,
+  TimelinePreviewMore,
+} from './TimelinePreviewList';
 
 const options: HTMLReactParserOptions = {
   replace(domNode) {
@@ -169,19 +176,15 @@ function DispayDocumentReferencesOrAttachmentTimelineItem(props: {
   return (
     <div className="mb-2 ms-2">
       <TimelineCardCategoryTitle title={'Documents'} color="text-teal-700" />
-      <ul className="list-disc list-inside">
-        {docsToDisplay.slice(0, 5).map((item, index) => (
+      <ul aria-label="Documents" className="list-disc list-inside">
+        {docsToDisplay.slice(0, TIMELINE_PREVIEW_LIMIT).map((item, index) => (
           <DocumentListItem
             key={`${item.id ?? item.metadata?.id ?? 'doc'}-${index}`}
             item={item as ClinicalDocument<BundleEntry<DocumentReference>>}
           />
         ))}
       </ul>
-      {docsToDisplay.length > 5 ? (
-        <p className="text-xs font-medium md:text-sm text-gray-900">
-          {`... and ${docsToDisplay.length - 5} more`}
-        </p>
-      ) : null}
+      <TimelinePreviewMore total={docsToDisplay.length} />
     </div>
   );
 }
@@ -511,7 +514,15 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
     );
 
   const [expanded, setExpanded] = React.useState(false);
+  const detailsId = React.useId();
   const { t } = useInterfaceLanguage();
+
+  // One category, so one preview limit across all medication resource types.
+  // The individual arrays are retained unchanged for the expanded detail.
+  const medications = useMemo(
+    () => [...medicationStatements, ...medicationRequests, ...medicationOrders],
+    [medicationStatements, medicationRequests, medicationOrders],
+  );
 
   // Shared with the timeline so a date whose records render nothing can be
   // skipped entirely rather than shown as an empty card.
@@ -604,12 +615,11 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Encounters'}
               color="text-red-700"
             />
-            <ul className="list-disc list-inside">
-              {encounters.map((item) => (
-                <li
-                  key={item.id}
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                >
+            <TimelinePreviewList
+              label="Encounters"
+              items={encounters}
+              renderItem={(item) => (
+                <>
                   {/* One run of inline text, not two `inline-block` boxes
                       with a dash between them: an inline-block does not break
                       inside, so a long location moved down as a whole and left
@@ -628,9 +638,9 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
                   {getEncounterLocation(item) ? (
                     <span>{getEncounterLocation(item)}</span>
                   ) : null}
-                </li>
-              ))}
-            </ul>
+                </>
+              )}
+            />
           </div>
         )}
         {(documentReferences.length > 0 ||
@@ -646,16 +656,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Procedures'}
               color="text-blue-700"
             />
-            <ul className="list-disc list-inside">
-              {procedures.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList label="Procedures" items={procedures} />
           </div>
         )}
         {consents.length > 0 && (
@@ -664,16 +665,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Consents'}
               color="text-rose-700"
             />
-            <ul className="list-disc list-inside">
-              {consents.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList label="Consents" items={consents} />
           </div>
         )}
         {diagnosticReports.length > 0 && (
@@ -682,24 +674,16 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Lab Panels'}
               color="text-blue-700"
             />
-            <ul className="list-disc list-inside">
-              {diagnosticReports.slice(0, 5).map((item) => (
-                <li
-                  id={getTimelineRecordElementId(item.id)}
-                  className="scroll-mt-24 text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name
-                    ?.replace(/- final result/gi, '')
-                    .replace(/- final/gi, '')}
-                </li>
-              ))}
-              <p className="text-xs font-medium md:text-sm text-gray-900">
-                {diagnosticReports.length > 5
-                  ? `... and ${diagnosticReports.length - 5} more`
-                  : null}
-              </p>
-            </ul>
+            <TimelinePreviewList
+              label="Lab Panels"
+              items={diagnosticReports}
+              getItemId={(item) => getTimelineRecordElementId(item.id)}
+              renderItem={(item) =>
+                item.metadata?.display_name
+                  ?.replace(/- final result/gi, '')
+                  .replace(/- final/gi, '')
+              }
+            />
           </div>
         )}
         {OBSERVATION_GROUPS.map((group) => {
@@ -713,21 +697,15 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
                 title={group}
                 color={OBSERVATION_GROUP_COLORS[group]}
               />
-              <ul className="list-disc list-inside">
-                {items.slice(0, 5).map((item) => (
-                  <li
-                    className="text-xs font-medium md:text-sm text-gray-900"
-                    key={item.id}
-                  >
-                    {item.metadata?.display_name
-                      ?.replace(/- final result/gi, '')
-                      .replace(/- final/gi, '')}
-                  </li>
-                ))}
-                <p className="text-xs font-medium md:text-sm text-gray-900">
-                  {items.length > 5 ? `... and ${items.length - 5} more` : null}
-                </p>
-              </ul>
+              <TimelinePreviewList
+                label={group}
+                items={items}
+                renderItem={(item) =>
+                  item.metadata?.display_name
+                    ?.replace(/- final result/gi, '')
+                    .replace(/- final/gi, '')
+                }
+              />
             </div>
           );
         })}
@@ -737,16 +715,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Immunizations'}
               color="text-purple-700"
             />
-            <ul className="list-disc list-inside">
-              {immunizations.map((item) => (
-                <li
-                  key={item.id}
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList label="Immunizations" items={immunizations} />
           </div>
         )}
         {conditions.length > 0 && (
@@ -755,52 +724,24 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Conditions'}
               color="text-green-700"
             />
-            <ul className="list-disc list-inside">
-              {conditions.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList label="Conditions" items={conditions} />
           </div>
         )}
-        {(medicationStatements.length > 0 ||
-          medicationRequests.length > 0 ||
-          medicationOrders.length > 0) && (
+        {medications.length > 0 && (
           <div className="mb-2 ms-2">
             <TimelineCardCategoryTitle
               title={'Medications'}
               color="text-fuchsia-600"
             />
-            <ul className="list-disc list-inside">
-              {medicationStatements.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-              {medicationRequests.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-              {medicationOrders.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {getMedicationOrderDisplayName(item)}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList
+              label="Medications"
+              items={medications}
+              renderItem={(item) =>
+                item.data_record.resource_type === 'medicationorder'
+                  ? getMedicationOrderDisplayName(item)
+                  : item.metadata?.display_name
+              }
+            />
           </div>
         )}
         {coverages.length > 0 && (
@@ -809,16 +750,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Coverage'}
               color="text-amber-700"
             />
-            <ul className="list-disc list-inside">
-              {coverages.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList label="Coverage" items={coverages} />
           </div>
         )}
         {carePlans.length > 0 && (
@@ -827,16 +759,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Care Plans'}
               color="text-indigo-600"
             />
-            <ul className="list-disc list-inside">
-              {carePlans.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList label="Care Plans" items={carePlans} />
           </div>
         )}
         {careTeams.length > 0 && (
@@ -845,16 +768,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Care Teams'}
               color="text-cyan-600"
             />
-            <ul className="list-disc list-inside">
-              {careTeams.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList label="Care Teams" items={careTeams} />
           </div>
         )}
         {referrals.length > 0 && (
@@ -863,16 +777,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Referrals'}
               color="text-sky-700"
             />
-            <ul className="list-disc list-inside">
-              {referrals.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList label="Referrals" items={referrals} />
           </div>
         )}
         {goals.length > 0 && (
@@ -881,16 +786,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Goals'}
               color="text-emerald-700"
             />
-            <ul className="list-disc list-inside">
-              {goals.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList label="Goals" items={goals} />
           </div>
         )}
         {appointments.length > 0 && (
@@ -899,16 +795,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Appointments'}
               color="text-violet-600"
             />
-            <ul className="list-disc list-inside">
-              {appointments.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList label="Appointments" items={appointments} />
           </div>
         )}
         {specimens.length > 0 && (
@@ -917,16 +804,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Specimens'}
               color="text-orange-600"
             />
-            <ul className="list-disc list-inside">
-              {specimens.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList label="Specimens" items={specimens} />
           </div>
         )}
         {allergyIntolerances.length > 0 && (
@@ -935,16 +813,11 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Allergies'}
               color="text-red-600"
             />
-            <ul className="list-disc list-inside">
-              {allergyIntolerances.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {getAllergyIntoleranceDisplayName(item)}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList
+              label="Allergies"
+              items={allergyIntolerances}
+              renderItem={getAllergyIntoleranceDisplayName}
+            />
           </div>
         )}
         {familyMemberHistories.length > 0 && (
@@ -953,16 +826,10 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               title={'Family History'}
               color="text-amber-700"
             />
-            <ul className="list-disc list-inside">
-              {familyMemberHistories.map((item) => (
-                <li
-                  className="text-xs font-medium md:text-sm text-gray-900"
-                  key={item.id}
-                >
-                  {item.metadata?.display_name}
-                </li>
-              ))}
-            </ul>
+            <TimelinePreviewList
+              label="Family History"
+              items={familyMemberHistories}
+            />
           </div>
         )}
         <div className="relative">
@@ -981,6 +848,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
               className="relative inline-flex min-h-8 items-center gap-x-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-[''] hover:bg-gray-50"
               onClick={() => setExpanded(!expanded)}
               aria-expanded={expanded}
+              aria-controls={detailsId}
             >
               {expanded ? 'View less' : 'View more'}
 
@@ -1000,7 +868,7 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           leaveFrom="opacity-100 scale-y-100"
           leaveTo="opacity-0 scale-y-0"
         >
-          <div className="mt-4">
+          <div id={detailsId} className="mt-4">
             {encounters.map((item) => (
               <div key={item.id} className="my-2">
                 <EncounterCard
@@ -1117,6 +985,13 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
             {careTeams.map((item) => (
               <div key={item.id} className="my-2">
                 <CareTeamCard key={item.id} item={item} />
+              </div>
+            ))}
+            {referrals.map((item) => (
+              <div key={item.id} className="my-2">
+                <ServiceRequestCard
+                  item={item as ClinicalDocument<R4BundleEntry<ServiceRequest>>}
+                />
               </div>
             ))}
             {goals.map((item) => (

@@ -6,16 +6,35 @@ import {
 import DOMPurify from 'dompurify';
 import parse from 'html-react-parser';
 
+import {
+  AttachmentContent,
+  attachmentMimeType,
+  createAttachmentBlob,
+  formatJsonAttachment,
+  hasAttachmentContent,
+  isJsonAttachment,
+  readAttachmentText,
+} from '../../../../shared/utils/attachmentContent';
 import { CCDAStructureDefinitionKeys2_1 } from './CCDAStructureDefinitionKeys2_1';
 import { DisplayCCDADocument } from './DisplayCCDADocument';
 import { checkIfXmlIsCCDA } from './ShowDocumentReferenceAttachmentExpandable';
 import { parseCCDA } from './parseCCDA/parseCCDA';
 
-export type EmbeddedAttachment = {
-  contentType?: string;
-  raw?: unknown;
+export type EmbeddedAttachment = AttachmentContent & {
   title?: string;
 };
+
+type AttachmentPreview =
+  | { kind: 'loading' | 'missing' | 'unsupported' | 'error' }
+  | { kind: 'text'; text: string; invalidJson?: boolean }
+  | { kind: 'pdf' | 'image'; url: string }
+  | { kind: 'html'; html: ReturnType<typeof parse> }
+  | {
+      kind: 'ccda';
+      ccda: Partial<
+        Record<CCDAStructureDefinitionKeys2_1, string | JSX.Element>
+      >;
+    };
 
 export function EmbeddedAttachmentViewer({
   attachment,
@@ -24,92 +43,109 @@ export function EmbeddedAttachmentViewer({
   attachment?: EmbeddedAttachment;
   matchedChunks?: { id: string; metadata?: any }[];
 }) {
-  const [ccda, setCCDA] = useState<
-    | Partial<Record<CCDAStructureDefinitionKeys2_1, string | JSX.Element>>
-    | undefined
-  >(undefined);
-  const [hasLoadedDocument, setHasLoadedDocument] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState<string | undefined>(undefined);
-  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
-  const [textContent, setTextContent] = useState<string | undefined>(undefined);
-  const [html, setHtml] = useState<
-    string | JSX.Element | JSX.Element[] | undefined
-  >(undefined);
+  const [preview, setPreview] = useState<AttachmentPreview>({
+    kind: 'loading',
+  });
 
   useEffect(() => {
-    setCCDA(undefined);
-    setHasLoadedDocument(false);
-    setPdfUrl(undefined);
-    setImageUrl(undefined);
-    setTextContent(undefined);
-    setHtml(undefined);
+    let cancelled = false;
+    let objectUrl: string | undefined;
+    setPreview({ kind: 'loading' });
 
-    const contentType = attachment?.contentType || '';
-    const raw = attachment?.raw;
-
-    if (contentType.includes('application/xml') && typeof raw === 'string') {
-      if (checkIfXmlIsCCDA(raw)) {
-        setCCDA(parseCCDA(raw));
-      } else {
-        setTextContent(raw);
+    async function loadPreview() {
+      if (!hasAttachmentContent(attachment?.raw)) {
+        setPreview({ kind: 'missing' });
+        return;
       }
-      setHasLoadedDocument(true);
-    } else if (
-      contentType.includes('application/pdf') &&
-      typeof raw === 'string'
-    ) {
-      const url = createBlobUrlFromBase64(raw, contentType);
-      setPdfUrl(url);
-      setHasLoadedDocument(true);
-    } else if (contentType.startsWith('image/') && typeof raw === 'string') {
-      const url = createBlobUrlFromBase64(raw, contentType);
-      setImageUrl(url);
-      setHasLoadedDocument(true);
-    } else if (contentType.includes('text/html') && typeof raw === 'string') {
-      setHtml(parse(DOMPurify.sanitize(raw)));
-      setHasLoadedDocument(true);
-    } else if (contentType.startsWith('text/') && typeof raw === 'string') {
-      setTextContent(raw);
-      setHasLoadedDocument(true);
-    } else {
-      setHasLoadedDocument(true);
+      const contentType = attachmentMimeType(attachment?.contentType);
+      try {
+        if (
+          contentType === 'application/pdf' ||
+          contentType.startsWith('image/')
+        ) {
+          const blob = createAttachmentBlob(attachment || {});
+          if (!blob) return;
+          objectUrl = URL.createObjectURL(blob);
+          setPreview({
+            kind: contentType === 'application/pdf' ? 'pdf' : 'image',
+            url: objectUrl,
+          });
+          return;
+        }
+
+        const isXml =
+          contentType === 'application/xml' || contentType.endsWith('+xml');
+        if (
+          !isJsonAttachment(contentType) &&
+          !isXml &&
+          !contentType.startsWith('text/')
+        ) {
+          setPreview({ kind: 'unsupported' });
+          return;
+        }
+
+        const text = await readAttachmentText(attachment || {});
+        if (cancelled) return;
+        if (text === undefined) {
+          setPreview({ kind: 'missing' });
+        } else if (isJsonAttachment(contentType)) {
+          const formatted = formatJsonAttachment(text);
+          setPreview({
+            kind: 'text',
+            text: formatted.text,
+            invalidJson: !formatted.valid,
+          });
+        } else if (
+          (isXml || contentType === 'text/xml') &&
+          checkIfXmlIsCCDA(text)
+        ) {
+          setPreview({ kind: 'ccda', ccda: parseCCDA(text) });
+        } else if (contentType === 'text/html') {
+          setPreview({ kind: 'html', html: parse(DOMPurify.sanitize(text)) });
+        } else {
+          setPreview({ kind: 'text', text });
+        }
+      } catch {
+        if (!cancelled) setPreview({ kind: 'error' });
+      }
     }
+    void loadPreview();
 
     return () => {
-      setPdfUrl((url) => {
-        if (url) URL.revokeObjectURL(url);
-        return undefined;
-      });
-      setImageUrl((url) => {
-        if (url) URL.revokeObjectURL(url);
-        return undefined;
-      });
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [attachment?.contentType, attachment?.raw]);
+  }, [attachment?.contentType, attachment?.raw, attachment?.encoding]);
 
-  if (!hasLoadedDocument) {
+  if (preview.kind === 'loading') {
     return <p className="text-md p-4 text-gray-900">Loading...</p>;
   }
 
-  if (ccda) {
+  if (preview.kind === 'ccda') {
     return (
-      <div className="text-md whitespace-wrap overflow-x-scroll p-4 text-gray-900">
-        <DisplayCCDADocument ccda={ccda} matchedChunks={matchedChunks} />
+      <div className="text-md min-w-0 max-w-full overflow-x-auto p-4 text-gray-900">
+        <DisplayCCDADocument
+          ccda={preview.ccda}
+          matchedChunks={matchedChunks}
+        />
       </div>
     );
   }
 
-  if (pdfUrl) {
+  if (preview.kind === 'pdf') {
     return (
-      <EmbeddedPdf url={pdfUrl} title={attachment?.title || 'PDF Document'} />
+      <EmbeddedPdf
+        url={preview.url}
+        title={attachment?.title || 'PDF Document'}
+      />
     );
   }
 
-  if (imageUrl) {
+  if (preview.kind === 'image') {
     return (
-      <div className="flex max-h-[700px] justify-center overflow-auto p-4">
+      <div className="flex max-h-[700px] min-w-0 max-w-full justify-center overflow-auto p-4">
         <img
-          src={imageUrl}
+          src={preview.url}
           alt={attachment?.title || 'Linked image'}
           className="max-h-[660px] max-w-full object-contain"
         />
@@ -117,34 +153,38 @@ export function EmbeddedAttachmentViewer({
     );
   }
 
-  if (html) {
-    return <div className="prose prose-sm overflow-x-auto p-4">{html}</div>;
+  if (preview.kind === 'html') {
+    return (
+      <div className="prose prose-sm min-w-0 max-w-full overflow-x-auto break-words p-4 [overflow-wrap:anywhere]">
+        {preview.html}
+      </div>
+    );
   }
 
-  if (textContent) {
+  if (preview.kind === 'text') {
     return (
-      <pre className="max-h-[600px] overflow-auto whitespace-pre-wrap p-4 text-sm text-gray-900">
-        {textContent}
-      </pre>
+      <div className="min-w-0 max-w-full">
+        {preview.invalidJson && (
+          <p className="px-4 pt-4 text-sm text-gray-700">
+            This JSON could not be formatted. Showing its original text.
+          </p>
+        )}
+        <pre className="max-h-[600px] min-w-0 max-w-full overflow-auto whitespace-pre-wrap break-words p-4 text-sm text-gray-900 [overflow-wrap:anywhere]">
+          {preview.text}
+        </pre>
+      </div>
     );
   }
 
   return (
-    <p className="text-md p-4 text-gray-900">
-      Sorry, looks like we were unable to get the linked document
+    <p className="text-md break-words p-4 text-gray-900 [overflow-wrap:anywhere]">
+      {preview.kind === 'missing'
+        ? 'This record has no embedded file to preview.'
+        : preview.kind === 'unsupported'
+          ? `This file is stored, but a preview is not available for ${attachmentMimeType(attachment?.contentType) || 'this file type'}.`
+          : 'This file is stored, but its contents could not be read for preview.'}
     </p>
   );
-}
-
-function createBlobUrlFromBase64(base64: string, contentType: string): string {
-  const byteCharacters = atob(base64);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-  const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: contentType });
-  return URL.createObjectURL(blob);
 }
 
 /**
@@ -167,15 +207,15 @@ function createBlobUrlFromBase64(base64: string, contentType: string): string {
  */
 function EmbeddedPdf({ url, title }: { url: string; title: string }) {
   return (
-    <div className="p-4">
+    <div className="min-w-0 max-w-full p-4">
       <button
         type="button"
         onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
-        className="flex w-full items-center gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 text-start hover:bg-gray-100"
+        className="flex min-h-[44px] w-full min-w-0 items-center gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 text-start hover:bg-gray-100"
       >
         <DocumentTextIcon className="h-8 w-8 shrink-0 text-gray-500" />
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-semibold text-gray-900">
+          <span className="block whitespace-normal break-words text-sm font-semibold text-gray-900 [overflow-wrap:anywhere]">
             {title}
           </span>
           <span className="block text-xs text-gray-600">

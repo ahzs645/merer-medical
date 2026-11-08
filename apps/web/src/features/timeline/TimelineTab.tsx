@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 
-import { useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Transition } from '@headlessui/react';
 import { ArrowUpIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useDebounceCallback } from '@react-hook/debounce';
@@ -40,7 +40,7 @@ import {
   formattedTitleDateMonthString,
 } from './utils/timelineDates';
 import { getTimelineCategories } from './utils/timelineCategories';
-import { TIMELINE_QUERY_PARAM } from './timelineQueryParam';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 export { QueryStatus };
 export {
@@ -60,13 +60,15 @@ export {
 const TIMELINE_DAYS_PER_PAGE = 15;
 
 export function TimelineTab() {
-  const [searchParams, setSearchParams] = useSearchParams(),
+  const location = useLocation(),
     user = useUser(),
     [view, setView] = useState<'cards' | 'trends'>('cards'),
-    [query, setQuery] = useState(
-      () => searchParams.get(TIMELINE_QUERY_PARAM) ?? '',
-    ),
-    [typeFilter, setTypeFilter] = useState<TimelineRecordTypeFilter>('all'),
+    {
+      query,
+      setQuery,
+      filterId: typeFilter,
+      setFilterId: setTypeFilter,
+    } = useListViewParams<TimelineRecordTypeFilter>({ defaultFilter: 'all' }),
     { t } = useInterfaceLanguage(),
     { experimental__use_openai_rag } = useLocalConfig(),
     vectorSyncStatus = useVectorSyncStatus(),
@@ -104,15 +106,12 @@ export function TimelineTab() {
     [activeDateKey, setActiveDateKey] = useState<string | undefined>(),
     [scrollY, setScrollY] = useState(0);
 
-  // The param seeds the search box on arrival and is then spent — leaving it in
-  // the URL would restore it on every reload, overriding whatever the reader
-  // has typed since.
+  // A search result can arrive while Timeline is already mounted in Trends.
+  // Its address is a record card, so make that card's view visible. The query
+  // and type filter stay in the URL, including through Back and reload.
   useEffect(() => {
-    if (!searchParams.has(TIMELINE_QUERY_PARAM)) return;
-    const next = new URLSearchParams(searchParams);
-    next.delete(TIMELINE_QUERY_PARAM);
-    setSearchParams(next, { replace: true });
-  }, [searchParams, setSearchParams]);
+    if (location.hash.startsWith('#timeline-record-')) setView('cards');
+  }, [location.hash, location.key]);
 
   const yearMap = useMemo(() => {
     const newYearMap = new Map<

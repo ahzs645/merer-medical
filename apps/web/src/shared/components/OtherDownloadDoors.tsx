@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
 
 import { Routes as AppRoutes } from '../../Routes';
 
@@ -41,21 +42,29 @@ export function OtherDownloadDoors({ from }: { from: Door }) {
   const others = (Object.keys(DOORS) as Door[]).filter((key) => key !== from);
 
   return (
-    <p className="mt-3 text-xs text-gray-700">
-      Other ways to take your records with you:{' '}
-      {others.map((key, index) => (
-        <span key={key}>
-          {index > 0 && '; '}
-          <Link
-            to={DOORS[key].to}
-            className="text-primary-700 hover:text-primary-900 font-medium underline"
-          >
-            {DOORS[key].label}
-          </Link>{' '}
-          gives you {DOORS[key].what}
-        </span>
-      ))}
-      .
-    </p>
+    <div className="mt-3 text-sm text-gray-700">
+      <p>Other ways to take your records with you:</p>
+      <ul className="mt-2 space-y-2">
+        {others.map((key) => (
+          <li key={key}>
+            <Link
+              to={DOORS[key].to}
+              className="flex min-h-[44px] items-center justify-between gap-3 rounded-md border border-gray-200 px-3 py-2 text-primary-800 hover:bg-primary-50"
+            >
+              <span className="min-w-0">
+                <span className="block font-semibold">{DOORS[key].label}</span>
+                <span className="block text-xs text-gray-600">
+                  {DOORS[key].what}
+                </span>
+              </span>
+              <ChevronRightIcon
+                className="h-4 w-4 shrink-0"
+                aria-hidden="true"
+              />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

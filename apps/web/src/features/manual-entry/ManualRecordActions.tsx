@@ -54,15 +54,13 @@ export const manualRecordActionRowClass =
   'mt-3 flex flex-wrap items-center gap-2';
 
 /**
- * One size for every action on a card. They used to come in two — Edit and
- * Delete at 44px, the source chips at 28px — so on a phone the row wrapped into
- * a short line and a tall one. Each button now draws at 32px and carries an
- * invisible 44px tap area (`after:` inset six pixels above and below), so the
- * row is compact without shrinking what a thumb has to hit.
+ * Phone actions have a visible 44px target. Extending a 32px button with a
+ * pseudo-element made wrapped rows' hit areas overlap, so the border did not
+ * show which action a tap would choose. Wider screens keep the compact style.
  */
 export const actionTapAreaClass =
-  "relative after:absolute after:inset-x-0 after:-inset-y-1.5 after:content-['']";
-export const actionChipClass = `${actionTapAreaClass} inline-flex min-h-8 items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold shadow-sm disabled:cursor-not-allowed disabled:opacity-60`;
+  "relative sm:after:absolute sm:after:inset-x-0 sm:after:-inset-y-1.5 sm:after:content-['']";
+export const actionChipClass = `${actionTapAreaClass} inline-flex min-h-[44px] items-center gap-1 rounded-md border px-2.5 py-1 text-sm font-semibold shadow-sm disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-8 sm:text-xs`;
 const neutralChip = `${actionChipClass} border-gray-300 text-gray-800 hover:bg-gray-50`;
 const primaryChip = `${actionChipClass} border-primary-200 text-primary-700 hover:bg-primary-50`;
 const dangerChip = `${actionChipClass} border-red-200 text-red-700 hover:bg-red-50`;
@@ -440,7 +438,7 @@ function MoreMenu({ label, children }: { label: string; children: ReactNode }) {
   return (
     <Menu as="div" className="relative inline-flex">
       <Menu.Button
-        className={`${neutralChip} px-2`}
+        className={`${neutralChip} min-w-[44px] justify-center px-2`}
         onClick={(event: MouseEvent<HTMLButtonElement>) =>
           event.stopPropagation()
         }

@@ -8,7 +8,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { Link, MemoryRouter, useLocation } from 'react-router-dom';
 import { strToU8, zipSync } from 'fflate';
 
 import { offerPackageFile, SharedPackagePanel } from './SharedPackagePanel';
@@ -98,6 +98,11 @@ function setViewport(desktop: boolean) {
   })) as unknown as typeof window.matchMedia;
 }
 
+function LocationProbe() {
+  const location = useLocation();
+  return <output data-testid="current-route">{location.pathname}</output>;
+}
+
 function renderWith(target: string, extra = '') {
   return render(
     <MemoryRouter
@@ -106,6 +111,8 @@ function renderWith(target: string, extra = '') {
       ]}
     >
       <SharedPackagePanel />
+      <LocationProbe />
+      <Link to="/records">Browse records</Link>
     </MemoryRouter>,
   );
 }
@@ -165,6 +172,108 @@ describe('SharedPackagePanel', () => {
     await waitFor(() => expect(mockImport).toHaveBeenCalled());
     // Adding, not replacing: a link must not be able to delete a record set.
     expect(mockImport.mock.calls[0][2]).toMatchObject({ replace: false });
+  });
+
+  it.each([false, true])(
+    'opens the summary after import and counts clinical records, desktop=%s',
+    async (desktop) => {
+      setViewport(desktop);
+      const imported = {
+        counts: {
+          clinical_documents: 3,
+          user_documents: 1,
+          connection_documents: 2,
+        },
+        unknownTables: [],
+      };
+      mockImport.mockResolvedValueOnce(imported);
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        arrayBuffer: async () => packageBytes().buffer,
+      });
+      renderWith('https://example.org/records.emrpkg');
+      const open = await screen.findByRole('button', {
+        name: /add to my records/i,
+      });
+
+      expect(screen.getByTestId('current-route').textContent).toBe(
+        '/connections',
+      );
+      fireEvent.click(open);
+
+      await waitFor(() =>
+        expect(screen.getByTestId('current-route').textContent).toBe(
+          '/summary',
+        ),
+      );
+      expect(mockNotify).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Imported 3 clinical records from https://example.org.',
+          variant: 'success',
+        }),
+      );
+      expect(mockImport.mock.calls[0][2]).toMatchObject({ replace: false });
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    },
+  );
+
+  it('keeps the offer and current page on import failure so it can be retried', async () => {
+    setViewport(false);
+    mockImport.mockRejectedValueOnce(new Error('Unable to unlock package'));
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => packageBytes().buffer,
+    });
+    renderWith('https://example.org/records.emrpkg');
+    fireEvent.click(
+      await screen.findByRole('button', { name: /add to my records/i }),
+    );
+
+    expect((await screen.findByRole('alert')).textContent).toContain(
+      'Unable to unlock package',
+    );
+    expect(screen.getByTestId('current-route').textContent).toBe(
+      '/connections',
+    );
+    expect(
+      screen
+        .getByRole('button', { name: /add to my records/i })
+        .hasAttribute('disabled'),
+    ).toBe(false);
+    expect(mockRemovePlaceholders).not.toHaveBeenCalled();
+  });
+
+  it('does not replace a later page when an import completes after its offer was dismissed', async () => {
+    setViewport(false);
+    let finishImport!: (value: Awaited<ReturnType<typeof mockImport>>) => void;
+    mockImport.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishImport = resolve;
+        }),
+    );
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => packageBytes().buffer,
+    });
+    renderWith('https://example.org/records.emrpkg');
+    fireEvent.click(
+      await screen.findByRole('button', { name: /add to my records/i }),
+    );
+    expect(mockImport).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    fireEvent.click(screen.getByRole('link', { name: 'Browse records' }));
+
+    await act(async () => {
+      finishImport({ counts: { clinical_documents: 3 }, unknownTables: [] });
+    });
+
+    expect(mockNotify).toHaveBeenCalledWith(
+      expect.objectContaining({ variant: 'success' }),
+    );
+    expect(screen.getByTestId('current-route').textContent).toBe('/records');
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 
   /**

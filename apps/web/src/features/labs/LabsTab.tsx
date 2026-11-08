@@ -202,7 +202,11 @@ export function LabsTab() {
               <LabsSkeleton />
             ) : groupedLabs.length > 0 ? (
               <>
-                <LibreCgmPanel labs={libreLabs} />
+                {/* A search or filter is a request for matching lab results.
+                    Keep an expanded device report from burying that list. */}
+                {!query.trim() && filterMode === 'all' && (
+                  <LibreCgmPanel labs={libreLabs} />
+                )}
                 {filteredGroups.length > 0 ? (
                   labSections.map((section) => (
                     <LabsTable

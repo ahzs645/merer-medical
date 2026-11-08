@@ -750,10 +750,18 @@ function ForYouFeed({
           route: AppRoutes.Medications,
         }
       : undefined,
-    allergyCount > 0 || conditionCount > 0
+    allergyCount > 0
       ? {
-          label: 'Allergies and conditions',
-          title: recordCount(allergyCount + conditionCount),
+          label: 'Allergies',
+          title: recordCount(allergyCount),
+          description: 'Review your recorded allergies and reactions.',
+          route: AppRoutes.Allergies,
+        }
+      : undefined,
+    conditionCount > 0
+      ? {
+          label: 'Conditions',
+          title: recordCount(conditionCount),
           description: 'Keep key clinical summary items current.',
           route: AppRoutes.Conditions,
         }
@@ -799,7 +807,7 @@ function ForYouFeed({
             className="group flex items-start justify-between gap-2 rounded-md border border-gray-200 p-3 transition hover:border-primary-300 hover:bg-primary-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 active:scale-[99%]"
           >
             <span className="min-w-0">
-              <span className="inline-flex min-h-[44px] items-center block text-xs font-semibold uppercase tracking-wide text-primary-700">
+              <span className="block text-xs font-semibold uppercase tracking-wide text-primary-700">
                 {t(item.label)}
               </span>
               <span className="mt-1 block text-sm font-semibold text-gray-900 group-hover:underline">

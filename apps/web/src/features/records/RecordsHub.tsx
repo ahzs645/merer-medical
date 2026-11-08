@@ -19,6 +19,9 @@ import {
   type CategoryCount,
 } from './useRecordCounts';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
+import { useRecordSearch } from '../../shared/components/useRecordSearch';
+import { resourceTypeLabel } from '../../shared/utils/resourceTypeLabels';
+import { TIMELINE_QUERY_PARAM } from '../timeline/timelineQueryParam';
 
 /** How many categories the wide-viewport overview ranks before it stops. */
 const OVERVIEW_ROWS = 6;
@@ -56,8 +59,8 @@ function countText(
 }
 
 /**
- * Records landing page: a searchable "browse" hub of grouped category cards
- * with approximate counts (the Apple Health Browse pattern). Replaces the old
+ * Records landing page: search the user's records, or browse grouped category
+ * cards with approximate counts. Replaces the old
  * redirect straight to Labs and gives the low-discoverability categories
  * (Referrals, Histories, Providers, …) a real home.
  *
@@ -74,6 +77,11 @@ export function RecordsHub() {
   const recordCounts = useRecordCounts();
   const q = query.trim().toLowerCase();
   const searching = q.length > 0;
+  const {
+    hits,
+    searching: searchingRecords,
+    error: searchError,
+  } = useRecordSearch(query);
 
   const groups = useMemo(() => {
     if (!q) return RECORD_GROUPS;
@@ -92,7 +100,7 @@ export function RecordsHub() {
             query,
             onChange: setQuery,
             placeholder: 'Search records',
-            label: 'Search record categories',
+            label: 'Search records and categories',
           }}
           // The hub is where "add a record of some kind" belongs: every
           // category page already carries its own typed add button, and this
@@ -109,9 +117,68 @@ export function RecordsHub() {
     >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-4xl gap-6 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          {groups.length === 0 ? (
-            <EmptyState text={`No record categories match “${query}”.`} />
-          ) : (
+          {searching && (
+            <section
+              aria-labelledby="record-search-heading"
+              aria-busy={searchingRecords}
+            >
+              <h2
+                id="record-search-heading"
+                className="mb-2 text-sm font-semibold text-gray-900"
+              >
+                {t('Matching records')}
+              </h2>
+              {q.length < 2 ? (
+                <p className="text-sm text-gray-600">
+                  {t('Type at least 2 characters to search your records.')}
+                </p>
+              ) : searchingRecords ? (
+                <p role="status" className="text-sm text-gray-600">
+                  {t('Searching records…')}
+                </p>
+              ) : searchError ? (
+                <p role="alert" className="text-sm text-red-700">
+                  {t('Unable to search records. Try again.')}
+                </p>
+              ) : hits.length > 0 ? (
+                <>
+                  <ul className="divide-y divide-gray-200 overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200">
+                    {hits.map((hit) => (
+                      <li key={hit.id}>
+                        <Link
+                          to={hit.path}
+                          className="hover:bg-primary-50 flex min-h-[44px] flex-col gap-1 px-4 py-3"
+                        >
+                          <span className="break-words text-sm font-semibold text-gray-900">
+                            {hit.name}
+                          </span>
+                          <span className="text-xs text-gray-600">
+                            {t(resourceTypeLabel(hit.resourceType, 1))} ·{' '}
+                            {hit.dateLabel}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    to={`${AppRoutes.Timeline}?${TIMELINE_QUERY_PARAM}=${encodeURIComponent(query.trim())}`}
+                    className="text-primary-700 mt-2 inline-flex min-h-[44px] items-center text-sm font-semibold underline"
+                  >
+                    {t('See all matching records in Timeline')}
+                  </Link>
+                </>
+              ) : groups.length > 0 ? (
+                <p className="text-sm text-gray-600">
+                  {t('No matching records. Browse the categories below.')}
+                </p>
+              ) : (
+                <EmptyState
+                  text={`No records or categories match “${query}”.`}
+                />
+              )}
+            </section>
+          )}
+          {groups.length > 0 && (
             <>
               {!searching && <RecordsOverview />}
               <div className={`grid gap-6 ${searching ? '' : 'lg:hidden'}`}>

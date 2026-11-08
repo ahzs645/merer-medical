@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { Disclosure } from '@headlessui/react';
 import {
   ArrowDownTrayIcon,
@@ -24,6 +24,12 @@ import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
 import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
+import {
+  AttachmentContent,
+  createAttachmentBlob,
+  getStoredAttachmentEncoding,
+  hasAttachmentContent,
+} from '../../shared/utils/attachmentContent';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { EmbeddedAttachmentViewer } from '../timeline/components/document-reference/EmbeddedAttachmentViewer';
 import {
@@ -109,18 +115,23 @@ function timelineLink(doc: ClinicalDocument): string {
   return `${AppRoutes.Timeline}#${getTimelineRecordElementId(doc.id)}`;
 }
 
-function makeBlobUrl(raw: unknown, contentType?: string): string | undefined {
+function makeBlobUrl(attachment: AttachmentContent): string | undefined {
   try {
-    if (raw instanceof Blob) return URL.createObjectURL(raw);
-    if (typeof raw !== 'string' || !raw) return undefined;
-    const bytes = atob(raw);
-    const arr = new Uint8Array(bytes.length);
-    for (let i = 0; i < bytes.length; i += 1) arr[i] = bytes.charCodeAt(i);
-    return URL.createObjectURL(
-      new Blob([arr], { type: contentType || 'application/octet-stream' }),
-    );
+    const blob = createAttachmentBlob(attachment);
+    return blob ? URL.createObjectURL(blob) : undefined;
   } catch {
     return undefined;
+  }
+}
+
+function getDocumentRouteId(pathname: string, routerId?: string): string {
+  // Router 6.11 decodes the path before decoding parameters. Read the original
+  // segment once so literal percent escapes in source IDs survive routing.
+  const segment = pathname.replace(/\/+$/, '').split('/').pop();
+  try {
+    return segment ? decodeURIComponent(segment) : routerId || '';
+  } catch {
+    return routerId || '';
   }
 }
 
@@ -128,7 +139,8 @@ export function DocumentDetailTab() {
   const db = useRxDb();
   const user = useUser();
   const { documentId } = useParams<{ documentId: string }>();
-  const decodedId = documentId ? decodeURIComponent(documentId) : '';
+  const { pathname } = useLocation();
+  const recordId = getDocumentRouteId(pathname, documentId);
 
   const [document, setDocument] = useState<ClinicalDocument | null>(null);
   const [attachment, setAttachment] = useState<ClinicalDocument | null>(null);
@@ -154,9 +166,14 @@ export function DocumentDetailTab() {
     let cancelled = false;
     async function load() {
       setStatus('loading');
-      const docRow = await db.clinical_documents
-        .findOne({ selector: { user_id: user.id, 'metadata.id': decodedId } })
+      let docRow = await db.clinical_documents
+        .findOne({ selector: { user_id: user.id, 'metadata.id': recordId } })
         .exec();
+      if (!docRow) {
+        docRow = await db.clinical_documents
+          .findOne({ selector: { user_id: user.id, id: recordId } })
+          .exec();
+      }
       if (cancelled) return;
       if (!docRow) {
         setStatus('missing');
@@ -170,7 +187,7 @@ export function DocumentDetailTab() {
         doc.data_record?.resource_type === 'documentreference_attachment';
       const resource = getFhirResource<any>(doc);
       const attachmentUrl = isAttachmentDoc
-        ? doc.metadata?.id
+        ? doc.metadata?.id || doc.id
         : resource?.content?.[0]?.attachment?.url;
 
       const [attachmentRow, connRow, reportRows, allRows] = await Promise.all([
@@ -201,7 +218,11 @@ export function DocumentDetailTab() {
       const byId = new Map<string, ClinicalDocument>();
       for (const row of allRows) {
         const record = row.toMutableJSON() as ClinicalDocument;
-        if (getMetaString(record, 'source_document_id') === decodedId) {
+        const sourceId = getMetaString(record, 'source_document_id');
+        if (
+          sourceId &&
+          (sourceId === doc.metadata?.id || sourceId === doc.id)
+        ) {
           byId.set(record.id, record);
         }
       }
@@ -235,14 +256,14 @@ export function DocumentDetailTab() {
     return () => {
       cancelled = true;
     };
-  }, [db, decodedId, user.id, refreshKey]);
+  }, [db, recordId, user.id, refreshKey]);
 
   const resource = document ? getFhirResource<any>(document) : undefined;
   const attachmentMeta = resource?.content?.[0]?.attachment;
   const isAttachmentDoc =
     document?.data_record?.resource_type === 'documentreference_attachment';
   const attachmentUrl: string | undefined = isAttachmentDoc
-    ? document?.metadata?.id
+    ? document?.metadata?.id || document?.id
     : attachmentMeta?.url;
   const title =
     document?.metadata?.display_name ||
@@ -250,11 +271,23 @@ export function DocumentDetailTab() {
     getMetaString(document || ({} as ClinicalDocument), 'source_image') ||
     'Document';
 
-  const rawBytes = attachment?.data_record.raw || attachmentMeta?.data;
-  const contentType =
-    attachment?.data_record.content_type || attachmentMeta?.contentType;
+  const hasStoredContent = hasAttachmentContent(attachment?.data_record.raw);
+  const rawBytes = hasStoredContent
+    ? attachment?.data_record.raw
+    : attachmentMeta?.data;
+  const contentType = hasStoredContent
+    ? attachment?.data_record.content_type
+    : attachmentMeta?.contentType || attachment?.data_record.content_type;
+  const encoding = hasStoredContent
+    ? getStoredAttachmentEncoding({
+        contentType,
+        sourceType: attachment?.metadata?.source_type,
+        entryMethod: attachment?.metadata?.entry_method,
+      })
+    : 'base64';
+  const embeddedAttachment = { contentType, raw: rawBytes, title, encoding };
   const openDoc = (download: boolean) => {
-    const url = makeBlobUrl(rawBytes, contentType);
+    const url = makeBlobUrl(embeddedAttachment);
     if (!url) return;
     if (download) {
       const anchor = window.document.createElement('a');
@@ -402,7 +435,7 @@ export function DocumentDetailTab() {
                             <button
                               type="button"
                               onClick={() => openDoc(false)}
-                              className="inline-flex items-center gap-1 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-50"
+                              className="inline-flex min-h-[44px] items-center gap-1 rounded-md border border-primary-200 px-2 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-50"
                             >
                               <ArrowTopRightOnSquareIcon className="h-4 w-4" />
                               Open
@@ -410,7 +443,7 @@ export function DocumentDetailTab() {
                             <button
                               type="button"
                               onClick={() => openDoc(true)}
-                              className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                              className="inline-flex min-h-[44px] items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50"
                             >
                               <ArrowDownTrayIcon className="h-4 w-4" />
                               Download
@@ -424,11 +457,7 @@ export function DocumentDetailTab() {
                         />
                       ) : attachment || attachmentMeta?.data ? (
                         <EmbeddedAttachmentViewer
-                          attachment={{
-                            contentType,
-                            raw: rawBytes,
-                            title,
-                          }}
+                          attachment={embeddedAttachment}
                         />
                       ) : (
                         <p className="p-4 text-sm text-gray-700">
@@ -462,7 +491,7 @@ export function DocumentDetailTab() {
                       <button
                         type="button"
                         onClick={() => openAdd(undefined)}
-                        className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+                        className="inline-flex min-h-[44px] w-fit shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
                       >
                         <PlusIcon className="h-4 w-4" />
                         Add linked record
@@ -474,7 +503,7 @@ export function DocumentDetailTab() {
                           key={quick.kind}
                           type="button"
                           onClick={() => openAdd(quick.kind)}
-                          className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100"
+                          className="min-h-[44px] rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100"
                         >
                           + {quick.label}
                         </button>
@@ -614,7 +643,7 @@ export function DocumentDetailTab() {
                 open={addOpen}
                 onClose={() => setAddOpen(false)}
                 initialRecordType={addType}
-                linkedDocumentId={decodedId}
+                linkedDocumentId={document.metadata?.id || document.id}
                 linkedAttachmentId={attachmentUrl}
                 onSaved={() => setRefreshKey((key) => key + 1)}
               />

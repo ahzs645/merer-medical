@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   BeakerIcon,
   DocumentTextIcon,
@@ -22,15 +23,25 @@ import { resultTotals } from './utils/resultTotals';
 import { useResultsData } from './hooks/useResultsData';
 import { useLabReferenceStandard } from '../labs/hooks/useLabReferenceStandard';
 import { ResultDetail, ResultGroup, ResultSummary, ResultType } from './types';
+import { Routes as AppRoutes } from '../../Routes';
+import { RESULT_SELECTION_PARAM } from './utils/resultRoute';
 
 export function ResultsTab() {
   const { t } = useInterfaceLanguage();
+  const [searchParams] = useSearchParams();
+  const showingResult = Boolean(searchParams.get(RESULT_SELECTION_PARAM));
 
   return (
     <AppPage
+      contentClassName="overflow-y-auto"
       banner={
         <RecordPageHeader
-          title={t('Results')}
+          title={t(showingResult ? 'Result details' : 'Results')}
+          backLink={
+            showingResult
+              ? { to: AppRoutes.Results, label: 'All results' }
+              : undefined
+          }
           description={t(
             'Labs, imaging, reports, and linked result documents.',
           )}
@@ -53,9 +64,17 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
   // Phones only: the picker is collapsed so records start near the top.
   const [showReferencePicker, setShowReferencePicker] = useState(false);
   const { groups, detailsById, status } = useResultsData(referenceMode);
-  const [selectedId, setSelectedId] = useState<string>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedId = searchParams.get(RESULT_SELECTION_PARAM) || undefined;
+  const selectResult = (id: string) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set(RESULT_SELECTION_PARAM, id);
+      return next;
+    });
+  };
   const selectedDetail = useMemo(() => {
-    if (selectedId && detailsById.has(selectedId)) {
+    if (selectedId) {
       return detailsById.get(selectedId);
     }
     return groups[0]?.results[0]
@@ -73,7 +92,9 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
       <div className="flex min-h-0 flex-1 flex-col gap-3 sm:gap-4">
         {/* Two compact columns on phones - four full-width tiles plus the
             reference picker used to fill two screens before the first record. */}
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+        <div
+          className={`${selectedId ? 'hidden lg:grid' : 'grid'} grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3`}
+        >
           <MetricCard label="Total results" value={totals.total} />
           <MetricCard label="Labs" value={totals.labs} />
           <MetricCard
@@ -87,14 +108,20 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
           type="button"
           onClick={() => setShowReferencePicker((shown) => !shown)}
           aria-expanded={showReferencePicker}
-          className="flex min-h-[44px] items-center justify-between gap-2 rounded-md border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-800 shadow-sm sm:hidden"
+          className={`${selectedId ? 'hidden' : 'flex'} min-h-[44px] items-center justify-between gap-2 rounded-md border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-800 shadow-sm sm:hidden`}
         >
           <span>Reference standard</span>
           <span className="font-normal text-gray-600">
             {referenceOverlayLabels[referenceMode]}
           </span>
         </button>
-        <div className={`${showReferencePicker ? '' : 'hidden'} sm:block`}>
+        <div
+          className={
+            selectedId
+              ? 'hidden lg:block'
+              : `${showReferencePicker ? '' : 'hidden'} sm:block`
+          }
+        >
           <LabReferenceStandardControl
             selectedMode={referenceMode}
             setSelectedMode={setReferenceMode}
@@ -102,7 +129,10 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
         </div>
 
         <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(20rem,0.9fr)_minmax(0,1.4fr)]">
-          <section className="min-h-0 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm">
+          <section
+            aria-label={t('Result list')}
+            className={`${selectedId ? 'hidden lg:block' : ''} min-h-0 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm`}
+          >
             {status === 'loading' ? (
               <div className="p-4 text-sm text-gray-600">
                 {t('Loading results...')}
@@ -117,14 +147,21 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
                   key={group.id}
                   group={group}
                   selectedId={selectedDetail?.detailId}
-                  onSelect={setSelectedId}
+                  onSelect={selectResult}
                 />
               ))
             )}
           </section>
 
-          <section className="min-h-0 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm">
-            {selectedDetail ? (
+          <section
+            aria-label={t('Selected result')}
+            className={`${selectedId ? '' : 'hidden lg:block'} min-h-0 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm`}
+          >
+            {status === 'loading' ? (
+              <div role="status" className="p-4 text-sm text-gray-600">
+                {t('Loading result...')}
+              </div>
+            ) : selectedDetail ? (
               <ResultDetailPanel
                 detail={selectedDetail}
                 enabledOverlayModes={enabledOverlayModes}
@@ -132,7 +169,11 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
               />
             ) : (
               <div className="p-6 text-sm text-gray-600">
-                {t('Select a result to view details.')}
+                {t(
+                  selectedId
+                    ? 'This result is no longer available.'
+                    : 'Select a result to view details.',
+                )}
               </div>
             )}
           </section>

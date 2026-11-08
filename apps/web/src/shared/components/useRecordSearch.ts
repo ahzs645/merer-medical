@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 
 import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useUser } from '../../app/providers/UserProvider';
+import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { safeFormatDate } from '../utils/dateFormatters';
+import { recordSearchPath } from '../utils/recordSearchPath';
+import { useRecordChangeTick } from '../utils/recordChangeSignal';
 
 export interface RecordSearchHit {
   id: string;
@@ -10,6 +13,7 @@ export interface RecordSearchHit {
   resourceType: string;
   date?: string;
   dateLabel: string;
+  path: string;
 }
 
 /** Regex metacharacters, so a typed "(" cannot blow up the query. */
@@ -21,7 +25,8 @@ const MAX_HITS = 6;
 const DEBOUNCE_MS = 200;
 
 /**
- * The user's own records, matched by display name.
+ * The user's own records, matched by display name, for the Records hub and
+ * command palette.
  *
  * The command palette — the search behind the rail's magnifying glass and the
  * phone's More → Search — offered pages only, while its placeholder promised
@@ -34,21 +39,27 @@ const DEBOUNCE_MS = 200;
 export function useRecordSearch(query: string): {
   hits: RecordSearchHit[];
   searching: boolean;
+  error: boolean;
 } {
   const db = useRxDb();
   const user = useUser();
   const [hits, setHits] = useState<RecordSearchHit[]>([]);
   const [searching, setSearching] = useState(false);
+  const [error, setError] = useState(false);
+  const recordChangeTick = useRecordChangeTick();
 
   useEffect(() => {
     const trimmed = query.trim();
     if (!db || !user?.id || trimmed.length < 2) {
       setHits([]);
       setSearching(false);
+      setError(false);
       return;
     }
 
     let cancelled = false;
+    setHits([]);
+    setError(false);
     setSearching(true);
 
     const timer = setTimeout(async () => {
@@ -79,12 +90,16 @@ export function useRecordSearch(query: string): {
               ),
               date,
               dateLabel: safeFormatDate(date, 'PP', 'Undated'),
+              path: recordSearchPath(doc.toMutableJSON() as ClinicalDocument),
             };
           }),
         );
       } catch (error) {
         console.error('Record search failed', error);
-        if (!cancelled) setHits([]);
+        if (!cancelled) {
+          setHits([]);
+          setError(true);
+        }
       } finally {
         if (!cancelled) setSearching(false);
       }
@@ -94,7 +109,7 @@ export function useRecordSearch(query: string): {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [db, query, user?.id]);
+  }, [db, query, user?.id, recordChangeTick]);
 
-  return { hits, searching };
+  return { hits, searching, error };
 }

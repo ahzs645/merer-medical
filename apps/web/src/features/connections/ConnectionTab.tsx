@@ -285,21 +285,21 @@ const ConnectionTab: React.FC = () => {
           <div className="flex flex-wrap gap-3">
             <Link
               to={Routes.AddRecord}
-              className="bg-primary-600 hover:bg-primary-700 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold text-white shadow-sm"
+              className="bg-primary-600 hover:bg-primary-700 inline-flex min-h-[44px] items-center gap-2 rounded-md px-4 py-2 text-sm font-bold text-white shadow-sm"
             >
               <PlusIcon className="h-4 w-4" />
               {t('Add a record')}
             </Link>
             <Link
               to={Routes.Dental}
-              className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-800 shadow-sm hover:bg-gray-50"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-800 shadow-sm hover:bg-gray-50"
             >
               <PencilSquareIcon className="h-4 w-4" />
               {t('Dental records')}
             </Link>
             <Link
               to={Routes.Optometry}
-              className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-800 shadow-sm hover:bg-gray-50"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-800 shadow-sm hover:bg-gray-50"
             >
               <PencilSquareIcon className="h-4 w-4" />
               {t('Optometry records')}

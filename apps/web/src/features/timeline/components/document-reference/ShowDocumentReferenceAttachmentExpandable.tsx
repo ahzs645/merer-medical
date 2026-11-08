@@ -1,6 +1,7 @@
 import { ClinicalDocument } from '../../../../models/clinical-document/ClinicalDocument.type';
 import { Modal } from '../../../../shared/components/Modal';
 import { ModalHeader } from '../../../../shared/components/ModalHeader';
+import { getStoredAttachmentEncoding } from '../../../../shared/utils/attachmentContent';
 import { EmbeddedAttachmentViewer } from './EmbeddedAttachmentViewer';
 
 export const LOINC_CODE_SYSTEM = '2.16.840.1.113883.6.1';
@@ -48,6 +49,11 @@ export function ShowDocumentResultsAttachmentExpandable({
                 contentType: item.data_record.content_type,
                 raw: item.data_record.raw,
                 title: item.metadata?.display_name,
+                encoding: getStoredAttachmentEncoding({
+                  contentType: item.data_record.content_type,
+                  sourceType: item.metadata?.source_type,
+                  entryMethod: item.metadata?.entry_method,
+                }),
               }}
               matchedChunks={matchedChunks}
             />

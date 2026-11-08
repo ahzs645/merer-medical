@@ -58,3 +58,44 @@ jobs:
         # command-level ceiling below the job timeout so a failed child server
         # cannot leave its sibling holding the runner indefinitely.
         run: timeout 1200 npx nx run web-e2e:e2e
+
+  mobile:
+    name: Mobile production workflows
+    timeout-minutes: 15
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    env:
+      NX_DAEMON: 'false'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - name: Set up npm
+        run: npm install -g npm@11.7.0
+      - name: Install dependencies
+        run: npm ci
+      - name: Verify required submodules
+        run: test -f packages/immunization-forecast/src/index.ts
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build production web app
+        run: npm exec nx -- build web --configuration=production
+      - name: Run mobile workflows with synthetic records
+        # The dedicated config starts the static production preview itself.
+        # /demo uses an in-memory database; no API server, portal credentials,
+        # or patient package is needed for these browser journeys.
+        run: npx playwright test --config apps/web-e2e/playwright.mobile.config.ts
+      - name: Upload mobile screenshots and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: test-results/mobile/
+          if-no-files-found: warn
+          retention-days: 7

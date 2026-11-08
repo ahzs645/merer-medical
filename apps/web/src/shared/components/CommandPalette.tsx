@@ -30,9 +30,8 @@ import {
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { Routes as AppRoutes } from '../../Routes';
 import { ALL_RECORD_CATEGORIES } from '../../features/records/recordCategories';
-import { TIMELINE_QUERY_PARAM } from '../../features/timeline/timelineQueryParam';
 import { resourceTypeLabel } from '../utils/resourceTypeLabels';
-import { useRecordSearch } from './useRecordSearch';
+import { useRecordSearch, type RecordSearchHit } from './useRecordSearch';
 import { useCloseOnBack } from '../hooks/useCloseOnBack';
 
 type CommandPaletteItem = {
@@ -258,8 +257,11 @@ export function CommandPalette({
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
   const resultsRef = useRef<HTMLDivElement | null>(null);
-  const { hits: recordHits, searching: searchingRecords } =
-    useRecordSearch(query);
+  const {
+    hits: recordHits,
+    searching: searchingRecords,
+    error: searchError,
+  } = useRecordSearch(query);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -327,13 +329,10 @@ export function CommandPalette({
     navigate(item.route, { replace: true });
   }
 
-  function openRecord(name: string) {
+  function openRecord(hit: RecordSearchHit) {
     closeForNavigation();
     setOpen(false);
-    navigate(
-      `${AppRoutes.Timeline}?${TIMELINE_QUERY_PARAM}=${encodeURIComponent(name)}`,
-      { replace: true },
-    );
+    navigate(hit.path, { replace: true });
   }
 
   return (
@@ -341,7 +340,7 @@ export function CommandPalette({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mx-1 my-1 flex h-11 w-11 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
+        className="mx-1 my-1 flex h-11 min-h-[44px] w-11 min-w-[44px] items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
         aria-expanded={open}
         aria-label={t('Search')}
         title={t('Search')}
@@ -378,10 +377,10 @@ export function CommandPalette({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="mx-auto mt-16 max-w-2xl overflow-hidden rounded-lg bg-white shadow-2xl ring-1 ring-gray-200">
+              <Dialog.Panel className="mx-auto flex max-h-[calc(100dvh-1.5rem)] max-w-2xl flex-col overflow-hidden rounded-lg bg-white shadow-2xl ring-1 ring-gray-200 sm:mt-16 sm:max-h-[calc(100dvh-7rem)]">
                 <Dialog.Title className="sr-only">{t('Search')}</Dialog.Title>
-                <div className="flex items-center gap-3 border-b border-gray-200 px-4 py-3">
-                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 px-3 py-2 sm:gap-3 sm:px-4 sm:py-3">
+                  <MagnifyingGlassIcon className="h-5 w-5 shrink-0 text-gray-400" />
                   <input
                     ref={inputRef}
                     value={query}
@@ -393,7 +392,10 @@ export function CommandPalette({
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' && query.trim()) {
                         event.preventDefault();
-                        if (recordHits[0]) openRecord(recordHits[0].name);
+                        // Record matches take precedence once their search has
+                        // settled; a quick Return must not open a page instead.
+                        if (searchingRecords) return;
+                        if (recordHits[0]) openRecord(recordHits[0]);
                         else if (results[0]) runCommand(results[0]);
                       } else if (event.key === 'ArrowDown') {
                         event.preventDefault();
@@ -403,12 +405,13 @@ export function CommandPalette({
                       }
                     }}
                     placeholder={t('Search records, pages, and actions')}
+                    aria-label={t('Search records, pages, and actions')}
                     className="min-w-0 flex-1 border-0 p-0 text-base text-gray-900 placeholder:text-gray-400 focus:ring-0"
                   />
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="flex h-11 w-11 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                     aria-label={t('Close search')}
                   >
                     <XMarkIcon className="h-5 w-5" />
@@ -416,14 +419,15 @@ export function CommandPalette({
                 </div>
                 <div
                   ref={resultsRef}
-                  className="max-h-[60vh] overflow-y-auto p-2"
+                  className="min-h-0 flex-1 overflow-y-auto p-2 sm:max-h-[60vh]"
                 >
-                  {/* Records first: the input asks for "records, pages, and
-                      actions", and for a while it only ever answered with
-                      pages — typing a lab name returned the Labs page rather
-                      than the lab. There is no per-record route to open, so a
-                      hit lands on the timeline with the search applied, which
-                      is where a record is read in context. */}
+                  {/* A result opens its existing detail view, or its exact
+                      timeline card. Page shortcuts remain separate below. */}
+                  {searchError && (
+                    <p role="alert" className="px-3 py-2 text-sm text-red-700">
+                      {t('Unable to search records. Try again.')}
+                    </p>
+                  )}
                   {recordHits.length > 0 ? (
                     <>
                       <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -433,7 +437,7 @@ export function CommandPalette({
                         <button
                           key={hit.id}
                           type="button"
-                          onClick={() => openRecord(hit.name)}
+                          onClick={() => openRecord(hit)}
                           className="flex w-full items-start gap-3 rounded-md px-3 py-3 text-start hover:bg-primary-50"
                         >
                           <DocumentTextIcon className="mt-0.5 h-5 w-5 shrink-0 text-primary-700" />
@@ -485,7 +489,7 @@ export function CommandPalette({
                         </button>
                       );
                     })
-                  ) : recordHits.length === 0 ? (
+                  ) : recordHits.length === 0 && !searchError ? (
                     <div className="px-4 py-8 text-center text-sm text-gray-600">
                       {searchingRecords
                         ? t('Searching…')

@@ -7,6 +7,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 import { LabsTab } from './LabsTab';
 import { RecordCoverageSummary } from './types';
+import { GLUCOSE_LOINC_CODE } from '../diabetes/libreView';
 
 // `mock`-prefixed so the hoisted jest.mock factories below may reach it.
 const mockCreateElement = createElement;
@@ -25,12 +26,13 @@ const mockCoverage: RecordCoverageSummary = {
 
 let mockStatus: 'loading' | 'success' = 'success';
 let mockLabs: unknown[] = [];
+let mockConnectionsById = new Map();
 
 jest.mock('./hooks/useLabsData', () => ({
   useLabsData: () => ({
     labs: mockLabs,
     reportsByObservationId: new Map(),
-    connectionsById: new Map(),
+    connectionsById: mockConnectionsById,
     referenceContext: { ageYears: 14, sex: 'male' },
     recordCoverage: mockCoverage,
     status: mockStatus,
@@ -100,6 +102,7 @@ describe('LabsTab', () => {
   beforeEach(() => {
     mockStatus = 'success';
     mockLabs = [makeLab('lab-1', 'Ferritin'), makeLab('lab-2', 'Sodium')];
+    mockConnectionsById = new Map();
     window.localStorage.clear();
   });
 
@@ -174,6 +177,7 @@ describe('LabsTab view state', () => {
   beforeEach(() => {
     mockStatus = 'success';
     mockLabs = [makeLab('lab-1', 'Ferritin'), makeLab('lab-2', 'Sodium')];
+    mockConnectionsById = new Map();
     window.localStorage.clear();
   });
 
@@ -208,5 +212,90 @@ describe('LabsTab view state', () => {
 
     const attention = screen.getByRole('button', { name: /^Attention/ });
     expect(attention.getAttribute('aria-pressed')).toBe('true');
+  });
+});
+
+describe('LabsTab with device readings', () => {
+  beforeEach(() => {
+    mockStatus = 'success';
+    mockConnectionsById = new Map([
+      ['libre-connection', { source: 'freestyle_libre' }],
+    ]);
+    mockLabs = [
+      makeLab('lab-1', 'Ferritin'),
+      {
+        ...makeLab('glucose-1', 'Glucose'),
+        connection_record_id: 'libre-connection',
+        metadata: {
+          id: 'glucose-1',
+          date: '2026-02-01T12:00:00.000Z',
+          display_name: 'Glucose',
+          loinc_coding: [GLUCOSE_LOINC_CODE],
+        },
+        data_record: {
+          raw: {
+            resource: {
+              code: { text: 'Glucose' },
+              effectiveDateTime: '2026-02-01T12:00:00.000Z',
+              valueQuantity: { value: 110 },
+            },
+          },
+          resource_type: 'observation',
+        },
+      },
+    ];
+    window.localStorage.clear();
+  });
+
+  it('keeps lab results visible alongside a closed device report', () => {
+    renderTab();
+
+    expect(screen.getAllByTestId('labs-table').length).toBeGreaterThan(0);
+    expect(
+      screen
+        .getByRole('button', { name: 'Show glucose report' })
+        .getAttribute('aria-expanded'),
+    ).toBe('false');
+    expect(screen.queryByText('Ambulatory Glucose Profile')).toBeNull();
+  });
+
+  it('puts matching results first when searching instead of showing unrelated device reports', () => {
+    const { container } = renderTab();
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Search labs' }), {
+      target: { value: 'ferritin' },
+    });
+
+    const flow = container.querySelector(
+      '#labs-scroll-container',
+    )?.firstElementChild;
+    expect(flow?.firstElementChild?.getAttribute('data-testid')).toBe(
+      'labs-table',
+    );
+    expect(
+      screen.queryByRole('button', { name: 'Show glucose report' }),
+    ).toBeNull();
+    expect(screen.getByText(/lab tests listed/).textContent).toContain(
+      '1 of 2',
+    );
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Search labs' }), {
+      target: { value: '' },
+    });
+    expect(
+      screen.getByRole('button', { name: 'Show glucose report' }),
+    ).toBeTruthy();
+  });
+
+  it('does not replace a filter empty state with a device report', () => {
+    renderTab('/records/labs?filter=attention');
+
+    expect(screen.queryByText('FreeStyle Libre CGM')).toBeNull();
+    expect(screen.queryByTestId('labs-table')).toBeNull();
+    expect(
+      screen
+        .getByRole('button', { name: /^Attention/ })
+        .getAttribute('aria-pressed'),
+    ).toBe('true');
   });
 });

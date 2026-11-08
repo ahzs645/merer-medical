@@ -15,6 +15,7 @@ import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocumen
 import { setClinicalDocumentSourceLink } from '../../repositories/ClinicalDocumentRepository';
 import { useClinicalDoc } from '../../shared/hooks/useClinicalDoc';
 import { getFhirResource } from '../../shared/utils/fhirResource';
+import { getStoredAttachmentEncoding } from '../../shared/utils/attachmentContent';
 import { Modal } from '../../shared/components/Modal';
 import { ModalHeader } from '../../shared/components/ModalHeader';
 import { EmbeddedAttachmentViewer } from '../timeline/components/document-reference/EmbeddedAttachmentViewer';
@@ -136,6 +137,11 @@ export function useSourceDocumentLink(
                 contentType: attachment.get('data_record.content_type'),
                 raw: attachment.get('data_record.raw'),
                 title: viewerTitle,
+                encoding: getStoredAttachmentEncoding({
+                  contentType: attachment.get('data_record.content_type'),
+                  sourceType: attachment.get('metadata.source_type'),
+                  entryMethod: attachment.get('metadata.entry_method'),
+                }),
               }}
             />
           </div>

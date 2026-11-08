@@ -340,7 +340,7 @@ function DocumentItemCard({ item }: { item: DocumentItem }) {
     >
       <DocumentMagnifyingGlassIcon className="h-5 w-5 shrink-0 text-primary-700" />
       <div className="min-w-0 flex-1">
-        <h2 className="truncate text-sm font-semibold text-gray-900">
+        <h2 className="line-clamp-2 break-words text-sm font-semibold text-gray-900 sm:line-clamp-1">
           {item.document.metadata?.display_name ||
             attachmentMetadata?.title ||
             t('Untitled document')}

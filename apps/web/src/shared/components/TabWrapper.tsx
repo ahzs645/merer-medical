@@ -15,7 +15,9 @@ import {
   QueueListIcon,
   ShareIcon,
   SparklesIcon,
+  UserCircleIcon,
   WrenchScrewdriverIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 
 import logo from '../../assets/img/white-logo.svg';
@@ -98,9 +100,9 @@ export function TabWrapper() {
     shortViewport
       ? setExpandedWhileShort(collapsed)
       : updateLocalConfig({ side_nav_collapsed: !collapsed });
-  const userName = user?.first_name
-    ? `${user.first_name} ${user.last_name}`
-    : 'Unknown User';
+  const userName =
+    [user.first_name, user.last_name].filter(Boolean).join(' ') ||
+    'Your profile';
 
   return (
     <div
@@ -125,6 +127,34 @@ export function TabWrapper() {
           does not also move the reader past the announcement. */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {routeAnnouncement}
+      </div>
+      {/* The desktop rail identifies the selected person and opens search.
+          Both must also be visible while reading records on a phone. */}
+      <div className="hide-when-typing flex shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-3 py-1 print:hidden md:hidden">
+        <Link
+          to={AppRoutes.Settings}
+          aria-label={`Records for ${userName}. Manage profiles`}
+          className="flex min-h-[44px] min-w-0 flex-1 items-center gap-2 rounded-md py-1 text-primary-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600"
+        >
+          <UserCircleIcon className="h-6 w-6 shrink-0" aria-hidden="true" />
+          <span className="min-w-0">
+            <span className="block text-xs text-gray-600">Records for</span>
+            <span className="block break-words text-sm font-semibold leading-tight">
+              {userName}
+            </span>
+          </span>
+        </Link>
+        <button
+          type="button"
+          onClick={() => setSearchOpen(true)}
+          aria-label="Search"
+          aria-haspopup="dialog"
+          aria-expanded={searchOpen}
+          className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-primary-800 hover:bg-primary-50"
+        >
+          <MagnifyingGlassIcon className="h-5 w-5" aria-hidden="true" />
+          Search
+        </button>
       </div>
       <main
         ref={mainRef}
@@ -159,7 +189,10 @@ export function TabWrapper() {
           </p>
         </div>
       )}
-      <div className="hide-when-typing flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 print:hidden md:relative md:bottom-auto md:top-0 md:h-full md:w-auto">
+      <nav
+        aria-label="Primary navigation"
+        className="hide-when-typing flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 print:hidden md:relative md:bottom-auto md:top-0 md:h-full md:w-auto"
+      >
         {/* The rail is ~770px of items and the shell clips anything taller
             than the window, so in a shorter one — a 1280x600 laptop browser,
             a phone held sideways — the profile link, and at 393px Settings
@@ -327,7 +360,7 @@ export function TabWrapper() {
             </Link>
           </div>
         </div>
-      </div>
+      </nav>
     </div>
   );
 }
@@ -432,6 +465,8 @@ function MobileMoreButton({
           isActive ? 'bg-gray-0 border-primary border-t-2' : ''
         }`}
         aria-label="More navigation"
+        aria-haspopup="dialog"
+        aria-expanded={open}
       >
         <span
           className={`h-5 w-5 text-base ${
@@ -494,14 +529,24 @@ function MobileMoreButton({
                   on the first child collapses out through the panel, which
                   pushed the sheet down and left the grabber sitting on its
                   edge instead of inside it. */}
-              <Dialog.Panel className="pb-safe rounded-t-2xl bg-white pt-2.5 shadow-xl">
+              <Dialog.Panel className="pb-safe max-h-[85vh] overflow-y-auto rounded-t-2xl bg-white pt-2.5 shadow-xl">
                 <div
                   aria-hidden="true"
                   className="mx-auto h-1.5 w-10 rounded-full bg-gray-300"
                 />
-                <Dialog.Title className="px-4 pb-2 pt-3 text-sm font-semibold text-gray-900">
-                  More
-                </Dialog.Title>
+                <div className="sticky top-0 flex items-center justify-between bg-white px-4 pb-2 pt-1">
+                  <Dialog.Title className="text-base font-semibold text-gray-900">
+                    More
+                  </Dialog.Title>
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    aria-label="Close navigation"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100"
+                  >
+                    <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                </div>
                 <div className="grid grid-cols-2 gap-2 px-3 pb-3">
                   <MobileMoreLink
                     route={AppRoutes.AddRecord}
@@ -521,12 +566,18 @@ function MobileMoreButton({
                     <span className="h-5 w-5 flex-shrink-0">
                       <MagnifyingGlassIcon />
                     </span>
-                    <span className="min-w-0 truncate">Search</span>
+                    <span className="min-w-0 break-words">Search</span>
                   </button>
                   <MobileMoreLink
                     route={AppRoutes.Utilities}
                     title="Utilities"
                     icon={<WrenchScrewdriverIcon />}
+                    onClick={leaveSheet}
+                  />
+                  <MobileMoreLink
+                    route={AppRoutes.Sharing}
+                    title="Sharing"
+                    icon={<ShareIcon />}
                     onClick={leaveSheet}
                   />
                   {showAssistant && (
@@ -594,14 +645,14 @@ function MobileMoreLink({
       // replacing it keeps Back from the destination one step, not two.
       replace
       onClick={onClick}
-      className={`flex items-center gap-3 rounded-lg border p-3 text-sm font-semibold ${
+      className={`flex min-h-[44px] min-w-0 items-center gap-3 rounded-lg border p-3 text-sm font-semibold ${
         isActive
           ? 'border-primary bg-primary-50 text-primary'
           : 'border-gray-200 bg-gray-50 text-slate-800'
       }`}
     >
       <span className="h-5 w-5 flex-shrink-0">{icon}</span>
-      <span className="min-w-0 truncate">{title}</span>
+      <span className="min-w-0 break-words">{title}</span>
     </Link>
   );
 }
