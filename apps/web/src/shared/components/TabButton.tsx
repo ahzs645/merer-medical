@@ -35,11 +35,11 @@ export function TabButton({
       : ''
   }`;
 
-  // The phone labels stop growing at 18px — 150% of their normal 12px. Four
-  // equal tabs are ~98px each, and past that "Summary" no longer fits and
-  // splits mid-word. The page keeps growing with the text setting; the bar
+  // The phone labels stop growing at 16px — 133% of their normal 12px. Four
+  // equal tabs are ~80px each on a 320px phone, and past that "Summary" no
+  // longer fits and splits mid-word. The page keeps growing with the text setting; the bar
   // stays four readable words, and browser zoom still scales all of it.
-  const labelClass = `max-w-full break-words pt-1 text-center text-[length:min(0.75rem,18px)] leading-tight md:pt-0 md:text-start md:text-base md:text-white ${
+  const labelClass = `max-w-full break-words pt-1 text-center text-[length:min(0.75rem,16px)] leading-tight md:pt-0 md:text-start md:text-base md:text-white ${
     isActive ? 'text-primary font-bold' : 'text-slate-800'
   } ${collapsed ? 'md:hidden' : ''}`;
 

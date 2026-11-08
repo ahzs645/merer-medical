@@ -273,7 +273,7 @@ export function HistoriesTab() {
           {status === 'error' ? (
             <ErrorPanel error={error} text="Unable to load histories." />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {SECTIONS.map((section) => (
                 <HistorySection
                   key={section.key}

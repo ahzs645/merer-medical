@@ -477,7 +477,7 @@ export function MobileMoreButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`flex min-w-0 flex-1 flex-col items-center justify-center px-0.5 py-2 text-white duration-75 active:scale-90 sm:active:scale-95 md:hidden ${
+        className={`flex min-w-0 flex-1 flex-col items-center justify-center px-0.5 py-[6px] text-white duration-75 active:scale-90 sm:active:scale-95 md:hidden ${
           isActive ? 'bg-gray-0 border-primary border-t-2' : ''
         }`}
         aria-label="More navigation"
@@ -485,14 +485,14 @@ export function MobileMoreButton({
         aria-expanded={open}
       >
         <span
-          className={`h-5 w-5 text-base ${
+          className={`h-[20px] w-[20px] text-base ${
             isActive ? 'text-primary font-bold' : 'text-slate-800'
           }`}
         >
           <EllipsisHorizontalIcon />
         </span>
         <span
-          className={`max-w-full break-words pt-1 text-center text-[length:min(0.75rem,18px)] leading-tight ${
+          className={`max-w-full break-words pt-1 text-center text-[length:min(0.75rem,16px)] leading-tight ${
             isActive ? 'text-primary font-bold' : 'text-slate-800'
           }`}
         >

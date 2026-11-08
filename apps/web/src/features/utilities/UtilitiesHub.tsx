@@ -19,7 +19,7 @@ export function UtilitiesHub() {
             Tools that work on top of your records — prepare for a visit, check
             what care is due, and export or share what you hold.
           </p>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {UTILITY_TOOLS.map((tool) => {
               const Icon = tool.icon;
               return (

@@ -481,7 +481,7 @@ export function ManualRecordForm({
                 the one required field sat below them, under the fold on a
                 phone. */}
             {isMedicationType && !isDeviceImportType && (
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div>
                   <label
                     htmlFor="manual-record-dose"

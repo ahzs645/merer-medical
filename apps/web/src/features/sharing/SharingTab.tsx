@@ -346,7 +346,7 @@ export function SharingTab() {
                 )}
                 icon={ShieldCheckIcon}
               >
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <TextField
                     label="Preferred name"
                     value={state.emergencyProfile.preferredName}
@@ -415,7 +415,7 @@ export function SharingTab() {
                       setProxyDraft((draft) => ({ ...draft, name: value }))
                     }
                   />
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <TextField
                       label="Relationship"
                       value={proxyDraft.relationship}
@@ -492,7 +492,7 @@ export function SharingTab() {
                 icon={DocumentArrowDownIcon}
               >
                 <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)]">
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <fieldset className="sm:col-span-2">
                       <legend className="text-sm font-medium text-gray-700">
                         Export scope

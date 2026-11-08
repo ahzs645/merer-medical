@@ -55,7 +55,7 @@ export function OptometrySurgeryFields({
         {t('Surgery details')}
       </p>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label
             htmlFor="manual-record-surgery-type"
@@ -84,7 +84,7 @@ export function OptometrySurgeryFields({
       </div>
 
       {showLaser && (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <SpecialtyTextInput
             label={t('Laser platform')}
             value={laserPlatform}
@@ -113,7 +113,7 @@ export function OptometrySurgeryFields({
       )}
 
       {showLens && (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <SpecialtyTextInput
             label={t('IOL / ICL model')}
             value={iolModel}
@@ -135,7 +135,7 @@ export function OptometrySurgeryFields({
         placeholder={t('e.g. plano / emmetropia')}
         onChange={setTargetRefraction}
       />
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <SpecialtyTextInput
           label={t('Complications')}
           value={surgeryComplications}

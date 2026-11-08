@@ -339,7 +339,7 @@ function ResultDetailPanel({
       {detail.type === 'lab' && detail.group && detail.lab ? (
         <div className="space-y-4">
           <section className="rounded-md border border-gray-200 p-3">
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <InfoBlock
                 label="Latest value"
                 value={formatResultValue(detail.lab)}

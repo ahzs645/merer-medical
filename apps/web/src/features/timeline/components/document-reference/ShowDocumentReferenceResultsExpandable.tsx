@@ -301,7 +301,7 @@ function DocumentReferenceFallback({
           {description}
         </p>
       )}
-      <dl className="grid gap-3 sm:grid-cols-2">
+      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {rows.map(([label, value]) => (
           <div key={label} className="min-w-0 rounded-md bg-gray-50 p-3">
             <dt className="text-xs font-semibold uppercase tracking-wide text-gray-500">

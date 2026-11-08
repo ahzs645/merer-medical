@@ -167,8 +167,11 @@ function LabMobileRow({
           className="min-w-0 flex-1 rounded text-start focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
         >
           <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
+            {/* Wraps so a long value ("16.0 x 15.0 x 40 mm") or enlarged
+                text drops the value under the name instead of pushing the
+                row past the card's edge. */}
+            <div className="flex flex-wrap items-start justify-between gap-x-2">
+              <div className="min-w-0 flex-1 basis-32">
                 <h2 className="break-words text-sm font-semibold leading-5 text-gray-900">
                   {group.name}
                 </h2>
@@ -181,7 +184,7 @@ function LabMobileRow({
                 </div>
               </div>
               <div
-                className={`shrink-0 text-end text-sm font-semibold ${getFlagTextClass(
+                className={`ms-auto min-w-0 max-w-full break-words text-end text-sm font-semibold ${getFlagTextClass(
                   latestReference.flag,
                 )}`}
               >

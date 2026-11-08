@@ -460,7 +460,7 @@ export function ManualSpecialtySection({
 
       {specialty === 'optometry' && (
         <div className="mt-4 grid gap-4">
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label
                 htmlFor="manual-record-eye-side"
@@ -506,7 +506,7 @@ export function ManualSpecialtySection({
               <p className="text-sm font-semibold text-gray-900">
                 {t('Refraction / Rx')}
               </p>
-              <div className="grid gap-3 md:grid-cols-5">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
                 <PrescriptionInput
                   label={t('OD sphere')}
                   value={odSphere}
@@ -558,7 +558,7 @@ export function ManualSpecialtySection({
 
           {(optometryEntryKind === 'visualAcuity' ||
             optometryEntryKind === 'checkup') && (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <PrescriptionInput
                 label={t('OD visual acuity')}
                 value={visualAcuityOd}
@@ -576,7 +576,7 @@ export function ManualSpecialtySection({
 
           {(optometryEntryKind === 'iop' ||
             optometryEntryKind === 'checkup') && (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <PrescriptionInput
                 label={t('OD IOP')}
                 value={iopOd}
