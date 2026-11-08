@@ -1,5 +1,7 @@
 # Mobile workflow review — 8 November 2026
 
+> **Historical review:** This document records the initial reading/navigation fixes and their 24-case browser result. The five design priorities below are now implemented in the [follow-up mobile design pass](../mobile-design-pass-2026-11-08/README.md), which documents the newer application revision and its separate verification. The results and screenshots here remain evidence for the original revision.
+
 ## Outcome
 
 The mobile interface has useful functionality, but several core journeys do not follow the reader's intent. Opening a shared chart ends in source setup; a field labelled “Search records” only filters categories; searching Labs leaves a large glucose dashboard ahead of the matching tests; and some result links open a general list instead of the selected result. These are navigation and information-order problems, beyond visual styling.
@@ -84,9 +86,9 @@ These routes are reachable and their examined top-level layouts fit the narrow v
 
 Small inline links between Export, Sharing, and Visit prep also wrapped across lines at 320px. They are now full-width labelled links with readable descriptions and actual 44px targets.
 
-These broader reorganizations are recorded as follow-up design work. This branch concentrates on the demonstrated navigation, reading, target-size, and content-preview failures rather than moving every existing control at once.
+These broader reorganizations were recorded as follow-up work at this review's checkpoint. They are now implemented in the [mobile design pass](../mobile-design-pass-2026-11-08/README.md). The findings above preserve the original rationale.
 
-## Validation and evidence
+## Historical validation and evidence
 
 The production build and application TypeScript check passed for application commit `6950359dc18ef8a7e323cf6d4efca556be6dbaef`. All **276 focused tests across 25 suites passed**, covering package import handoff/failure, record routing and literal search terms, exact result selection, CGM disclosure, Timeline previews, dialog transitions, and document decoding/download fidelity.
 
@@ -134,7 +136,7 @@ npx playwright test --config apps/web-e2e/playwright.mobile.config.ts
 
 The mobile configuration starts `npm run preview:web:local` itself. `E2E_BASE_URL` can select an already-running build. It uses an in-memory demo database and generated readings; do not substitute a real patient package in committed test data or CI artifacts.
 
-## Review coverage and next design priorities
+## Original review coverage and subsequent design priorities
 
 The automated route sweep follows the actual Records cards, opens every category, checks its heading and loaded layout for horizontal page overflow, and returns with browser Back. It covers these 20 destinations:
 
@@ -148,7 +150,7 @@ The automated route sweep follows the actual Records cards, opens every category
 
 The deeper browser journeys cover search, selected details, navigation overlays, cancellation of an unsaved medication, and synthetic glucose-file import. Sources, Utilities, and Settings also have automated navigation/layout checks. The live walkthrough additionally inspected Sharing, Export, Visit prep, the dental tooth selector, and the optometry prescription view. Opening every category is not equivalent to exercising every clinical form, connection provider, or specialty tool.
 
-The next design pass should prioritize the following work, in order:
+The following priorities were identified by this review and are now implemented in the [follow-up design pass](../mobile-design-pass-2026-11-08/README.md). The original recommendations are retained here for traceability:
 
 1. **Sources:** put “Import file,” “Connect a portal,” and “Add manually” at the start, with setup details inside the chosen task. A shared-chart reader should reach the imported chart without having to understand connection administration.
 2. **Visit prep:** begin with the visit's purpose and questions, then let the reader choose included records and open one optional preview. Remove the competing embedded and rendered packet views from the main sequence.
@@ -156,4 +158,4 @@ The next design pass should prioritize the following work, in order:
 4. **Settings:** keep profile, language, and basic preferences together; put terminology packs, medication plugins, storage, and developer tools in an advanced section.
 5. **Screen density:** further reduce stacked Labs and specialty headers on short screens, and make horizontally scrollable filter choices easier to discover. The selected filter remains visible, but neighboring choices can be partially off-screen.
 
-Physical keyboard and browser checks should follow on both iOS and Android. Arabic/right-to-left presentation, enlarged text, and assistive-technology reading order also need their own pass; the English Chromium viewport suite does not establish those outcomes.
+This review's English Chromium suite did not establish Arabic/right-to-left or enlarged-text behavior. The follow-up adds targeted Arabic specialty navigation, RTL scrolling, and doubled-font reflow checks; see its current result and limitations. Physical keyboard/browser checks on iOS and Android and assistive-technology reading order still require their own validation.
