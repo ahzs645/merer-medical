@@ -19,6 +19,7 @@ import { getStoredAttachmentEncoding } from '../../shared/utils/attachmentConten
 import { Modal } from '../../shared/components/Modal';
 import { ModalHeader } from '../../shared/components/ModalHeader';
 import { EmbeddedAttachmentViewer } from '../timeline/components/document-reference/EmbeddedAttachmentViewer';
+import { useConnectionDoc } from '../connections/hooks/useConnectionDoc';
 
 function getMetaString(
   item: ClinicalDocument,
@@ -76,6 +77,8 @@ export function useSourceDocumentLink(
   const sourceDocumentId = getMetaString(item, 'source_document_id');
   const attachment = useClinicalDoc(sourceAttachmentId);
   const sourceDocument = useClinicalDoc(sourceDocumentId);
+  const attachmentConnectionId = attachment?.get('connection_record_id');
+  const attachmentConnection = useConnectionDoc(attachmentConnectionId);
 
   const resourceType = item.data_record?.resource_type;
   const isSourceItself =
@@ -141,6 +144,10 @@ export function useSourceDocumentLink(
                   contentType: attachment.get('data_record.content_type'),
                   sourceType: attachment.get('metadata.source_type'),
                   entryMethod: attachment.get('metadata.entry_method'),
+                  connectionSource:
+                    attachmentConnection?.get('id') === attachmentConnectionId
+                      ? attachmentConnection?.get('source')
+                      : undefined,
                 }),
               }}
             />

@@ -20,25 +20,48 @@ export function isJsonAttachment(contentType?: string): boolean {
   );
 }
 
-/** Match the existing ManualRecordForm file reader, not the file's contents. */
+/** Use the source's storage contract, never the apparent validity of its file. */
 export function getStoredAttachmentEncoding({
   contentType,
   sourceType,
   entryMethod,
+  connectionSource,
 }: {
   contentType?: string;
   sourceType?: string;
   entryMethod?: string;
+  connectionSource?: string;
 }): AttachmentEncoding | undefined {
-  if (sourceType !== 'manual' || entryMethod !== 'file-import') {
-    return undefined;
+  // ManualRecordForm reads these formats as text before storing the file.
+  if (sourceType === 'manual' && entryMethod === 'file-import') {
+    const type = attachmentMimeType(contentType);
+    return type.startsWith('text/') ||
+      type.includes('xml') ||
+      type.includes('html')
+      ? 'text'
+      : 'base64';
   }
-  const type = attachmentMimeType(contentType);
-  return type.startsWith('text/') ||
-    type.includes('xml') ||
-    type.includes('html')
-    ? 'text'
-    : 'base64';
+
+  // Legacy portal rows have only id/date/display_name metadata. Their linked
+  // connection still identifies the producer. Match its exact MIME branch:
+  // Cerner/Healow decode application/xml and types containing "text" before
+  // storage, but retain Binary.data for +xml, JSON (even malformed), and all
+  // other formats. Normalizing MIME parameters here would change that rule.
+  if (connectionSource === 'cerner' || connectionSource === 'healow') {
+    return contentType === 'application/xml' || contentType?.includes('text')
+      ? 'text'
+      : 'base64';
+  }
+
+  // Epic keeps response text except for the PDF/image blobs it base64-encodes.
+  if (connectionSource === 'epic') {
+    return contentType?.includes('application/pdf') ||
+      contentType?.includes('image/')
+      ? 'base64'
+      : 'text';
+  }
+
+  return undefined;
 }
 
 export function hasAttachmentContent(raw: unknown): boolean {

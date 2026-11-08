@@ -100,7 +100,8 @@ export function ResultsDigestCard() {
             const detail = detailsById.get(result.detailId);
             const destination =
               detail && (result.type === 'lab' || result.type === 'document')
-                ? recordSearchPath(detail.document)
+                ? recordSearchPath(detail.document) ??
+                  resultDetailPath(result.detailId)
                 : resultDetailPath(result.detailId);
             return (
               <li key={result.detailId}>

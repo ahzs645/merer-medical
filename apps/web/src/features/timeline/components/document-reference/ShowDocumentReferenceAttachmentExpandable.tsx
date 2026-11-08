@@ -2,6 +2,7 @@ import { ClinicalDocument } from '../../../../models/clinical-document/ClinicalD
 import { Modal } from '../../../../shared/components/Modal';
 import { ModalHeader } from '../../../../shared/components/ModalHeader';
 import { getStoredAttachmentEncoding } from '../../../../shared/utils/attachmentContent';
+import { useConnectionDoc } from '../../../connections/hooks/useConnectionDoc';
 import { EmbeddedAttachmentViewer } from './EmbeddedAttachmentViewer';
 
 export const LOINC_CODE_SYSTEM = '2.16.840.1.113883.6.1';
@@ -31,6 +32,8 @@ export function ShowDocumentResultsAttachmentExpandable({
   matchedChunks?: { id: string; metadata?: any }[];
   searchQuery?: string;
 }) {
+  const connection = useConnectionDoc(item.connection_record_id);
+
   return (
     <Modal open={expanded} setOpen={setExpanded}>
       <div className="flex flex-col">
@@ -53,6 +56,10 @@ export function ShowDocumentResultsAttachmentExpandable({
                   contentType: item.data_record.content_type,
                   sourceType: item.metadata?.source_type,
                   entryMethod: item.metadata?.entry_method,
+                  connectionSource:
+                    connection?.get('id') === item.connection_record_id
+                      ? connection.get('source')
+                      : undefined,
                 }),
               }}
               matchedChunks={matchedChunks}

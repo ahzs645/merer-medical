@@ -228,6 +228,34 @@ test('Records search finds a stored result and preserves the search on Back', as
   await expect(page.getByText(/No records or categories match/)).toBeVisible();
   await search.fill('');
   await expect(page.getByRole('link', { name: /^Labs\b/ })).toBeVisible();
+
+  // This bundled synthetic condition uses the generic Timeline handoff. Its
+  // parentheses must remain literal search text, not become regex groups.
+  const conditionName = 'TB (pulmonary tuberculosis)';
+  const conditionRecordId =
+    '9a00c884-153c-4cc9-aedd-1ef3dd8b6610|91a8d8cb-6480-4db4-a628-18a5e44536cd|https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/Condition/TpQ3y0axeAgBy6ee7oUTTLgB';
+  const anchorId = `timeline-record-${encodeURIComponent(conditionRecordId)}`;
+  await search.fill(conditionName);
+  const conditionResult = page.getByRole('link').filter({
+    has: page.getByText(conditionName, { exact: true }),
+  });
+  await expect(conditionResult).toBeVisible();
+  await conditionResult.click();
+  await expect(page).toHaveURL(/\/demo\/timeline\?/);
+  const timelineUrl = new URL(page.url());
+  expect(timelineUrl.searchParams.get('q')).toBe(conditionName);
+  expect(timelineUrl.hash).toBe(`#${anchorId}`);
+  const anchoredRecord = page.locator(`[id="${anchorId}"]`);
+  await expect(anchoredRecord).toBeVisible();
+  await expect(anchoredRecord).toBeInViewport();
+  await expect(anchoredRecord).toContainText(conditionName);
+  await expectNoHorizontalOverflow(page);
+  await captureDemoEvidence(page, 'timeline-search-result');
+
+  await page.goBack();
+  await expect(page).toHaveURL(/\/demo\/records\?.+/);
+  await expect(search).toHaveValue(conditionName);
+  await expect(conditionResult).toBeVisible();
 });
 
 test('a lab opens into a readable detail and Back restores the filtered list', async ({

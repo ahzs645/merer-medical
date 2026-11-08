@@ -164,7 +164,7 @@ export function RecordsHub() {
                     to={`${AppRoutes.Timeline}?${TIMELINE_QUERY_PARAM}=${encodeURIComponent(query.trim())}`}
                     className="text-primary-700 mt-2 inline-flex min-h-[44px] items-center text-sm font-semibold underline"
                   >
-                    {t('See all matching records in Timeline')}
+                    {t('Search Timeline')}
                   </Link>
                 </>
               ) : groups.length > 0 ? (

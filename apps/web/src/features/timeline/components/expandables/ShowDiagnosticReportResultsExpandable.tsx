@@ -12,6 +12,8 @@ import { ObservationResultRow } from '../ObservationResultRow';
 import { useClinicalDoc } from '../../../../shared/hooks/useClinicalDoc';
 import { EmbeddedAttachmentViewer } from '../document-reference/EmbeddedAttachmentViewer';
 import { getFhirResource } from '../../../../shared/utils/fhirResource';
+import { getStoredAttachmentEncoding } from '../../../../shared/utils/attachmentContent';
+import { useConnectionDoc } from '../../../connections/hooks/useConnectionDoc';
 
 export function ShowDiagnosticReportResultsExpandable({
   item,
@@ -35,6 +37,8 @@ export function ShowDiagnosticReportResultsExpandable({
       ? resource?.presentedForm?.[0]
       : undefined;
   const attachment = useClinicalDoc(presentedForm?.url);
+  const attachmentConnectionId = attachment?.get('connection_record_id');
+  const attachmentConnection = useConnectionDoc(attachmentConnectionId);
 
   return (
     <Modal open={expanded} setOpen={setExpanded}>
@@ -93,6 +97,16 @@ export function ShowDiagnosticReportResultsExpandable({
                       title:
                         presentedForm?.title ||
                         attachment.get('metadata.display_name'),
+                      encoding: getStoredAttachmentEncoding({
+                        contentType: attachment.get('data_record.content_type'),
+                        sourceType: attachment.get('metadata.source_type'),
+                        entryMethod: attachment.get('metadata.entry_method'),
+                        connectionSource:
+                          attachmentConnection?.get('id') ===
+                          attachmentConnectionId
+                            ? attachmentConnection?.get('source')
+                            : undefined,
+                      }),
                     }}
                   />
                 </div>

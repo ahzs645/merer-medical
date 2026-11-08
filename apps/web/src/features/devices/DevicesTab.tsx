@@ -1,8 +1,10 @@
 import { CpuChipIcon } from '@heroicons/react/24/outline';
+import { useMemo } from 'react';
 
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { RecordListPage } from '../../shared/components/records/RecordListPage';
 import { useRecordList } from '../../shared/hooks/useRecordList';
+import { useListViewParams } from '../../shared/hooks/useListViewParams';
 import { splitClinicalNote } from '../../shared/utils/clinicalNotes';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
@@ -62,19 +64,32 @@ export function DevicesTab() {
     resourceTypes: ['device'],
     mapDocs: mapDeviceDocs,
   });
+  const { query, setQuery } = useListViewParams();
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return items;
+    return items.filter((item) =>
+      [item.name, item.type, item.manufacturer]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(q)),
+    );
+  }, [items, query]);
 
   return (
     <RecordListPage
       title="Devices"
+      search={{ query, onChange: setQuery, placeholder: 'Search devices' }}
       status={status}
       error={error}
       loadingText="Loading devices…"
       errorText="Unable to load devices."
       isEmpty={items.length === 0}
+      isNoMatch={filtered.length === 0}
+      noMatchText="No devices match this search."
       emptyText="No devices recorded yet. Glucose monitors, CPAP machines and other devices appear here as your records arrive."
       emptyIcon={<CpuChipIcon className="h-6 w-6" />}
     >
-      {items.map((item) => (
+      {filtered.map((item) => (
         <article
           key={item.id}
           className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"

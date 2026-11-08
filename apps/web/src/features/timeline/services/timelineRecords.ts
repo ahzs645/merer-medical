@@ -5,6 +5,7 @@ import { IVSSimilaritySearchParams, VectorStorage } from '@mere/vector-storage';
 import { DatabaseCollections } from '../../../app/providers/DatabaseCollections';
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
 import { TimelineRecordTypeFilter } from '../types';
+import { escapeRegExp } from '../../../shared/utils/escapeRegExp';
 import {
   compareTimelineDateKeysDesc,
   timelineDateKey,
@@ -211,7 +212,10 @@ export async function fetchRecords(
   if (parsedQuery) {
     selector = {
       ...selector,
-      'metadata.display_name': { $regex: `.*${parsedQuery}.*`, $options: 'si' },
+      'metadata.display_name': {
+        $regex: `.*${escapeRegExp(parsedQuery)}.*`,
+        $options: 'si',
+      },
     };
   }
 

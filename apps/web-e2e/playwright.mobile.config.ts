@@ -42,7 +42,14 @@ export default defineConfig({
   },
   projects: [
     { name: 'phone-320', use: { viewport: { width: 320, height: 640 } } },
-    { name: 'phone-390', use: { viewport: { width: 390, height: 844 } } },
+    {
+      name: 'phone-390',
+      use: {
+        viewport: { width: 390, height: 844 },
+        // Exercise the animated dialog/focus handoff as well as reduced motion.
+        contextOptions: { reducedMotion: 'no-preference' },
+      },
+    },
     { name: 'phone-landscape', use: { viewport: { width: 844, height: 390 } } },
   ],
   webServer: process.env.E2E_BASE_URL

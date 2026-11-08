@@ -154,6 +154,118 @@ describe('embedded attachment content', () => {
     ).toBeUndefined();
   });
 
+  it.each(['cerner', 'healow'])(
+    'uses the %s connection contract for legacy +xml and malformed JSON bytes',
+    async (connectionSource) => {
+      for (const [contentType, original] of [
+        [
+          'application/fhir+xml',
+          '<Observation><text>العربية and English</text></Observation>',
+        ],
+        ['application/json', '{"text":"العربية", unfinished'],
+        ['application/fhir+json', '{"resourceType":"Observation",'],
+        ['application/xml; charset=utf-8', '<note>العربية</note>'],
+      ]) {
+        const attachment = {
+          contentType,
+          raw: base64(original),
+          encoding: getStoredAttachmentEncoding({
+            contentType,
+            connectionSource,
+          }),
+        };
+        expect(attachment.encoding).toBe('base64');
+        expect(await readAttachmentText(attachment)).toBe(original);
+        expect(
+          new Uint8Array(await createAttachmentBlob(attachment)!.arrayBuffer()),
+        ).toEqual(new Uint8Array(Buffer.from(original, 'utf8')));
+      }
+    },
+  );
+
+  it.each(['cerner', 'healow'])(
+    'keeps already-decoded XML/text from %s literal',
+    async (connectionSource) => {
+      for (const contentType of [
+        'application/xml',
+        'text/plain',
+        'text/xml',
+        'text/html',
+        'text/json',
+      ]) {
+        const raw = base64('This is literal stored text');
+        const encoding = getStoredAttachmentEncoding({
+          contentType,
+          connectionSource,
+        });
+        expect(encoding).toBe('text');
+        expect(
+          await createAttachmentBlob({ contentType, raw, encoding })?.text(),
+        ).toBe(raw);
+      }
+    },
+  );
+
+  it('preserves Epic response text even when it looks like encoded XML or JSON', async () => {
+    for (const contentType of ['application/fhir+xml', 'application/json']) {
+      const raw = base64('{"text":"This is literal stored text"}');
+      const encoding = getStoredAttachmentEncoding({
+        contentType,
+        connectionSource: 'epic',
+      });
+      expect(encoding).toBe('text');
+      expect(
+        await createAttachmentBlob({ contentType, raw, encoding })?.text(),
+      ).toBe(raw);
+    }
+    expect(
+      getStoredAttachmentEncoding({
+        contentType: 'application/pdf',
+        connectionSource: 'epic',
+      }),
+    ).toBe('base64');
+    expect(
+      getStoredAttachmentEncoding({
+        contentType: 'image/png',
+        connectionSource: 'epic',
+      }),
+    ).toBe('base64');
+  });
+
+  it('prioritizes the explicit manual XML contract over a connector association', async () => {
+    const raw = 'Literal العربية text';
+    const encoding = getStoredAttachmentEncoding({
+      contentType: 'application/fhir+xml',
+      sourceType: 'manual',
+      entryMethod: 'file-import',
+      connectionSource: 'cerner',
+    });
+    expect(encoding).toBe('text');
+    expect(
+      await createAttachmentBlob({
+        contentType: 'application/fhir+xml',
+        raw,
+        encoding,
+      })?.text(),
+    ).toBe(raw);
+  });
+
+  it('keeps connector JSON download bytes even when they are not valid UTF-8', async () => {
+    const bytes = Uint8Array.from([0x7b, 0x22, 0xff, 0x22]);
+    const attachment = {
+      contentType: 'application/json',
+      raw: Buffer.from(bytes).toString('base64'),
+      encoding: getStoredAttachmentEncoding({
+        contentType: 'application/json',
+        connectionSource: 'cerner',
+      }),
+    };
+    expect(
+      new Uint8Array(await createAttachmentBlob(attachment)!.arrayBuffer()),
+    ).toEqual(bytes);
+    await expect(readAttachmentText(attachment)).rejects.toThrow();
+  });
+
   it('rejects invalid declared base64 and invalid UTF-8 rather than corrupting text', async () => {
     await expect(
       readAttachmentText({

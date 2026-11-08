@@ -41,6 +41,37 @@ describe('fetchRecords', () => {
     await cleanupTestDatabase(db);
   });
 
+  it.each([
+    'TB (pulmonary tuberculosis)',
+    'Blood pressure [sitting]',
+    'Dose 5.0+ units?',
+    'Pending [',
+  ])(
+    'matches a literal record name containing punctuation: %s',
+    async (name) => {
+      const wanted = createSearchableDocument(
+        userId,
+        '2026-01-15T10:00:00Z',
+        'condition',
+        name,
+      );
+      await db.clinical_documents.bulkInsert([
+        wanted,
+        createSearchableDocument(
+          userId,
+          '2026-01-15T10:00:00Z',
+          'condition',
+          name.replace(/[()[\].+?]/g, ''),
+        ),
+      ]);
+
+      const matches = Object.values(
+        await fetchRecords(db, userId, name),
+      ).flat();
+      expect(matches.map((record) => record.id)).toEqual([wanted.id]);
+    },
+  );
+
   /**
    * Search used to exclude a different set of resource types than the grouped
    * timeline, so a query matching a clinic or a doctor by name returned a

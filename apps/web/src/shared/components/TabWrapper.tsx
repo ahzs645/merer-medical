@@ -420,7 +420,7 @@ function RailAddRecordButton({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-function MobileMoreButton({
+export function MobileMoreButton({
   open,
   setOpen,
   showAssistant,
@@ -496,7 +496,11 @@ function MobileMoreButton({
       >
         <Dialog
           as="div"
-          className="relative z-dialog md:hidden"
+          // The transition root must retain a real box and zero duration of
+          // its own. A zero-sized wrapper can be removed before afterLeave;
+          // the global reduced-motion duration can otherwise wait forever for
+          // an event on this non-animated wrapper, dropping More → Search.
+          className="fixed inset-0 z-dialog motion-reduce:!duration-0 md:hidden"
           onClose={setOpen}
         >
           <Transition.Child

@@ -7,6 +7,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { notifyRecordsChanged } from '../../shared/utils/recordChangeSignal';
 import { DirectoryTab } from './DirectoryTab';
+import { recordSearchPath } from '../../shared/utils/recordSearchPath';
 
 const mockDocsByType: Record<string, ClinicalDocument[]> = {};
 // The directory reads every record now — a clinician named as the performer on
@@ -50,6 +51,34 @@ describe('DirectoryTab', () => {
   beforeEach(() => {
     mockFind.mockClear();
     for (const key of Object.keys(mockDocsByType)) delete mockDocsByType[key];
+  });
+
+  it('opens a searched practitioner using the directory name rather than the stored label', async () => {
+    const provider = encounterDoc('synthetic-provider', '');
+    provider.data_record.resource_type = 'practitioner';
+    provider.data_record.raw = {
+      resource: {
+        resourceType: 'Practitioner',
+        name: [{ text: 'Dr Ada Ray' }],
+      },
+    };
+    provider.metadata = { display_name: 'Portal practitioner 123' };
+    mockDocsByType['practitioner'] = [provider];
+    render(
+      <MemoryRouter initialEntries={[recordSearchPath(provider)!]}>
+        <DirectoryTab />
+      </MemoryRouter>,
+    );
+    expect(
+      await screen.findByRole('heading', { name: 'Dr Ada Ray' }),
+    ).toBeTruthy();
+    expect(
+      (
+        screen.getByPlaceholderText(
+          'Search providers and locations',
+        ) as HTMLInputElement
+      ).value,
+    ).toBe('Dr Ada Ray');
   });
 
   /**

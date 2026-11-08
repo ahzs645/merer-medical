@@ -45,7 +45,9 @@ Summary's broader card arrangement and clinical prioritization are not redesigne
 
 ### Records → search → detail → Back
 
-The category grid is useful for browsing, but it cannot be the only search target. Search now combines stored-record matches with category matches. Its scope is the existing record display name, with a two-character minimum and six recent hits; the Timeline link offers the remaining matches. It is not full-text attachment search.
+The category grid is useful for browsing, but it cannot be the only search target. Search now combines stored-record matches with category matches. Its scope is the existing record display name, with a two-character minimum and six recent usable hits. Search terms are literal, including parentheses and brackets. It is not full-text attachment search.
+
+Each offered hit has a destination that can render it: a lab/document/result detail, a filtered device/provider list, or a dated Timeline card. Undated encounters and referrals use their lists. Unsupported internal resources and undated generic rows without a usable target are omitted; their supported category views remain available through browsing. The “Search Timeline” link searches dated Timeline records and does not claim to include every result from the hub.
 
 Errors, loading, and an empty match set are separate states. The selected record destination is explicit rather than always opening a generic list. Timeline query/filter state is addressable so search handoffs also work when Timeline is already mounted.
 
@@ -59,7 +61,7 @@ Shorter category previews make date groups easier to scan while preserving acces
 
 ### Documents
 
-The app has multiple attachment sources with different encodings. Manual text/XML/HTML imports store literal text; manual binary/JSON uploads and FHIR inline attachment data use base64. Legacy integrations can store either JSON text or base64-encoded file data. The shared decoder respects explicit source encoding and only infers legacy JSON base64 when it decodes to valid UTF-8 JSON. Ordinary text and XML are not guessed to be base64. Other legacy binary formats retain their decoded download bytes even when a preview is unavailable.
+The app has multiple attachment sources with different encodings. Manual text/XML/HTML imports store literal text; manual binary/JSON uploads and FHIR inline attachment data use base64. Legacy integrations can store either JSON text or base64-encoded file data. The shared decoder uses the attachment's connection to apply the original connector's storage rules even when older attachment metadata has no source fields. Cerner/Healow JSON and `application/*+xml` retain their decoded file bytes regardless of whether the contents are valid JSON or XML; Epic response text remains literal. When no encoding or connector is known, JSON base64 is inferred only if it decodes to valid UTF-8 JSON. Ordinary text and XML are not guessed to be base64. Other legacy binary formats retain their decoded download bytes even when a preview is unavailable.
 
 Malformed JSON text remains readable with an explanation. When a legacy JSON string has no known encoding and cannot be validated after decoding, the original stored text is preserved. Unsupported stored formats have an honest “preview not available” state. PDF reading continues to open the browser's full-page viewer, where zoom, search, and print are practical on a phone.
 
@@ -86,9 +88,9 @@ These broader reorganizations are recorded as follow-up design work. This branch
 
 ## Validation and evidence
 
-The final production build and application TypeScript check passed. All 236 focused tests across 19 suites passed, covering package import handoff/failure, record routing, exact result selection, CGM disclosure, Timeline previews, and document decoding/lookup. Browser acceptance is pending the pull-request CI run; its result and evidence will be recorded here after it completes.
+The final production build and application TypeScript check passed. All 276 focused tests across 25 suites passed, covering package import handoff/failure, record routing and literal search terms, exact result selection, CGM disclosure, Timeline previews, dialog transitions, and document decoding/download fidelity. Browser acceptance is pending the pull-request CI run; its result and evidence will be recorded here after it completes.
 
-The dedicated mobile Playwright suite contains 24 cases (eight journeys across three viewports) and runs the production static preview with synthetic `/demo` data at 320×640, 390×844, and 844×390. It exercises navigation/dismissal, direct Search, record search/detail/Back, Labs search/detail/Back, dirty-form cancellation, a generated LibreView import, exact Results selection/list/Back behavior, and a read-only category/settings route sweep. It saves screenshots and traces as CI artifacts.
+The dedicated mobile Playwright suite contains 24 cases (eight journeys across three viewports) and runs the production static preview with synthetic `/demo` data at 320×640, 390×844, and 844×390. The 390px project uses normal motion; the other two use reduced motion. It exercises navigation/dismissal, More-to-Search handoff, direct Search, record search/detail/Back (including a condition name with parentheses), Labs search/detail/Back, dirty-form cancellation, a generated LibreView import, exact Results selection/list/Back behavior, and a read-only category/settings route sweep. It saves screenshots and traces as CI artifacts.
 
 Local automated Chromium could not start because this workspace denies a required browser socket. No browser assertions ran in that attempt. The pull-request workflow is the alternative execution environment; a test collection or successful build is not counted as a browser pass.
 
@@ -111,3 +113,27 @@ npx playwright test --config apps/web-e2e/playwright.mobile.config.ts
 ```
 
 The mobile configuration starts `npm run preview:web:local` itself. `E2E_BASE_URL` can select an already-running build. It uses an in-memory demo database and generated readings; do not substitute a real patient package in committed test data or CI artifacts.
+
+## Review coverage and next design priorities
+
+The automated route sweep follows the actual Records cards, opens every category, checks its heading and loaded layout for horizontal page overflow, and returns with browser Back. It covers these 20 destinations:
+
+| Group                        | Categories                                                           |
+| ---------------------------- | -------------------------------------------------------------------- |
+| Results                      | Labs, Vitals, Imaging, All results                                   |
+| Health profile               | Conditions, Allergies, Medications, Immunizations                    |
+| Care and visits              | Visits, Referrals, Care plans, Procedures, Goals, Devices, Histories |
+| Documents and administration | Documents, Insurance, Providers                                      |
+| Specialty                    | Dental, Optometry                                                    |
+
+The deeper browser journeys cover search, selected details, navigation overlays, cancellation of an unsaved medication, and synthetic glucose-file import. Sources, Utilities, and Settings also have automated navigation/layout checks. The live walkthrough additionally inspected Sharing, Export, Visit prep, the dental tooth selector, and the optometry prescription view. Opening every category is not equivalent to exercising every clinical form, connection provider, or specialty tool.
+
+The next design pass should prioritize the following work, in order:
+
+1. **Sources:** put “Import file,” “Connect a portal,” and “Add manually” at the start, with setup details inside the chosen task. A shared-chart reader should reach the imported chart without having to understand connection administration.
+2. **Visit prep:** begin with the visit's purpose and questions, then let the reader choose included records and open one optional preview. Remove the competing embedded and rendered packet views from the main sequence.
+3. **Sharing:** separate emergency information, caregivers, package download, and the sharing log. Each section should explain the action it performs and what happens next.
+4. **Settings:** keep profile, language, and basic preferences together; put terminology packs, medication plugins, storage, and developer tools in an advanced section.
+5. **Screen density:** further reduce stacked Labs and specialty headers on short screens, and make horizontally scrollable filter choices easier to discover. The selected filter remains visible, but neighboring choices can be partially off-screen.
+
+Physical keyboard and browser checks should follow on both iOS and Android. Arabic/right-to-left presentation, enlarged text, and assistive-technology reading order also need their own pass; the English Chromium viewport suite does not establish those outcomes.

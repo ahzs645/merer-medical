@@ -147,6 +147,8 @@ export function DocumentDetailTab() {
   const [connection, setConnection] = useState<
     ConnectionDocument | undefined
   >();
+  const [attachmentConnectionSource, setAttachmentConnectionSource] =
+    useState<ConnectionDocument['source']>();
   const [linked, setLinked] = useState<ClinicalDocument[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'missing'>(
     'loading',
@@ -215,6 +217,25 @@ export function DocumentDetailTab() {
       ]);
       if (cancelled) return;
 
+      const storedAttachment = attachmentRow
+        ? (attachmentRow.toMutableJSON() as ClinicalDocument)
+        : null;
+      let attachmentConnRow = connRow;
+      if (
+        storedAttachment &&
+        storedAttachment.connection_record_id !== doc.connection_record_id
+      ) {
+        attachmentConnRow = await db.connection_documents
+          .findOne({
+            selector: {
+              user_id: user.id,
+              id: storedAttachment.connection_record_id,
+            },
+          })
+          .exec();
+        if (cancelled) return;
+      }
+
       const byId = new Map<string, ClinicalDocument>();
       for (const row of allRows) {
         const record = row.toMutableJSON() as ClinicalDocument;
@@ -241,10 +262,9 @@ export function DocumentDetailTab() {
       }
 
       setDocument(doc);
-      setAttachment(
-        attachmentRow
-          ? (attachmentRow.toMutableJSON() as ClinicalDocument)
-          : null,
+      setAttachment(storedAttachment);
+      setAttachmentConnectionSource(
+        storedAttachment ? attachmentConnRow?.get('source') : undefined,
       );
       setConnection(
         connRow ? (connRow.toMutableJSON() as ConnectionDocument) : undefined,
@@ -283,6 +303,7 @@ export function DocumentDetailTab() {
         contentType,
         sourceType: attachment?.metadata?.source_type,
         entryMethod: attachment?.metadata?.entry_method,
+        connectionSource: attachmentConnectionSource,
       })
     : 'base64';
   const embeddedAttachment = { contentType, raw: rawBytes, title, encoding };

@@ -6,6 +6,7 @@ import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocumen
 import { safeFormatDate } from '../utils/dateFormatters';
 import { recordSearchPath } from '../utils/recordSearchPath';
 import { useRecordChangeTick } from '../utils/recordChangeSignal';
+import { escapeRegExp } from '../utils/escapeRegExp';
 
 export interface RecordSearchHit {
   id: string;
@@ -16,12 +17,8 @@ export interface RecordSearchHit {
   path: string;
 }
 
-/** Regex metacharacters, so a typed "(" cannot blow up the query. */
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 const MAX_HITS = 6;
+const CANDIDATE_PAGE_SIZE = 24;
 const DEBOUNCE_MS = 200;
 
 /**
@@ -64,25 +61,35 @@ export function useRecordSearch(query: string): {
 
     const timer = setTimeout(async () => {
       try {
-        const docs = await db.clinical_documents
-          .find({
-            selector: {
-              user_id: user.id,
-              'metadata.display_name': {
-                $regex: `.*${escapeRegExp(trimmed)}.*`,
-                $options: 'si',
+        const nextHits: RecordSearchHit[] = [];
+        let offset = 0;
+        // Some stored rows (for example provenance or an undated generic
+        // resource) have no readable destination. Skip them before applying
+        // the six-hit cap so they cannot hide a usable result further down.
+        while (nextHits.length < MAX_HITS && !cancelled) {
+          const docs = await db.clinical_documents
+            .find({
+              selector: {
+                user_id: user.id,
+                'metadata.display_name': {
+                  $regex: `.*${escapeRegExp(trimmed)}.*`,
+                  $options: 'si',
+                },
               },
-            },
-            sort: [{ 'metadata.date': 'desc' }],
-          })
-          .limit(MAX_HITS)
-          .exec();
+              sort: [{ 'metadata.date': 'desc' }],
+            })
+            .skip(offset)
+            .limit(CANDIDATE_PAGE_SIZE)
+            .exec();
 
-        if (cancelled) return;
-        setHits(
-          docs.map((doc) => {
+          if (cancelled) return;
+          for (const doc of docs) {
+            const path = recordSearchPath(
+              doc.toMutableJSON() as ClinicalDocument,
+            );
+            if (!path) continue;
             const date = doc.get('metadata')?.date as string | undefined;
-            return {
+            nextHits.push({
               id: doc.get('id'),
               name: String(doc.get('metadata')?.display_name || 'Untitled'),
               resourceType: String(
@@ -90,10 +97,14 @@ export function useRecordSearch(query: string): {
               ),
               date,
               dateLabel: safeFormatDate(date, 'PP', 'Undated'),
-              path: recordSearchPath(doc.toMutableJSON() as ClinicalDocument),
-            };
-          }),
-        );
+              path,
+            });
+            if (nextHits.length === MAX_HITS) break;
+          }
+          if (docs.length < CANDIDATE_PAGE_SIZE) break;
+          offset += docs.length;
+        }
+        if (!cancelled) setHits(nextHits);
       } catch (error) {
         console.error('Record search failed', error);
         if (!cancelled) {
