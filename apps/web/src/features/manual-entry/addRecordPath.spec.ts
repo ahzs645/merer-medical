@@ -39,6 +39,24 @@ describe('safeReturnTo', () => {
 });
 
 describe('buildAddRecordPath', () => {
+  it('carries an explicit device-file preset and its task return path', () => {
+    const path = buildAddRecordPath({
+      type: 'device',
+      deviceImport: 'freestyle_libre',
+      returnTo: '/connections?task=import',
+    });
+    const params = new URLSearchParams(path.split('?')[1]);
+    expect(params.get('type')).toBe('device');
+    expect(params.get('deviceImport')).toBe('freestyle_libre');
+    expect(params.get('returnTo')).toBe('/connections?task=import');
+    expect(buildAddRecordPath({ type: 'device' })).not.toContain(
+      'deviceImport',
+    );
+    expect(
+      buildAddRecordPath({ type: 'document', deviceImport: 'freestyle_libre' }),
+    ).not.toContain('deviceImport');
+  });
+
   it('carries the return path so Save and Cancel come back to the page', () => {
     const path = buildAddRecordPath({
       type: 'medicationstatement',

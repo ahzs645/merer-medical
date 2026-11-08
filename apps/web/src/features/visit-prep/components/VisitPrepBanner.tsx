@@ -1,44 +1,14 @@
-import {
-  DocumentArrowDownIcon,
-  DocumentTextIcon,
-  PrinterIcon,
-} from '@heroicons/react/24/outline';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
+import { RecordPageHeader } from '../../../shared/components/records/RecordPageHeader';
 
-import {
-  RecordHeaderButton,
-  RecordPageHeader,
-} from '../../../shared/components/records/RecordPageHeader';
-
-export function VisitPrepBanner({
-  downloadMarkdownPacket,
-  downloadHtmlPacket,
-}: {
-  downloadMarkdownPacket: () => void;
-  downloadHtmlPacket: () => void;
-}) {
+export function VisitPrepBanner() {
+  const { t } = useInterfaceLanguage();
   return (
     <RecordPageHeader
-      title="Visit prep and provider packet"
-      description="A printable summary and a visit-sized copy of your records, built from what is stored on this device."
-      action={
-        <>
-          <RecordHeaderButton
-            onClick={downloadMarkdownPacket}
-            label="Markdown"
-            icon={DocumentArrowDownIcon}
-          />
-          <RecordHeaderButton
-            onClick={downloadHtmlPacket}
-            label="HTML"
-            icon={DocumentTextIcon}
-          />
-          <RecordHeaderButton
-            onClick={() => window.print()}
-            label="Print / PDF"
-            icon={PrinterIcon}
-          />
-        </>
-      }
+      title={t('Visit prep')}
+      description={t(
+        'Prepare questions and choose records for your next visit.',
+      )}
       className="print:hidden"
     />
   );

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ComponentType, type ReactNode } from 'react';
+import { type ComponentType, type ReactNode } from 'react';
 import {
   ArrowLeftIcon,
   MagnifyingGlassIcon,
@@ -7,6 +7,7 @@ import {
 import { Link } from 'react-router-dom';
 
 import { useRegisterPageBackLink } from '../../../features/records/pageBackLink';
+import { HorizontalChoiceScroller } from '../HorizontalChoiceScroller';
 
 type IconComponent = ComponentType<{ className?: string }>;
 
@@ -50,6 +51,8 @@ export interface RecordPageHeaderProps<Id extends string = string> {
   filters?: RecordHeaderFilters<Id>;
   /** Escape hatch for per-route visibility only (e.g. `print:hidden`). */
   className?: string;
+  /** Hide supporting counts visually on phones while retaining their accessible text. */
+  compactCount?: boolean;
 }
 
 /**
@@ -89,6 +92,7 @@ export function RecordPageHeader<Id extends string = string>({
   action,
   filters,
   className = '',
+  compactCount = false,
 }: RecordPageHeaderProps<Id>) {
   // Tells the Records shell to drop its generic "All records" bar while a page
   // with its own back link is on screen, so a phone shows one back link, not
@@ -133,7 +137,17 @@ export function RecordPageHeader<Id extends string = string>({
                 {description}
               </p>
             )}
-            {count && <p className="mt-1 text-sm text-primary-100">{count}</p>}
+            {count && (
+              <p
+                className={
+                  compactCount
+                    ? 'sr-only sm:not-sr-only sm:mt-1 sm:text-sm sm:text-primary-100 short:sr-only'
+                    : 'mt-1 text-sm text-primary-100'
+                }
+              >
+                {count}
+              </p>
+            )}
           </div>
 
           {/* The action row wraps rather than overflowing. `shrink-0` here
@@ -190,39 +204,13 @@ function HeaderFilters<Id extends string>({
   onSelect,
   label,
 }: RecordHeaderFilters<Id>) {
-  const rowRef = useRef<HTMLDivElement>(null);
-
-  // A one-line row can hold the selected chip off-screen — after a reload, or
-  // when the selection is set from somewhere other than a tap — which leaves
-  // the list filtered by something the reader cannot see. Bring it back only
-  // when it is actually out of view, so tapping a visible chip never yanks the
-  // row out from under the finger.
-  useEffect(() => {
-    const row = rowRef.current;
-    const chip = row?.querySelector<HTMLElement>('[aria-pressed="true"]');
-    if (!row || !chip) return;
-
-    const start = chip.offsetLeft;
-    const end = start + chip.offsetWidth;
-    if (start < row.scrollLeft) {
-      row.scrollLeft = start - 8;
-    } else if (end > row.scrollLeft + row.clientWidth) {
-      row.scrollLeft = end - row.clientWidth + 8;
-    }
-  }, [selectedId]);
-
   return (
-    // Six chips wrapped onto three rows on a phone, so the banner grew taller
-    // than the first record underneath it. Below `sm` they stay on one line and
-    // scroll sideways instead — the affordance the record tab strip already
-    // uses — and only wrap once there is width to wrap into. The negative
-    // margin lets the row bleed to the banner's edge so a half-cut chip reads
-    // as "more this way"; the matching padding keeps focus rings unclipped.
-    <div
-      ref={rowRef}
-      role="group"
-      aria-label={label}
-      className="scrollbar-hide -mx-1 flex gap-2 overflow-x-auto px-1 py-0.5 sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0 short:flex-nowrap short:overflow-x-auto"
+    <HorizontalChoiceScroller
+      label={label}
+      activeKey={selectedId}
+      activeSelector='[aria-pressed="true"]'
+      tone="dark"
+      rowClassName="gap-2 px-1 py-0.5 sm:flex-wrap sm:overflow-x-visible short:flex-nowrap short:overflow-x-auto"
     >
       {items.map((filter) => {
         const Icon = filter.icon;
@@ -254,7 +242,7 @@ function HeaderFilters<Id extends string>({
           </button>
         );
       })}
-    </div>
+    </HorizontalChoiceScroller>
   );
 }
 

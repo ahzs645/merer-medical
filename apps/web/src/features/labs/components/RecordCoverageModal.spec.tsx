@@ -6,6 +6,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import { RecordCoverageModal } from './RecordCoverageModal';
 import { RecordCoverageSummary } from '../types';
+import { ReferenceOverlayMode } from '../enrichment/types';
 
 // Headless UI's Dialog observes its panel to decide whether it is on screen,
 // and jsdom ships no IntersectionObserver, so without this stub the dialog
@@ -136,5 +137,54 @@ describe('RecordCoverageModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Close' }));
 
     expect(screen.queryByText('14y, male')).toBeNull();
+  });
+
+  it('changes the reference without closing the options and preserves the selection on reopening', () => {
+    const referenceChanged = jest.fn();
+    function Host() {
+      const [open, setOpen] = useState(true);
+      const [referenceMode, setReferenceMode] =
+        useState<ReferenceOverlayMode>('canadian');
+      return (
+        <>
+          <button onClick={() => setOpen(true)}>Open options</button>
+          <RecordCoverageModal
+            open={open}
+            setOpen={setOpen}
+            coverage={coverage}
+            visibleCount={referenceMode === 'original' ? 8 : 12}
+            totalGroups={51}
+            filterMode="attention"
+            reference={{
+              mode: referenceMode,
+              onChange: (next) => {
+                referenceChanged(next);
+                setReferenceMode(next);
+              },
+            }}
+          />
+        </>
+      );
+    }
+    render(<Host />);
+    fireEvent.change(screen.getByRole('combobox', { name: 'Reference' }), {
+      target: { value: 'original' },
+    });
+
+    expect(referenceChanged).toHaveBeenCalledWith('original');
+    expect(screen.getByRole('dialog', { name: /^Lab options/ })).toBeTruthy();
+    expect(screen.getByText(/8 of 51 lab tests listed/)).toBeTruthy();
+    expect(
+      (screen.getByRole('combobox', { name: 'Reference' }) as HTMLSelectElement)
+        .value,
+    ).toBe('original');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Open options' }));
+    expect(
+      (screen.getByRole('combobox', { name: 'Reference' }) as HTMLSelectElement)
+        .value,
+    ).toBe('original');
+    expect(screen.getByText(/8 of 51 lab tests listed/)).toBeTruthy();
   });
 });

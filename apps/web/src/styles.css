@@ -200,6 +200,34 @@ html {
   overscroll-behavior-y: none;
 }
 
+/* Visit summaries print outside the viewport-sized application shell. */
+@media print {
+  html.visit-prep-print-view,
+  html.visit-prep-print-view body {
+    height: auto !important;
+    overflow: visible !important;
+    background: white;
+  }
+
+  html.visit-prep-print-view body > :not(.visit-prep-print-packet) {
+    display: none !important;
+  }
+
+  .visit-prep-print-packet {
+    display: block;
+    color: #111827;
+  }
+
+  .visit-prep-print-packet h2,
+  .visit-prep-print-packet h3 {
+    break-after: avoid;
+  }
+
+  .visit-prep-print-packet li {
+    break-inside: avoid;
+  }
+}
+
 /*
  * No text field under 16px on a touch screen.
  *

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import {
-  ChartBarSquareIcon,
+  AdjustmentsHorizontalIcon,
   DocumentPlusIcon,
 } from '@heroicons/react/24/outline';
 
@@ -11,7 +11,6 @@ import {
   RecordHeaderLink,
   RecordPageHeader,
 } from '../../shared/components/records/RecordPageHeader';
-import { LabReferenceSelect } from './components/LabReferenceSelect';
 import { LabsEmptySearch } from './components/LabsEmptySearch';
 import { LabsSkeleton } from './components/LabsSkeleton';
 import { LabsTable } from './components/LabsTable';
@@ -20,6 +19,7 @@ import { RecordCoverageModal } from './components/RecordCoverageModal';
 import {
   buildLabReferenceEvaluation,
   isPlannerRelevantLab,
+  referenceOverlayLabels,
 } from './enrichment/labEnrichment';
 import { useLabsData } from './hooks/useLabsData';
 import { useLabReferenceStandard } from './hooks/useLabReferenceStandard';
@@ -120,27 +120,21 @@ export function LabsTab() {
 
   return (
     <AppPage
+      allowHeaderScroll
       banner={
         <RecordPageHeader<LabFilterMode>
           title="All lab results"
-          // How much of the list you are being shown — it reflects the search
-          // box as well as the chips, so neither replaces it.
-          //
-          // On a phone it is the one row here that repeats itself: the chips
-          // directly below already read "Attention 5 · Key markers 2 · All 50",
-          // and the page opens on Attention, so "5 of 50 lab tests listed"
-          // above them mostly succeeded in reading as "you only have 5 labs".
-          // It stays from `sm` up, where the banner has the room and the count
-          // is the only thing tying the search box to the chips.
           count={
-            groupedLabs.length > 0 ? (
-              <span className="hidden sm:inline">
-                <span className="font-semibold text-white">
-                  {filteredGroups.length} of {groupedLabs.length}
-                </span>{' '}
-                lab tests listed
-              </span>
-            ) : undefined
+            <>
+              <span>Reference: {referenceOverlayLabels[referenceMode]}</span>
+              {groupedLabs.length > 0 && (
+                <span className="hidden sm:inline short:hidden">
+                  {' · '}
+                  {filteredGroups.length} of {groupedLabs.length} lab tests
+                  listed
+                </span>
+              )}
+            </>
           }
           search={{
             query,
@@ -148,19 +142,12 @@ export function LabsTab() {
             placeholder: 'Search lab name or code',
             label: 'Search labs',
           }}
-          // Three controls, so the group takes its own row below `md` — the
-          // banner's documented behaviour once buttons cannot share the title's
-          // line, and 52px of it buys back the 286px card underneath.
           action={
             <>
-              <LabReferenceSelect
-                mode={referenceMode}
-                setMode={setReferenceMode}
-              />
               <RecordHeaderButton
                 onClick={() => setCoverageOpen(true)}
-                label="What's in your records"
-                icon={ChartBarSquareIcon}
+                label="Lab options"
+                icon={AdjustmentsHorizontalIcon}
                 variant="subtle"
                 compact
               />
@@ -242,6 +229,7 @@ export function LabsTab() {
         totalGroups={groupedLabs.length}
         filterMode={filterMode}
         referenceContext={referenceContext}
+        reference={{ mode: referenceMode, onChange: setReferenceMode }}
       />
     </AppPage>
   );

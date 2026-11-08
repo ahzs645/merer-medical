@@ -4,17 +4,28 @@ import { PacketItem, PacketOptions, PacketSections } from '../types';
 export function buildPacketMarkdown({
   packet,
   questions,
+  visitPurpose = '',
   patientName,
   generatedAt,
   options,
 }: {
   packet: PacketSections;
   questions: string;
+  visitPurpose?: string;
   patientName: string;
   generatedAt: Date;
   options: PacketOptions;
 }) {
   const sections = [
+    options.includeQuestions && visitPurpose.trim()
+      ? ['## Visit purpose', visitPurpose.trim()].join('\n\n')
+      : undefined,
+    options.includeQuestions
+      ? [
+          '## Questions for visit',
+          questions.trim() || 'No questions saved.',
+        ].join('\n\n')
+      : undefined,
     options.includeProblems
       ? formatPacketSection('Active problems', packet.problems)
       : undefined,
@@ -36,12 +47,6 @@ export function buildPacketMarkdown({
     options.includeProcedures
       ? formatPacketSection('Recent procedures', packet.procedures)
       : undefined,
-    options.includeQuestions
-      ? [
-          '## Questions for visit',
-          questions.trim() || 'No questions saved.',
-        ].join('\n\n')
-      : undefined,
   ].filter(Boolean);
 
   return [
@@ -57,17 +62,27 @@ export function buildPacketMarkdown({
 export function buildPacketHtml({
   packet,
   questions,
+  visitPurpose = '',
   patientName,
   generatedAt,
   options,
 }: {
   packet: PacketSections;
   questions: string;
+  visitPurpose?: string;
   patientName: string;
   generatedAt: Date;
   options: PacketOptions;
 }) {
   const sectionHtml = [
+    options.includeQuestions && visitPurpose.trim()
+      ? `<section><h2>Visit purpose</h2><p>${escapeHtml(visitPurpose.trim()).replace(/\n/g, '<br>')}</p></section>`
+      : undefined,
+    options.includeQuestions
+      ? `<section><h2>Questions for visit</h2><p>${escapeHtml(
+          questions.trim() || 'No questions saved.',
+        ).replace(/\n/g, '<br>')}</p></section>`
+      : undefined,
     options.includeProblems
       ? formatPacketHtmlSection('Active problems', packet.problems)
       : undefined,
@@ -88,11 +103,6 @@ export function buildPacketHtml({
       : undefined,
     options.includeProcedures
       ? formatPacketHtmlSection('Recent procedures', packet.procedures)
-      : undefined,
-    options.includeQuestions
-      ? `<section><h2>Questions for visit</h2><p>${escapeHtml(
-          questions.trim() || 'No questions saved.',
-        ).replace(/\n/g, '<br>')}</p></section>`
       : undefined,
   ]
     .filter(Boolean)

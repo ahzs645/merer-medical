@@ -92,9 +92,11 @@ export function useScrollRestoration(containerRef: RefObject<HTMLElement>) {
     const onScroll = (event: Event) => {
       const target = event.target as HTMLElement | null;
       if (!target || typeof target.scrollTop !== 'number') return;
-      latestTop.current = target.scrollTop;
       const index = findScrollers(container).indexOf(target);
-      if (index >= 0) latestIndex.current = index;
+      // A sideways filter/tab scroll must not erase the list's vertical place.
+      if (index < 0) return;
+      latestTop.current = target.scrollTop;
+      latestIndex.current = index;
     };
     container.addEventListener('scroll', onScroll, {
       capture: true,

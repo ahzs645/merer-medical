@@ -1,6 +1,7 @@
 import { Routes as AppRoutes } from '../../Routes';
 import type {
   DentalEntryKind,
+  DeviceImportKind,
   ManualRecordKind,
   OptometryEntryKind,
 } from './manualRecordTypes';
@@ -15,6 +16,8 @@ import type {
  */
 export function buildAddRecordPath(options: {
   type?: ManualRecordKind;
+  /** Selects the file-import form without changing ordinary Add device. */
+  deviceImport?: DeviceImportKind;
   specialty?: 'dental' | 'optometry';
   dental?: DentalEntryKind;
   optometry?: OptometryEntryKind;
@@ -28,6 +31,9 @@ export function buildAddRecordPath(options: {
 }): string {
   const params = new URLSearchParams();
   if (options.type) params.set('type', options.type);
+  if (options.type === 'device' && options.deviceImport) {
+    params.set('deviceImport', options.deviceImport);
+  }
   if (options.specialty) params.set('specialty', options.specialty);
   if (options.dental) params.set('dental', options.dental);
   if (options.optometry) params.set('optometry', options.optometry);

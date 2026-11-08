@@ -13,6 +13,9 @@ export const interfaceLanguages: {
 ];
 
 export const arabicTranslations: Record<string, string> = {
+  'Unable to load records for this profile. Reload the page to try again.':
+    'تعذّر تحميل سجلات هذا الملف الشخصي. أعد تحميل الصفحة للمحاولة مرة أخرى.',
+  'Loading records for this profile…': 'جارٍ تحميل سجلات هذا الملف الشخصي…',
   About: 'حول',
   'About me': 'نبذة عني',
   'About Mere Medical': 'حول مير ميديكال',
@@ -2152,6 +2155,159 @@ export const arabicTranslations: Record<string, string> = {
   'Date of the record': 'تاريخ السجل',
   'View source': 'عرض المصدر',
   Record: 'سجل',
+  // Mobile task organization, preparation, sharing, and compact controls.
+  'A review date is a reminder for you. It does not expire a file that someone already has.':
+    'تاريخ المراجعة هو تذكير لك. ولا يؤدي إلى انتهاء صلاحية ملف لدى شخص آخر.',
+  'Add a dental record': 'إضافة سجل أسنان',
+  'Add a document': 'إضافة مستند',
+  'Add a medical record': 'إضافة سجل طبي',
+  'Add a record manually': 'إضافة سجل يدوياً',
+  'Add an optometry record': 'إضافة سجل بصريات',
+  'Add caregiver': 'إضافة مقدم رعاية',
+  'Add documents, device readings, or a record package.':
+    'أضف مستندات أو قراءات أجهزة أو حزمة سجلات.',
+  'Add records': 'إضافة سجلات',
+  'Add symptoms, goals, and questions to discuss.':
+    'أضف الأعراض والأهداف والأسئلة التي تريد مناقشتها.',
+  Advanced: 'متقدمة',
+  'Advanced settings': 'الإعدادات المتقدمة',
+  'After downloading, choose how to give the file to its recipient. You can record that action in the sharing log.':
+    'بعد التنزيل، اختر طريقة تسليم الملف إلى المستلم. ويمكنك توثيق ذلك في سجل المشاركة.',
+  'All profiles on this device': 'جميع الملفات الشخصية على هذا الجهاز',
+  'All profiles, connections, records, and stored workflow data in this app.':
+    'جميع الملفات الشخصية والاتصالات والسجلات وبيانات سير العمل المحفوظة في هذا التطبيق.',
+  'All source tasks': 'جميع مهام المصادر',
+  'Attach a report, image, or other file to a document record.':
+    'أرفق تقريراً أو صورة أو ملفاً آخر بسجل مستند.',
+  Basic: 'أساسية',
+  'Basic settings': 'الإعدادات الأساسية',
+  Caregivers: 'مقدمو الرعاية',
+  'Changes saved on this device.': 'تم حفظ التغييرات على هذا الجهاز.',
+  'Choose a form. You can review it before saving to the selected profile.':
+    'اختر نموذجاً. يمكنك مراجعته قبل حفظه في الملف الشخصي المحدد.',
+  'Choose a task. Information stays on this device unless you download and share a copy yourself.':
+    'اختر مهمة. تبقى المعلومات على هذا الجهاز ما لم تنزّل نسخة وتشاركها بنفسك.',
+  'Choose how to add records. Your records stay on this device.':
+    'اختر طريقة إضافة السجلات. تبقى سجلاتك على هذا الجهاز.',
+  'Choose the kind of file you want to add.':
+    'اختر نوع الملف الذي تريد إضافته.',
+  'Choose the sections for the printable summary. Visit questions includes your visit purpose and questions.':
+    'اختر الأقسام التي تريد تضمينها في الملخص القابل للطباعة. يتضمن قسم «أسئلة الزيارة» سبب الزيارة وأسئلتك.',
+  'Choose your provider, review what will be imported, then sign in to its patient portal.':
+    'اختر جهة الرعاية، وراجع ما سيُستورد، ثم سجّل الدخول إلى بوابة المرضى التابعة لها.',
+  'Connect a patient portal': 'ربط بوابة مرضى',
+  'Create a file to give to someone yourself. Downloading does not send records or create a share link.':
+    'أنشئ ملفاً لتسليمه إلى شخص آخر بنفسك. لا يؤدي التنزيل إلى إرسال السجلات أو إنشاء رابط مشاركة.',
+  'Device readings': 'قراءات الأجهزة',
+  'Document or image': 'مستند أو صورة',
+  'Download HTML': 'تنزيل HTML',
+  'Download Markdown': 'تنزيل Markdown',
+  'Download a package': 'تنزيل حزمة',
+  'Download a record package instead': 'تنزيل حزمة سجلات بدلاً من ذلك',
+  'Download again': 'تنزيل مرة أخرى',
+  'Download or print your summary': 'تنزيل الملخص أو طباعته',
+  'Download this profile’s records and stored workflow notes as an .emrpkg file. The summary selections do not filter this package. Your visit purpose and questions are included in the summary downloads only.':
+    'نزّل سجلات هذا الملف الشخصي وملاحظات سير العمل المحفوظة بصيغة .emrpkg. لا تحدد اختيارات الملخص محتويات هذه الحزمة. يُدرج سبب الزيارة وأسئلتك في ملفات الملخص فقط.',
+  'Emergency information': 'معلومات الطوارئ',
+  'Enter a medical, dental, or eye-care record.':
+    'أدخل سجلاً طبياً أو سجلاً للأسنان أو لرعاية العين.',
+  'Export password': 'كلمة مرور التصدير',
+  'Find a patient portal': 'البحث عن بوابة مرضى',
+  'Find your provider and sign in to import records.':
+    'ابحث عن جهة الرعاية وسجّل الدخول لاستيراد السجلات.',
+  'Hide preview': 'إخفاء المعاينة',
+  'Import a FreeStyle Libre export as glucose readings.':
+    'استورد ملفاً مصدّراً من FreeStyle Libre على هيئة قراءات لسكر الدم.',
+  'Import a file': 'استيراد ملف',
+  'Included records': 'السجلات المضمّنة',
+  'Keep names, relationships, and contact details. Adding a caregiver does not grant account or remote access.':
+    'احفظ الأسماء وصلة القرابة أو العلاقة وبيانات الاتصال. لا تمنح إضافة مقدم رعاية صلاحية الدخول إلى الحساب أو الوصول عن بُعد.',
+  'Lab options': 'خيارات المختبر',
+  'Lab records': 'سجلات المختبر',
+  'Loading sharing information…': 'جارٍ تحميل معلومات المشاركة…',
+  'Manage connected sources': 'إدارة المصادر المتصلة',
+  'Manage sources': 'إدارة المصادر',
+  'Manage terminology, medication plugins, storage, and optional tools.':
+    'إدارة المصطلحات وإضافات الأدوية والتخزين والأدوات الاختيارية.',
+  'Manage your profile, language, and privacy preferences.':
+    'إدارة ملفك الشخصي واللغة وتفضيلات الخصوصية.',
+  'More choices': 'خيارات أخرى',
+  'No caregivers saved yet.': 'لم تُحفظ بيانات أي مقدم رعاية بعد.',
+  'No shares recorded yet.': 'لم تُسجّل أي مشاركة بعد.',
+  'Optional tools': 'أدوات اختيارية',
+  'Other record types': 'أنواع سجلات أخرى',
+  'Package passphrase (if encrypted)': 'عبارة مرور الحزمة (إذا كانت مشفّرة)',
+  'Passphrase (for encrypted .emrpkg)': 'عبارة المرور (لملف .emrpkg المشفّر)',
+  'Prepare emergency information, keep caregiver contacts, download records, or log a share.':
+    'جهّز معلومات الطوارئ، واحفظ بيانات مقدمي الرعاية، أو نزّل السجلات، أو وثّق مشاركة.',
+  'Prepare for your visit': 'استعدّ لزيارتك',
+  'Prepare questions and choose records for your next visit.':
+    'حضّر أسئلتك واختر السجلات لزيارتك القادمة.',
+  'Preview (optional)': 'المعاينة (اختيارية)',
+  'Preview type': 'نوع المعاينة',
+  'Previous choices': 'الخيارات السابقة',
+  'Record a share': 'تسجيل مشاركة',
+  'Record who received a copy and what you sent. Log entries do not grant access, create links, or revoke downloaded copies.':
+    'وثّق من استلم نسخة وما أرسلته. لا تمنح إدخالات السجل صلاحية الوصول، ولا تنشئ روابط، ولا تلغي النسخ التي سبق تنزيلها.',
+  'Reference ranges affect result flags and the Attention filter. Your selected reference is always shown above the lab list.':
+    'تؤثر النطاقات المرجعية في علامات النتائج ومرشّح «انتباه». يظهر المرجع الذي اخترته دائماً فوق قائمة نتائج المختبر.',
+  'Reference:': 'المرجع:',
+  'Review connected portals, imported devices, and sync history.':
+    'راجع البوابات المتصلة والأجهزة التي استوردت بياناتها وسجل المزامنة.',
+  'Review date': 'تاريخ المراجعة',
+  'Review date (optional)': 'تاريخ المراجعة (اختياري)',
+  'Review your summary when you are ready. You can also check a file from this device.':
+    'راجع ملخصك عندما تكون جاهزاً. ويمكنك أيضاً معاينة ملف من هذا الجهاز.',
+  'Save contact details and critical notes for this profile. This does not publish an emergency page.':
+    'احفظ بيانات الاتصال والملاحظات المهمة لهذا الملف الشخصي. لا يؤدي ذلك إلى نشر صفحة للطوارئ.',
+  'Save visit notes': 'حفظ ملاحظات الزيارة',
+  'Saving on this device…': 'جارٍ الحفظ على هذا الجهاز…',
+  'Selected profile only': 'الملف الشخصي المحدد فقط',
+  'Selected profile record package': 'حزمة سجلات الملف الشخصي المحدد',
+  'Settings sections': 'أقسام الإعدادات',
+  'Sharing log': 'سجل المشاركة',
+  'Show additional configuration for experimental features and troubleshooting.':
+    'عرض إعدادات إضافية للميزات التجريبية واستكشاف الأخطاء وإصلاحها.',
+  'Show preview': 'عرض المعاينة',
+  'Start with what you want to discuss. Save your notes on this device, then choose the records to include.':
+    'ابدأ بما تريد مناقشته. احفظ ملاحظاتك على هذا الجهاز، ثم اختر السجلات التي تريد تضمينها.',
+  'Summary format': 'صيغة الملخص',
+  'The summary uses your current notes and selected sections. Downloading does not send it to anyone.':
+    'يتضمن الملخص ملاحظاتك الحالية والأقسام المحددة. لا يؤدي تنزيله إلى إرساله إلى أي شخص.',
+  'This profile’s records and stored workflow notes. This is not limited to a single visit.':
+    'سجلات هذا الملف الشخصي وملاحظات سير العمل المحفوظة. لا تقتصر على زيارة واحدة.',
+  'This user profile package is encrypted. Open Advanced settings, then Data, to import it with a passphrase.':
+    'حزمة الملف الشخصي هذه مشفّرة. افتح الإعدادات المتقدمة، ثم البيانات، لاستيرادها باستخدام عبارة مرور.',
+  'Unable to load sharing information. Reload the page to try again.':
+    'تعذّر تحميل معلومات المشاركة. أعد تحميل الصفحة للمحاولة مرة أخرى.',
+  'Unable to prepare the package. Try downloading again.':
+    'تعذّر تجهيز الحزمة. حاول تنزيلها مرة أخرى.',
+  'Unable to save sharing information. Your changes remain on this page; edit a field to retry.':
+    'تعذّر حفظ معلومات المشاركة. تبقى تغييراتك في هذه الصفحة؛ عدّل أحد الحقول لإعادة المحاولة.',
+  'Visit prep packet preview': 'معاينة حزمة التحضير للزيارة',
+  'Visit purpose': 'سبب الزيارة',
+  'What is this visit about?': 'ما سبب هذه الزيارة؟',
+  'What would you like to do?': 'ماذا تريد أن تفعل؟',
+  'Working…': 'جارٍ التنفيذ…',
+  'Your visit purpose and questions are excluded from the summary. Select Visit questions below to include them; your notes stay here.':
+    'سبب الزيارة وأسئلتك غير مضمّنين في الملخص. حدّد «أسئلة الزيارة» أدناه لتضمينهما؛ تبقى ملاحظاتك هنا.',
+  love: 'حب',
+  // Reading and search states from the initial mobile workflow pass.
+  'Loading result...': 'جارٍ تحميل النتيجة...',
+  'Matching records': 'السجلات المطابقة',
+  'No matching records. Browse the categories below.':
+    'لا توجد سجلات مطابقة. تصفّح الفئات أدناه.',
+  'Result list': 'قائمة النتائج',
+  'Search Timeline': 'البحث في التسلسل الزمني',
+  'Searching records…': 'جارٍ البحث في السجلات…',
+  'Selected result': 'النتيجة المحددة',
+  'Type at least 2 characters to search your records.':
+    'اكتب حرفين على الأقل للبحث في سجلاتك.',
+  'Unable to search records. Try again.':
+    'تعذّر البحث في السجلات. حاول مرة أخرى.',
+  'Review your recorded allergies and reactions.':
+    'راجع الحساسيات والتفاعلات المسجلة لديك.',
+  'Search records and categories': 'البحث في السجلات والفئات',
 };
 
 export function getInterfaceLanguageDirection(language: InterfaceLanguage) {

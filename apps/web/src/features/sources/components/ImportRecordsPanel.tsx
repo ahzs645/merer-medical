@@ -74,10 +74,10 @@ function ActionCard({
 }
 
 const buttonClass =
-  'bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex w-full items-center justify-center rounded-md border border-transparent px-3 py-2 text-sm font-bold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-400';
+  'bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex min-h-[44px] w-full items-center justify-center rounded-md border border-transparent px-3 py-2 text-sm font-bold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-400';
 
 const secondaryButtonClass =
-  'inline-flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-800 shadow-sm hover:bg-gray-50 disabled:bg-gray-100';
+  'inline-flex min-h-[44px] w-full items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-800 shadow-sm hover:bg-gray-50 disabled:bg-gray-100';
 
 /**
  * Surfaces the app's local data portability features (import/export) as a
@@ -85,7 +85,15 @@ const secondaryButtonClass =
  * is unsupported. Reuses the same emrpkg/JSON service primitives as the Data
  * settings section.
  */
-export function ImportRecordsPanel() {
+export function ImportRecordsPanel({
+  includeBackupExport = true,
+  returnTo = Routes.AddConnection,
+}: {
+  /** Sources uses an import-only view; existing portability callers keep export. */
+  includeBackupExport?: boolean;
+  /** Return from document/device entry to the selected Sources task. */
+  returnTo?: string;
+} = {}) {
   const db = useRxDb();
   const notifyDispatch = useNotificationDispatch();
 
@@ -196,40 +204,85 @@ export function ImportRecordsPanel() {
     [db, notify],
   );
 
-  return (
-    <div>
-      <div className="mb-3 flex flex-wrap items-center gap-3">
+  const packageOptions = (
+    <div className="mb-3 grid min-w-0 gap-3">
+      <label className="block text-sm text-gray-700">
+        <span className="mb-1 block font-medium">
+          Package passphrase (if encrypted)
+        </span>
         <input
           type="password"
-          aria-label="Passphrase (for encrypted .emrpkg)"
           placeholder="Passphrase (for encrypted .emrpkg)"
-          className="focus:ring-primary-500 focus:border-primary-500 block w-64 rounded-md border-gray-300 text-sm shadow-sm"
+          className="focus:ring-primary-500 focus:border-primary-500 block min-h-[44px] w-full min-w-0 rounded-md border-gray-300 text-sm shadow-sm"
           value={passphrase}
           onChange={(e) => setPassphrase(e.target.value)}
           autoComplete="new-password"
+          disabled={busy}
         />
-        <label className="inline-flex items-center text-sm text-gray-700">
-          <span className="me-2 font-medium">On import:</span>
-          <select
-            value={importMode}
-            onChange={(e) =>
-              setImportMode(e.target.value as 'merge' | 'replace')
-            }
-            className="focus:ring-primary-500 focus:border-primary-500 rounded-md border-gray-300 text-sm shadow-sm"
-          >
-            <option value="merge">Add to this app</option>
-            <option value="replace">Replace everything</option>
-          </select>
-        </label>
-        {busy ? <ButtonLoadingSpinner /> : null}
-      </div>
+      </label>
+      <label className="block text-sm text-gray-700">
+        <span className="mb-1 block font-medium">On package import:</span>
+        <select
+          value={importMode}
+          onChange={(e) => setImportMode(e.target.value as 'merge' | 'replace')}
+          className="focus:ring-primary-500 focus:border-primary-500 min-h-[44px] w-full rounded-md border-gray-300 text-sm shadow-sm"
+          disabled={busy}
+        >
+          <option value="merge">Add to this app</option>
+          <option value="replace">Replace everything</option>
+        </select>
+      </label>
+    </div>
+  );
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+  return (
+    <div aria-busy={busy}>
+      {includeBackupExport ? (
+        <div className="mb-4 max-w-sm">{packageOptions}</div>
+      ) : null}
+      {busy ? (
+        <div
+          role="status"
+          className="mb-3 flex items-center gap-2 text-sm text-gray-700"
+        >
+          <ButtonLoadingSpinner /> Working…
+        </div>
+      ) : null}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <ActionCard
+          icon={<DocumentArrowDownIcon />}
+          title="Document or image"
+          description="Attach a report, image, or other file to a document record."
+        >
+          <Link
+            to={buildAddRecordPath({ type: 'document', returnTo })}
+            className={secondaryButtonClass}
+          >
+            Add a document
+          </Link>
+        </ActionCard>
+        <ActionCard
+          icon={<ArrowUpTrayIcon />}
+          title="Device readings"
+          description="Import a FreeStyle Libre export as glucose readings."
+        >
+          <Link
+            to={buildAddRecordPath({
+              type: 'device',
+              deviceImport: 'freestyle_libre',
+              returnTo,
+            })}
+            className={secondaryButtonClass}
+          >
+            Import device file
+          </Link>
+        </ActionCard>
         <ActionCard
           icon={<ArrowUpTrayIcon />}
           title="Import .emrpkg"
           description="Restore a full record package exported from Mere. Supports passphrase or passkey encryption."
         >
+          {!includeBackupExport ? packageOptions : null}
           <button
             type="button"
             disabled={busy}
@@ -239,22 +292,22 @@ export function ImportRecordsPanel() {
             Choose .emrpkg file
           </button>
         </ActionCard>
-
-        <ActionCard
-          icon={<ArrowDownTrayIcon />}
-          title="Export encrypted backup"
-          description="Download all of your records as a single .emrpkg file. Enter a passphrase above to encrypt it."
-        >
-          <button
-            type="button"
-            disabled={busy}
-            className={secondaryButtonClass}
-            onClick={handleEmrpkgExport}
+        {includeBackupExport ? (
+          <ActionCard
+            icon={<ArrowDownTrayIcon />}
+            title="Export backup"
+            description="Download all of your records as a single .emrpkg file. Enter a passphrase above to encrypt it."
           >
-            Export backup
-          </button>
-        </ActionCard>
-
+            <button
+              type="button"
+              disabled={busy}
+              className={secondaryButtonClass}
+              onClick={handleEmrpkgExport}
+            >
+              Export backup
+            </button>
+          </ActionCard>
+        ) : null}
         <ActionCard
           icon={<DocumentArrowDownIcon />}
           title="Import old JSON backup"
@@ -268,34 +321,6 @@ export function ImportRecordsPanel() {
           >
             Choose JSON file
           </button>
-        </ActionCard>
-
-        {/* This card used to link to a bare `/records/new` and then spend the
-            last sentence of its description telling the user to "Choose Device
-            on the next screen" — asking them to do by hand what the link had
-            been able to carry all along. The preset does it; the sentence is
-            gone. `returnTo` keeps them on Sources, where they were importing.
-
-            The card that stood beside it, "Add record manually", was the
-            Sources page's own "Add a record" button a section further down,
-            with a different label and the same destination. A typed-in record
-            is not a file moving in or out of the app, which is all this section
-            claims to be about, so the copy of it that lives here is the one
-            that went. */}
-        <ActionCard
-          icon={<ArrowUpTrayIcon />}
-          title="Import device file"
-          description="Import a FreeStyle Libre export or other device file as readings."
-        >
-          <Link
-            to={buildAddRecordPath({
-              type: 'device',
-              returnTo: Routes.AddConnection,
-            })}
-            className={secondaryButtonClass}
-          >
-            Import device file
-          </Link>
         </ActionCard>
       </div>
 

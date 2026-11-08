@@ -5,6 +5,7 @@ import {
 
 import { CheckboxField } from './CheckboxField';
 import { OtherDownloadDoors } from '../../../shared/components/OtherDownloadDoors';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
 export function RecordPackageCard({
   includeAttachments,
@@ -16,6 +17,7 @@ export function RecordPackageCard({
   exportPassphrase,
   setExportPassphrase,
   exportBusy,
+  exportError,
   downloadRecordPackage,
 }: {
   includeAttachments: boolean;
@@ -27,19 +29,22 @@ export function RecordPackageCard({
   exportPassphrase: string;
   setExportPassphrase: (value: string) => void;
   exportBusy: boolean;
+  exportError?: string | null;
   downloadRecordPackage: () => void;
 }) {
+  const { t } = useInterfaceLanguage();
   return (
     <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="flex items-center gap-2">
         <LockClosedIcon className="h-5 w-5 text-primary-700" />
         <h2 className="text-base font-semibold text-gray-900">
-          Visit record package
+          {t('Selected profile record package')}
         </h2>
       </div>
       <p className="mt-2 text-sm text-gray-600">
-        Export your records as a visit-sized .emrpkg file to hand to a provider
-        or keep as a backup.
+        {t(
+          'Download this profile’s records and stored workflow notes as an .emrpkg file. The summary selections do not filter this package. Your visit purpose and questions are included in the summary downloads only.',
+        )}
       </p>
       <div className="mt-3 grid gap-2">
         <CheckboxField
@@ -72,12 +77,17 @@ export function RecordPackageCard({
           type="button"
           onClick={downloadRecordPackage}
           disabled={exportBusy || (passwordProtect && !exportPassphrase.trim())}
-          className="mt-1 inline-flex w-fit items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+          className="mt-1 inline-flex min-h-[44px] w-fit items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
         >
           <DocumentArrowDownIcon className="h-4 w-4" />
           {exportBusy ? 'Preparing...' : 'Download .emrpkg'}
         </button>
       </div>
+      {exportError && (
+        <p role="alert" className="mt-3 text-sm text-red-700">
+          {t(exportError)}
+        </p>
+      )}
       <OtherDownloadDoors from="visit-prep" />
     </div>
   );

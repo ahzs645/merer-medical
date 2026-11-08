@@ -389,6 +389,14 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     (recordTypes.some((entry) => entry.value === searchParams.get('type'))
       ? (searchParams.get('type') as ManualRecordKind)
       : undefined);
+  // An explicit file-import entry can skip the manual-reading chooser. Only
+  // the supported file mode is accepted; absent/unknown query values retain
+  // the usual manual-device default. Other record kinds ignore this preset.
+  const requestedDeviceImportType: DeviceImportKind =
+    requestedRecordType === 'device' &&
+    searchParams.get('deviceImport') === 'freestyle_libre'
+      ? 'freestyle_libre'
+      : 'manual_reading';
   const requestedTitle =
     options.initialTitle ?? searchParams.get('title') ?? '';
   const requestedDental =
@@ -415,13 +423,16 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
   const requestedTypeLabel = requestedRecordType
     ? recordTypes.find((entry) => entry.value === requestedRecordType)?.label
     : undefined;
-  const presetAddTitle = requestedTypeLabel
-    ? `${t('Add')} ${t(requestedTypeLabel).toLowerCase()}`
-    : requestedSpecialty === 'dental'
-      ? t('Add dental record')
-      : requestedSpecialty === 'optometry'
-        ? t('Add eye-care record')
-        : undefined;
+  const presetAddTitle =
+    requestedDeviceImportType === 'freestyle_libre'
+      ? t('Import device file')
+      : requestedTypeLabel
+        ? `${t('Add')} ${t(requestedTypeLabel).toLowerCase()}`
+        : requestedSpecialty === 'dental'
+          ? t('Add dental record')
+          : requestedSpecialty === 'optometry'
+            ? t('Add eye-care record')
+            : undefined;
   // Where to go when leaving the form — saved, cancelled, discarded, or the
   // record failed to load: the page named by `returnTo`, else the page you
   // were on before (a step back in history), else — only when the form was
@@ -473,7 +484,7 @@ export function useManualRecordForm(options: UseManualRecordFormOptions = {}) {
     recordType: 'condition',
     dentalEntryKind: 'cleaning',
     optometryEntryKind: 'checkup',
-    deviceImportType: 'manual_reading',
+    deviceImportType: requestedDeviceImportType,
     title: '',
     date: today,
     notes: '',

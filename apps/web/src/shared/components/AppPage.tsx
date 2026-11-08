@@ -3,6 +3,8 @@ import React, { PropsWithChildren } from 'react';
 type AppPageProps = PropsWithChildren<{
   banner: React.ReactNode;
   contentClassName?: string;
+  /** Let a tall header scroll away when short screens need room for content. */
+  allowHeaderScroll?: boolean;
 }>;
 
 /**
@@ -15,10 +17,12 @@ type AppPageProps = PropsWithChildren<{
  */
 export function AppPage(props: AppPageProps) {
   return (
-    <div className="flex h-full flex-col overflow-y-hidden">
+    <div
+      className={`flex h-full flex-col ${props.allowHeaderScroll ? 'overflow-y-auto' : 'overflow-y-hidden'}`}
+    >
       {props.banner}
       <div
-        className={`min-h-0 flex-1 flex-grow overflow-x-hidden ${
+        className={`${props.allowHeaderScroll ? 'min-h-[128px]' : 'min-h-0'} flex-1 flex-grow overflow-x-hidden ${
           props.contentClassName ?? ''
         }`}
       >

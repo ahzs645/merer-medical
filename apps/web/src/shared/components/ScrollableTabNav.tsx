@@ -1,15 +1,8 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type ComponentType,
-} from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { type ComponentType } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
+import { HorizontalChoiceScroller } from './HorizontalChoiceScroller';
 
 export interface ScrollableTab {
   to: string;
@@ -25,12 +18,7 @@ export interface ScrollableTab {
   end?: boolean;
 }
 
-/**
- * Horizontal tab strip that scrolls when the tabs overflow the viewport
- * (common on mobile, where Records has 14 tabs). Adds left/right fade
- * gradients and chevron buttons so it's obvious more tabs exist off-screen —
- * otherwise the strip just clips with no affordance.
- */
+/** Visible controls reveal off-screen sections in either reading direction. */
 export function ScrollableTabNav({
   tabs,
   ariaLabel,
@@ -40,116 +28,19 @@ export function ScrollableTabNav({
 }) {
   const { t } = useInterfaceLanguage();
   const location = useLocation();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-
-  const updateScrollState = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const maxScroll = el.scrollWidth - el.clientWidth;
-    setCanScrollLeft(el.scrollLeft > 1);
-    setCanScrollRight(el.scrollLeft < maxScroll - 1);
-  }, []);
-
-  const scrollTabIntoView = useCallback(
-    (node: HTMLAnchorElement) => {
-      const el = scrollRef.current;
-      if (!el) return;
-      const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
-      const target = Math.min(
-        Math.max(0, node.offsetLeft - (el.clientWidth - node.offsetWidth) / 2),
-        maxScroll,
-      );
-      el.scrollLeft = target;
-      updateScrollState();
-    },
-    [updateScrollState],
-  );
-
-  useLayoutEffect(() => {
-    updateScrollState();
-    const el = scrollRef.current;
-    if (!el) return;
-    el.addEventListener('scroll', updateScrollState, { passive: true });
-    window.addEventListener('resize', updateScrollState);
-    return () => {
-      el.removeEventListener('scroll', updateScrollState);
-      window.removeEventListener('resize', updateScrollState);
-    };
-  }, [updateScrollState]);
-
-  useEffect(() => {
-    const pathname = location.pathname.replace(/\/+$/, '') || '/';
-    const activeTab = tabs.find((tab) => {
-      const target = tab.to.replace(/\/+$/, '') || '/';
-      if (tab.end) return pathname === target;
-      return pathname === target || pathname.startsWith(`${target}/`);
-    });
-    const findActiveNode = () =>
-      scrollRef.current?.querySelector<HTMLAnchorElement>(
-        'a[aria-current="page"]',
-      ) || (activeTab ? tabRefs.current[activeTab.to] : undefined);
-    const scrollActiveNode = () => {
-      const activeNode = findActiveNode();
-      if (activeNode) {
-        scrollTabIntoView(activeNode);
-      } else {
-        updateScrollState();
-      }
-    };
-    const frame = window.requestAnimationFrame(scrollActiveNode);
-    const scrollTimeout = window.setTimeout(scrollActiveNode, 100);
-    const stateTimeout = window.setTimeout(updateScrollState, 350);
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.clearTimeout(scrollTimeout);
-      window.clearTimeout(stateTimeout);
-    };
-  }, [location.pathname, tabs, scrollTabIntoView, updateScrollState]);
-
-  const scrollBy = (delta: number) => {
-    const reduceMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-    scrollRef.current?.scrollBy({
-      left: delta,
-      behavior: reduceMotion ? 'auto' : 'smooth',
-    });
-  };
 
   return (
-    <div className="relative mx-auto max-w-7xl">
-      {canScrollLeft && (
-        <>
-          <div className="pointer-events-none absolute inset-y-0 start-0 z-10 w-11 bg-gradient-to-r from-white via-white to-transparent" />
-          <button
-            type="button"
-            aria-label={t('Scroll tabs left')}
-            onClick={() => scrollBy(-200)}
-            className="absolute start-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-gray-600 shadow ring-1 ring-gray-200 hover:text-gray-900"
-          >
-            <ChevronLeftIcon className="h-5 w-5" />
-          </button>
-        </>
-      )}
-      {/* Pad the scroll area by the chevron width on whichever side a chevron is
-          showing, so a tab label is never hidden underneath one. scroll-p keeps
-          scrollIntoView from parking a tab under the same chevron. */}
-      <nav
-        ref={scrollRef}
-        className={`scrollbar-hide flex gap-1 overflow-x-auto py-2 sm:gap-2 ${
-          canScrollLeft ? 'scroll-pl-11 ps-11' : ''
-        } ${canScrollRight ? 'scroll-pr-11 pe-11' : ''}`}
-        aria-label={ariaLabel}
+    <div className="mx-auto max-w-7xl">
+      <HorizontalChoiceScroller
+        as="nav"
+        label={ariaLabel}
+        activeKey={location.pathname}
+        activeSelector='a[aria-current="page"]'
+        rowClassName="gap-1 py-1 sm:gap-2 sm:py-2 short:py-1"
       >
         {tabs.map(({ to, label, shortLabel, icon: Icon, end }) => (
           <NavLink
             key={to}
-            ref={(node) => {
-              tabRefs.current[to] = node;
-            }}
             to={to}
             end={end}
             className={({ isActive }) =>
@@ -176,20 +67,7 @@ export function ScrollableTabNav({
             )}
           </NavLink>
         ))}
-      </nav>
-      {canScrollRight && (
-        <>
-          <div className="pointer-events-none absolute inset-y-0 end-0 z-10 w-11 bg-gradient-to-l from-white via-white to-transparent" />
-          <button
-            type="button"
-            aria-label={t('Scroll tabs right')}
-            onClick={() => scrollBy(200)}
-            className="absolute end-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-gray-600 shadow ring-1 ring-gray-200 hover:text-gray-900"
-          >
-            <ChevronRightIcon className="h-5 w-5" />
-          </button>
-        </>
-      )}
+      </HorizontalChoiceScroller>
     </div>
   );
 }

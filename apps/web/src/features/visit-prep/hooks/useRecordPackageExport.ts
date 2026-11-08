@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useRxDb } from '../../../app/providers/RxDbProvider';
 import { useUser } from '../../../app/providers/UserProvider';
@@ -14,10 +14,30 @@ export function useRecordPackageExport() {
   const [passwordProtect, setPasswordProtect] = useState(false);
   const [exportPassphrase, setExportPassphrase] = useState('');
   const [exportBusy, setExportBusy] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const exportGenerationRef = useRef(0);
+  const exportOwnerRef = useRef({ db, userId: user.id });
+  exportOwnerRef.current = { db, userId: user.id };
+
+  useEffect(() => {
+    exportGenerationRef.current += 1;
+    setExportBusy(false);
+    setExportError(null);
+    setExportPassphrase('');
+    return () => {
+      exportGenerationRef.current += 1;
+    };
+  }, [db, user.id]);
 
   async function downloadRecordPackage() {
-    if (passwordProtect && !exportPassphrase.trim()) return;
+    if (exportBusy || (passwordProtect && !exportPassphrase.trim())) return;
+    const generation = ++exportGenerationRef.current;
+    const isCurrent = () =>
+      generation === exportGenerationRef.current &&
+      exportOwnerRef.current.db === db &&
+      exportOwnerRef.current.userId === user.id;
     setExportBusy(true);
+    setExportError(null);
     try {
       const bytes = await exportEmrpkgFromRxDb(db, {
         passphrase: passwordProtect ? exportPassphrase : undefined,
@@ -29,6 +49,7 @@ export function useRecordPackageExport() {
           includeAuditTrail,
         },
       });
+      if (!isCurrent()) return;
       await appendAuditLog(db, {
         userId: user.id,
         actor: 'local-user',
@@ -37,14 +58,19 @@ export function useRecordPackageExport() {
         source: 'Visit prep',
         summary: 'Exported visit-prep record package',
       });
+      if (!isCurrent()) return;
       downloadBlob(
         new Blob([bytes], { type: 'application/octet-stream' }),
         `visit-prep-records-${filenameDate(new Date())}${
           passwordProtect ? '.enc' : ''
         }.emrpkg`,
       );
+    } catch {
+      if (isCurrent()) {
+        setExportError('Unable to prepare the package. Try downloading again.');
+      }
     } finally {
-      setExportBusy(false);
+      if (isCurrent()) setExportBusy(false);
     }
   }
 
@@ -58,6 +84,7 @@ export function useRecordPackageExport() {
     exportPassphrase,
     setExportPassphrase,
     exportBusy,
+    exportError,
     downloadRecordPackage,
   };
 }

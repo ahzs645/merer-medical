@@ -1,7 +1,11 @@
-import React, { useCallback, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Link, useNavigationType, useSearchParams } from 'react-router-dom';
 import {
+  ArrowLeftIcon,
+  ArrowUpTrayIcon,
   CheckCircleIcon,
+  ChevronRightIcon,
+  LinkIcon,
   ExclamationCircleIcon,
   PencilSquareIcon,
   PlusIcon,
@@ -27,6 +31,7 @@ import {
   setTenantHealowUrl,
 } from './oauth';
 import { Routes } from '../../Routes';
+import { buildAddRecordPath } from '../manual-entry/addRecordPath';
 import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 import { useNotificationDispatch } from '../../app/providers/NotificationProvider';
 import { useUserPreferences } from '../../app/providers/UserPreferencesProvider';
@@ -51,8 +56,8 @@ function SourcesSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mb-8">
-      <h2 className="text-xl font-extrabold text-gray-900">{title}</h2>
+    <section className="mt-6">
+      <h3 className="text-base font-bold text-gray-900">{title}</h3>
       {description ? (
         <p className="mt-1 text-sm font-medium text-gray-600">{description}</p>
       ) : null}
@@ -94,7 +99,65 @@ function SyncHistoryRow({ item }: { item: RxDocument<ConnectionDocument> }) {
   );
 }
 
+type SourceTask = 'import' | 'portal' | 'manual' | 'manage';
+
+const sourceTasks = [
+  {
+    id: 'import',
+    title: 'Import a file',
+    description: 'Add documents, device readings, or a record package.',
+    icon: ArrowUpTrayIcon,
+  },
+  {
+    id: 'portal',
+    title: 'Connect a patient portal',
+    description: 'Find your provider and sign in to import records.',
+    icon: LinkIcon,
+  },
+  {
+    id: 'manual',
+    title: 'Add a record manually',
+    description: 'Enter a medical, dental, or eye-care record.',
+    icon: PencilSquareIcon,
+  },
+] as const;
+
 const ConnectionTab: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const navigationType = useNavigationType();
+  const taskParam = searchParams.get('task');
+  const task: SourceTask | null =
+    taskParam === 'import' ||
+    taskParam === 'portal' ||
+    taskParam === 'manual' ||
+    taskParam === 'manage'
+      ? taskParam
+      : null;
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const previousTask = useRef(task);
+
+  const taskPath = (nextTask: SourceTask | null) => {
+    const params = new URLSearchParams(searchParams);
+    if (nextTask) params.set('task', nextTask);
+    else params.delete('task');
+    const query = params.toString();
+    return `${Routes.AddConnection}${query ? `?${query}` : ''}`;
+  };
+
+  useEffect(() => {
+    if (previousTask.current === task) return;
+    previousTask.current = task;
+    // Query-only navigation is not announced by the shell's route hook. Give
+    // the chosen task a focus destination, without interrupting a package offer.
+    if (!document.querySelector('[role="dialog"]')) {
+      headingRef.current?.focus({ preventScroll: true });
+    }
+    if (navigationType !== 'POP' && contentRef.current?.parentElement) {
+      contentRef.current.parentElement.scrollTop = 0;
+    }
+  }, [navigationType, task]);
+
   const list = useConnectionCards(),
     { t } = useInterfaceLanguage(),
     notifyDispatch = useNotificationDispatch(),
@@ -197,154 +260,280 @@ const ConnectionTab: React.FC = () => {
     (item) => item.get('source') === 'freestyle_libre',
   );
 
+  const selectedTask = sourceTasks.find((item) => item.id === task);
+  const heading =
+    selectedTask?.title ??
+    (task === 'manage' ? 'Manage sources' : 'What would you like to do?');
+
   return (
-    <AppPage banner={<GenericBanner text={t('Sources')} />}>
-      <div className="mx-auto flex max-w-4xl flex-col gap-x-4 px-4 pb-20 pt-6 sm:px-6 sm:pb-6 lg:px-8">
-        <div className="mb-6">
-          <p className="text-sm font-medium text-gray-600">
-            {t(
-              'Bring records together from patient portals, files, devices, and manual entry. Everything is stored locally on this device.',
-            )}
-          </p>
-        </div>
-
-        <SourcesSection
-          title={t('Connected portals')}
-          description={t(
-            'Patient portals you have connected for automatic syncing.',
-          )}
-        >
-          {portalConnections && portalConnections.length > 0 ? (
-            <ul className="grid grid-cols-1">
-              {portalConnections.map((item) => (
-                <ConnectionCard
-                  key={item.id}
-                  item={item}
-                  baseUrl={item.get('location')}
-                />
-              ))}
-            </ul>
-          ) : (
-            <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-500">
-              {t('No portals connected yet.')}
-            </p>
-          )}
-          <button
-            className="bg-primary hover:bg-primary-600 active:bg-primary-700 mt-4 w-full rounded-lg p-4 text-white duration-75 active:scale-[98%]"
-            onClick={() => setOpenSelectModal(true)}
+    <AppPage
+      banner={<GenericBanner text={t('Sources')} />}
+      contentClassName="overflow-y-auto"
+    >
+      <div
+        ref={contentRef}
+        className="mx-auto max-w-4xl px-4 pb-8 pt-4 sm:px-6 lg:px-8"
+      >
+        {task ? (
+          <Link
+            to={taskPath(null)}
+            className="text-primary-700 hover:bg-primary-50 -ms-2 mb-2 inline-flex min-h-[44px] items-center gap-2 rounded-md px-2 text-sm font-semibold"
           >
-            <p className="font-bold">{t('Add a portal')}</p>
-          </button>
-          {/* The panel's own heading is an <h3>, so it has to sit under an <h2>
-              rather than above the first one for the outline to stay in order. */}
-          <div className="mt-4">
-            <IntegrationStatusPanel status={integrationStatus} />
-          </div>
-        </SourcesSection>
-
-        <SourcesSection
-          title={t('Devices and wearables')}
-          description={t(
-            'Continuous glucose monitors and other devices you import readings from.',
-          )}
+            <ArrowLeftIcon
+              className="h-4 w-4 shrink-0 rtl:rotate-180"
+              aria-hidden="true"
+            />
+            {t('All source tasks')}
+          </Link>
+        ) : null}
+        <h2
+          ref={headingRef}
+          tabIndex={-1}
+          className="text-xl font-bold text-gray-900 focus:outline-none"
         >
-          {deviceConnections && deviceConnections.length > 0 ? (
-            <ul className="grid grid-cols-1">
-              {deviceConnections.map((item) => (
-                <ConnectionCard
-                  key={item.id}
-                  item={item}
-                  baseUrl={item.get('location')}
-                />
-              ))}
-            </ul>
-          ) : (
-            <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-500">
+          {t(heading)}
+        </h2>
+        {!task ? (
+          <>
+            <p className="mt-1 text-sm text-gray-600">
               {t(
-                'No devices yet. Import a FreeStyle Libre export or log device readings manually.',
+                'Choose how to add records. Your records stay on this device.',
               )}
             </p>
-          )}
-        </SourcesSection>
+            <nav
+              aria-label={t('Add records')}
+              className="mt-4 grid gap-3 sm:grid-cols-3"
+            >
+              {sourceTasks.map(({ id, title, description, icon: Icon }) => (
+                <Link
+                  key={id}
+                  to={taskPath(id)}
+                  aria-labelledby={`source-task-${id}`}
+                  className="hover:border-primary-400 focus-visible:ring-primary-500 flex min-h-[76px] items-start gap-3 rounded-xl border border-gray-200 bg-white p-4 text-start shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                >
+                  <Icon
+                    className="text-primary-700 mt-0.5 h-5 w-5 shrink-0"
+                    aria-hidden="true"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span
+                      id={`source-task-${id}`}
+                      className="block text-sm font-bold text-gray-900"
+                    >
+                      {t(title)}
+                    </span>
+                    <span className="mt-1 block text-sm text-gray-600">
+                      {t(description)}
+                    </span>
+                  </span>
+                  <ChevronRightIcon
+                    className="mt-0.5 h-5 w-5 shrink-0 text-gray-400 rtl:rotate-180"
+                    aria-hidden="true"
+                  />
+                </Link>
+              ))}
+            </nav>
+            <div className="mt-5 border-t border-gray-200 pt-3">
+              <Link
+                to={taskPath('manage')}
+                className="text-primary-700 hover:bg-primary-50 -ms-2 inline-flex min-h-[44px] items-center gap-2 rounded-md px-2 text-sm font-semibold"
+              >
+                {t('Manage sources')}
+                <ChevronRightIcon
+                  className="h-4 w-4 rtl:rotate-180"
+                  aria-hidden="true"
+                />
+              </Link>
+              <p className="text-sm text-gray-600">
+                {t(
+                  'Review connected portals, imported devices, and sync history.',
+                )}
+              </p>
+            </div>
+          </>
+        ) : null}
 
-        <SourcesSection
-          title={t('Import records')}
-          description={t(
-            'Move records in and out of the app as files — useful when your provider is unsupported.',
-          )}
-        >
-          <ImportRecordsPanel />
-        </SourcesSection>
+        {task === 'import' ? (
+          <div className="mt-2">
+            <p className="mb-4 text-sm text-gray-600">
+              {t('Choose the kind of file you want to add.')}
+            </p>
+            <ImportRecordsPanel
+              includeBackupExport={false}
+              returnTo={taskPath('import')}
+            />
+          </div>
+        ) : null}
 
-        <SourcesSection
-          title={t('Add manually')}
-          description={t(
-            'Enter records by hand, including dedicated dental and optometry modes.',
-          )}
-        >
-          <div className="flex flex-wrap gap-3">
-            <Link
-              to={Routes.AddRecord}
-              className="bg-primary-600 hover:bg-primary-700 inline-flex min-h-[44px] items-center gap-2 rounded-md px-4 py-2 text-sm font-bold text-white shadow-sm"
+        {task === 'portal' ? (
+          <div className="mt-2">
+            <p className="text-sm text-gray-600">
+              {t(
+                'Choose your provider, review what will be imported, then sign in to its patient portal.',
+              )}
+            </p>
+            <button
+              type="button"
+              className="bg-primary-600 hover:bg-primary-700 mt-4 inline-flex min-h-[44px] w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-bold text-white sm:w-auto"
+              onClick={() => setOpenSelectModal(true)}
             >
-              <PlusIcon className="h-4 w-4" />
-              {t('Add a record')}
-            </Link>
+              {t('Find a patient portal')}
+            </button>
+            <div className="mt-5">
+              <IntegrationStatusPanel status={integrationStatus} />
+            </div>
             <Link
-              to={Routes.Dental}
-              className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-800 shadow-sm hover:bg-gray-50"
+              to={taskPath('manage')}
+              className="text-primary-700 mt-3 inline-flex min-h-[44px] items-center text-sm font-semibold"
             >
-              <PencilSquareIcon className="h-4 w-4" />
-              {t('Dental records')}
-            </Link>
-            <Link
-              to={Routes.Optometry}
-              className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-800 shadow-sm hover:bg-gray-50"
-            >
-              <PencilSquareIcon className="h-4 w-4" />
-              {t('Optometry records')}
+              {t('Manage connected sources')}
             </Link>
           </div>
-        </SourcesSection>
+        ) : null}
 
-        <SourcesSection
-          title={t('Source health / sync history')}
-          description={t(
-            'Last successful and attempted sync for every source.',
-          )}
-        >
-          {list && list.length > 0 ? (
-            <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200 text-start">
-                    <th className="pb-2 pe-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      {t('Source')}
-                    </th>
-                    <th className="pb-2 pe-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      {t('Last sync')}
-                    </th>
-                    <th className="pb-2 pe-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      {t('Last attempt')}
-                    </th>
-                    <th className="pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      {t('Status')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {list.map((item) => (
-                    <SyncHistoryRow key={item.id} item={item} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-500">
-              {t('No sources yet.')}
+        {task === 'manual' ? (
+          <div className="mt-2">
+            <p className="text-sm text-gray-600">
+              {t(
+                'Choose a form. You can review it before saving to the selected profile.',
+              )}
             </p>
-          )}
-        </SourcesSection>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {[
+                { label: 'Add a medical record', specialty: undefined },
+                { label: 'Add a dental record', specialty: 'dental' as const },
+                {
+                  label: 'Add an optometry record',
+                  specialty: 'optometry' as const,
+                },
+              ].map(({ label, specialty }) => (
+                <Link
+                  key={label}
+                  to={buildAddRecordPath({
+                    specialty,
+                    returnTo: taskPath('manual'),
+                  })}
+                  className="text-primary-700 hover:bg-primary-50 inline-flex min-h-[52px] items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm font-bold shadow-sm"
+                >
+                  <PlusIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                  {t(label)}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {task === 'manage' ? (
+          <>
+            <p className="mt-1 text-sm text-gray-600">
+              {t(
+                'Review connected portals, imported devices, and sync history.',
+              )}
+            </p>
+            <SourcesSection
+              title={t('Connected portals')}
+              description={t(
+                'Patient portals you have connected for automatic syncing.',
+              )}
+            >
+              {portalConnections && portalConnections.length > 0 ? (
+                <ul className="grid grid-cols-1">
+                  {portalConnections.map((item) => (
+                    <ConnectionCard
+                      key={item.id}
+                      item={item}
+                      baseUrl={item.get('location')}
+                    />
+                  ))}
+                </ul>
+              ) : (
+                <p className="rounded-lg border border-dashed border-gray-300 p-4 text-sm text-gray-500">
+                  {t('No portals connected yet.')}
+                </p>
+              )}
+              <Link
+                to={taskPath('portal')}
+                className="text-primary-700 mt-2 inline-flex min-h-[44px] items-center text-sm font-semibold"
+              >
+                {t('Connect a patient portal')}
+              </Link>
+            </SourcesSection>
+
+            <SourcesSection
+              title={t('Devices and wearables')}
+              description={t(
+                'Continuous glucose monitors and other devices you import readings from.',
+              )}
+            >
+              {deviceConnections && deviceConnections.length > 0 ? (
+                <ul className="grid grid-cols-1">
+                  {deviceConnections.map((item) => (
+                    <ConnectionCard
+                      key={item.id}
+                      item={item}
+                      baseUrl={item.get('location')}
+                    />
+                  ))}
+                </ul>
+              ) : (
+                <p className="rounded-lg border border-dashed border-gray-300 p-4 text-sm text-gray-500">
+                  {t(
+                    'No devices yet. Import a FreeStyle Libre export or log device readings manually.',
+                  )}
+                </p>
+              )}
+              <Link
+                to={taskPath('import')}
+                className="text-primary-700 mt-2 inline-flex min-h-[44px] items-center text-sm font-semibold"
+              >
+                {t('Import a file')}
+              </Link>
+            </SourcesSection>
+
+            <SourcesSection
+              title={t('Source health / sync history')}
+              description={t(
+                'Last successful and attempted sync for every source.',
+              )}
+            >
+              {list && list.length > 0 ? (
+                <div
+                  className="overflow-x-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+                  role="region"
+                  aria-label={t('Source health / sync history')}
+                  tabIndex={0}
+                >
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200 text-start">
+                        {['Source', 'Last sync', 'Last attempt', 'Status'].map(
+                          (label) => (
+                            <th
+                              key={label}
+                              scope="col"
+                              className="pb-2 pe-3 text-xs font-semibold uppercase tracking-wide text-gray-500"
+                            >
+                              {t(label)}
+                            </th>
+                          ),
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {list.map((item) => (
+                        <SyncHistoryRow key={item.id} item={item} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="rounded-lg border border-dashed border-gray-300 p-4 text-sm text-gray-500">
+                  {t('No sources yet.')}
+                </p>
+              )}
+            </SourcesSection>
+          </>
+        ) : null}
       </div>
 
       <TenantSelectModal

@@ -93,7 +93,12 @@ test('Add connection modal opens and unified search responds', async ({
     await skipTutorial.click();
   }
 
-  await page.getByText('Add a portal').click();
+  await page
+    .getByRole('link', { name: 'Connect a patient portal', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Find a patient portal', exact: true })
+    .click();
   await expect(
     page.getByText('Search for your hospital, clinic, or patient portal'),
   ).toBeVisible();

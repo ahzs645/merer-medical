@@ -6,39 +6,67 @@ import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocu
 import { useRecordChangeTick } from '../../../shared/utils/recordChangeSignal';
 import { buildPacket } from '../utils/packetBuilder';
 
+export type VisitPacketStatus = 'loading' | 'success' | 'error';
+
 export function useVisitPrepPacket() {
   const db = useRxDb();
   const user = useUser();
-  const [documents, setDocuments] = useState<ClinicalDocument[]>([]);
-  const [status, setStatus] = useState<'loading' | 'success'>('loading');
-  // Refetch when a manual record is added, edited, or deleted.
+  const [snapshot, setSnapshot] = useState<{
+    db: typeof db;
+    userId: string;
+    documents: ClinicalDocument[];
+    status: VisitPacketStatus;
+  } | null>(null);
   const recordChangeTick = useRecordChangeTick();
 
   useEffect(() => {
-    let isMounted = true;
+    let isCurrent = true;
+    setSnapshot({ db, userId: user.id, documents: [], status: 'loading' });
 
     async function fetchDocuments() {
-      setStatus('loading');
-      const docs = await db.clinical_documents
-        .find({
-          selector: { user_id: user.id },
-          sort: [{ 'metadata.date': 'desc' }],
-        })
-        .exec();
-
-      if (!isMounted) return;
-      setDocuments(docs.map((doc) => doc.toMutableJSON() as ClinicalDocument));
-      setStatus('success');
+      try {
+        const docs = await db.clinical_documents
+          .find({
+            selector: { user_id: user.id },
+            sort: [{ 'metadata.date': 'desc' }],
+          })
+          .exec();
+        if (!isCurrent) return;
+        setSnapshot({
+          db,
+          userId: user.id,
+          documents: docs.map((doc) => doc.toMutableJSON() as ClinicalDocument),
+          status: 'success',
+        });
+      } catch {
+        if (isCurrent) {
+          setSnapshot({ db, userId: user.id, documents: [], status: 'error' });
+        }
+      }
     }
 
-    fetchDocuments();
-
+    void fetchDocuments();
     return () => {
-      isMounted = false;
+      isCurrent = false;
     };
   }, [db, user.id, recordChangeTick]);
 
-  const packet = useMemo(() => buildPacket(documents), [documents]);
+  // A selected profile/database can change before the fetch effect runs. Never
+  // combine its name with the previous owner's packet, even for one render.
+  const isCurrentOwner =
+    snapshot !== null && snapshot.db === db && snapshot.userId === user.id;
+  const status: VisitPacketStatus = isCurrentOwner
+    ? snapshot.status
+    : 'loading';
+  const packet = useMemo(
+    () =>
+      buildPacket(
+        isCurrentOwner && snapshot.status === 'success'
+          ? snapshot.documents
+          : [],
+      ),
+    [isCurrentOwner, snapshot],
+  );
 
   return { packet, status };
 }

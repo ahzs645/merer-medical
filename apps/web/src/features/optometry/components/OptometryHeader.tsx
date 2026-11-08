@@ -18,6 +18,7 @@ export function OptometryHeader({
 
   return (
     <RecordPageHeader
+      compactCount
       title={t('Optometry')}
       icon={EyeIcon}
       count={

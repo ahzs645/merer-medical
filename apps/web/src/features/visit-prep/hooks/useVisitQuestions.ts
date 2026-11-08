@@ -4,6 +4,7 @@ import { useUser } from '../../../app/providers/UserProvider';
 
 export function useVisitQuestions() {
   const user = useUser();
+  const [visitPurpose, setVisitPurpose] = useState('');
   const [questions, setQuestions] = useState('');
   const [questionsSavedAt, setQuestionsSavedAt] = useState('');
   const [questionsSaveStatus, setQuestionsSaveStatus] = useState<
@@ -16,6 +17,7 @@ export function useVisitQuestions() {
 
   useEffect(() => {
     const stored = loadSavedQuestions(questionsStorageKey);
+    setVisitPurpose(stored.visitPurpose);
     setQuestions(stored.questions);
     setQuestionsSavedAt(stored.savedAt);
     setQuestionsSaveStatus(stored.savedAt ? 'saved' : 'idle');
@@ -26,7 +28,7 @@ export function useVisitQuestions() {
     try {
       localStorage.setItem(
         questionsStorageKey,
-        JSON.stringify({ questions, savedAt }),
+        JSON.stringify({ visitPurpose, questions, savedAt }),
       );
       setQuestionsSavedAt(savedAt);
       setQuestionsSaveStatus('saved');
@@ -41,7 +43,14 @@ export function useVisitQuestions() {
     setQuestionsSaveStatus('idle');
   }
 
+  function updateVisitPurpose(value: string) {
+    setVisitPurpose(value);
+    setQuestionsSaveStatus('idle');
+  }
+
   return {
+    visitPurpose,
+    updateVisitPurpose,
     questions,
     questionsSavedAt,
     questionsSaveStatus,
@@ -53,17 +62,20 @@ export function useVisitQuestions() {
 function loadSavedQuestions(storageKey: string) {
   try {
     const rawValue = localStorage.getItem(storageKey);
-    if (!rawValue) return { questions: '', savedAt: '' };
+    if (!rawValue) return { visitPurpose: '', questions: '', savedAt: '' };
 
     const parsed = JSON.parse(rawValue) as {
+      visitPurpose?: unknown;
       questions?: unknown;
       savedAt?: unknown;
     };
     return {
+      visitPurpose:
+        typeof parsed.visitPurpose === 'string' ? parsed.visitPurpose : '',
       questions: typeof parsed.questions === 'string' ? parsed.questions : '',
       savedAt: typeof parsed.savedAt === 'string' ? parsed.savedAt : '',
     };
   } catch {
-    return { questions: '', savedAt: '' };
+    return { visitPurpose: '', questions: '', savedAt: '' };
   }
 }

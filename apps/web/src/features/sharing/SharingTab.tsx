@@ -1,10 +1,20 @@
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ComponentType,
+  FormEvent,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   DocumentArrowDownIcon,
   PlusIcon,
   ShieldCheckIcon,
   TrashIcon,
   UserGroupIcon,
+  ClipboardDocumentListIcon,
+  ChevronDownIcon,
 } from '@heroicons/react/24/outline';
 
 import { useUser } from '../../app/providers/UserProvider';
@@ -18,6 +28,7 @@ import { OtherDownloadDoors } from '../../shared/components/OtherDownloadDoors';
 import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { exportEmrpkgFromRxDb } from '../../services/emrpkg';
 import { appendAuditLog } from '../audit/auditLog';
+import { useInterfaceLanguage } from '../../app/providers/InterfaceLanguageProvider';
 
 type EmergencyProfile = {
   preferredName: string;
@@ -99,28 +110,51 @@ const EMPTY_GRANT: Omit<ShareGrant, 'id'> = {
 
 export function SharingTab() {
   const user = useUser();
+  const { t } = useInterfaceLanguage();
   const db = useRxDb();
   const storageKey = useMemo(() => `mere:sharing:${user.id}`, [user.id]);
   const [state, setState] = useState<SharingState>(emptySharingState);
-  const [isSharingStateLoaded, setIsSharingStateLoaded] = useState(false);
+  const [loadedOwner, setLoadedOwner] = useState<{
+    db: typeof db;
+    userId: string;
+  } | null>(null);
+  const sharingReady =
+    loadedOwner?.db === db && loadedOwner?.userId === user.id;
+  const [sharingStatus, setSharingStatus] = useState<
+    'loading' | 'saving' | 'saved' | 'error'
+  >('loading');
+  const saveQueue = useRef(Promise.resolve());
   const [proxyDraft, setProxyDraft] =
     useState<Omit<CaregiverProxy, 'id'>>(EMPTY_PROXY);
   const [grantDraft, setGrantDraft] =
     useState<Omit<ShareGrant, 'id'>>(EMPTY_GRANT);
-  const [exportScope, setExportScope] = useState<'full' | 'visit'>('full');
+  const [exportScope, setExportScope] = useState<'full' | 'visit'>('visit');
   const [includeProvenance, setIncludeProvenance] = useState(true);
   const [includeAttachments, setIncludeAttachments] = useState(true);
   const [includeAuditTrail, setIncludeAuditTrail] = useState(false);
   const [passwordProtect, setPasswordProtect] = useState(false);
   const [exportPassphrase, setExportPassphrase] = useState('');
   const [exportBusy, setExportBusy] = useState(false);
+  const [exportError, setExportError] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState('');
   const [downloadName, setDownloadName] = useState('');
   const downloadRef = useRef<HTMLAnchorElement | null>(null);
+  const exportGenerationRef = useRef(0);
+  const exportOwnerRef = useRef({ db, userId: user.id });
+  // Compare the current owner synchronously, before passive load/reset effects.
+  exportOwnerRef.current = { db, userId: user.id };
 
   useEffect(() => {
     let isMounted = true;
-    setIsSharingStateLoaded(false);
+    exportGenerationRef.current += 1;
+    setExportBusy(false);
+    setExportError(false);
+    setLoadedOwner(null);
+    setSharingStatus('loading');
+    setProxyDraft(EMPTY_PROXY);
+    setGrantDraft(EMPTY_GRANT);
+    setDownloadUrl('');
+    setExportPassphrase('');
 
     async function fetchSharingState() {
       const records = await listWorkflowRecords<SharingState>(
@@ -134,7 +168,7 @@ export function SharingTab() {
       if (stored) {
         if (isMounted) {
           setState(normalizeSharingState(stored.payload));
-          setIsSharingStateLoaded(true);
+          setLoadedOwner({ db, userId: user.id });
         }
         return;
       }
@@ -144,21 +178,51 @@ export function SharingTab() {
       localStorage.removeItem(storageKey);
       if (isMounted) {
         setState(legacyState);
-        setIsSharingStateLoaded(true);
+        setLoadedOwner({ db, userId: user.id });
       }
     }
 
-    fetchSharingState();
+    fetchSharingState().catch(() => {
+      if (isMounted) setSharingStatus('error');
+    });
 
     return () => {
       isMounted = false;
+      // An export initiated for this owner must not surface after a switch,
+      // including A → B → A, or after this page has been left.
+      exportGenerationRef.current += 1;
     };
   }, [db, storageKey, user.id]);
 
   useEffect(() => {
-    if (!isSharingStateLoaded) return;
-    saveSharingState(db, user.id, state);
-  }, [db, isSharingStateLoaded, state, user.id]);
+    if (!sharingReady) return;
+    let isCurrent = true;
+    setSharingStatus('saving');
+    // Keep snapshots in edit order, including rapid changes across fields.
+    saveQueue.current = saveQueue.current
+      .catch(() => undefined)
+      .then(async () => {
+        await saveSharingState(db, user.id, state);
+      });
+    saveQueue.current.then(
+      () => {
+        if (isCurrent) setSharingStatus('saved');
+      },
+      () => {
+        if (isCurrent) setSharingStatus('error');
+      },
+    );
+    return () => {
+      isCurrent = false;
+    };
+  }, [db, sharingReady, state, user.id]);
+
+  useEffect(
+    () => () => {
+      if (downloadUrl) URL.revokeObjectURL(downloadUrl);
+    },
+    [downloadUrl],
+  );
 
   function updateProfile(field: keyof EmergencyProfile, value: string) {
     setState((current) => ({
@@ -188,9 +252,22 @@ export function SharingTab() {
   }
 
   async function exportRecordPackage() {
-    if (passwordProtect && !exportPassphrase.trim()) return;
+    if (
+      exportBusy ||
+      !sharingReady ||
+      (passwordProtect && !exportPassphrase.trim())
+    )
+      return;
+    const generation = ++exportGenerationRef.current;
+    const isCurrent = () =>
+      generation === exportGenerationRef.current &&
+      exportOwnerRef.current.db === db &&
+      exportOwnerRef.current.userId === user.id;
     setExportBusy(true);
+    setExportError(false);
     try {
+      await saveQueue.current;
+      if (!isCurrent()) return;
       const bytes = await exportEmrpkgFromRxDb(db, {
         passphrase: passwordProtect ? exportPassphrase : undefined,
         exportNotes: {
@@ -201,6 +278,7 @@ export function SharingTab() {
           includeAuditTrail,
         },
       });
+      if (!isCurrent()) return;
       await appendAuditLog(db, {
         userId: user.id,
         actor: 'local-user',
@@ -209,6 +287,7 @@ export function SharingTab() {
         source: 'Sharing',
         summary: `Exported ${exportScope === 'full' ? 'full' : 'visit-prep'} record package`,
       });
+      if (!isCurrent()) return;
       const blob = new Blob([bytes], { type: 'application/octet-stream' });
       const url = URL.createObjectURL(blob);
       const ts = new Date().toISOString().replace(/[:.]/g, '-');
@@ -216,9 +295,15 @@ export function SharingTab() {
       setDownloadName(
         `mere_record_${exportScope}_${ts}${passwordProtect ? '.enc' : ''}.emrpkg`,
       );
-      setTimeout(() => downloadRef.current?.click(), 0);
+      setTimeout(() => {
+        if (isCurrent() && downloadRef.current?.href === url) {
+          downloadRef.current.click();
+        }
+      }, 0);
+    } catch {
+      if (isCurrent()) setExportError(true);
     } finally {
-      setExportBusy(false);
+      if (isCurrent()) setExportBusy(false);
     }
   }
 
@@ -226,383 +311,492 @@ export function SharingTab() {
     <AppPage
       banner={
         <RecordPageHeader
-          title="Sharing and emergency access"
-          description="Your emergency profile, the caregivers who can act for you, and a record of what you have shared — all kept on this device."
+          title={t('Sharing')}
+          description={t(
+            'Prepare emergency information, keep caregiver contacts, download records, or log a share.',
+          )}
         />
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.85fr)] lg:px-8">
-          {/* The emergency profile and the caregivers lead, because they are
-              what the page is called. The download card was first and full
-              width, so at 1440px a page titled "Sharing and emergency access"
-              opened on neither — both sat below the fold behind a package
-              builder that Export and Visit prep also offer. */}
-          <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-            <div className="mb-4 flex items-center gap-2">
-              <ShieldCheckIcon className="h-5 w-5 text-primary-700" />
-              <h2 className="text-base font-semibold text-gray-900">
-                Emergency profile
-              </h2>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <TextField
-                label="Preferred name"
-                value={state.emergencyProfile.preferredName}
-                onChange={(value) => updateProfile('preferredName', value)}
-              />
-              <TextField
-                label="Date of birth"
-                type="date"
-                value={state.emergencyProfile.dateOfBirth}
-                onChange={(value) => updateProfile('dateOfBirth', value)}
-              />
-              <TextField
-                label="Blood type"
-                value={state.emergencyProfile.bloodType}
-                onChange={(value) => updateProfile('bloodType', value)}
-              />
-              <TextField
-                label="Primary clinician"
-                value={state.emergencyProfile.primaryClinician}
-                onChange={(value) => updateProfile('primaryClinician', value)}
-              />
-              <TextField
-                label="Emergency contact"
-                value={state.emergencyProfile.emergencyContactName}
-                onChange={(value) =>
-                  updateProfile('emergencyContactName', value)
-                }
-              />
-              <TextField
-                label="Emergency phone"
-                value={state.emergencyProfile.emergencyContactPhone}
-                onChange={(value) =>
-                  updateProfile('emergencyContactPhone', value)
-                }
-              />
-              <label className="sm:col-span-2">
-                <span className="text-sm font-medium text-gray-700">
-                  Critical notes
-                </span>
-                <textarea
-                  className="mt-1 min-h-28 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-primary focus:ring-primary"
-                  value={state.emergencyProfile.emergencyNotes}
-                  onChange={(event) =>
-                    updateProfile('emergencyNotes', event.target.value)
-                  }
-                />
-              </label>
-            </div>
-          </section>
+        <div className="mx-auto grid w-full max-w-5xl gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
+          <p className="text-sm text-gray-600">
+            {t(
+              'Choose a task. Information stays on this device unless you download and share a copy yourself.',
+            )}
+          </p>
+          {!sharingReady ? (
+            <p
+              role="status"
+              className="rounded-md bg-white p-4 text-sm text-gray-700"
+            >
+              {sharingStatus === 'error'
+                ? t(
+                    'Unable to load sharing information. Reload the page to try again.',
+                  )
+                : t('Loading sharing information…')}
+            </p>
+          ) : (
+            <>
+              <SharingSection
+                id="emergency"
+                title={t('Emergency information')}
+                description={t(
+                  'Save contact details and critical notes for this profile. This does not publish an emergency page.',
+                )}
+                icon={ShieldCheckIcon}
+              >
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <TextField
+                    label="Preferred name"
+                    value={state.emergencyProfile.preferredName}
+                    onChange={(value) => updateProfile('preferredName', value)}
+                  />
+                  <TextField
+                    label="Date of birth"
+                    type="date"
+                    value={state.emergencyProfile.dateOfBirth}
+                    onChange={(value) => updateProfile('dateOfBirth', value)}
+                  />
+                  <TextField
+                    label="Blood type"
+                    value={state.emergencyProfile.bloodType}
+                    onChange={(value) => updateProfile('bloodType', value)}
+                  />
+                  <TextField
+                    label="Primary clinician"
+                    value={state.emergencyProfile.primaryClinician}
+                    onChange={(value) =>
+                      updateProfile('primaryClinician', value)
+                    }
+                  />
+                  <TextField
+                    label="Emergency contact"
+                    value={state.emergencyProfile.emergencyContactName}
+                    onChange={(value) =>
+                      updateProfile('emergencyContactName', value)
+                    }
+                  />
+                  <TextField
+                    label="Emergency phone"
+                    value={state.emergencyProfile.emergencyContactPhone}
+                    onChange={(value) =>
+                      updateProfile('emergencyContactPhone', value)
+                    }
+                  />
+                  <label className="sm:col-span-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      Critical notes
+                    </span>
+                    <textarea
+                      className="mt-1 min-h-28 w-full rounded-md border-gray-300 text-base sm:text-sm shadow-sm focus:border-primary focus:ring-primary"
+                      value={state.emergencyProfile.emergencyNotes}
+                      onChange={(event) =>
+                        updateProfile('emergencyNotes', event.target.value)
+                      }
+                    />
+                  </label>
+                </div>
+              </SharingSection>
 
-          <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-            <div className="mb-4 flex items-center gap-2">
-              <UserGroupIcon className="h-5 w-5 text-primary-700" />
-              <h2 className="text-base font-semibold text-gray-900">
-                Caregivers and proxies
-              </h2>
-            </div>
-            <form className="grid gap-3" onSubmit={addProxy}>
-              <TextField
-                label="Name"
-                value={proxyDraft.name}
-                onChange={(value) =>
-                  setProxyDraft((draft) => ({ ...draft, name: value }))
-                }
-              />
-              <div className="grid gap-3 sm:grid-cols-2">
-                <TextField
-                  label="Relationship"
-                  value={proxyDraft.relationship}
-                  onChange={(value) =>
-                    setProxyDraft((draft) => ({
-                      ...draft,
-                      relationship: value,
+              <SharingSection
+                id="caregivers"
+                title={t('Caregivers')}
+                description={t(
+                  'Keep names, relationships, and contact details. Adding a caregiver does not grant account or remote access.',
+                )}
+                icon={UserGroupIcon}
+              >
+                <form className="grid gap-3" onSubmit={addProxy}>
+                  <TextField
+                    label="Name"
+                    value={proxyDraft.name}
+                    onChange={(value) =>
+                      setProxyDraft((draft) => ({ ...draft, name: value }))
+                    }
+                  />
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <TextField
+                      label="Relationship"
+                      value={proxyDraft.relationship}
+                      onChange={(value) =>
+                        setProxyDraft((draft) => ({
+                          ...draft,
+                          relationship: value,
+                        }))
+                      }
+                    />
+                    <TextField
+                      label="Phone"
+                      value={proxyDraft.phone}
+                      onChange={(value) =>
+                        setProxyDraft((draft) => ({ ...draft, phone: value }))
+                      }
+                    />
+                  </div>
+                  <TextField
+                    label="Email"
+                    type="email"
+                    value={proxyDraft.email}
+                    onChange={(value) =>
+                      setProxyDraft((draft) => ({ ...draft, email: value }))
+                    }
+                  />
+                  <TextField
+                    label="Notes"
+                    value={proxyDraft.notes}
+                    onChange={(value) =>
+                      setProxyDraft((draft) => ({ ...draft, notes: value }))
+                    }
+                  />
+                  <button className="inline-flex min-h-[44px] w-fit items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+                    <PlusIcon className="h-4 w-4" />
+                    {t('Add caregiver')}
+                  </button>
+                </form>
+                <ItemList
+                  items={state.proxies}
+                  emptyLabel={t('No caregivers saved yet.')}
+                  onRemove={(id) =>
+                    setState((current) => ({
+                      ...current,
+                      proxies: current.proxies.filter(
+                        (proxy) => proxy.id !== id,
+                      ),
                     }))
                   }
-                />
-                <TextField
-                  label="Phone"
-                  value={proxyDraft.phone}
-                  onChange={(value) =>
-                    setProxyDraft((draft) => ({ ...draft, phone: value }))
-                  }
-                />
-              </div>
-              <TextField
-                label="Email"
-                type="email"
-                value={proxyDraft.email}
-                onChange={(value) =>
-                  setProxyDraft((draft) => ({ ...draft, email: value }))
-                }
-              />
-              <TextField
-                label="Notes"
-                value={proxyDraft.notes}
-                onChange={(value) =>
-                  setProxyDraft((draft) => ({ ...draft, notes: value }))
-                }
-              />
-              <button className="inline-flex w-fit items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700">
-                <PlusIcon className="h-4 w-4" />
-                Add proxy
-              </button>
-            </form>
-            <ItemList
-              items={state.proxies}
-              emptyLabel="No caregiver proxies yet."
-              onRemove={(id) =>
-                setState((current) => ({
-                  ...current,
-                  proxies: current.proxies.filter((proxy) => proxy.id !== id),
-                }))
-              }
-              render={(proxy) => (
-                <>
-                  <p className="font-medium text-gray-900">{proxy.name}</p>
-                  <p className="text-sm text-gray-600">
-                    {[proxy.relationship, proxy.phone, proxy.email]
-                      .filter(Boolean)
-                      .join(' | ')}
-                  </p>
-                  {proxy.notes && (
-                    <p className="mt-1 text-sm text-gray-600">{proxy.notes}</p>
+                  render={(proxy) => (
+                    <>
+                      <p className="font-medium text-gray-900">{proxy.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {[proxy.relationship, proxy.phone, proxy.email]
+                          .filter(Boolean)
+                          .join(' | ')}
+                      </p>
+                      {proxy.notes && (
+                        <p className="mt-1 text-sm text-gray-600">
+                          {proxy.notes}
+                        </p>
+                      )}
+                    </>
                   )}
-                </>
-              )}
-            />
-          </section>
+                />
+              </SharingSection>
 
-          <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 lg:col-span-2">
-            <div className="mb-4 flex items-center gap-2">
-              <DocumentArrowDownIcon className="h-5 w-5 text-primary-700" />
-              <h2 className="text-base font-semibold text-gray-900">
-                Download your records
-              </h2>
-            </div>
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)]">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <fieldset className="sm:col-span-2">
-                  <legend className="text-sm font-medium text-gray-700">
-                    Export scope
-                  </legend>
-                  <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                    <RadioCard
-                      checked={exportScope === 'full'}
-                      title="Full record"
-                      description="Everything on this device: every profile, connection, record, and setting."
-                      onChange={() => setExportScope('full')}
+              <SharingSection
+                id="download"
+                title={t('Download a package')}
+                description={t(
+                  'Create a file to give to someone yourself. Downloading does not send records or create a share link.',
+                )}
+                icon={DocumentArrowDownIcon}
+              >
+                <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)]">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <fieldset className="sm:col-span-2">
+                      <legend className="text-sm font-medium text-gray-700">
+                        Export scope
+                      </legend>
+                      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                        <RadioCard
+                          checked={exportScope === 'full'}
+                          title={t('All profiles on this device')}
+                          description={t(
+                            'All profiles, connections, records, and stored workflow data in this app.',
+                          )}
+                          onChange={() => setExportScope('full')}
+                        />
+                        <RadioCard
+                          checked={exportScope === 'visit'}
+                          title={t('Selected profile only')}
+                          description={t(
+                            'This profile’s records and stored workflow notes. This is not limited to a single visit.',
+                          )}
+                          onChange={() => setExportScope('visit')}
+                        />
+                      </div>
+                    </fieldset>
+                    <CheckboxField
+                      checked={includeProvenance}
+                      label="Include provenance"
+                      onChange={setIncludeProvenance}
                     />
-                    <RadioCard
-                      checked={exportScope === 'visit'}
-                      title="Visit-specific package"
-                      description="Just your records and workflow notes, leaving out any other profiles on this device."
-                      onChange={() => setExportScope('visit')}
+                    <CheckboxField
+                      checked={includeAttachments}
+                      label="Include attachments"
+                      onChange={setIncludeAttachments}
                     />
-                  </div>
-                </fieldset>
-                <CheckboxField
-                  checked={includeProvenance}
-                  label="Include provenance"
-                  onChange={setIncludeProvenance}
-                />
-                <CheckboxField
-                  checked={includeAttachments}
-                  label="Include attachments"
-                  onChange={setIncludeAttachments}
-                />
-                <CheckboxField
-                  checked={includeAuditTrail}
-                  label="Include audit trail"
-                  onChange={setIncludeAuditTrail}
-                />
-                <CheckboxField
-                  checked={passwordProtect}
-                  label="Password-protect package"
-                  onChange={setPasswordProtect}
-                />
-                {passwordProtect ? (
-                  <TextField
-                    label="Export password"
-                    type="password"
-                    value={exportPassphrase}
-                    onChange={setExportPassphrase}
-                  />
-                ) : null}
-              </div>
-              <div className="rounded-md bg-gray-50 p-4 text-sm text-gray-700 ring-1 ring-gray-200">
-                <h3 className="font-semibold text-gray-900">Package summary</h3>
-                <ul className="mt-2 space-y-1">
-                  <li>
-                    Scope:{' '}
-                    {exportScope === 'full' ? 'full record' : 'visit-specific'}
-                  </li>
-                  <li>
-                    {includeProvenance ? 'Includes' : 'Omits'} provenance
-                    metadata
-                  </li>
-                  <li>
-                    {includeAttachments ? 'Includes' : 'Omits'} embedded
-                    attachments
-                  </li>
-                  <li>
-                    {includeAuditTrail ? 'Includes' : 'Omits'} audit trail
-                    metadata
-                  </li>
-                  <li>
-                    {passwordProtect
-                      ? 'Encrypted with password'
-                      : 'Not password protected'}
-                  </li>
-                </ul>
-                <p className="mt-3 text-xs text-gray-600">
-                  The share grants below are your own notes. They give nobody
-                  access on their own — you share by handing over the package
-                  you download here.
-                </p>
-                <OtherDownloadDoors from="sharing" />
-                <button
-                  type="button"
-                  onClick={exportRecordPackage}
-                  disabled={
-                    exportBusy || (passwordProtect && !exportPassphrase.trim())
-                  }
-                  className="mt-4 inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-                >
-                  <DocumentArrowDownIcon className="h-4 w-4" />
-                  {exportBusy ? 'Preparing...' : 'Download package'}
-                </button>
-                {downloadUrl ? (
-                  <a
-                    ref={downloadRef}
-                    href={downloadUrl}
-                    download={downloadName}
-                    className="hidden"
-                  >
-                    Download
-                  </a>
-                ) : null}
-              </div>
-            </div>
-          </section>
-
-          <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200 lg:col-span-2">
-            <h2 className="text-base font-semibold text-gray-900">
-              Share grants
-            </h2>
-            <p className="mt-1 text-sm text-gray-600">
-              Keep track of who you shared records with, what you sent, and when
-              it should expire. These notes do not grant anyone account access
-              or create a share link.
-            </p>
-            <form
-              className="mt-4 grid gap-3 lg:grid-cols-3"
-              onSubmit={addGrant}
-            >
-              <TextField
-                label="Recipient"
-                value={grantDraft.recipient}
-                onChange={(value) =>
-                  setGrantDraft((draft) => ({ ...draft, recipient: value }))
-                }
-              />
-              <TextField
-                label="Purpose"
-                value={grantDraft.purpose}
-                onChange={(value) =>
-                  setGrantDraft((draft) => ({ ...draft, purpose: value }))
-                }
-              />
-              <TextField
-                label="Expires on"
-                type="date"
-                value={grantDraft.expiresOn}
-                onChange={(value) =>
-                  setGrantDraft((draft) => ({ ...draft, expiresOn: value }))
-                }
-              />
-              <fieldset className="lg:col-span-3">
-                <legend className="text-sm font-medium text-gray-700">
-                  Categories
-                </legend>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {CATEGORY_OPTIONS.map((category) => (
-                    <label
-                      key={category}
-                      // min-h keeps the whole row a 44px touch target.
-                      className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm"
-                    >
-                      <input
-                        type="checkbox"
-                        className="rounded border-gray-300 text-primary focus:ring-primary"
-                        checked={grantDraft.categories.includes(category)}
-                        onChange={(event) =>
-                          setGrantDraft((draft) => ({
-                            ...draft,
-                            categories: event.target.checked
-                              ? [...draft.categories, category]
-                              : draft.categories.filter(
-                                  (item) => item !== category,
-                                ),
-                          }))
-                        }
+                    <CheckboxField
+                      checked={includeAuditTrail}
+                      label="Include audit trail"
+                      onChange={setIncludeAuditTrail}
+                    />
+                    <CheckboxField
+                      checked={passwordProtect}
+                      label="Password-protect package"
+                      onChange={setPasswordProtect}
+                    />
+                    {passwordProtect ? (
+                      <TextField
+                        label="Export password"
+                        type="password"
+                        value={exportPassphrase}
+                        onChange={setExportPassphrase}
                       />
-                      {category}
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-              <TextField
-                label="Notes"
-                value={grantDraft.notes}
-                onChange={(value) =>
-                  setGrantDraft((draft) => ({ ...draft, notes: value }))
-                }
-              />
-              <div className="flex items-end">
-                <button className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700">
-                  <PlusIcon className="h-4 w-4" />
-                  Add grant
-                </button>
-              </div>
-            </form>
-            <ItemList
-              items={state.grants}
-              emptyLabel="No share grants yet."
-              onRemove={(id) =>
-                setState((current) => ({
-                  ...current,
-                  grants: current.grants.filter((grant) => grant.id !== id),
-                }))
-              }
-              render={(grant) => (
-                <>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-medium text-gray-900">
-                      {grant.recipient}
-                    </p>
-                    {grant.expiresOn && (
-                      <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-                        Expires {grant.expiresOn}
-                      </span>
-                    )}
+                    ) : null}
                   </div>
-                  <p className="text-sm text-gray-600">{grant.purpose}</p>
-                  <p className="mt-1 text-sm text-gray-700">
-                    {grant.categories.join(', ')}
-                  </p>
-                  {grant.notes && (
-                    <p className="mt-1 text-sm text-gray-600">{grant.notes}</p>
+                  <div className="rounded-md bg-gray-50 p-4 text-sm text-gray-700 ring-1 ring-gray-200">
+                    <h3 className="font-semibold text-gray-900">
+                      Package summary
+                    </h3>
+                    <ul className="mt-2 space-y-1">
+                      <li>
+                        Scope:{' '}
+                        {exportScope === 'full'
+                          ? t('All profiles on this device')
+                          : t('Selected profile only')}
+                      </li>
+                      <li>
+                        {includeProvenance ? 'Includes' : 'Omits'} provenance
+                        metadata
+                      </li>
+                      <li>
+                        {includeAttachments ? 'Includes' : 'Omits'} embedded
+                        attachments
+                      </li>
+                      <li>
+                        {includeAuditTrail ? 'Includes' : 'Omits'} audit trail
+                        metadata
+                      </li>
+                      <li>
+                        {passwordProtect
+                          ? 'Encrypted with password'
+                          : 'Not password protected'}
+                      </li>
+                    </ul>
+                    <p className="mt-3 text-xs text-gray-600">
+                      {t(
+                        'After downloading, choose how to give the file to its recipient. You can record that action in the sharing log.',
+                      )}
+                    </p>
+                    <OtherDownloadDoors from="sharing" />
+                    <button
+                      type="button"
+                      onClick={exportRecordPackage}
+                      disabled={
+                        exportBusy ||
+                        (passwordProtect && !exportPassphrase.trim())
+                      }
+                      className="mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                    >
+                      <DocumentArrowDownIcon className="h-4 w-4" />
+                      {exportBusy ? 'Preparing...' : 'Download package'}
+                    </button>
+                    {exportError && (
+                      <p role="alert" className="mt-3 text-sm text-red-700">
+                        {t(
+                          'Unable to prepare the package. Try downloading again.',
+                        )}
+                      </p>
+                    )}
+                    {downloadUrl ? (
+                      <a
+                        ref={downloadRef}
+                        href={downloadUrl}
+                        download={downloadName}
+                        className="mt-2 inline-flex min-h-[44px] items-center rounded-md px-2 text-primary-700 underline"
+                      >
+                        {t('Download again')}
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
+              </SharingSection>
+
+              <SharingSection
+                id="log"
+                title={t('Sharing log')}
+                description={t(
+                  'Record who received a copy and what you sent. Log entries do not grant access, create links, or revoke downloaded copies.',
+                )}
+                icon={ClipboardDocumentListIcon}
+              >
+                <p className="text-sm text-gray-600">
+                  {t(
+                    'A review date is a reminder for you. It does not expire a file that someone already has.',
                   )}
-                </>
-              )}
-            />
-          </section>
+                </p>
+                <form
+                  className="mt-4 grid gap-3 lg:grid-cols-3"
+                  onSubmit={addGrant}
+                >
+                  <TextField
+                    label="Recipient"
+                    value={grantDraft.recipient}
+                    onChange={(value) =>
+                      setGrantDraft((draft) => ({ ...draft, recipient: value }))
+                    }
+                  />
+                  <TextField
+                    label="Purpose"
+                    value={grantDraft.purpose}
+                    onChange={(value) =>
+                      setGrantDraft((draft) => ({ ...draft, purpose: value }))
+                    }
+                  />
+                  <TextField
+                    label={t('Review date (optional)')}
+                    type="date"
+                    value={grantDraft.expiresOn}
+                    onChange={(value) =>
+                      setGrantDraft((draft) => ({ ...draft, expiresOn: value }))
+                    }
+                  />
+                  <fieldset className="lg:col-span-3">
+                    <legend className="text-sm font-medium text-gray-700">
+                      Categories
+                    </legend>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {CATEGORY_OPTIONS.map((category) => (
+                        <label
+                          key={category}
+                          // min-h keeps the whole row a 44px touch target.
+                          className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm"
+                        >
+                          <input
+                            type="checkbox"
+                            className="rounded border-gray-300 text-primary focus:ring-primary"
+                            checked={grantDraft.categories.includes(category)}
+                            onChange={(event) =>
+                              setGrantDraft((draft) => ({
+                                ...draft,
+                                categories: event.target.checked
+                                  ? [...draft.categories, category]
+                                  : draft.categories.filter(
+                                      (item) => item !== category,
+                                    ),
+                              }))
+                            }
+                          />
+                          {category}
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                  <TextField
+                    label="Notes"
+                    value={grantDraft.notes}
+                    onChange={(value) =>
+                      setGrantDraft((draft) => ({ ...draft, notes: value }))
+                    }
+                  />
+                  <div className="flex items-end">
+                    <button className="inline-flex min-h-[44px] items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+                      <PlusIcon className="h-4 w-4" />
+                      {t('Record a share')}
+                    </button>
+                  </div>
+                </form>
+                <ItemList
+                  items={state.grants}
+                  emptyLabel={t('No shares recorded yet.')}
+                  onRemove={(id) =>
+                    setState((current) => ({
+                      ...current,
+                      grants: current.grants.filter((grant) => grant.id !== id),
+                    }))
+                  }
+                  render={(grant) => (
+                    <>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-medium text-gray-900">
+                          {grant.recipient}
+                        </p>
+                        {grant.expiresOn && (
+                          <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                            {t('Review date')}: {grant.expiresOn}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-600">{grant.purpose}</p>
+                      <p className="mt-1 text-sm text-gray-700">
+                        {grant.categories.join(', ')}
+                      </p>
+                      {grant.notes && (
+                        <p className="mt-1 text-sm text-gray-600">
+                          {grant.notes}
+                        </p>
+                      )}
+                    </>
+                  )}
+                />
+              </SharingSection>
+              <p
+                role="status"
+                aria-live="polite"
+                className={`text-xs ${sharingStatus === 'error' ? 'text-red-700' : 'text-gray-500'}`}
+              >
+                {sharingStatus === 'saving'
+                  ? t('Saving on this device…')
+                  : sharingStatus === 'error'
+                    ? t(
+                        'Unable to save sharing information. Your changes remain on this page; edit a field to retry.',
+                      )
+                    : t('Changes saved on this device.')}
+              </p>
+            </>
+          )}
         </div>
       </div>
     </AppPage>
+  );
+}
+
+function SharingSection({
+  id,
+  title,
+  description,
+  icon: Icon,
+  children,
+}: {
+  id: string;
+  title: string;
+  description: string;
+  icon: ComponentType<{ className?: string }>;
+  children: ReactNode;
+}) {
+  return (
+    <details
+      id={`sharing-${id}`}
+      className="group min-w-0 rounded-md bg-white shadow-sm ring-1 ring-gray-200"
+    >
+      <summary
+        aria-labelledby={`sharing-${id}-title`}
+        aria-describedby={`sharing-${id}-description`}
+        className="flex min-h-[44px] cursor-pointer list-none items-start gap-3 rounded-md p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden"
+      >
+        <Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary-700" />
+        <span className="min-w-0 flex-1">
+          <span
+            id={`sharing-${id}-title`}
+            className="block text-base font-semibold text-gray-900"
+          >
+            {title}
+          </span>
+          <span
+            id={`sharing-${id}-description`}
+            className="mt-1 block text-sm text-gray-600"
+          >
+            {description}
+          </span>
+        </span>
+        <ChevronDownIcon
+          className="mt-0.5 h-5 w-5 shrink-0 text-gray-500 group-open:rotate-180"
+          aria-hidden="true"
+        />
+      </summary>
+      <div className="border-t border-gray-100 p-4">{children}</div>
+    </details>
   );
 }
 
@@ -622,7 +816,7 @@ function TextField({
       <span className="text-sm font-medium text-gray-700">{label}</span>
       <input
         type={type}
-        className="mt-1 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-primary focus:ring-primary"
+        className="mt-1 min-h-[44px] w-full rounded-md border-gray-300 text-base sm:text-sm shadow-sm focus:border-primary focus:ring-primary"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
@@ -717,7 +911,7 @@ function ItemList<T extends { id: string }>({
           <div className="min-w-0 flex-1">{render(item)}</div>
           <button
             type="button"
-            className="h-8 rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-red-700"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center self-start rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-red-700"
             onClick={() => onRemove(item.id)}
             aria-label="Remove"
           >

@@ -28,7 +28,7 @@ export function SettingsSection({
   return (
     <section
       id={id}
-      className="scroll-mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
+      className="scroll-mt-20 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm [&_[id]]:scroll-mt-20"
     >
       <div className="border-b border-gray-100 px-5 py-4">
         <div className="flex items-center gap-3">

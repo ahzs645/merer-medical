@@ -24,6 +24,8 @@ import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useNotificationDispatch } from '../../app/providers/NotificationProvider';
 import { importEmrpkgToRxDb, inspectEmrpkg } from '../../services/emrpkg';
 import { useIsDesktop } from '../../shared/hooks/useIsDesktop';
+import { SettingsPanels } from './components/SettingsPanels';
+import { AdvancedToolsSettingsGroup } from './components/AdvancedToolsSettingsGroup';
 
 export function fetchPatientRecords(
   db: RxDatabase<DatabaseCollections>,
@@ -119,7 +121,7 @@ const SettingsTab: React.FC = () => {
           notifyDispatch({
             type: 'set_notification',
             message: t(
-              'This user profile package is encrypted. Import it from Data settings so you can enter the passphrase.',
+              'This user profile package is encrypted. Open Advanced settings, then Data, to import it with a passphrase.',
             ),
             variant: 'error',
           });
@@ -159,17 +161,28 @@ const SettingsTab: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
+    if (!hash) return;
+    const timer = setTimeout(() => {
       const id = hash.replace('#', '');
-      const element = document.getElementById(id);
+      // Experimental and developer groups are intentionally absent until
+      // enabled. Keep their existing links useful by exposing that control.
+      const element =
+        document.getElementById(id) ??
+        (id === 'experimental' || id === 'developer'
+          ? document.getElementById('advanced-tools')
+          : null);
       if (element) {
         element.scrollIntoView({
-          behavior: 'smooth',
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)')
+            .matches
+            ? 'auto'
+            : 'smooth',
           block: 'start',
           inline: 'nearest',
         });
       }
     }, 100);
+    return () => clearTimeout(timer);
   }, [pathname, hash, key]);
 
   return (
@@ -178,30 +191,40 @@ const SettingsTab: React.FC = () => {
       contentClassName="overflow-y-auto overscroll-contain bg-gray-50"
     >
       <div className="mx-auto flex max-w-4xl flex-col gap-y-4 px-4 pb-20 pt-4 sm:px-6 sm:pb-6 lg:px-8">
-        {/* Profile lives in a SettingsSection like every other group so the
-            page has a single section pattern at every breakpoint. */}
-        <SettingsSection
-          id="about-me"
-          title={t('About me')}
-          action={
-            <button
-              onClick={() => setShowUserSwitcher(true)}
-              className="text-primary-600 hover:text-primary-700 hover:bg-primary-50 -me-2 inline-flex min-h-[44px] items-center rounded-md px-3 text-sm font-medium transition-colors"
-            >
-              {t('Switch user')}
-            </button>
+        <SettingsPanels
+          basic={
+            <>
+              <SettingsSection
+                id="about-me"
+                title={t('About me')}
+                action={
+                  <button
+                    type="button"
+                    onClick={() => setShowUserSwitcher(true)}
+                    className="text-primary-600 hover:text-primary-700 hover:bg-primary-50 -me-2 inline-flex min-h-[44px] items-center rounded-md px-3 text-sm font-medium transition-colors"
+                  >
+                    {t('Switch user')}
+                  </button>
+                }
+              >
+                <UserCard />
+              </SettingsSection>
+              <InterfaceLanguageSettingsGroup />
+              <PrivacyAndSecuritySettingsGroup />
+              <AboutMereSettingsGroup />
+            </>
           }
-        >
-          <UserCard />
-        </SettingsSection>
-        <InterfaceLanguageSettingsGroup />
-        <PrivacyAndSecuritySettingsGroup />
-        <TerminologySettingsGroup />
-        <MedicationInteractionSettingsGroup />
-        <UserDataSettingsGroup />
-        <AboutMereSettingsGroup />
-        <ExperimentalSettingsGroup />
-        <DeveloperSettingsGroup />
+          advanced={
+            <>
+              <TerminologySettingsGroup />
+              <MedicationInteractionSettingsGroup />
+              <UserDataSettingsGroup />
+              <AdvancedToolsSettingsGroup />
+              <ExperimentalSettingsGroup />
+              <DeveloperSettingsGroup />
+            </>
+          }
+        />
       </div>
 
       {isDesktop ? (

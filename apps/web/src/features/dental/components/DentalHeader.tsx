@@ -18,6 +18,7 @@ export function DentalHeader({
 
   return (
     <RecordPageHeader
+      compactCount
       title={t('Dental')}
       icon={FaceSmileIcon}
       count={

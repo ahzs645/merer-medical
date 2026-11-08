@@ -1,7 +1,8 @@
 import { PacketOptions } from '../types';
 import { CheckboxChip } from './CheckboxChip';
+import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
 
-/** Every packet section, in the order they appear in the exported packet. */
+/** Every selectable section of the printable summary. */
 const SECTIONS: { key: keyof PacketOptions; label: string }[] = [
   { key: 'includeProblems', label: 'Problems' },
   { key: 'includeMedications', label: 'Medications' },
@@ -20,6 +21,7 @@ export function PacketContentsCard({
   packetOptions: PacketOptions;
   updatePacketOption: (option: keyof PacketOptions, checked: boolean) => void;
 }) {
+  const { t } = useInterfaceLanguage();
   const selected = SECTIONS.filter(
     (section) => packetOptions[section.key],
   ).length;
@@ -29,7 +31,7 @@ export function PacketContentsCard({
     <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <h2 className="text-base font-semibold text-gray-900">
-          Packet contents
+          {t('Included records')}
         </h2>
         {/* Eight chips carry their state in the fill, which is quick to read
             but slow to count. The tally says how many are in without the
@@ -51,6 +53,11 @@ export function PacketContentsCard({
           </button>
         </div>
       </div>
+      <p className="mt-1 text-sm text-gray-600">
+        {t(
+          'Choose the sections for the printable summary. Visit questions includes your visit purpose and questions.',
+        )}
+      </p>
       <div className="mt-2 flex flex-wrap gap-2">
         {SECTIONS.map((section) => (
           <CheckboxChip
