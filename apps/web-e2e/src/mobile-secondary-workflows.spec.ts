@@ -12,7 +12,9 @@ async function openDemo(page: Page, path: string, title: string) {
 async function dismissDemoNotification(page: Page) {
   const toast = page
     .locator('[aria-live="assertive"]')
-    .getByRole('button', { name: 'Close', exact: true });
+    // The notification's first button is its close control in every language.
+    .getByRole('button')
+    .first();
   if (await toast.isVisible()) await toast.click();
 }
 
@@ -90,6 +92,15 @@ test('Sources starts with tasks and device imports return to the chosen task', a
     0,
   );
   await fits(page);
+  await main
+    .getByRole('button', { name: 'Choose .emrpkg file' })
+    .scrollIntoViewIfNeeded();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/connections$/);
+  await expect(
+    main.getByRole('link', { name: 'Import a file', exact: true }),
+  ).toBeInViewport();
+  await main.getByRole('link', { name: 'Import a file', exact: true }).click();
   await main
     .getByRole('link', { name: 'Import device file', exact: true })
     .click();
@@ -315,6 +326,9 @@ test('Settings separates everyday preferences and preserves advanced navigation 
   await expect(
     advanced.getByRole('heading', { name: 'Terminology', exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Settings', exact: true }),
+  ).toBeInViewport();
   await fits(page);
   await capture(page, 'settings-advanced');
   await page.goBack();
@@ -327,6 +341,9 @@ test('Settings separates everyday preferences and preserves advanced navigation 
     nav.getByRole('link', { name: 'Advanced', exact: true }),
   ).toHaveAttribute('aria-current', 'page');
   await expect(page.locator('#data')).toBeInViewport();
+  await expect(
+    page.getByRole('heading', { name: 'Settings', exact: true }),
+  ).toBeInViewport();
   await fits(page);
 });
 
@@ -434,6 +451,7 @@ test('Secondary pages remain usable with doubled interface text', async ({
       await editor.scrollIntoViewIfNeeded();
       await expect(editor).toBeInViewport();
       await editor.fill('Synthetic enlarged-text check');
+      await capture(page, 'visit-prep-enlarged-text');
     }
     if (path === '/records/labs') {
       await page
@@ -443,8 +461,9 @@ test('Secondary pages remain usable with doubled interface text', async ({
         .getByRole('link')
         .filter({ has: page.getByText('LYMPHS', { exact: true }) })
         .first();
-      await result.scrollIntoViewIfNeeded();
-      await expect(result).toBeInViewport();
+      const resultTitle = result.getByText('LYMPHS', { exact: true });
+      await resultTitle.scrollIntoViewIfNeeded();
+      await expect(resultTitle).toBeInViewport();
     }
   }
   await capture(page, 'labs-enlarged-text');

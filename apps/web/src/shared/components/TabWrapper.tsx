@@ -129,17 +129,25 @@ export function TabWrapper() {
         {routeAnnouncement}
       </div>
       {/* The desktop rail identifies the selected person and opens search.
-          Both must also be visible while reading records on a phone. */}
+          On narrow phones, reserve one fixed-size search target and give the
+          name the remaining width. A growing icon and Search label previously
+          squeezed an enlarged name into a one-character-wide column. */}
       <div className="hide-when-typing flex shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-3 py-1 print:hidden md:hidden">
         <Link
           to={AppRoutes.Settings}
           aria-label={`Records for ${userName}. Manage profiles`}
           className="flex min-h-[44px] min-w-0 flex-1 items-center gap-2 rounded-md py-1 text-primary-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600"
         >
-          <UserCircleIcon className="h-6 w-6 shrink-0" aria-hidden="true" />
-          <span className="min-w-0">
+          <UserCircleIcon
+            className="hidden h-6 w-6 shrink-0 sm:block"
+            aria-hidden="true"
+          />
+          <span className="min-w-0 flex-1">
             <span className="block text-xs text-gray-600">Records for</span>
-            <span className="block break-words text-sm font-semibold leading-tight">
+            <span
+              title={userName}
+              className="line-clamp-2 break-words text-sm font-semibold leading-tight"
+            >
               {userName}
             </span>
           </span>
@@ -150,10 +158,14 @@ export function TabWrapper() {
           aria-label="Search"
           aria-haspopup="dialog"
           aria-expanded={searchOpen}
-          className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-primary-800 hover:bg-primary-50"
+          title="Search"
+          className="inline-flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-md text-sm font-semibold text-primary-800 hover:bg-primary-50 sm:w-auto sm:gap-1.5 sm:px-2"
         >
-          <MagnifyingGlassIcon className="h-5 w-5" aria-hidden="true" />
-          Search
+          <MagnifyingGlassIcon
+            className="h-[24px] w-[24px] shrink-0"
+            aria-hidden="true"
+          />
+          <span className="hidden sm:inline">Search</span>
         </button>
       </div>
       <main

@@ -68,10 +68,10 @@ export function UtilitiesToolNav() {
           className="flex min-h-[44px] w-full items-center gap-2 rounded-md px-3 text-start text-sm font-medium text-gray-800 ring-1 ring-gray-200 hover:bg-gray-50"
         >
           <ActiveIcon className="text-primary-700 h-5 w-5 shrink-0" />
-          <span className="min-w-0 flex-1 truncate">
+          <span className="min-w-0 flex-1 break-words">
             {activeTool ? activeTool.label : 'All tools'}
           </span>
-          <span className="shrink-0 text-xs font-normal text-gray-500">
+          <span className="sr-only shrink-0 text-xs font-normal text-gray-500 sm:not-sr-only">
             Change tool
           </span>
           <ChevronUpDownIcon className="h-5 w-5 shrink-0 text-gray-400" />

@@ -24,7 +24,10 @@ import { useRxDb } from '../../app/providers/RxDbProvider';
 import { useNotificationDispatch } from '../../app/providers/NotificationProvider';
 import { importEmrpkgToRxDb, inspectEmrpkg } from '../../services/emrpkg';
 import { useIsDesktop } from '../../shared/hooks/useIsDesktop';
-import { SettingsPanels } from './components/SettingsPanels';
+import {
+  SettingsPanels,
+  scrollSettingsSectionIntoView,
+} from './components/SettingsPanels';
 import { AdvancedToolsSettingsGroup } from './components/AdvancedToolsSettingsGroup';
 
 export function fetchPatientRecords(
@@ -102,6 +105,7 @@ const SettingsTab: React.FC = () => {
   const [showUserSwitcher, setShowUserSwitcher] = useState(false);
   const isDesktop = useIsDesktop();
   const importUserProfileRef = useRef<HTMLInputElement | null>(null);
+  const settingsScrollRef = useRef<HTMLDivElement>(null);
 
   const handleUserProfileImport = useCallback(
     async (file: File) => {
@@ -171,15 +175,15 @@ const SettingsTab: React.FC = () => {
         (id === 'experimental' || id === 'developer'
           ? document.getElementById('advanced-tools')
           : null);
-      if (element) {
-        element.scrollIntoView({
-          behavior: window.matchMedia('(prefers-reduced-motion: reduce)')
-            .matches
+      const container = settingsScrollRef.current;
+      if (element && container) {
+        scrollSettingsSectionIntoView(
+          container,
+          element,
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches
             ? 'auto'
             : 'smooth',
-          block: 'start',
-          inline: 'nearest',
-        });
+        );
       }
     }, 100);
     return () => clearTimeout(timer);
@@ -188,43 +192,49 @@ const SettingsTab: React.FC = () => {
   return (
     <AppPage
       banner={<GenericBanner text={t('Settings')} />}
-      contentClassName="overflow-y-auto overscroll-contain bg-gray-50"
+      contentClassName="overflow-y-hidden bg-gray-50"
     >
-      <div className="mx-auto flex max-w-4xl flex-col gap-y-4 px-4 pb-20 pt-4 sm:px-6 sm:pb-6 lg:px-8">
-        <SettingsPanels
-          basic={
-            <>
-              <SettingsSection
-                id="about-me"
-                title={t('About me')}
-                action={
-                  <button
-                    type="button"
-                    onClick={() => setShowUserSwitcher(true)}
-                    className="text-primary-600 hover:text-primary-700 hover:bg-primary-50 -me-2 inline-flex min-h-[44px] items-center rounded-md px-3 text-sm font-medium transition-colors"
-                  >
-                    {t('Switch user')}
-                  </button>
-                }
-              >
-                <UserCard />
-              </SettingsSection>
-              <InterfaceLanguageSettingsGroup />
-              <PrivacyAndSecuritySettingsGroup />
-              <AboutMereSettingsGroup />
-            </>
-          }
-          advanced={
-            <>
-              <TerminologySettingsGroup />
-              <MedicationInteractionSettingsGroup />
-              <UserDataSettingsGroup />
-              <AdvancedToolsSettingsGroup />
-              <ExperimentalSettingsGroup />
-              <DeveloperSettingsGroup />
-            </>
-          }
-        />
+      <div
+        ref={settingsScrollRef}
+        className="h-full overflow-y-auto overscroll-contain"
+      >
+        <div className="mx-auto flex max-w-4xl flex-col gap-y-4 px-4 pb-20 pt-4 sm:px-6 sm:pb-6 lg:px-8">
+          <SettingsPanels
+            scrollContainerRef={settingsScrollRef}
+            basic={
+              <>
+                <SettingsSection
+                  id="about-me"
+                  title={t('About me')}
+                  action={
+                    <button
+                      type="button"
+                      onClick={() => setShowUserSwitcher(true)}
+                      className="text-primary-600 hover:text-primary-700 hover:bg-primary-50 -me-2 inline-flex min-h-[44px] items-center rounded-md px-3 text-sm font-medium transition-colors"
+                    >
+                      {t('Switch user')}
+                    </button>
+                  }
+                >
+                  <UserCard />
+                </SettingsSection>
+                <InterfaceLanguageSettingsGroup />
+                <PrivacyAndSecuritySettingsGroup />
+                <AboutMereSettingsGroup />
+              </>
+            }
+            advanced={
+              <>
+                <TerminologySettingsGroup />
+                <MedicationInteractionSettingsGroup />
+                <UserDataSettingsGroup />
+                <AdvancedToolsSettingsGroup />
+                <ExperimentalSettingsGroup />
+                <DeveloperSettingsGroup />
+              </>
+            }
+          />
+        </div>
       </div>
 
       {isDesktop ? (

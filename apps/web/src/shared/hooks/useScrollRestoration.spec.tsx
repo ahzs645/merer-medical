@@ -64,6 +64,30 @@ function RecordShell() {
   );
 }
 
+/** Sources changes its task query while retaining one vertical content box. */
+function SourceTaskShell() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  useScrollRestoration(containerRef);
+  const selectedTask = new URLSearchParams(location.search).get('task');
+
+  return (
+    <main ref={containerRef}>
+      <div
+        ref={dimensions(1600, 500)}
+        data-testid="source-content"
+        style={{ overflowY: 'auto' }}
+      >
+        <h1>{selectedTask ? 'Import a file' : 'Source tasks'}</h1>
+        <Link to="/connections?task=import">Choose import</Link>
+        <button onClick={() => navigate(-1)}>Browser Back</button>
+        <button onClick={() => navigate(1)}>Browser Forward</button>
+      </div>
+    </main>
+  );
+}
+
 beforeEach(() => {
   clearRememberedScrollPositions();
   jest.useFakeTimers();
@@ -74,6 +98,32 @@ afterEach(() => {
 });
 
 describe('useScrollRestoration', () => {
+  it('restores a remembered top position on Back when query navigation reuses a scroller, and restores the task on Forward', () => {
+    render(
+      <MemoryRouter initialEntries={['/connections']}>
+        <SourceTaskShell />
+      </MemoryRouter>,
+    );
+    const scroller = screen.getByTestId('source-content');
+    expect(scroller.scrollTop).toBe(0);
+    fireEvent.click(screen.getByRole('link', { name: 'Choose import' }));
+    scroller.scrollTop = 620;
+    fireEvent.scroll(scroller);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Browser Back' }));
+    expect(screen.getByRole('heading', { name: 'Source tasks' })).toBeTruthy();
+    expect(screen.getByTestId('source-content')).toBe(scroller);
+    // The reused element still holds the task's offset until restoration runs.
+    expect(scroller.scrollTop).toBe(620);
+    act(() => jest.advanceTimersByTime(20));
+    expect(scroller.scrollTop).toBe(0);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Browser Forward' }));
+    expect(screen.getByRole('heading', { name: 'Import a file' })).toBeTruthy();
+    act(() => jest.advanceTimersByTime(20));
+    expect(scroller.scrollTop).toBe(620);
+  });
+
   it('restores the vertical list position after a horizontal filter scroll and browser Back', () => {
     render(
       <MemoryRouter initialEntries={['/records/labs']}>

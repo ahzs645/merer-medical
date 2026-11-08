@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, RefObject, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { useInterfaceLanguage } from '../../../app/providers/InterfaceLanguageProvider';
@@ -35,25 +35,44 @@ function activeLevel(hash: string, search: string): 'basic' | 'advanced' {
     : 'basic';
 }
 
+/** Scroll a settings destination without moving the surrounding app shell. */
+export function scrollSettingsSectionIntoView(
+  container: HTMLElement,
+  section: HTMLElement,
+  behavior: ScrollBehavior,
+) {
+  if (!container.contains(section)) return;
+  const margin = parseFloat(getComputedStyle(section).scrollMarginTop) || 0;
+  const top =
+    container.scrollTop +
+    section.getBoundingClientRect().top -
+    container.getBoundingClientRect().top -
+    margin;
+  container.scrollTo({ top: Math.max(0, top), behavior });
+}
+
 export function SettingsPanels({
   basic,
   advanced,
+  scrollContainerRef,
 }: {
   basic: ReactNode;
   advanced: ReactNode;
+  scrollContainerRef: RefObject<HTMLElement>;
 }) {
   const { t } = useInterfaceLanguage();
   const { pathname, search, hash } = useLocation();
   const level = activeLevel(hash, search);
   const [advancedVisited, setAdvancedVisited] = useState(level === 'advanced');
-  const navigationRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (level === 'advanced') setAdvancedVisited(true);
-    if (!hash) {
-      navigationRef.current?.scrollIntoView({ block: 'start' });
+    if (!hash && scrollContainerRef.current) {
+      // scrollIntoView also scrolls overflow-hidden ancestors, which can lift
+      // the profile strip and bottom navigation out of the phone viewport.
+      scrollContainerRef.current.scrollTop = 0;
     }
-  }, [level, hash]);
+  }, [level, hash, scrollContainerRef]);
 
   const destination = (nextLevel: 'basic' | 'advanced') => {
     const params = new URLSearchParams(search);
@@ -66,7 +85,6 @@ export function SettingsPanels({
   return (
     <>
       <nav
-        ref={navigationRef}
         aria-label={t('Settings sections')}
         className="sticky top-0 z-10 grid grid-cols-2 gap-2 bg-gray-50 py-1"
       >

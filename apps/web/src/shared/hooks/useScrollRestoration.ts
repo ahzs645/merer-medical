@@ -122,7 +122,10 @@ export function useScrollRestoration(containerRef: RefObject<HTMLElement>) {
       cancelled = true;
     };
 
-    if (target) {
+    // Zero is a real remembered position. Query-driven task pages can reuse
+    // the same scroller, so returning to a page that was at the top must clear
+    // the offset left by the task that is being closed.
+    if (remembered) {
       const attempt = () => {
         if (cancelled) return;
         // The scroller may not exist yet on the first frames: the page is

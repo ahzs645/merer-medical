@@ -2,10 +2,13 @@
  * @jest-environment jsdom
  */
 import { fireEvent, render, screen } from '@testing-library/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, MemoryRouter, useLocation, useNavigate } from 'react-router-dom';
 
-import { SettingsPanels } from './SettingsPanels';
+import {
+  SettingsPanels,
+  scrollSettingsSectionIntoView,
+} from './SettingsPanels';
 
 const mountAdvanced = jest.fn();
 
@@ -39,13 +42,26 @@ function NavigationProbe() {
 }
 
 function renderSettings(entry = '/settings') {
+  function SettingsHost() {
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    return (
+      <div data-testid="app-shell">
+        <div ref={scrollContainerRef} data-testid="settings-scroll-container">
+          <SettingsPanels
+            scrollContainerRef={scrollContainerRef}
+            basic={
+              <input aria-label="Profile name" defaultValue="Demo person" />
+            }
+            advanced={<AdvancedEditor />}
+          />
+        </div>
+        <NavigationProbe />
+      </div>
+    );
+  }
   return render(
     <MemoryRouter initialEntries={[entry]}>
-      <SettingsPanels
-        basic={<input aria-label="Profile name" defaultValue="Demo person" />}
-        advanced={<AdvancedEditor />}
-      />
-      <NavigationProbe />
+      <SettingsHost />
     </MemoryRouter>,
   );
 }
@@ -109,6 +125,49 @@ describe('SettingsPanels', () => {
       ).value,
     ).toBe('http://localhost:11434/custom');
     expect(mountAdvanced).toHaveBeenCalledTimes(1);
+  });
+
+  it('resets only the settings content when changing levels, keeping the app shell in place', () => {
+    renderSettings();
+    const shell = screen.getByTestId('app-shell');
+    const container = screen.getByTestId('settings-scroll-container');
+    shell.scrollTop = 17;
+    container.scrollTop = 280;
+
+    fireEvent.click(
+      screen.getByRole('link', { name: 'Advanced', exact: true }),
+    );
+
+    expect(container.scrollTop).toBe(0);
+    expect(shell.scrollTop).toBe(17);
+    expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled();
+  });
+
+  it('scrolls a section anchor within settings with its sticky-navigation margin', () => {
+    renderSettings();
+    const shell = screen.getByTestId('app-shell');
+    const container = screen.getByTestId('settings-scroll-container');
+    const section = screen.getByRole('region', { name: 'Basic settings' });
+    shell.scrollTop = 17;
+    container.scrollTop = 200;
+    section.style.scrollMarginTop = '80px';
+    jest
+      .spyOn(container, 'getBoundingClientRect')
+      .mockReturnValue({ top: 100 } as DOMRect);
+    jest
+      .spyOn(section, 'getBoundingClientRect')
+      .mockReturnValue({ top: 500 } as DOMRect);
+    const scrollTo = jest.fn(({ top }: ScrollToOptions) => {
+      container.scrollTop = top ?? 0;
+    });
+    Object.defineProperty(container, 'scrollTo', { value: scrollTo });
+
+    scrollSettingsSectionIntoView(container, section, 'auto');
+
+    expect(scrollTo).toHaveBeenCalledWith({ top: 520, behavior: 'auto' });
+    expect(container.scrollTop).toBe(520);
+    expect(shell.scrollTop).toBe(17);
+    expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled();
   });
 
   it('restores the selected level with browser Back and retains unrelated query parameters', () => {
