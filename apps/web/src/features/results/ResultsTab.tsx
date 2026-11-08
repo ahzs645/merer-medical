@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   BeakerIcon,
@@ -25,15 +25,26 @@ import { useLabReferenceStandard } from '../labs/hooks/useLabReferenceStandard';
 import { ResultDetail, ResultGroup, ResultSummary, ResultType } from './types';
 import { Routes as AppRoutes } from '../../Routes';
 import { RESULT_SELECTION_PARAM } from './utils/resultRoute';
+import { useMediaQuery } from '../../shared/hooks/useMediaQuery';
 
 export function ResultsTab() {
   const { t } = useInterfaceLanguage();
   const [searchParams] = useSearchParams();
-  const showingResult = Boolean(searchParams.get(RESULT_SELECTION_PARAM));
+  const selectedId = searchParams.get(RESULT_SELECTION_PARAM);
+  const showingResult = Boolean(selectedId);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const desktopLayout = useMediaQuery('(min-width: 1024px)');
+
+  useLayoutEffect(() => {
+    // List/detail changes only the query, so the scroll container survives.
+    // Start the new phone view at its heading instead of retaining the old
+    // list's offset. The shell still restores remembered positions on Back.
+    if (!desktopLayout && contentRef.current) contentRef.current.scrollTop = 0;
+  }, [desktopLayout, selectedId]);
 
   return (
     <AppPage
-      contentClassName="overflow-y-auto"
+      contentClassName="overflow-y-hidden"
       banner={
         <RecordPageHeader
           title={t(showingResult ? 'Result details' : 'Results')}
@@ -48,7 +59,13 @@ export function ResultsTab() {
         />
       }
     >
-      <ResultsHubContent />
+      <div
+        ref={contentRef}
+        id="results-scroll-container"
+        className="h-full overflow-y-auto"
+      >
+        <ResultsHubContent />
+      </div>
     </AppPage>
   );
 }

@@ -44,6 +44,15 @@ async function expectReachableTouchTarget(control: Locator) {
 }
 
 async function captureDemoEvidence(page: Page, name: string) {
+  // Dismiss the synthetic demo/import toast through its actual close control
+  // so it does not cover the record content in the review evidence.
+  const notificationClose = page
+    .locator('[aria-live="assertive"]')
+    .getByRole('button', { name: 'Close', exact: true });
+  if (await notificationClose.isVisible()) {
+    await notificationClose.click();
+    await expect(notificationClose).toHaveCount(0);
+  }
   await page.screenshot({
     path: test.info().outputPath(`${name}.png`),
     fullPage: true,
@@ -89,19 +98,42 @@ test('primary navigation and More preserve the page when dismissed or returning'
     await expectReachableTouchTarget(more);
     await more.click();
     const sheet = page.getByRole('dialog', { name: 'More', exact: true });
-    await expect(sheet).toBeVisible();
+    // Headless UI's outer dialog has fixed children and no own height. Check
+    // its visible content and controls, then require unmounting on dismissal.
+    const sheetTitle = sheet.getByRole('heading', {
+      name: 'More',
+      exact: true,
+    });
+    const closeSheet = sheet.getByRole('button', {
+      name: 'Close navigation',
+      exact: true,
+    });
+    await expect(sheetTitle).toBeVisible();
+    await expectReachableTouchTarget(closeSheet);
     await captureDemoEvidence(page, 'more-navigation');
 
-    await sheet
-      .getByRole('button', { name: 'Close navigation', exact: true })
+    await closeSheet.click();
+    await expect(sheet).toHaveCount(0);
+    await expect(page).toHaveURL(/\/demo\/records$/);
+
+    // Reduced motion must also finish the sheet-to-search handoff, whose
+    // search action is deliberately opened after the sheet has closed.
+    await more.click();
+    await sheet.getByRole('button', { name: 'Search', exact: true }).click();
+    const palette = page.getByRole('dialog', { name: 'Search', exact: true });
+    await expect(
+      palette.getByPlaceholder('Search records, pages, and actions'),
+    ).toBeVisible();
+    await palette
+      .getByRole('button', { name: 'Close search', exact: true })
       .click();
-    await expect(sheet).toBeHidden();
+    await expect(palette).toHaveCount(0);
     await expect(page).toHaveURL(/\/demo\/records$/);
 
     await more.click();
-    await expect(sheet).toBeVisible();
+    await expect(sheetTitle).toBeVisible();
     await page.goBack();
-    await expect(sheet).toBeHidden();
+    await expect(sheet).toHaveCount(0);
     await expect(page).toHaveURL(/\/demo\/records$/);
 
     await more.click();
@@ -123,7 +155,7 @@ test('primary navigation and More preserve the page when dismissed or returning'
   await expect(page).toHaveURL(/\/demo\/records$/);
   await expect(
     page.getByRole('dialog', { name: 'More', exact: true }),
-  ).toBeHidden();
+  ).toHaveCount(0);
 });
 
 test('Search is reachable directly and opening a result has a single Back step', async ({
@@ -147,7 +179,7 @@ test('Search is reachable directly and opening a result has a single Back step',
     .click();
 
   await expect(page).toHaveURL(/\/demo\/records\/labs$/);
-  await expect(search).toBeHidden();
+  await expect(search).toHaveCount(0);
   await expect(
     page.getByRole('heading', { level: 1, name: 'All lab results' }),
   ).toBeVisible();
@@ -155,7 +187,7 @@ test('Search is reachable directly and opening a result has a single Back step',
 
   await page.goBack();
   await expect(page).toHaveURL(/\/demo\/summary$/);
-  await expect(search).toBeHidden();
+  await expect(search).toHaveCount(0);
 });
 
 test('Records search finds a stored result and preserves the search on Back', async ({
@@ -296,10 +328,19 @@ test('cancelling an add protects edits and returns to the originating category',
     name: 'Discard unsaved changes?',
     exact: true,
   });
-  await expect(confirmation).toBeVisible();
-  await confirmation
-    .getByRole('button', { name: 'Keep editing', exact: true })
-    .click();
+  await expect(
+    confirmation.getByRole('heading', {
+      name: 'Discard unsaved changes?',
+      exact: true,
+    }),
+  ).toBeVisible();
+  const keepEditing = confirmation.getByRole('button', {
+    name: 'Keep editing',
+    exact: true,
+  });
+  await expectReachableTouchTarget(keepEditing);
+  await keepEditing.click();
+  await expect(confirmation).toHaveCount(0);
   await expect(title).toHaveValue('Synthetic mobile cancellation check');
 
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();

@@ -47,10 +47,10 @@ export function Modal({
                 scales, reduced motion gets the end state. */}
             <Transition.Child
               as={Fragment}
-              enter="transition-[transform,opacity] duration-[280ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none sm:duration-300 sm:ease-out"
+              enter="transition-[transform,opacity] duration-[280ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none motion-reduce:!duration-0 sm:duration-300 sm:ease-out"
               enterFrom="translate-y-full sm:translate-y-4 sm:scale-95 sm:opacity-0"
               enterTo="translate-y-0 sm:scale-100 sm:opacity-100"
-              leave="transition-[transform,opacity] duration-200 ease-in motion-reduce:transition-none"
+              leave="transition-[transform,opacity] duration-200 ease-in motion-reduce:transition-none motion-reduce:!duration-0"
               leaveFrom="translate-y-0 sm:scale-100 sm:opacity-100"
               leaveTo="translate-y-full sm:translate-y-4 sm:scale-95 sm:opacity-0"
             >

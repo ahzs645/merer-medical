@@ -56,10 +56,10 @@ export function ConfirmDeleteDialog({
       >
         <Transition.Child
           as={Fragment}
-          enter="ease-out duration-200 motion-reduce:transition-none"
+          enter="ease-out duration-200 motion-reduce:transition-none motion-reduce:!duration-0"
           enterFrom="opacity-0"
           enterTo="opacity-100"
-          leave="ease-in duration-150 motion-reduce:transition-none"
+          leave="ease-in duration-150 motion-reduce:transition-none motion-reduce:!duration-0"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
@@ -70,10 +70,10 @@ export function ConfirmDeleteDialog({
           <div className="flex min-h-full items-end justify-center p-4 sm:items-center">
             <Transition.Child
               as={Fragment}
-              enter="ease-out duration-200 motion-reduce:transition-none"
+              enter="ease-out duration-200 motion-reduce:transition-none motion-reduce:!duration-0"
               enterFrom="opacity-0 translate-y-2 sm:scale-95"
               enterTo="opacity-100 translate-y-0 sm:scale-100"
-              leave="ease-in duration-150 motion-reduce:transition-none"
+              leave="ease-in duration-150 motion-reduce:transition-none motion-reduce:!duration-0"
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-2 sm:scale-95"
             >

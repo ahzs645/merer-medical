@@ -501,10 +501,10 @@ function MobileMoreButton({
         >
           <Transition.Child
             as={Fragment}
-            enter="transition-opacity ease-out duration-200 motion-reduce:transition-none"
+            enter="transition-opacity ease-out duration-200 motion-reduce:transition-none motion-reduce:!duration-0"
             enterFrom="opacity-0"
             enterTo="opacity-100"
-            leave="transition-opacity ease-in duration-150 motion-reduce:transition-none"
+            leave="transition-opacity ease-in duration-150 motion-reduce:transition-none motion-reduce:!duration-0"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
@@ -515,13 +515,16 @@ function MobileMoreButton({
             {/* The sheet already slid up; it was just doing it on `transition:
                 all` with the default curve, so it read as a jump. Transform
                 only, and a decelerating curve over 280ms — the shape a sheet
-                pushed by a thumb has. Reduced motion gets the end state. */}
+                pushed by a thumb has. Reduced motion gets the end state.
+                Zero duration must override the global 0.01ms !important rule:
+                Headless UI otherwise waits for a transitionend that
+                transition-none will never emit, leaving this portal open. */}
             <Transition.Child
               as={Fragment}
-              enter="transition-transform duration-[280ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none"
+              enter="transition-transform duration-[280ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none motion-reduce:!duration-0"
               enterFrom="translate-y-full"
               enterTo="translate-y-0"
-              leave="transition-transform duration-200 ease-in motion-reduce:transition-none"
+              leave="transition-transform duration-200 ease-in motion-reduce:transition-none motion-reduce:!duration-0"
               leaveFrom="translate-y-0"
               leaveTo="translate-y-full"
             >

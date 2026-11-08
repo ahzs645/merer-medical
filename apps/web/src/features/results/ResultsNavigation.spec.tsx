@@ -150,6 +150,30 @@ it('keeps result selection in browser history so Back returns to the list', () =
   expect(screen.queryByRole('link', { name: 'All results' })).toBeNull();
 });
 
+it('starts a newly selected phone detail at the top instead of keeping the list scroll offset', () => {
+  render(
+    <MemoryRouter initialEntries={['/records/results']}>
+      <ResultsTab />
+    </MemoryRouter>,
+  );
+  const scroller = document.getElementById('results-scroll-container')!;
+  scroller.scrollTop = 158;
+
+  fireEvent.click(screen.getByRole('button', { name: /Second report/ }));
+
+  expect(scroller.scrollTop).toBe(0);
+  expect(
+    within(screen.getByRole('region', { name: 'Selected result' })).getByRole(
+      'heading',
+      { level: 2, name: 'Second report' },
+    ),
+  ).toBeTruthy();
+
+  scroller.scrollTop = 240;
+  fireEvent.click(screen.getByRole('link', { name: 'All results' }));
+  expect(scroller.scrollTop).toBe(0);
+});
+
 it('reports a missing selected result instead of showing an unrelated result', () => {
   render(
     <MemoryRouter initialEntries={['/records/results?result=missing']}>

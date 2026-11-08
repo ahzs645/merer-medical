@@ -35,10 +35,10 @@ export function FormSheet({
       <Dialog as="div" className="relative z-dialog" onClose={onRequestClose}>
         <Transition.Child
           as={Fragment}
-          enter="transition-opacity ease-out duration-200 motion-reduce:transition-none"
+          enter="transition-opacity ease-out duration-200 motion-reduce:transition-none motion-reduce:!duration-0"
           enterFrom="opacity-0"
           enterTo="opacity-100"
-          leave="transition-opacity ease-in duration-150 motion-reduce:transition-none"
+          leave="transition-opacity ease-in duration-150 motion-reduce:transition-none motion-reduce:!duration-0"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
@@ -51,13 +51,15 @@ export function FormSheet({
                 default — `all` — it animates every other property that changes
                 with it. The phone slides the sheet up off the bottom edge; the
                 desktop keeps its fade and scale. Reduced motion gets the end
-                state with no travel. */}
+                state with no travel. The important zero duration overrides
+                the global reduced-motion duration so Headless UI does not
+                wait for a transitionend from transition-none. */}
             <Transition.Child
               as={Fragment}
-              enter="transition-[transform,opacity] duration-[280ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none sm:duration-200 sm:ease-out"
+              enter="transition-[transform,opacity] duration-[280ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none motion-reduce:!duration-0 sm:duration-200 sm:ease-out"
               enterFrom="translate-y-full sm:translate-y-2 sm:scale-95 sm:opacity-0"
               enterTo="translate-y-0 sm:scale-100 sm:opacity-100"
-              leave="transition-[transform,opacity] duration-200 ease-in motion-reduce:transition-none sm:duration-150"
+              leave="transition-[transform,opacity] duration-200 ease-in motion-reduce:transition-none motion-reduce:!duration-0 sm:duration-150"
               leaveFrom="translate-y-0 sm:scale-100 sm:opacity-100"
               leaveTo="translate-y-full sm:translate-y-2 sm:scale-95 sm:opacity-0"
             >
