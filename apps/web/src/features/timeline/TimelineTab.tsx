@@ -78,6 +78,7 @@ export function TimelineTab() {
       data,
       status,
       initialized,
+      dataReadyForQuery,
       loadNextPage,
       pageCursor,
       jumpToDate,
@@ -194,7 +195,7 @@ export function TimelineTab() {
     }
   }, [pendingJumpDateKey, data, status]);
 
-  useScrollToHash();
+  useScrollToHash({ ready: dataReadyForQuery });
 
   const listItems = useMemo(
     () =>

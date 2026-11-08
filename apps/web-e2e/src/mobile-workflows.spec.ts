@@ -223,6 +223,62 @@ test('a lab opens into a readable detail and Back restores the filtered list', a
   await expect(result).toBeVisible();
 });
 
+test('Results opens the selected detail on a phone and Back restores that selection', async ({
+  page,
+  viewport,
+}) => {
+  if (!viewport) throw new Error('The mobile project must set a viewport');
+  await openDemo(page, '/records/results', 'Results');
+
+  const list = page.getByRole('region', {
+    name: 'Result list',
+    exact: true,
+    includeHidden: true,
+  });
+  const selected = page.getByRole('region', {
+    name: 'Selected result',
+    exact: true,
+    includeHidden: true,
+  });
+  // This report and ID already belong to the bundled synthetic optometry demo.
+  const title = 'OCT RNFL diagnostic report';
+  const resultId =
+    'optometry-demo-connection|91a8d8cb-6480-4db4-a628-18a5e44536cd|DiagnosticReport/demo-oct-report';
+  const result = list.getByRole('button').filter({
+    has: page.getByText(title, { exact: true }),
+  });
+  await expect(list).toBeVisible();
+  await result.scrollIntoViewIfNeeded();
+  await expect(result).toBeInViewport();
+  await result.click();
+
+  const selectedUrl = new URL('/demo/records/results', page.url());
+  selectedUrl.searchParams.set('result', resultId);
+  await expect(page).toHaveURL(selectedUrl.href);
+  await expect(selected).toBeVisible();
+  const detailTitle = selected.getByRole('heading', {
+    level: 2,
+    name: title,
+    exact: true,
+  });
+  await expect(detailTitle).toBeInViewport();
+  if (viewport.width < 1024) await expect(list).toBeHidden();
+  await expectNoHorizontalOverflow(page);
+  await captureDemoEvidence(page, 'selected-result');
+
+  await page.getByRole('link', { name: 'All results', exact: true }).click();
+  await expect(page).toHaveURL(/\/demo\/records\/results$/);
+  await expect(list).toBeVisible();
+  await expect(result).toBeVisible();
+  if (viewport.width < 1024) await expect(selected).toBeHidden();
+
+  await page.goBack();
+  await expect(page).toHaveURL(selectedUrl.href);
+  await expect(selected).toBeVisible();
+  await expect(detailTitle).toBeInViewport();
+  if (viewport.width < 1024) await expect(list).toBeHidden();
+});
+
 test('cancelling an add protects edits and returns to the originating category', async ({
   page,
 }) => {

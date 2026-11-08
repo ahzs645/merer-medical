@@ -65,6 +65,7 @@ beforeEach(() => {
     data: {},
     status: QueryStatus.SUCCESS,
     initialized: true,
+    dataReadyForQuery: true,
     pageCursor: 0,
     loadNextPage: jest.fn(),
     jumpToDate: jest.fn(),

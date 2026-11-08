@@ -90,7 +90,8 @@ jobs:
         # The dedicated config starts the static production preview itself.
         # /demo uses an in-memory database; no API server, portal credentials,
         # or patient package is needed for these browser journeys.
-        run: npx playwright test --config apps/web-e2e/playwright.mobile.config.ts
+        # Leave time below the job ceiling to upload evidence after a hang.
+        run: timeout 540 npx playwright test --config apps/web-e2e/playwright.mobile.config.ts
       - name: Upload mobile screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4

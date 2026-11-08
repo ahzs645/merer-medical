@@ -4,19 +4,23 @@ import { Link, MemoryRouter } from 'react-router-dom';
 
 import { useScrollToHash } from './useScrollToHash';
 
-function AnchorReader() {
-  useScrollToHash();
+function AnchorReader({ ready = true }: { ready?: boolean }) {
+  useScrollToHash({ ready });
   return <Link to="/records">Leave timeline</Link>;
 }
 
-function renderReader() {
-  return render(
+function reader(ready = true) {
+  return (
     <MemoryRouter
       initialEntries={['/timeline?q=synthetic#timeline-record-synthetic']}
     >
-      <AnchorReader />
-    </MemoryRouter>,
+      <AnchorReader ready={ready} />
+    </MemoryRouter>
   );
+}
+
+function renderReader(ready = true) {
+  return render(reader(ready));
 }
 
 let target: HTMLDivElement;
@@ -53,5 +57,26 @@ it('lets an intentional scroll cancel the pending anchor', async () => {
   await act(async () => {
     document.body.appendChild(target);
   });
+  expect(target.scrollIntoView).not.toHaveBeenCalled();
+});
+
+it('ignores a stale target until the new query is ready and does not repeat on later refreshes', () => {
+  document.body.appendChild(target);
+  const view = renderReader(false);
+  expect(target.scrollIntoView).not.toHaveBeenCalled();
+
+  view.rerender(reader(true));
+  expect(target.scrollIntoView).toHaveBeenCalledTimes(1);
+
+  view.rerender(reader(false));
+  view.rerender(reader(true));
+  expect(target.scrollIntoView).toHaveBeenCalledTimes(1);
+});
+
+it('respects a reader scroll while the destination query is still loading', () => {
+  document.body.appendChild(target);
+  const view = renderReader(false);
+  fireEvent.wheel(window);
+  view.rerender(reader(true));
   expect(target.scrollIntoView).not.toHaveBeenCalled();
 });

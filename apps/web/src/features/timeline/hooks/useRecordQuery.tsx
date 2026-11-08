@@ -855,6 +855,8 @@ export function useRecordQuery(
   data: RecordsByDate | undefined;
   status: QueryStatus;
   initialized: boolean;
+  /** The rendered records were committed for the current query and filter. */
+  dataReadyForQuery: boolean;
   loadNextPage: () => void;
   /**
    * Advances every time a page is committed. The scroll loader re-arms on it:
@@ -872,6 +874,13 @@ export function useRecordQuery(
   const user = useUser();
   const vectorStorage = useVectors();
   const requestIdRef = useRef(0);
+  const dataQueryKey = JSON.stringify([
+    user.id,
+    query,
+    typeFilter,
+    Boolean(enableAISemanticSearch),
+  ]);
+  const committedDataQueryKey = useRef<string>();
   // Held in a ref, not reducer state: `execQuery` has to read the window the
   // moment a jump is requested, before a dispatch could be reflected in state.
   const groupedMaxDateRef = useRef<string | undefined>(undefined);
@@ -894,6 +903,7 @@ export function useRecordQuery(
           console.debug('useRecordQuery: ignoring stale response');
           return;
         }
+        if ('records' in action) committedDataQueryKey.current = dataQueryKey;
         dispatch(action);
       };
 
@@ -949,6 +959,7 @@ export function useRecordQuery(
       vectorStorage,
       experimental__use_openai_rag,
       enableAISemanticSearch,
+      dataQueryKey,
     ],
   );
 
@@ -976,12 +987,17 @@ export function useRecordQuery(
     groupedMaxDateRef.current = undefined;
     dispatch({ type: 'RESET_PAGINATION' });
     execQueryRef.current(false);
-  }, [query, enableAISemanticSearch, typeFilter, recordChangeTick]);
+  }, [user.id, query, enableAISemanticSearch, typeFilter, recordChangeTick]);
 
   return {
     data: state.data,
     status: state.status,
     initialized: state.initialized,
+    dataReadyForQuery:
+      committedDataQueryKey.current === dataQueryKey &&
+      (state.status === QueryStatus.SUCCESS ||
+        state.status === QueryStatus.COMPLETE_HIDE_LOAD_MORE ||
+        state.status === QueryStatus.LOADING_MORE),
     loadNextPage,
     pageCursor: isGroupedView ? state.groupedOffset : state.searchPage,
     jumpToDate,

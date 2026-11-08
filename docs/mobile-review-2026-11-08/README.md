@@ -86,9 +86,9 @@ These broader reorganizations are recorded as follow-up design work. This branch
 
 ## Validation and evidence
 
-The final production build and application TypeScript check passed. All 147 focused tests across 14 suites passed, covering package import handoff/failure, record routing, exact result selection, CGM disclosure, Timeline previews, and document decoding/lookup. Browser acceptance is pending the pull-request CI run; its result and evidence will be recorded here after it completes.
+The final production build and application TypeScript check passed. All 226 focused tests across 17 suites passed, covering package import handoff/failure, record routing, exact result selection, CGM disclosure, Timeline previews, and document decoding/lookup. Browser acceptance is pending the pull-request CI run; its result and evidence will be recorded here after it completes.
 
-The dedicated mobile Playwright suite contains 21 cases (seven journeys across three viewports) and runs the production static preview with synthetic `/demo` data at 320×640, 390×844, and 844×390. It exercises navigation/dismissal, direct Search, record search/detail/Back, Labs search/detail/Back, dirty-form cancellation, a generated LibreView import, and a read-only category/settings route sweep. It saves screenshots and traces as CI artifacts.
+The dedicated mobile Playwright suite contains 24 cases (eight journeys across three viewports) and runs the production static preview with synthetic `/demo` data at 320×640, 390×844, and 844×390. It exercises navigation/dismissal, direct Search, record search/detail/Back, Labs search/detail/Back, dirty-form cancellation, a generated LibreView import, exact Results selection/list/Back behavior, and a read-only category/settings route sweep. It saves screenshots and traces as CI artifacts.
 
 Local automated Chromium could not start because this workspace denies a required browser socket. No browser assertions ran in that attempt. The pull-request workflow is the alternative execution environment; a test collection or successful build is not counted as a browser pass.
 
