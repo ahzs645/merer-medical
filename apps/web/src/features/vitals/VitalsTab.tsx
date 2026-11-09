@@ -462,11 +462,16 @@ export function VitalsTab() {
             filtered.map((group) => (
               <article
                 key={group.key}
-                className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
+                className="relative rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
               >
+                {/* The headline reading's actions — View source, Edit, History,
+                    Delete — behind one quiet button in the corner. */}
+                <div className="absolute end-2 top-2.5">
+                  <ManualRecordActions item={group.latest.document} inline />
+                </div>
                 {/* Wraps: with enlarged text the sparkline moves under the
                     reading instead of squeezing it into a narrow column. */}
-                <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+                <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2 pe-8">
                   <div className="min-w-0 flex-1 basis-40">
                     <h2 className="break-words text-sm font-semibold text-gray-900">
                       {group.name}
@@ -499,11 +504,6 @@ export function VitalsTab() {
                     button semantics, the expanded state and the keyboard — with
                     the summary left a list-item, because a flex summary drops
                     the triangle in Chrome. */}
-                {/* The reading in the headline is a record like any other, and
-                    until now it was the only one on the page you could not
-                    trace: the actions row existed on Allergies, Conditions and
-                    Medications cards but not here. */}
-                <ManualRecordActions item={group.latest.document} />
 
                 {group.readings.length > 1 && (
                   <details className="-mb-4 mt-3 border-t border-gray-100">

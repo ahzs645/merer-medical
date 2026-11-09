@@ -1,5 +1,9 @@
 import { useMemo } from 'react';
-import { PlusIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
+import {
+  ChevronRightIcon,
+  PlusIcon,
+  Squares2X2Icon,
+} from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 
 import { Routes as AppRoutes } from '../../Routes';
@@ -13,9 +17,7 @@ import {
   RecordViewSwitch,
 } from '../../shared/components/records/RecordViewSwitch';
 import { ErrorPanel } from '../../shared/components/StatusPanel';
-import { isManualRecord } from '../../shared/utils/manualRecordUtils';
 import { buildAddRecordPath } from '../manual-entry/addRecordPath';
-import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { useConditionsData } from './hooks/useConditionsData';
 import { ConditionBundle, RelatedKind } from './types';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
@@ -80,11 +82,14 @@ export function ConditionsTab() {
           ) : filtered.length === 0 ? (
             <Placeholder text="No conditions match this search." />
           ) : (
-            <div className="grid gap-3">
+            // A list, not a stack of cards: one row per condition, read top to
+            // bottom, each opening the condition's page — where its source,
+            // Edit and its related records are.
+            <ul className="divide-y divide-gray-100 overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200">
               {filtered.map((bundle) => (
                 <ConditionRow key={bundle.id} bundle={bundle} />
               ))}
-            </div>
+            </ul>
           )}
         </div>
       </div>
@@ -132,63 +137,44 @@ function ConditionsHeader({
 
 function ConditionRow({ bundle }: { bundle: ConditionBundle }) {
   const counts = countByKind(bundle);
+  // Topic and the related-record tally share one line under the name. The
+  // card version had a topic chip, a "91 related" total, the tally, and a row
+  // of View source / Edit / Delete under every condition.
+  const meta = [
+    bundle.topicLabels.join(', '),
+    counts
+      .map(([kind, count]) => {
+        const [singular, plural] = KIND_LABEL[kind];
+        return `${count} ${count === 1 ? singular : plural}`;
+      })
+      .join(' · '),
+  ].filter(Boolean);
 
   return (
-    // The whole row is one link, so the Edit/Delete pair sits in a footer
-    // outside it — buttons nested inside an anchor are not valid markup, and
-    // the row would swallow the tap on its way to the detail page.
-    // The ring moved to the wrapper with it, so hovering or tabbing to the
-    // link still lights the whole card the way it did before.
-    <article className="rounded-md bg-white shadow-sm ring-1 ring-gray-200 transition focus-within:ring-2 focus-within:ring-primary-500 hover:ring-primary-300">
+    <li>
       <Link
         to={conditionDetailPath(bundle.id)}
-        className="block rounded-md p-4 focus:outline-none"
+        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
       >
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="break-words text-base font-semibold text-gray-900">
-                {bundle.name}
-              </h2>
-              <StatusBadge status={bundle.status} />
-            </div>
-            {bundle.topicLabels.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {bundle.topicLabels.map((label) => (
-                  <span
-                    key={label}
-                    className="inline-flex items-center rounded-md bg-primary-50 px-2 py-1 text-xs font-medium text-primary-700 ring-1 ring-inset ring-primary-600/10"
-                  >
-                    {label}
-                  </span>
-                ))}
-              </div>
-            )}
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <h2 className="break-words text-sm font-semibold text-gray-900">
+              {bundle.name}
+            </h2>
+            <StatusBadge status={bundle.status} />
           </div>
-          {/* The breakdown below ("11 meds · 68 labs") already says it on a
-              phone; the total is for the wide layout. */}
-          <span className="hidden shrink-0 text-sm font-medium text-primary-700 sm:inline">
-            {bundle.related.length} related
-          </span>
+          {meta.length > 0 && (
+            <p className="mt-0.5 line-clamp-2 text-xs text-gray-600">
+              {meta.join(' · ')}
+            </p>
+          )}
         </div>
-
-        {bundle.related.length > 0 && (
-          <p className="mt-3 text-sm text-gray-600">
-            {counts
-              .map(([kind, count]) => {
-                const [singular, plural] = KIND_LABEL[kind];
-                return `${count} ${count === 1 ? singular : plural}`;
-              })
-              .join(' · ')}
-          </p>
-        )}
+        <ChevronRightIcon
+          className="h-4 w-4 shrink-0 text-gray-400 rtl:rotate-180"
+          aria-hidden="true"
+        />
       </Link>
-      {isManualRecord(bundle.document) && (
-        <div className="px-4 pb-3">
-          <ManualRecordActions item={bundle.document} />
-        </div>
-      )}
-    </article>
+    </li>
   );
 }
 

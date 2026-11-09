@@ -93,23 +93,17 @@ const panels: Array<{
 describe.each(panels)(
   '$name manual record actions',
   ({ kind, render: mount }) => {
-    it('offers edit, and delete under More actions, on a hand-entered record', async () => {
+    it('keeps edit and delete behind one quiet More actions button on a hand-entered record', async () => {
       renderPanel(mount([buildRecord(kind, true)]));
 
-      const edit = screen.getByRole('button', { name: 'Edit' });
-      const more = screen.getByRole('button', { name: 'More actions' });
-
-      // Drawn at 32px on wider screens, with an invisible tap area around it.
-      for (const button of [edit, more]) {
-        expect(button.className).toContain('min-h-8');
-        expect(button.className).toContain('after:-inset-y-1.5');
-      }
-      // Delete is the menu's last item, not a red button on every card.
+      // A list row carries one button; its menu holds the actions.
+      expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
       expect(screen.queryByRole('button', { name: 'Delete' })).toBeNull();
-      fireEvent.click(more);
+      fireEvent.click(screen.getByRole('button', { name: 'More actions' }));
       expect(
-        await screen.findByRole('menuitem', { name: 'Delete' }),
+        await screen.findByRole('menuitem', { name: 'Edit' }),
       ).toBeTruthy();
+      expect(screen.getByRole('menuitem', { name: 'Delete' })).toBeTruthy();
     });
 
     it('no longer sends the correction through the full-page edit route', () => {

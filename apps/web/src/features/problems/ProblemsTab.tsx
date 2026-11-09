@@ -349,11 +349,15 @@ function ProblemGroups({
 
 function ProblemCard({ item }: { item: ProblemItem }) {
   return (
-    <article className="min-w-0 rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+    <article className="relative min-w-0 rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+      {/* View source, Edit, History and Delete, behind one quiet button. */}
+      <div className="absolute end-2 top-2.5">
+        <ManualRecordActions item={item.document} inline />
+      </div>
       {/* No date beside the title: it was `onset || recorded`, and the grid
           below prints whichever of those the record has, so every card said
           the same date twice. */}
-      <div className="min-w-0">
+      <div className="min-w-0 pe-8">
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="break-words text-base font-semibold text-gray-900">
             {item.name}
@@ -395,7 +399,6 @@ function ProblemCard({ item }: { item: ProblemItem }) {
           {item.note}
         </p>
       )}
-      <ManualRecordActions item={item.document} />
     </article>
   );
 }

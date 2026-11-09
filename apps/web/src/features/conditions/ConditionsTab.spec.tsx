@@ -33,8 +33,7 @@ jest.mock('../../app/providers/RxDbProvider', () => ({
 jest.mock('../../app/providers/UserProvider', () => ({
   useUser: () => ({ id: 'user-1' }),
 }));
-// Stands in for the real Edit/Delete pair; this page's job is only to hand
-// over the clinical document and to keep the buttons out of the row's link.
+// Stands in for the real actions, so a test can see whether a row renders them.
 jest.mock('../manual-entry/ManualRecordActions', () => ({
   ManualRecordActions: ({ item }: { item: ClinicalDocument }) =>
     mockCreateElement('span', { 'data-testid': `actions-${item.id}` }),
@@ -136,16 +135,18 @@ describe('ConditionsTab', () => {
     expect(screen.queryByRole('link', { name: /Go to Problems/ })).toBeNull();
   });
 
-  it('keeps the Edit/Delete pair out of the row link', async () => {
+  it('lists each condition as one link to its page, with no actions in the row', async () => {
     mockDocsByType['condition'] = [conditionDoc('typed-1', 'Migraine', true)];
 
     renderTab();
 
     await waitFor(() => expect(screen.getByText('Migraine')).toBeTruthy());
-    const actions = screen.getByTestId('actions-typed-1');
-    // Buttons nested inside an anchor are invalid markup, and the row would
-    // navigate out from under the tap.
-    expect(actions.closest('a')).toBeNull();
+    // View source, Edit and Delete live on the condition's own page; the row
+    // is only the way there.
+    expect(screen.queryByTestId('actions-typed-1')).toBeNull();
+    expect(
+      screen.getByText('Migraine').closest('a')?.getAttribute('href'),
+    ).toContain('/records/conditions/');
   });
 
   it('picks up a condition added while it is on screen', async () => {

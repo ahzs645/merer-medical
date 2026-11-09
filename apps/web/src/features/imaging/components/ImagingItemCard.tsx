@@ -1,8 +1,4 @@
-import {
-  ArrowTopRightOnSquareIcon,
-  DocumentTextIcon,
-  PhotoIcon,
-} from '@heroicons/react/24/outline';
+import { DocumentTextIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import { BundleEntry, DocumentReference } from 'fhir/r2';
 import { useState } from 'react';
 
@@ -11,11 +7,7 @@ import { Modal } from '../../../shared/components/Modal';
 import { ModalHeader } from '../../../shared/components/ModalHeader';
 import { isManualRecord } from '../../../shared/utils/manualRecordUtils';
 import { resourceTypeLabel } from '../../../shared/utils/resourceTypeLabels';
-import {
-  actionChipClass,
-  ManualRecordActions,
-  manualRecordActionRowClass,
-} from '../../manual-entry/ManualRecordActions';
+import { ManualRecordActions } from '../../manual-entry/ManualRecordActions';
 import { ShowDocumentResultsAttachmentExpandable } from '../../timeline/components/document-reference/ShowDocumentReferenceAttachmentExpandable';
 import { ShowDocumentResultsExpandable } from '../../timeline/components/document-reference/ShowDocumentReferenceResultsExpandable';
 import { ImagingItem } from '../types';
@@ -41,11 +33,14 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
 
   return (
     <>
-      <article className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
+      <article className="relative rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="block w-full text-start transition hover:text-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          aria-label={`${t('Open record')}: ${item.title}`}
+          className={`block w-full text-start transition hover:text-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+            canManageRecord ? 'pe-8' : ''
+          }`}
         >
           <div className="flex items-start gap-3">
             {thumbnailUrl ? (
@@ -85,12 +80,12 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
                 )}
               </div>
               {studyType.text && (
-                <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-700">
+                <p className="mt-2 line-clamp-2 text-sm text-gray-700">
                   {studyType.text}
                 </p>
               )}
               {item.summary && (
-                <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-700">
+                <p className="mt-2 line-clamp-2 text-sm text-gray-700">
                   {item.summary}
                 </p>
               )}
@@ -107,29 +102,17 @@ export function ImagingItemCard({ item }: { item: ImagingItem }) {
             </div>
           </div>
         </button>
-        {/* One row for everything you can do to this card. "Open record" used
-            to sit inside the card body as a text hint on its own line, above
-            an Edit/Delete row it had nothing to do with — three controls, two
-            rows, no relationship. It is a button now, drawn by the same class
-            as View source, Edit and Delete beside it — it was 44px tall in a
-            row of 32px chips — and the card stays clickable for anyone who
-            taps the body. */}
-        <div className={manualRecordActionRowClass}>
-          <button
-            type="button"
-            onClick={() => setExpanded(true)}
-            className={`${actionChipClass} border-primary-200 text-primary-700 hover:bg-primary-50`}
-          >
-            <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-            {t('Open record')}
-          </button>
-          {canManageRecord && (
+        {/* The card itself opens the record, so there is no separate "Open
+            record" button; View source, Edit, History and Delete sit behind
+            one quiet button in the corner. */}
+        {canManageRecord && (
+          <div className="absolute end-2 top-2.5">
             <ManualRecordActions
               item={item.document as ClinicalDocument}
               inline
             />
-          )}
-        </div>
+          </div>
+        )}
       </article>
       {item.type === 'documentreference' ? (
         <ShowDocumentResultsExpandable

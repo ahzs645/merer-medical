@@ -599,7 +599,14 @@ function MedicationCard({ item }: { item: MedicationViewItem }) {
               Edit and the menu on one row on a phone. */}
           {t(isExpanded ? 'Hide details' : 'Details')}
         </button>
-        <ManualRecordActions item={item.document} inline />
+        {/* Closed, the card offers only "…"; opened, its details come with
+            View source and Edit spelled out — the place for them is the
+            record someone chose to look into, not every row of the list. */}
+        <ManualRecordActions
+          item={item.document}
+          inline
+          variant={isExpanded ? 'buttons' : 'menu'}
+        />
       </div>
     </article>
   );

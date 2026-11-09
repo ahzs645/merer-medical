@@ -85,8 +85,17 @@ export function ManualRecordActions({
   inline = false,
   explainReadOnly = false,
   connection,
+  variant = 'menu',
 }: {
   item: ClinicalDocument;
+  /**
+   * `menu` (lists): one quiet "…" button holding View source, Edit, History
+   * and Delete. A row of three or four bordered buttons under every card made
+   * the actions heavier than the record, and records gather sources over time,
+   * so "the" source is better found on the record's own page.
+   * `buttons` (a page showing one record): View source and Edit spelled out.
+   */
+  variant?: 'menu' | 'buttons';
   /** Render the buttons only, for a caller supplying the row around them. */
   inline?: boolean;
   /**
@@ -271,7 +280,7 @@ export function ManualRecordActions({
   // source link, files attached by hand) is one tap further, in the menu.
   const actions = (
     <>
-      {source.canView && (
+      {variant === 'buttons' && source.canView && (
         <SourceButton
           title={source.documentTitle}
           fileName={source.fileName}
@@ -281,21 +290,37 @@ export function ManualRecordActions({
           }}
         />
       )}
-      <button
-        type="button"
-        onClick={(event) => {
-          stop(event);
-          setIsEditOpen(true);
-        }}
-        className={neutralChip}
-      >
-        <PencilSquareIcon className="h-4 w-4" aria-hidden="true" />
-        {t('Edit')}
-      </button>
+      {variant === 'buttons' && (
+        <button
+          type="button"
+          onClick={(event) => {
+            stop(event);
+            setIsEditOpen(true);
+          }}
+          className={neutralChip}
+        >
+          <PencilSquareIcon className="h-4 w-4" aria-hidden="true" />
+          {t('Edit')}
+        </button>
+      )}
       {/* Delete lives in the menu: a red button on every card made the
           rarest, most destructive action the loudest thing in the list, and
           a fourth button wrapped the row onto a second line on a phone. */}
-      <MoreMenu label={t('More actions')}>
+      <MoreMenu label={t('More actions')} quiet={variant === 'menu'}>
+        {variant === 'menu' && source.canView && (
+          <MenuAction
+            icon={DocumentMagnifyingGlassIcon}
+            onSelect={source.openViewer}
+            label={t('View source')}
+          />
+        )}
+        {variant === 'menu' && (
+          <MenuAction
+            icon={PencilSquareIcon}
+            onSelect={() => setIsEditOpen(true)}
+            label={t('Edit')}
+          />
+        )}
         <MenuAction
           icon={ClockIcon}
           onSelect={() => setHistoryOpen(true)}
@@ -387,6 +412,11 @@ export function ManualRecordActions({
   );
 
   if (inline) return actions;
+  if (variant === 'menu') {
+    // Callers that cannot place the button in the card's header get it at
+    // the end of the card, on its own short line.
+    return <div className="mt-2 flex justify-end">{actions}</div>;
+  }
   return <div className={manualRecordActionRowClass}>{actions}</div>;
 }
 
@@ -435,17 +465,33 @@ function SourceButton({
   );
 }
 
-function MoreMenu({ label, children }: { label: string; children: ReactNode }) {
+function MoreMenu({
+  label,
+  children,
+  quiet = false,
+}: {
+  label: string;
+  children: ReactNode;
+  /** A borderless icon button, for a menu that is a card's only action. */
+  quiet?: boolean;
+}) {
   return (
     <Menu as="div" className="relative inline-flex">
       <Menu.Button
-        className={`${neutralChip} min-w-9 justify-center px-2`}
+        className={
+          quiet
+            ? `${actionTapAreaClass} inline-flex h-9 w-9 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-800 sm:h-8 sm:w-8`
+            : `${neutralChip} min-w-9 justify-center px-2`
+        }
         onClick={(event: MouseEvent<HTMLButtonElement>) =>
           event.stopPropagation()
         }
       >
         <span className="sr-only">{label}</span>
-        <EllipsisHorizontalIcon className="h-4 w-4" aria-hidden="true" />
+        <EllipsisHorizontalIcon
+          className={quiet ? 'h-5 w-5' : 'h-4 w-4'}
+          aria-hidden="true"
+        />
       </Menu.Button>
       <Transition
         as={Fragment}

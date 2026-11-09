@@ -97,7 +97,13 @@ export function ProceduresTab() {
           key={item.id}
           className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
         >
-          <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+          <div className="relative flex flex-wrap items-start justify-between pe-8 gap-x-3 gap-y-1">
+            {/* The card's actions — View source, Edit, History, Delete — sit
+                behind one quiet button in its corner, not a row of buttons
+                under every record. */}
+            <div className="absolute -end-2 -top-1.5">
+              <ManualRecordActions item={item.document} inline />
+            </div>
             <div className="min-w-0 flex-1 basis-48">
               <h2 className="break-words text-sm font-semibold text-gray-900">
                 {item.name}
@@ -115,7 +121,6 @@ export function ProceduresTab() {
               </span>
             )}
           </div>
-          <ManualRecordActions item={item.document} />
         </article>
       ))}
     </RecordListPage>

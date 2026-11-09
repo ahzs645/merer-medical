@@ -352,7 +352,13 @@ function HistorySection({
         <ul className="divide-y divide-gray-100">
           {shown.map((item) => (
             <li key={item.id} className="py-2">
-              <div className="flex items-start justify-between gap-3">
+              <div className="relative flex items-start justify-between pe-8 gap-3">
+                {/* The card's actions — View source, Edit, History, Delete — sit
+                    behind one quiet button in its corner, not a row of buttons
+                    under every record. */}
+                <div className="absolute -end-2 -top-1.5">
+                  <ManualRecordActions item={item.document} inline />
+                </div>
                 <div className="min-w-0">
                   <p className="break-words text-sm font-medium text-gray-900">
                     {item.title}
@@ -369,7 +375,6 @@ function HistorySection({
                   </span>
                 )}
               </div>
-              <ManualRecordActions item={item.document} />
             </li>
           ))}
         </ul>

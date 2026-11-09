@@ -444,11 +444,15 @@ function CareResourceRow({ item }: { item: CareDocument }) {
       : resource?.description?.text;
 
   return (
-    <article className="px-4 py-3">
+    <article className="relative px-4 py-3">
+      {/* View source, Edit, History and Delete, behind one quiet button. */}
+      <div className="absolute end-2 top-2.5">
+        <ManualRecordActions item={item} inline />
+      </div>
       {/* No per-row "CARE PLANS" / "GOALS" tag: every row sits under a section
           heading that already says it, so the tag repeated the heading once a
           row, eight times down the page. */}
-      <div>
+      <div className="pe-8">
         <div className="min-w-0">
           <h3 className="text-sm font-semibold text-gray-900">{name}</h3>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-600">
@@ -473,7 +477,6 @@ function CareResourceRow({ item }: { item: CareDocument }) {
           {description}
         </p>
       )}
-      <ManualRecordActions item={item} />
     </article>
   );
 }

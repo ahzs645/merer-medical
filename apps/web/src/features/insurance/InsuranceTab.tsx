@@ -268,6 +268,7 @@ function InsuranceDetails({ item }: { item: InsuranceItem }) {
           item={item.document}
           connection={item.connection}
           explainReadOnly
+          variant="buttons"
         />
       </div>
 

@@ -191,6 +191,7 @@ export function DentalRecordDetailTab() {
           <ManualRecordActions
             item={record.document}
             explainReadOnly={!isManualRecord(record.document)}
+            variant="buttons"
           />
         </div>
       </section>

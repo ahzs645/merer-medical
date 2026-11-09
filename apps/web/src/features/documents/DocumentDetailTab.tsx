@@ -442,6 +442,7 @@ export function DocumentDetailTab() {
                           item={document}
                           connection={connection}
                           explainReadOnly
+                          variant="buttons"
                         />
                       </div>
                     )}

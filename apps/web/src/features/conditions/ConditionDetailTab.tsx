@@ -16,6 +16,7 @@ import { Routes as AppRoutes } from '../../Routes';
 import { AppPage } from '../../shared/components/AppPage';
 import { RecordPageHeader } from '../../shared/components/records/RecordPageHeader';
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
+import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { useConditionsData } from './hooks/useConditionsData';
 import {
   ConditionBundle,
@@ -128,6 +129,13 @@ function ConditionDetail({ bundle }: { bundle: ConditionBundle }) {
             <span>Also recorded as:</span> {bundle.aliases.join(' · ')}
           </p>
         )}
+        {/* The list rows carry no actions; this page is where a condition's
+            source is read and the record is corrected. */}
+        <ManualRecordActions
+          item={bundle.document}
+          variant="buttons"
+          explainReadOnly
+        />
       </section>
 
       {bundle.notes.length > 0 && <NotesSection notes={bundle.notes} />}
