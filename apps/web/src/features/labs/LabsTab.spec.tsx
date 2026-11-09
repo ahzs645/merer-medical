@@ -119,10 +119,15 @@ describe('LabsTab', () => {
     expect(scroller?.textContent).not.toContain('181');
   });
 
-  it('keeps the reference standard on screen rather than in the modal', () => {
+  it('shows the reference standard in the banner and changes it under Lab options', () => {
     renderTab();
 
-    // Still a control the reader can see and change without opening anything.
+    // The current standard is always on screen, beside the list it flags.
+    const banner = screen.getByText(/^Reference:/);
+    expect(banner.closest('.bg-primary-800')).not.toBeNull();
+    // Changing it is one press away, in the options sheet.
+    expect(screen.queryByLabelText('Reference')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Lab options' }));
     expect(screen.getByLabelText('Reference')).toBeTruthy();
   });
 
@@ -141,9 +146,7 @@ describe('LabsTab', () => {
 
     expect(screen.queryByText('181')).toBeNull();
 
-    fireEvent.click(
-      screen.getByRole('button', { name: "What's in your records" }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'Lab options' }));
 
     // The three lab tiles and the five that were behind a disclosure.
     ['181', '9', '14y, male', '23', '17', '5', '11', '412'].forEach((value) => {
@@ -157,12 +160,10 @@ describe('LabsTab', () => {
     renderTab();
 
     expect(screen.queryByText(/lab tests listed/)).toBeNull();
-    // The control and the button do not blink into existence on load, so the
-    // banner keeps its height when the labs arrive.
-    expect(screen.getByLabelText('Reference')).toBeTruthy();
-    expect(
-      screen.getByRole('button', { name: "What's in your records" }),
-    ).toBeTruthy();
+    // The reference line and the options button do not blink into existence
+    // on load, so the banner keeps its height when the labs arrive.
+    expect(screen.getByText(/^Reference:/)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Lab options' })).toBeTruthy();
   });
 });
 
