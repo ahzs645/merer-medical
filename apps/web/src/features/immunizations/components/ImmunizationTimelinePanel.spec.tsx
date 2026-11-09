@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 import { ClinicalDocument } from '../../../models/clinical-document/ClinicalDocument.type';
@@ -68,17 +68,23 @@ function renderPanel(records: ImmunizationRecord[]) {
  * be removed at all.
  */
 describe('ImmunizationTimelinePanel manual record actions', () => {
-  it('offers edit and delete on a hand-entered dose at a 44px tap target', () => {
+  it('offers edit, and delete under More actions, on a hand-entered dose', async () => {
     renderPanel([MANUAL]);
 
     const edit = screen.getByRole('button', { name: 'Edit' });
-    const remove = screen.getByRole('button', { name: 'Delete' });
+    const more = screen.getByRole('button', { name: 'More actions' });
 
-    // Drawn at 32px, with an invisible tap area reaching 44px.
-    for (const button of [edit, remove]) {
+    // Drawn at 32px on wider screens, with an invisible tap area around it.
+    for (const button of [edit, more]) {
       expect(button.className).toContain('min-h-8');
       expect(button.className).toContain('after:-inset-y-1.5');
     }
+    // Delete is the menu's last item, not a red button on every card.
+    expect(screen.queryByRole('button', { name: 'Delete' })).toBeNull();
+    fireEvent.click(more);
+    expect(
+      await screen.findByRole('menuitem', { name: 'Delete' }),
+    ).toBeTruthy();
   });
 
   it('no longer sends the correction through the full-page edit route', () => {

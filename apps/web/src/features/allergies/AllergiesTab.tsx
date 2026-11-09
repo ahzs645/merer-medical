@@ -22,6 +22,7 @@ import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { ManualRecordModal } from '../manual-entry/ManualRecordModal';
 import { ManualSourceDocumentLink } from '../manual-entry/ManualSourceDocumentLink';
 import { FactList } from '../../shared/components/FactList';
+import { SourceLine } from '../../shared/components/SourceLine';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 interface AllergyItem {
@@ -231,8 +232,8 @@ function NegationStatement({ item }: { item: AllergyItem }) {
 function AllergyCard({ item }: { item: AllergyItem }) {
   return (
     <article className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
+      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+        <div className="min-w-0 flex-1 basis-48">
           <h2 className="break-words text-sm font-semibold text-gray-900">
             {item.name}
           </h2>
@@ -242,18 +243,21 @@ function AllergyCard({ item }: { item: AllergyItem }) {
             )}
             <FactList
               facts={[
-                item.reaction,
+                item.reaction ? `Reaction: ${item.reaction}` : null,
                 item.severity ? (
                   <span className="capitalize">{item.severity}</span>
                 ) : null,
-                item.source,
               ]}
             />
           </div>
+          <SourceLine source={item.source} />
         </div>
         {item.date && (
-          <span className="shrink-0 text-sm text-gray-500">
-            {safeFormatDate(item.date, 'PP', '')}
+          <span className="shrink-0 text-xs text-gray-500 sm:text-end">
+            Recorded{' '}
+            <span className="text-sm sm:block">
+              {safeFormatDate(item.date, 'PP', '')}
+            </span>
           </span>
         )}
       </div>

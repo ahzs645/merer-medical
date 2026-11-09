@@ -17,7 +17,7 @@ export function NotFoundPage() {
   return (
     <AppPage banner={<GenericBanner text="Page not found" />}>
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-2xl gap-4 px-4 py-8 pb-24 sm:px-6">
+        <div className="mx-auto grid w-full max-w-2xl grid-cols-1 gap-4 px-4 py-8 pb-24 sm:px-6">
           <div className="rounded-md bg-white p-6 shadow-sm ring-1 ring-gray-200">
             <span className="bg-primary-50 text-primary-700 mb-4 flex h-12 w-12 items-center justify-center rounded-full">
               <MapIcon className="h-6 w-6" />

@@ -62,7 +62,7 @@ export function ConditionDetailTab() {
   return (
     <AppPage banner={<DetailHeader bundle={bundle} />}>
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'loading' ? (
             <Placeholder text="Loading condition..." />
           ) : !bundle ? (

@@ -131,8 +131,12 @@ describe('VitalsTab history disclosure', () => {
       expect(screen.getByText('Body Mass Index')).toBeTruthy(),
     );
     // The one row worth seeing on arrival is the headline, not a table row.
-    expect(screen.getByText('20 kg/m²')).toBeTruthy();
-    expect(screen.getByText('Mar 15, 2026')).toBeTruthy();
+    // The unit is set smaller than the number, and the date says what it is.
+    const headline = container.querySelector('article p.text-2xl');
+    expect(headline?.textContent).toBe('20 kg/m²');
+    expect(screen.getByText('Latest reading, Mar 15, 2026')).toBeTruthy();
+    // The sparkline's direction, in words, against the reading before it.
+    expect(screen.getByText(/since Mar 15, 2025$/)).toBeTruthy();
     // The sparkline is the point of collapsing the rows, so it must survive.
     expect(container.querySelector('article svg')).toBeTruthy();
     expect(historyDisclosure().open).toBe(false);

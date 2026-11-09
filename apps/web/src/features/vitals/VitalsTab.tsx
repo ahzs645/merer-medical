@@ -34,6 +34,8 @@ interface Reading {
   text: string;
   /** Numeric value used for the sparkline (systolic for blood pressure). */
   numeric?: number;
+  /** The unit on its own, so the headline can set it smaller than the number. */
+  unit?: string;
   /**
    * The record this reading was read out of.
    *
@@ -209,6 +211,7 @@ function useVitals() {
           date: resource.effectiveDateTime || d.metadata?.date,
           text: value.text,
           numeric: value.numeric,
+          unit: value.unit,
           document: d,
           source:
             connectionsById.get(d.connection_record_id)?.name ||
@@ -273,6 +276,45 @@ function useVitals() {
  * Each point carries a `<title>`, so hovering or focusing a dot names its date
  * and value without a charting library or a tooltip of our own.
  */
+function ReadingValue({ reading }: { reading: Reading }) {
+  const { text, unit } = reading;
+  if (unit && text.endsWith(` ${unit}`)) {
+    return (
+      <>
+        {text.slice(0, -unit.length - 1)}{' '}
+        <span className="whitespace-nowrap text-sm font-semibold text-gray-600">
+          {unit}
+        </span>
+      </>
+    );
+  }
+  return <>{text}</>;
+}
+
+/**
+ * "↑ 2.1 since Jun 3, 2026" — what the sparkline shows, in words, for anyone
+ * who cannot read a 40px line (or cannot see it). Readings are newest first.
+ */
+function changeSincePrevious(readings: Reading[]): string | undefined {
+  const [latest, previous] = readings;
+  if (latest?.numeric == null || previous?.numeric == null) return undefined;
+  const delta = latest.numeric - previous.numeric;
+  const when = safeFormatDate(previous.date, 'PP', '');
+  const since = when ? ` since ${when}` : ' since previous';
+  if (Math.abs(delta) < 1e-9) return `No change${since}`;
+  const decimals = Math.max(
+    decimalPlaces(latest.numeric),
+    decimalPlaces(previous.numeric),
+  );
+  const amount = Math.abs(delta).toFixed(Math.min(decimals, 2));
+  return `${delta > 0 ? '↑' : '↓'} ${amount}${latest.unit && latest.unit !== '%' ? ` ${latest.unit}` : latest.unit ?? ''}${since}`;
+}
+
+function decimalPlaces(value: number): number {
+  const [, fraction = ''] = String(value).split('.');
+  return fraction.length;
+}
+
 function Sparkline({ readings, name }: { readings: Reading[]; name: string }) {
   const plotted = readings
     .filter((r) => typeof r.numeric === 'number')
@@ -407,7 +449,7 @@ export function VitalsTab() {
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-3xl gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
+        <div className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'loading' ? (
             <Placeholder text="Loading vital signs…" />
           ) : status === 'error' ? (
@@ -422,21 +464,30 @@ export function VitalsTab() {
                 key={group.key}
                 className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
+                {/* Wraps: with enlarged text the sparkline moves under the
+                    reading instead of squeezing it into a narrow column. */}
+                <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+                  <div className="min-w-0 flex-1 basis-40">
                     <h2 className="break-words text-sm font-semibold text-gray-900">
                       {group.name}
                     </h2>
-                    <div className="mt-1 flex items-baseline gap-2">
-                      <span className="text-primary-700 text-2xl font-bold">
-                        {group.latest.text}
-                      </span>
-                      {group.latest.date && (
-                        <span className="text-xs text-gray-500">
-                          {safeFormatDate(group.latest.date, 'PP', '')}
-                        </span>
-                      )}
-                    </div>
+                    {/* The number reads first and the unit after it, smaller,
+                        so "119/66 mmHg" no longer breaks into two headline
+                        lines beside a date squeezed into a column of its
+                        own. The date says what it is: the latest reading. */}
+                    <p className="text-primary-700 mt-1 break-words text-2xl font-bold leading-tight">
+                      <ReadingValue reading={group.latest} />
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      {group.latest.date
+                        ? `Latest reading, ${safeFormatDate(group.latest.date, 'PP', '')}`
+                        : 'Latest reading'}
+                    </p>
+                    {changeSincePrevious(group.readings) && (
+                      <p className="text-xs text-gray-500">
+                        {changeSincePrevious(group.readings)}
+                      </p>
+                    )}
                   </div>
                   <Sparkline readings={group.readings} name={group.name} />
                 </div>

@@ -14,6 +14,7 @@ import {
 import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { mapReferralDocs, type ReferralItem } from './referralRecords';
 import { FactList } from '../../shared/components/FactList';
+import { SourceLine } from '../../shared/components/SourceLine';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 function useReferrals() {
@@ -76,8 +77,8 @@ export function ReferralsTab() {
           key={item.id}
           className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
         >
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
+          <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+            <div className="min-w-0 flex-1 basis-48">
               <h2 className="break-words text-sm font-semibold text-gray-900">
                 {item.name}
               </h2>
@@ -85,10 +86,9 @@ export function ReferralsTab() {
                 {item.status && (
                   <Badge className="capitalize">{item.status}</Badge>
                 )}
-                <FactList
-                  facts={[item.requester, item.performer, item.source]}
-                />
+                <FactList facts={[item.requester, item.performer]} />
               </div>
+              <SourceLine source={item.source} />
               {item.notes.length > 0 && (
                 <div className="mt-2 space-y-1 text-xs text-gray-600">
                   {item.notes.map((note, i) => (

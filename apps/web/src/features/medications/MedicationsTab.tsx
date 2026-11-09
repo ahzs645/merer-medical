@@ -135,7 +135,7 @@ export function MedicationsTab() {
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'loading' ? (
             <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">
               Loading medications...
@@ -418,6 +418,10 @@ function SupplementsPanel({ items }: { items: MedicationViewItem[] }) {
     })),
   );
 
+  // A panel announcing that there is nothing to show cost a screenful on a
+  // phone between the allergy strip and the first medication.
+  if (facts.length === 0) return null;
+
   return (
     <section className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200">
       <div className="flex items-center gap-2">
@@ -426,29 +430,22 @@ function SupplementsPanel({ items }: { items: MedicationViewItem[] }) {
           Supplements and Nutrition
         </h2>
       </div>
-      {facts.length === 0 ? (
-        <p className="mt-3 text-sm text-gray-600">
-          Supplement records are present, but no vitamin, mineral, or nutrition
-          facts were provided.
-        </p>
-      ) : (
-        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {facts.map((fact) => (
-            <div
-              key={fact.id}
-              className="rounded-md border border-gray-200 bg-gray-50 p-3"
-            >
-              <p className="text-xs font-medium text-gray-500">
-                {fact.medicationName}
-              </p>
-              <p className="mt-1 text-sm font-semibold text-gray-900">
-                {fact.label}
-              </p>
-              <p className="text-sm text-gray-700">{fact.value}</p>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {facts.map((fact) => (
+          <div
+            key={fact.id}
+            className="rounded-md border border-gray-200 bg-gray-50 p-3"
+          >
+            <p className="text-xs font-medium text-gray-500">
+              {fact.medicationName}
+            </p>
+            <p className="mt-1 text-sm font-semibold text-gray-900">
+              {fact.label}
+            </p>
+            <p className="text-sm text-gray-700">{fact.value}</p>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
@@ -518,9 +515,15 @@ function MedicationCard({ item }: { item: MedicationViewItem }) {
             <ReconciliationBadge state={item.reconciliationState} />
           </div>
         </div>
-        <div className="shrink-0 text-sm text-gray-500">
-          {formatDate(item.startDate || item.stopDate)}
-        </div>
+        {/* A bare date did not say what happened on it. */}
+        {(item.startDate || item.stopDate) && (
+          <div className="shrink-0 text-xs text-gray-500 sm:text-end">
+            {t(item.startDate ? 'Started' : 'Stopped')}{' '}
+            <span className="text-sm text-gray-700 sm:block">
+              {formatDate(item.startDate || item.stopDate)}
+            </span>
+          </div>
+        )}
       </div>
 
       {summary && !isExpanded && (
@@ -591,7 +594,10 @@ function MedicationCard({ item }: { item: MedicationViewItem }) {
               isExpanded ? 'rotate-180' : '',
             ].join(' ')}
           />
-          {t(isExpanded ? 'Hide details' : 'Show details')}
+          {/* "Details" rather than "Show details": the chevron already says
+              it opens, and the shorter label keeps the toggle, View source,
+              Edit and the menu on one row on a phone. */}
+          {t(isExpanded ? 'Hide details' : 'Details')}
         </button>
         <ManualRecordActions item={item.document} inline />
       </div>

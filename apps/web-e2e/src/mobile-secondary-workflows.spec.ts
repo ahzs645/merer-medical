@@ -413,7 +413,7 @@ test('Specialty navigation reveals off-screen choices and selected routes in Eng
       const lastTab = nav.locator(
         `a[href="/demo/records/${specialty}/records"]`,
       );
-      // Native scrolling and explicit arrows must both expose the last section.
+      // Native scrolling, or the arrows where shown, must expose the last section.
       for (
         let attempts = 0;
         attempts < 8 && (await next.isVisible()) && (await next.isEnabled());
@@ -422,6 +422,8 @@ test('Specialty navigation reveals off-screen choices and selected routes in Eng
         await next.click();
         await page.waitForTimeout(180);
       }
+      // Touch screens get an edge fade instead of arrows: swipe the row.
+      if (!(await next.isVisible())) await lastTab.scrollIntoViewIfNeeded();
       await expectChoiceInRow(lastTab, nav);
       await lastTab.click();
       await expect(lastTab).toHaveAttribute('aria-current', 'page');

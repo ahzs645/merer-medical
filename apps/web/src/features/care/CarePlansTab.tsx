@@ -209,7 +209,7 @@ export function CarePlansTab() {
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8 lg:grid-cols-[minmax(0,1fr)_360px]">
           <section className="grid gap-4">
             {status === 'loading' ? (
               <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200">

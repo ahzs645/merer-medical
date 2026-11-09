@@ -13,7 +13,7 @@ import { safeFormatDate } from '../../shared/utils/dateFormatters';
 import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
-import { FactList } from '../../shared/components/FactList';
+import { SourceLine } from '../../shared/components/SourceLine';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 interface ProcedureItem {
@@ -97,8 +97,8 @@ export function ProceduresTab() {
           key={item.id}
           className="rounded-md bg-white p-4 shadow-sm ring-1 ring-gray-200"
         >
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
+          <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+            <div className="min-w-0 flex-1 basis-48">
               <h2 className="break-words text-sm font-semibold text-gray-900">
                 {item.name}
               </h2>
@@ -106,8 +106,8 @@ export function ProceduresTab() {
                 {item.status && (
                   <Badge className="capitalize">{item.status}</Badge>
                 )}
-                <FactList facts={[item.source]} />
               </div>
+              <SourceLine source={item.source} />
             </div>
             {item.date && (
               <span className="shrink-0 text-sm text-gray-500">

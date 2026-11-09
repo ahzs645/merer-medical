@@ -116,7 +116,7 @@ export function RecordsHub() {
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-4xl gap-6 px-4 py-4 pb-24 sm:px-6 lg:px-8">
+        <div className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {searching && (
             <section
               aria-labelledby="record-search-heading"

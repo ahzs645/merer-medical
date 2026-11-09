@@ -301,7 +301,7 @@ export function HealthMaintenanceTab() {
   return (
     <AppPage banner={<GenericBanner text="Health maintenance" />}>
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-3xl gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
+        <div className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           {status === 'loading' ? (
             <Placeholder text="Checking your preventive care…" />
           ) : (

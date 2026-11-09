@@ -159,10 +159,16 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
                 {t('No results found.')}
               </div>
             ) : (
-              groups.map((group) => (
+              groups.map((group, index) => (
                 <ResultGroupSection
                   key={group.id}
                   group={group}
+                  // Most groups are one result, so a busy day printed the
+                  // same "OCT 22, 2026" header over every row. Name the day
+                  // once and let the rows that follow sit under it.
+                  showDate={
+                    index === 0 || !sameDay(groups[index - 1].date, group.date)
+                  }
                   selectedId={selectedDetail?.detailId}
                   onSelect={selectResult}
                 />
@@ -213,12 +219,19 @@ function MetricCard({ label, value }: { label: string; value: number }) {
   );
 }
 
+function sameDay(a?: string, b?: string): boolean {
+  if (!a || !b) return a === b;
+  return a.slice(0, 10) === b.slice(0, 10);
+}
+
 function ResultGroupSection({
   group,
+  showDate = true,
   selectedId,
   onSelect,
 }: {
   group: ResultGroup;
+  showDate?: boolean;
   selectedId?: string;
   onSelect: (id: string) => void;
 }) {
@@ -233,16 +246,20 @@ function ResultGroupSection({
 
   return (
     <div className="border-b border-gray-100 last:border-b-0">
-      <div className="bg-gray-50 px-3 py-2">
-        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-          {safeFormatDate(group.date, 'PP', 'Unknown date')}
-        </p>
-        {namesOneResult ? null : (
-          <h2 className="truncate text-sm font-semibold text-gray-900">
-            {group.title}
-          </h2>
-        )}
-      </div>
+      {(showDate || !namesOneResult) && (
+        <div className="bg-gray-50 px-3 py-2">
+          {showDate && (
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              {safeFormatDate(group.date, 'PP', 'Unknown date')}
+            </p>
+          )}
+          {namesOneResult ? null : (
+            <h2 className="line-clamp-2 break-words text-sm font-semibold text-gray-900">
+              {group.title}
+            </h2>
+          )}
+        </div>
+      )}
       <div className="divide-y divide-gray-100">
         {group.results.map((result) => (
           <ResultRow
@@ -266,6 +283,7 @@ function ResultRow({
   selected: boolean;
   onSelect: (id: string) => void;
 }) {
+  const { t } = useInterfaceLanguage();
   const Icon = resultTypeIcon(result.type);
 
   return (
@@ -279,7 +297,9 @@ function ResultRow({
       <Icon className="mt-0.5 h-5 w-5 text-primary-700" />
       <div className="min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <p className="truncate text-sm font-semibold text-gray-900">
+          {/* Two lines rather than one: "Operative note — examination
+              under anesthesia …" lost the part that said what it was. */}
+          <p className="line-clamp-2 break-words text-sm font-semibold text-gray-900">
             {result.title}
           </p>
           <StatusBadge abnormal={result.abnormal} status={result.status} />
@@ -288,8 +308,10 @@ function ResultRow({
           {result.source || resultTypeLabel(result.type)}
         </p>
         {result.metadataOnly ? (
+          // "Report metadata only" was jargon for: the source sent the
+          // name and date, but no values or report text.
           <p className="mt-1 text-xs font-medium text-amber-700">
-            Report metadata only
+            {t('Name and date only — no report text')}
           </p>
         ) : null}
       </div>

@@ -160,7 +160,7 @@ export function TrackersTab() {
             and under them below it. The add form used to sit here, above both,
             so a page for reading back what you logged opened on empty fields —
             it is a sheet now, off the "Add entry" button in the banner. */}
-        <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-8">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-4 py-4 pb-24 sm:px-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-8">
           <section className="rounded-md bg-white shadow-sm ring-1 ring-gray-200">
             <div className="flex items-center gap-2 border-b border-gray-200 px-4 py-3">
               <ChartBarIcon className="h-5 w-5 text-primary-700" />

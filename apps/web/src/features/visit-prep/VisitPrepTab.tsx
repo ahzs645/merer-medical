@@ -92,7 +92,7 @@ export function VisitPrepTab() {
   return (
     <AppPage banner={<VisitPrepBanner />} allowHeaderScroll>
       <div className="h-full overflow-y-auto bg-gray-50 print:h-auto print:overflow-visible print:bg-white">
-        <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8 print:max-w-none print:px-0 print:py-0">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-4 py-4 pb-24 sm:px-6 lg:px-8 print:max-w-none print:px-0 print:py-0">
           <VisitQuestionsCard
             visitPurpose={visitPurpose}
             updateVisitPurpose={updateVisitPurpose}

@@ -319,7 +319,7 @@ export function SharingTab() {
       }
     >
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-5xl gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
+        <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
           <p className="text-sm text-gray-600">
             {t(
               'Choose a task. Information stays on this device unless you download and share a copy yourself.',

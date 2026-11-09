@@ -37,6 +37,7 @@ export function HorizontalChoiceScroller({
     previous: false,
     next: false,
     overflow: false,
+    rtl: false,
   });
   const overflows = edges.overflow;
 
@@ -66,9 +67,10 @@ export function HorizontalChoiceScroller({
     setEdges((current) =>
       current.previous === previous &&
       current.next === next &&
-      current.overflow === overflow
+      current.overflow === overflow &&
+      current.rtl === rtl
         ? current
-        : { previous, next, overflow },
+        : { previous, next, overflow, rtl },
     );
   }, []);
 
@@ -131,7 +133,20 @@ export function HorizontalChoiceScroller({
     });
   };
 
-  const controlClass = `flex h-9 w-9 shrink-0 items-center justify-center rounded-md ring-1 ring-inset disabled:opacity-30 ${
+  // On a touch screen the row is swiped, and two arrow buttons took a fifth of
+  // a 390px row — at enlarged text, room for a single chip between them. Touch
+  // gets a fade on whichever edge has more choices behind it; a mouse, which
+  // cannot swipe, keeps the buttons.
+  const fadeStart = edges.rtl ? edges.next : edges.previous;
+  const fadeEnd = edges.rtl ? edges.previous : edges.next;
+  const fade =
+    fadeStart || fadeEnd
+      ? `linear-gradient(to right, ${fadeStart ? 'transparent, black 28px' : 'black'}, ${
+          fadeEnd ? 'black calc(100% - 28px), transparent' : 'black'
+        })`
+      : undefined;
+
+  const controlClass = `hidden [@media(pointer:fine)]:flex h-9 w-9 shrink-0 items-center justify-center rounded-md ring-1 ring-inset disabled:opacity-30 ${
     tone === 'dark'
       ? 'bg-white/10 text-white ring-white/30 hover:bg-white/20'
       : 'bg-white text-gray-700 ring-gray-200 hover:bg-gray-100'
@@ -155,6 +170,7 @@ export function HorizontalChoiceScroller({
         role={Element === 'div' ? 'group' : undefined}
         aria-label={t(label)}
         onScroll={measure}
+        style={fade ? { WebkitMaskImage: fade, maskImage: fade } : undefined}
         onFocusCapture={(event) => reveal(event.target)}
         className={`scrollbar-hide flex min-w-0 flex-1 overflow-x-auto ${rowClassName}`}
       >

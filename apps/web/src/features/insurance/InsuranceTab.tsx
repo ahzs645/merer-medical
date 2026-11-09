@@ -99,7 +99,7 @@ export function InsuranceTab() {
         onClose={() => setAddOpen(false)}
       />
       <div className="h-full overflow-y-auto bg-gray-50">
-        <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 py-4 pb-24 sm:px-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.25fr)] lg:px-8">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-4 py-4 pb-24 sm:px-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.25fr)] lg:px-8">
           {status === 'loading' ? (
             <div className="rounded-md bg-white p-8 text-center text-gray-600 shadow-sm ring-1 ring-gray-200 lg:col-span-2">
               {t('Loading insurance...')}

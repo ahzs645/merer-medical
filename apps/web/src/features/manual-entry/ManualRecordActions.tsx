@@ -65,7 +65,6 @@ export const actionTapAreaClass =
 export const actionChipClass = `${actionTapAreaClass} inline-flex min-h-9 items-center gap-1 rounded-md border px-2 py-1 text-sm font-semibold shadow-sm disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-8 sm:px-2.5 sm:text-xs`;
 const neutralChip = `${actionChipClass} border-gray-300 text-gray-800 hover:bg-gray-50`;
 const primaryChip = `${actionChipClass} border-primary-200 text-primary-700 hover:bg-primary-50`;
-const dangerChip = `${actionChipClass} border-red-200 text-red-700 hover:bg-red-50`;
 
 /**
  * The edit sheet, fetched the first time somebody presses Edit.
@@ -204,9 +203,8 @@ export function ManualRecordActions({
     return <div className={manualRecordActionRowClass}>{readOnly}</div>;
   }
 
-  function onRequestDelete(event: MouseEvent<HTMLButtonElement>) {
-    event.preventDefault();
-    event.stopPropagation();
+  // MenuAction already stops the click from reaching the card underneath.
+  function onRequestDelete() {
     if (!db || isDeleting) return;
     // Asked in the app's own dialog rather than the browser's, and asked at
     // all — unlike a tracker entry or a comment, deleting a record takes its
@@ -294,15 +292,9 @@ export function ManualRecordActions({
         <PencilSquareIcon className="h-4 w-4" aria-hidden="true" />
         {t('Edit')}
       </button>
-      <button
-        type="button"
-        disabled={isDeleting}
-        onClick={onRequestDelete}
-        className={dangerChip}
-      >
-        <TrashIcon className="h-4 w-4" aria-hidden="true" />
-        {t(isDeleting ? 'Deleting' : 'Delete')}
-      </button>
+      {/* Delete lives in the menu: a red button on every card made the
+          rarest, most destructive action the loudest thing in the list, and
+          a fourth button wrapped the row onto a second line on a phone. */}
       <MoreMenu label={t('More actions')}>
         <MenuAction
           icon={ClockIcon}
@@ -339,6 +331,13 @@ export function ManualRecordActions({
             />
           </Fragment>
         ))}
+        <MenuAction
+          icon={TrashIcon}
+          tone="danger"
+          disabled={isDeleting}
+          onSelect={onRequestDelete}
+          label={t(isDeleting ? 'Deleting' : 'Delete')}
+        />
       </MoreMenu>
       {source.dialogs}
       {historyOpen && (
@@ -470,12 +469,15 @@ function MenuAction({
   label,
   onSelect,
   disabled,
+  tone = 'neutral',
 }: {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
   label: string;
   onSelect: () => void;
   disabled?: boolean;
+  tone?: 'neutral' | 'danger';
 }) {
+  const danger = tone === 'danger';
   return (
     <Menu.Item disabled={disabled}>
       {({ active }) => (
@@ -488,10 +490,17 @@ function MenuAction({
             onSelect();
           }}
           className={`flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 py-2 text-start text-sm disabled:opacity-60 ${
-            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
+            danger
+              ? `${active ? 'bg-red-50' : ''} text-red-700`
+              : active
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-700'
           }`}
         >
-          <Icon className="h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
+          <Icon
+            className={`h-4 w-4 shrink-0 ${danger ? 'text-red-500' : 'text-gray-400'}`}
+            aria-hidden="true"
+          />
           <span className="min-w-0 break-words">{label}</span>
         </button>
       )}
