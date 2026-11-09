@@ -155,14 +155,19 @@ function DocumentSectionList({ section }: { section: DocumentSection }) {
   return (
     <section className="overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-gray-200">
       <div className="border-b border-gray-200 px-4 py-3">
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-          <div>
+        {/* On a phone: the heading and its count on one line. The section
+            blurb explains the grouping on a wide screen; on a phone it was two
+            more lines in front of every group. */}
+        <div className="flex items-baseline justify-between gap-2 sm:items-end">
+          <div className="min-w-0">
             <h2 className="text-base font-semibold text-gray-900">
               {t(section.title)}
             </h2>
-            <p className="text-sm text-gray-600">{t(section.description)}</p>
+            <p className="hidden text-sm text-gray-600 sm:block">
+              {t(section.description)}
+            </p>
           </div>
-          <span className="text-sm font-medium text-gray-500">
+          <span className="shrink-0 text-sm font-medium text-gray-500">
             {section.items.length}{' '}
             {section.items.length === 1 ? t('item') : t('items')}
           </span>

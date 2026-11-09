@@ -111,7 +111,7 @@ export function SettingsPanels({
         hidden={level !== 'basic'}
         className="space-y-4"
       >
-        <p className="text-sm text-gray-600">
+        <p className="hidden text-sm text-gray-600 sm:block">
           {t('Manage your profile, language, and privacy preferences.')}
         </p>
         {basic}

@@ -35,7 +35,7 @@ export function VisitQuestionsCard({
       >
         {t('Prepare for your visit')}
       </h2>
-      <p className="mt-1 text-sm text-gray-600">
+      <p className="mt-1 hidden text-sm text-gray-600 sm:block">
         {t(
           'Start with what you want to discuss. Save your notes on this device, then choose the records to include.',
         )}

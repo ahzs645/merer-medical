@@ -216,6 +216,8 @@ export const arabicTranslations: Record<string, string> = {
   Results: 'النتائج',
   result: 'نتيجة',
   results: 'نتائج',
+  'need attention': 'تحتاج إلى انتباه',
+  'Reference ranges': 'النطاقات المرجعية',
   Reports: 'التقارير',
   Route: 'طريقة الإعطاء',
   Save: 'حفظ',

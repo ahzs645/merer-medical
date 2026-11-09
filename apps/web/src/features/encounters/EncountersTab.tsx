@@ -1,5 +1,9 @@
 import { useMemo } from 'react';
-import { BuildingOffice2Icon } from '@heroicons/react/24/outline';
+import {
+  BuildingOffice2Icon,
+  ChevronRightIcon,
+} from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
 
 import { ClinicalDocument } from '../../models/clinical-document/ClinicalDocument.type';
 import { ConnectionDocument } from '../../models/connection-document/ConnectionDocument.type';
@@ -15,6 +19,8 @@ import { getFhirResource } from '../../shared/utils/fhirResource';
 import { firstText, periodStart } from '../../shared/utils/fhirText';
 import { ManualRecordActions } from '../manual-entry/ManualRecordActions';
 import { SourceLine } from '../../shared/components/SourceLine';
+import { timelineDatePath } from '../timeline/timelineQueryParam';
+import { timelineDateKey } from '../timeline/utils/timelineDates';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
 
 // Resource types we treat as "records" when counting same-day activity.
@@ -245,11 +251,21 @@ export function EncountersTab() {
               </p>
             )}
 
-            {item.sameDayCount > 0 && (
-              <span className="mt-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
-                {item.sameDayCount} same-day record
-                {item.sameDayCount === 1 ? '' : 's'}
-              </span>
+            {/* The count used to be a grey chip that said how many other
+                records share the day and went nowhere. It opens that day on
+                the timeline now. */}
+            {item.sameDayCount > 0 && item.date && (
+              <Link
+                to={timelineDatePath(timelineDateKey(item.date))}
+                className="text-primary-700 hover:text-primary-900 mt-2 inline-flex min-h-9 items-center gap-1 text-sm font-medium"
+              >
+                {item.sameDayCount} other record
+                {item.sameDayCount === 1 ? '' : 's'} this day
+                <ChevronRightIcon
+                  className="h-4 w-4 rtl:rotate-180"
+                  aria-hidden="true"
+                />
+              </Link>
             )}
 
             <ManualRecordActions item={item.document} />

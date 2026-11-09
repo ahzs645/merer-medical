@@ -41,6 +41,7 @@ import {
 } from './utils/timelineDates';
 import { getTimelineCategories } from './utils/timelineCategories';
 import { useListViewParams } from '../../shared/hooks/useListViewParams';
+import { TIMELINE_DATE_PARAM } from './timelineQueryParam';
 
 export { QueryStatus };
 export {
@@ -196,6 +197,23 @@ export function TimelineTab() {
   }, [pendingJumpDateKey, data, status]);
 
   useScrollToHash({ ready: dataReadyForQuery });
+
+  // `?date=yyyy-MM-dd` opens the timeline at that day (a visit's "same-day
+  // records" link). Once per navigation, after the first page has loaded, so
+  // the seek is not undone by the initial load starting over.
+  const dateParam = new URLSearchParams(location.search).get(
+    TIMELINE_DATE_PARAM,
+  );
+  const handledDateJump = useRef<string>();
+  useEffect(() => {
+    if (!dateParam || !initialized) return;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateParam)) return;
+    const handledKey = `${location.key}:${dateParam}`;
+    if (handledDateJump.current === handledKey) return;
+    handledDateJump.current = handledKey;
+    setView('cards');
+    onJumpToDate(dateParam);
+  }, [dateParam, initialized, location.key, onJumpToDate]);
 
   const listItems = useMemo(
     () =>

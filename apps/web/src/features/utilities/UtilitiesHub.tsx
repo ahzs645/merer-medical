@@ -15,7 +15,9 @@ export function UtilitiesHub() {
     <AppPage banner={<GenericBanner text="Utilities" />}>
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto w-full max-w-4xl px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          <p className="mb-4 text-sm text-gray-600">
+          {/* The page intro is for the wide layout; on a phone the list of
+              tools, each with its own line, says the same thing. */}
+          <p className="mb-4 hidden text-sm text-gray-600 sm:block">
             Tools that work on top of your records — prepare for a visit, check
             what care is due, and export or share what you hold.
           </p>
@@ -35,7 +37,7 @@ export function UtilitiesHub() {
                     <span className="block text-sm font-semibold text-gray-900">
                       {tool.label}
                     </span>
-                    <span className="mt-0.5 block text-xs text-gray-600">
+                    <span className="mt-0.5 line-clamp-1 text-xs text-gray-600 sm:line-clamp-none">
                       {tool.description}
                     </span>
                   </span>

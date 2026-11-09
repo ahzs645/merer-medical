@@ -785,7 +785,7 @@ function ForYouFeed({
           <h2 className="text-base font-semibold text-gray-900">
             {t('For you')}
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="hidden text-sm text-gray-600 sm:block">
             {t('Recent and useful record areas to review next.')}
           </p>
         </div>
@@ -815,7 +815,10 @@ function ForYouFeed({
                     string rather than composing one to look up. */}
                 {item.title}
               </span>
-              <span className="mt-1 block text-xs text-gray-600">
+              {/* "Check medication details and source context." under
+                  "Medications · 73 records" — the wide layout has room for it;
+                  a phone shows what the tile opens and how many. */}
+              <span className="mt-1 hidden text-xs text-gray-600 sm:block">
                 {t(item.description)}
               </span>
             </span>

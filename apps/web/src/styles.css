@@ -258,6 +258,15 @@ html {
   }
 }
 
+/* Set by TabWrapper while a phone reader scrolls down a page (see
+   useHideChromeOnScroll). The top bar and page banner step aside; the bottom
+   navigation stays. */
+@media (max-width: 767.98px) {
+  [data-chrome='hidden'] .hide-on-scroll {
+    display: none;
+  }
+}
+
 @media (pointer: coarse) {
   input:not(
       [type='checkbox'],

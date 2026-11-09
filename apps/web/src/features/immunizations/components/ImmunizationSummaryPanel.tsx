@@ -46,7 +46,10 @@ export function ImmunizationSummaryPanel({
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-3">
+    // Three zeros say nothing a phone needs before the schedule below it.
+    <div
+      className={`${counts.total === 0 ? 'hidden sm:grid' : 'grid'} grid-cols-3 gap-3`}
+    >
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (

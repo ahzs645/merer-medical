@@ -320,7 +320,7 @@ export function SharingTab() {
     >
       <div className="h-full overflow-y-auto bg-gray-50">
         <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-3 px-4 py-4 pb-24 sm:px-6 lg:px-8">
-          <p className="text-sm text-gray-600">
+          <p className="hidden text-sm text-gray-600 sm:block">
             {t(
               'Choose a task. Information stays on this device unless you download and share a copy yourself.',
             )}
@@ -785,7 +785,9 @@ function SharingSection({
           </span>
           <span
             id={`sharing-${id}-description`}
-            className="mt-1 block text-sm text-gray-600"
+            // Two lines while closed on a phone, all of it once opened: the
+            // four closed tasks were a page of reading before choosing one.
+            className="mt-1 line-clamp-2 text-sm text-gray-600 group-open:line-clamp-none sm:line-clamp-none"
           >
             {description}
           </span>

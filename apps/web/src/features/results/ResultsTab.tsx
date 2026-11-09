@@ -109,8 +109,27 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
       <div className="flex min-h-0 flex-1 flex-col gap-3 sm:gap-4">
         {/* Two compact columns on phones - four full-width tiles plus the
             reference picker used to fill two screens before the first record. */}
+        {/* A phone gets the totals as one line, not four tiles: the tiles and
+            the reference picker filled the first screen before any result. */}
+        {!selectedId && (
+          <p className="text-sm text-gray-700 sm:hidden">
+            <span className="font-semibold text-gray-900">
+              {totals.total.toLocaleString()}
+            </span>{' '}
+            {t('results')}
+            {totals.attention > 0 && (
+              <>
+                {' · '}
+                <span className="font-semibold text-amber-800">
+                  {totals.attention.toLocaleString()}
+                </span>{' '}
+                {t('need attention')}
+              </>
+            )}
+          </p>
+        )}
         <div
-          className={`${selectedId ? 'hidden lg:grid' : 'grid'} grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3`}
+          className={`${selectedId ? 'hidden lg:grid' : 'hidden sm:grid'} grid-cols-4 gap-3`}
         >
           <MetricCard label="Total results" value={totals.total} />
           <MetricCard label="Labs" value={totals.labs} />
@@ -125,10 +144,10 @@ export function ResultsHubContent({ className = '' }: { className?: string }) {
           type="button"
           onClick={() => setShowReferencePicker((shown) => !shown)}
           aria-expanded={showReferencePicker}
-          className={`${selectedId ? 'hidden' : 'flex'} min-h-9 items-center justify-between gap-2 rounded-md border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-800 shadow-sm sm:hidden`}
+          className={`${selectedId ? 'hidden' : 'flex'} min-h-9 items-center justify-between gap-2 rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-700 shadow-sm sm:hidden`}
         >
-          <span>Reference standard</span>
-          <span className="font-normal text-gray-600">
+          <span>{t('Reference ranges')}</span>
+          <span className="font-semibold text-gray-900">
             {referenceOverlayLabels[referenceMode]}
           </span>
         </button>

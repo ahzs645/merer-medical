@@ -5,6 +5,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import {
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
+  ChevronLeftIcon,
   Cog6ToothIcon,
   DocumentIcon,
   EllipsisHorizontalIcon,
@@ -31,6 +32,7 @@ import {
 } from '../../app/providers/LocalConfigProvider';
 import { NotificationCenter } from '../../features/notifications/NotificationCenter';
 import { CommandPalette } from './CommandPalette';
+import { TopBarBackLinkProvider, useTopBarBackLink } from './TopBarBackLink';
 import { TutorialOverlay } from '../../features/tutorial/TutorialOverlay';
 import { isDemoMode } from '../utils/demoMode';
 import { useRouteAnnouncement } from '../hooks/useRouteAnnouncement';
@@ -38,6 +40,7 @@ import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import { SharedPackagePanel } from '../../features/sources/components/SharedPackagePanel';
 import { useCloseOnBack } from '../hooks/useCloseOnBack';
 import { useSoftKeyboardOpen } from '../hooks/useSoftKeyboardOpen';
+import { useHideChromeOnScroll } from '../hooks/useHideChromeOnScroll';
 import { SHORT_VIEWPORT_QUERY, useMediaQuery } from '../hooks/useMediaQuery';
 import { useWindowFileDrop } from '../hooks/useWindowFileDrop';
 
@@ -71,6 +74,9 @@ function RouteLoading() {
   );
 }
 
+/** Below Tailwind's `md`: the bottom bar, not the rail. */
+const PHONE_QUERY = '(max-width: 767.98px)';
+
 export function TabWrapper() {
   // Hung off `main`, the one element that both contains every route's scroll
   // container and is only ever rendered inside the router.
@@ -83,6 +89,9 @@ export function TabWrapper() {
   const [moreOpen, setMoreOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const softKeyboardOpen = useSoftKeyboardOpen();
+  const phone = useMediaQuery(PHONE_QUERY);
+  const { pathname } = useLocation();
+  const chromeHidden = useHideChromeOnScroll(mainRef, phone, pathname);
   const draggingFile = useWindowFileDrop();
   // Only the `md`+ rail collapses. Below that the same markup is the bottom
   // bar, which has nothing to collapse, so every collapsed style is `md:`.
@@ -105,278 +114,335 @@ export function TabWrapper() {
     'Your profile';
 
   return (
-    <div
-      // Native fragment navigation can scroll overflow-hidden ancestors and
-      // lift the profile strip and navigation out of view. This shell only
-      // clips; main and the route content own scrolling. Keep hidden as the
-      // fallback for engines without overflow: clip support.
-      className="mobile-full-height relative flex min-h-0 max-w-[100vw] flex-col overflow-hidden supports-[overflow:clip]:overflow-clip md:flex-row-reverse"
-      // Read by `.hide-when-typing` in styles.css.
-      data-soft-keyboard={softKeyboardOpen ? 'open' : undefined}
-    >
-      {!isDemoMode() && <TutorialOverlay />}
-      {/* First stop in the tab order on every route, and the only way past the
+    <TopBarBackLinkProvider>
+      <div
+        // Native fragment navigation can scroll overflow-hidden ancestors and
+        // lift the profile strip and navigation out of view. This shell only
+        // clips; main and the route content own scrolling. Keep hidden as the
+        // fallback for engines without overflow: clip support.
+        className="mobile-full-height relative flex min-h-0 max-w-[100vw] flex-col overflow-hidden supports-[overflow:clip]:overflow-clip md:flex-row-reverse"
+        // Read by `.hide-when-typing` in styles.css.
+        data-soft-keyboard={softKeyboardOpen ? 'open' : undefined}
+        // Read by `.hide-on-scroll` in styles.css.
+        data-chrome={chromeHidden ? 'hidden' : undefined}
+      >
+        {!isDemoMode() && <TutorialOverlay />}
+        {/* First stop in the tab order on every route, and the only way past the
           secondary navigation some pages open with — the timeline's date rail,
           the Records category list. It targets the `main` below, which is why
           `main` is here and not inside each page: one landmark, 46 routes. */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-dialog focus:inline-flex focus:min-h-9 focus:items-center focus:rounded-md focus:bg-white focus:px-4 focus:text-sm focus:font-semibold focus:text-primary-800 focus:shadow-lg focus:ring-2 focus:ring-primary-600"
-      >
-        Skip to content
-      </a>
-      {/* Names the page a navigation just landed on. Off-screen and polite: it
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-dialog focus:inline-flex focus:min-h-9 focus:items-center focus:rounded-md focus:bg-white focus:px-4 focus:text-sm focus:font-semibold focus:text-primary-800 focus:shadow-lg focus:ring-2 focus:ring-primary-600"
+        >
+          Skip to content
+        </a>
+        {/* Names the page a navigation just landed on. Off-screen and polite: it
           waits for whatever the reader is in the middle of, and says the new
           page's own heading. Outside `main` so that moving focus into `main`
           does not also move the reader past the announcement. */}
-      <div aria-live="polite" aria-atomic="true" className="sr-only">
-        {routeAnnouncement}
-      </div>
-      {/* The desktop rail identifies the selected person and opens search.
-          On narrow phones, reserve one fixed-size search target and give the
-          name the remaining width. A growing icon and Search label previously
-          squeezed an enlarged name into a one-character-wide column. */}
-      <div className="hide-when-typing flex shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-3 py-1 print:hidden md:hidden">
-        <Link
-          to={AppRoutes.Settings}
-          aria-label={`Records for ${userName}. Manage profiles`}
-          className="flex min-h-9 min-w-0 flex-1 items-center gap-2 rounded-md py-1 text-primary-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600"
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          {routeAnnouncement}
+        </div>
+        <PhoneTopBar
+          userName={userName}
+          searchOpen={searchOpen}
+          onOpenSearch={() => setSearchOpen(true)}
+        />
+        <main
+          ref={mainRef}
+          id="main-content"
+          tabIndex={-1}
+          className="min-h-0 flex-grow overflow-y-auto focus:outline-none"
         >
-          <UserCircleIcon
-            className="hidden h-6 w-6 shrink-0 sm:block"
-            aria-hidden="true"
-          />
-          <span className="min-w-0 flex-1">
-            <span className="block text-xs text-gray-600">Records for</span>
-            <span
-              title={userName}
-              className="line-clamp-2 break-words text-sm font-semibold leading-tight"
-            >
-              {userName}
-            </span>
-          </span>
-        </Link>
-        <button
-          type="button"
-          onClick={() => setSearchOpen(true)}
-          aria-label="Search"
-          aria-haspopup="dialog"
-          aria-expanded={searchOpen}
-          title="Search"
-          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-sm font-semibold text-primary-800 hover:bg-primary-50 sm:w-auto sm:gap-1.5 sm:px-2"
-        >
-          <MagnifyingGlassIcon
-            className="h-5 w-5 shrink-0"
-            aria-hidden="true"
-          />
-          <span className="hidden sm:inline">Search</span>
-        </button>
-      </div>
-      <main
-        ref={mainRef}
-        id="main-content"
-        tabIndex={-1}
-        className="min-h-0 flex-grow overflow-y-auto focus:outline-none"
-      >
-        {/* Routes are code-split, so opening one for the first time can
+          {/* Routes are code-split, so opening one for the first time can
             suspend while its chunk arrives. The fallback is deliberately quiet
             — a centred spinner, no banner or skeleton furniture — because on a
             warm cache it is on screen for a frame or two, and anything with
             layout in it would flash. */}
-        <React.Suspense fallback={<RouteLoading />}>
-          <Outlet />
-        </React.Suspense>
-      </main>
-      {/* Above the routes rather than inside one: an offer that disappeared
+          <React.Suspense fallback={<RouteLoading />}>
+            <Outlet />
+          </React.Suspense>
+        </main>
+        {/* Above the routes rather than inside one: an offer that disappeared
           the moment somebody tapped the nav could not be said to need
           dismissing. It renders fixed either way — a sheet on a phone, a card
           in the corner on a wider screen. */}
-      <SharedPackagePanel />
-      {draggingFile && (
-        // Says what letting go will do before anyone does it. Pointer events
-        // pass through, so the drop still lands on whatever is underneath —
-        // a visible file field keeps its own drop.
-        <div
-          aria-hidden="true"
-          className="pointer-events-none fixed inset-3 z-dialog flex items-center justify-center rounded-xl border-2 border-dashed border-primary-600 bg-primary-50/90 p-6 text-center print:hidden"
+        <SharedPackagePanel />
+        {draggingFile && (
+          // Says what letting go will do before anyone does it. Pointer events
+          // pass through, so the drop still lands on whatever is underneath —
+          // a visible file field keeps its own drop.
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed inset-3 z-dialog flex items-center justify-center rounded-xl border-2 border-dashed border-primary-600 bg-primary-50/90 p-6 text-center print:hidden"
+          >
+            <p className="max-w-sm text-base font-semibold text-primary-900">
+              Drop a .emrpkg package to review it before anything is imported
+            </p>
+          </div>
+        )}
+        <nav
+          aria-label="Primary navigation"
+          className="hide-when-typing flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 print:hidden md:relative md:bottom-auto md:top-0 md:h-full md:w-auto"
         >
-          <p className="max-w-sm text-base font-semibold text-primary-900">
-            Drop a .emrpkg package to review it before anything is imported
-          </p>
-        </div>
-      )}
-      <nav
-        aria-label="Primary navigation"
-        className="hide-when-typing flex-0 md:bg-primary-800 z-20 w-full bg-slate-100 print:hidden md:relative md:bottom-auto md:top-0 md:h-full md:w-auto"
-      >
-        {/* The rail is ~770px of items and the shell clips anything taller
+          {/* The rail is ~770px of items and the shell clips anything taller
             than the window, so in a shorter one — a 1280x600 laptop browser,
             a phone held sideways — the profile link, and at 393px Settings
             too, sat below the edge with no way to reach them. It scrolls on
             short windows only: scrolling on one axis clips the other, and the
             collapsed rail's name bubbles hang off its side. */}
-        <div
-          className={`pb-safe md:pb-0 mx-auto flex w-full max-w-3xl justify-around md:h-full md:flex-col md:justify-start md:[@media(max-height:800px)]:overflow-y-auto motion-safe:md:transition-[width] motion-safe:md:duration-200 ${
-            collapsed ? 'md:w-[4.5rem]' : 'md:w-64'
-          }`}
-        >
           <div
-            className={`hidden md:flex ${
-              collapsed
-                ? 'flex-col items-center gap-1 px-2 pt-3'
-                : 'items-center'
+            className={`pb-safe md:pb-0 mx-auto flex w-full max-w-3xl justify-around md:h-full md:flex-col md:justify-start md:[@media(max-height:800px)]:overflow-y-auto motion-safe:md:transition-[width] motion-safe:md:duration-200 ${
+              collapsed ? 'md:w-[4.5rem]' : 'md:w-64'
             }`}
           >
-            <img
-              src={logo}
-              className={collapsed ? 'h-10 w-10' : 'h-20 w-20 p-4'}
-              alt="logo"
-            ></img>
             <div
-              className={`flex items-center ${
-                collapsed ? 'flex-col gap-1' : 'ms-auto pe-2'
+              className={`hidden md:flex ${
+                collapsed
+                  ? 'flex-col items-center gap-1 px-2 pt-3'
+                  : 'items-center'
               }`}
             >
-              <Link
-                to={AppRoutes.Sharing}
-                className="group relative mx-1 my-1 inline-flex h-10 w-10 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
-                aria-label="Sharing"
+              <img
+                src={logo}
+                className={collapsed ? 'h-10 w-10' : 'h-20 w-20 p-4'}
+                alt="logo"
+              ></img>
+              <div
+                className={`flex items-center ${
+                  collapsed ? 'flex-col gap-1' : 'ms-auto pe-2'
+                }`}
               >
-                <ShareIcon className="h-5 w-5" />
-                <NavTooltip label="Sharing" collapsed={collapsed} />
-              </Link>
-              <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
-              <button
-                type="button"
-                onClick={toggleNav}
-                aria-pressed={collapsed}
-                className="group relative mx-1 my-1 inline-flex h-10 w-10 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
-                aria-label={
-                  collapsed ? 'Expand navigation' : 'Collapse navigation'
-                }
-              >
-                {collapsed ? (
-                  <ChevronDoubleRightIcon className="h-5 w-5 rtl:rotate-180" />
-                ) : (
-                  <ChevronDoubleLeftIcon className="h-5 w-5 rtl:rotate-180" />
-                )}
-                <NavTooltip label="Expand navigation" collapsed={collapsed} />
-              </button>
+                <Link
+                  to={AppRoutes.Sharing}
+                  className="group relative mx-1 my-1 inline-flex h-10 w-10 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
+                  aria-label="Sharing"
+                >
+                  <ShareIcon className="h-5 w-5" />
+                  <NavTooltip label="Sharing" collapsed={collapsed} />
+                </Link>
+                <CommandPalette
+                  open={searchOpen}
+                  onOpenChange={setSearchOpen}
+                />
+                <button
+                  type="button"
+                  onClick={toggleNav}
+                  aria-pressed={collapsed}
+                  className="group relative mx-1 my-1 inline-flex h-10 w-10 items-center justify-center rounded-md border border-primary-700 bg-primary-900/30 text-primary-100 hover:bg-primary-700"
+                  aria-label={
+                    collapsed ? 'Expand navigation' : 'Collapse navigation'
+                  }
+                >
+                  {collapsed ? (
+                    <ChevronDoubleRightIcon className="h-5 w-5 rtl:rotate-180" />
+                  ) : (
+                    <ChevronDoubleLeftIcon className="h-5 w-5 rtl:rotate-180" />
+                  )}
+                  <NavTooltip label="Expand navigation" collapsed={collapsed} />
+                </button>
+              </div>
             </div>
-          </div>
-          <RailAddRecordButton collapsed={collapsed} />
-          <TabButton
-            route={AppRoutes.Timeline}
-            title="Timeline"
-            icon={<NewspaperIcon />}
-            collapsed={collapsed}
-          />
-          <TabButton
-            route={AppRoutes.Summary}
-            title="Summary"
-            icon={<QueueListIcon />}
-            collapsed={collapsed}
-          />
-          {/* The Records tab used to carry an overlaid "+" pinned to its top
+            <RailAddRecordButton collapsed={collapsed} />
+            <TabButton
+              route={AppRoutes.Timeline}
+              title="Timeline"
+              icon={<NewspaperIcon />}
+              collapsed={collapsed}
+            />
+            <TabButton
+              route={AppRoutes.Summary}
+              title="Summary"
+              icon={<QueueListIcon />}
+              collapsed={collapsed}
+            />
+            {/* The Records tab used to carry an overlaid "+" pinned to its top
               corner: a second tap target inside a tab, too small to hit
               cleanly and unexplained by any label. Adding a record now lives
               where the records are — the "Add record" button in the Records
               banner — with the labelled entries above and in the More sheet as
               the reachable-from-anywhere path on each size. */}
-          <TabButton
-            route={AppRoutes.Records}
-            title="Records"
-            icon={<DocumentIcon />}
-            collapsed={collapsed}
-          />
-          <div className="hidden md:contents">
             <TabButton
-              route={AppRoutes.Utilities}
-              title="Utilities"
-              icon={<WrenchScrewdriverIcon />}
+              route={AppRoutes.Records}
+              title="Records"
+              icon={<DocumentIcon />}
               collapsed={collapsed}
             />
-          </div>
-          {experimental__use_openai_rag && (
             <div className="hidden md:contents">
               <TabButton
-                route={AppRoutes.MereAIAssistant}
-                title="Mere Assistant"
-                smallTitle="Assistant"
-                icon={<SparklesIcon />}
+                route={AppRoutes.Utilities}
+                title="Utilities"
+                icon={<WrenchScrewdriverIcon />}
                 collapsed={collapsed}
               />
             </div>
-          )}
-          <div className="hidden md:contents">
-            <TabButton
-              route={AppRoutes.AddConnection}
-              title="Sources"
-              icon={<PlusCircleIcon />}
-              collapsed={collapsed}
+            {experimental__use_openai_rag && (
+              <div className="hidden md:contents">
+                <TabButton
+                  route={AppRoutes.MereAIAssistant}
+                  title="Mere Assistant"
+                  smallTitle="Assistant"
+                  icon={<SparklesIcon />}
+                  collapsed={collapsed}
+                />
+              </div>
+            )}
+            <div className="hidden md:contents">
+              <TabButton
+                route={AppRoutes.AddConnection}
+                title="Sources"
+                icon={<PlusCircleIcon />}
+                collapsed={collapsed}
+              />
+            </div>
+            <div className="hidden md:contents">
+              <TabButton
+                route={AppRoutes.Settings}
+                title="Settings"
+                icon={<Cog6ToothIcon />}
+                collapsed={collapsed}
+              />
+            </div>
+            <div className="hidden md:contents">
+              <NotificationCenter collapsed={collapsed} />
+            </div>
+            <MobileMoreButton
+              open={moreOpen}
+              setOpen={setMoreOpen}
+              showAssistant={!!experimental__use_openai_rag}
+              onOpenSearch={() => setSearchOpen(true)}
             />
-          </div>
-          <div className="hidden md:contents">
-            <TabButton
-              route={AppRoutes.Settings}
-              title="Settings"
-              icon={<Cog6ToothIcon />}
-              collapsed={collapsed}
-            />
-          </div>
-          <div className="hidden md:contents">
-            <NotificationCenter collapsed={collapsed} />
-          </div>
-          <MobileMoreButton
-            open={moreOpen}
-            setOpen={setMoreOpen}
-            showAssistant={!!experimental__use_openai_rag}
-            onOpenSearch={() => setSearchOpen(true)}
-          />
-          <div className="hidden md:block md:flex-1"></div>
-          <div
-            className={`border-primary-700 hidden flex-shrink-0 border-t md:block ${
-              collapsed ? 'p-2' : 'p-4'
-            }`}
-          >
-            {/* Collapsed, the whole card becomes the avatar and the link that
-                was under it, so the rail still reaches Settings in one tap. */}
-            <Link
-              to={AppRoutes.Settings}
-              className={`group relative block flex-shrink-0 ${
-                collapsed ? 'flex justify-center rounded-md py-1' : ''
+            <div className="hidden md:block md:flex-1"></div>
+            <div
+              className={`border-primary-700 hidden flex-shrink-0 border-t md:block ${
+                collapsed ? 'p-2' : 'p-4'
               }`}
             >
-              <div className="flex items-center">
-                <div className="inline-block h-10 w-10 shrink-0 rounded-full border-2 border-white bg-slate-100">
-                  {user.profile_picture?.data === undefined ? (
-                    <svg
-                      className="h-full w-full rounded-full text-gray-800"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                  ) : (
-                    <img
-                      className="h-full w-full rounded-full text-gray-300"
-                      src={user.profile_picture.data}
-                      alt="profile"
-                    ></img>
-                  )}
+              {/* Collapsed, the whole card becomes the avatar and the link that
+                was under it, so the rail still reaches Settings in one tap. */}
+              <Link
+                to={AppRoutes.Settings}
+                className={`group relative block flex-shrink-0 ${
+                  collapsed ? 'flex justify-center rounded-md py-1' : ''
+                }`}
+              >
+                <div className="flex items-center">
+                  <div className="inline-block h-10 w-10 shrink-0 rounded-full border-2 border-white bg-slate-100">
+                    {user.profile_picture?.data === undefined ? (
+                      <svg
+                        className="h-full w-full rounded-full text-gray-800"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                    ) : (
+                      <img
+                        className="h-full w-full rounded-full text-gray-300"
+                        src={user.profile_picture.data}
+                        alt="profile"
+                      ></img>
+                    )}
+                  </div>
+                  <div className={`ms-3 ${collapsed ? 'md:hidden' : ''}`}>
+                    <p className="text-base font-medium text-white">
+                      {userName}
+                    </p>
+                    <span className="-my-1 inline-flex min-h-9 items-center text-sm font-medium text-indigo-200 group-hover:text-white">
+                      {user?.first_name ? 'View details' : 'Add User Details'}
+                    </span>
+                  </div>
                 </div>
-                <div className={`ms-3 ${collapsed ? 'md:hidden' : ''}`}>
-                  <p className="text-base font-medium text-white">{userName}</p>
-                  <span className="-my-1 inline-flex min-h-9 items-center text-sm font-medium text-indigo-200 group-hover:text-white">
-                    {user?.first_name ? 'View details' : 'Add User Details'}
-                  </span>
-                </div>
-              </div>
-              <NavTooltip label={userName} collapsed={collapsed} />
-            </Link>
+                <NavTooltip label={userName} collapsed={collapsed} />
+              </Link>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </div>
+    </TopBarBackLinkProvider>
+  );
+}
+
+/**
+ * The phone's one row above the page: where to go back to (when the page
+ * offers somewhere), whose records these are, and search. The desktop rail
+ * identifies the person and opens search, so this is phone-only.
+ *
+ * Search keeps one fixed-size target and the name takes the remaining width:
+ * a growing icon and label once squeezed an enlarged name into a
+ * one-character column.
+ */
+function PhoneTopBar({
+  userName,
+  searchOpen,
+  onOpenSearch,
+}: {
+  userName: string;
+  searchOpen: boolean;
+  onOpenSearch: () => void;
+}) {
+  const back = useTopBarBackLink();
+
+  return (
+    <div className="hide-when-typing hide-on-scroll flex shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-3 py-1 print:hidden md:hidden">
+      {back && (
+        <Link
+          to={back.to}
+          className="-ms-1 inline-flex min-h-9 min-w-0 max-w-[60%] shrink-0 items-center gap-1 rounded-md px-1 text-sm font-medium text-primary-700 hover:text-primary-900"
+        >
+          <ChevronLeftIcon
+            className="h-4 w-4 shrink-0 rtl:rotate-180"
+            aria-hidden="true"
+          />
+          <span className="truncate">{back.label}</span>
+        </Link>
+      )}
+      <Link
+        to={AppRoutes.Settings}
+        aria-label={`Records for ${userName}. Manage profiles`}
+        className={`flex min-h-9 min-w-0 flex-1 items-center gap-2 rounded-md py-1 text-primary-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 ${
+          back ? 'justify-end' : ''
+        }`}
+      >
+        {back ? (
+          // Beside a back link the name is a reminder, not a heading.
+          <span
+            title={userName}
+            className="min-w-0 truncate text-xs font-medium text-gray-600"
+          >
+            {userName}
+          </span>
+        ) : (
+          <>
+            <UserCircleIcon
+              className="hidden h-6 w-6 shrink-0 sm:block"
+              aria-hidden="true"
+            />
+            <span className="min-w-0 flex-1">
+              <span className="block text-xs text-gray-600">Records for</span>
+              <span
+                title={userName}
+                className="line-clamp-2 break-words text-sm font-semibold leading-tight"
+              >
+                {userName}
+              </span>
+            </span>
+          </>
+        )}
+      </Link>
+      <button
+        type="button"
+        onClick={onOpenSearch}
+        aria-label="Search"
+        aria-haspopup="dialog"
+        aria-expanded={searchOpen}
+        title="Search"
+        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-sm font-semibold text-primary-800 hover:bg-primary-50 sm:w-auto sm:gap-1.5 sm:px-2"
+      >
+        <MagnifyingGlassIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+        <span className="hidden sm:inline">Search</span>
+      </button>
     </div>
   );
 }

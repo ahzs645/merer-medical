@@ -2,6 +2,7 @@ import { Link, Outlet, useMatch } from 'react-router-dom';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 
 import { Routes as AppRoutes } from '../../Routes';
+import { useOfferTopBarBackLink } from '../../shared/components/TopBarBackLink';
 import { PageBackLinkProvider, usePageBackLink } from './pageBackLink';
 import { RecordsSideNav } from './RecordsSideNav';
 import { RecordCountsProvider } from './useRecordCounts';
@@ -35,6 +36,13 @@ function RecordsShell() {
   // ("All lab results"). Two stacked back links pointing at different places is
   // one too many, so this bar yields to theirs.
   const pageHasBackLink = usePageBackLink();
+  // Below `md` the phone's top bar draws "All records" beside the profile name;
+  // the white bar below is only for the band between the phone and the
+  // desktop side nav, where that top bar is gone.
+  useOfferTopBarBackLink(
+    atRoot ? undefined : { to: AppRoutes.Records, label: 'All records' },
+    0,
+  );
 
   return (
     <div className="flex h-full min-h-0 bg-gray-50 lg:flex-row-reverse">
@@ -43,7 +51,7 @@ function RecordsShell() {
           inner overflow-x-auto strips stretch the page sideways on phones. */}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         {!atRoot && !pageHasBackLink && (
-          <div className="hide-when-typing border-b border-gray-200 bg-white px-3 lg:hidden">
+          <div className="hide-when-typing hidden border-b border-gray-200 bg-white px-3 md:block lg:hidden">
             <Link
               to={AppRoutes.Records}
               className="text-primary-700 hover:text-primary-900 -mx-2 inline-flex min-h-9 items-center gap-1 px-2 text-sm font-medium"

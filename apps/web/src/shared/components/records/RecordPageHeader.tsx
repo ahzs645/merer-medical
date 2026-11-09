@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 
 import { useRegisterPageBackLink } from '../../../features/records/pageBackLink';
 import { HorizontalChoiceScroller } from '../HorizontalChoiceScroller';
+import { useOfferTopBarBackLink } from '../TopBarBackLink';
 
 type IconComponent = ComponentType<{ className?: string }>;
 
@@ -98,6 +99,9 @@ export function RecordPageHeader<Id extends string = string>({
   // with its own back link is on screen, so a phone shows one back link, not
   // two stacked ones pointing at different places.
   useRegisterPageBackLink(Boolean(backLink));
+  // On a phone the link is drawn in the top bar, beside the profile name, so
+  // the banner starts with the page title instead of a third row above it.
+  useOfferTopBarBackLink(backLink, 1);
 
   return (
     // Tighter on a phone than it was: `py-4` + `gap-4` between four rows spent
@@ -118,7 +122,7 @@ export function RecordPageHeader<Id extends string = string>({
             {backLink && (
               <Link
                 to={backLink.to}
-                className="-mt-1 mb-1 inline-flex min-h-9 w-fit items-center gap-1.5 text-sm font-medium text-primary-100 hover:text-white"
+                className="-mt-1 mb-1 hidden min-h-9 w-fit items-center gap-1.5 text-sm font-medium text-primary-100 hover:text-white md:inline-flex"
               >
                 <ArrowLeftIcon className="h-4 w-4 shrink-0 rtl:rotate-180" />
                 {backLink.label}

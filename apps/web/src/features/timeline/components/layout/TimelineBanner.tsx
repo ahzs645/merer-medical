@@ -34,7 +34,7 @@ export function TimelineBanner({
           {/* h1 so the default landing route exposes a page title, matching
               GenericBanner on every other tab. */}
           <h1 className="text-xl font-bold text-white sm:text-2xl">{text}</h1>
-          <p className="text-sm text-white sm:text-base">{subtext}</p>
+          <p className="hidden text-white sm:block sm:text-base">{subtext}</p>
         </div>
       </div>
     </div>

@@ -295,7 +295,7 @@ const ConnectionTab: React.FC = () => {
         </h2>
         {!task ? (
           <>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 hidden text-sm text-gray-600 sm:block">
               {t(
                 'Choose how to add records. Your records stay on this device.',
               )}
@@ -355,7 +355,7 @@ const ConnectionTab: React.FC = () => {
 
         {task === 'import' ? (
           <div className="mt-2">
-            <p className="mb-4 text-sm text-gray-600">
+            <p className="mb-4 hidden text-sm text-gray-600 sm:block">
               {t('Choose the kind of file you want to add.')}
             </p>
             <ImportRecordsPanel

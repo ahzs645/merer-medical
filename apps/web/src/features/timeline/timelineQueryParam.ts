@@ -9,3 +9,15 @@
  * without importing the timeline page and closing an import cycle around it.
  */
 export const TIMELINE_QUERY_PARAM = 'q';
+
+/**
+ * Day the timeline opens on, as `yyyy-MM-dd`, e.g. `/timeline?date=2026-10-23`.
+ *
+ * Visits link a day's other records this way: "14 same-day records" opens the
+ * timeline at that day rather than only counting them.
+ */
+export const TIMELINE_DATE_PARAM = 'date';
+
+export function timelineDatePath(dateKey: string): string {
+  return `/timeline?${TIMELINE_DATE_PARAM}=${encodeURIComponent(dateKey)}`;
+}

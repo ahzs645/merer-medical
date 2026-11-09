@@ -47,7 +47,9 @@ export function ImagingSummaryPanel({
   ];
 
   return (
-    <div>
+    // Phones skip the tiles: the filter chips under them carry the same
+    // counts ("X-rays 8", "MRI 3"), and the tiles filled the first screen.
+    <div className="hidden sm:block">
       <div
         // Two across on a phone too: one per row, the four counts filled the
         // whole first screen before a single study.

@@ -575,15 +575,19 @@ export const ElementsByDateListCard = memo(function ElementsByDateListCard({
           {title}
         </h2>
         <div className="flex sm:flex-row flex-col sm:justify-between">
-          <div className="flex flex-col">
+          <div className="flex min-w-0 flex-col">
             {connectionDocs.map((conn, index) =>
               conn?.get('name') ? (
+                // One line, cut with an ellipsis: a merged package's source
+                // name ("Consolidated medical record (Mayo 2026, Johns Hopkins
+                // 2024, …)") otherwise ran four lines under every card title.
                 <p
                   key={conn?.get('id') ?? index}
-                  className="me-1 flex flex-row align-center items-center text-gray-900 text-sm md:text-base"
+                  title={conn?.get('name')}
+                  className="me-1 flex min-w-0 flex-row align-center items-center text-gray-600 text-sm md:text-base"
                 >
-                  <MapPinIcon className="me-1 h-4 sm:h-5 w-auto inline-block text-primary-700" />
-                  {conn?.get('name')}
+                  <MapPinIcon className="me-1 h-4 sm:h-5 w-auto shrink-0 inline-block text-primary-700" />
+                  <span className="min-w-0 truncate">{conn?.get('name')}</span>
                 </p>
               ) : null,
             )}

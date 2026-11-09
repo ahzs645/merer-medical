@@ -59,7 +59,9 @@ export function LabsTable({
                 {t(title)}
               </h2>
               {description ? (
-                <p className="mt-1 text-sm text-gray-600">{t(description)}</p>
+                <p className="mt-1 hidden text-sm text-gray-600 sm:block">
+                  {t(description)}
+                </p>
               ) : null}
             </div>
           </div>

@@ -165,7 +165,9 @@ function ConditionRow({ bundle }: { bundle: ConditionBundle }) {
               </div>
             )}
           </div>
-          <span className="shrink-0 text-sm font-medium text-primary-700">
+          {/* The breakdown below ("11 meds · 68 labs") already says it on a
+              phone; the total is for the wide layout. */}
+          <span className="hidden shrink-0 text-sm font-medium text-primary-700 sm:inline">
             {bundle.related.length} related
           </span>
         </div>
